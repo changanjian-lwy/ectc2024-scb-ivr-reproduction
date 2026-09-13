@@ -1,0 +1,79 @@
+* R04E1 - replaceable predictive narrow-pulse module inserted at P24 phase 1
+* POWER STAGE: unchanged P24 Fig.3 single-module/four-phase topology.
+* SEQUENCE SCOPE: P24 explicit QH1+QS2 only; no four-phase startup is claimed.
+* INITIAL STATE: all flying/output capacitors and inductors start at zero (UIC).
+* CONTROL: exploratory calculated pulse; no precharge parts or new power switch.
+*
+* LPHASE=1.4666667 nH is the project/user-selected recalculation from P24's
+* printed equation and inputs, not the inconsistent 2.68-nH Table-I entry.
+* DELTA_I_ALLOW=10 A is an exploratory controller boundary, not a paper value.
+* At zero state, measured/initial Vout=0, predicted VL=48 V and
+* TPULSE=L*dI/VL=0.3055556 ns. Target Vout=1 V is not substituted at startup.
+
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY={4*10u+2*4.7u+2*2.2u}
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param DI_ALLOW=10 VOUT_INITIAL=0 VL_PRED={VIN-VOUT_INITIAL} TPULSE={LPHASE*DI_ALLOW/VL_PRED}
+.param TRAIL=10p TSTART=.1n VGATE=5 RON=1u ROFF=1T RLDAMP=1u
+
+* Explicit numerical rail establishment finishes before the controlled pulse.
+* It replaces LTspice's hidden long `startup` ramp and is logged as a boundary.
+VRAIL vin 0 PWL(0 0 {TRAIL} {VIN} 3n {VIN})
+XMOD vin out 0 SCB4P_STARTUP_SLOT
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+
+.meas tran TPULSE_PARAMETER PARAM {TPULSE}
+.meas tran IL1_AT_GATE_OFF FIND I(XMOD:L1) AT {TSTART+TPULSE}
+.meas tran IL1_PEAK MAX I(XMOD:L1) FROM 0 TO 2n
+.meas tran IL1_AT_2NS FIND I(XMOD:L1) AT 2n
+.meas tran IL2_PEAK MAX I(XMOD:L2) FROM 0 TO 2n
+.meas tran VC1_AT_GATE_OFF FIND V(xmod:r1,xmod:x1) AT {TSTART+TPULSE}
+.meas tran VC2_AT_GATE_OFF FIND V(xmod:r2,xmod:x2) AT {TSTART+TPULSE}
+.meas tran VC3_AT_GATE_OFF FIND V(xmod:r3,xmod:x3) AT {TSTART+TPULSE}
+.meas tran VOUT_AT_GATE_OFF FIND V(out) AT {TSTART+TPULSE}
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vin) V(out) V(xmod:gh1) V(xmod:gl2) V(xmod:r1,xmod:x1) V(xmod:r2,xmod:x2) V(xmod:r3,xmod:x3) I(XMOD:L1) I(XMOD:L2)
+.tran 0 3n 0 1p UIC
+
+.subckt SCB4P_STARTUP_SLOT vin out g
+* Plug-in controller outputs: only the P24-explicit QH1 and QS2 commands.
+BGH1 gh1 g V=if(time>=TSTART & time<TSTART+TPULSE,VGATE,0)
+BGL2 gl2 g V=VGATE
+VGOFF_H2 gh2 g 0
+VGOFF_H3 gh3 g 0
+VGOFF_H4 gh4 g 0
+VGOFF_L1 gl1 g 0
+VGOFF_L3 gl3 g 0
+VGOFF_L4 gl4 g 0
+
+SH1 vin r1 gh1 g SWI
+CS1 r1 x1 {CFLY} ic=0
+SL1 x1 g gl1 g SWI
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 r1 r2 gh2 g SWI
+CS2 r2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWI
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 r2 r3 gh3 g SWI
+CS3 r3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWI
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 r3 x4 gh4 g SWI
+SL4 x4 g gl4 g SWI
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+* Numerical-only DC references for nodes floating at the exact zero-energy
+* initial instant.  1 MOhm draws at most 48 uA and is not a power component.
+RNUM_R1 r1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_R2 r2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_R3 r3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.ends SCB4P_STARTUP_SLOT
+.end

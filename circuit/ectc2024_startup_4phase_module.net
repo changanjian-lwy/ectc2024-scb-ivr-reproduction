@@ -1,0 +1,117 @@
+* =====================================================================
+* ECTC 2024 STARTUP TEST - ONE 4-PHASE, 125 W MODULE
+* PURPOSE: start C1/C2/C3 from 0 V and observe whether the 36/24/12 V
+* staircase develops. This is an exploratory engineering test because the
+* paper does not publish a startup/precharge controller.
+* =====================================================================
+
+.param VIN_FINAL=48 VOUT_TARGET=1 PMODULE=125
+.param FSW=5Meg T={1/FSW} D_CMD=.102 TON={D_CMD*T}
+.param TENABLE=2u TRAMP=20u TDEAD=.2n
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+
+* Paper-derived equivalent phase inductor: 12 x 36.7 nH in parallel.
+.param NIND_PAR=12 L_EMBEDDED=36.7n LPHASE={L_EMBEDDED/NIND_PAR}
+.param RL_EMBEDDED=13.6m RL_PHASE={RL_EMBEDDED/NIND_PAR}
+
+* Unpublished component assumptions, retained from the steady-state test.
+.param CFLY=12u CFLY_ESR=.5m
+.param COUT=100u COUT_ESR=.2m
+.param RON_H=7m RON_L=3.5m
+.param COSS_H=100p COSS_L=200p
+
+* STARTUP-SPECIFIC ASSUMPTIONS (not supplied by the paper):
+* - input ramps from 0 to 48 V over 20 us after a 2 us delay;
+* - 20 mOhm + 10 nH represent a modest source/current-limiting impedance;
+* - fixed-frequency interleaved PWM begins at TENABLE;
+* - no explicit capacitor precharge, balancing loop, current-mode control,
+*   over-current protection or adaptive duty control is modeled.
+VRAIL vin_raw 0 PWL(0 0 {TENABLE} 0 {TENABLE+TRAMP} {VIN_FINAL} 200u {VIN_FINAL})
+RIN vin_raw vin_limited 20m
+LIN vin_limited vin 10n
+
+* Four high-side commands are spaced by T/4. Low sides conduct outside the
+* high-side pulse, with the same idealized dead time as the steady-state test.
+BGH1 gh1 0 V=if(time>TENABLE & mod(time+T,T)>TDEAD/2 & mod(time+T,T)<TON-TDEAD/2,5,0)
+BGL1 gl1 0 V=if(time>TENABLE & mod(time+T,T)>TON+TDEAD/2 & mod(time+T,T)<T-TDEAD/2,5,0)
+BGH2 gh2 0 V=if(time>TENABLE & mod(time+T-T/4,T)>TDEAD/2 & mod(time+T-T/4,T)<TON-TDEAD/2,5,0)
+BGL2 gl2 0 V=if(time>TENABLE & mod(time+T-T/4,T)>TON+TDEAD/2 & mod(time+T-T/4,T)<T-TDEAD/2,5,0)
+BGH3 gh3 0 V=if(time>TENABLE & mod(time+T-T/2,T)>TDEAD/2 & mod(time+T-T/2,T)<TON-TDEAD/2,5,0)
+BGL3 gl3 0 V=if(time>TENABLE & mod(time+T-T/2,T)>TON+TDEAD/2 & mod(time+T-T/2,T)<T-TDEAD/2,5,0)
+BGH4 gh4 0 V=if(time>TENABLE & mod(time+T-3*T/4,T)>TDEAD/2 & mod(time+T-3*T/4,T)<TON-TDEAD/2,5,0)
+BGL4 gl4 0 V=if(time>TENABLE & mod(time+T-3*T/4,T)>TON+TDEAD/2 & mod(time+T-3*T/4,T)<T-TDEAD/2,5,0)
+
+SH1 vin a1 gh1 0 SWH
+C1 a1 sw1 {CFLY} Rser={CFLY_ESR}
+SL1 sw1 0 gl1 0 SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o out {RL_PHASE}
+
+SH2 a1 a2 gh2 0 SWH
+C2 a2 sw2 {CFLY} Rser={CFLY_ESR}
+SL2 sw2 0 gl2 0 SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o out {RL_PHASE}
+
+SH3 a2 a3 gh3 0 SWH
+C3 a3 sw3 {CFLY} Rser={CFLY_ESR}
+SL3 sw3 0 gl3 0 SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o out {RL_PHASE}
+
+SH4 a3 sw4 gh4 0 SWH
+SL4 sw4 0 gl4 0 SWL
+L4 sw4 l4o {LPHASE}
+RL4 l4o out {RL_PHASE}
+
+* Approximate GaN reverse paths and output capacitances.
+DH1 a1 vin DMOD
+DL1 0 sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 0 sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 0 sw3 DMOD
+DH4 sw4 a3 DMOD
+DL4 0 sw4 DMOD
+CH1 vin a1 {COSS_H}
+CL1 sw1 0 {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 0 {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 0 {COSS_L}
+CH4 a3 sw4 {COSS_H}
+CL4 sw4 0 {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+
+* No IC=36/24/12 and no UIC: flying capacitors begin discharged.
+.options plotwinsize=200 reltol=.003
+.save V(vin) V(out) V(a1,sw1) V(a2,sw2) V(a3,sw3) I(VRAIL) I(L1) I(L2) I(L3) I(L4)
+.tran 0 120u 0 .2n startup
+
+* Final-window staircase values and drift indicators.
+.meas tran VC1_FINAL AVG V(a1,sw1) FROM 110u TO 120u
+.meas tran VC2_FINAL AVG V(a2,sw2) FROM 110u TO 120u
+.meas tran VC3_FINAL AVG V(a3,sw3) FROM 110u TO 120u
+.meas tran VC1_DRIFT PARAM VC1_LATE-VC1_EARLY
+.meas tran VC2_DRIFT PARAM VC2_LATE-VC2_EARLY
+.meas tran VC3_DRIFT PARAM VC3_LATE-VC3_EARLY
+.meas tran VC1_EARLY AVG V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_EARLY AVG V(a2,sw2) FROM 90u TO 100u
+.meas tran VC3_EARLY AVG V(a3,sw3) FROM 90u TO 100u
+.meas tran VC1_LATE AVG V(a1,sw1) FROM 110u TO 120u
+.meas tran VC2_LATE AVG V(a2,sw2) FROM 110u TO 120u
+.meas tran VC3_LATE AVG V(a3,sw3) FROM 110u TO 120u
+.meas tran VOUT_FINAL AVG V(out) FROM 110u TO 120u
+.meas tran IIN_PEAK MAX I(VRAIL) FROM 0 TO 120u
+.meas tran IL1_PEAK MAX I(L1) FROM 0 TO 120u
+.meas tran IL2_PEAK MAX I(L2) FROM 0 TO 120u
+.meas tran IL3_PEAK MAX I(L3) FROM 0 TO 120u
+.meas tran IL4_PEAK MAX I(L4) FROM 0 TO 120u
+
+.end

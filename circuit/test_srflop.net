@@ -1,0 +1,10 @@
+VSET nset 0 PULSE(5 0 1u 1n 1n 100n 10u)
+VRST nrst 0 PULSE(5 0 3u 1n 1n 100n 10u)
+A1 nset nrst 0 0 0 qb q 0 SRFLOP trise=1n tfall=1n vhigh=5 vlow=0 ref=.5
+.save V(nset) V(nrst) V(q) V(qb)
+.meas tran Q_AFTER_SET FIND V(q) AT 2u
+.meas tran Q_AFTER_RESET FIND V(q) AT 4u
+.meas tran QB_AFTER_SET FIND V(qb) AT 2u
+.meas tran QB_AFTER_RESET FIND V(qb) AT 4u
+.tran 0 5u 0 1n
+.end

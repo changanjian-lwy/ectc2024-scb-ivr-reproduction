@@ -1,0 +1,109 @@
+* =====================================================================
+* APEC 2025 verified prototype topology - ONE three-phase SCB module
+* Paper: DOI 10.1109/APEC48143.2025.10977125
+* Prototype system: 12 V -> 1 V, 200 W, 0.5 MHz, 3 phases x 3 modules
+* This file first validates one 67 W module before assembling all modules.
+* =====================================================================
+
+.param VIN=12
+.param VOUT_TARGET=1
+.param PMODULE=67
+.param FSW=0.5Meg
+.param T={1/FSW}
+.param D=0.2578
+.param TON={D*T}
+.param TDEAD=5n
+.param LOW_OFF_GAP=300n
+
+* Published prototype components
+.param LPHASE=22n
+.param RL=0.5m
+.param RON_H=7m
+.param RON_L=3.5m
+
+* The GRM32EC72 and GRM219R60 part numbers are published, but exact
+* capacitance suffixes are omitted. These two values are explicit assumptions.
+.param CFLY=120u
+.param CFLY_ESR=1m
+.param COUT=470u
+.param COUT_ESR=0.5m
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+.param COSS_H=100p
+.param COSS_L=200p
+
+VINPUT vin 0 {VIN}
+
+* Three phases separated by T/3. Low-side gates are complementary, with
+* dead time. This follows Fig. 2; later control will terminate the low-side
+* interval at the measured 5-10% negative current threshold.
+BGH1 gh1 0 V=if(mod(time+T,T)>TDEAD/2 & mod(time+T,T)<TON-TDEAD/2,5,0)
+BGL1 gl1 0 V=if(mod(time+T,T)>TON+TDEAD/2 & mod(time+T,T)<T-LOW_OFF_GAP,5,0)
+BGH2 gh2 0 V=if(mod(time+T-T/3,T)>TDEAD/2 & mod(time+T-T/3,T)<TON-TDEAD/2,5,0)
+BGL2 gl2 0 V=if(mod(time+T-T/3,T)>TON+TDEAD/2 & mod(time+T-T/3,T)<T-LOW_OFF_GAP,5,0)
+BGH3 gh3 0 V=if(mod(time+T-2*T/3,T)>TDEAD/2 & mod(time+T-2*T/3,T)<TON-TDEAD/2,5,0)
+BGL3 gl3 0 V=if(mod(time+T-2*T/3,T)>TON+TDEAD/2 & mod(time+T-2*T/3,T)<T-LOW_OFF_GAP,5,0)
+
+* Correct Fig. 1 topology: series-connected HIGH-side ladder.
+* All LOW-side switches return their phase switching node directly to ground.
+SH1 vin a1 gh1 0 SWH
+CS1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=8
+SL1 sw1 0 gl1 0 SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o out {RL}
+
+SH2 a1 a2 gh2 0 SWH
+CS2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=4
+SL2 sw2 0 gl2 0 SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o out {RL}
+
+SH3 a2 sw3 gh3 0 SWH
+SL3 sw3 0 gl3 0 SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o out {RL}
+
+* GaN reverse conduction approximated by antiparallel diode paths.
+DH1 a1 vin DMOD
+DL1 0 sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 0 sw2 DMOD
+DH3 sw3 a2 DMOD
+DL3 0 sw3 DMOD
+
+* Added snubber/output capacitances CH1-CH3 and CL1-CL3 from Fig. 1.
+CH1 vin a1 {COSS_H}
+CL1 sw1 0 {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 0 {COSS_L}
+CH3 a2 sw3 {COSS_H}
+CL3 sw3 0 {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=0.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=0.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+
+.ic V(out)=1 I(L1)=0 I(L2)=0 I(L3)=0
+.options plotwinsize=0 reltol=0.002
+.tran 0 100u 0 0.5n UIC
+
+* Measurements over the final five periods.
+.meas tran VOUT_AVG AVG V(out) FROM 90u TO 100u
+.meas tran IL1_AVG AVG I(L1) FROM 90u TO 100u
+.meas tran IL2_AVG AVG I(L2) FROM 90u TO 100u
+.meas tran IL3_AVG AVG I(L3) FROM 90u TO 100u
+.meas tran IL1_MAX MAX I(L1) FROM 90u TO 100u
+.meas tran IL1_MIN MIN I(L1) FROM 90u TO 100u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 90u TO 100u
+.meas tran VC1_PP PP V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_PP PP V(a2,sw2) FROM 90u TO 100u
+.meas tran IL1_AT_LSOFF FIND I(L1) AT=99.7u
+.meas tran VDSH1_COMM_MIN MIN V(vin,a1) FROM 99.7u TO 100u
+.meas tran VDSH1_COMM_MAX MAX V(vin,a1) FROM 99.7u TO 100u
+.meas tran TZVS_LAST WHEN V(vin,a1)=0 FALL=LAST
+.meas tran VDSH1_PREON FIND V(vin,a1) AT=99.999u
+
+.end

@@ -1,0 +1,74 @@
+* R04D0E - P25 all-inactive-low first interval, extended to four phases
+* BRANCH PURPOSE: compare the switch-set ambiguity without changing any
+* electrical parameter from the P24-minimal R04D0 branch.
+*
+* SOURCE CLASSIFICATION
+* P24 explicitly states QH1 + QS2 conduct, but does not explicitly command the
+* remaining low sides OFF. P25 Mode 1 explicitly commands SH1 + SL2 + SL3 in
+* its three-phase implementation. Adding SL4 for nP=4 is therefore a labelled
+* CROSS_PAPER_EXTENSION, not a P24-explicit fact.
+*
+* LOCKED CONDITIONS
+* Vin=48 V, Vo=1 V, nP=4, nM=1, fsw=5 MHz, Ton=16.6667 ns,
+* Lphase=1.46667 nH, capacitor ICs=36/24/12 V, Cfly=53.8 uF numerical enabler.
+* Only the commanded low-side set differs from the P24-minimal branch.
+*
+* CLAIM BOUNDARY
+* This is one first interval, not a full period, balance, startup or ZVS test.
+* Cfly remains cross-source because P24/P25 do not publish its numeric value.
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T} LPHASE=1.4666667n CFLY=53.8u
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+VGH1 gh1 0 5
+VGH2 gh2 0 0
+VGH3 gh3 0 0
+VGH4 gh4 0 0
+VGL1 gl1 0 0
+VGL2 gl2 0 5
+VGL3 gl3 0 5
+VGL4 gl4 0 5
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY} IC=36
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC=0
+
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY} IC=12
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser=1u IC=0
+
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser=1u IC=0
+
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran IL1_AT_TON FIND I(L1) AT {TON-20p}
+.meas tran IL2_AT_TON FIND I(L2) AT {TON-20p}
+.meas tran IL3_AT_TON FIND I(L3) AT {TON-20p}
+.meas tran IL4_AT_TON FIND I(L4) AT {TON-20p}
+.meas tran VC1_START FIND V(a1,x1) AT 20p
+.meas tran VC1_END FIND V(a1,x1) AT {TON-20p}
+.meas tran VC2_START FIND V(a2,x2) AT 20p
+.meas tran VC2_END FIND V(a2,x2) AT {TON-20p}
+.meas tran VC3_START FIND V(a3,x3) AT 20p
+.meas tran VC3_END FIND V(a3,x3) AT {TON-20p}
+.meas tran Q_C1_INTV INTEG I(CF1) FROM 20p TO {TON-20p}
+.meas tran Q_C2_INTV INTEG I(CF2) FROM 20p TO {TON-20p}
+.meas tran Q_C3_INTV INTEG I(CF3) FROM 20p TO {TON-20p}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(a1,x1) V(a2,x2) V(a3,x3) I(CF1) I(CF2) I(CF3) I(L1) I(L2) I(L3) I(L4)
+.tran 0 {TON} 0 2p UIC
+.end

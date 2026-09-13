@@ -1,0 +1,72 @@
+* R04A - single-phase latched boundary-mode audit, two published L cases
+* PURPOSE: validate the P24 interval boundaries before reinserting the
+* controller into the four-phase switched-capacitor network.
+*
+* PAPER-SUPPORTED CONDITIONS
+* P24 Eq.(1)/(3), Table I: Vin=48 V, nP=4, Vo=1 V, fsw=5 MHz,
+* D=1/12 and Ton=16.667 ns.
+* P24 Eq.(2): target phase peak is 125 A for nP=4,nM=4,Io=1000 A.
+* P24 Sec. II-B: continue low-side conduction to -1% to -2% of peak.
+* P25 Fig.3: high-side interval -> positive-current low-side interval ->
+* zero crossing -> controlled small-negative-current interval.
+*
+* TWO NON-FITTED INDUCTANCE CASES
+* LCASE=1: 1.46667 nH calculated directly from printed P24 Eq.(4).
+* LCASE=2: 2.68 nH printed in the P24 Table-I 4-phase/4-module/5-MHz row.
+* They are kept separate because the publication values conflict.
+*
+* MODEL SCOPE
+* The active phase sees Vin/nP=12 V and a stiff 1-V output. These are analytical
+* periodic-state boundary conditions derived from P24, not a startup model and
+* not preset flying-capacitor voltages in the full converter.
+* An LTspice .machine supplies state memory so a zero crossing cannot chatter.
+* This run stops after detecting -2% current; it does not model the subsequent
+* Coss commutation or claim ZVS. No unknown capacitance/dead-time is inserted.
+
+.param VIN=48 NP=4 VO=1 FSW=5Meg T={1/FSW} D={NP*VO/VIN}
+.param TON={D*T} IPK_TARGET=125 INEG_TARGET={-0.02*IPK_TARGET} T0=1n
+.step param LPHASE list 1.4666667n 2.68n
+
+VPH rail 0 {VIN/NP}
+VOUT out 0 {VO}
+VCLK clk 0 PULSE(0 5 {T0} 10p 10p {TON} 1u)
+
+RGH gh 0 1k
+RGL gl 0 1k
+RSTATE state_mon 0 1k
+
+.machine 1p
+.state IDLE 0
+.state HS 1
+.state LS_POS 2
+.state LS_NEG 3
+.rule IDLE HS V(clk)>2.5
+.rule HS LS_POS V(clk)<0.5
+.rule LS_POS LS_NEG I(LPH)<0
+.output (gh) 5*(state==HS)
+.output (gl) 5*((state==LS_POS)+(state==LS_NEG))
+.output (state_mon) state
+.endmachine
+
+SH rail sw gh 0 SWI
+SL sw 0 gl 0 SWI
+LPH sw out {LPHASE} Rser=1u
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran I_AT_TON FIND I(LPH) AT {T0+TON-20p}
+.meas tran I_MAX MAX I(LPH) FROM 0 TO {T0+TON+1n}
+.meas tran T_ZERO WHEN I(LPH)=0 FALL=1
+.meas tran T_NEG2 WHEN I(LPH)={INEG_TARGET} FALL=1
+.meas tran TON_NUM PARAM {TON}
+.meas tran L_SELECTED PARAM {LPHASE}
+.meas tran VGH_MAX MAX V(gh)
+.meas tran VGL_MAX MAX V(gl)
+.meas tran STATE_MAX MAX V(state_mon)
+.meas tran VGH_MIN MIN V(gh)
+.meas tran VGL_MIN MIN V(gl)
+.meas tran STATE_MIN MIN V(state_mon)
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(gh) V(gl) V(state_mon) V(sw) I(LPH)
+.tran 0 220n 0 10p UIC
+.end

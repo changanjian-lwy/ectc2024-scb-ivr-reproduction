@@ -1,0 +1,149 @@
+* R04C - four-phase staggered local-boundary replay (one module interface)
+* PURPOSE: extend the validated R04A local boundary model to nP=4 while
+* preserving the P24 phase origins and event-driven current boundaries.
+*
+* PAPER-LOCKED INPUTS
+* P24 Eq.(1)/(3): Vin=48 V, Vo=1 V, nP=4, fsw=5 MHz,
+* T=200 ns, Ton=16.6667 ns. P24 Eq.(4) recalculation: L=1.46667 nH.
+* P24 Sec. II-B: HS interval, LS positive-current interval, zero crossing,
+* then LS conduction to -2% of the P24 Eq.(2) phase peak.
+* P24 states phases are interleaved; origins are separated by T/nP=50 ns.
+*
+* ARCHITECTURE INTERFACE
+* nM remains explicit and equals 1 because this is the requested single-module
+* timing experiment. IPK_REF=125 A is retained from the eventual P24 Table-I
+* nM=4 system branch only to preserve the already validated R04A local case;
+* this run does not claim the single module alone delivers 1 kW.
+*
+* CLAIM BOUNDARY
+* Each phase uses a derived stiff Vin/nP rail and stiff 1-V output. No flying
+* capacitors, startup, Coss commutation, dead time, ZVS, charge balance, output
+* ripple or hardware loss is modelled. Each machine stops at -2%; the missing
+* post-negative Coss transition is not replaced with an invented reset rule.
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T} DTP={T/NP} DTM={T/NM}
+.param TREF=1n IPK_REF=125 INEG_TARGET={-0.02*IPK_REF}
+.param LPHASE=1.4666667n
+
+VPH1 rail1 0 {VIN/NP}
+VPH2 rail2 0 {VIN/NP}
+VPH3 rail3 0 {VIN/NP}
+VPH4 rail4 0 {VIN/NP}
+VOUT out 0 {VO}
+
+VCLK1 clk1 0 PULSE(0 5 {TREF+0*DTP} 10p 10p {TON} 1u)
+VCLK2 clk2 0 PULSE(0 5 {TREF+1*DTP} 10p 10p {TON} 1u)
+VCLK3 clk3 0 PULSE(0 5 {TREF+2*DTP} 10p 10p {TON} 1u)
+VCLK4 clk4 0 PULSE(0 5 {TREF+3*DTP} 10p 10p {TON} 1u)
+
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+RST1 st1 0 1k
+.machine 1p
+.state P1_IDLE 0
+.state P1_HS 1
+.state P1_LS_POS 2
+.state P1_LS_NEG 3
+.state P1_DONE 4
+.rule P1_IDLE P1_HS V(clk1)>2.5
+.rule P1_HS P1_LS_POS V(clk1)<0.5
+.rule P1_LS_POS P1_LS_NEG I(L1)<0
+.rule P1_LS_NEG P1_DONE I(L1)<INEG_TARGET
+.output (gh1) 5*(state==P1_HS)
+.output (gl1) 5*((state==P1_LS_POS)+(state==P1_LS_NEG))
+.output (st1) state
+.endmachine
+
+RGH2 gh2 0 1k
+RGL2 gl2 0 1k
+RST2 st2 0 1k
+.machine 1p
+.state P2_IDLE 0
+.state P2_HS 1
+.state P2_LS_POS 2
+.state P2_LS_NEG 3
+.state P2_DONE 4
+.rule P2_IDLE P2_HS V(clk2)>2.5
+.rule P2_HS P2_LS_POS V(clk2)<0.5
+.rule P2_LS_POS P2_LS_NEG I(L2)<0
+.rule P2_LS_NEG P2_DONE I(L2)<INEG_TARGET
+.output (gh2) 5*(state==P2_HS)
+.output (gl2) 5*((state==P2_LS_POS)+(state==P2_LS_NEG))
+.output (st2) state
+.endmachine
+
+RGH3 gh3 0 1k
+RGL3 gl3 0 1k
+RST3 st3 0 1k
+.machine 1p
+.state P3_IDLE 0
+.state P3_HS 1
+.state P3_LS_POS 2
+.state P3_LS_NEG 3
+.state P3_DONE 4
+.rule P3_IDLE P3_HS V(clk3)>2.5
+.rule P3_HS P3_LS_POS V(clk3)<0.5
+.rule P3_LS_POS P3_LS_NEG I(L3)<0
+.rule P3_LS_NEG P3_DONE I(L3)<INEG_TARGET
+.output (gh3) 5*(state==P3_HS)
+.output (gl3) 5*((state==P3_LS_POS)+(state==P3_LS_NEG))
+.output (st3) state
+.endmachine
+
+RGH4 gh4 0 1k
+RGL4 gl4 0 1k
+RST4 st4 0 1k
+.machine 1p
+.state P4_IDLE 0
+.state P4_HS 1
+.state P4_LS_POS 2
+.state P4_LS_NEG 3
+.state P4_DONE 4
+.rule P4_IDLE P4_HS V(clk4)>2.5
+.rule P4_HS P4_LS_POS V(clk4)<0.5
+.rule P4_LS_POS P4_LS_NEG I(L4)<0
+.rule P4_LS_NEG P4_DONE I(L4)<INEG_TARGET
+.output (gh4) 5*(state==P4_HS)
+.output (gl4) 5*((state==P4_LS_POS)+(state==P4_LS_NEG))
+.output (st4) state
+.endmachine
+
+SH1 rail1 sw1 gh1 0 SWI
+SL1 sw1 0 gl1 0 SWI
+L1 sw1 out {LPHASE} Rser=1u
+SH2 rail2 sw2 gh2 0 SWI
+SL2 sw2 0 gl2 0 SWI
+L2 sw2 out {LPHASE} Rser=1u
+SH3 rail3 sw3 gh3 0 SWI
+SL3 sw3 0 gl3 0 SWI
+L3 sw3 out {LPHASE} Rser=1u
+SH4 rail4 sw4 gh4 0 SWI
+SL4 sw4 0 gl4 0 SWI
+L4 sw4 out {LPHASE} Rser=1u
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran P1_IMAX MAX I(L1)
+.meas tran P2_IMAX MAX I(L2)
+.meas tran P3_IMAX MAX I(L3)
+.meas tran P4_IMAX MAX I(L4)
+.meas tran P1_TZERO WHEN I(L1)=0 FALL=1
+.meas tran P2_TZERO WHEN I(L2)=0 FALL=1
+.meas tran P3_TZERO WHEN I(L3)=0 FALL=1
+.meas tran P4_TZERO WHEN I(L4)=0 FALL=1
+.meas tran P1_TNEG2 WHEN I(L1)={INEG_TARGET} FALL=1
+.meas tran P2_TNEG2 WHEN I(L2)={INEG_TARGET} FALL=1
+.meas tran P3_TNEG2 WHEN I(L3)={INEG_TARGET} FALL=1
+.meas tran P4_TNEG2 WHEN I(L4)={INEG_TARGET} FALL=1
+.meas tran PHASE12_ZERO_SHIFT PARAM P2_TZERO-P1_TZERO
+.meas tran PHASE23_ZERO_SHIFT PARAM P3_TZERO-P2_TZERO
+.meas tran PHASE34_ZERO_SHIFT PARAM P4_TZERO-P3_TZERO
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+.meas tran DTP_EXPLICIT PARAM {DTP}
+.meas tran DTM_EXPLICIT PARAM {DTM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(gh1) V(gl1) V(gh2) V(gl2) V(gh3) V(gl3) V(gh4) V(gl4) I(L1) I(L2) I(L3) I(L4)
+.tran 0 370n 0 10p UIC
+.end

@@ -1,0 +1,86 @@
+* I0-4M -- ideal SCB hierarchy test, zero capacitor initial voltage
+* Paper topology/timing only: no precharge, no fixed 36/24/12 V sources, no parasitics.
+.param VIN=48 VOUT=1 POUT=1000 NP=4 NM=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} RLOAD={VOUT*VOUT/POUT}
+.param LPHASE=1.55n CFLY=27.34375u COUT=470u
+.param RON=1n ROFF=1T RLDAMP=1m VGATE=5 TENABLE=5u
+
+VRAIL vin 0 PWL(0 0 5u 48 60u 48)
+XMOD1 vin out 0 SCB4P PARAMS: MOFF={(0)*T/(4*NM)}
+XMOD2 vin out 0 SCB4P PARAMS: MOFF={(1)*T/(4*NM)}
+XMOD3 vin out 0 SCB4P PARAMS: MOFF={(2)*T/(4*NM)}
+XMOD4 vin out 0 SCB4P PARAMS: MOFF={(3)*T/(4*NM)}
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+
+.meas tran VOUT_AVG AVG V(out) FROM 40u TO 50u
+.meas tran VOUT_PP PP V(out) FROM 40u TO 50u
+.meas tran VC1_AVG AVG V(xmod1:a1,xmod1:sw1) FROM 40u TO 50u
+.meas tran VC2_AVG AVG V(xmod1:a2,xmod1:sw2) FROM 40u TO 50u
+.meas tran VC3_AVG AVG V(xmod1:a3,xmod1:sw3) FROM 40u TO 50u
+.meas tran VC1_PP PP V(xmod1:a1,xmod1:sw1) FROM 40u TO 50u
+.meas tran VC2_PP PP V(xmod1:a2,xmod1:sw2) FROM 40u TO 50u
+.meas tran VC3_PP PP V(xmod1:a3,xmod1:sw3) FROM 40u TO 50u
+.meas tran IL1_MAX MAX I(XMOD1:L1) FROM 40u TO 50u
+.meas tran IL1_MIN MIN I(XMOD1:L1) FROM 40u TO 50u
+.meas tran IL1_AVG AVG I(XMOD1:L1) FROM 40u TO 50u
+.meas tran IL2_AVG AVG I(XMOD1:L2) FROM 40u TO 50u
+.meas tran IL3_AVG AVG I(XMOD1:L3) FROM 40u TO 50u
+.meas tran IL4_AVG AVG I(XMOD1:L4) FROM 40u TO 50u
+.meas tran ICOUT_AVG AVG I(CCO) FROM 40u TO 50u
+.meas tran ILOAD_AVG AVG I(RLOAD_MAIN) FROM 40u TO 50u
+.meas tran VL1_AVG AVG V(xmod1:sw1,out) FROM 40u TO 50u
+.meas tran VL2_AVG AVG V(xmod1:sw2,out) FROM 40u TO 50u
+.meas tran VL3_AVG AVG V(xmod1:sw3,out) FROM 40u TO 50u
+.meas tran VL4_AVG AVG V(xmod1:sw4,out) FROM 40u TO 50u
+.meas tran IC1_AVG AVG I(XMOD1:CS1) FROM 40u TO 50u
+.meas tran IC2_AVG AVG I(XMOD1:CS2) FROM 40u TO 50u
+.meas tran IC3_AVG AVG I(XMOD1:CS3) FROM 40u TO 50u
+.meas tran IIN_AVG AVG -I(VRAIL) FROM 40u TO 50u
+.meas tran PIN_AVG AVG (-V(vin)*I(VRAIL)) FROM 40u TO 50u
+.meas tran POUT_AVG AVG (V(out)*V(out)/RLOAD) FROM 40u TO 50u
+.meas tran VOUT_40U FIND V(out) AT 40u
+.meas tran VOUT_50U FIND V(out) AT 50u
+
+.options plotwinsize=0 reltol=1e-4 abstol=1e-8 chgtol=1e-16
+.save V(vin) V(out) V(xmod1:sw4) V(xmod1:a1,xmod1:sw1) V(xmod1:a2,xmod1:sw2) V(xmod1:a3,xmod1:sw3) V(xmod2:a1,xmod2:sw1) V(xmod2:a2,xmod2:sw2) V(xmod2:a3,xmod2:sw3) V(xmod3:a1,xmod3:sw1) V(xmod3:a2,xmod3:sw2) V(xmod3:a3,xmod3:sw3) V(xmod4:a1,xmod4:sw1) V(xmod4:a2,xmod4:sw2) V(xmod4:a3,xmod4:sw3) I(VRAIL) I(CCO) I(RLOAD_MAIN) I(XMOD1:CS1) I(XMOD1:CS2) I(XMOD1:CS3) I(XMOD1:L1) I(XMOD1:L2) I(XMOD1:L3) I(XMOD1:L4) I(XMOD2:L1) I(XMOD3:L1) I(XMOD4:L1)
+.tran 0 50u 0 .5n startup
+
+.subckt SCB4P vin out g PARAMS: MOFF=0
+BH1 gh1 g V=if(time>TENABLE & mod(time-MOFF+T,T)<TON,VGATE,0)
+BL1 gl1 g V=if(time>TENABLE & mod(time-MOFF+T,T)>=TON,VGATE,0)
+BH2 gh2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)<TON,VGATE,0)
+BL2 gl2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)>=TON,VGATE,0)
+BH3 gh3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)<TON,VGATE,0)
+BL3 gl3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)>=TON,VGATE,0)
+BH4 gh4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)<TON,VGATE,0)
+BL4 gl4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)>=TON,VGATE,0)
+
+SH1 vin a1 gh1 g SWI
+CS1 a1 sw1 {CFLY}
+SL1 sw1 g gl1 g SWI
+L1 sw1 out {LPHASE} Rser={RLDAMP}
+SH2 a1 a2 gh2 g SWI
+CS2 a2 sw2 {CFLY}
+SL2 sw2 g gl2 g SWI
+L2 sw2 out {LPHASE} Rser={RLDAMP}
+SH3 a2 a3 gh3 g SWI
+CS3 a3 sw3 {CFLY}
+SL3 sw3 g gl3 g SWI
+L3 sw3 out {LPHASE} Rser={RLDAMP}
+SH4 a3 sw4 gh4 g SWI
+SL4 sw4 g gl4 g SWI
+L4 sw4 out {LPHASE} Rser={RLDAMP}
+
+DH1 a1 vin DIDEAL
+DL1 g sw1 DIDEAL
+DH2 a2 a1 DIDEAL
+DL2 g sw2 DIDEAL
+DH3 a3 a2 DIDEAL
+DL3 g sw3 DIDEAL
+DH4 sw4 a3 DIDEAL
+DL4 g sw4 DIDEAL
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.model DIDEAL D(Ron={RON} Roff={ROFF} Vfwd=0)
+.ends SCB4P
+.end

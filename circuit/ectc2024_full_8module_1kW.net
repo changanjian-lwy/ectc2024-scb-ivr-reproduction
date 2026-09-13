@@ -1,0 +1,112 @@
+* =====================================================================
+* ECTC 2024 FULL SYSTEM REPRODUCTION
+* 48 V -> 1 V, 1 kW, 8 parallel modules, 4 phases/module, 32 phases total
+* Each XMOD instance is independently removable/duplicable.
+* =====================================================================
+.param VIN=48 VOUT_TARGET=1 PTOTAL=1000
+.param NMODULES=8 NPHASES=4 FSW=5Meg T={1/FSW}
+.param D_IDEAL={NPHASES*VOUT_TARGET/VIN}
+.param D_CMD=.102 TON={D_CMD*T} TDEAD=.2n
+.param L_EMBEDDED=36.7n NIND_PAR=12
+.param LPHASE={L_EMBEDDED/NIND_PAR}
+.param RL_PHASE={13.6m/NIND_PAR}
+.param CFLY=12u CFLY_ESR=.5m
+.param RON_H=7m RON_L=3.5m COSS_H=100p COSS_L=200p
+
+VINPUT vin 0 {VIN}
+
+* Eight modules share input and output; module clocks are interleaved by T/8.
+XMOD1 vin m1out 0 SCB4 PHOFF=0
+XMOD2 vin m2out 0 SCB4 PHOFF={T/8}
+XMOD3 vin m3out 0 SCB4 PHOFF={2*T/8}
+XMOD4 vin m4out 0 SCB4 PHOFF={3*T/8}
+XMOD5 vin m5out 0 SCB4 PHOFF={4*T/8}
+XMOD6 vin m6out 0 SCB4 PHOFF={5*T/8}
+XMOD7 vin m7out 0 SCB4 PHOFF={6*T/8}
+XMOD8 vin m8out 0 SCB4 PHOFF={7*T/8}
+
+* Zero-volt monitors make every module output current directly recordable.
+VMON1 m1out out 0
+VMON2 m2out out 0
+VMON3 m3out out 0
+VMON4 m4out out 0
+VMON5 m5out out 0
+VMON6 m6out out 0
+VMON7 m7out out 0
+VMON8 m8out out 0
+
+COUT out 0 800u Rser=.1m
+RLOAD out 0 {VOUT_TARGET*VOUT_TARGET/PTOTAL}
+.ic V(out)=1
+.options plotwinsize=0 reltol=.003
+.tran 0 20u 0 .05n UIC
+
+* System-level records over the final 25 switching periods.
+.meas tran VOUT_AVG AVG V(out) FROM 15u TO 20u
+.meas tran VOUT_PP PP V(out) FROM 15u TO 20u
+.meas tran IIN_AVG AVG -I(VINPUT) FROM 15u TO 20u
+.meas tran POUT PARAM VOUT_AVG*VOUT_AVG/(VOUT_TARGET*VOUT_TARGET/PTOTAL)
+.meas tran PIN PARAM VIN*IIN_AVG
+.meas tran EFFICIENCY_PCT PARAM 100*POUT/PIN
+.meas tran IMOD1_AVG AVG I(VMON1) FROM 15u TO 20u
+.meas tran IMOD2_AVG AVG I(VMON2) FROM 15u TO 20u
+.meas tran IMOD3_AVG AVG I(VMON3) FROM 15u TO 20u
+.meas tran IMOD4_AVG AVG I(VMON4) FROM 15u TO 20u
+.meas tran IMOD5_AVG AVG I(VMON5) FROM 15u TO 20u
+.meas tran IMOD6_AVG AVG I(VMON6) FROM 15u TO 20u
+.meas tran IMOD7_AVG AVG I(VMON7) FROM 15u TO 20u
+.meas tran IMOD8_AVG AVG I(VMON8) FROM 15u TO 20u
+
+* ---------------- MODULAR FOUR-PHASE POWER STAGE ---------------------
+.subckt SCB4 IN OUT GND params: PHOFF=0
+BGH1 gh1 GND V=if(mod(time+T-PHOFF,T)>TDEAD/2 & mod(time+T-PHOFF,T)<TON-TDEAD/2,5,0)
+BGL1 gl1 GND V=if(mod(time+T-PHOFF,T)>TON+TDEAD/2 & mod(time+T-PHOFF,T)<T-TDEAD/2,5,0)
+BGH2 gh2 GND V=if(mod(time+T-PHOFF-T/4,T)>TDEAD/2 & mod(time+T-PHOFF-T/4,T)<TON-TDEAD/2,5,0)
+BGL2 gl2 GND V=if(mod(time+T-PHOFF-T/4,T)>TON+TDEAD/2 & mod(time+T-PHOFF-T/4,T)<T-TDEAD/2,5,0)
+BGH3 gh3 GND V=if(mod(time+T-PHOFF-T/2,T)>TDEAD/2 & mod(time+T-PHOFF-T/2,T)<TON-TDEAD/2,5,0)
+BGL3 gl3 GND V=if(mod(time+T-PHOFF-T/2,T)>TON+TDEAD/2 & mod(time+T-PHOFF-T/2,T)<T-TDEAD/2,5,0)
+BGH4 gh4 GND V=if(mod(time+T-PHOFF-3*T/4,T)>TDEAD/2 & mod(time+T-PHOFF-3*T/4,T)<TON-TDEAD/2,5,0)
+BGL4 gl4 GND V=if(mod(time+T-PHOFF-3*T/4,T)>TON+TDEAD/2 & mod(time+T-PHOFF-3*T/4,T)<T-TDEAD/2,5,0)
+
+SH1 IN a1 gh1 GND SWH
+C1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=36
+SL1 sw1 GND gl1 GND SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o OUT {RL_PHASE}
+SH2 a1 a2 gh2 GND SWH
+C2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=24
+SL2 sw2 GND gl2 GND SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o OUT {RL_PHASE}
+SH3 a2 a3 gh3 GND SWH
+C3 a3 sw3 {CFLY} Rser={CFLY_ESR} IC=12
+SL3 sw3 GND gl3 GND SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o OUT {RL_PHASE}
+SH4 a3 sw4 gh4 GND SWH
+SL4 sw4 GND gl4 GND SWL
+L4 sw4 l4o {LPHASE}
+RL4 l4o OUT {RL_PHASE}
+
+DH1 a1 IN DMOD
+DL1 GND sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 GND sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 GND sw3 DMOD
+DH4 sw4 a3 DMOD
+DL4 GND sw4 DMOD
+CH1 IN a1 {COSS_H}
+CL1 sw1 GND {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 GND {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 GND {COSS_L}
+CH4 a3 sw4 {COSS_H}
+CL4 sw4 GND {COSS_L}
+.ends SCB4
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+.end

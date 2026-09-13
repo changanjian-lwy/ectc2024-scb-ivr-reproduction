@@ -1,0 +1,75 @@
+* R02A - passive divider precharge module, isolated from PWM
+* PURPOSE: test whether a literature-supported passive network can establish
+* the 2024 ECTC four-phase module's three flying-capacitor voltages from zero.
+*
+* POWER-STAGE TARGET (not imposed as an initial condition):
+*   P24-FIG3: one module, four phases, three flying capacitors.
+*   DERIVED:N-level balance targets are 3/4*Vin, 2/4*Vin, 1/4*Vin.
+*
+* STARTUP MODULE:
+*   IPEC2018-FIG2/FIG8/TEXT: split-input-capacitor divider with diode charging;
+*   the paper states extension to any N-level FC topology and illustrates the
+*   corresponding 3-phase series-capacitor buck in Fig. 8(e).
+*   This file applies that stated N-level extension to N=4. That extension is
+*   a test hypothesis, not a topology explicitly drawn in either P24 or P25.
+*
+* VALUES:
+*   IPEC2018-TABLE2: Lpar=5 nH, Rpar=10 mOhm, each divider cap=10 uF for the
+*   demonstrated input-divider method. These values are transferred unchanged
+*   as a cross-source module test, not claimed as 48-V optimum values.
+*   EPE2019-TABLE1: each P24 flying-capacitor bank=53.8 uF nominal.
+*   NUMERICAL-ONLY: ideal diodes; 1 GOhm leakage gives each floating tap a DC
+*   reference but has negligible effect over the 200-us observation interval.
+*
+* BOUNDARIES:
+*   - all capacitors start at 0 V via UIC; no 36/24/12 V IC statements;
+*   - high-side switches/PWM/output load are absent in this module-level test;
+*   - lower flying-capacitor terminals are held at the module reference, which
+*     represents the all-low-side-on precharge state;
+*   - only precharge establishment and peak source/diode current are evaluated.
+
+.param VIN=48 CIN_DIV=10u LPAR=5n RPAR=10m RLEAK=1G
+* Case 1 is the complete IPEC Table-II capacitance ratio; case 2 retains the
+* existing P24 cross-source flying-capacitor bank. No value is fitted.
+.step param CFLY list 1u 53.8u
+
+VSTEP src 0 PWL(0 0 1u {VIN} 200u {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+* Four equal input-divider capacitors create three candidate taps.
+CIN1 vin tap3 {CIN_DIV}
+CIN2 tap3 tap2 {CIN_DIV}
+CIN3 tap2 tap1 {CIN_DIV}
+CIN4 tap1 0 {CIN_DIV}
+RLEAK1 vin tap3 {RLEAK}
+RLEAK2 tap3 tap2 {RLEAK}
+RLEAK3 tap2 tap1 {RLEAK}
+RLEAK4 tap1 0 {RLEAK}
+
+* IPEC Fig. 8(e) principle extended by one level: each divider tap charges the
+* corresponding flying capacitor; lower terminals are the precharge reference.
+DPC1 tap3 vc1 DPRE
+DPC2 tap2 vc2 DPRE
+DPC3 tap1 vc3 DPRE
+CF1 vc1 0 {CFLY}
+CF2 vc2 0 {CFLY}
+CF3 vc3 0 {CFLY}
+
+.model DPRE D(Ron=1m Roff=1T Vfwd=0)
+
+.meas tran VC1_FINAL AVG V(vc1) FROM 190u TO 200u
+.meas tran VC2_FINAL AVG V(vc2) FROM 190u TO 200u
+.meas tran VC3_FINAL AVG V(vc3) FROM 190u TO 200u
+.meas tran VC1_ERR PARAM 100*(VC1_FINAL-0.75*VIN)/(0.75*VIN)
+.meas tran VC2_ERR PARAM 100*(VC2_FINAL-0.50*VIN)/(0.50*VIN)
+.meas tran VC3_ERR PARAM 100*(VC3_FINAL-0.25*VIN)/(0.25*VIN)
+.meas tran IIN_PK MAX -I(VSTEP) FROM 0 TO 200u
+.meas tran ID1_PK MAX I(DPC1) FROM 0 TO 200u
+.meas tran ID2_PK MAX I(DPC2) FROM 0 TO 200u
+.meas tran ID3_PK MAX I(DPC3) FROM 0 TO 200u
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-10 chgtol=1e-16
+.save V(vin) V(tap3) V(tap2) V(tap1) V(vc1) V(vc2) V(vc3) I(VSTEP) I(DPC1) I(DPC2) I(DPC3)
+.tran 0 200u 0 5n UIC
+.end

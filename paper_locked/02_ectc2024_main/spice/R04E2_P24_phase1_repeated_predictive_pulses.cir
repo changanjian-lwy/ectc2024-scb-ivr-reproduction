@@ -1,0 +1,82 @@
+* R04E2 - P24 phase-1-only repeated predictive startup pulses
+* CHANGE FROM R04E1: repeat period only, stepped at 10/4/2/1 ns.
+* P24 EXPLICIT STATE ONLY: QH1 + QS2. No phase rotation is inserted.
+* CLAIM LIMIT: pulse accumulation screen, not complete ladder startup.
+
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY={4*10u+2*4.7u+2*2.2u}
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param DI_ALLOW=10 VOUT_INITIAL=0 VL_PRED={VIN-VOUT_INITIAL}
+.param TPULSE={LPHASE*DI_ALLOW/VL_PRED} TRAIL=10p TSTART=.1n
+.param VGATE=5 RON=1u ROFF=1T RLDAMP=1u
+.step param TPREP list 10n 4n 2n 1n
+
+VRAIL vin 0 PWL(0 0 {TRAIL} {VIN} 120n {VIN})
+XMOD vin out 0 SCB4P_REPEAT
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+
+* Global checks; a safe repeat requires current to return close to zero before
+* the next pulse. Sample 5 ps before the 10th pulse for every stepped period.
+.meas tran TPULSE_PARAMETER PARAM {TPULSE}
+.meas tran IL1_PEAK MAX I(XMOD:L1) FROM {TSTART} TO 100n
+.meas tran IL1_MIN MIN I(XMOD:L1) FROM {TSTART} TO 100n
+.meas tran IL1_BEFORE_PULSE10 FIND I(XMOD:L1) AT {TSTART+9*TPREP-5p}
+.meas tran IL1_PULSE1_MAX MAX I(XMOD:L1) FROM {TSTART} TO {TSTART+TPULSE+20p}
+.meas tran IL1_PULSE2_MAX MAX I(XMOD:L1) FROM {TSTART+TPREP} TO {TSTART+TPREP+TPULSE+20p}
+.meas tran IL1_PULSE10_MAX MAX I(XMOD:L1) FROM {TSTART+9*TPREP} TO {TSTART+9*TPREP+TPULSE+20p}
+.meas tran X1_BEFORE_PULSE10 FIND V(xmod:x1) AT {TSTART+9*TPREP-5p}
+.meas tran R1_BEFORE_PULSE10 FIND V(xmod:r1) AT {TSTART+9*TPREP-5p}
+.meas tran VOUT_BEFORE_PULSE10 FIND V(out) AT {TSTART+9*TPREP-5p}
+.meas tran VC1_20NS FIND V(xmod:r1,xmod:x1) AT 20n
+.meas tran VC1_50NS FIND V(xmod:r1,xmod:x1) AT 50n
+.meas tran VC1_100NS FIND V(xmod:r1,xmod:x1) AT 100n
+.meas tran VC1_MAX MAX V(xmod:r1,xmod:x1) FROM 0 TO 100n
+.meas tran VC2_100NS FIND V(xmod:r2,xmod:x2) AT 100n
+.meas tran VC3_100NS FIND V(xmod:r3,xmod:x3) AT 100n
+.meas tran VOUT_100NS FIND V(out) AT 100n
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vin) V(out) V(xmod:gh1) V(xmod:gl2) V(xmod:r1,xmod:x1) V(xmod:r2,xmod:x2) V(xmod:r3,xmod:x3) I(XMOD:L1) I(XMOD:L2)
+.tran 0 105n 0 2p UIC
+
+.subckt SCB4P_REPEAT vin out g
+* Replaceable controller slot: native PULSE supplies explicit edge breakpoints;
+* the earlier behavioral mod(time) version created spurious intermediate peaks.
+VGH1 gh1 g PULSE(0 {VGATE} {TSTART} 1p 1p {TPULSE} {TPREP})
+BGL2 gl2 g V=VGATE
+VGOFF_H2 gh2 g 0
+VGOFF_H3 gh3 g 0
+VGOFF_H4 gh4 g 0
+VGOFF_L1 gl1 g 0
+VGOFF_L3 gl3 g 0
+VGOFF_L4 gl4 g 0
+
+SH1 vin r1 gh1 g SWI
+CS1 r1 x1 {CFLY} ic=0
+SL1 x1 g gl1 g SWI
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 r1 r2 gh2 g SWI
+CS2 r2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWI
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 r2 r3 gh3 g SWI
+CS3 r3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWI
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 r3 x4 gh4 g SWI
+SL4 x4 g gl4 g SWI
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+* Numerical references only; at most 48 uA, not proposed package components.
+RNUM_R1 r1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_R2 r2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_R3 r3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.ends SCB4P_REPEAT
+.end

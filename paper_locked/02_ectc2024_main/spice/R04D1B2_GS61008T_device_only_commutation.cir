@@ -1,0 +1,55 @@
+* R04D1B2 - GS61008T device-only capacitance commutation
+* P25 Table III: one GS61008T high side, two parallel GS61008T low sides.
+* Official datasheet: C_O(TR)=385 pF per device for a 0-to-50-V transition.
+* Therefore CH_DEVICE=385 pF and CL_DEVICE=770 pF.
+*
+* BOUNDARY
+* This uses the official time-equivalent scalar as a first-order model at an
+* approximately 12-V swing. It excludes unpublished external CH/CL snubbers,
+* nonlinear Coss(Vds), package/layout parasitics and dead time. It is a
+* device-only estimate, not the complete P25 prototype and not P24 hardware.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.include ../../04_component_models/GS61008T_commutation_capacitance.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param LPHASE=1.4666667n CFLY=53.8u
+.param IL1_T1=124.932723999 VC1_T1=36.0193109995 IL2_T1=-11.3505529996
+.param VX1_T1={VIN-VC1_T1}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+VGH1 gh1 0 0
+VGL1 gl1 0 0
+VGL2 gl2 0 5
+VGH2 gh2 0 0
+
+SH1 vin a1 gh1 0 SWI
+CH1 vin a1 {CH_TOTAL} IC=0
+CF1 a1 x1 {CFLY} IC={VC1_T1}
+CL1 x1 0 {CL_TOTAL} IC={VX1_T1}
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser=1u IC={IL1_T1}
+
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC={IL2_T1}
+
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran T_LOW_VDS_ZERO WHEN V(x1)=0 FALL=1
+.meas tran IL1_AT_LOW_ZERO FIND I(L1) WHEN V(x1)=0 FALL=1
+.meas tran HIGH_VDS_AT_LOW_ZERO FIND V(vin,a1) WHEN V(x1)=0 FALL=1
+.meas tran VC1_AT_LOW_ZERO FIND V(a1,x1) WHEN V(x1)=0 FALL=1
+.meas tran CH_DEVICE_USED PARAM {CH_DEVICE}
+.meas tran CL_DEVICE_USED PARAM {CL_DEVICE}
+.meas tran RHS_EQ_USED PARAM {GS61008T_RDS_TYP_25C/NHS}
+.meas tran RLS_EQ_USED PARAM {GS61008T_RDS_TYP_25C/NLS}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(vin,a1) V(x1) I(L1) I(CH1) I(CL1)
+.tran 0 5n 0 0.5p UIC
+.end

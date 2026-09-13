@@ -1,0 +1,12 @@
+* GS61008T typical scalar parameters - official datasheet Rev 200402
+* EXTERNAL_DEVICE_DATA, not values printed in P24/P25.
+* Conditions/meaning must remain attached to each value.
+.param GS61008T_VRATED=100
+.param GS61008T_RDS_TYP_25C=7m
+.param GS61008T_COSS_TYP=250p
+.param GS61008T_COER_0_50V=302p
+.param GS61008T_COTR_0_50V=385p
+.param GS61008T_QOSS_50V=20n
+* COTR is used only as a first-order timing equivalent. It is specified for a
+* 0-to-50-V transition; the present approximately 12-V transition is an
+* extrapolation unless the nonlinear Coss/Qoss curve is implemented.

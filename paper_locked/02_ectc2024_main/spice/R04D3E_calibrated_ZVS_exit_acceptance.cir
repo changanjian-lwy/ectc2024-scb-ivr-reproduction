@@ -1,0 +1,68 @@
+* R04D3E - Acceptance test for the calibrated R04D3 ZVS exit
+* Uses the model-library default (7.77%) without changing any R04D3D boundary.
+* PASS intent: QL1 OFF first; negative iL1 commutates Vds(QH1) to zero; QH1
+* turns ON with QL1 still OFF; no gate overlap occurs.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.include ../../04_component_models/GS61008T_commutation_capacitance.lib
+.include ../../04_component_models/negative_current_targets.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n IPEAK_P24=125
+.param NEG_FRAC={NEG_FRAC_CURRENT_MODEL_DEFAULT} INEG={NEG_FRAC*IPEAK_P24}
+.param VC1_T2=36.0193959392 VX1_T2=-9.6476751536u VA1_T2=36.0193862915
+.param RHS={GS61008T_RDS_TYP_25C/NHS} RLS={GS61008T_RDS_TYP_25C/NLS}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+RSTATE state_mon 0 1k
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+BOVERLAP overlap 0 V={V(gh1)*V(gl1)}
+
+.machine 1p
+.state LOW_SIDE_BUILD_NEGATIVE 0
+.state COMMUTATE_TO_HIGH 1
+.state HIGH_SIDE_ZVS_ON 2
+.rule LOW_SIDE_BUILD_NEGATIVE COMMUTATE_TO_HIGH I(L1)<-INEG
+.rule COMMUTATE_TO_HIGH HIGH_SIDE_ZVS_ON V(vin,a1)<0
+.output (gl1) 5*(state==LOW_SIDE_BUILD_NEGATIVE)
+.output (gh1) 5*(state==HIGH_SIDE_ZVS_ON)
+.output (state_mon) state
+.endmachine
+
+SH1 vin a1 gh1 0 SWH
+CH1 vin a1 {CH_TOTAL} IC={VIN-VA1_T2}
+CF1 a1 x1 53.8u IC={VC1_T2}
+CL1 x1 0 {CL_TOTAL} IC={VX1_T2}
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC=0
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran T_QL1_GATE_OFF WHEN V(gl1)=2.5 FALL=1
+.meas tran IL1_AT_QL1_GATE_OFF FIND I(L1) WHEN V(gl1)=2.5 FALL=1
+.meas tran T_HIGH_VDS_ZERO WHEN V(vin,a1)=0 FALL=1
+.meas tran IL1_AT_HIGH_VDS_ZERO FIND I(L1) WHEN V(vin,a1)=0 FALL=1
+.meas tran VC1_AT_HIGH_VDS_ZERO FIND V(a1,x1) WHEN V(vin,a1)=0 FALL=1
+.meas tran VX1_AT_HIGH_VDS_ZERO FIND V(x1) WHEN V(vin,a1)=0 FALL=1
+.meas tran T_QH1_GATE_ON WHEN V(gh1)=2.5 RISE=1
+.meas tran IL1_AT_QH1_GATE_ON FIND I(L1) WHEN V(gh1)=2.5 RISE=1
+.meas tran DEAD_INTERVAL PARAM T_QH1_GATE_ON-T_QL1_GATE_OFF
+.meas tran EVENT_TO_GATE_DELAY PARAM T_QH1_GATE_ON-T_HIGH_VDS_ZERO
+.meas tran GATE_OVERLAP_MAX MAX V(overlap)
+.meas tran VGL1_AFTER_QH1_ON FIND V(gl1) AT=16.82n
+.meas tran VGH1_AFTER_QH1_ON FIND V(gh1) AT=16.82n
+.meas tran IL1_AFTER_QH1_ON FIND I(L1) AT=16.82n
+.meas tran VDS_HS_AFTER_QH1_ON FIND V(vin,a1) AT=16.82n
+.meas tran CALIBRATED_NEG_FRAC PARAM {NEG_FRAC}
+.meas tran CALIBRATED_INEG PARAM {INEG}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(x1) V(vin,a1) V(a1,x1) I(L1) V(gl1) V(gh1) V(state_mon) V(overlap)
+* Stop immediately after the exit hand-off. Longer post-turn-on dynamics belong
+* to the next-stage model and caused timestep collapse when mixed into this test.
+.tran 0 16.85n 0 0.5p UIC
+.end

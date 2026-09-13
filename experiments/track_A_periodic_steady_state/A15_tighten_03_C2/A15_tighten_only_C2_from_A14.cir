@@ -1,0 +1,99 @@
+* A15 - periodic seed tightening 03: C2 only
+* CONTROL: DV1=0. PERTURBED: DV1=-0.5/+0.5 V on C1 only.
+* Compared cases differ only by DV1. The ideal 1-V output source is a shared
+* isolation boundary for both cases, not a claim about the unregulated model.
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+.param VIN=48 VO=1 POUT=250 NP=4 NM_SYSTEM=4 NM_INSTANCE=1 FSW=5Meg T={1/FSW}
+.param TON={NP*VO/VIN*T} T0=0 PHASE={T/NP}
+.param LPHASE=1.466666666666667n IPEAK=125 NEG_FRAC=.02 INEG={NEG_FRAC*IPEAK}
+.param CFLY={4*10u+2*4.7u+2*2.2u} COUT={8*220u+32*47u+64*22u}
+.param IL1_INIT=-.935685816243 IL2_INIT=4.75555393314 IL3_INIT=41.5782701063 IL4_INIT=84.1447433786
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param VG=5 RLOAD={VO*VO/POUT}
+
+VRAIL vin 0 {VIN}
+XMOD vin out 0 SCB4P_PERIODIC_SEED
+VOUT_BOUNDARY out 0 {VO}
+
+* Initial and final state samples are separated by exactly one P24 period.
+.meas tran VC1_I FIND V(xmod:a1,xmod:x1) AT {T0+2p}
+.meas tran VC2_I FIND V(xmod:a2,xmod:x2) AT {T0+2p}
+.meas tran VC3_I FIND V(xmod:a3,xmod:x3) AT {T0+2p}
+.meas tran VO_I FIND V(out) AT {T0+2p}
+.meas tran IL1_I FIND I(XMOD:L1) AT {T0+2p}
+.meas tran IL2_I FIND I(XMOD:L2) AT {T0+2p}
+.meas tran IL3_I FIND I(XMOD:L3) AT {T0+2p}
+.meas tran IL4_I FIND I(XMOD:L4) AT {T0+2p}
+.meas tran VC1_F FIND V(xmod:a1,xmod:x1) AT {T0+T+2p}
+.meas tran VC2_F FIND V(xmod:a2,xmod:x2) AT {T0+T+2p}
+.meas tran VC3_F FIND V(xmod:a3,xmod:x3) AT {T0+T+2p}
+.meas tran VO_F FIND V(out) AT {T0+T+2p}
+.meas tran IL1_F FIND I(XMOD:L1) AT {T0+T+2p}
+.meas tran IL2_F FIND I(XMOD:L2) AT {T0+T+2p}
+.meas tran IL3_F FIND I(XMOD:L3) AT {T0+T+2p}
+.meas tran IL4_F FIND I(XMOD:L4) AT {T0+T+2p}
+.meas tran DVC1 PARAM VC1_F-VC1_I
+.meas tran DVC2 PARAM VC2_F-VC2_I
+.meas tran DVC3 PARAM VC3_F-VC3_I
+.meas tran DVO PARAM VO_F-VO_I
+.meas tran DIL1 PARAM IL1_F-IL1_I
+.meas tran DIL2 PARAM IL2_F-IL2_I
+.meas tran DIL3 PARAM IL3_F-IL3_I
+.meas tran DIL4 PARAM IL4_F-IL4_I
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(out) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:L4)
+.tran 0 {T0+T+5n} 0 5p UIC
+.ic V(xmod:a1)=48 V(xmod:x1)=11.999933546 V(xmod:a2)=24 V(xmod:x2)=0.0000857674 V(xmod:a3)=12 V(xmod:x3)=0 V(xmod:x4)=0 V(out)=1
+
+.subckt SCB4P_PERIODIC_SEED vin out g
+* Native PULSE gives explicit high-side breakpoints at T/4 origins.
+VH1 gh1 g PULSE(0 {VG} {T0} 1p 1p {TON} {T})
+VH2 gh2 g PULSE(0 {VG} {T0+PHASE} 1p 1p {TON} {T})
+VH3 gh3 g PULSE(0 {VG} {T0+2*PHASE} 1p 1p {TON} {T})
+VH4 gh4 g PULSE(0 {VG} {T0+3*PHASE} 1p 1p {TON} {T})
+
+* P24-derived symmetric controller: the next low side supports each active-high
+* interval. A leg's own low side is admitted only after its switch node reaches
+* zero and is removed at the P24 2% negative-current boundary.
+BL1 gl1 g V=if(time>=T0 & (V(gh4)>2.5 | (V(gh1)<2.5 & V(x1)<=0 & I(L1)>-INEG)),VG,0)
+BL2 gl2 g V=if(time>=T0 & (V(gh1)>2.5 | (V(gh2)<2.5 & V(x2)<=0 & I(L2)>-INEG)),VG,0)
+BL3 gl3 g V=if(time>=T0 & (V(gh2)>2.5 | (V(gh3)<2.5 & V(x3)<=0 & I(L3)>-INEG)),VG,0)
+BL4 gl4 g V=if(time>=T0 & (V(gh3)>2.5 | (V(gh4)<2.5 & V(x4)<=0 & I(L4)>-INEG)),VG,0)
+
+SH1 vin a1 gh1 g SWH
+CH1_TOTAL vin a1 {CH_TOTAL}
+C1 a1 x1 {CFLY} ic=36.000066454
+CL1_TOTAL x1 g {CL_TOTAL}
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser=1u ic={IL1_INIT}
+SH2 a1 a2 gh2 g SWH
+CH2_TOTAL a1 a2 {CH_TOTAL}
+C2 a2 x2 {CFLY} ic=23.9999142326
+CL2_TOTAL x2 g {CL_TOTAL}
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser=1u ic={IL2_INIT}
+SH3 a2 a3 gh3 g SWH
+CH3_TOTAL a2 a3 {CH_TOTAL}
+C3 a3 x3 {CFLY} ic=12
+CL3_TOTAL x3 g {CL_TOTAL}
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser=1u ic={IL3_INIT}
+SH4 a3 x4 gh4 g SWH
+CH4_TOTAL a3 x4 {CH_TOTAL}
+CL4_TOTAL x4 g {CL_TOTAL}
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser=1u ic={IL4_INIT}
+
+RNUM_A1 a1 g 1G
+RNUM_X1 x1 g 1G
+RNUM_A2 a2 g 1G
+RNUM_X2 x2 g 1G
+RNUM_A3 a3 g 1G
+RNUM_X3 x3 g 1G
+RNUM_X4 x4 g 1G
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_PERIODIC_SEED
+.end

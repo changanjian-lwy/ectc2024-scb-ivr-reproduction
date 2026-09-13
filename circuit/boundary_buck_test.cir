@@ -1,0 +1,49 @@
+* ================================================================
+* ECTC 2024 - Fig. 2 operating-principle validation
+* Scaled synchronous buck: 12 V -> 1 V, 10 W, 1 MHz
+* This validates CCM/DCM boundary current before the full Fig. 3 model.
+* ================================================================
+
+.param VIN=12
+.param VOUT_TARGET=1
+.param POUT=10
+.param FSW=1Meg
+.param PERIOD={1/FSW}
+.param DUTY={VOUT_TARGET/VIN}
+.param TON={DUTY*PERIOD}
+.param DEADTIME=3n
+.param IOUT={POUT/VOUT_TARGET}
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/POUT}
+.param LCRIT={VOUT_TARGET*(1-DUTY)/(2*IOUT*FSW)}
+.param LOUT={0.985*LCRIT}
+
+VINPUT vin 0 {VIN}
+
+* Non-overlapping high-side and low-side gate signals
+VGH gh 0 PULSE(0 5 0 0.2n 0.2n {TON-DEADTIME} {PERIOD})
+VGL gl 0 PULSE(0 5 {TON} 0.2n 0.2n {PERIOD-TON-DEADTIME} {PERIOD})
+
+* Idealized synchronous switches and their antiparallel body diodes
+SH vin sw gh 0 SWMOD
+SL sw 0 gl 0 SWMOD
+DH sw vin DMOD
+DL 0 sw DMOD
+.model SWMOD SW(Ron=2m Roff=100Meg Vt=2.5 Vh=0.1)
+.model DMOD D(Ron=2m Roff=100Meg Vfwd=0.7)
+
+Lout sw out {LOUT}
+Cout out 0 100u Rser=2m
+Rload out 0 {RLOAD}
+
+.ic V(out)=1 I(Lout)=0
+.options plotwinsize=0
+* Fifty switching periods are sufficient because the output starts at 1 V.
+.tran 0 50u 0 1n UIC
+
+.meas tran VOUT_AVG AVG V(out) FROM 40u TO 50u
+.meas tran IL_MAX MAX I(Lout) FROM 40u TO 50u
+.meas tran IL_MIN MIN I(Lout) FROM 40u TO 50u
+.meas tran IL_AVG AVG I(Lout) FROM 40u TO 50u
+.meas tran VSW_MAX MAX V(sw) FROM 40u TO 50u
+
+.end

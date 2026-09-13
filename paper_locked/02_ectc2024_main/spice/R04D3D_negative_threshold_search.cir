@@ -1,0 +1,48 @@
+* R04D3D - Search minimum negative-current fraction for high-side ZVS
+* Same circuit/state as R04D3C. Only NEG_FRAC is stepped.
+* Values are model calibration results, not paper-source values.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n IPEAK_P24=125 NEG_FRAC=0.05 INEG={NEG_FRAC*IPEAK_P24}
+.param VC1_T2=36.0193959392 VX1_T2=-9.6476751536u VA1_T2=36.0193862915
+.param NHS=1 NLS=2
+.param CH={NHS*GS61008T_COTR_0_50V} CL={NLS*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C/NHS} RLS={GS61008T_RDS_TYP_25C/NLS}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+RSTATE state_mon 0 1k
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+.machine 1p
+.state LOW_SIDE_BUILD_NEGATIVE 0
+.state COMMUTATE_TO_HIGH 1
+.state HIGH_SIDE_ZVS_ON 2
+.rule LOW_SIDE_BUILD_NEGATIVE COMMUTATE_TO_HIGH I(L1)<-INEG
+.rule COMMUTATE_TO_HIGH HIGH_SIDE_ZVS_ON V(vin,a1)<0
+.output (gl1) 5*(state==LOW_SIDE_BUILD_NEGATIVE)
+.output (gh1) 5*(state==HIGH_SIDE_ZVS_ON)
+.output (state_mon) state
+.endmachine
+
+SH1 vin a1 gh1 0 SWH
+CH1 vin a1 {CH} IC={VIN-VA1_T2}
+CF1 a1 x1 53.8u IC={VC1_T2}
+CL1 x1 0 {CL} IC={VX1_T2}
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC=0
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.step param NEG_FRAC list 0.0777 0.0800 0.0900 0.1000
+.meas tran T_LOW_SIDE_OFF WHEN I(L1)=-INEG FALL=1
+.meas tran T_HIGH_VDS_ZERO WHEN V(vin,a1)=0 FALL=1
+.meas tran IL1_AT_HIGH_VDS_ZERO FIND I(L1) WHEN V(vin,a1)=0 FALL=1
+.meas tran VDS_HS_MIN_AFTER_OFF MIN V(vin,a1) FROM=9n TO=60n
+.meas tran VX1_MAX MAX V(x1)
+.meas tran NEGATIVE_TARGET PARAM {INEG}
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(x1) V(vin,a1) I(L1) V(gl1) V(gh1) V(state_mon)
+.tran 0 60n 0 0.5p UIC
+.end

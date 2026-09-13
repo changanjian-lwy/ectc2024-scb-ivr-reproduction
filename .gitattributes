@@ -1,0 +1,6 @@
+* text=auto
+*.cir text eol=lf
+*.net text eol=lf
+*.lib text eol=lf
+*.md text eol=lf
+*.py text eol=lf

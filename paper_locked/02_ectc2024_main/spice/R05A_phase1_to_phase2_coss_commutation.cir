@@ -1,0 +1,104 @@
+* R05A - P24/P25-grounded phase-1 -> phase-2 local Coss commutation
+*
+* QUESTION
+* Starting at P25 Mode 5, can each source-defined negative-current branch
+* discharge the phase-2 high-side output capacitance to zero for S2a ZVS?
+*
+* CLAIM BOUNDARY
+* - This is a local steady-state handoff replay, not startup and not a full cycle.
+* - Topology is the P24 Fig.3 four-phase ladder with grounded low sides, the
+*   latter resolved from P25 Fig.1 and the user-approved fourth-phase extension.
+* - C1/C2/C3 carry initial capacitor voltages; no 36/24/12 V node sources exist.
+* - L=1.32 nH is the P24 recalculated critical L (1.4666667 nH) multiplied by
+*   (1-0.10), generalizing P25 Eq.(20) to the user-selected 10% bring-up branch.
+* - GS61008T device-inherent Co(tr)=385 pF/device is used only for transition
+*   timing. One high-side device and two parallel low-side devices follow P25.
+* - Added CH/CL/snubber capacitance is zero because neither paper publishes it.
+* - Exact driver delay, nonlinear Coss and package parasitics are not modelled.
+
+.param VIN=48 VO=1 LCRIT=1.4666666667n NEGFRAC=0.10
+.param LPH={(1-NEGFRAC)*LCRIT} IPK=125 INEG={-NEGFRAC*IPK}
+.param CFLY=53.8u COTR=385p CH={COTR} CL={2*COTR}
+* 6%-9% are a controlled sensitivity scan inside P25's explicit 5%-10% range.
+.step param NEGFRAC list 0.10 0.096 0.095 0.094 0.09 0.08 0.07 0.06 0.05 0.02
+
+VINPUT r0 0 {VIN}
+VOUT out 0 {VO}
+
+* P24 Fig.3 ladder and four phase power paths
+S1A r0 r1 g1a 0 SWH
+C1 r1 x1 {CFLY} IC=36
+S1B x1 0 g1b 0 SWL
+L1 x1 out {LPH} IC=0 Rser=1u
+
+S2A r1 r2 g2a 0 SWH
+C2 r2 x2 {CFLY} IC=24
+S2B x2 0 g2b 0 SWL
+L2 x2 out {LPH} IC={INEG} Rser=1u
+
+S3A r2 r3 g3a 0 SWH
+C3 r3 x3 {CFLY} IC=12
+S3B x3 0 g3b 0 SWL
+L3 x3 out {LPH} IC=0 Rser=1u
+
+S4A r3 x4 g4a 0 SWH
+S4B x4 0 g4b 0 SWL
+L4 x4 out {LPH} IC=0 Rser=1u
+
+* Device-inherent time-equivalent output capacitance.
+* High side: one GS61008T. Low side: two GS61008T in parallel (P25 hardware).
+CH1 r0 r1 {CH}
+CL1 x1 0 {CL}
+CH2 r1 r2 {CH}
+CL2 x2 0 {CL}
+CH3 r2 r3 {CH}
+CL3 x3 0 {CL}
+CH4 r3 x4 {CH}
+CL4 x4 0 {CL}
+
+* P25 Mode 5 -> Mode 6: S1b/S3b/S4b conduct; S2b is released; when
+* Vds(S2a)=V(r1,r2) reaches zero, S2a is latched ON.
+RG1A g1a 0 1k
+RG1B g1b 0 1k
+RG2A g2a 0 1k
+RG2B g2b 0 1k
+RG3A g3a 0 1k
+RG3B g3b 0 1k
+RG4A g4a 0 1k
+RG4B g4b 0 1k
+RSTATE state_mon 0 1k
+
+.machine 1p
+.state COMMUTE 0
+.state PHASE2_ENERGY 1
+.rule COMMUTE PHASE2_ENERGY (time>50p)&(V(r1,r2)<=0)
+.output (g1a) 0
+.output (g1b) 5
+.output (g2a) 5*(state==PHASE2_ENERGY)
+.output (g2b) 0
+.output (g3a) 0
+.output (g3b) 5
+.output (g4a) 0
+.output (g4b) 5
+.output (state_mon) state
+.endmachine
+
+.model SWH SW(Ron=7m Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron=3.5m Roff=1T Vt=2.5 Vh=0)
+
+.meas tran VDS2A_INITIAL FIND V(r1,r2) AT=10p
+.meas tran VDS2A_MIN MIN V(r1,r2) FROM=10p TO=5n
+.meas tran VDS2A_FINAL FIND V(r1,r2) AT=5n
+.meas tran T_VDS2A_ZERO WHEN V(r1,r2)=0 FALL=1
+.meas tran T_S2A_ON WHEN V(g2a)=2.5 RISE=1
+.meas tran IL2_INITIAL FIND I(L2) AT=10p
+.meas tran IL2_AT_ZVS FIND I(L2) WHEN V(g2a)=2.5 RISE=1
+.meas tran VX2_MAX MAX V(x2) FROM=0 TO=5n
+.meas tran STATE_MAX MAX V(state_mon)
+.meas tran NEGATIVE_FRACTION PARAM {NEGFRAC}
+.meas tran L_SELECTED PARAM {LPH}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-18 plotwinsize=0
+.save V(r1) V(r2) V(x2) V(r1,r2) V(g2a) V(state_mon) I(L2)
+.tran 0 5n 0 0.2p UIC
+.end

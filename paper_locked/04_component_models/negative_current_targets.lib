@@ -1,0 +1,14 @@
+* Negative-current target library with provenance preserved
+* Paper values remain available and are never overwritten by calibration.
+.param NEG_FRAC_P24_MIN=0.01
+.param NEG_FRAC_P24_MAX=0.02
+.param NEG_FRAC_P25_DESIGN=0.05
+.param NEG_FRAC_P25_MODE4_MAX=0.10
+
+* R04D3D model calibration only:
+* 7.76% failed; 7.77% first reached Vds(QH1)=0 in the refined sweep.
+* Valid only for the exact R04D3 GS61008T scalar-capacitance/local-state context.
+.param NEG_FRAC_R04D3_CALIBRATED=0.0777
+* Ideal-stage operating selection: smallest whole-percent value above threshold.
+.param NEG_FRAC_R04D3_IDEAL_OPERATING=0.08
+.param NEG_FRAC_CURRENT_MODEL_DEFAULT={NEG_FRAC_R04D3_IDEAL_OPERATING}

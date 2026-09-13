@@ -1,0 +1,53 @@
+* A02-1 - R04D0 Mode-1 boundary with only GS61008T device Coss added
+* COMPARED WITH: R04D0_p24_first_interval_shared_ladder.cir
+* ONLY ELECTRICAL CHANGE: device-inherent commutation capacitances.
+* All topology, gate states, initial flying-capacitor voltages, L, Fsw and Ton
+* are retained. External snubber remains zero. No threshold is fitted to Coss.
+
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T}
+.param LPHASE=1.4666667n CFLY=53.8u
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+
+VGH1 gh1 0 5
+VGL2 gl2 0 5
+VZERO gh2 0 0
+
+SH1 vin a1 gh1 0 SWI
+CH1 vin a1 {CH_TOTAL} IC=0
+CF1 a1 x1 {CFLY} IC=36
+CL1 x1 0 {CL_TOTAL} IC=12
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+SH2 a1 a2 gh2 0 SWI
+CH2 a1 a2 {CH_TOTAL} IC=24
+CF2 a2 x2 {CFLY} IC=24
+CL2 x2 0 {CL_TOTAL} IC=0
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC=0
+
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran IL1_AT_TON FIND I(L1) AT {TON-20p}
+.meas tran IL1_MAX MAX I(L1) FROM 0 TO {TON}
+.meas tran IL2_AT_TON FIND I(L2) AT {TON-20p}
+.meas tran VC1_START FIND V(a1,x1) AT 20p
+.meas tran VC1_END FIND V(a1,x1) AT {TON-20p}
+.meas tran VC2_START FIND V(a2,x2) AT 20p
+.meas tran VC2_END FIND V(a2,x2) AT {TON-20p}
+.meas tran Q_C1_INTV INTEG I(CF1) FROM 20p TO {TON-20p}
+.meas tran Q_C2_INTV INTEG I(CF2) FROM 20p TO {TON-20p}
+.meas tran CH_DEVICE_USED PARAM {CH_DEVICE}
+.meas tran CL_DEVICE_USED PARAM {CL_DEVICE}
+.meas tran CH_SNUBBER_USED PARAM {CH_SNUBBER}
+.meas tran CL_SNUBBER_USED PARAM {CL_SNUBBER}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(a1,x1) V(a2,x2) V(x1) V(x2) I(CF1) I(CF2) I(L1) I(L2)
+.tran 0 {TON} 0 2p UIC
+.end

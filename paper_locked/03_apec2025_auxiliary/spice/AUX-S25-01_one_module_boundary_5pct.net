@@ -1,0 +1,99 @@
+* PF-A1: 2025 APEC Fig.1 one-module, three-phase boundary-control test
+* This is NOT a startup test.  Initial 8 V / 4 V / 1 V are the analytical
+* periodic-state initialization implied by a 12-to-1, 3-phase SCB.
+* Fixed paper boundary: 12 V, 1 V, 67 W/module, 0.5 MHz, 22 nH.
+* Control target: low-side turn-off at -5% of the paper's 50 A peak.
+
+.param VIN=12 VO=1 PMOD=67 FSW=.5Meg T={1/FSW}
+.param NP=3 D_EQ={NP*VO/VIN} TON={D_EQ*T} IPK_PAPER=50 KNEG=.05 INEG={KNEG*IPK_PAPER}
+.param LPH=22n RL=.5m RONH=7m RONL=3.5m
+* GS61008T datasheet typical Coss=250 pF.  Two parallel low-side devices.
+.param COSS1=250p COSS2=500p CSNUB=0
+.step param CSNUB list 0 250p 500p 1n 2n
+* UNRESOLVED paper variables: incomplete capacitor part numbers.
+* Values below are sensitivity-baseline values, not claimed prototype values.
+.param CFLY_TEST=120u COUT_TEST=470u ESRFLY_TEST=1m ESROUT_TEST=.5m
+.param RLOAD={VO*VO/PMOD} VG=5 VZL=.15
+
+VINPUT vin 0 {VIN}
+
+* Paper Eq.(17) fixes high-side on-time.  Three phase clocks are T/3 apart.
+BGH1 gh1 0 V=if(mod(time+T,T)<TON,VG,0)
+BGH2 gh2 0 V=if(mod(time+T-T/3,T)<TON,VG,0)
+BGH3 gh3 0 V=if(mod(time+T-2*T/3,T)<TON,VG,0)
+
+* Paper Mode 2->4 abstraction:
+* - high side forces low-side controller OFF;
+* - low side may latch ON only after its switch-node voltage has commutated
+*   close to zero and positive inductor current is present;
+* - hysteresis keeps it ON until I(L) falls through -2.5 A (5% of 50 A).
+* The hysteretic switch is a numerical state realization of the published
+* boundary rule; it does not introduce a new current target.
+BZC1 zc1 0 V=if(V(gh1)>2.5,-20,if(V(sw1)<VZL,I(L1),-20))
+BZC2 zc2 0 V=if(V(gh2)>2.5,-20,if(V(sw2)<VZL,I(L2),-20))
+BZC3 zc3 0 V=if(V(gh3)>2.5,-20,if(V(sw3)<VZL,I(L3),-20))
+
+* 2025 Fig.1 power stage.
+SH1 vin a1 gh1 0 SWH
+CS1 a1 sw1 {CFLY_TEST} Rser={ESRFLY_TEST} IC=8
+SL1 sw1 0 zc1 0 SWZC off
+L1 sw1 l1o {LPH} Rser=0
+RL1 l1o out {RL}
+
+SH2 a1 a2 gh2 0 SWH
+CS2 a2 sw2 {CFLY_TEST} Rser={ESRFLY_TEST} IC=4
+SL2 sw2 0 zc2 0 SWZC off
+L2 sw2 l2o {LPH} Rser=0
+RL2 l2o out {RL}
+
+SH3 a2 sw3 gh3 0 SWH
+SL3 sw3 0 zc3 0 SWZC off
+L3 sw3 l3o {LPH} Rser=0
+RL3 l3o out {RL}
+
+* GaN reverse-conduction path: zero Qrr; Vf is only a numerical clamp here.
+DH1 a1 vin DGAN
+DL1 0 sw1 DGAN
+DH2 a2 a1 DGAN
+DL2 0 sw2 DGAN
+DH3 sw3 a2 DGAN
+DL3 0 sw3 DGAN
+
+CH1 vin a1 {COSS1+CSNUB}
+CL1 sw1 0 {COSS2+CSNUB}
+CH2 a1 a2 {COSS1+CSNUB}
+CL2 sw2 0 {COSS2+CSNUB}
+CH3 a2 sw3 {COSS1+CSNUB}
+CL3 sw3 0 {COSS2+CSNUB}
+
+.model SWH SW(Ron={RONH} Roff=100Meg Vt=2.5 Vh=.1)
+* rising threshold +5 A, falling threshold -2.5 A
+.model SWZC SW(Ron={RONL} Roff=100Meg Vt=1.25 Vh=3.75)
+.model DGAN D(Ron=3m Roff=100Meg Vfwd=1.5)
+
+COUT out 0 {COUT_TEST} Rser={ESROUT_TEST} IC=1
+RLOAD out 0 {RLOAD}
+
+.ic I(L1)=0 I(L2)=0 I(L3)=0
+.options plotwinsize=500 reltol=.001 abstol=1u chgtol=1e-15
+.tran 0 100u 0 .5n UIC
+
+.meas tran VOUT_AVG AVG V(out) FROM 90u TO 100u
+.meas tran IL1_MAX MAX I(L1) FROM 90u TO 100u
+.meas tran IL1_MIN MIN I(L1) FROM 90u TO 100u
+.meas tran IL1_AVG AVG I(L1) FROM 90u TO 100u
+.meas tran IL2_AVG AVG I(L2) FROM 90u TO 100u
+.meas tran IL3_AVG AVG I(L3) FROM 90u TO 100u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 90u TO 100u
+.meas tran VC1_PP PP V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_PP PP V(a2,sw2) FROM 90u TO 100u
+.meas tran ILOAD_AVG AVG I(RLOAD) FROM 90u TO 100u
+.meas tran TNEG_LAST WHEN I(L1)=-INEG FALL=LAST
+.meas tran VDSH1_AT_NEG FIND V(vin,a1) WHEN I(L1)=-INEG FALL=LAST
+.meas tran VDSH1_PREON FIND V(vin,a1) AT=99.999u
+.meas tran VDSH1_MIN MIN V(vin,a1) FROM 98u TO 100u
+.meas tran VDSH1_MAX MAX V(vin,a1) FROM 98u TO 100u
+
+.save V(out) V(a1) V(a2) V(sw1) V(sw2) V(sw3) V(gh1) V(zc1) V(vin,a1) V(a1,a2) V(a2,sw3) I(L1) I(L2) I(L3) I(RLOAD)
+.end

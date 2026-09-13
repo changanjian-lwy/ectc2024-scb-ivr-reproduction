@@ -1,0 +1,152 @@
+* R01C - R01B-short with ideal high/low mutual exclusion
+* PURPOSE: change only LTspice initialization relative to R01A; skip its undefined DC point.
+*
+* ECTC 2024 Table I row used without fitting:
+*   Vin=48 V, Vout=1 V, Ptotal=1 kW, nP=4, nM=4, Pmodule=250 W,
+*   fsw=5 MHz, duty=8.4% (Eq. 1 exact value 1/12), Ton=16.7 ns,
+*   Lcrit=2.68 nH, IL_peak=125 A.
+*
+* EPE 2019 Table I values used without fitting, only where ECTC 2024 is silent:
+*   each flying-capacitor bank = 4x10uF + 2x4.7uF + 2x2.2uF = 53.8uF nominal;
+*   output bank = 8x220uF + 32x47uF + 64x22uF = 4.672mF nominal.
+* These are CROSS-SOURCE CANDIDATES, not claimed ECTC 2024 component values.
+*
+* NUMERICAL IDEALIZATION (not a fitted device parameter):
+*   ideal voltage-controlled switches use Ron=1uOhm and Roff=1TOhm;
+*   inductors include 1uOhm solely to avoid an ideal-L/ideal-switch singularity.
+*   No Coss, dead time, ESR/ESL, controller delay, precharge, or fixed capacitor IC.
+*   Ideal startup controller caps positive phase current at the paper's 125 A target.
+*
+* TOPOLOGY BOUNDARY:
+*   S1b-S4b are referenced to module ground following APEC 2025 Fig. 1.
+*   The EPE 2019 Fig. 5 start-up state machine is NOT inserted because its
+*   conventional SCB drawing uses a different cascaded low-side connection.
+
+.param VIN=48 VOUT=1 POUT=250 NP=4 NM_TOTAL=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} LPHASE=2.68n
+.param CFLY={4*10u+2*4.7u+2*2.2u} COUT={8*220u+32*47u+64*22u}
+.param RLOAD={VOUT*VOUT/POUT} RON=1u ROFF=1T RLDAMP=1u VGATE=5
+.param ILIMIT=125 TSET=0.5n ISET=4m IRESET=20m CSTATE=1p IZC=10m
+.param ILSET=1 ILSRESET=20m CLSTATE=1p
+
+VRAIL vin 0 48
+XMOD vin out 0 SCB4P
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+
+* Four phase opportunities remain T/4 apart. At each opportunity, the high side
+* is latched on until IL reaches 125 A or the unchanged paper Ton expires.
+* The low side then conducts only until IL returns to zero. This is a proposed
+* topology-compatible ideal startup controller, not a circuit reported in P24/P25.
+.meas tran VOUT_AVG AVG V(out) FROM 4u TO 5u
+.meas tran VOUT_PP PP V(out) FROM 4u TO 5u
+.meas tran VC1_AVG AVG V(xmod:r1,xmod:x1) FROM 4u TO 5u
+.meas tran VC2_AVG AVG V(xmod:r2,xmod:x2) FROM 4u TO 5u
+.meas tran VC3_AVG AVG V(xmod:r3,xmod:x3) FROM 4u TO 5u
+.meas tran IL1_MIN MIN I(XMOD:L1) FROM 4u TO 5u
+.meas tran IL1_MAX MAX I(XMOD:L1) FROM 4u TO 5u
+.meas tran IL2_MIN MIN I(XMOD:L2) FROM 4u TO 5u
+.meas tran IL2_MAX MAX I(XMOD:L2) FROM 4u TO 5u
+.meas tran IL3_MIN MIN I(XMOD:L3) FROM 4u TO 5u
+.meas tran IL3_MAX MAX I(XMOD:L3) FROM 4u TO 5u
+.meas tran IL4_MIN MIN I(XMOD:L4) FROM 4u TO 5u
+.meas tran IL4_MAX MAX I(XMOD:L4) FROM 4u TO 5u
+.meas tran IIN_PK MAX -I(VRAIL) FROM 0 TO 5u
+.meas tran GH1_PW INTEG V(xmod:gh1) FROM 0 TO 1u
+
+.options plotwinsize=0 reltol=1e-4 abstol=1e-8 chgtol=1e-16
+.save V(vin) V(out) V(xmod:gh1) V(xmod:gl1) V(xmod:r1,xmod:x1) V(xmod:r2,xmod:x2) V(xmod:r3,xmod:x3) I(VRAIL) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:L4)
+.tran 0 5u 0 .25n startup UIC
+
+.subckt SCB4P vin out g
+VONE one g 1
+
+* Phase 1 high-side latch: set at slot start; reset at 125 A or Ton.
+BSET1 g hs1 I=if(mod(time+T,T)<TSET,ISET,0)
+BRST1 hs1 g I=if(I(L1)>=ILIMIT | mod(time+T,T)>=TON,IRESET,0)
+CHS1 hs1 g {CSTATE}
+DH1C hs1 one DCLAMP
+DL1C g hs1 DCLAMP
+BGH1 gh1 g V=if(V(hs1,g)>.5,VGATE,0)
+* Low-side state is set after high-side turn-off while current is positive;
+* it is reset only after the current crosses -IZC, avoiding zero-point chatter.
+BLSSET1 g ls1 I=if(V(hs1,g)<.5 & I(L1)>IZC,ILSET,0)
+BLSRST1 ls1 g I=if(I(L1)<-IZC | V(hs1,g)>.5,ILSRESET,0)
+CLS1 ls1 g {CLSTATE}
+DLSH1 ls1 one DCLAMP
+DLSL1 g ls1 DCLAMP
+BGL1 gl1 g V=if(V(ls1,g)>.5 & V(hs1,g)<.5,VGATE,0)
+
+* Phase 2, shifted by T/4.
+BSET2 g hs2 I=if(mod(time+T-T/4,T)<TSET,ISET,0)
+BRST2 hs2 g I=if(I(L2)>=ILIMIT | mod(time+T-T/4,T)>=TON,IRESET,0)
+CHS2 hs2 g {CSTATE}
+DH2C hs2 one DCLAMP
+DL2C g hs2 DCLAMP
+BGH2 gh2 g V=if(V(hs2,g)>.5,VGATE,0)
+* Low-side state is set after high-side turn-off while current is positive;
+* it is reset only after the current crosses -IZC, avoiding zero-point chatter.
+BLSSET2 g ls2 I=if(V(hs2,g)<.5 & I(L2)>IZC,ILSET,0)
+BLSRST2 ls2 g I=if(I(L2)<-IZC | V(hs2,g)>.5,ILSRESET,0)
+CLS2 ls2 g {CLSTATE}
+DLSH2 ls2 one DCLAMP
+DLSL2 g ls2 DCLAMP
+BGL2 gl2 g V=if(V(ls2,g)>.5 & V(hs2,g)<.5,VGATE,0)
+
+* Phase 3, shifted by T/2.
+BSET3 g hs3 I=if(mod(time+T-T/2,T)<TSET,ISET,0)
+BRST3 hs3 g I=if(I(L3)>=ILIMIT | mod(time+T-T/2,T)>=TON,IRESET,0)
+CHS3 hs3 g {CSTATE}
+DH3C hs3 one DCLAMP
+DL3C g hs3 DCLAMP
+BGH3 gh3 g V=if(V(hs3,g)>.5,VGATE,0)
+* Low-side state is set after high-side turn-off while current is positive;
+* it is reset only after the current crosses -IZC, avoiding zero-point chatter.
+BLSSET3 g ls3 I=if(V(hs3,g)<.5 & I(L3)>IZC,ILSET,0)
+BLSRST3 ls3 g I=if(I(L3)<-IZC | V(hs3,g)>.5,ILSRESET,0)
+CLS3 ls3 g {CLSTATE}
+DLSH3 ls3 one DCLAMP
+DLSL3 g ls3 DCLAMP
+BGL3 gl3 g V=if(V(ls3,g)>.5 & V(hs3,g)<.5,VGATE,0)
+
+* Phase 4, shifted by 3T/4.
+BSET4 g hs4 I=if(mod(time+T-3*T/4,T)<TSET,ISET,0)
+BRST4 hs4 g I=if(I(L4)>=ILIMIT | mod(time+T-3*T/4,T)>=TON,IRESET,0)
+CHS4 hs4 g {CSTATE}
+DH4C hs4 one DCLAMP
+DL4C g hs4 DCLAMP
+BGH4 gh4 g V=if(V(hs4,g)>.5,VGATE,0)
+* Low-side state is set after high-side turn-off while current is positive;
+* it is reset only after the current crosses -IZC, avoiding zero-point chatter.
+BLSSET4 g ls4 I=if(V(hs4,g)<.5 & I(L4)>IZC,ILSET,0)
+BLSRST4 ls4 g I=if(I(L4)<-IZC | V(hs4,g)>.5,ILSRESET,0)
+CLS4 ls4 g {CLSTATE}
+DLSH4 ls4 one DCLAMP
+DLSL4 g ls4 DCLAMP
+BGL4 gl4 g V=if(V(ls4,g)>.5 & V(hs4,g)<.5,VGATE,0)
+
+SH1 vin r1 gh1 g SWI
+CS1 r1 x1 {CFLY}
+SL1 x1 g gl1 g SWI
+L1 x1 out {LPHASE} Rser={RLDAMP}
+SH2 r1 r2 gh2 g SWI
+CS2 r2 x2 {CFLY}
+SL2 x2 g gl2 g SWI
+L2 x2 out {LPHASE} Rser={RLDAMP}
+SH3 r2 r3 gh3 g SWI
+CS3 r3 x3 {CFLY}
+SL3 x3 g gl3 g SWI
+L3 x3 out {LPHASE} Rser={RLDAMP}
+SH4 r3 x4 gh4 g SWI
+SL4 x4 g gl4 g SWI
+L4 x4 out {LPHASE} Rser={RLDAMP}
+
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.model DCLAMP D(Ron=1m Roff=1T Vfwd=0)
+.ends SCB4P
+.end
+
+
+
+
+

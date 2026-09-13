@@ -1,0 +1,41 @@
+* R04D4A - P25-native local Mode 4, t3 (iL2=0) to t4 (-5% Ipk)
+* P25 Table II/III: Vin=12 V, Vo=1 V, nP=3, nM=3, Pout=200 W,
+* L2=22 nH, two parallel GS61008T low-side devices (R=3.5 mOhm).
+* Other phases are source-level sign contracts only: iL1/iL3 positive and
+* decreasing. Their unreported magnitudes are not invented in this local run.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.include ../../04_component_models/negative_current_targets.lib
+.param VIN=12 VO=1 POUT=200 NP=3 NM=3 LPHASE=22n
+.param IOUT={POUT/VO} IPEAK={2*IOUT/(NP*NM)}
+.param NEG_FRAC={NEG_FRAC_P25_DESIGN} INEG={NEG_FRAC*IPEAK}
+.param RLS={GS61008T_RDS_TYP_25C/2} CL={2*GS61008T_COTR_0_50V}
+
+VOUT out 0 {VO}
+RGL2 gl2 0 1k
+RSTATE state_mon 0 1k
+.machine 1p
+.state P25_MODE4_BUILD_NEGATIVE 0
+.state P25_T4_SL2_OFF 1
+.rule P25_MODE4_BUILD_NEGATIVE P25_T4_SL2_OFF I(L2)<-INEG
+.output (gl2) 5*(state==P25_MODE4_BUILD_NEGATIVE)
+.output (state_mon) state
+.endmachine
+
+CL2 x2 0 {CL} IC=0
+SL2 x2 0 gl2 0 SWL
+L2 x2 out {LPHASE} Rser=0.5m IC=0
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran T4_SL2_OFF WHEN V(gl2)=2.5 FALL=1
+.meas tran IL2_AT_T4 FIND I(L2) WHEN V(gl2)=2.5 FALL=1
+.meas tran MODE4_DURATION PARAM T4_SL2_OFF
+.meas tran IPEAK_DERIVED PARAM {IPEAK}
+.meas tran NEGATIVE_TARGET PARAM {INEG}
+.meas tran NEGATIVE_FRACTION PARAM {NEG_FRAC}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save I(L2) V(x2) V(gl2) V(state_mon)
+.tran 0 52n 0 1p UIC
+.end

@@ -1,0 +1,142 @@
+* =====================================================================
+* ECTC 2024 MODULARITY TEST - HYPOTHETICAL FIVE-PHASE MODULE
+* Paper system: 48 V -> 1 V, 1 kW, 8 input/output-parallel modules
+* This file modifies the paper's four-phase cell to five phases.
+* It is an engineering extension, not a topology published in the paper.
+* Published topology: Fig. 3. Published design values: Tables 1 and 3.
+* =====================================================================
+
+* ------------------------- USER INPUTS -------------------------------
+.param VIN_SYSTEM=48
+.param VOUT_TARGET=1
+.param PTOTAL=1000
+.param NMODULES=8
+.param NPHASES=5
+.param FSW=5Meg
+
+* --------------------- PAPER-DERIVED VALUES --------------------------
+.param VIN_MODULE={VIN_SYSTEM}
+.param PMODULE={PTOTAL/NMODULES}
+.param D_IDEAL={NPHASES*VOUT_TARGET/VIN_SYSTEM}
+* Practical command includes the first compensation for modeled conduction
+* drops. D_IDEAL remains recorded separately for direct paper comparison.
+.param D_CMD={1.224*D_IDEAL}
+.param D={D_CMD}
+.param T={1/FSW}
+.param TON={D*T}
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+* Recalculated boundary inductance for 25 A average current per phase.
+.param IPHASE_AVG={PMODULE/(VOUT_TARGET*NPHASES)}
+.param LCRIT_5PH={VOUT_TARGET*(1-D_IDEAL)/(2*IPHASE_AVG*FSW)}
+.param LPHASE={.985*LCRIT_5PH}
+.param NIND_PAR=12
+.param L_EMBEDDED={LPHASE*NIND_PAR}
+.param RL_EMBEDDED=13.6m
+.param RL_PHASE={RL_EMBEDDED/NIND_PAR}
+
+* ---------------- EXPLICIT MODEL ASSUMPTIONS -------------------------
+* Exact capacitor suffixes, Coss and gate timing are not published.
+.param CFLY=12u CFLY_ESR=.5m
+.param COUT=100u COUT_ESR=.2m
+.param RON_H=7m RON_L=3.5m
+.param COSS_H=100p COSS_L=200p
+.param TDEAD=.2n
+
+VINPUT vin 0 {VIN_MODULE}
+
+* Five interleaved phases, 72 degrees apart.
+BGH1 gh1 0 V=if(mod(time+T,T)>TDEAD/2 & mod(time+T,T)<TON-TDEAD/2,5,0)
+BGL1 gl1 0 V=if(mod(time+T,T)>TON+TDEAD/2 & mod(time+T,T)<T-TDEAD/2,5,0)
+BGH2 gh2 0 V=if(mod(time+T-T/5,T)>TDEAD/2 & mod(time+T-T/5,T)<TON-TDEAD/2,5,0)
+BGL2 gl2 0 V=if(mod(time+T-T/5,T)>TON+TDEAD/2 & mod(time+T-T/5,T)<T-TDEAD/2,5,0)
+BGH3 gh3 0 V=if(mod(time+T-2*T/5,T)>TDEAD/2 & mod(time+T-2*T/5,T)<TON-TDEAD/2,5,0)
+BGL3 gl3 0 V=if(mod(time+T-2*T/5,T)>TON+TDEAD/2 & mod(time+T-2*T/5,T)<T-TDEAD/2,5,0)
+BGH4 gh4 0 V=if(mod(time+T-3*T/5,T)>TDEAD/2 & mod(time+T-3*T/5,T)<TON-TDEAD/2,5,0)
+BGL4 gl4 0 V=if(mod(time+T-3*T/5,T)>TON+TDEAD/2 & mod(time+T-3*T/5,T)<T-TDEAD/2,5,0)
+BGH5 gh5 0 V=if(mod(time+T-4*T/5,T)>TDEAD/2 & mod(time+T-4*T/5,T)<TON-TDEAD/2,5,0)
+BGL5 gl5 0 V=if(mod(time+T-4*T/5,T)>TON+TDEAD/2 & mod(time+T-4*T/5,T)<T-TDEAD/2,5,0)
+
+* Fig. 3 four-phase series-capacitor buck power stage.
+SH1 vin a1 gh1 0 SWH
+C1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=38.4
+SL1 sw1 0 gl1 0 SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o out {RL_PHASE}
+
+SH2 a1 a2 gh2 0 SWH
+C2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=28.8
+SL2 sw2 0 gl2 0 SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o out {RL_PHASE}
+
+SH3 a2 a3 gh3 0 SWH
+C3 a3 sw3 {CFLY} Rser={CFLY_ESR} IC=19.2
+SL3 sw3 0 gl3 0 SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o out {RL_PHASE}
+
+C4 a4 sw4 {CFLY} Rser={CFLY_ESR} IC=9.6
+SH4 a3 a4 gh4 0 SWH
+SL4 sw4 0 gl4 0 SWL
+L4 sw4 l4o {LPHASE}
+RL4 l4o out {RL_PHASE}
+
+SH5 a4 sw5 gh5 0 SWH
+SL5 sw5 0 gl5 0 SWL
+L5 sw5 l5o {LPHASE}
+RL5 l5o out {RL_PHASE}
+
+* GaN reverse paths and output capacitances for boundary/ZVS observation.
+DH1 a1 vin DMOD
+DL1 0 sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 0 sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 0 sw3 DMOD
+DH4 a4 a3 DMOD
+DL4 0 sw4 DMOD
+DH5 sw5 a4 DMOD
+DL5 0 sw5 DMOD
+CH1 vin a1 {COSS_H}
+CL1 sw1 0 {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 0 {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 0 {COSS_L}
+CH4 a3 a4 {COSS_H}
+CL4 sw4 0 {COSS_L}
+CH5 a4 sw5 {COSS_H}
+CL5 sw5 0 {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+.ic V(out)=1 I(L1)=0 I(L2)=0 I(L3)=0 I(L4)=0 I(L5)=0
+.options reltol=.003
+.tran 0 20u 0 .05n UIC
+
+* -------------------- AUTOMATIC RECORD OUTPUTS -----------------------
+.meas tran VOUT_AVG AVG V(out) FROM 15u TO 20u
+.meas tran IL1_AVG AVG I(L1) FROM 15u TO 20u
+.meas tran IL2_AVG AVG I(L2) FROM 15u TO 20u
+.meas tran IL3_AVG AVG I(L3) FROM 15u TO 20u
+.meas tran IL4_AVG AVG I(L4) FROM 15u TO 20u
+.meas tran IL5_AVG AVG I(L5) FROM 15u TO 20u
+.meas tran IL1_MAX MAX I(L1) FROM 15u TO 20u
+.meas tran IL1_MIN MIN I(L1) FROM 15u TO 20u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 15u TO 20u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 15u TO 20u
+.meas tran VC3_AVG AVG V(a3,sw3) FROM 15u TO 20u
+.meas tran VC4_AVG AVG V(a4,sw4) FROM 15u TO 20u
+.meas tran VC1_PP PP V(a1,sw1) FROM 15u TO 20u
+.meas tran VC2_PP PP V(a2,sw2) FROM 15u TO 20u
+.meas tran VC3_PP PP V(a3,sw3) FROM 15u TO 20u
+.meas tran VC4_PP PP V(a4,sw4) FROM 15u TO 20u
+.meas tran VDSH1_MIN MIN V(vin,a1) FROM 15u TO 20u
+.meas tran OUTPUT_ERROR_PCT PARAM 100*(VOUT_AVG-VOUT_TARGET)/VOUT_TARGET
+.meas tran NEGATIVE_CURRENT_PCT PARAM 100*abs(IL1_MIN)/IL1_MAX
+
+.end

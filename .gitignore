@@ -1,0 +1,35 @@
+# macOS and editor files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# LTspice generated outputs (source netlists remain tracked)
+*.raw
+*.op.raw
+*.log.raw
+*.log
+*.db
+*.plt
+*.fft
+
+# Generic generated outputs and temporary artifacts
+outputs/
+tmp/
+*.zip
+
+# Source papers and personal meeting material must not be published
+*.pdf
+reports/TALKING_POINTS_CN_*.md
+
+# Local application/runtime state
+.wine/
+.crossover/

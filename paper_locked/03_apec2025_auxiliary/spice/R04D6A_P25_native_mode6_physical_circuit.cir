@@ -1,0 +1,31 @@
+* R04D6A - P25 Mode 6 physical local-circuit branch
+* Start: accepted R04D5A t6 state, SH2 ON under ZVS, iL2=-2.125439 A.
+* End: after D*T using P25 Eq.(17): D=nP*Vo/Vin=0.25, T=2 us, DT=0.5 us.
+* Circuit voltage across L2 is Vrail2-Vo = 4 V-1 V = 3 V.
+* This is intentionally compared with printed Eq.(15), whose numerator is
+* VCS1-VCS2=4 V and does not show -Vo.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.param VIN=12 VO=1 NP=3 NM=3 FSW=0.5Meg D={NP*VO/VIN} TON={D/FSW}
+.param VCS1=8 VCS2=4 VRAIL2={VCS1-VCS2}
+.param LPHASE=22n IL2_T6=-2.12543904781
+.param RHS={GS61008T_RDS_TYP_25C}
+VRAIL rail2 0 {VRAIL2}
+VOUT out 0 {VO}
+VGH2 gh2 0 5
+SH2 rail2 x2 gh2 0 SWH
+L2 x2 out {LPHASE} Rser=0.5m IC={IL2_T6}
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.meas tran IL2_START FIND I(L2) AT=1p
+.meas tran IL2_END_PHYSICAL FIND I(L2) AT={TON}
+.meas tran IL2_MAX_PHYSICAL MAX I(L2)
+.meas tran TON_USED PARAM {TON}
+.meas tran DUTY_USED PARAM {D}
+.meas tran VL2_INITIAL FIND V(x2,out) AT=1p
+.meas tran EQ15_DELTA_I PARAM {(VCS1-VCS2)*TON/LPHASE}
+.meas tran EQ16_PEAK_FROM_T6 PARAM {IL2_T6+(VCS1-VCS2)*TON/LPHASE}
+.meas tran P24_EQ2_REFERENCE_PEAK PARAM {2*(200/VO)/(NP*NM)}
+.options reltol=1e-7 abstol=1e-10
+.save V(x2) V(x2,out) I(L2) V(gh2)
+.tran 0 {TON} 0 10p UIC
+.end

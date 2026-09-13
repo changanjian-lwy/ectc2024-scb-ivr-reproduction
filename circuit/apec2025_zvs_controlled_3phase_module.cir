@@ -1,0 +1,90 @@
+* =====================================================================
+* APEC 2025 three-phase SCB module - ZVS-DETECTED CONTROL EXPERIMENT
+* Power stage follows published Fig. 1. The detector/controller is an
+* engineering reconstruction because the paper does not publish its circuit.
+* =====================================================================
+
+.param VIN=12 VOUT_TARGET=1 PMODULE=67 FSW=0.5Meg
+.param T={1/FSW} D=0.2578 TON={D*T} TDEAD=5n
+* Controller settings: low side is released near the negative-current target;
+* the high side is allowed to turn on only after its VDS falls below VZVS.
+.param COMM_START={T-300n}
+.param VZVS=0.8
+
+.param LPHASE=22n RL=0.5m RON_H=7m RON_L=3.5m
+.param CFLY=120u CFLY_ESR=1m COUT=470u COUT_ESR=0.5m
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+.param COSS_H=100p COSS_L=200p
+
+VINPUT vin 0 {VIN}
+
+* q1/q2/q3 are phase clocks. Each low side is opened at COMM_START.
+* During the commutation window, the corresponding high gate is enabled only
+* when measured high-side VDS <= VZVS. Once on, low VDS holds the gate until
+* the constant-on-time window ends. This is a behavioral ZVS detector/latch.
+BGL1 gl1 0 V=if(mod(time+T,T)>TON+TDEAD & mod(time+T,T)<COMM_START,5,0)
+BGL2 gl2 0 V=if(mod(time+T-T/3,T)>TON+TDEAD & mod(time+T-T/3,T)<COMM_START,5,0)
+BGL3 gl3 0 V=if(mod(time+T-2*T/3,T)>TON+TDEAD & mod(time+T-2*T/3,T)<COMM_START,5,0)
+
+BGH1 gh1 0 V=if((mod(time+T,T)>COMM_START | mod(time+T,T)<TON) & V(vin,a1)<VZVS,5,0)
+BGH2 gh2 0 V=if((mod(time+T-T/3,T)>COMM_START | mod(time+T-T/3,T)<TON) & V(a1,a2)<VZVS,5,0)
+BGH3 gh3 0 V=if((mod(time+T-2*T/3,T)>COMM_START | mod(time+T-2*T/3,T)<TON) & V(a2,sw3)<VZVS,5,0)
+
+* Published series-capacitor buck power-stage topology.
+SH1 vin a1 gh1 0 SWH
+CS1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=8
+SL1 sw1 0 gl1 0 SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o out {RL}
+
+SH2 a1 a2 gh2 0 SWH
+CS2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=4
+SL2 sw2 0 gl2 0 SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o out {RL}
+
+SH3 a2 sw3 gh3 0 SWH
+SL3 sw3 0 gl3 0 SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o out {RL}
+
+DH1 a1 vin DMOD
+DL1 0 sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 0 sw2 DMOD
+DH3 sw3 a2 DMOD
+DL3 0 sw3 DMOD
+
+CH1 vin a1 {COSS_H}
+CL1 sw1 0 {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 0 {COSS_L}
+CH3 a2 sw3 {COSS_H}
+CL3 sw3 0 {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=0.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=0.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+
+.ic V(out)=1 I(L1)=0 I(L2)=0 I(L3)=0
+.options plotwinsize=0 reltol=0.002
+.tran 0 100u 0 0.5n UIC
+
+.meas tran VOUT_AVG AVG V(out) FROM 90u TO 100u
+.meas tran IL1_AVG AVG I(L1) FROM 90u TO 100u
+.meas tran IL2_AVG AVG I(L2) FROM 90u TO 100u
+.meas tran IL3_AVG AVG I(L3) FROM 90u TO 100u
+.meas tran IL1_MAX MAX I(L1) FROM 90u TO 100u
+.meas tran IL1_MIN MIN I(L1) FROM 90u TO 100u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 90u TO 100u
+.meas tran VC1_PP PP V(a1,sw1) FROM 90u TO 100u
+.meas tran VC2_PP PP V(a2,sw2) FROM 90u TO 100u
+.meas tran IL1_AT_GATE FIND I(L1) WHEN V(gh1)=2.5 RISE=LAST
+.meas tran TGATE_LAST WHEN V(gh1)=2.5 RISE=LAST
+.meas tran VDSH1_PRE_GATE FIND V(vin,a1) WHEN V(gh1)=2.5 RISE=LAST
+
+.end

@@ -1,0 +1,90 @@
+* R04B - four-phase periodic-state replay, two locked inductance branches
+* PURPOSE: test phase rotation, phase-current extrema and flying-capacitor
+* charge balance of the P24 one-module/four-phase topology.
+*
+* SOURCE AND REUSE BOUNDARY
+* Topology/phase order: P24 Fig.3 and Sec.II-B; grounded low sides clarified
+* by P25 Fig.1. Duty/on-time: P24 Eq.(1)/(3). Peak target: P24 Eq.(2).
+* R04A contributes only the demonstrated need to retain two inductance cases.
+*
+* THIS IS A STEADY-STATE REPLAY, NOT STARTUP
+* C1/C2/C3 use 36/24/12-V capacitor initial conditions derived from the ideal
+* four-level 48-V ladder. They are not independent voltage sources and are not
+* allowed in a startup claim. Cout starts at the published 1-V operating point.
+*
+* TWO NON-FITTED CASES
+* LPHASE=1.4666667 nH: calculated from printed P24 Eq.(4).
+* LPHASE=2.68 nH: printed P24 Table-I 4-phase/4-module/5-MHz entry.
+* All other conditions are identical. No tuning is performed.
+*
+* CROSS-SOURCE COMPONENT VALUES
+* Cfly=53.8 uF and Cout=4.672 mF are taken from EPE2019 Table I only to make
+* the periodic replay executable; they are not P24/P25 component values.
+*
+* PROHIBITED CLAIMS
+* Ideal complementary commands omit P25 Modes 2/5 capacitance commutation,
+* Coss, added CH/CL, dead time, ZCD delay, device loss and startup. Therefore
+* this run cannot prove ZVS or hardware feasibility. If charge/current does not
+* settle, the failure is retained; initial states or values are not fitted.
+
+.param VIN=48 VO=1 POUT_MODULE=250 NP=4 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T} CFLY=53.8u COUT=4.672m
+.step param LPHASE list 1.4666667n 2.68n
+
+VIN_SRC vin 0 {VIN}
+
+BH1 gh1 0 V=if(mod(time+T,T)<TON,5,0)
+BL1 gl1 0 V=if(mod(time+T,T)>=TON,5,0)
+BH2 gh2 0 V=if(mod(time+T-T/4,T)<TON,5,0)
+BL2 gl2 0 V=if(mod(time+T-T/4,T)>=TON,5,0)
+BH3 gh3 0 V=if(mod(time+T-T/2,T)<TON,5,0)
+BL3 gl3 0 V=if(mod(time+T-T/2,T)>=TON,5,0)
+BH4 gh4 0 V=if(mod(time+T-3*T/4,T)<TON,5,0)
+BL4 gl4 0 V=if(mod(time+T-3*T/4,T)>=TON,5,0)
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY} IC=36
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC=0
+
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY} IC=12
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser=1u IC=0
+
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser=1u IC=0
+
+CCO out 0 {COUT} IC={VO}
+RLOAD out 0 {VO*VO/POUT_MODULE}
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+* Final 2-us window: ten periods, used only after the initial periodic replay.
+.meas tran VOUT_AVG AVG V(out) FROM 8u TO 10u
+.meas tran VOUT_MIN MIN V(out) FROM 8u TO 10u
+.meas tran VOUT_MAX MAX V(out) FROM 8u TO 10u
+.meas tran VC1_AVG AVG V(a1,x1) FROM 8u TO 10u
+.meas tran VC2_AVG AVG V(a2,x2) FROM 8u TO 10u
+.meas tran VC3_AVG AVG V(a3,x3) FROM 8u TO 10u
+.meas tran IC1_AVG AVG I(CF1) FROM 8u TO 10u
+.meas tran IC2_AVG AVG I(CF2) FROM 8u TO 10u
+.meas tran IC3_AVG AVG I(CF3) FROM 8u TO 10u
+.meas tran IL1_MIN MIN I(L1) FROM 8u TO 10u
+.meas tran IL1_MAX MAX I(L1) FROM 8u TO 10u
+.meas tran IL2_MIN MIN I(L2) FROM 8u TO 10u
+.meas tran IL2_MAX MAX I(L2) FROM 8u TO 10u
+.meas tran IL3_MIN MIN I(L3) FROM 8u TO 10u
+.meas tran IL3_MAX MAX I(L3) FROM 8u TO 10u
+.meas tran IL4_MIN MIN I(L4) FROM 8u TO 10u
+.meas tran IL4_MAX MAX I(L4) FROM 8u TO 10u
+
+.options reltol=1e-6 abstol=1e-9 chgtol=1e-16
+.save V(out) V(a1,x1) V(a2,x2) V(a3,x3) I(CF1) I(CF2) I(CF3) I(L1) I(L2) I(L3) I(L4) V(gh1) V(gh2) V(gh3) V(gh4)
+.tran 0 10u 0 .2n UIC
+.end

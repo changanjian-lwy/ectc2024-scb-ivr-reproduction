@@ -1,0 +1,113 @@
+* ECTC 2024 SCB IVR -- sourced-parameter attempt
+* 48 V -> 1 V, 1 kW, 4 phases x 4 modules, 5 MHz
+* No IC statements and no preset 36/24/12 V flying-capacitor voltages.
+
+.param VIN=48 VOUT=1 POUT=1000 NP=4 NM=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} IOUT={POUT/VOUT}
+.param RLOAD={VOUT*VOUT/POUT}
+
+* Table 1 value.  Printed Eq. (4) gives 1.467 nH instead of 2.68 nH.
+.param LPHASE=2.68n
+
+* APEC 2025 Eq. (23): Cfly >= 1.05*Io/(4*np*nM*fsw*dVc).
+* dVc=0.12 V is a declared design target (1% of the 12 V ladder step).
+.param DVC_ALLOW=.12
+.param CFLY={1.05*IOUT/(4*NP*NM*FSW*DVC_ALLOW)}
+
+* EPC2067 official typical values, scaled for ECTC 2024 Table 3:
+* 2 parallel devices/high-side position and 3/low-side position.
+.param RON_H={1.3m/2} RON_L={1.3m/3}
+.param COSS_H={1597p*2} COSS_L={1597p*3}
+.param VGATE=5 VF_REV=1.2
+
+* Not reported by either paper: kept explicit and sweepable.
+* ESR/ESL are provisional embedded-MLCC values; COUT is a provisional bank.
+.param CFLY_ESR=.5m CFLY_ESL=30p
+.param COUT=470u COUT_ESR=.2m COUT_ESL=30p
+.param TDEAD=2n TENABLE=5u TRAMP=40u
+.param RSOURCE=5m LSOURCE=10n
+
+VRAIL vin_raw 0 PWL(0 0 {TENABLE} 0 {TENABLE+TRAMP} {VIN} 1m {VIN})
+RINPUT vin_raw vin_limited {RSOURCE}
+LINPUT vin_limited vin {LSOURCE}
+
+XMOD1 vin out 0 SCB4P PARAMS: MOFF=0
+XMOD2 vin out 0 SCB4P PARAMS: MOFF={T/16}
+XMOD3 vin out 0 SCB4P PARAMS: MOFF={2*T/16}
+XMOD4 vin out 0 SCB4P PARAMS: MOFF={3*T/16}
+
+LCO out out_c {COUT_ESL}
+RCO out_c out_cr {COUT_ESR}
+CCO out_cr 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+
+.meas tran CFLY_VALUE PARAM {CFLY}
+.meas tran VOUT_FINAL AVG V(out) FROM 480u TO 500u
+.meas tran VC11_FINAL AVG V(xmod1:a1,xmod1:sw1) FROM 480u TO 500u
+.meas tran VC12_FINAL AVG V(xmod1:a2,xmod1:sw2) FROM 480u TO 500u
+.meas tran VC13_FINAL AVG V(xmod1:a3,xmod1:sw3) FROM 480u TO 500u
+.meas tran IL11_MAX MAX I(XMOD1:L1) FROM 450u TO 500u
+.meas tran IL11_MIN MIN I(XMOD1:L1) FROM 450u TO 500u
+.meas tran IINPUT_PEAK MAX I(VRAIL) FROM 0 TO 500u
+
+.options plotwinsize=500 reltol=.003
+.save V(vin) V(out) V(xmod1:a1,xmod1:sw1) V(xmod1:a2,xmod1:sw2) V(xmod1:a3,xmod1:sw3) I(VRAIL) I(XMOD1:L1)
+.tran 0 500u 0 .5n startup
+
+.subckt SCB4P vin out g PARAMS: MOFF=0
+BH1 gh1 g V=if(time>TENABLE & mod(time-MOFF+T,T)>TDEAD/2 & mod(time-MOFF+T,T)<TON-TDEAD/2,VGATE,0)
+BL1 gl1 g V=if(time>TENABLE & mod(time-MOFF+T,T)>TON+TDEAD/2 & mod(time-MOFF+T,T)<T-TDEAD/2,VGATE,0)
+BH2 gh2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)>TDEAD/2 & mod(time-MOFF+T-T/4,T)<TON-TDEAD/2,VGATE,0)
+BL2 gl2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)>TON+TDEAD/2 & mod(time-MOFF+T-T/4,T)<T-TDEAD/2,VGATE,0)
+BH3 gh3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)>TDEAD/2 & mod(time-MOFF+T-T/2,T)<TON-TDEAD/2,VGATE,0)
+BL3 gl3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)>TON+TDEAD/2 & mod(time-MOFF+T-T/2,T)<T-TDEAD/2,VGATE,0)
+BH4 gh4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)>TDEAD/2 & mod(time-MOFF+T-3*T/4,T)<TON-TDEAD/2,VGATE,0)
+BL4 gl4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)>TON+TDEAD/2 & mod(time-MOFF+T-3*T/4,T)<T-TDEAD/2,VGATE,0)
+
+SH1 vin a1 gh1 g SWH
+LCS1 a1 c1a {CFLY_ESL}
+RCS1 c1a c1b {CFLY_ESR}
+CS1 c1b sw1 {CFLY}
+SL1 sw1 g gl1 g SWL
+L1 sw1 out {LPHASE}
+
+SH2 a1 a2 gh2 g SWH
+LCS2 a2 c2a {CFLY_ESL}
+RCS2 c2a c2b {CFLY_ESR}
+CS2 c2b sw2 {CFLY}
+SL2 sw2 g gl2 g SWL
+L2 sw2 out {LPHASE}
+
+SH3 a2 a3 gh3 g SWH
+LCS3 a3 c3a {CFLY_ESL}
+RCS3 c3a c3b {CFLY_ESR}
+CS3 c3b sw3 {CFLY}
+SL3 sw3 g gl3 g SWL
+L3 sw3 out {LPHASE}
+
+SH4 a3 sw4 gh4 g SWH
+SL4 sw4 g gl4 g SWL
+L4 sw4 out {LPHASE}
+
+DH1 a1 vin DMOD
+DL1 g sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 g sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 g sw3 DMOD
+DH4 sw4 a3 DMOD
+DL4 g sw4 DMOD
+CH1 vin a1 {COSS_H}
+CL1 sw1 g {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 g {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 g {COSS_L}
+CH4 a3 sw4 {COSS_H}
+CL4 sw4 g {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=1m Roff=100Meg Vfwd={VF_REV})
+.ends SCB4P
+.end

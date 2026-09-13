@@ -1,0 +1,154 @@
+* A06 - full four-phase 8% branch with P24 triangular interleaved-current seed
+* COMPARED WITH A05: only the four inductor initial-current seeds change.
+* They are calculated from the P24 0-to-peak-to-0 triangle at T/4 phase shifts.
+* They are solver seeds, not forced final currents or a claimed periodic orbit.
+* The supervisor is exploratory and observes local adjacent-rail differences;
+* it is not claimed as a P24/P25 published controller.
+* 36/24/12 V and all-zero iL are INPUT SEEDS, not claimed steady-state results.
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+.param VIN=48 VO=1 POUT=250 NP=4 NM_SYSTEM=4 NM_INSTANCE=1 FSW=5Meg T={1/FSW}
+.param TON={NP*VO/VIN*T} T0=0 PHASE={T/NP}
+.param VSEG={VIN/NP} SEG_TOL=2 VSEG_LO={VSEG-SEG_TOL} VSEG_HI={VSEG+SEG_TOL}
+.param LPHASE=1.466666666666667n IPEAK=125 NEG_FRAC=.08 INEG={NEG_FRAC*IPEAK}
+.param IL1_INIT=0 IL2_INIT=34.0909090909 IL3_INIT=68.1818181818 IL4_INIT=102.2727272727
+.param CFLY={4*10u+2*4.7u+2*2.2u} COUT={8*220u+32*47u+64*22u}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param VG=5 RLOAD={VO*VO/POUT}
+
+VRAIL vin 0 {VIN}
+RREADY ready_state 0 1k
+RGH2_CMD gh2_cmd 0 1k
+RGH3_CMD gh3_cmd 0 1k
+RGH4_CMD gh4_cmd 0 1k
+.machine 1p
+.state WAIT_P2 0
+.state P2_ON 1
+.state WAIT_P3 2
+.state P3_ON 3
+.state WAIT_P4 4
+.state P4_ON 5
+.state DONE 6
+.rule WAIT_P2 P2_ON (time>=T0+PHASE)*(V(xmod:a1,xmod:a2)>=VSEG_LO)*(V(xmod:a1,xmod:a2)<=VSEG_HI)
+.rule P2_ON WAIT_P3 time>=T0+PHASE+TON
+.rule WAIT_P3 P3_ON (time>=T0+2*PHASE)*(V(xmod:a2,xmod:a3)>=VSEG_LO)*(V(xmod:a2,xmod:a3)<=VSEG_HI)
+.rule P3_ON WAIT_P4 time>=T0+2*PHASE+TON
+.rule WAIT_P4 P4_ON (time>=T0+3*PHASE)*(V(xmod:a3,xmod:x4)>=VSEG_LO)*(V(xmod:a3,xmod:x4)<=VSEG_HI)
+.rule P4_ON DONE time>=T0+3*PHASE+TON
+.output (gh2_cmd) VG*(state==P2_ON)
+.output (gh3_cmd) VG*(state==P3_ON)
+.output (gh4_cmd) VG*(state==P4_ON)
+.output (ready_state) state
+.endmachine
+
+XMOD vin out 0 gh2_cmd gh3_cmd gh4_cmd SCB4P_PERIODIC_SEED
+CCO out 0 {COUT} ic={VO}
+RLOAD_MAIN out 0 {RLOAD}
+
+* Initial and final state samples are separated by exactly one P24 period.
+.meas tran VC1_I FIND V(xmod:a1,xmod:x1) AT {T0+2p}
+.meas tran VC2_I FIND V(xmod:a2,xmod:x2) AT {T0+2p}
+.meas tran VC3_I FIND V(xmod:a3,xmod:x3) AT {T0+2p}
+.meas tran VO_I FIND V(out) AT {T0+2p}
+.meas tran IL1_I FIND I(XMOD:L1) AT {T0+2p}
+.meas tran IL2_I FIND I(XMOD:L2) AT {T0+2p}
+.meas tran IL3_I FIND I(XMOD:L3) AT {T0+2p}
+.meas tran IL4_I FIND I(XMOD:L4) AT {T0+2p}
+.meas tran VC1_F FIND V(xmod:a1,xmod:x1) AT {T0+T+2p}
+.meas tran VC2_F FIND V(xmod:a2,xmod:x2) AT {T0+T+2p}
+.meas tran VC3_F FIND V(xmod:a3,xmod:x3) AT {T0+T+2p}
+.meas tran VO_F FIND V(out) AT {T0+T+2p}
+.meas tran IL1_F FIND I(XMOD:L1) AT {T0+T+2p}
+.meas tran IL2_F FIND I(XMOD:L2) AT {T0+T+2p}
+.meas tran IL3_F FIND I(XMOD:L3) AT {T0+T+2p}
+.meas tran IL4_F FIND I(XMOD:L4) AT {T0+T+2p}
+.meas tran DVC1 PARAM VC1_F-VC1_I
+.meas tran DVC2 PARAM VC2_F-VC2_I
+.meas tran DVC3 PARAM VC3_F-VC3_I
+.meas tran DVO PARAM VO_F-VO_I
+.meas tran DIL1 PARAM IL1_F-IL1_I
+.meas tran DIL2 PARAM IL2_F-IL2_I
+.meas tran DIL3 PARAM IL3_F-IL3_I
+.meas tran DIL4 PARAM IL4_F-IL4_I
+.meas tran IL_MAX MAX I(XMOD:L1) FROM {T0} TO {T0+T}
+.meas tran IL_MIN MIN I(XMOD:L1) FROM {T0} TO {T0+T}
+.meas tran SEG2_MIN MIN V(xmod:a1,xmod:a2) FROM {T0} TO {T0+T}
+.meas tran SEG2_MAX MAX V(xmod:a1,xmod:a2) FROM {T0} TO {T0+T}
+.meas tran SEG3_MIN MIN V(xmod:a2,xmod:a3) FROM {T0} TO {T0+T}
+.meas tran SEG3_MAX MAX V(xmod:a2,xmod:a3) FROM {T0} TO {T0+T}
+.meas tran SEG4_MIN MIN V(xmod:a3,xmod:x4) FROM {T0} TO {T0+T}
+.meas tran SEG4_MAX MAX V(xmod:a3,xmod:x4) FROM {T0} TO {T0+T}
+.meas tran A2_ABS_AT_PHASE2 FIND V(xmod:a2) AT {T0+PHASE}
+.meas tran SEG2_AT_PHASE2 FIND V(xmod:a1,xmod:a2) AT {T0+PHASE}
+.meas tran A3_ABS_AT_PHASE3 FIND V(xmod:a3) AT {T0+2*PHASE}
+.meas tran SEG3_AT_PHASE3 FIND V(xmod:a2,xmod:a3) AT {T0+2*PHASE}
+.meas tran SEG4_AT_PHASE4 FIND V(xmod:a3,xmod:x4) AT {T0+3*PHASE}
+.meas tran GH2_MAX MAX V(gh2_cmd) FROM {T0+PHASE} TO {T0+PHASE+TON}
+.meas tran GH3_MAX MAX V(gh3_cmd) FROM {T0+2*PHASE} TO {T0+2*PHASE+TON}
+.meas tran GH4_MAX MAX V(gh4_cmd) FROM {T0+3*PHASE} TO {T0+3*PHASE+TON}
+.meas tran T_GH2_ON WHEN V(gh2_cmd)=2.5 RISE=1
+.meas tran T_GH3_ON WHEN V(gh3_cmd)=2.5 RISE=1
+.meas tran T_GH4_ON WHEN V(gh4_cmd)=2.5 RISE=1
+.meas tran P2_RELEASE_DELAY PARAM T_GH2_ON-(T0+PHASE)
+.meas tran P3_RELEASE_DELAY PARAM T_GH3_ON-(T0+2*PHASE)
+.meas tran P4_RELEASE_DELAY PARAM T_GH4_ON-(T0+3*PHASE)
+.meas tran SEG2_AT_RELEASE FIND V(xmod:a1,xmod:a2) WHEN V(gh2_cmd)=2.5 RISE=1
+.meas tran SEG3_AT_RELEASE FIND V(xmod:a2,xmod:a3) WHEN V(gh3_cmd)=2.5 RISE=1
+.meas tran SEG4_AT_RELEASE FIND V(xmod:a3,xmod:x4) WHEN V(gh4_cmd)=2.5 RISE=1
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(out) V(gh2_cmd) V(gh3_cmd) V(gh4_cmd) V(ready_state) V(xmod:a1) V(xmod:a2) V(xmod:a3) V(xmod:x4) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:L4)
+.tran 0 {T0+T+5n} 0 2p UIC
+.ic V(xmod:a1)=48 V(xmod:x1)=12 V(xmod:a2)=24 V(xmod:x2)=0 V(xmod:a3)=12 V(xmod:x3)=0 V(xmod:x4)=0 V(out)=1
+
+.subckt SCB4P_PERIODIC_SEED vin out g gh2_in gh3_in gh4_in
+* Native PULSE gives the phase-1 origin. Phases 2-4 are explicit controller
+* plug-in ports, leaving all power-stage connections unchanged.
+VH1 gh1 g PULSE(0 {VG} {T0} 1p 1p {TON} {T})
+BGH2 gh2 g V=V(gh2_in,g)
+BGH3 gh3 g V=V(gh3_in,g)
+BGH4 gh4 g V=V(gh4_in,g)
+
+* P24-derived symmetric controller: the next low side supports each active-high
+* interval. A leg's own low side is admitted only after its switch node reaches
+* zero and is removed at the P24 2% negative-current boundary.
+BL1 gl1 g V=if(time>=T0 & (V(gh4)>2.5 | (V(gh1)<2.5 & V(x1)<=0 & I(L1)>-INEG)),VG,0)
+BL2 gl2 g V=if(time>=T0 & (V(gh1)>2.5 | (V(gh2)<2.5 & V(x2)<=0 & I(L2)>-INEG)),VG,0)
+BL3 gl3 g V=if(time>=T0 & (V(gh2)>2.5 | (V(gh3)<2.5 & V(x3)<=0 & I(L3)>-INEG)),VG,0)
+BL4 gl4 g V=if(time>=T0 & (V(gh3)>2.5 | (V(gh4)<2.5 & V(x4)<=0 & I(L4)>-INEG)),VG,0)
+
+SH1 vin a1 gh1 g SWH
+CH1_TOTAL vin a1 {CH_TOTAL}
+C1 a1 x1 {CFLY} ic=36
+CL1_TOTAL x1 g {CL_TOTAL}
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser=1u ic={IL1_INIT}
+SH2 a1 a2 gh2 g SWH
+CH2_TOTAL a1 a2 {CH_TOTAL}
+C2 a2 x2 {CFLY} ic=24
+CL2_TOTAL x2 g {CL_TOTAL}
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser=1u ic={IL2_INIT}
+SH3 a2 a3 gh3 g SWH
+CH3_TOTAL a2 a3 {CH_TOTAL}
+C3 a3 x3 {CFLY} ic=12
+CL3_TOTAL x3 g {CL_TOTAL}
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser=1u ic={IL3_INIT}
+SH4 a3 x4 gh4 g SWH
+CH4_TOTAL a3 x4 {CH_TOTAL}
+CL4_TOTAL x4 g {CL_TOTAL}
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser=1u ic={IL4_INIT}
+
+RNUM_A1 a1 g 1G
+RNUM_X1 x1 g 1G
+RNUM_A2 a2 g 1G
+RNUM_X2 x2 g 1G
+RNUM_A3 a3 g 1G
+RNUM_X3 x3 g 1G
+RNUM_X4 x4 g 1G
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_PERIODIC_SEED
+.end

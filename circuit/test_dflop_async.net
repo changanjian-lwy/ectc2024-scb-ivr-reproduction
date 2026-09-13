@@ -1,0 +1,11 @@
+VD d 0 1
+VCLK clk 0 PULSE(0 1 1u 1n 1n 100n 10u)
+VCLR clr 0 PULSE(0 1 3u 1n 1n 100n 10u)
+A1 d 0 clk 0 clr qb q 0 DFLOP
+.save V(clk) V(clr) V(q) V(qb)
+.meas tran Q_AFTER_PRE FIND V(q) AT 2u
+.meas tran Q_AFTER_CLR FIND V(q) AT 4u
+.meas tran QB_AFTER_PRE FIND V(qb) AT 2u
+.meas tran QB_AFTER_CLR FIND V(qb) AT 4u
+.tran 0 5u 0 1n
+.end

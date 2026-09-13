@@ -1,0 +1,118 @@
+* =====================================================================
+* INVALIDATED DRAFT - retained only as an audit record.
+* ECTC 2024 Fig. 3 - four-phase series-capacitor buck reproduction
+* One 125 W module of the paper's 48 V -> 1 V, 8-module, 1 kW system
+*
+* FROM PAPER: Vin, Vo, total power, nP, nM, fsw, duty equation, L equation
+* ASSUMED HERE: Cfly, Cout, ESR, switch Ron, diode model, dead time
+* Do not use for validation: the inferred low-side connections were disproved
+* by the detailed APEC 2025 Fig. 1. Use apec2025_verified_3phase_module.cir.
+* =====================================================================
+
+.param VIN=48
+.param VOUT_TARGET=1
+.param PTOTAL=1000
+.param NMODULES=8
+.param NPHASES=4
+.param PMODULE={PTOTAL/NMODULES}
+.param IOMODULE={PMODULE/VOUT_TARGET}
+.param FSW=5Meg
+.param T={1/FSW}
+.param D={NPHASES*VOUT_TARGET/VIN}
+.param TON={D*T}
+.param TDEAD=0.5n
+
+* Eq. (4) value for one electrical phase in the complete 8-module system.
+.param LCRIT={NPHASES*NMODULES*VOUT_TARGET*(1-D)/(2*(PTOTAL/VOUT_TARGET)*FSW)}
+.param LPHASE={0.985*LCRIT}
+
+* Explicit reproduction assumptions because the paper omits these values.
+.param CFLY=1u
+.param CFLY_ESR=2m
+.param COUT=1m
+.param COUT_ESR=0.2m
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+.param RON_H=2m
+.param RON_L=1m
+.param COSS_H=200p
+.param COSS_L=400p
+
+VINPUT vin 0 {VIN}
+
+* Four interleaved phases, 90 electrical degrees apart. Behavioral modulo
+* clocks preserve the complementary low-side state across period boundaries;
+* delayed PULSE sources do not do this correctly for phases 2-4 at startup.
+BHG1 gh1 0 V=if(mod(time+T-0,T)>TDEAD/2 & mod(time+T-0,T)<TON-TDEAD/2,5,0)
+BLG1 gl1 0 V=if(mod(time+T-0,T)>TON+TDEAD/2 & mod(time+T-0,T)<T-TDEAD/2,5,0)
+BHG2 gh2 0 V=if(mod(time+T-T/4,T)>TDEAD/2 & mod(time+T-T/4,T)<TON-TDEAD/2,5,0)
+BLG2 gl2 0 V=if(mod(time+T-T/4,T)>TON+TDEAD/2 & mod(time+T-T/4,T)<T-TDEAD/2,5,0)
+BHG3 gh3 0 V=if(mod(time+T-T/2,T)>TDEAD/2 & mod(time+T-T/2,T)<TON-TDEAD/2,5,0)
+BLG3 gl3 0 V=if(mod(time+T-T/2,T)>TON+TDEAD/2 & mod(time+T-T/2,T)<T-TDEAD/2,5,0)
+BHG4 gh4 0 V=if(mod(time+T-3*T/4,T)>TDEAD/2 & mod(time+T-3*T/4,T)<TON-TDEAD/2,5,0)
+BLG4 gl4 0 V=if(mod(time+T-3*T/4,T)>TON+TDEAD/2 & mod(time+T-3*T/4,T)<T-TDEAD/2,5,0)
+
+* Fig. 3 ladder topology. a1-a3 are the left-side ladder nodes;
+* sw1-sw4 are the four phase switching nodes.
+SH1 vin a1 gh1 0 SWH
+CF1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=36
+SL1 sw1 a2 gl1 0 SWL
+L1 sw1 out {LPHASE}
+
+SH2 a1 a2 gh2 0 SWH
+CF2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=24
+SL2 sw2 a3 gl2 0 SWL
+L2 sw2 out {LPHASE}
+
+SH3 a2 a3 gh3 0 SWH
+CF3 a3 sw3 {CFLY} Rser={CFLY_ESR} IC=12
+SL3 sw3 sw4 gl3 0 SWL
+L3 sw3 out {LPHASE}
+
+SH4 a3 sw4 gh4 0 SWH
+SL4 sw4 0 gl4 0 SWL
+L4 sw4 out {LPHASE}
+
+* Antiparallel diodes and explicit output capacitances for ZVS observation.
+DH1 a1 vin DMOD
+DL1 a2 sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 a3 sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 sw4 sw3 DMOD
+DH4 sw4 a3 DMOD
+DL4 0 sw4 DMOD
+
+CH1 vin a1 {COSS_H}
+CL1 sw1 a2 {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 a3 {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 sw4 {COSS_L}
+CH4 a3 sw4 {COSS_H}
+CL4 sw4 0 {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=0.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=0.1)
+.model DMOD D(Ron=2m Roff=100Meg Vfwd=0.7)
+
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+
+.ic V(out)=1 I(L1)=0 I(L2)=0 I(L3)=0 I(L4)=0
+.options plotwinsize=0 reltol=0.002
+.tran 0 20u 0 0.1n UIC
+
+* Steady-state checks over the final ten switching periods.
+.meas tran VOUT_AVG AVG V(out) FROM 18u TO 20u
+.meas tran IL1_AVG AVG I(L1) FROM 18u TO 20u
+.meas tran IL2_AVG AVG I(L2) FROM 18u TO 20u
+.meas tran IL3_AVG AVG I(L3) FROM 18u TO 20u
+.meas tran IL4_AVG AVG I(L4) FROM 18u TO 20u
+.meas tran IL1_MAX MAX I(L1) FROM 18u TO 20u
+.meas tran IL1_MIN MIN I(L1) FROM 18u TO 20u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 18u TO 20u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 18u TO 20u
+.meas tran VC3_AVG AVG V(a3,sw3) FROM 18u TO 20u
+.meas tran VDSH1_AT_TURNON FIND V(vin,a1) AT=19.2u
+
+.end

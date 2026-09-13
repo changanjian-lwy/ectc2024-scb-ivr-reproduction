@@ -1,0 +1,109 @@
+* R03D - EPE2019-guided gradual-duty takeover sensitivity
+* PURPOSE: determine whether the P24 four-phase power stage survives takeover
+* from a physically generated (imperfect) capacitor ladder for 20 periods.
+*
+* LOCKED POWER-STAGE VALUES
+* P24-FIG3: one module, four phases, grounded low sides per P25 Fig. 1.
+* P24-TABLE1: Vin=48 V, Vout target=1 V, Pmodule=250 W, fsw=5 MHz,
+* duty printed 8.4% (Eq. 1 exact 1/12), Lphase=2.68 nH.
+* CROSS-SOURCE:EPE2019-TABLE1: Cfly=53.8 uF, Cout=4.672 mF.
+*
+* STARTUP MODULE RETAINED FROM R02B
+* IPEC2018-FIG2/FIG8: input-divider/diode passive precharge, generalized N=4.
+* R02B-SENSITIVITY: Cdiv=1.076 mF and Tramp=100 us are the best tested point;
+* they are not P24 reported values and are not claimed optimal.
+* IPEC2018-TABLE2: Lpar=5 nH, Rpar=10 mOhm.
+*
+* MODULATION BOUNDARY
+* OJPEL2024-EQ1/TEXT: for N=4, D<1/4 and adjacent main-switch ON intervals
+* must not overlap to retain nominal switch stress. D=1/12 passes this gate.
+* Conventional phase sequence 1->2->3->4 is used; star sequencing is not
+* applicable/needed for N=4 at this duty.
+*
+* EXPLICIT LIMITATIONS
+* Complementary low-side PWM after takeover is a diagnostic baseline, not the
+* P24/P25 CCM-DCM boundary controller. No Coss, dead time, ZCD, negative-current
+* target, ESR/ESL, device model, or closed-loop output control is inserted.
+* No capacitor IC is used. Failure is admissible; no fitting is allowed.
+
+.param VIN=48 VOUT=1 POUT=250 NP=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} LPHASE=2.68n
+.param CFLY=53.8u COUT=4.672m RLOAD={VOUT*VOUT/POUT}
+.param CDIV=1.076m TRAMP=100u TSTART=150u TSOFT=100u TSTOP=260u
+.param LPAR=5n RPAR=10m RON=1u ROFF=1T VGATE=5 RLDAMP=1u
+
+VSTEP src 0 PWL(0 0 {TRAMP} {VIN} {TSTOP} {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+* Passive divider and precharge diodes remain connected as in the IPEC method.
+CIN1 vin tap3 {CDIV}
+CIN2 tap3 tap2 {CDIV}
+CIN3 tap2 tap1 {CDIV}
+CIN4 tap1 0 {CDIV}
+RLEAK1 vin tap3 1G
+RLEAK2 tap3 tap2 1G
+RLEAK3 tap2 tap1 1G
+RLEAK4 tap1 0 1G
+DPC1 tap3 a1 DPRE
+DPC2 tap2 a2 DPRE
+DPC3 tap1 a3 DPRE
+
+* Before TSTART all low sides are ON to provide the precharge reference.
+* After TSTART, high sides follow non-overlapping 1-2-3-4 interleaving and
+* low sides are simply complementary for this takeover-only diagnostic.
+BH1 gh1 0 V=if(time>=TSTART & mod(time-TSTART+T,T)<TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BL1 gl1 0 V=if(time<TSTART | mod(time-TSTART+T,T)>=TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BH2 gh2 0 V=if(time>=TSTART & mod(time-TSTART+T-T/4,T)<TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BL2 gl2 0 V=if(time<TSTART | mod(time-TSTART+T-T/4,T)>=TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BH3 gh3 0 V=if(time>=TSTART & mod(time-TSTART+T-T/2,T)<TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BL3 gl3 0 V=if(time<TSTART | mod(time-TSTART+T-T/2,T)>=TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BH4 gh4 0 V=if(time>=TSTART & mod(time-TSTART+T-3*T/4,T)<TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+BL4 gl4 0 V=if(time<TSTART | mod(time-TSTART+T-3*T/4,T)>=TON*limit((time-TSTART)/TSOFT,0,1),VGATE,0)
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY}
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser={RLDAMP}
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY}
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser={RLDAMP}
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY}
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser={RLDAMP}
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser={RLDAMP}
+
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.model DPRE D(Ron=1m Roff=1T Vfwd=0)
+
+.meas tran VC1_PRE FIND V(a1,x1) AT {TSTART-1u}
+.meas tran VC2_PRE FIND V(a2,x2) AT {TSTART-1u}
+.meas tran VC3_PRE FIND V(a3,x3) AT {TSTART-1u}
+.meas tran VC1_POST FIND V(a1,x1) AT {TSTOP-1n}
+.meas tran VC2_POST FIND V(a2,x2) AT {TSTOP-1n}
+.meas tran VC3_POST FIND V(a3,x3) AT {TSTOP-1n}
+.meas tran VOUT_POST FIND V(out) AT {TSTOP-1n}
+.meas tran VOUT_PK MAX V(out) FROM {TSTART} TO {TSTOP}
+.meas tran VOUT_MIN_LAST MIN V(out) FROM {TSTOP-2u} TO {TSTOP}
+.meas tran VOUT_MAX_LAST MAX V(out) FROM {TSTOP-2u} TO {TSTOP}
+.meas tran IIN_PK MAX -I(VSTEP) FROM {TSTART} TO {TSTOP}
+.meas tran IL1_MIN MIN I(L1) FROM {TSTART} TO {TSTOP}
+.meas tran IL1_MAX MAX I(L1) FROM {TSTART} TO {TSTOP}
+.meas tran IL2_MIN MIN I(L2) FROM {TSTART} TO {TSTOP}
+.meas tran IL2_MAX MAX I(L2) FROM {TSTART} TO {TSTOP}
+.meas tran IL3_MIN MIN I(L3) FROM {TSTART} TO {TSTOP}
+.meas tran IL3_MAX MAX I(L3) FROM {TSTART} TO {TSTOP}
+.meas tran IL4_MIN MIN I(L4) FROM {TSTART} TO {TSTOP}
+.meas tran IL4_MAX MAX I(L4) FROM {TSTART} TO {TSTOP}
+
+.options reltol=1e-5 abstol=1e-9 chgtol=1e-16
+.save V(vin) V(out) V(a1,x1) V(a2,x2) V(a3,x3) V(gh1) V(gh2) V(gh3) V(gh4) I(VSTEP) I(L1) I(L2) I(L3) I(L4)
+.tran 0 {TSTOP} 0 .5n UIC
+.end
+

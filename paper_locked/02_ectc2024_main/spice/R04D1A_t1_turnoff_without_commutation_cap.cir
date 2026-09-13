@@ -1,0 +1,45 @@
+* R04D1A - t1 boundary with the commutation-capacitance slot intentionally empty
+* CHANGE FROM R04D0: the measured R04D0 state at t1 is transferred here with
+* QH1 already OFF. The run attempts to continue for 2 ns with no Coss path.
+*
+* EXPECTED INTERPRETATION
+* P24 states positive iL1 must charge QH1 Coss and discharge QL1 Coss after
+* t1. Those elements are intentionally absent here. Any singularity, extreme
+* voltage or Roff-dependent current path is a retained missing-model failure,
+* not a physical result and not evidence against P24.
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T} LPHASE=1.4666667n CFLY=53.8u
+.param IL1_T1=124.932723999 VC1_T1=36.0193109995 IL2_T1=-11.3505529996
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+VGH1 gh1 0 0
+VGL2 gl2 0 5
+VGH2 gh2 0 0
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY} IC={VC1_T1}
+L1 x1 out {LPHASE} Rser=1u IC={IL1_T1}
+
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC={IL2_T1}
+
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran IL1_START FIND I(L1) AT 1p
+.meas tran IL1_AFTER FIND I(L1) AT 20p
+.meas tran IL1_JUMP PARAM IL1_AFTER-IL1_START
+.meas tran VX1_MAX MAX V(x1) FROM 0 TO 2n
+.meas tran VX1_MIN MIN V(x1) FROM 0 TO 2n
+.meas tran VA1_MAX MAX V(a1) FROM 0 TO 2n
+.meas tran VA1_MIN MIN V(a1) FROM 0 TO 2n
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(a1) V(x1) I(L1) V(gh1)
+.tran 0 2n 0 1p UIC
+.end

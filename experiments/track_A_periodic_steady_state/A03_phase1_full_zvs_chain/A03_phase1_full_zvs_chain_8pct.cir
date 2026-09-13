@@ -1,0 +1,96 @@
+* A03 - phase-1 full local ZVS chain using natural state inheritance
+* PURPOSE: join the separately verified Mode-1, low-side commutation,
+* freewheel/negative-current, and high-side commutation stages in one run.
+*
+* LOCKED BOUNDARIES
+* - P24 48 V/1 V, NP=4, 5 MHz, recalculated L=1.4666667 nH.
+* - P24 Mode-1 command: QH1 and adjacent-phase low-side QS2 conduct.
+* - Low-side turn-on occurs only after X1 reaches zero.
+* - 8% is the separately calibrated local model branch, not a P24 paper value.
+* - Device Coss: GS61008T Co(tr), 1 HS and 2 parallel LS devices from P25.
+* - External snubber=0; no numeric dead time, driver delay or nonlinear Coss.
+* - 36/24 V are periodic-state candidates, not zero-start or balance claims.
+* - No intermediate state is copied from a preceding simulation.
+
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T}
+.param LPHASE=1.4666667n CFLY=53.8u IPEAK=125
+.param INEG={NEG_FRAC*IPEAK}
+.param RHS={GS61008T_RDS_TYP_25C/NHS} RLS={GS61008T_RDS_TYP_25C/NLS}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+RSTATE state_mon 0 1k
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+BOVERLAP overlap 0 V={V(gh1)*V(gl1)}
+VGL2 gl2 0 5
+VGH2 gh2 0 0
+
+.machine 1p
+.state HS1_ENERGY 0
+.state COMMUTATE_TO_LS1 1
+.state LS1_FREEWHEEL 2
+.state COMMUTATE_TO_HS1 3
+.state HS1_ZVS_RETURN 4
+.rule HS1_ENERGY COMMUTATE_TO_LS1 time>TON
+.rule COMMUTATE_TO_LS1 LS1_FREEWHEEL V(x1)<0
+.rule LS1_FREEWHEEL COMMUTATE_TO_HS1 I(L1)<-INEG
+.rule COMMUTATE_TO_HS1 HS1_ZVS_RETURN V(vin,a1)<0
+.output (gh1) 5*((state==HS1_ENERGY)+(state==HS1_ZVS_RETURN))
+.output (gl1) 5*(state==LS1_FREEWHEEL)
+.output (state_mon) state
+.endmachine
+
+SH1 vin a1 gh1 0 SWH
+CH1 vin a1 {CH_TOTAL} IC=0
+CF1 a1 x1 {CFLY} IC=36
+CL1 x1 0 {CL_TOTAL} IC=12
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+SH2 a1 a2 gh2 0 SWH
+CH2 a1 a2 {CH_TOTAL} IC=24
+CF2 a2 x2 {CFLY} IC=24
+CL2 x2 0 {CL_TOTAL} IC=0
+SL2 x2 0 gl2 0 SWL
+L2 x2 out {LPHASE} Rser=1u IC=0
+
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran T_HS1_OFF WHEN V(gh1)=2.5 FALL=1
+.meas tran IL1_AT_HS1_OFF FIND I(L1) WHEN V(gh1)=2.5 FALL=1
+.meas tran T_LS1_VDS_ZERO WHEN V(x1)=0 FALL=1
+.meas tran T_LS1_ON WHEN V(gl1)=2.5 RISE=1
+.meas tran IL1_AT_LS1_ON FIND I(L1) WHEN V(gl1)=2.5 RISE=1
+.meas tran T_IL1_ZERO WHEN I(L1)=0 FALL=1
+.meas tran T_LS1_OFF WHEN V(gl1)=2.5 FALL=1
+.meas tran IL1_AT_LS1_OFF FIND I(L1) WHEN V(gl1)=2.5 FALL=1
+.meas tran VC1_AT_LS1_OFF FIND V(a1,x1) WHEN V(gl1)=2.5 FALL=1
+.meas tran X1_AT_LS1_OFF FIND V(x1) WHEN V(gl1)=2.5 FALL=1
+.meas tran HS_VDS_AT_LS1_OFF FIND V(vin,a1) WHEN V(gl1)=2.5 FALL=1
+.meas tran T_HS1_VDS_ZERO WHEN V(vin,a1)=0 FALL=1
+.meas tran T_HS1_ZVS_ON WHEN V(gh1)=2.5 RISE=2
+.meas tran IL1_AT_HS1_ZVS_ON FIND I(L1) WHEN V(gh1)=2.5 RISE=2
+.meas tran LS_EVENT_TO_GATE PARAM T_LS1_ON-T_LS1_VDS_ZERO
+.meas tran HS_EVENT_TO_GATE PARAM T_HS1_ZVS_ON-T_HS1_VDS_ZERO
+.meas tran HS_DEAD_INTERVAL PARAM T_HS1_ZVS_ON-T_LS1_OFF
+.meas tran GATE_OVERLAP_MAX MAX V(overlap)
+.meas tran VDS_HS_MIN MIN V(vin,a1)
+.meas tran VDS_HS_MIN_AFTER_LS_OFF MIN V(vin,a1) FROM=179.23n TO=220n
+.meas tran VDS_LS_MAX MAX V(x1)
+.meas tran VC1_END FIND V(a1,x1) AT=220n
+.meas tran IL2_END FIND I(L2) AT=220n
+.meas tran NEG_FRAC_USED PARAM {NEG_FRAC}
+.meas tran CH_USED PARAM {CH_TOTAL}
+.meas tran CL_USED PARAM {CL_TOTAL}
+
+.options plotwinsize=0 reltol=1e-7 abstol=1e-10 chgtol=1e-16 solver=alt
+.save V(x1) V(vin,a1) V(a1,x1) I(L1) I(L2) V(gl1) V(gh1) V(state_mon) V(overlap)
+.step param NEG_FRAC list .08 .09 .10
+.tran 0 220n 0 0.5p UIC
+.end

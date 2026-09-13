@@ -1,0 +1,76 @@
+* R04D3B - P25 Mode 3 extended nP=3 -> nP=4, chained attempt
+* START EVENT: P25 t2, Vds(SL1)=0 and SL1 ON. Initial currents are chained
+* without alteration from R04D2B / the preceding isolated first-interval run.
+* TARGET END EVENT: P25 t3, iL2=0.
+*
+* P25 EXPLICIT / DECLARED EXTENSION
+* P25 has SL1/SL2/SL3 ON. SL4 ON is the declared nP=4 extension.
+* This run intentionally does not invent the positive periodic-state iL2 that
+* P25 Mode 3 requires. Failure to encounter t3 is an accepted boundary result.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n CFLY=53.8u
+.param IL1_T2=125.308306398 IINACTIVE_T2=-11.424
+.param NHS=1 NLS=2
+.param CH={NHS*GS61008T_COTR_0_50V} CL={NLS*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C/NHS} RLS={GS61008T_RDS_TYP_25C/NLS}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+VGH1 gh1 0 0
+VGH2 gh2 0 0
+VGH3 gh3 0 0
+VGH4 gh4 0 0
+VGL1 gl1 0 5
+VGL2 gl2 0 5
+VGL3 gl3 0 5
+VGL4 gl4 0 5
+
+SH1 vin a1 gh1 0 SWH
+CH1 vin a1 {CH} IC=12
+CF1 a1 x1 {CFLY} IC=36
+CL1 x1 0 {CL} IC=0
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC={IL1_T2}
+
+SH2 a1 a2 gh2 0 SWH
+CH2 a1 a2 {CH} IC=12
+CF2 a2 x2 {CFLY} IC=24
+CL2 x2 0 {CL} IC=0
+SL2 x2 0 gl2 0 SWL
+L2 x2 out {LPHASE} Rser=1u IC={IINACTIVE_T2}
+
+SH3 a2 a3 gh3 0 SWH
+CH3 a2 a3 {CH} IC=12
+CF3 a3 x3 {CFLY} IC=12
+CL3 x3 0 {CL} IC=0
+SL3 x3 0 gl3 0 SWL
+L3 x3 out {LPHASE} Rser=1u IC={IINACTIVE_T2}
+
+SH4 a3 x4 gh4 0 SWH
+CH4 a3 x4 {CH} IC=12
+CL4 x4 0 {CL} IC=0
+SL4 x4 0 gl4 0 SWL
+L4 x4 out {LPHASE} Rser=1u IC={IINACTIVE_T2}
+
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+* RISE=1 is intentional: the chained iL2 begins negative. A valid P25 Mode-3
+* entrance must instead start positive and cross zero while decreasing; hence
+* the requested target event is also guarded by the initial-sign measurement.
+.meas tran P25_T3_IL2_ZERO WHEN I(L2)=0 RISE=1
+.meas tran P25_IL1_END FIND I(L1) AT=50n
+.meas tran P25_IL2_START FIND I(L2) AT=1p
+.meas tran P25_IL2_END FIND I(L2) AT=50n
+.meas tran P25_IL2_MAX MAX I(L2)
+.meas tran P25_IL2_MIN MIN I(L2)
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save I(L1) I(L2) I(L3) I(L4) V(x1) V(x2) V(x3) V(x4)
+.tran 0 50n 0 0.5p UIC
+.end

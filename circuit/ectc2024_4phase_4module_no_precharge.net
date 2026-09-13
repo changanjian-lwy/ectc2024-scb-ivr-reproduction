@@ -1,0 +1,123 @@
+* =====================================================================
+* ECTC 2024 / APEC 2025 BASELINE: 4 PHASES x 4 PARALLEL MODULES
+* 48 V -> 1 V, 1 kW, 5 MHz nominal
+* No capacitor-voltage or output-voltage initial conditions are imposed.
+* =====================================================================
+
+* ------------------------ SYSTEM PARAMETERS --------------------------
+.param VIN_FINAL=48 VOUT_TARGET=1 POUT=1000
+.param NPHASES=4 NMODULES=4 FSW=5Meg T={1/FSW}
+.param D_IDEAL={NPHASES*VOUT_TARGET/VIN_FINAL}
+.param TON={D_IDEAL*T} TON_MIN=3.4n
+.param IOUT={POUT/VOUT_TARGET}
+.param IPHASE_PK={2*IOUT/(NPHASES*NMODULES)}
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/POUT}
+
+* Eq. (4) and the independently reported Table 1 value at 5 MHz.
+.param L_EQ4={NPHASES*NMODULES*VOUT_TARGET*(1-NPHASES*VOUT_TARGET/VIN_FINAL)/(2*IOUT*FSW)}
+.param L_TABLE1={2.68n*5Meg/FSW}
+* LMODE=0 uses printed Eq. (4); LMODE=1 uses Table 1.
+.step param LMODE list 0 1
+.param LPHASE={if(LMODE<0.5,L_EQ4,L_TABLE1)}
+
+* ---------------- UNPUBLISHED IMPLEMENTATION INPUTS ------------------
+* These values are explicit assumptions, not values reported in either paper.
+.param CFLY=2u CFLY_ESR=.5m
+.param COUT=2m COUT_ESR=.1m
+.param RON_H=1m RON_L=1m
+.param COSS_H=100p COSS_L=200p
+.param TDEAD=.2n TENABLE=5u TRAMP=40u
+.param RSOURCE=5m LSOURCE=10n
+
+* Dynamic startup: no IC=36/24/12 and no .ic V(out)=1.
+VRAIL vin_raw 0 PWL(0 0 {TENABLE} 0 {TENABLE+TRAMP} {VIN_FINAL} 500u {VIN_FINAL})
+RINPUT vin_raw vin_limited {RSOURCE}
+LINPUT vin_limited vin {LSOURCE}
+
+* Four modules are globally interleaved by one sixteenth of a switching
+* period, so the 16 high-side events are uniformly distributed.
+XMOD1 vin out 0 SCB4 PARAMS: MOFF=0
+XMOD2 vin out 0 SCB4 PARAMS: MOFF={T/16}
+XMOD3 vin out 0 SCB4 PARAMS: MOFF={2*T/16}
+XMOD4 vin out 0 SCB4 PARAMS: MOFF={3*T/16}
+
+COUT_MAIN out 0 {COUT} Rser={COUT_ESR}
+RLOAD_MAIN out 0 {RLOAD}
+
+* -------------------------- MEASUREMENTS -----------------------------
+.meas tran TON_CALC PARAM {TON}
+.meas tran DUTY_CALC PARAM {D_IDEAL}
+.meas tran IPHASE_PK_TABLE_RELATION PARAM {IPHASE_PK}
+.meas tran L_EQ4_VALUE PARAM {L_EQ4}
+.meas tran L_TABLE1_VALUE PARAM {L_TABLE1}
+.meas tran VOUT_FINAL AVG V(out) FROM 380u TO 400u
+.meas tran VC11_FINAL AVG V(xmod1:a1,xmod1:sw1) FROM 380u TO 400u
+.meas tran VC12_FINAL AVG V(xmod1:a2,xmod1:sw2) FROM 380u TO 400u
+.meas tran VC13_FINAL AVG V(xmod1:a3,xmod1:sw3) FROM 380u TO 400u
+.meas tran IL11_MAX MAX I(XMOD1:L1) FROM 300u TO 400u
+.meas tran IL11_MIN MIN I(XMOD1:L1) FROM 300u TO 400u
+.meas tran IINPUT_PEAK MAX I(VRAIL) FROM 0 TO 400u
+
+.options plotwinsize=500 reltol=.003
+.save V(vin) V(out) V(xmod1:a1,xmod1:sw1) V(xmod1:a2,xmod1:sw2) V(xmod1:a3,xmod1:sw3) I(VRAIL) I(XMOD1:L1)
+.tran 0 400u 0 .5n startup
+
+* -------------------- COMPLETE FOUR-PHASE MODULE ---------------------
+* Low-side sources are connected to common ground as explicitly drawn in
+* the authors' 2025 APEC prototype. Extending it to phase 4 completes the
+* connection omitted/ambiguous in the 2024 conceptual drawing.
+.subckt SCB4 vin out g PARAMS: MOFF=0
+
+* Module-local phase offsets are 0, T/4, T/2 and 3T/4.
+BH1 gh1 g V=if(time>TENABLE & mod(time-MOFF+T,T)>TDEAD/2 & mod(time-MOFF+T,T)<TON-TDEAD/2,5,0)
+BL1 gl1 g V=if(time>TENABLE & mod(time-MOFF+T,T)>TON+TDEAD/2 & mod(time-MOFF+T,T)<T-TDEAD/2,5,0)
+BH2 gh2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)>TDEAD/2 & mod(time-MOFF+T-T/4,T)<TON-TDEAD/2,5,0)
+BL2 gl2 g V=if(time>TENABLE & mod(time-MOFF+T-T/4,T)>TON+TDEAD/2 & mod(time-MOFF+T-T/4,T)<T-TDEAD/2,5,0)
+BH3 gh3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)>TDEAD/2 & mod(time-MOFF+T-T/2,T)<TON-TDEAD/2,5,0)
+BL3 gl3 g V=if(time>TENABLE & mod(time-MOFF+T-T/2,T)>TON+TDEAD/2 & mod(time-MOFF+T-T/2,T)<T-TDEAD/2,5,0)
+BH4 gh4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)>TDEAD/2 & mod(time-MOFF+T-3*T/4,T)<TON-TDEAD/2,5,0)
+BL4 gl4 g V=if(time>TENABLE & mod(time-MOFF+T-3*T/4,T)>TON+TDEAD/2 & mod(time-MOFF+T-3*T/4,T)<T-TDEAD/2,5,0)
+
+SH1 vin a1 gh1 g SWH
+CS1 a1 sw1 {CFLY} Rser={CFLY_ESR}
+SL1 sw1 g gl1 g SWL
+L1 sw1 out {LPHASE}
+
+SH2 a1 a2 gh2 g SWH
+CS2 a2 sw2 {CFLY} Rser={CFLY_ESR}
+SL2 sw2 g gl2 g SWL
+L2 sw2 out {LPHASE}
+
+SH3 a2 a3 gh3 g SWH
+CS3 a3 sw3 {CFLY} Rser={CFLY_ESR}
+SL3 sw3 g gl3 g SWL
+L3 sw3 out {LPHASE}
+
+SH4 a3 sw4 gh4 g SWH
+SL4 sw4 g gl4 g SWL
+L4 sw4 out {LPHASE}
+
+* GaN reverse conduction and output-capacitance approximation.
+DH1 a1 vin DMOD
+DL1 g sw1 DMOD
+DH2 a2 a1 DMOD
+DL2 g sw2 DMOD
+DH3 a3 a2 DMOD
+DL3 g sw3 DMOD
+DH4 sw4 a3 DMOD
+DL4 g sw4 DMOD
+CH1 vin a1 {COSS_H}
+CL1 sw1 g {COSS_L}
+CH2 a1 a2 {COSS_H}
+CL2 sw2 g {COSS_L}
+CH3 a2 a3 {COSS_H}
+CL3 sw3 g {COSS_L}
+CH4 a3 sw4 {COSS_H}
+CL4 sw4 g {COSS_L}
+
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=1m Roff=100Meg Vfwd=.1)
+.ends SCB4
+
+.end

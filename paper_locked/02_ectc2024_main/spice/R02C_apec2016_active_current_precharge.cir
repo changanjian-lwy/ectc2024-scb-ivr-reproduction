@@ -1,0 +1,52 @@
+* R02C - APEC-2016 active constant-current precharge principle
+* PURPOSE: validate tpc=C*DeltaV/Ipc for the three P24 flying banks and
+* establish a bounded active alternative to the passive R02A/R02B module.
+*
+* SOURCE LOCKS
+* APEC2016-SEC-IV-B/EQ5: precharge before switching; Ipc=10 mA in the IC;
+* tpc=Ct*(Vin/2)/Ipc for its one-capacitor/two-phase SCB.
+* P24-FIG3/DERIVED:N=4: three capacitor targets are 3/4, 2/4, 1/4 Vin.
+* EPE2019-TABLE1 CROSS-SOURCE CANDIDATE: each flying bank=53.8 uF.
+*
+* EXPLICIT EXTRAPOLATION
+* The three independent current-source branches are not printed in P24, P25,
+* or APEC 2016. They are a replaceable N=4 extension used only to test the
+* timing law. Exact hardware current-source topology remains unresolved.
+*
+* BOUNDARIES
+* All flying capacitors start at 0 V by UIC; no IC=36/24/12 V.
+* No PWM, power inductors, output load, ESR/ESL, or device model is included.
+* Target voltages only disable precharge; they do not impose capacitor voltage.
+* No result from this file may be called a P24 reproduction.
+
+.param VIN=48 CFLY=53.8u IPC=10m TRAMP=1u
+.param VT1={0.75*VIN} VT2={0.50*VIN} VT3={0.25*VIN}
+
+VRAIL vin 0 PWL(0 0 {TRAMP} {VIN} 220m {VIN})
+
+* Positive current flows from the input rail into each initially empty bank.
+BPC1 vin vc1 I=if(V(vin)>VT1 & V(vc1)<VT1,IPC,0)
+BPC2 vin vc2 I=if(V(vin)>VT2 & V(vc2)<VT2,IPC,0)
+BPC3 vin vc3 I=if(V(vin)>VT3 & V(vc3)<VT3,IPC,0)
+CF1 vc1 0 {CFLY}
+CF2 vc2 0 {CFLY}
+CF3 vc3 0 {CFLY}
+RREF1 vc1 0 1T
+RREF2 vc2 0 1T
+RREF3 vc3 0 1T
+
+.meas tran T_VC1 WHEN V(vc1)=VT1 RISE=1
+.meas tran T_VC2 WHEN V(vc2)=VT2 RISE=1
+.meas tran T_VC3 WHEN V(vc3)=VT3 RISE=1
+.meas tran T1_PRED PARAM CFLY*VT1/IPC+TRAMP
+.meas tran T2_PRED PARAM CFLY*VT2/IPC+TRAMP
+.meas tran T3_PRED PARAM CFLY*VT3/IPC+TRAMP
+.meas tran VC1_FINAL AVG V(vc1) FROM 210m TO 220m
+.meas tran VC2_FINAL AVG V(vc2) FROM 210m TO 220m
+.meas tran VC3_FINAL AVG V(vc3) FROM 210m TO 220m
+.meas tran IIN_PK MAX -I(VRAIL) FROM 0 TO 220m
+
+.options reltol=1e-6 abstol=1e-10 chgtol=1e-16
+.save V(vin) V(vc1) V(vc2) V(vc3) I(VRAIL)
+.tran 0 220m 0 10u UIC
+.end

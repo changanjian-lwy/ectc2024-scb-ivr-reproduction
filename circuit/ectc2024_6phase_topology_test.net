@@ -1,0 +1,112 @@
+* ECTC 2024 topology-scaling experiment
+* Hypothetical 6-phase, 48 V -> 1 V, 125 W module
+* Engineering extension; only the four-phase case is the paper baseline.
+.param VIN=48 VOUT_TARGET=1 PMODULE=125 FSW=5Meg
+.param NPHASES=6 T={1/FSW} D_IDEAL={NPHASES*VOUT_TARGET/VIN}
+.param D_CMD={1.174*D_IDEAL} TON={D_CMD*T} TDEAD=.2n
+.param IPHASE_AVG={PMODULE/(VOUT_TARGET*NPHASES)}
+.param LCRIT={VOUT_TARGET*(1-D_IDEAL)/(2*IPHASE_AVG*FSW)}
+.param LPHASE={.985*LCRIT} RL_PHASE={13.6m/12}
+.param CFLY=12u CFLY_ESR=.5m COUT=100u COUT_ESR=.2m
+.param RON_H=7m RON_L=3.5m COSS_H=100p COSS_L=200p
+.param RLOAD={VOUT_TARGET*VOUT_TARGET/PMODULE}
+VINPUT vin 0 {VIN}
+* 6 gate pairs, uniformly shifted by T/6.
+BGH1 gh1 0 V=if(mod(time+T-0,T)>TDEAD/2 & mod(time+T-0,T)<TON-TDEAD/2,5,0)
+BGL1 gl1 0 V=if(mod(time+T-0,T)>TON+TDEAD/2 & mod(time+T-0,T)<T-TDEAD/2,5,0)
+BGH2 gh2 0 V=if(mod(time+T-T/6,T)>TDEAD/2 & mod(time+T-T/6,T)<TON-TDEAD/2,5,0)
+BGL2 gl2 0 V=if(mod(time+T-T/6,T)>TON+TDEAD/2 & mod(time+T-T/6,T)<T-TDEAD/2,5,0)
+BGH3 gh3 0 V=if(mod(time+T-2*T/6,T)>TDEAD/2 & mod(time+T-2*T/6,T)<TON-TDEAD/2,5,0)
+BGL3 gl3 0 V=if(mod(time+T-2*T/6,T)>TON+TDEAD/2 & mod(time+T-2*T/6,T)<T-TDEAD/2,5,0)
+BGH4 gh4 0 V=if(mod(time+T-3*T/6,T)>TDEAD/2 & mod(time+T-3*T/6,T)<TON-TDEAD/2,5,0)
+BGL4 gl4 0 V=if(mod(time+T-3*T/6,T)>TON+TDEAD/2 & mod(time+T-3*T/6,T)<T-TDEAD/2,5,0)
+BGH5 gh5 0 V=if(mod(time+T-4*T/6,T)>TDEAD/2 & mod(time+T-4*T/6,T)<TON-TDEAD/2,5,0)
+BGL5 gl5 0 V=if(mod(time+T-4*T/6,T)>TON+TDEAD/2 & mod(time+T-4*T/6,T)<T-TDEAD/2,5,0)
+BGH6 gh6 0 V=if(mod(time+T-5*T/6,T)>TDEAD/2 & mod(time+T-5*T/6,T)<TON-TDEAD/2,5,0)
+BGL6 gl6 0 V=if(mod(time+T-5*T/6,T)>TON+TDEAD/2 & mod(time+T-5*T/6,T)<T-TDEAD/2,5,0)
+* Reusable series-capacitor ladder power stage.
+SH1 vin a1 gh1 0 SWH
+C1 a1 sw1 {CFLY} Rser={CFLY_ESR} IC=40
+SL1 sw1 0 gl1 0 SWL
+L1 sw1 l1o {LPHASE}
+RL1 l1o out {RL_PHASE}
+SH2 a1 a2 gh2 0 SWH
+C2 a2 sw2 {CFLY} Rser={CFLY_ESR} IC=32
+SL2 sw2 0 gl2 0 SWL
+L2 sw2 l2o {LPHASE}
+RL2 l2o out {RL_PHASE}
+SH3 a2 a3 gh3 0 SWH
+C3 a3 sw3 {CFLY} Rser={CFLY_ESR} IC=24
+SL3 sw3 0 gl3 0 SWL
+L3 sw3 l3o {LPHASE}
+RL3 l3o out {RL_PHASE}
+SH4 a3 a4 gh4 0 SWH
+C4 a4 sw4 {CFLY} Rser={CFLY_ESR} IC=16
+SL4 sw4 0 gl4 0 SWL
+L4 sw4 l4o {LPHASE}
+RL4 l4o out {RL_PHASE}
+SH5 a4 a5 gh5 0 SWH
+C5 a5 sw5 {CFLY} Rser={CFLY_ESR} IC=8
+SL5 sw5 0 gl5 0 SWL
+L5 sw5 l5o {LPHASE}
+RL5 l5o out {RL_PHASE}
+SH6 a5 sw6 gh6 0 SWH
+SL6 sw6 0 gl6 0 SWL
+L6 sw6 l6o {LPHASE}
+RL6 l6o out {RL_PHASE}
+* Reverse-conduction paths and switch capacitances.
+DH1 a1 vin DMOD
+DL1 0 sw1 DMOD
+CH1 vin a1 {COSS_H}
+CL1 sw1 0 {COSS_L}
+DH2 a2 a1 DMOD
+DL2 0 sw2 DMOD
+CH2 a1 a2 {COSS_H}
+CL2 sw2 0 {COSS_L}
+DH3 a3 a2 DMOD
+DL3 0 sw3 DMOD
+CH3 a2 a3 {COSS_H}
+CL3 sw3 0 {COSS_L}
+DH4 a4 a3 DMOD
+DL4 0 sw4 DMOD
+CH4 a3 a4 {COSS_H}
+CL4 sw4 0 {COSS_L}
+DH5 a5 a4 DMOD
+DL5 0 sw5 DMOD
+CH5 a4 a5 {COSS_H}
+CL5 sw5 0 {COSS_L}
+DH6 sw6 a5 DMOD
+DL6 0 sw6 DMOD
+CH6 a5 sw6 {COSS_H}
+CL6 sw6 0 {COSS_L}
+.model SWH SW(Ron={RON_H} Roff=100Meg Vt=2.5 Vh=.1)
+.model SWL SW(Ron={RON_L} Roff=100Meg Vt=2.5 Vh=.1)
+.model DMOD D(Ron=3m Roff=100Meg Vfwd=1.5)
+Cout out 0 {COUT} Rser={COUT_ESR}
+Rload out 0 {RLOAD}
+.ic V(out)=1 I(L1)=0 I(L2)=0 I(L3)=0 I(L4)=0 I(L5)=0 I(L6)=0
+.options reltol=.003
+.tran 0 20u 0 .05n UIC
+.meas tran VOUT_AVG AVG V(out) FROM 15u TO 20u
+.meas tran IL1_AVG AVG I(L1) FROM 15u TO 20u
+.meas tran IL2_AVG AVG I(L2) FROM 15u TO 20u
+.meas tran IL3_AVG AVG I(L3) FROM 15u TO 20u
+.meas tran IL4_AVG AVG I(L4) FROM 15u TO 20u
+.meas tran IL5_AVG AVG I(L5) FROM 15u TO 20u
+.meas tran IL6_AVG AVG I(L6) FROM 15u TO 20u
+.meas tran IL1_MAX MAX I(L1) FROM 15u TO 20u
+.meas tran IL1_MIN MIN I(L1) FROM 15u TO 20u
+.meas tran VC1_AVG AVG V(a1,sw1) FROM 15u TO 20u
+.meas tran VC1_PP PP V(a1,sw1) FROM 15u TO 20u
+.meas tran VC2_AVG AVG V(a2,sw2) FROM 15u TO 20u
+.meas tran VC2_PP PP V(a2,sw2) FROM 15u TO 20u
+.meas tran VC3_AVG AVG V(a3,sw3) FROM 15u TO 20u
+.meas tran VC3_PP PP V(a3,sw3) FROM 15u TO 20u
+.meas tran VC4_AVG AVG V(a4,sw4) FROM 15u TO 20u
+.meas tran VC4_PP PP V(a4,sw4) FROM 15u TO 20u
+.meas tran VC5_AVG AVG V(a5,sw5) FROM 15u TO 20u
+.meas tran VC5_PP PP V(a5,sw5) FROM 15u TO 20u
+.meas tran VDSH1_MIN MIN V(vin,a1) FROM 15u TO 20u
+.meas tran OUTPUT_ERROR_PCT PARAM 100*(VOUT_AVG-VOUT_TARGET)/VOUT_TARGET
+.meas tran NEGATIVE_CURRENT_PCT PARAM 100*abs(IL1_MIN)/IL1_MAX
+.end

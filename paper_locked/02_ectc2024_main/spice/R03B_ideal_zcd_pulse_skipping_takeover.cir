@@ -1,0 +1,123 @@
+* R03B - literature-guided ideal-ZCD / pulse-skipping takeover
+* PURPOSE: isolate whether R03A failed because fixed 5-MHz PWM violated
+* the CCM-DCM boundary during startup.
+*
+* UNCHANGED FROM R03A
+* P24 Fig.3 one-module/four-phase power stage; Vin=48 V, target Vout=1 V,
+* Pmodule=250 W, 5-MHz phase opportunities, D=1/12, Lphase=2.68 nH.
+* EPE2019 Table-I Cfly=53.8 uF and Cout=4.672 mF.
+* IPEC2018 passive divider startup; Cdiv=1.076 mF and Tramp=100 us remain
+* R02B sensitivity settings, not P24 values. No capacitor initial conditions.
+*
+* ONLY CHANGED VARIABLE RELATIVE TO R03A
+* Fixed complementary takeover is replaced by an ideal control abstraction:
+* (1) a phase may start only at its ordinary 5-MHz interleaved opportunity,
+*     when its inductor current is non-positive and Vout is below VREF;
+* (2) fixed P24 on-time is retained;
+* (3) after high-side turn-off, its low side conducts only while phase current
+*     remains positive, then opens at the ideal zero crossing;
+* (4) missed opportunities are skipped. No switching event is advanced merely
+*     to improve a result.
+*
+* LITERATURE BOUNDARY
+* P24/P25: boundary operation and interleaving are the target operating family.
+* ISSCC2019 ref. [12]/[22]: output-comparator pulse request, variable timing,
+* peak-current control and low-side ZCD support this controller abstraction.
+* EPE2019 startup work supports separating capacitor establishment from normal
+* PWM takeover. None of these sources provides the P24 numeric ZCD threshold,
+* delay, blanking or startup-current limit; R03B therefore uses IDEAL zero and
+* is not a hardware-controller reproduction.
+*
+* EXPLICIT OMISSIONS
+* No Coss, dead time, negative-current ZVS interval, ESR/ESL, GaN model,
+* propagation delay, current limit, or fitted capacitor initial voltage.
+
+.param VIN=48 VREF=1 POUT=250 NP=4 FSW=5Meg T={1/FSW}
+.param D={NP*VREF/VIN} TON={D*T} LPHASE=2.68n
+.param CFLY=53.8u COUT=4.672m RLOAD={VREF*VREF/POUT}
+.param CDIV=1.076m TRAMP=100u TSTART=150u TSTOP=170u
+.param LPAR=5n RPAR=10m RON=1u ROFF=1T VGATE=5 RLDAMP=1u
+
+VSTEP src 0 PWL(0 0 {TRAMP} {VIN} {TSTOP} {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+* Passive precharge remains physically connected; no 36/24/12-V sources.
+CIN1 vin tap3 {CDIV}
+CIN2 tap3 tap2 {CDIV}
+CIN3 tap2 tap1 {CDIV}
+CIN4 tap1 0 {CDIV}
+RLEAK1 vin tap3 1G
+RLEAK2 tap3 tap2 1G
+RLEAK3 tap2 tap1 1G
+RLEAK4 tap1 0 1G
+DPC1 tap3 a1 DPRE
+DPC2 tap2 a2 DPRE
+DPC3 tap1 a3 DPRE
+
+* Ordinary 1->2->3->4 opportunity order. A phase whose current has not
+* returned to zero misses that opportunity; its gate is not time-shifted.
+BH1 gh1 0 V=if(time>=TSTART & mod(time-TSTART+T,T)<TON & I(L1)<=0 & V(out)<VREF,VGATE,0)
+BH2 gh2 0 V=if(time>=TSTART & mod(time-TSTART+T-T/4,T)<TON & I(L2)<=0 & V(out)<VREF,VGATE,0)
+BH3 gh3 0 V=if(time>=TSTART & mod(time-TSTART+T-T/2,T)<TON & I(L3)<=0 & V(out)<VREF,VGATE,0)
+BH4 gh4 0 V=if(time>=TSTART & mod(time-TSTART+T-3*T/4,T)<TON & I(L4)<=0 & V(out)<VREF,VGATE,0)
+
+* Precharge: all low sides ON. Takeover: freewheel only for positive current;
+* turn OFF at ideal zero current. High/low commands are mutually exclusive.
+BL1 gl1 0 V=if(time<TSTART,VGATE,if(V(gh1)<2.5 & I(L1)>0,VGATE,0))
+BL2 gl2 0 V=if(time<TSTART,VGATE,if(V(gh2)<2.5 & I(L2)>0,VGATE,0))
+BL3 gl3 0 V=if(time<TSTART,VGATE,if(V(gh3)<2.5 & I(L3)>0,VGATE,0))
+BL4 gl4 0 V=if(time<TSTART,VGATE,if(V(gh4)<2.5 & I(L4)>0,VGATE,0))
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY}
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser={RLDAMP}
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY}
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser={RLDAMP}
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY}
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser={RLDAMP}
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser={RLDAMP}
+
+* Numerical leakage prevents an open DCM switch node from becoming singular;
+* 1-Gohm paths are numerical references, not claimed physical components.
+RX1 x1 0 1G
+RX2 x2 0 1G
+RX3 x3 0 1G
+RX4 x4 0 1G
+
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.model DPRE D(Ron=1m Roff=1T Vfwd=0)
+
+.meas tran VC1_PRE FIND V(a1,x1) AT {TSTART-1u}
+.meas tran VC2_PRE FIND V(a2,x2) AT {TSTART-1u}
+.meas tran VC3_PRE FIND V(a3,x3) AT {TSTART-1u}
+.meas tran VC1_END FIND V(a1,x1) AT {TSTOP-1n}
+.meas tran VC2_END FIND V(a2,x2) AT {TSTOP-1n}
+.meas tran VC3_END FIND V(a3,x3) AT {TSTOP-1n}
+.meas tran VOUT_END FIND V(out) AT {TSTOP-1n}
+.meas tran VOUT_PK MAX V(out) FROM {TSTART} TO {TSTOP}
+.meas tran VOUT_MIN_LAST MIN V(out) FROM {TSTOP-2u} TO {TSTOP}
+.meas tran VOUT_MAX_LAST MAX V(out) FROM {TSTOP-2u} TO {TSTOP}
+.meas tran IIN_PK MAX -I(VSTEP) FROM {TSTART} TO {TSTOP}
+.meas tran IL1_MIN MIN I(L1) FROM {TSTART} TO {TSTOP}
+.meas tran IL1_MAX MAX I(L1) FROM {TSTART} TO {TSTOP}
+.meas tran IL2_MIN MIN I(L2) FROM {TSTART} TO {TSTOP}
+.meas tran IL2_MAX MAX I(L2) FROM {TSTART} TO {TSTOP}
+.meas tran IL3_MIN MIN I(L3) FROM {TSTART} TO {TSTOP}
+.meas tran IL3_MAX MAX I(L3) FROM {TSTART} TO {TSTOP}
+.meas tran IL4_MIN MIN I(L4) FROM {TSTART} TO {TSTOP}
+.meas tran IL4_MAX MAX I(L4) FROM {TSTART} TO {TSTOP}
+
+.options reltol=1e-5 abstol=1e-9 chgtol=1e-16
+.save V(vin) V(out) V(a1,x1) V(a2,x2) V(a3,x3) V(gh1) V(gh2) V(gh3) V(gh4) V(gl1) V(gl2) V(gl3) V(gl4) I(VSTEP) I(L1) I(L2) I(L3) I(L4)
+.tran 0 {TSTOP} 0 .5n UIC
+.end

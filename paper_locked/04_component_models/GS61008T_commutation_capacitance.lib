@@ -1,0 +1,12 @@
+* Modular commutation-capacitance assembly for the P24 main-line model.
+* Device Coss source: GS61008T datasheet Rev 200402 (external device data).
+* Population source: P25 Table III (1 high-side, 2 parallel low-side devices).
+* External snubber values are not published by P24/P25 and default to zero.
+* Control thresholds and timing must be defined outside this component module.
+.param NHS=1 NLS=2
+.param CH_DEVICE={NHS*GS61008T_COTR_0_50V}
+.param CL_DEVICE={NLS*GS61008T_COTR_0_50V}
+.param CH_SNUBBER=0
+.param CL_SNUBBER=0
+.param CH_TOTAL={CH_DEVICE+CH_SNUBBER}
+.param CL_TOTAL={CL_DEVICE+CL_SNUBBER}

@@ -1,0 +1,38 @@
+* R04D5A - P25-native Mode 5 with explicit device-capacitance plug-in
+* Start: physical SL2 OFF. Ideal baseline sets t5=t4 because P25 reports no
+* command/driver delay. End: Vds(SH2)=0 and ideal SH2 ZVS gate event (t6).
+* P25 prototype operating point: 12 V, 3 phases, 22 nH. The phase-2 effective
+* rail is VCS1-VCS2 = 8 V-4 V = 4 V per P25 capacitor-voltage ratings/Eq.(13).
+* CH2/CL2 use GS61008T CO(TR) scalar values; no unreported snubber is invented.
+
+.include ../../04_component_models/GS61008T_typical_params.lib
+.param VO=1 VRAIL2=4 LPHASE=22n IL2_T5=-2.22230815887
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C}
+VRAIL rail2 0 {VRAIL2}
+VOUT out 0 {VO}
+RGH2 gh2 0 1k
+RSTATE state_mon 0 1k
+.machine 1p
+.state P25_MODE5_COMMUTATE 0
+.state P25_T6_SH2_ZVS_ON 1
+.rule P25_MODE5_COMMUTATE P25_T6_SH2_ZVS_ON V(rail2,x2)<0
+.output (gh2) 5*(state==P25_T6_SH2_ZVS_ON)
+.output (state_mon) state
+.endmachine
+SH2 rail2 x2 gh2 0 SWH
+CH2 rail2 x2 {CH} IC={VRAIL2}
+CL2 x2 0 {CL} IC=0
+L2 x2 out {LPHASE} Rser=0.5m IC={IL2_T5}
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.meas tran T6_HIGH_VDS_ZERO WHEN V(rail2,x2)=0 FALL=1
+.meas tran IL2_AT_T6 FIND I(L2) WHEN V(rail2,x2)=0 FALL=1
+.meas tran VX2_AT_T6 FIND V(x2) WHEN V(rail2,x2)=0 FALL=1
+.meas tran T_SH2_GATE_ON WHEN V(gh2)=2.5 RISE=1
+.meas tran IL2_AT_SH2_ON FIND I(L2) WHEN V(gh2)=2.5 RISE=1
+.meas tran VCH2_USED PARAM {CH}
+.meas tran VCL2_USED PARAM {CL}
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(x2) V(rail2,x2) I(L2) V(gh2) V(state_mon)
+.tran 0 8n 0 0.25p UIC
+.end
