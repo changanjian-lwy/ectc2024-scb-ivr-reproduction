@@ -31,6 +31,7 @@ tmp/
 *.pdf
 reports/TALKING_POINTS_*.md
 reports/QA_PREP_*.md
+reports/MEETING_NOTES_*.md
 
 # Local application/runtime state
 .wine/
