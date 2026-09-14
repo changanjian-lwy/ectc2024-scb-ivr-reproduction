@@ -54,6 +54,7 @@ circuit/          Earlier exploratory netlists retained for traceability
 
 Start with:
 
+- `paper_locked/00_boundaries/EXPERIMENT_PROTOCOL_AND_ARCHIVE_RULES.md`
 - `reports/MIHAI_MEETING_2026-09-14.md`
 - `paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md`
 - `paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md`
