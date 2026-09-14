@@ -114,6 +114,13 @@ listed as unresolved. This does not change the adopted `1.4667 nH` value or
 promote `2.68 nH` to a candidate; it only sharpens the discrepancy record for
 any future correspondence with the authors, and it must not be used to infer
 a "correction factor" applied back onto `nP=4`.
+
+This ratio table has since been independently re-derived directly from
+freshly extracted primary-source Table 1 text (not a prior recalculation) in
+`TABLE1_PRIMARY_SOURCE_EXTRACT.md` (2026-09-14), which also confirms this
+project's own `nP=4` raw inputs (`Vin`, `Vo`, `nP`, `nM`, `fsw`, `Ton`,
+`IL,pk`, table `Lcrit`) match the printed cell exactly, ruling out a
+project-side transcription error as the cause of the discrepancy.
 - 2024 Sec. II-B asks for approximately 1-2% negative peak current before
   low-side turn-off.
 
