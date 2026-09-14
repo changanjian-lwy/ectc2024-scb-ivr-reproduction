@@ -104,6 +104,35 @@ Section 5's three questions -- not a converged residual. Concretely:
   point as a new default value; do not silently narrow the `IL1_INIT` sweep
   range to avoid finding an inconvenient flattening point.
 
+## 8a. Addendum: ideal-target vs. non-ideal-device tension (confirmed 2026-09-14)
+
+A separate, real modeling tension exists alongside this diagnostic's own
+finding, and the two must not be conflated. The `125 A` target itself comes
+from 2024's lossless Eq. (2); once `RDS(on)=7 mOhm` (2025 device data) is
+included, `L di/dt = V - RDS(on)*i` means a fixed starting current no longer
+reaches the ideal lossless endpoint over one `TON`. This is quantitatively
+confirmed here: `exp(-RDS(on)*TON/L) = exp(-0.007*16.6667e-9/1.4667e-9)
+= 0.9235`, matching this diagnostic's measured H1 sensitivity
+(`0.9219-0.9236 A/A`) almost exactly. `ILk_INIT` being a free, solved
+variable (Section VIII, `NUMERICAL_IDEALIZATION`) rather than a value fixed
+at the ideal formula's implied starting point (typically near `0 A`) is
+precisely what absorbs this gap and lets the model still land on the
+2024-defined `125 A` target despite using 2025's non-ideal `RDS(on)`. This is
+a legitimate, already-used reconciliation, not a hidden error -- but it had
+not previously been written down as the reason `ILk_INIT` needs to be
+strictly positive rather than zero or paper-derived.
+
+This tension is **not** the cause of A38's H2 peak-current shortfall. Section
+6/7's own measurements show the `RDS(on)`-driven ramp shape is nearly
+identical between H1 and H2 (gain and average `di/dt` within `0.6%` of each
+other) -- the derating this addendum describes applies almost equally to
+both phases and does not explain why one phase's shortfall can be tuned away
+and the other's cannot. The actual cause is recorded in this experiment's own
+`RESULTS.md` ("decisive factor" section): H2's *starting* current at
+admission is pinned by the `L`-`Coss` resonant commutation, not chosen by
+`IL2_INIT`, which is a categorically different mechanism from the
+RDS(on)-derating described here.
+
 ## 8. What this experiment cannot prove
 
 - Not a solve of A38's `PHYSICAL_BOUNDARY_FAIL`, and not a claim that the
