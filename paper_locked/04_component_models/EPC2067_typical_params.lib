@@ -1,0 +1,22 @@
+* EPC2067 typical scalar parameters - official EPC datasheet, revised 2021-10-21
+* EXTERNAL_DEVICE_DATA, not values printed in P24/P25 text.
+* This is the device 2024 Table 3 names for the nP=4 embedded/GaN-package
+* row (2 parallel high-side, 3 parallel low-side for nM=4); it is NOT the
+* device the present active P25_SUPPLEMENT commutation branch uses.
+* Conditions/meaning must remain attached to each value.
+.param EPC2067_VRATED=40
+.param EPC2067_RDS_TYP_25C=1.55m
+.param EPC2067_COSS_TYP=1607p
+.param EPC2067_COER_0_20V=1597p
+.param EPC2067_COTR_0_20V=1860p
+.param EPC2067_QOSS_20V=56n
+* COTR is specified for a 0-to-20-V transition (0 to 50% of the 40 V BVDSS),
+* not 0-to-48-V or 0-to-50-V like the GS61008T sheet's COTR. Any use across a
+* different voltage swing than 0-20 V is an extrapolation unless the
+* nonlinear Coss/Qoss curve is implemented.
+* BVDSS=40 V continuous (48 V pulsed) is below the full 48 V bus; this is
+* only plausible because each switch in the flying-capacitor ladder is
+* expected to block roughly Vin/nP (~12 V for nP=4), not the full 48 V --
+* this has not been independently confirmed against the netlist's actual
+* per-switch blocking voltage and must be checked before this device is
+* used in any active branch.

@@ -32,7 +32,8 @@ row remains `TRANSCRIBE`. `MISSING` rows must remain named variables and
 | Sec. II-B interval 3 | 1-2% negative current and high-side Coss discharge | LOCKED |
 | Fig. 5 | conceptual 3-D package integration | TRANSCRIBE before package layer |
 | Fig. 6 | estimated package dimensions | TRANSCRIBE before package layer |
-| named high-/low-side device and driver | required device model | MISSING |
+| Table 3 | embedded-inductor and EPC GaN switch/parallel-count selection per `nP`/`nM` (e.g. `nP=4`,`nM=4`: 2x EPC2067 HS, 3x EPC2067 LS) | LOCKED (2026-09-14); scope caveat below |
+| named high-/low-side device and driver for the Sec. II-B ZVS circuit itself | required device model | MISSING (Table 3's EPC2067 selection is Sec. IV's embedded/3-D-package concept; not yet confirmed to be the same device intended for Sec. II-B's commutation mechanism) |
 | flying/output capacitor values and parasitics | required hardware model | MISSING |
 | exact ZCD/dead-time/startup implementation | required controller/startup model | MISSING |
 

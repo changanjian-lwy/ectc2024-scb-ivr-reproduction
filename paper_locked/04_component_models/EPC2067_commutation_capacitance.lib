@@ -1,0 +1,20 @@
+* Modular commutation-capacitance assembly for the P24_TABLE3_CANDIDATE branch.
+* STATUS: candidate only. Not included by any active/graded netlist as of
+* 2026-09-14. Do not wire this into R04D*/A37-A44 netlists without opening a
+* new, separately-numbered experiment; those results are graded against the
+* GS61008T-based GS61008T_commutation_capacitance.lib and must not be
+* silently changed underneath them.
+* Device Coss source: EPC2067 datasheet, revised 2021-10-21 (external device data).
+* Population source: 2024 Table 3, nP=4/nM=4 row (2 parallel high-side,
+* 3 parallel low-side EPC2067). This is 2024's own Sec. IV embedded/3-D
+* package integration selection, NOT confirmed to be the device the Sec.
+* II-B ZVS mechanism itself assumes -- see SOURCE_COVERAGE_MATRIX.md.
+* External snubber values are not published by P24/P25 and default to zero.
+* Control thresholds and timing must be defined outside this component module.
+.param NHS=2 NLS=3
+.param CH_DEVICE={NHS*EPC2067_COTR_0_20V}
+.param CL_DEVICE={NLS*EPC2067_COTR_0_20V}
+.param CH_SNUBBER=0
+.param CL_SNUBBER=0
+.param CH_TOTAL={CH_DEVICE+CH_SNUBBER}
+.param CL_TOTAL={CL_DEVICE+CL_SNUBBER}
