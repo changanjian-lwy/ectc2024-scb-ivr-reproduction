@@ -1,0 +1,8 @@
+* Ideal-boundary GaN off-state reverse-conduction plug-in
+* PHYSICAL BASIS: P25 states that GaN transistors conduct in reverse without
+* reverse-recovery charge and explicitly identifies Modes 2' and 5'.
+* NUMERICAL IDEALIZATION: P24/P25 publish no reverse-drop model. VFWD=0 and
+* RON=1m are ideal/numerical boundary values, not GS61008T measured parameters.
+.param DGAN_IDEAL_RON=1m
+.param DGAN_IDEAL_VF=0
+.model DGAN_IDEAL D(Ron={DGAN_IDEAL_RON} Roff=1T Vfwd={DGAN_IDEAL_VF})

@@ -1,0 +1,187 @@
+* A28 - A27 plus phase-2 paper-event scheduler
+* CONTROL: DV1=0. PERTURBED: DV1=-0.5/+0.5 V on C1 only.
+* Compared cases differ only by DV1. The ideal 1-V output source is a shared
+* isolation boundary for both cases, not a claim about the unregulated model.
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+.include ../../../paper_locked/04_component_models/GaN_reverse_conduction_ideal.lib
+.param VIN=48 VO=1 POUT=250 NP=4 NM_SYSTEM=4 NM_INSTANCE=1 FSW=5Meg T={1/FSW}
+.param TON={NP*VO/VIN*T} T0=0 PHASE={T/NP}
+.param LPHASE=1.466666666666667n IPEAK=125 NEG_FRAC=.02 INEG={NEG_FRAC*IPEAK}
+.param CFLY={4*10u+2*4.7u+2*2.2u} COUT={8*220u+32*47u+64*22u}
+.param IL1_INIT=-.935685816243 IL2_INIT=4.75555393314 IL3_INIT=41.5782701063 IL4_INIT=84.1447433786
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param VG=5 RLOAD={VO*VO/POUT}
+
+VRAIL vin 0 {VIN}
+XMOD vin out 0 SCB4P_PERIODIC_SEED
+VOUT_BOUNDARY out 0 {VO}
+
+* Initial and final state samples are separated by exactly one P24 period.
+.meas tran VC1_I FIND V(xmod:a1,xmod:x1) AT {T0+2p}
+.meas tran VC2_I FIND V(xmod:a2,xmod:x2) AT {T0+2p}
+.meas tran VC3_I FIND V(xmod:a3,xmod:x3) AT {T0+2p}
+.meas tran VO_I FIND V(out) AT {T0+2p}
+.meas tran IL1_I FIND I(XMOD:L1) AT {T0+2p}
+.meas tran IL2_I FIND I(XMOD:L2) AT {T0+2p}
+.meas tran IL3_I FIND I(XMOD:L3) AT {T0+2p}
+.meas tran IL4_I FIND I(XMOD:L4) AT {T0+2p}
+.meas tran VC1_F FIND V(xmod:a1,xmod:x1) AT {T0+T+2p}
+.meas tran VC2_F FIND V(xmod:a2,xmod:x2) AT {T0+T+2p}
+.meas tran VC3_F FIND V(xmod:a3,xmod:x3) AT {T0+T+2p}
+.meas tran VO_F FIND V(out) AT {T0+T+2p}
+.meas tran IL1_F FIND I(XMOD:L1) AT {T0+T+2p}
+.meas tran IL2_F FIND I(XMOD:L2) AT {T0+T+2p}
+.meas tran IL3_F FIND I(XMOD:L3) AT {T0+T+2p}
+.meas tran IL4_F FIND I(XMOD:L4) AT {T0+T+2p}
+.meas tran DVC1 PARAM VC1_F-VC1_I
+.meas tran DVC2 PARAM VC2_F-VC2_I
+.meas tran DVC3 PARAM VC3_F-VC3_I
+.meas tran DVO PARAM VO_F-VO_I
+.meas tran DIL1 PARAM IL1_F-IL1_I
+.meas tran DIL2 PARAM IL2_F-IL2_I
+.meas tran DIL3 PARAM IL3_F-IL3_I
+.meas tran DIL4 PARAM IL4_F-IL4_I
+
+
+* A28/A29 local phase-2 event measurements.
+.meas tran T_SL2_RELEASE WHEN V(xmod:st2)=0.5 RISE=1
+.meas tran T_SH2_ON WHEN V(xmod:gh2)=2.5 RISE=1
+.meas tran T_SH2_OFF WHEN V(xmod:gh2)=2.5 FALL=1
+.meas tran VDS_H2_AT_ON FIND V(xmod:a1,xmod:a2) WHEN V(xmod:gh2)=2.5 RISE=1
+.meas tran IL2_AT_ON FIND I(XMOD:L2) WHEN V(xmod:gh2)=2.5 RISE=1
+.meas tran LOCAL_COMM_DELAY PARAM T_SH2_ON-T_SL2_RELEASE
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(xmod:h2_guard_state) V(xmod:gh1) V(xmod:gh2) V(xmod:gh3) V(xmod:gh4) V(xmod:gl1) V(xmod:gl2) V(xmod:gl3) V(xmod:gl4) V(xmod:st1) V(xmod:st2) V(xmod:st3) V(xmod:st4) V(xmod:x1) V(xmod:x2) V(xmod:x3) V(xmod:x4) V(out) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:L4)
+.tran 0 {T0+T+5n} 0 5p UIC
+.ic V(xmod:a1)=48 V(xmod:x1)=11.999933546 V(xmod:a2)=24 V(xmod:x2)=0.0000857674 V(xmod:a3)=12 V(xmod:x3)=-0.0006048777 V(xmod:x4)=0 V(out)=1
+
+.subckt SCB4P_PERIODIC_SEED vin out g
+* Native PULSE gives explicit high-side breakpoints at T/4 origins.
+VH1 gh1 g PULSE(0 {VG} {T0} 1p 1p {TON} {T})
+* A28 phase-2 paper-event scheduler.
+* P2 low-side release (negative-current event) arms commutation.  The first
+* high-side Vds-zero event turns SH2 on.  The phase-current peak ends Mode 1.
+.machine 1p
+.state H2_WAIT_LOW_RELEASE 0
+.state H2_WAIT_VDS_ZERO 1
+.state H2_ON 2
+.state H2_OFF_AFTER_PEAK 3
+.rule H2_WAIT_LOW_RELEASE H2_WAIT_VDS_ZERO V(st2)>=0.5
+.rule H2_WAIT_VDS_ZERO H2_ON V(a1,a2)<=0
+.rule H2_ON H2_OFF_AFTER_PEAK I(L2)>=IPEAK
+.output (gh2) VG*(state==H2_ON)
+.output (h2_guard_state) state
+.endmachine
+RGH2_MACHINE gh2 g 1k
+RH2_GUARD_STATE h2_guard_state g 1k
+VH3 gh3 g PULSE(0 {VG} {T0+2*PHASE} 1p 1p {TON} {T})
+VH4 gh4 g PULSE(0 {VG} {T0+3*PHASE} 1p 1p {TON} {T})
+
+* P24-derived symmetric controller: the next low side supports each active-high
+* interval. A leg's own low side is admitted only after its switch node reaches
+* zero and is removed at the P24 2% negative-current boundary.
+* A25 one-period event-memory controller. At this periodic time origin,
+* phase 1 begins in its own high-side interval; phases 2-4 begin with their low
+* sides latched as required by P25 Mode 1. High-side timing remains the locked
+* fixed P24 interleaving schedule; A25 diagnoses rather than moves those edges.
+
+* Phase 1: admit after H1 turn-off/low-side Coss discharge, retain through the
+* other high-side intervals, release after H4 support and the negative target.
+.machine 1p
+.state P1_WAIT_LOW_ZVS 0
+.state P1_LOW_LATCHED 1
+.state P1_LOW_RELEASED 2
+.rule P1_WAIT_LOW_ZVS P1_LOW_LATCHED (time>TON)*(V(x1)<=0)
+.rule P1_LOW_LATCHED P1_LOW_RELEASED (time>3*PHASE+TON)*(I(L1)<=-INEG)
+.output (gl1) VG*(state==P1_LOW_LATCHED)
+.output (st1) state
+.endmachine
+
+* Phase 2 begins latched, releases after H1 support at its negative target,
+* then is re-admitted after H2 turns off and its low-side Vds reaches zero.
+.machine 1p
+.state P2_LOW_PRE 0
+.state P2_RELEASED 1
+.state P2_LOW_POST 2
+.rule P2_LOW_PRE P2_RELEASED (time>TON)*(I(L2)<=-INEG)
+.rule P2_RELEASED P2_LOW_POST (time>PHASE+TON)*(V(x2)<=0)
+.output (gl2) VG*((state==P2_LOW_PRE)+(state==P2_LOW_POST))
+.output (st2) state
+.endmachine
+
+* Phase 3 is the same rotation, one PHASE later.
+.machine 1p
+.state P3_LOW_PRE 0
+.state P3_RELEASED 1
+.state P3_LOW_POST 2
+.rule P3_LOW_PRE P3_RELEASED (time>PHASE+TON)*(I(L3)<=-INEG)
+.rule P3_RELEASED P3_LOW_POST (time>2*PHASE+TON)*(V(x3)<=0)
+.output (gl3) VG*((state==P3_LOW_PRE)+(state==P3_LOW_POST))
+.output (st3) state
+.endmachine
+
+* Phase 4 is the same rotation, two PHASE intervals later.
+.machine 1p
+.state P4_LOW_PRE 0
+.state P4_RELEASED 1
+.state P4_LOW_POST 2
+.rule P4_LOW_PRE P4_RELEASED (time>2*PHASE+TON)*(I(L4)<=-INEG)
+.rule P4_RELEASED P4_LOW_POST (time>3*PHASE+TON)*(V(x4)<=0)
+.output (gl4) VG*((state==P4_LOW_PRE)+(state==P4_LOW_POST))
+.output (st4) state
+.endmachine
+
+RGL1_MACHINE gl1 g 1k
+RGL2_MACHINE gl2 g 1k
+RGL3_MACHINE gl3 g 1k
+RGL4_MACHINE gl4 g 1k
+RST1 st1 g 1k
+RST2 st2 g 1k
+RST3 st3 g 1k
+RST4 st4 g 1k
+
+SH1 vin a1 gh1 g SWH
+DH1_REVERSE a1 vin DGAN_IDEAL
+CH1_TOTAL vin a1 {CH_TOTAL}
+C1 a1 x1 {CFLY} ic=36.000066454
+CL1_TOTAL x1 g {CL_TOTAL}
+SL1 x1 g gl1 g SWL
+DL1_REVERSE g x1 DGAN_IDEAL
+L1 x1 out {LPHASE} Rser=1u ic={IL1_INIT}
+SH2 a1 a2 gh2 g SWH
+DH2_REVERSE a2 a1 DGAN_IDEAL
+CH2_TOTAL a1 a2 {CH_TOTAL}
+C2 a2 x2 {CFLY} ic=23.9999142326
+CL2_TOTAL x2 g {CL_TOTAL}
+SL2 x2 g gl2 g SWL
+DL2_REVERSE g x2 DGAN_IDEAL
+L2 x2 out {LPHASE} Rser=1u ic={IL2_INIT}
+SH3 a2 a3 gh3 g SWH
+DH3_REVERSE a3 a2 DGAN_IDEAL
+CH3_TOTAL a2 a3 {CH_TOTAL}
+C3 a3 x3 {CFLY} ic=12.0006048777
+CL3_TOTAL x3 g {CL_TOTAL}
+SL3 x3 g gl3 g SWL
+DL3_REVERSE g x3 DGAN_IDEAL
+L3 x3 out {LPHASE} Rser=1u ic={IL3_INIT}
+SH4 a3 x4 gh4 g SWH
+DH4_REVERSE x4 a3 DGAN_IDEAL
+CH4_TOTAL a3 x4 {CH_TOTAL}
+CL4_TOTAL x4 g {CL_TOTAL}
+SL4 x4 g gl4 g SWL
+DL4_REVERSE g x4 DGAN_IDEAL
+L4 x4 out {LPHASE} Rser=1u ic={IL4_INIT}
+
+RNUM_A1 a1 g 1G
+RNUM_X1 x1 g 1G
+RNUM_A2 a2 g 1G
+RNUM_X2 x2 g 1G
+RNUM_A3 a3 g 1G
+RNUM_X3 x3 g 1G
+RNUM_X4 x4 g 1G
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_PERIODIC_SEED
+.end
