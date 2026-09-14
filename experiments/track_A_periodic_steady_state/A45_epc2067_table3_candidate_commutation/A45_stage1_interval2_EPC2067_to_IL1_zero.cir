@@ -1,0 +1,85 @@
+* A45 stage 1 - P24 interval 2, EPC2067 Table-3 candidate commutation cap
+* PARENT: R04D2A_P24_interval2_to_IL1_zero_GS_plugin.cir. SINGLE CHANGED
+* VARIABLE: .include swapped from GS61008T_*.lib to EPC2067_*.lib (2024
+* Table 3's nP=4/nM=4 row: 2 parallel HS + 3 parallel LS EPC2067, NOT yet
+* confirmed to be the Sec.II-B ZVS-mechanism device -- see A45 BOUNDARY.md).
+* Ron is intentionally left at the GS61008T-derived RHS/RLS value; Table 3
+* gives no validated Ron model to swap in, so only Coss/parallel-count-for-
+* capacitance changes here (declared scope limitation, not an oversight).
+* SEQUENCE: P24 only. At t1 QH1 is OFF; positive iL1 commutates the high/low
+* output capacitances; QL1 is ideally commanded ON when its Vds reaches zero;
+* the accepted interval ends when iL1 reaches zero (P24 t2).
+*
+* P24 MINIMAL GATE CONTEXT
+* QS2 remains ON. Other low-side states are unspecified and omitted from this
+* local two-phase subnetwork; omission is not asserted to mean OFF.
+*
+* DEVICE PLUG-IN, NOT P24 DEVICE EVIDENCE
+* EPC2067 datasheet typical values (2024 Table 3 population: NHS=2, NLS=3)
+* are used for the commutation capacitance only: CH_TOTAL=3720 pF,
+* CL_TOTAL=5580 pF. Ron remains the GS61008T-derived RHS/RLS expression
+* (scope limitation, see header).
+* No external snubber, nonlinear Coss, detector delay or dead time is included.
+
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/EPC2067_typical_params.lib
+.include ../../../paper_locked/04_component_models/EPC2067_commutation_capacitance.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n CFLY=53.8u
+.param IL1_T1=124.932723999 VC1_T1=36.0193109995 IL2_T1=-11.3505529996
+.param VX1_T1={VIN-VC1_T1}
+* Ron frozen at the GS61008T 1-HS/2-LS values regardless of the EPC2067
+* capacitance library's own NHS=2/NLS=3 (declared scope limitation).
+.param RHS={GS61008T_RDS_TYP_25C/1} RLS={GS61008T_RDS_TYP_25C/2}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+VGH1 gh1 0 0
+VGL2 gl2 0 5
+VGH2 gh2 0 0
+RGL1 gl1 0 1k
+RSTATE state_mon 0 1k
+
+.machine 1p
+.state P24_COMMUTATE 0
+.state P24_QL1_ON 1
+.rule P24_COMMUTATE P24_QL1_ON V(x1)<0
+.output (gl1) 5*(state==P24_QL1_ON)
+.output (state_mon) state
+.endmachine
+
+SH1 vin a1 gh1 0 SWH
+CH1 vin a1 {CH_TOTAL} IC=0
+CF1 a1 x1 {CFLY} IC={VC1_T1}
+CL1 x1 0 {CL_TOTAL} IC={VX1_T1}
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC={IL1_T1}
+
+SH2 a1 a2 gh2 0 SWH
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWL
+L2 x2 out {LPHASE} Rser=1u IC={IL2_T1}
+
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran P24_T_LOW_ZVS WHEN V(x1)=0 FALL=1
+.meas tran P24_IL1_AT_LOW_ZVS FIND I(L1) WHEN V(x1)=0 FALL=1
+.meas tran P24_T2_IL1_ZERO WHEN I(L1)=0 FALL=1
+.meas tran P24_A1_AT_IL1_ZERO FIND V(a1) WHEN I(L1)=0 FALL=1
+.meas tran P24_X1_AT_IL1_ZERO FIND V(x1) WHEN I(L1)=0 FALL=1
+.meas tran P24_C1_AT_IL1_ZERO FIND V(a1,x1) WHEN I(L1)=0 FALL=1
+.meas tran P24_IL2_AT_IL1_ZERO FIND I(L2) WHEN I(L1)=0 FALL=1
+.meas tran P24_INTERVAL2_DURATION PARAM P24_T2_IL1_ZERO
+.meas tran P24_FREEWHEEL_DURATION PARAM P24_T2_IL1_ZERO-P24_T_LOW_ZVS
+.meas tran VGL1_MAX MAX V(gl1)
+.meas tran CH_USED PARAM {CH_TOTAL}
+.meas tran CL_USED PARAM {CL_TOTAL}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(x1) V(vin,a1) I(L1) I(L2) V(gl1) V(state_mon)
+.tran 0 210n 0 1p UIC
+.end
