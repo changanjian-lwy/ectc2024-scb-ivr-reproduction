@@ -21,6 +21,7 @@ reproduced.
 | R04A | `PASS_LOCAL_STATE_SEQUENCE / MODULAR_REGRESSION_RECONFIRMED` | Latched sequence works; Eq.(4) L gives 125 A, while Table-I L gives 68.5 A; modular rerun reproduced both | P24 local sequence, state-memory pattern and recalculated 1.4667-nH main value | Propagating the 2.68-nH table discrepancy, four-phase balance, startup or ZVS |
 | R04B/R04B-LONG | `REJECTED_NON_P24_COMPLEMENTARY_PWM_BASELINE` | Ordinary per-leg complementary PWM can show near-1-V output while FC charge and phase currents remain unbalanced | Numerical anti-pattern only | Any P24 electrical conclusion, valid steady state, balance, startup or ZVS |
 | R05A | `QUARANTINED_CROSS_PAPER_EXPLORATION` | Under its stated P25-assisted sequence and external Coss assumptions, the local threshold lies between 9.4% and 9.5% | Numerical lessons and later P25-branch comparison only | P24 sequence reproduction, startup, periodic balance, loss, or any judgment of P24's 1%-2% statement |
+| A40 analytical audit | `PASS_ANALYTICAL_BOUNDARY / MISSING_MODE5_TIME_BUDGET_AND_CAP_PARTICIPATION` | P24 125 A is the zero-admission lossless rise; P25 Eq. (13) gives 7.392/3.696 ns for 385 pF at P24 1%/2%, but no unique C ceiling without an allowed Mode-5 time | Defining the A41 snubber-sweep axes, direction and acceptance metrics | Unique CH/CL values, complete four-phase ZVS, periodic closure or hardware behavior |
 
 ## Reuse rule
 

@@ -28,5 +28,14 @@ the fixed high-side schedule so scheduler incompatibility is visible.
 check at the first A25 failure. It prevents hard turn-on but exposes an
 unresolved choice between shortened on-time and shifted interleaving timing.
 
+`A27-A39` develop and diagnose the device-capacitance/event-controlled 9%
+cross-paper branch. Their local ZVS results and failures do not constitute a
+P24 1%-2% periodic reproduction. `A40_analytical_peak_and_commutation_feasibility`
+then separates the P24 lossless peak-current target from the P25
+device-augmented ramp and derives the P25 Mode-5 capacitance ceiling without
+running LTspice. Its next permitted child is the explicitly labelled A41
+snubber sensitivity study; it is not permission to select an unpublished
+snubber value.
+
 No result may be promoted to the four-module assembly until the complete
 single-module periodic orbit and its paper-defined event alignment are closed.
