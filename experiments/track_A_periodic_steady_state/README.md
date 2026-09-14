@@ -40,6 +40,10 @@ added capacitance monotonically worsens the post-release minimum high-side
 negative-current target and independently brackets the local device-augmented
 ZVS threshold at 7.76%-7.77%. This is a mechanism result, not a P24 periodic or
 hardware conclusion, and it must not replace the P24 1%-2% branch.
+`A43_p25_device_augmented_7p77_full_event_machine` then transplants only 7.77%
+into A37's unchanged full-machine seed. It stops at `P1_M5`: H2's Vds bottoms
+at 1.418 V and H2 remains blocked. This proves the A42 local threshold is not
+portable without its complete local energy state.
 
 No result may be promoted to the four-module assembly until the complete
 single-module periodic orbit and its paper-defined event alignment are closed.

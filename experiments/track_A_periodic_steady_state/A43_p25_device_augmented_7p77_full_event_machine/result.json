@@ -1,0 +1,25 @@
+{
+  "model_layer": "P25_DEVICE_AUGMENTED",
+  "negative_fraction_pct": 7.77,
+  "negative_target_a": 9.7125,
+  "transitions": {
+    "P1_M1_to_P1_M2_ns": 16.66806926622944,
+    "P1_M2_to_P1_M3_ns": 16.805189748302006,
+    "P1_M3_to_P1_M4_ns": 30.847140078421038,
+    "P1_M4_to_P1_M5_ns": 45.34023171297327,
+    "P1_M5_to_P2_M1_ns": null
+  },
+  "h1_on_ns": 0.0007026876376942067,
+  "h1_off_ns": 16.66806926622944,
+  "l2_release_ns": 45.34023171297327,
+  "l2_current_at_release_a": -9.71398639678955,
+  "h2_minimum_vds_after_release_v": 1.4184799194335938,
+  "h2_minimum_vds_time_ns": 47.85193608813936,
+  "h2_vds_at_50ns_v": 9.58917208236916,
+  "h2_admitted": false,
+  "h3_admitted": false,
+  "h4_admitted": false,
+  "final_state": 4,
+  "first_failure": "P1_M5_WAITING_FOR_H2_VDS_ZERO",
+  "controller_guard_pass": true
+}
