@@ -11,6 +11,13 @@ tolerances: three flying-capacitor voltages, four inductor currents and output
 voltage. Output average, ripple, charge balance and switching boundaries are
 separate acceptance checks.
 
+Peak-current acceptance also has two non-interchangeable layers:
+`P24_IDEAL` checks the lossless 125-A analytical target, whereas
+`P25_DEVICE_AUGMENTED` checks the phase-local non-ideal endpoint predicted
+from the actual admission state. Any locally solved initial current remains a
+`LOCAL_SOLVED_SEED` until the complete period closes; only then may it be
+called a `VALID_PERIODIC_INITIAL_STATE`.
+
 ## Track B - zero-start engineering extension
 
 The startup detector, predictive pulses, repeated-pulse screen and first-ZVS

@@ -80,6 +80,52 @@ capacitance.
 
 ## III. Experiment tracks
 
+### Model-fidelity and peak-current acceptance layers
+
+Every Track-A experiment must declare exactly one electrical-model layer. A
+result may not use an acceptance target from one layer while silently using
+the device equations of the other layer.
+
+#### `P24_IDEAL`
+
+- Purpose: reproduce the analytical relationships printed in the 2024 paper.
+- The high-side conduction path is lossless for the Eq. (2)/(4) peak-current
+  check (`RDS(on)=0` for that check).
+- The published analytical reference remains `IL,pk=125 A` with
+  `Ton=16.6667 ns` and the adopted Eq.-(4) `L=1.4667 nH`.
+- A mismatch against `125 A` may be graded against the P24 analytical target
+  only when the run actually uses this ideal electrical layer.
+
+#### `P25_DEVICE_AUGMENTED`
+
+- Purpose: retain the P24 topology/timing while adding a device module from
+  P25 and/or an external datasheet, such as `RDS(on)=7 mOhm`.
+- `125 A` remains a separately reported P24 ideal reference; it is not the
+  sole pass/fail endpoint for the non-ideal current ramp.
+- For a locally near-constant drive voltage `VDRV`, total series resistance
+  `RPATH`, fixed `Ton`, inductance `L`, and measured current at actual high-side
+  admission `IADMIT`, the device-layer endpoint prediction is
+
+  ```text
+  IEND_DEVICE = VDRV/RPATH
+              + (IADMIT - VDRV/RPATH)*exp(-RPATH*Ton/L)
+  ```
+
+  with the continuous limit `IEND_DEVICE=IADMIT+VDRV*Ton/L` when
+  `RPATH -> 0`.
+- `VDRV` and `IADMIT` must be read at that phase's physical admission event;
+  a single fixed `118 A` or `119 A` value must not be installed as a global
+  target. Capacitor motion or other non-constant effects must be reported as
+  the residual between the simulated endpoint and this local prediction.
+- Every result reports two quantities separately: deviation from
+  `IEND_DEVICE`, which validates the augmented model, and deviation from
+  `125 A`, which quantifies departure from the P24 ideal reference. The latter
+  alone is not a `PHYSICAL_BOUNDARY_FAIL` of the P24 topology.
+
+Using a P25 device parameter does not convert a cross-paper control sequence
+into a P24-primary result. Sequence provenance, negative-current branch and
+model-fidelity layer remain independent labels.
+
 Experiments are organized into at least these tracks.
 
 ### Track A: periodic steady-state reproduction
@@ -227,6 +273,23 @@ x = [VC1, VC2, VC3, Vo, IL1, IL2, IL3, IL4]
 ```
 
 A local solve success must never substitute for full period closure.
+
+Initial-state outputs use the following mandatory names:
+
+- `LOCAL_SOLVED_SEED`: one or more local event/endpoint residuals converge,
+  but the complete state vector has not satisfied `x(T)=x(0)`. It remains a
+  numerical solver coordinate and may seed the next experiment, but is not a
+  demonstrated steady-state initial condition.
+- `VALID_PERIODIC_INITIAL_STATE`: every declared state in the complete vector
+  satisfies the period-closure tolerances and the event sequence remains
+  valid throughout the period.
+
+A positive solved `ILk_INIT` may compensate a device-layer conduction drop
+inside a local calculation, but that reconciliation is physically admissible
+as a steady-state initial current only after it earns the
+`VALID_PERIODIC_INITIAL_STATE` label. Until then it must remain
+`LOCAL_SOLVED_SEED`; it may not be described as natural balance or a valid
+periodic orbit.
 
 ## IX. Naming convention
 

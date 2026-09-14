@@ -144,3 +144,19 @@ residuals converge; this is not expected given the 7-DOF system.
 - A `PASS` or `LOCAL_PASS` grade here never authorizes claiming "the 2024
   paper's four-phase period is reproduced"; it authorizes only the
   per-residual claims actually observed.
+
+## 9. Post-run model-layer interpretation (added 2026-09-14)
+
+This archived experiment predates the formal `P24_IDEAL` versus
+`P25_DEVICE_AUGMENTED` split. Its netlist electrically applies
+`RDS(on)=7 mOhm`, so its model layer is retrospectively classified
+`P25_DEVICE_AUGMENTED`, while its `125 A` residuals remain the originally
+declared P24 ideal-reference diagnostics. Those residuals are retained
+unchanged for reproducibility, but a nonzero `iLk(TON)-125 A` must not by
+itself be interpreted as a physical failure of the P24 topology. A future
+device-layer experiment must additionally calculate the phase-local RL
+endpoint from actual admission current and voltage, as required by the global
+protocol.
+
+All seven values in `best_candidate.json` are `LOCAL_SOLVED_SEED` values, not
+`VALID_PERIODIC_INITIAL_STATE` values: A37 did not close the complete period.

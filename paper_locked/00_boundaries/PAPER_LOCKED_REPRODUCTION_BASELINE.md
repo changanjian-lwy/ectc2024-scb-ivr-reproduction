@@ -117,6 +117,21 @@ a "correction factor" applied back onto `nP=4`.
 - 2024 Sec. II-B asks for approximately 1-2% negative peak current before
   low-side turn-off.
 
+### Mandatory ideal/device-layer separation
+
+The 2024 `125 A` value is a lossless analytical target. It is tested directly
+only in the `P24_IDEAL` layer defined by
+`EXPERIMENT_PROTOCOL_AND_ARCHIVE_RULES.md`. When P25's GS61008T
+`RDS(on)=7 mOhm` or other non-ideal device data is electrically active, the
+experiment is `P25_DEVICE_AUGMENTED`: it must calculate the phase-local RL
+endpoint from the actual admission current and available drive voltage, and
+must report that endpoint residual separately from the difference to the
+2024 ideal `125 A` reference. A lower non-ideal endpoint alone is not evidence
+that the P24 topology or Eq. (2) has failed.
+
+The model layer does not resolve the separate sequence conflict: the P24
+1-2% branch and P25 5-10%/9% extensions remain separately labelled.
+
 ### 2025 APEC demonstrated hardware
 
 - `Vin=12 V`, `Vo=1 V`, `Po=200 W`, `nP=3`, `nM=3`, `fsw=0.5 MHz`.

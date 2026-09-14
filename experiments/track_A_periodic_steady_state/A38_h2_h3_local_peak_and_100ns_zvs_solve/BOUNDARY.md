@@ -135,3 +135,19 @@ re-adjusting `IL1_INIT` without renaming the experiment.
   further phase pair must still be checked, not assumed.
 - Not evidence about zero-start (Track B), closed-loop regulation, efficiency,
   loss, thermal, EMI, or package behavior.
+
+## 9. Post-run model-layer interpretation (added 2026-09-14)
+
+This archived experiment electrically applies P25's
+`RDS(on)=7 mOhm`; it is therefore `P25_DEVICE_AUGMENTED`, not
+`P24_IDEAL`. The original R1 definition against `125 A` remains frozen as an
+ideal-reference diagnostic so the historical experiment is reproducible.
+Its `PHYSICAL_BOUNDARY_FAIL` grade applies only to the originally configured
+mixed acceptance problem: it means `IL2_INIT` could not simultaneously force
+the non-ideal/event-gated H2 endpoint to the P24 ideal reference while
+preserving the ZVS events. It does **not** establish that the P24 topology or
+lossless Eq. (2) physically fails.
+
+`IL1_INIT`, `IL2_INIT`, and the solved `IL3_INIT` are
+`LOCAL_SOLVED_SEED` values. None is a `VALID_PERIODIC_INITIAL_STATE`, because
+A38 did not test or achieve complete 200-ns state closure.

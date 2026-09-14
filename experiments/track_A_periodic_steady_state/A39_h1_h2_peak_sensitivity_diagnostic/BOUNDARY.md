@@ -116,11 +116,13 @@ confirmed here: `exp(-RDS(on)*TON/L) = exp(-0.007*16.6667e-9/1.4667e-9)
 (`0.9219-0.9236 A/A`) almost exactly. `ILk_INIT` being a free, solved
 variable (Section VIII, `NUMERICAL_IDEALIZATION`) rather than a value fixed
 at the ideal formula's implied starting point (typically near `0 A`) is
-precisely what absorbs this gap and lets the model still land on the
+precisely what absorbs this gap and lets the local model still land on the
 2024-defined `125 A` target despite using 2025's non-ideal `RDS(on)`. This is
-a legitimate, already-used reconciliation, not a hidden error -- but it had
-not previously been written down as the reason `ILk_INIT` needs to be
-strictly positive rather than zero or paper-derived.
+a transparent local numerical reconciliation, not a hidden error, but it is
+only a `LOCAL_SOLVED_SEED`: it becomes a physically admissible steady-state
+reconciliation only if the complete state later satisfies `x(T)=x(0)` and is
+therefore promoted to `VALID_PERIODIC_INITIAL_STATE`. A37 did not achieve
+that closure.
 
 This tension is **not** the cause of A38's H2 peak-current shortfall. Section
 6/7's own measurements show the `RDS(on)`-driven ramp shape is nearly

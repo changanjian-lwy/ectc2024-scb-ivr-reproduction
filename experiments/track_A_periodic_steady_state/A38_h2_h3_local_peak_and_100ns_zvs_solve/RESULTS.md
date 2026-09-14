@@ -3,6 +3,13 @@
 Branch: `CROSS_PAPER_EXTENSION`, labelled P25 9% negative-current branch. Not a
 2024-primary (`P24_EXPLICIT` 1-2%) result; see BOUNDARY.md Section 8.
 
+> **Model-layer clarification (2026-09-14):** this run is
+> `P25_DEVICE_AUGMENTED`. The `PHYSICAL_BOUNDARY_FAIL` grade below is limited
+> to its original mixed requirement of reaching the P24 ideal 125-A reference
+> with the non-ideal, event-gated device model while preserving ZVS. It is not
+> evidence that the P24 topology or lossless Eq. (2) fails. The initial-state
+> values remain `LOCAL_SOLVED_SEED`, not `VALID_PERIODIC_INITIAL_STATE`.
+
 ## 1. Whether the simulation completed normally
 
 Yes. All 11 LTspice batch invocations in `solver_history.json` completed with

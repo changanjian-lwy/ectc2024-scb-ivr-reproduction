@@ -3,6 +3,13 @@
 Branch: `CROSS_PAPER_EXTENSION`, labelled P25 9% negative-current branch. Not a
 2024-primary (`P24_EXPLICIT` 1-2%) result; see BOUNDARY.md Section 8.
 
+> **Model-layer clarification (2026-09-14):** this run is
+> `P25_DEVICE_AUGMENTED` because `RDS(on)=7 mOhm` is electrically active.
+> Its 125-A residuals are retained as P24 ideal-reference diagnostics, not as
+> standalone proof of P24-topology failure. All reported initial-state values
+> are `LOCAL_SOLVED_SEED`, not `VALID_PERIODIC_INITIAL_STATE`, because the
+> complete period did not close.
+
 ## 1. Whether the simulation completed normally
 
 Yes, at the individual-run level: every one of the 174 LTspice batch
