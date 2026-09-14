@@ -25,16 +25,22 @@ fi
 
 netlist="$(cd "$(dirname "$netlist")" && pwd)/$(basename "$netlist")"
 
+ltspice_exe='C:\Program Files\ADI\LTspice\LTspice.exe'
+
 case "$mode" in
   run)
+    # A bare "LTspice.exe" relies on the wine wrapper resolving it against
+    # --workdir/PATH; this build's winewrapper.exe fails that resolution
+    # ("cannot execute") even for a known-good netlist, so the fully
+    # qualified Windows path is passed explicitly instead.
     exec "$wine_runner" --bottle default --wait-children \
       --workdir 'C:/Program Files/ADI/LTspice' \
-      LTspice.exe -b "$netlist"
+      "$ltspice_exe" -b "$netlist"
     ;;
   open)
     exec "$wine_runner" --bottle default --no-wait \
       --workdir 'C:/Program Files/ADI/LTspice' \
-      LTspice.exe "$netlist"
+      "$ltspice_exe" "$netlist"
     ;;
   *)
     echo "Unknown mode: $mode (expected run or open)" >&2

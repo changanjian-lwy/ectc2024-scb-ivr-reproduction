@@ -1,0 +1,39 @@
+{
+  "iteration": 1,
+  "x": {
+    "IL1_INIT": 5.2947,
+    "IL2_INIT": 21.205095337,
+    "IL3_INIT": 41.5782701063,
+    "IL4_INIT": 84.1447433786,
+    "VC1_INIT": 36.000066454,
+    "VC2_INIT": 23.9999142326,
+    "VC3_INIT": 12.0006048777
+  },
+  "peak_error_h1_a": -7.62939453125e-06,
+  "peak_error_h2_a": -7.234306335449219,
+  "peak_error_h3_a": -125.0,
+  "peak_error_h4_a": -125.0,
+  "zvs_error_h2_v": -0.00017477418553375746,
+  "zvs_error_h3_v": 11.246405784994762,
+  "zvs_error_h4_v": 13.91595865218034,
+  "zvs_error_h1_v": 11.977802114056793,
+  "periodic_error_il1_a": -11.002768101881282,
+  "periodic_error_il2_a": 1.2488280056612666,
+  "periodic_error_il3_a": -40.614855063734076,
+  "periodic_error_il4_a": -134.0589223270964,
+  "periodic_error_vc1_v": 0.002246856689453125,
+  "periodic_error_vc2_v": 0.018204602853561624,
+  "periodic_error_vc3_v": -1.3871363746531529e-05,
+  "residual_norm": 226.9579705607569,
+  "missed_admission": {
+    "h1": false,
+    "h2": false,
+    "h3": true,
+    "h4": true
+  },
+  "converged_residual_count": 3,
+  "residual_tolerance": 0.0002,
+  "selection_method": "row with the MOST individually-converged residuals (tolerance 2e-4 in the respective A/V unit, matching the order of magnitude A36 itself achieved and called converged) across the full 174-evaluation combined solver_history.json (two optimizer attempts: method=lm interrupted after 120 evaluations by an external session teardown, then method=trf restarted from the same seed and converged by its own xtol criterion after 19 more evaluations). This maximum (3 of 15) occurs at iteration 1, the UNOPTIMIZED seed itself (IL1_INIT/IL2_INIT inherited exactly from A36 best_candidate.json, IL3_INIT/IL4_INIT inherited from A33, VC1_INIT/VC2_INIT/VC3_INIT from the 36/24/12 V guess table) -- neither optimizer run found any point with more converged residuals, or even an equal count at a lower overall residual norm, than this untouched seed. The point with the smallest overall Euclidean residual_norm (iteration 119, norm=209.40379752962167) has ZERO converged residuals: its smaller norm comes entirely from trading away the seed already-converged peak_error_h1/zvs_error_h2/periodic_error_vc3 for smaller (but still non-converged) periodic current errors elsewhere, which is not an improvement by the per-residual grading this experiment uses.",
+  "final_solution": true,
+  "note": "H3 and H4 never achieved their own ZVS admission (missed_admission=true) in ANY of the 174 evaluated points, including a wide excursion during the lm run (iteration 9) that pushed IL4_INIT to -506 A. peak_error_h3_a and peak_error_h4_a are therefore exactly -125.0 A (no conduction occurred) at every evaluated point, this one included. The joint 7-DOF solve made no net progress over 174 LTspice evaluations across two optimizer methods."
+}

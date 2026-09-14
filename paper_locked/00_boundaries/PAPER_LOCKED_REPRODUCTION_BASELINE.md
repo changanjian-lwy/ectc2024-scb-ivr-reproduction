@@ -84,6 +84,36 @@ never an inferred conventional control law.
 - User decision: the main model uses the recalculated `1.4667 nH`; `2.68 nH`
   remains only as a documented table inconsistency and is not a simulation
   branch or parameter candidate.
+
+### Table I / Eq. (4) discrepancy: per-`nP` structure (rechecked 2026-09-14)
+
+The `table/Eq.(4)` ratio at 5 MHz is not a single approximately-constant
+factor; it is essentially exact within each `nP` group (all `nM` sub-rows of
+a given `nP` agree with each other to within Table I's own printed rounding)
+but differs sharply between `nP` groups:
+
+| `nP` | `table_L / Eq.(4)_L` at 5 MHz (all `nM` rows) |
+|---:|---:|
+| 4 | ~1.827-1.841 (not a clean small integer) |
+| 6 | 2.000 (exact) |
+| 8 | ~1.995-2.003 (matches `2x` within Table I's printed rounding) |
+| 16 | ~1.000-1.003 (matches `1x`, i.e. agrees with Eq. (4) directly) |
+
+Three of the four `nP` groups (6, 8, 16) match a clean integer multiple of
+the Eq. (4) prediction (`2x`, `2x`, `1x` respectively) essentially exactly.
+The `nP=4` row — the row this project's active mainline uses — is the one
+group that does **not** fit either clean multiple; it sits at an
+intermediate, non-clean ~1.83x that does not resolve to a simple factor.
+
+This pattern is evidence against a single hidden alternate formula applied
+uniformly across Table I (a uniform formula would not produce clean integer
+multiples for three groups and a non-integer multiple for the fourth). It is
+more consistent with an inconsistent, per-row table-generation or
+spreadsheet-transcription error, one of the causes this document already
+listed as unresolved. This does not change the adopted `1.4667 nH` value or
+promote `2.68 nH` to a candidate; it only sharpens the discrepancy record for
+any future correspondence with the authors, and it must not be used to infer
+a "correction factor" applied back onto `nP=4`.
 - 2024 Sec. II-B asks for approximately 1-2% negative peak current before
   low-side turn-off.
 
