@@ -32,10 +32,11 @@ unresolved choice between shortened on-time and shifted interleaving timing.
 cross-paper branch. Their local ZVS results and failures do not constitute a
 P24 1%-2% periodic reproduction. `A40_analytical_peak_and_commutation_feasibility`
 then separates the P24 lossless peak-current target from the P25
-device-augmented ramp and derives the P25 Mode-5 capacitance ceiling without
-running LTspice. Its next permitted child is the explicitly labelled A41
-snubber sensitivity study; it is not permission to select an unpublished
-snubber value.
+device-augmented ramp and audits the P25 Mode-5 time law without inventing an
+unpublished time budget. `A41_p24_snubber_local_sensitivity` runs the resulting
+fixed 1%-2%, 0-2-nF local screen. No positive passive snubber case reaches ZVS;
+added capacitance monotonically worsens the post-release minimum high-side
+`Vds`. This is a mechanism result, not a periodic or hardware conclusion.
 
 No result may be promoted to the four-module assembly until the complete
 single-module periodic orbit and its paper-defined event alignment are closed.

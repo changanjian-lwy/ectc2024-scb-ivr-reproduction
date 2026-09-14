@@ -22,6 +22,7 @@ reproduced.
 | R04B/R04B-LONG | `REJECTED_NON_P24_COMPLEMENTARY_PWM_BASELINE` | Ordinary per-leg complementary PWM can show near-1-V output while FC charge and phase currents remain unbalanced | Numerical anti-pattern only | Any P24 electrical conclusion, valid steady state, balance, startup or ZVS |
 | R05A | `QUARANTINED_CROSS_PAPER_EXPLORATION` | Under its stated P25-assisted sequence and external Coss assumptions, the local threshold lies between 9.4% and 9.5% | Numerical lessons and later P25-branch comparison only | P24 sequence reproduction, startup, periodic balance, loss, or any judgment of P24's 1%-2% statement |
 | A40 analytical audit | `PASS_ANALYTICAL_BOUNDARY / MISSING_MODE5_TIME_BUDGET_AND_CAP_PARTICIPATION` | P24 125 A is the zero-admission lossless rise; P25 Eq. (13) gives 7.392/3.696 ns for 385 pF at P24 1%/2%, but no unique C ceiling without an allowed Mode-5 time | Defining the A41 snubber-sweep axes, direction and acceptance metrics | Unique CH/CL values, complete four-phase ZVS, periodic closure or hardware behavior |
+| A41 local snubber sensitivity | `28/28 NUMERICALLY COMPLETE / 0 ZVS / 28 GUARD_PASS` | At exact P24 1%-2% release, 0-2 nF positive added capacitance does not create high-side ZVS; it monotonically raises minimum post-release Vds and delays its minimum | Rejecting a wider passive-capacitance search; defining a zero-snubber negative-current threshold experiment | P24 periodic reproduction, hardware snubber need, four-phase closure, startup, or unpublished device values |
 
 ## Reuse rule
 
