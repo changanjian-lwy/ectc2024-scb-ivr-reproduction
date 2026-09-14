@@ -155,6 +155,79 @@ Paper-local labels such as `t1/t2/t3` are treated as aliases for these events,
 because the two papers do not always attach the same label to the same physical
 boundary.
 
+### 5.1 How V5, V6 and V7 are controlled in each horizontal segment
+
+The three active implementation layers are kept distinct:
+
+- V5 answers what electrical device is present and therefore determines the
+  waveform.
+- V6 observes that waveform and declares whether a physical boundary has been
+  reached.
+- V7 remembers the declared event and changes the gate state. A detector is
+  not itself a gate command, and a device parameter is not adjusted by the
+  controller merely to force an event.
+
+| Segment | V5 device model | V6 detected boundary | V7 control action | Evidence/method | Present status or blocker |
+|---|---|---|---|---|---|
+| H1: energise | First run lossless; device branch adds GS61008T `RDS(on)` and fixed phase `L` | fixed relative `Ton` edge; peak current is measured, not used to extend the pulse | latch present high side on, then turn it off after `Ton=16.667 ns` | `Ton` and target peak from P24; `RDS(on)` from P25 Table III/device library | Ideal equation branch reaches about 125 A with 1.4667 nH. Device resistance lowers the endpoint. P24 Table-I 2.68 nH conflicts with the printed equation and remains a separate branch |
+| H2: high-side turn-off | high- and low-side charge-equivalent `Coss`; optional reverse-conduction plug-in; snubber fixed at zero unless explicitly swept | present phase node reaches its low-side zero-voltage/clamp condition | high side remains off; low side is admitted/latches only at its required voltage condition | P24 turn-off sequence; P25 supplies detailed capacitance-commutation mechanism and GS61008T population; constant `Coss` is an external-device approximation | Basic commutation is executable, but effective participating capacitance, nonlinear `Coss(V)`, dead time and package parasitics are not published for the P24 design |
+| H3: positive freewheel | low-side `RDS(on)`, phase inductor and explicitly labelled reverse-conduction model | phase current crosses zero | low side stays latched through positive freewheel; zero crossing changes controller state but does not immediately create a new high-side command | current continuity from common physics; P24/P25 interval descriptions mapped by physical event | Zero-cross detection and latching work locally. Real detector delay/hysteresis and GaN third-quadrant voltage are not yet modelled at hardware fidelity |
+| H4: negative-current build | same low-side/reverse-conduction path; its voltage drop determines negative-current slope and loss | current reaches `-Ineg` | turn off the selected low side exactly once at the threshold; retain all unrelated gates according to the selected P24 or P25 truth-table branch | P24 explicitly states 1-2%; P25 states a required 5-10% range and supplies the fuller mode narrative | The papers disagree. Both ranges remain separate; sensing delay and the precise P24 current/path definition require confirmation |
+| H5: next-switch commutation | stored inductor energy exchanges with the participating high-/low-side `Coss`; passive snubber is a detachable sensitivity module | next high-side `Vds` reaches zero after low-side release | keep both switches off during commutation; admit the next high side only after its own zero-voltage event | P25 Mode-5 equations guide charge/time auditing; A40 analytical check; A41 snubber sweep; A42 zero-snubber current sweep | Main blocker. P24 1-2% fails with the present device plug-in. Added passive capacitance worsens it. A42 locally needs 7.76-7.77%, but that threshold is state-dependent |
+| H6: next-phase admission | next high-side switch plus the full coupled flying-capacitor/inductor state | both the high-side `Vds=0` opportunity and the permitted phase-order/slot condition are monitored | zero-voltage event creates permission; gate then latches and receives its own fixed `Ton`; if no event is available, hard turn-on is blocked | P25 supplies the detailed ZVS admission concept; four-phase rotation is an explicitly labelled extension on P24 topology; event memory is a numerical controller implementation | A43 shows the current first full-machine failure: after the 7.77% cutoff, H2 `Vds` bottoms at 1.418 V, so H2 is blocked in `P1_M5`. A37 at 9% admitted H2 but later missed the H3/100-ns handoff and was not periodic |
+
+### 5.2 Methods used to keep the three layers from contaminating each other
+
+1. **Progressive device fidelity:** each event is first checked with an ideal
+   switch layer, then rerun with `RDS(on)+Coss`, and only later may receive
+   nonlinear capacitance, driver delay or package parasitics. A more detailed
+   layer never overwrites the ideal result.
+2. **Event-based boundaries:** transitions use physical conditions such as
+   current zero, `-Ineg` and the relevant switch `Vds=0`, rather than arbitrary
+   delays chosen after inspecting the waveform.
+3. **Latched control:** a momentary zero-voltage event grants permission; the
+   gate state is then retained until its own paper-defined exit condition.
+   This avoids comparator chatter and one-timestep gate pulses found in early
+   experiments.
+4. **Hard-turn-on guard:** if the next high-side zero-voltage condition is not
+   reached, the state machine stops and records the first failure. It does not
+   advance merely to produce a complete-looking waveform.
+5. **One-change experiments:** a capacitance sweep, current-threshold sweep or
+   state transplant changes only its declared variable. Initial states are not
+   re-solved in the same experiment unless the experiment is explicitly a
+   periodic-state solve.
+6. **Local-to-system revalidation:** a local pass is promoted only as a local
+   mechanism result. The same condition must be retested in the four-phase
+   model and again under `x(T)=x(0)`. A42-to-A43 demonstrates why this rule is
+   necessary.
+7. **Source-labelled branches:** P24 and P25 gate truth tables and negative-
+   current rules remain separate. A P25-assisted pass never edits the P24
+   baseline.
+
+### 5.3 Present stopping point
+
+The project has implemented V5-V7 far enough to traverse H1-H4 and enter H5.
+The earliest unresolved boundary in the current complete four-phase branch is
+the H5-to-H6 transition for H2:
+
+`negative-current cutoff reached -> low side turns off -> H2 Vds does not reach zero -> H2 remains blocked`.
+
+This stopping point could originate from more than one layer and must not be
+assigned prematurely:
+
+- V5 possibility: the constant participating `Coss`/reverse-conduction model
+  does not match the P24 design;
+- V6 possibility: the real zero-voltage window and detector tolerance/delay are
+  different from the ideal event detector;
+- V7/V8 possibility: the cutoff, latch and phase-slot logic produces a coupled
+  four-phase state different from the paper's intended sequence;
+- V9 possibility: the starting coordinates are only a local seed and not the
+  true periodic state.
+
+The next scientific decision is therefore not simply “increase the negative
+current.” It is to determine which of V5-V9 must be corrected using additional
+paper/author evidence, and then rerun the same horizontal H5-H6 boundary.
+
 ## 6. Common numerical boundary
 
 All present periodic-state, local-commutation and P24/P25 comparison runs use
