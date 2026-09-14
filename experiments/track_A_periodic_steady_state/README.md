@@ -36,7 +36,10 @@ device-augmented ramp and audits the P25 Mode-5 time law without inventing an
 unpublished time budget. `A41_p24_snubber_local_sensitivity` runs the resulting
 fixed 1%-2%, 0-2-nF local screen. No positive passive snubber case reaches ZVS;
 added capacitance monotonically worsens the post-release minimum high-side
-`Vds`. This is a mechanism result, not a periodic or hardware conclusion.
+`Vds`. `A42_zero_snubber_negative_current_threshold` then changes only the
+negative-current target and independently brackets the local device-augmented
+ZVS threshold at 7.76%-7.77%. This is a mechanism result, not a P24 periodic or
+hardware conclusion, and it must not replace the P24 1%-2% branch.
 
 No result may be promoted to the four-module assembly until the complete
 single-module periodic orbit and its paper-defined event alignment are closed.
