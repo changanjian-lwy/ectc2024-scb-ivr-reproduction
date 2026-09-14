@@ -152,8 +152,16 @@ has been achieved.
    into the complete four-phase controller with every other state held
    fixed, phase 2's high-side `Vds` minimum is still 1.418 V -- ZVS is not
    reached, and the controller correctly halts at this boundary.
-6. **Higher-threshold test:** a 9% condition does let phase 2 turn on, but
-   the subsequent phase-3 event and full period closure still do not pass.
+6. **A separate, earlier experimental line, using a different method (not a
+   continuation of the ratio sweep above):** a hybrid fixed-on-time /
+   event-driven controller, solved with an exact two-variable numerical
+   search rather than a coarse ratio sweep, shows that a `9%` negative
+   current lets phase 2 turn on with its zero-voltage-switching residual
+   converged to numerical precision. Applying the identical method one phase
+   later, however, shows phase 2's own peak current falls about 7.2 A short
+   of the 125 A target, and the subsequent phase-3 event and full
+   four-phase period closure still do not pass (the detailed diagnosis of
+   that shortfall is in Section 6, item 3).
 
 The most important experimental insight is: a single phase's local
 commutation passing does not mean the same threshold transfers directly to
