@@ -7,7 +7,7 @@ def _state(phase: int, mode: int) -> str:
     return f"P{phase}_M{mode}"
 
 
-def emit_p25_np4_machine(*, phases: int = 4) -> str:
+def emit_p25_np4_machine(*, phases: int = 4, hybrid_timing: bool = False) -> str:
     if phases != 4:
         raise ValueError("current Fig. 3 emitter is locked to phases=4")
 
@@ -27,11 +27,20 @@ def emit_p25_np4_machine(*, phases: int = 4) -> str:
         nxt = phase % phases + 1
         lines.extend(
             (
-                f".rule {_state(phase,1)} {_state(phase,2)} I(L{phase})>=IPEAK",
+                (
+                    f".rule {_state(phase,1)} {_state(phase,2)} V(gh{phase}_ton)>=2.5"
+                    if hybrid_timing
+                    else f".rule {_state(phase,1)} {_state(phase,2)} I(L{phase})>=IPEAK"
+                ),
                 f".rule {_state(phase,2)} {_state(phase,3)} V(x{phase})<=0",
                 f".rule {_state(phase,3)} {_state(phase,4)} I(L{nxt})<=0",
                 f".rule {_state(phase,4)} {_state(phase,5)} I(L{nxt})<=-INEG",
-                f".rule {_state(phase,5)} {_state(nxt,1)} {high_vds[nxt]}<=0",
+                (
+                    f".rule {_state(phase,5)} {_state(nxt,1)} "
+                    f"(time>=T0+{phase}*PHASE)*({high_vds[nxt]}<=0)"
+                    if hybrid_timing
+                    else f".rule {_state(phase,5)} {_state(nxt,1)} {high_vds[nxt]}<=0"
+                ),
             )
         )
 
@@ -52,9 +61,15 @@ def emit_p25_np4_machine(*, phases: int = 4) -> str:
         lines.append(f".output (gl{gate_phase}) VG*({' + '.join(on_states)})")
     lines.append(".output (sequence_state) state")
     lines.append(".endmachine")
+    if hybrid_timing:
+        lines.extend(
+            f"B_GH{k}_TON gh{k}_ton g V=delay(V(gh{k}),TON)"
+            for k in range(1, phases + 1)
+        )
     lines.extend(
         [f"RGH{k}_MACHINE gh{k} g 1k" for k in range(1, phases + 1)]
         + [f"RGL{k}_MACHINE gl{k} g 1k" for k in range(1, phases + 1)]
+        + ([f"R_GH{k}_TON gh{k}_ton g 1k" for k in range(1, phases + 1)] if hybrid_timing else [])
         + ["R_SEQUENCE_STATE sequence_state g 1k"]
     )
     return "\n".join(lines)

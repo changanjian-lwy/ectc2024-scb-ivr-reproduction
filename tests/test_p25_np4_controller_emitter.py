@@ -29,6 +29,13 @@ class P25NP4ControllerEmitterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             emit_p25_np4_machine(phases=3)
 
+    def test_hybrid_uses_relative_ton_and_nominal_slot_guard(self):
+        text = emit_p25_np4_machine(phases=4, hybrid_timing=True)
+        self.assertIn("V(gh1_ton)>=2.5", text)
+        self.assertIn("B_GH1_TON gh1_ton g V=delay(V(gh1),TON)", text)
+        self.assertIn("(time>=T0+1*PHASE)*(V(a1,a2)<=0)", text)
+        self.assertNotIn("P1_M1 P1_M2 I(L1)>=IPEAK", text)
+
 
 if __name__ == "__main__":
     unittest.main()
