@@ -30,6 +30,7 @@ tmp/
 # Source papers and personal meeting material must not be published
 *.pdf
 reports/TALKING_POINTS_*.md
+reports/QA_PREP_*.md
 
 # Local application/runtime state
 .wine/
