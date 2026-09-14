@@ -29,7 +29,7 @@ tmp/
 
 # Source papers and personal meeting material must not be published
 *.pdf
-reports/TALKING_POINTS_CN_*.md
+reports/TALKING_POINTS_*.md
 
 # Local application/runtime state
 .wine/
