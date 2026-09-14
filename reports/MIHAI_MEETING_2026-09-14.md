@@ -1,193 +1,223 @@
-# ECTC 2024 SCB-IVR Reproduction - Progress Brief
+# ECTC 2024 SCB-IVR Reproduction - Live Progress Brief
 
-## 1. Objective and present scope
+> This is the continuously updated report source. When a meeting is confirmed,
+> freeze a dated copy from this file rather than rewriting the experiment
+> history. Results are organised in two dimensions: horizontal evidence
+> branches and vertical model layers.
 
-The immediate objective is to reproduce and understand the operating mechanism
-of the 2024 ECTC 48-to-1 V SCB integrated voltage regulator before expanding
-the work into a broader design framework.
+## 1. Research objective
 
-The current work deliberately separates three questions:
+The final target remains the 2024 ECTC 48-to-1 V, 1-kW SCB-IVR architecture.
+The immediate objective is narrower: determine whether the reported system
+specification, topology, analytical relationships, switching events and
+device conditions admit a self-consistent four-phase periodic trajectory.
 
-1. Does the paper-derived switching sequence produce a self-consistent
-   periodic operating trajectory?
-2. Can the flying-capacitor ladder reject a small perturbation around that
-   trajectory?
-3. Can a real controller establish and regulate that trajectory from zero
-   initial energy?
+The work does not tune a circuit merely until its output resembles 1 V. It
+records the first analytical or physical boundary at which a claimed operating
+sequence ceases to be self-consistent.
 
-The present validated work addresses Questions 1 and 2 under an explicit
-1 V output-isolation boundary. It does not yet claim zero-start or closed-loop
-output regulation.
+## 2. Two-dimensional decomposition
 
-## 2. Evidence rule used throughout
+### 2.1 Horizontal axis: evidence branches
 
-The implementation follows a source hierarchy rather than inventing a complete
-controller:
+| Branch | Electrical target | What is imported | Purpose | Claim boundary |
+|---|---|---|---|---|
+| `P24_PRIMARY_REPRODUCTION_AUDIT` | 48 V to 1 V, 4 phases, 4 modules, 5 MHz | Conditions explicitly stated in the 2024 paper | Test whether P24's own reported conditions close | A failure remains a P24 reproduction-audit result; missing data are not tuned |
+| `P25_NATIVE_REFERENCE` | 12 V to 1 V, 3 phases, 3 modules | Native 2025 prototype modes and components | Understand the detailed six-mode mechanism in its published context | Not a 48-V P24 result |
+| `P25_EXTENDED_ON_P24_TOPOLOGY` | 48 V to 1 V, 4 phases | P24 system/topology plus explicitly labelled P25 control and device supplements | Build the most complete executable four-phase event model currently supported by the papers | Cross-paper extension, never presented as direct P24 reproduction |
 
-- **Primary source:** the 2024 ECTC paper defines the target topology,
-  four-phase/four-module architecture, analytical relationships and its own
-  three-interval physical sequence.
-- **Supplementary source:** the 2025 APEC paper is used only where the 2024
-  paper is silent, for example explicit grounded low-side sources, detailed
-  commutation mechanisms, prototype component information and control concepts.
-- **Conflict rule:** when the papers differ, both interpretations are retained
-  as separate branches. The 2025 sequence is not pasted over the 2024 sequence.
-- **Unknown rule:** an unreported quantity remains an explicit model input or
-  blocker. It is never adjusted merely to obtain a desirable waveform.
+The first and third branches use the same 48-to-1 V target so their results can
+be compared at system level. The native P25 reference remains 12-to-1 V and is
+not numerically transferred without re-derivation.
 
-This rule produced a physical-event mapping layer. Paper-local labels such as
-`t2` and `t3` are treated as aliases, because the same labels refer to different
-physical events in the two papers.
+### 2.2 Vertical axis: model hierarchy
 
-## 3. Important 2024/2025 differences found
+| Layer | Question | Current implementation/output |
+|---|---|---|
+| 1. System specification | What system is being reproduced? | 48 V, 1 V, 1 kW, 5 MHz, 4 phases per module, 4 modules |
+| 2. Evidence and boundary | Where does every assumption come from? | P24/P25/device/numerical/unknown/sensitivity provenance; conflicts become branches |
+| 3. Analytical design | Are duty, on-time, current, inductance and ZVS energy mutually consistent? | Python equation library and formula/table audit |
+| 4. Power topology | How are switches, flying capacitors and inductors connected? | Modular P24 four-phase SCB power stage |
+| 5. Device model | What nonideal elements participate? | Ideal layer and a separate P25/device-augmented `RDS(on)+Coss` layer |
+| 6. Physical events | What ends each switching interval? | Peak/on-time, node clamp, current zero, negative-current cutoff and `Vds=0` events |
+| 7. Control state machine | Which gate changes after each event? | Latched event controller; high-side admission is blocked unless its own `Vds=0` |
+| 8. Four-phase coordination | Can H1, H2, H3 and H4 hand off in sequence? | Full rotating event machine with 50-ns nominal phase slots |
+| 9. Periodic steady state | Does the stored-energy state close after 200 ns? | Seven-state residual `x(T)-x(0)` under a common ideal 1-V output-isolation boundary |
+| 10. Startup and implementation | Can the orbit be established from zero and realised in package? | Separate future layer; startup, nonlinear devices, loss, thermal, package and FEM are not yet claimed |
 
-| Topic | 2024 ECTC | 2025 APEC | Implementation decision |
-|---|---|---|---|
-| Target | 48 V to 1 V, 1 kW; 4 phases x 4 modules | 12 V to 1 V, 200 W prototype; 3 phases x 3 modules | Keep 2024 as the reproduction target |
-| Sequence detail | Three intervals centered on a displayed phase | Six prototype modes with more commutation detail | Store separately and map by physical event |
-| Negative current | 1-2% of peak | Mode text 5-10%; design discussion up to 5% | P24 2% and P25 5-10% remain separate branches |
-| Low-side source connection | Graphically ambiguous in the 2024 figure | Explicitly connected to common ground | Grounded connection is a P25-sourced supplement, visibly labelled |
-| Device/prototype data | Target architecture and design tables | GS61008T, driver and prototype parts | Device data are modular; cross-voltage transfer is labelled |
+The framework therefore supports both directions of reasoning: system
+requirements are decomposed downward into physical events, and local event
+results are propagated upward to test four-phase and periodic feasibility.
 
-## 4. Analytical audit before SPICE
+## 3. System-level meaning of 1 kW and 5 MHz
 
-For the 2024 four-phase, four-module, 5 MHz case, the paper relationships give:
+At `Vo=1 V`, a 1-kW system requires 1000 A. Four modules share 250 A each;
+four phases per module share 62.5 A average per phase. Under the paper's
+zero-to-peak triangular boundary-mode approximation:
+
+`Iphase,pk ~= 2 x 62.5 A = 125 A`.
+
+Equivalently:
+
+`Ptotal ~= nM x nP x Vo x Iphase,pk/2`
+
+`= 4 x 4 x 1 x 125/2 = 1000 W`.
+
+The active electrical simulation presently represents one repeatable 250-W,
+four-phase module, not a completed four-module 1-kW validation.
+
+At 5 MHz, `T=200 ns`. With four interleaved phases, the nominal phase spacing
+is `T/nP=50 ns`. P24's duty relationship gives `D=4/48=8.333%`, hence
+`Ton=16.667 ns`. The 5-MHz design point is treated as P24's reported nominal
+case: it balances nH-scale embedded inductance against short-pulse control and
+high-frequency loss. It is not asserted to be a universal optimum.
+
+## 4. Analytical audit
+
+For the P24 four-phase/four-module 5-MHz row, the reported relationships give:
 
 - duty ratio: 8.333%;
 - high-side on-time: 16.667 ns;
 - phase peak current: 125 A;
-- critical inductance from the printed equation: 1.4667 nH.
+- recalculated inductance from the printed equation: 1.4667 nH per phase.
 
-The 2024 Table I value at 5 MHz is 2.68 nH. This does not agree with the
-printed equation; the difference is approximately a factor of 1.83. The 2025
-`0.95 Lcrit` design factor does not explain the mismatch. The active mainline
-therefore uses the calculated 1.4667 nH, while the table value remains a
-documented unresolved source conflict.
+P24 Table I reports 2.68 nH per phase for the same selected row. For strict
+reproduction these are two independent P24 branches:
 
-## 5. Experiment logic and results
+- `P24_TABLE_I_BRANCH`: lock 2.68 nH exactly and measure the resulting current
+  and power; never retune it to reach 125 A.
+- `P24_EQUATION_CONSISTENCY_BRANCH`: use the recalculated 1.4667 nH to test the
+  printed equation and 125-A event sequence.
 
-### 5.1 Early zero-start exploration - retained as negative evidence
+The current event-development line uses 1.4667 nH and therefore must not be
+described as a strict Table-I reproduction. The 2.68-nH branch is preserved in
+A30.
 
-Direct zero-state fixed-PWM simulations did not establish the intended
-36/24/12 V ladder or 1 V output. Precharge, fixed takeover and instantaneous
-zero-current comparators exposed startup-current accumulation, chatter and
-unreported controller requirements. These runs are quarantined as diagnostic
-evidence; they are not used to claim failure of the 2024 power stage.
+## 5. Topology and control decomposition
 
-### 5.2 Return to the paper's periodic operating assumption
+The reusable power-stage module contains four series high-side switches, four
+ground-referenced low-side switch positions, three flying capacitors, four
+phase inductors and one common output node. Device `Coss`, reverse conduction
+and parasitics are plug-in layers rather than being embedded in control logic.
 
-The mainline was restarted from the 2024 boundary-mode assumption. A
-phase-shifted triangular-current seed replaced the physically inappropriate
-all-zero-current seed for a periodic four-phase snapshot. Fixed-point shooting
-then reduced the maximum current residual:
+One phase-to-next-phase transition is represented by physical events:
 
-| Stage | Maximum absolute current residual |
-|---|---:|
-| All-zero current seed | 80.468 A |
-| Analytical phase-shifted triangular seed | 30.499 A |
-| Shooting iteration 1 | 1.300 A |
-| Shooting iteration 2 | 0.461 A |
-| Shooting iteration 3 | 0.226 A |
+1. present high side conducts;
+2. fixed `Ton` ends and the high side turns off;
+3. output capacitances commutate the phase node;
+4. low side freewheels and inductor current decreases;
+5. current crosses zero and builds a controlled negative value;
+6. low side turns off at the selected negative-current boundary;
+7. stored negative-current energy commutates the next high-side capacitance;
+8. the next high side is admitted only if its own `Vds=0` event occurs;
+9. the admitted gate is latched until its own fixed `Ton` expires.
 
-This is a numerical periodic-state solver, not a startup method. Its initial
-inductor energy is imposed for steady-state analysis and must not be presented
-as naturally generated startup energy.
+Paper-local labels such as `t1/t2/t3` are treated as aliases for these events,
+because the two papers do not always attach the same label to the same physical
+boundary.
 
-### 5.3 Commutation and branch checks
+## 6. Common numerical boundary
 
-- The local phase-1 commutation chain was checked with device commutation
-  capacitance included and no external snubber.
-- In the shared two-phase local state, 8% negative current did not satisfy the
-  selected high-side ZVS acceptance test; 9% and 10% did.
-- In the full four-phase first-period model, the current reached only about
-  2.7% negative, so the configured 8% event was never exercised. This is
-  recorded as an unexercised condition, not a failed 8% hardware conclusion.
-- The four-phase readiness detector was implemented using adjacent voltage
-  differences rather than hard-coded absolute 24 V/12 V thresholds.
+All present periodic-state, local-commutation and P24/P25 comparison runs use
+the same ideal output-isolation condition:
 
-### 5.4 Isolated passive-balance test
+`Vo(t) = 1 V`.
 
-To separate flying-capacitor charge redistribution from unresolved output
-regulation, the output was explicitly clamped to 1 V and C1 was perturbed by
-`-0.5/0/+0.5 V` with all other conditions identical.
+This freezes output regulation so that topology, switching, ZVS, capacitor
+balance and periodic closure can be studied consistently. It is a
+`NUMERICAL_IDEALIZATION`, not proof of output regulation or 250-W delivery.
 
-After 20 periods:
+The zero-start track is separate and cannot use this boundary: it must begin
+with `Vo(0)=0` and stored energy equal to zero.
 
-- negative perturbation: `-0.5000 -> -0.4519 V` relative to control;
-- positive perturbation: `+0.5000 -> +0.4827 V` relative to control.
+## 7. Results by vertical layer
 
-Both signs moved toward the simultaneous control trajectory, supporting a
-weak bidirectional passive restoring tendency. The response was asymmetric,
-and the control orbit was not yet exactly periodic, so this is not proof of
-asymptotic convergence.
+### 7.1 Analytical layer
 
-### 5.5 One-state-group-at-a-time periodic tightening
+- Duty, `Ton`, phase-average and 125-A peak relationships were reproduced.
+- The 1.4667-nH versus 2.68-nH P24 conflict was exposed and preserved.
+- A40 showed that P25's Mode-5 commutation relation does not yield a unique
+  capacitance limit without a stated available time/dead-time budget.
 
-The output-clamped model has seven free periodic states: four coupled inductor
-currents and three flying-capacitor voltages. Each update received a separate
-experiment folder and only one state group changed at a time.
+### 7.2 Local physical-event layer
 
-| Experiment | Only newly updated state/group | Max capacitor residual | Max current residual |
-|---|---|---:|---:|
-| A11 control | parent seed | 2.934 mV | 1.340 A |
-| A13 | four coupled inductor currents | 0.597 mV | 0.11114 A |
-| A14 | C1 | 0.597 mV | 0.11113 A |
-| A15 | C2 | 0.596 mV | 0.11110 A |
-| A16 | C3 | 0.595 mV | 0.10491 A |
+- P24 1% and 2% negative-current cases do not reach high-side ZVS under the
+  present GS61008T charge-equivalent capacitance plug-in.
+- A41 ran 28 fixed-boundary snubber cases from 0 to 2 nF. No case reached ZVS;
+  added passive capacitance monotonically increased residual `Vds` and delayed
+  the voltage minimum.
+- A42 kept zero snubber and changed only negative current. The local threshold
+  was independently bracketed between 7.76% and 7.77% of 125 A. This is a
+  P25-device-augmented sensitivity result, not a replacement for P24's 1-2%.
 
-The current-group update produced the main improvement without worsening the
-capacitor closure. It remains a steady-state numerical tool, not a physical
-control action or design optimization.
+### 7.3 Four-phase coordination layer
 
-## 6. Current model boundaries
+A43 transplanted only 7.77% into A37's unchanged full four-phase event machine.
+It deliberately retained all seven A37 `LOCAL_SOLVED_SEED` coordinates.
 
-- Single 250 W module of the 2024 1 kW architecture; four-module operation is
-  not yet claimed.
-- Four phases, 5 MHz, 48 V input, calculated 1.4667 nH inductors.
-- P24-derived 2% branch is the active mainline; P25 thresholds remain separate.
-- Constant scalar device commutation capacitance is included; nonlinear
-  `Coss(Vds)`, detailed gate charge and package extraction are not yet included.
-- External snubber capacitance is zero because neither paper provides its value.
-- The passive-balance and tightening tests use an ideal 1 V output clamp as an
-  isolation fixture.
-- The 36/24/12 V capacitor values are periodic-state coordinates in these
-  experiments, not zero-start results.
-- No efficiency, thermal, EMI, reliability or hardware-loss claim is made.
+- H1 completed its fixed on-time;
+- the next inductor reached the -9.7125-A cutoff;
+- H2 `Vds` bottomed at 1.418 V rather than zero;
+- H2 was correctly blocked from hard turn-on;
+- H3 and H4 never started because they are downstream of this first failure.
 
-## 7. Problems exposed by the reproduction
+Thus a negative-current percentage found in an isolated local state is not a
+topology-independent control constant. It depends on the complete coupled
+energy state and participating commutation paths.
 
-1. The 2024 printed critical-inductance equation and Table I are inconsistent.
-2. The two papers attach different events to similarly named time boundaries;
-   merging by `t1/t2/t3` would create a wrong sequence.
-3. Their negative-current targets differ and cannot be silently averaged.
-4. A complete startup/precharge/takeover law is absent.
-5. Numeric dead time, sensing delay, nonlinear device capacitance and external
-   snubber values are not fully reported.
-6. The four-phase/four-module scheduling rule needs a collision audit; naive
-   phase and module offsets can create coincident events.
-7. Passive flying-capacitor restoration is observed locally, but output power
-   balance and closed-loop regulation remain deliberately unresolved.
+### 7.4 Periodic-state layer
 
-## 8. Focused questions for discussion
+Earlier one-group-at-a-time iterations reduced the maximum current residual
+from 80.468 A for an all-zero current seed to approximately 0.105 A. A37 then
+tested the complete 15-condition problem (four peaks, four ZVS/slot conditions
+and seven periodic residuals) on the 9% P25 extension. Only 3 of 15 residuals
+met tolerance; the full periodic orbit did not close.
 
-1. Should the 2024 printed inductance equation or Table I be treated as the
-   intended 5 MHz design basis? Is there an omitted derating or current
-   definition behind 2.68 nH?
-2. Is the immediate goal the paper's ideal periodic mechanism, or should the
-   next milestone include a specific startup and output-control strategy?
-3. Are target device models, gate-driver delay/dead time, snubber capacitance,
-   and flying/output capacitor bank data available for the 48 V design?
-4. For the full 4 x 4 case, what module-origin scheduling convention should be
-   used when simple `T/nP` and `T/nM` offsets coincide?
-5. Should the P24 1-2% and P25 5-10% negative-current laws remain two formal
-   cases, or is one intended for the target 48 V implementation?
+Therefore 36/24/12 V and the solved inductor currents remain
+`LOCAL_SOLVED_SEED` coordinates, not a demonstrated startup result or a valid
+complete periodic initial state.
 
-## 9. Proposed next work after confirmation
+## 8. Current conclusion
 
-1. Complete a tighter output-clamped periodic orbit using the documented
-   one-state-group-at-a-time solver.
-2. Re-run the symmetric passive-balance perturbation around that orbit.
-3. Remove the ideal output clamp in a separate experiment and solve the power
-   balance/output-control problem without changing the paper-derived topology.
-4. Only then return to zero-start and determine whether a detachable
-   precharge/takeover controller can reach the validated periodic orbit.
+The actively developed executable line is
+`P25_EXTENDED_ON_P24_TOPOLOGY`, because P25 provides the more complete mode
+sequence, switch population and device information. The final target remains
+P24, while `P24_PRIMARY_REPRODUCTION_AUDIT` is retained to expose precisely
+which P24 claims cannot yet be reproduced using disclosed information.
+
+The current failure is no longer described generically as “the SPICE waveform
+does not work.” It is localised by hierarchy and event:
+
+- P24 1-2% fails the current device-augmented local ZVS boundary;
+- a local 7.77% pass does not transfer to the unchanged full four-phase state;
+- the earliest A43 full-machine failure is H2 ZVS admission at `P1_M5`;
+- no complete four-phase periodic state has yet been demonstrated.
+
+## 9. Information to confirm with Mihai
+
+1. For P24 Table I's four-phase/four-module 5-MHz row, is 2.68 nH the final
+   inductance of each individual phase? Which voltage/current boundary produces
+   it, and does the 125-A peak apply to the same row?
+2. In P24, exactly which current, switch-off instant, capacitances and
+   commutation paths define the reported 1-2% negative-current requirement?
+3. What device model and effective high-/low-side commutation capacitances were
+   used for the 48-to-1 V case? Was an external snubber included, and for what
+   purpose?
+4. Were the 36/24/12-V flying-capacitor coordinates directly initialised,
+   obtained from a periodic-state solver, or established by an unpublished
+   startup/equalisation controller?
+5. Should the immediate milestone be a complete ideal periodic mechanism, or
+   should a specific startup and output-regulation implementation be included?
+
+## 10. Next work after clarification
+
+1. Keep P24 1-2% as an independent audit branch.
+2. On the P25-on-P24 executable branch, evaluate complete downstream effects
+   rather than selecting a threshold from H2 alone.
+3. Seek a state that jointly satisfies the physical event chain and periodic
+   closure; never repair phases sequentially while freezing an invalid prior
+   solution.
+4. Remove the ideal 1-V output boundary only in a separately named power-
+   balance/regulation layer.
+5. Return to zero-start only after the target periodic orbit and its required
+   state are defined.
