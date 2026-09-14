@@ -190,6 +190,24 @@ voltages, and stored-energy state at that moment all change the ZVS outcome.
    and what the complete four-phase system actually needs (9%) are not the
    same number -- the negative-current fraction is not a topology-
    independent constant."
+   (Follow-up, experiment A44, 2026-09-14): A39's pinning claim was tested
+   against only one variable, `IL2_INIT`. A44 swept the other six coupled
+   state coordinates one at a time to check whether the pinning is real
+   against the full state or an artifact of having varied only one of seven
+   variables. Four of them -- the other three phases' own starting currents,
+   plus the third flying capacitor's voltage -- confirm the same pinning
+   (sub-0.01 sensitivity per unit). The first two flying-capacitor voltages,
+   `VC1` and `VC2`, do not: moving either one by as little as 0.2-0.5 V does
+   not merely shift the admission current, it can eliminate phase 2's
+   zero-voltage turn-on event entirely for the whole run. This sharpens
+   rather than overturns the earlier claim: H2's admission is immune to the
+   other phases' currents but highly sensitive to exactly two specific
+   capacitor voltages, consistent with the physical picture that a
+   capacitor voltage sets a node's dc bias directly while a current only
+   couples in dynamically. This raises a new, currently open question: if
+   flying-capacitor voltage precision is this consequential for ZVS, is
+   flying-capacitor voltage regulation tolerance an implicit design
+   requirement of this topology that the papers do not state numerically?
 4. Increasing the negative current improves ZVS margin, but it also
    increases circulating current and conduction loss and disturbs the next
    stage's peak; the negative-current fraction should therefore be a jointly
