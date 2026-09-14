@@ -1,6 +1,6 @@
 Subject: EPC2067 candidate rerun, a scaling law across three experiments, and a possible explanation for the missing 48V data
 
-Hi Mihai,
+Dear Mihai,
 
 A quick update on what we followed up on since we last spoke, so it's all in one place.
 
@@ -24,4 +24,4 @@ Separately, we noticed two 2026 papers in the same author line (yourself, Ramin 
 Happy to walk through any of the above in more detail whenever convenient.
 
 Best,
-[name]
+Jian
