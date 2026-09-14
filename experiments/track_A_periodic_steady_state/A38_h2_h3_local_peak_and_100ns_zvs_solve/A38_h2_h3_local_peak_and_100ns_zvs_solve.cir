@@ -1,0 +1,224 @@
+* A38 - A37 seed, H2-to-H3 local search: IL3_INIT solved for R2; IL2_INIT left at A37's seed (R1 found structurally unfixable by IL2_INIT without breaking A36's H2-ZVS residual, see RESULTS.md)
+* PARAM VALUES: the UNOPTIMIZED seed (IL1_INIT/IL2_INIT inherited exactly
+* from A36 best_candidate.json, IL3_INIT/IL4_INIT inherited from A33,
+* VC1_INIT/VC2_INIT/VC3_INIT from the 36/24/12 V guess table). This is the
+* best candidate found: it has the most individually-converged residuals
+* (3 of 15) of any of the 174 points visited by two full optimizer attempts
+* (see best_candidate.json/solver_history.json/RESULTS.md) -- neither
+* attempt improved on it. H3 and H4 never achieve their own ZVS admission at
+* this or any other explored point in this run (see RESULTS.md).
+* Parent: A35 hybrid fixed-TON/event-ZVS/slot-guard controller (already
+* symmetric across all four phases in the compiled .machine below) and A36's
+* local two-residual (IL1_INIT, IL2_INIT) H1-to-H2 solve. A37 does not change
+* the controller topology relative to A35/A36: the .rule table already turns
+* every high side off after its own fixed relative TON (via a per-phase
+* delay-block gateway ghk_ton) and already gates every next-phase high-side
+* admission on BOTH its own nominal T/nP slot and its own Vds=0 event. What
+* A37 adds is (a) exposing the three flying-capacitor initial voltages as
+* adjustable .param values VC1_INIT/VC2_INIT/VC3_INIT instead of literal
+* C1/C2/C3 "ic=" constants and matching .ic node values, so all seven
+* state-vector coordinates x=[VC1,VC2,VC3,IL1,IL2,IL3,IL4] are solver-visible,
+* and (b) the additional .meas instrumentation for the phase 2/3/4 fixed-TON
+* peak-current edges and the phase 3/4/1(next-cycle) nominal-slot ZVS timing,
+* so that all 15 residuals defined in this experiment's BOUNDARY.md Section 6
+* can be read from one run. Inductors are named LINDk per the project naming
+* convention (never Lk, which would collide with the low-side switch Lk).
+* CONTROL: DV1=0. The ideal 1-V output source remains a shared isolation
+* boundary, not a claim about the unregulated model.
+.include ../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+.include ../../../paper_locked/04_component_models/GaN_reverse_conduction_ideal.lib
+.param VIN=48 VO=1 POUT=250 NP=4 NM_SYSTEM=4 NM_INSTANCE=1 FSW=5Meg T={1/FSW}
+.param TON={NP*VO/VIN*T} T0=0 PHASE={T/NP}
+.param LPHASE=1.466666666666667n IPEAK=125 NEG_FRAC=.09 INEG={NEG_FRAC*IPEAK}
+.param CFLY={4*10u+2*4.7u+2*2.2u} COUT={8*220u+32*47u+64*22u}
+.param IL1_INIT=5.2947 IL2_INIT=21.205095337 IL3_INIT=56.3205656631 IL4_INIT=84.1447433786
+.param VC1_INIT=36.000066454 VC2_INIT=23.9999142326 VC3_INIT=12.0006048777
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param VG=5 RLOAD={VO*VO/POUT}
+
+VRAIL vin 0 {VIN}
+XMOD vin out 0 SCB4P_PERIODIC_SEED
+VOUT_BOUNDARY out 0 {VO}
+
+* Initial and final state samples are separated by exactly one P24 period.
+.meas tran VC1_I FIND V(xmod:a1,xmod:x1) AT {T0+2p}
+.meas tran VC2_I FIND V(xmod:a2,xmod:x2) AT {T0+2p}
+.meas tran VC3_I FIND V(xmod:a3,xmod:x3) AT {T0+2p}
+.meas tran VO_I FIND V(out) AT {T0+2p}
+.meas tran IL1_I FIND I(XMOD:LIND1) AT {T0+2p}
+.meas tran IL2_I FIND I(XMOD:LIND2) AT {T0+2p}
+.meas tran IL3_I FIND I(XMOD:LIND3) AT {T0+2p}
+.meas tran IL4_I FIND I(XMOD:LIND4) AT {T0+2p}
+.meas tran VC1_F FIND V(xmod:a1,xmod:x1) AT {T0+T+2p}
+.meas tran VC2_F FIND V(xmod:a2,xmod:x2) AT {T0+T+2p}
+.meas tran VC3_F FIND V(xmod:a3,xmod:x3) AT {T0+T+2p}
+.meas tran VO_F FIND V(out) AT {T0+T+2p}
+.meas tran IL1_F FIND I(XMOD:LIND1) AT {T0+T+2p}
+.meas tran IL2_F FIND I(XMOD:LIND2) AT {T0+T+2p}
+.meas tran IL3_F FIND I(XMOD:LIND3) AT {T0+T+2p}
+.meas tran IL4_F FIND I(XMOD:LIND4) AT {T0+T+2p}
+.meas tran DVC1 PARAM VC1_F-VC1_I
+.meas tran DVC2 PARAM VC2_F-VC2_I
+.meas tran DVC3 PARAM VC3_F-VC3_I
+.meas tran DVO PARAM VO_F-VO_I
+.meas tran DIL1 PARAM IL1_F-IL1_I
+.meas tran DIL2 PARAM IL2_F-IL2_I
+.meas tran DIL3 PARAM IL3_F-IL3_I
+.meas tran DIL4 PARAM IL4_F-IL4_I
+
+* A37 fixed-TON peak-current edges, all four phases.
+.meas tran T_H1_OFF WHEN V(xmod:gh1)=2.5 FALL=1
+.meas tran IL1_H1_OFF FIND I(XMOD:LIND1) WHEN V(xmod:gh1)=2.5 FALL=1
+.meas tran PEAK_ERROR_H1 PARAM IL1_H1_OFF-IPEAK
+.meas tran T_H2_OFF WHEN V(xmod:gh2)=2.5 FALL=1
+.meas tran IL2_H2_OFF FIND I(XMOD:LIND2) WHEN V(xmod:gh2)=2.5 FALL=1
+.meas tran PEAK_ERROR_H2 PARAM IL2_H2_OFF-IPEAK
+.meas tran T_H3_OFF WHEN V(xmod:gh3)=2.5 FALL=1
+.meas tran IL3_H3_OFF FIND I(XMOD:LIND3) WHEN V(xmod:gh3)=2.5 FALL=1
+.meas tran PEAK_ERROR_H3 PARAM IL3_H3_OFF-IPEAK
+.meas tran T_H4_OFF WHEN V(xmod:gh4)=2.5 FALL=1
+.meas tran IL4_H4_OFF FIND I(XMOD:LIND4) WHEN V(xmod:gh4)=2.5 FALL=1
+.meas tran PEAK_ERROR_H4 PARAM IL4_H4_OFF-IPEAK
+
+* A37 nominal-slot ZVS timing residuals, Vds(H_(k mod 4)+1) sampled AT k*50ns,
+* not WHEN-triggered: this reads whatever Vds actually is at the nominal slot
+* regardless of whether admission already happened, which is how a
+* MISSED_ZVS_SLOT is detected rather than masked.
+.meas tran VDS_H2_SLOT FIND V(xmod:a1,xmod:a2) AT {T0+1*PHASE}
+.meas tran VDS_H3_SLOT FIND V(xmod:a2,xmod:a3) AT {T0+2*PHASE}
+.meas tran VDS_H4_SLOT FIND V(xmod:a3,xmod:x4) AT {T0+3*PHASE}
+.meas tran VDS_H1_SLOT FIND V(vin,xmod:a1) AT {T0+4*PHASE}
+
+* Diagnostic-only: actual admission instants/voltages (not themselves a
+* residual; used only to identify a MISSED_ZVS_SLOT in the written record).
+.meas tran T_H2_ON WHEN V(xmod:gh2)=2.5 RISE=1
+.meas tran VDS_H2_ON FIND V(xmod:a1,xmod:a2) WHEN V(xmod:gh2)=2.5 RISE=1
+.meas tran T_H3_ON WHEN V(xmod:gh3)=2.5 RISE=1
+.meas tran VDS_H3_ON FIND V(xmod:a2,xmod:a3) WHEN V(xmod:gh3)=2.5 RISE=1
+.meas tran T_H4_ON WHEN V(xmod:gh4)=2.5 RISE=1
+.meas tran VDS_H4_ON FIND V(xmod:a3,xmod:x4) WHEN V(xmod:gh4)=2.5 RISE=1
+.meas tran T_H1_ON2 WHEN V(xmod:gh1)=2.5 RISE=2
+.meas tran VDS_H1_ON2 FIND V(vin,xmod:a1) WHEN V(xmod:gh1)=2.5 RISE=2
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(xmod:sequence_state) V(xmod:gh1) V(xmod:gh2) V(xmod:gh3) V(xmod:gh4) V(xmod:gl1) V(xmod:gl2) V(xmod:gl3) V(xmod:gl4) V(vin) V(xmod:a1) V(xmod:a2) V(xmod:a3) V(xmod:x1) V(xmod:x2) V(xmod:x3) V(xmod:x4) V(out) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:LIND1) I(XMOD:LIND2) I(XMOD:LIND3) I(XMOD:LIND4)
+.tran 0 {T0+T+5n} 0 5p UIC
+.ic V(xmod:a1)=48 V(xmod:x1)={48-VC1_INIT} V(xmod:a2)=24 V(xmod:x2)={24-VC2_INIT} V(xmod:a3)=12 V(xmod:x3)={12-VC3_INIT} V(xmod:x4)=0 V(out)=1
+
+.subckt SCB4P_PERIODIC_SEED vin out g
+* Native PULSE gives explicit high-side breakpoints at T/4 origins.
+* Generated P25_NP4_EXTENSION controller: one rotating event machine.
+* No absolute T/4 threshold substitutes for a physical event.
+.machine 1p
+.state P1_M1 0
+.state P1_M2 1
+.state P1_M3 2
+.state P1_M4 3
+.state P1_M5 4
+.state P2_M1 5
+.state P2_M2 6
+.state P2_M3 7
+.state P2_M4 8
+.state P2_M5 9
+.state P3_M1 10
+.state P3_M2 11
+.state P3_M3 12
+.state P3_M4 13
+.state P3_M5 14
+.state P4_M1 15
+.state P4_M2 16
+.state P4_M3 17
+.state P4_M4 18
+.state P4_M5 19
+.rule P1_M1 P1_M2 V(gh1_ton)>=2.5
+.rule P1_M2 P1_M3 V(x1)<=0
+.rule P1_M3 P1_M4 I(LIND2)<=0
+.rule P1_M4 P1_M5 I(LIND2)<=-INEG
+.rule P1_M5 P2_M1 (time>=T0+1*PHASE)*(V(a1,a2)<=0)
+.rule P2_M1 P2_M2 V(gh2_ton)>=2.5
+.rule P2_M2 P2_M3 V(x2)<=0
+.rule P2_M3 P2_M4 I(LIND3)<=0
+.rule P2_M4 P2_M5 I(LIND3)<=-INEG
+.rule P2_M5 P3_M1 (time>=T0+2*PHASE)*(V(a2,a3)<=0)
+.rule P3_M1 P3_M2 V(gh3_ton)>=2.5
+.rule P3_M2 P3_M3 V(x3)<=0
+.rule P3_M3 P3_M4 I(LIND4)<=0
+.rule P3_M4 P3_M5 I(LIND4)<=-INEG
+.rule P3_M5 P4_M1 (time>=T0+3*PHASE)*(V(a3,x4)<=0)
+.rule P4_M1 P4_M2 V(gh4_ton)>=2.5
+.rule P4_M2 P4_M3 V(x4)<=0
+.rule P4_M3 P4_M4 I(LIND1)<=0
+.rule P4_M4 P4_M5 I(LIND1)<=-INEG
+.rule P4_M5 P1_M1 (time>=T0+4*PHASE)*(V(vin,a1)<=0)
+.output (gh1) VG*(state==P1_M1)
+.output (gh2) VG*(state==P2_M1)
+.output (gh3) VG*(state==P3_M1)
+.output (gh4) VG*(state==P4_M1)
+.output (gl1) VG*((state==P1_M3) + (state==P1_M4) + (state==P1_M5) + (state==P2_M1) + (state==P2_M2) + (state==P2_M3) + (state==P2_M4) + (state==P2_M5) + (state==P3_M1) + (state==P3_M2) + (state==P3_M3) + (state==P3_M4) + (state==P3_M5) + (state==P4_M1) + (state==P4_M2) + (state==P4_M3) + (state==P4_M4))
+.output (gl2) VG*((state==P1_M1) + (state==P1_M2) + (state==P1_M3) + (state==P1_M4) + (state==P2_M3) + (state==P2_M4) + (state==P2_M5) + (state==P3_M1) + (state==P3_M2) + (state==P3_M3) + (state==P3_M4) + (state==P3_M5) + (state==P4_M1) + (state==P4_M2) + (state==P4_M3) + (state==P4_M4) + (state==P4_M5))
+.output (gl3) VG*((state==P1_M1) + (state==P1_M2) + (state==P1_M3) + (state==P1_M4) + (state==P1_M5) + (state==P2_M1) + (state==P2_M2) + (state==P2_M3) + (state==P2_M4) + (state==P3_M3) + (state==P3_M4) + (state==P3_M5) + (state==P4_M1) + (state==P4_M2) + (state==P4_M3) + (state==P4_M4) + (state==P4_M5))
+.output (gl4) VG*((state==P1_M1) + (state==P1_M2) + (state==P1_M3) + (state==P1_M4) + (state==P1_M5) + (state==P2_M1) + (state==P2_M2) + (state==P2_M3) + (state==P2_M4) + (state==P2_M5) + (state==P3_M1) + (state==P3_M2) + (state==P3_M3) + (state==P3_M4) + (state==P4_M3) + (state==P4_M4) + (state==P4_M5))
+.output (sequence_state) state
+.endmachine
+B_GH1_TON gh1_ton g V=delay(V(gh1),TON)
+B_GH2_TON gh2_ton g V=delay(V(gh2),TON)
+B_GH3_TON gh3_ton g V=delay(V(gh3),TON)
+B_GH4_TON gh4_ton g V=delay(V(gh4),TON)
+RGH1_MACHINE gh1 g 1k
+RGH2_MACHINE gh2 g 1k
+RGH3_MACHINE gh3 g 1k
+RGH4_MACHINE gh4 g 1k
+RGL1_MACHINE gl1 g 1k
+RGL2_MACHINE gl2 g 1k
+RGL3_MACHINE gl3 g 1k
+RGL4_MACHINE gl4 g 1k
+R_GH1_TON gh1_ton g 1k
+R_GH2_TON gh2_ton g 1k
+R_GH3_TON gh3_ton g 1k
+R_GH4_TON gh4_ton g 1k
+R_SEQUENCE_STATE sequence_state g 1k
+
+SH1 vin a1 gh1 g SWH
+DH1_REVERSE a1 vin DGAN_IDEAL
+CH1_TOTAL vin a1 {CH_TOTAL}
+C1 a1 x1 {CFLY} ic={VC1_INIT}
+CL1_TOTAL x1 g {CL_TOTAL}
+SL1 x1 g gl1 g SWL
+DL1_REVERSE g x1 DGAN_IDEAL
+LIND1 x1 out {LPHASE} Rser=1u ic={IL1_INIT}
+SH2 a1 a2 gh2 g SWH
+DH2_REVERSE a2 a1 DGAN_IDEAL
+CH2_TOTAL a1 a2 {CH_TOTAL}
+C2 a2 x2 {CFLY} ic={VC2_INIT}
+CL2_TOTAL x2 g {CL_TOTAL}
+SL2 x2 g gl2 g SWL
+DL2_REVERSE g x2 DGAN_IDEAL
+LIND2 x2 out {LPHASE} Rser=1u ic={IL2_INIT}
+SH3 a2 a3 gh3 g SWH
+DH3_REVERSE a3 a2 DGAN_IDEAL
+CH3_TOTAL a2 a3 {CH_TOTAL}
+C3 a3 x3 {CFLY} ic={VC3_INIT}
+CL3_TOTAL x3 g {CL_TOTAL}
+SL3 x3 g gl3 g SWL
+DL3_REVERSE g x3 DGAN_IDEAL
+LIND3 x3 out {LPHASE} Rser=1u ic={IL3_INIT}
+SH4 a3 x4 gh4 g SWH
+DH4_REVERSE x4 a3 DGAN_IDEAL
+CH4_TOTAL a3 x4 {CH_TOTAL}
+CL4_TOTAL x4 g {CL_TOTAL}
+SL4 x4 g gl4 g SWL
+DL4_REVERSE g x4 DGAN_IDEAL
+LIND4 x4 out {LPHASE} Rser=1u ic={IL4_INIT}
+
+RNUM_A1 a1 g 1G
+RNUM_X1 x1 g 1G
+RNUM_A2 a2 g 1G
+RNUM_X2 x2 g 1G
+RNUM_A3 a3 g 1G
+RNUM_X3 x3 g 1G
+RNUM_X4 x4 g 1G
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_PERIODIC_SEED
+.end

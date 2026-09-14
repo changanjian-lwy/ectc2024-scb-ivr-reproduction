@@ -1,0 +1,27 @@
+{
+  "iteration": 10,
+  "il2_init_a": 21.205095337,
+  "il3_init_a": 56.32056566312004,
+  "h2_admission_missing": false,
+  "i2_at_ton2_a": 117.76382446289062,
+  "peak_error_h2_a": -7.236175537109375,
+  "first_h3_vds_zero_ns": 99.99997920590906,
+  "zvs_time_error_h3_ns": -2.079409093273683e-05,
+  "vds_h3_at_100ns_v": -3.4332275390625e-05,
+  "recheck_a36_peak_error_h1_a": -9.1552734375e-05,
+  "recheck_a36_first_h2_vds_zero_ns": 49.99980582613284,
+  "recheck_a36_zvs_time_error_h2_ns": -0.0001941738671532625,
+  "recheck_a36_vds_h2_at_50ns_v": -0.000152587890625,
+  "r1_converged": false,
+  "r2_converged": true,
+  "r1_pursuable_via_il2_init": false,
+  "il2_init_r1_local_slope_a_per_a": 0.016215006510416668,
+  "residual_tolerance": 0.0002,
+  "frozen": {
+    "IL1_INIT": 5.2947,
+    "IL4_INIT": 84.1447433786,
+    "VC1_INIT": 36.000066454,
+    "VC2_INIT": 23.9999142326,
+    "VC3_INIT": 12.0006048777
+  }
+}
