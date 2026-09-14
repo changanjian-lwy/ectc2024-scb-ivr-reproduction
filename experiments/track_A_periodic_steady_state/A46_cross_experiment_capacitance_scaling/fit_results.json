@@ -1,0 +1,46 @@
+{
+  "n_points": 102,
+  "sources": {
+    "A45": 42,
+    "A42": 32,
+    "A41_high_only": 14,
+    "A41_symmetric": 14
+  },
+  "model": "Vds_min = V0 - k*Ineg/Ceff^p",
+  "fit": {
+    "V0": 10.15953191984779,
+    "k": 17.329119270951384,
+    "p": 0.5117192204286994,
+    "V0_stderr": 0.18231155882545205,
+    "k_stderr": 1.4579136896786955,
+    "p_stderr": 0.01180599038587351,
+    "R2": 0.9469438775050648
+  },
+  "fixed_p_0p5_comparison": {
+    "V0": 10.143437577219974,
+    "k": 15.984952717977704,
+    "R2": 0.946419233499768
+  },
+  "direction": {
+    "at_fixed_Ineg": "Vds_min increases (moves away from ZVS) as Ceff grows: Vds_min ~ V0 - k*Ineg*Ceff^(-p)",
+    "threshold_vs_Ceff": "Ineg_threshold increases as Ceff grows: Ineg_threshold = (V0/k) * Ceff^(+p), NOT Ceff^(-p)"
+  },
+  "threshold_consistency_checks": [
+    {
+      "label": "A42 (GS61008T, Ceff=256.7pF)",
+      "Ceff_pF": 256.6666666666667,
+      "predicted_threshold_pct": 8.018771948570151,
+      "actual_bracket_low_pct": 7.76,
+      "actual_bracket_high_pct": 7.77,
+      "relative_error_pct": 3.268151301611742
+    },
+    {
+      "label": "A45 (EPC2067, Ceff=2232pF)",
+      "Ceff_pF": 2232.0,
+      "predicted_threshold_pct": 24.253720910477757,
+      "actual_bracket_low_pct": 22.04,
+      "actual_bracket_high_pct": 22.05,
+      "relative_error_pct": 10.019146792822657
+    }
+  ]
+}
