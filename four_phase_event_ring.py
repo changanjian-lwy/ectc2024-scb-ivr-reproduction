@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from topology_naming import phase_names
+
 
 class LocalEvent(str, Enum):
     HIGH_SIDE_ON = "high_side_on"
@@ -44,15 +46,22 @@ def build_p24_event_rings(phases: int) -> tuple[PhaseEventRing, ...]:
     if not isinstance(phases, int) or phases <= 1:
         raise ValueError("interleaved event ring requires at least two phases")
     return tuple(
-        PhaseEventRing(
-            phase_index=k,
-            next_phase_index=(k % phases) + 1,
-            high_side=f"QH{k}",
-            own_low_side=f"QL{k}",
-            adjacent_support_low_side=f"QS{(k % phases) + 1}",
-            inductor=f"L{k}",
-        )
+        _build_ring(k, phases)
         for k in range(1, phases + 1)
+    )
+
+
+def _build_ring(k: int, phases: int) -> PhaseEventRing:
+    own = phase_names(k, phases)
+    next_index = (k % phases) + 1
+    adjacent = phase_names(next_index, phases)
+    return PhaseEventRing(
+        phase_index=k,
+        next_phase_index=next_index,
+        high_side=own.canonical_high,
+        own_low_side=own.canonical_low,
+        adjacent_support_low_side=adjacent.canonical_low,
+        inductor=own.inductor,
     )
 
 

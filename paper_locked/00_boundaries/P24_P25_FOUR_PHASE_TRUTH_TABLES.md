@@ -11,9 +11,9 @@ Legend: `1` commanded ON, `0` commanded OFF, `E` physical-event controlled,
 | I2 Coss/low-ZVS/current decay | 0 0 0 0 | E ? ? ? | `iL1=0` | blocked by P24 silence |
 | I3 negative/high-ZVS | E 0 0 0 | E ? ? ? | `Vds(H1)=0` | blocked by P24 silence |
 
-Rows for phases 2-4 are exact index rotations. `L2=1` in the first row is the
-P24-explicit adjacent support command (`QS2`). The `QS2 == L2` connectivity
-alias remains an adapter assertion, not an unlabelled source fact.
+Rows for phases 2-4 are exact index rotations. Visual inspection of P24 Fig. 3
+establishes `Ska -> Hk` and `Skb -> Lk`; therefore the first row's adjacent
+support device is the physical `S2b`, canonically `L2`.
 
 The P24-minimal table passes the no-commanded-shoot-through check but is
 intentionally **not compile-ready** because unreported gates remain unknown.

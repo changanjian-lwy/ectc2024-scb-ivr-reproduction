@@ -14,15 +14,15 @@ are physical-event transitions.
 
 | Active phase | High side | Own commutating low side | P24-explicit adjacent support in interval 1 | Next active phase |
 |---:|---|---|---|---:|
-| 1 | QH1 | QL1 | QS2 | 2 |
-| 2 | QH2 | QL2 | QS3 | 3 |
-| 3 | QH3 | QL3 | QS4 | 4 |
-| 4 | QH4 | QL4 | QS1 | 1 |
+| 1 | H1 (`S1a`) | L1 (`S1b`) | L2 (`S2b`) | 2 |
+| 2 | H2 (`S2a`) | L2 (`S2b`) | L3 (`S3b`) | 3 |
+| 3 | H3 (`S3a`) | L3 (`S3b`) | L4 (`S4b`) | 4 |
+| 4 | H4 (`S4a`) | L4 (`S4b`) | L1 (`S1b`) | 1 |
 
-`QS` is retained exactly as P24's printed low-side notation in the symbolic
-source layer. A later topology adapter may establish whether each `QSk` is the
-same physical position called `QLk` elsewhere; it may not assume the alias
-silently.
+Visual inspection of P24 Fig. 3 resolves the physical labels: `Ska` is the
+high-side position and `Skb` is the low-side position. The canonical adapter
+therefore maps `Ska -> Hk` and `Skb -> Lk`; functional/OCR names do not create
+additional devices.
 
 ## What this resolves
 

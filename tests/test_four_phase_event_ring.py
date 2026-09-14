@@ -14,7 +14,7 @@ class FourPhaseEventRingTests(unittest.TestCase):
         self.assertEqual([r.next_phase_index for r in rings], [2, 3, 4, 1])
         self.assertEqual(
             [r.adjacent_support_low_side for r in rings],
-            ["QS2", "QS3", "QS4", "QS1"],
+            ["L2", "L3", "L4", "L1"],
         )
 
     def test_every_phase_uses_identical_local_event_order(self):
