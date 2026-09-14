@@ -6,9 +6,18 @@
 * silently changed underneath them.
 * Device Coss source: EPC2067 datasheet, revised 2021-10-21 (external device data).
 * Population source: 2024 Table 3, nP=4/nM=4 row (2 parallel high-side,
-* 3 parallel low-side EPC2067). This is 2024's own Sec. IV embedded/3-D
-* package integration selection, NOT confirmed to be the device the Sec.
-* II-B ZVS mechanism itself assumes -- see SOURCE_COVERAGE_MATRIX.md.
+* 3 parallel low-side EPC2067) -- re-verified 2026-09-15 directly against
+* the printed table (HS/LS peak-current formula values 125 A/200 A match
+* the row exactly) and cross-checked against Table 3's own nM=8 row, which
+* the paper's body text separately describes in words ("a single EPC2067...
+* two parallel switches") and which matches that row's 1 HS/2 LS reading.
+* Note: nM=4 (used here, matching this project's 250 W/module mainline) is
+* a correctly-read row of the same table, but is NOT the row Sec. IV's own
+* headline package-integration example (Fig. 5, the conclusion's size
+* estimate) uses -- that example is nM=8, not nM=4.
+* This is 2024's own Sec. IV embedded/3-D package integration selection,
+* NOT confirmed to be the device the Sec. II-B ZVS mechanism itself
+* assumes -- see SOURCE_COVERAGE_MATRIX.md.
 * External snubber values are not published by P24/P25 and default to zero.
 * Control thresholds and timing must be defined outside this component module.
 .param NHS=2 NLS=3
