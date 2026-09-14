@@ -1,0 +1,36 @@
+{
+  "il1_init_a": 5.2947,
+  "il2_init_a": 21.205095337,
+  "ton1_window_ns": [
+    0.0007026243611482076,
+    16.668056604223818
+  ],
+  "ton2_window_ns": [
+    50.00072090770056,
+    66.66810885154172
+  ],
+  "i1_at_ton1_start_a": 5.317709445953369,
+  "i1_at_ton1_end_a": 124.99990844726562,
+  "i2_at_ton2_start_a": -1.285839557647705,
+  "i2_at_ton2_end_a": 117.76382446289062,
+  "ton1_didt_start_a_per_ns": 8.478351519503438,
+  "ton1_didt_end_a_per_ns": 6.898815534908496,
+  "ton1_didt_avg_a_per_ns": 7.180635733506327,
+  "ton2_didt_start_a_per_ns": 7.462077748108866,
+  "ton2_didt_end_a_per_ns": 6.80751980544338,
+  "ton2_didt_avg_a_per_ns": 7.142670930773467,
+  "vc1_at_ton1_start_v": 36.000179290771484,
+  "vc1_at_ton1_end_v": 36.02049255371094,
+  "vc1_delta_v": 0.020313262939453125,
+  "vc2_at_ton2_start_v": 23.999656677246094,
+  "vc2_at_ton2_end_v": 24.017967224121094,
+  "vc2_delta_v": 0.018310546875,
+  "rhs_ohm": 0.007,
+  "ir_drop_h1_at_peak_v": 0.8749993591308594,
+  "ir_drop_h2_at_peak_v": 0.8243467712402344,
+  "ineg_a": 11.25,
+  "t_i2_zero_cross_ns": 30.845296348991766,
+  "t_i2_ineg_cross_ns": 47.67924168463681,
+  "t_h2_admission_ns": 50.00072090770056,
+  "pre_admission_delay_zero_to_admit_ns": 19.155424558708795
+}
