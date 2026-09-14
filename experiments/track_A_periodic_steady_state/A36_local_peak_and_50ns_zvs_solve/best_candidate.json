@@ -1,0 +1,9 @@
+{
+  "iteration": 5,
+  "il1_init_a": 5.2947,
+  "il2_init_a": 21.20509533697147,
+  "i1_at_ton_a": 124.999988669,
+  "peak_error_a": -1.13309469043e-05,
+  "first_h2_vds_zero_ns": 50.0007464662,
+  "zvs_time_error_ns": 0.0007464662
+}

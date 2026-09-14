@@ -24,6 +24,7 @@ venv/
 # Generic generated outputs and temporary artifacts
 outputs/
 tmp/
+A36_solver_work/
 *.zip
 
 # Source papers and personal meeting material must not be published
