@@ -256,3 +256,20 @@ reproduced, but that a traceable, replaceable reproduction framework has
 been established that can localize the first failure event, narrowing the
 problem down to the device commutation, freewheel path, and multi-phase
 state coupling immediately before the next phase's ZVS.
+
+## 8. Information requested
+
+The following would let this specific boundary be checked directly, rather
+than by further guessing:
+
+1. The real capacitance actually participating in the phase-1-to-phase-2
+   commutation -- device `Coss` plus any added snubber -- at the point where
+   phase 2's high-side voltage currently stalls before reaching zero.
+2. Real dead time and gate-driver propagation delay around that same
+   handoff. The zero-voltage-switching window found so far is on the order
+   of 2 ns, at which scale these are unlikely to still be negligible.
+3. The flying capacitors' (`C1`-`C3`) real values, ESR/ESL, and the intended
+   voltage-balancing/regulation tolerance -- today's finding that phase 2's
+   admission is highly sensitive to `VC1`/`VC2` specifically (Section 6,
+   item 3) suggests this tolerance may be a real design requirement, not
+   just a modeling detail.
