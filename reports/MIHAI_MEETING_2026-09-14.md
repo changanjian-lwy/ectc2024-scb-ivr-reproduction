@@ -2,8 +2,10 @@
 
 > This is the continuously updated report source. When a meeting is confirmed,
 > freeze a dated copy from this file rather than rewriting the experiment
-> history. Results are organised in two dimensions: horizontal evidence
-> branches and vertical model layers.
+> history. Results are organised in two dimensions: the switching sequence is
+> decomposed horizontally in time, while each interval is refined vertically
+> through device, control, multiphase and periodic-state layers. P24/P25 labels
+> identify evidence provenance; they are not themselves the horizontal axis.
 
 ## 1. Research objective
 
@@ -18,36 +20,73 @@ sequence ceases to be self-consistent.
 
 ## 2. Two-dimensional decomposition
 
-### 2.1 Horizontal axis: evidence branches
+### 2.1 Horizontal axis: one phase-to-next-phase switching sequence
 
-| Branch | Electrical target | What is imported | Purpose | Claim boundary |
+The horizontal decomposition follows physical causality rather than paper-local
+`t1/t2/t3` names:
+
+| Horizontal segment | Start event | Dominant process | End event | Main quantity checked |
 |---|---|---|---|---|
-| `P24_PRIMARY_REPRODUCTION_AUDIT` | 48 V to 1 V, 4 phases, 4 modules, 5 MHz | Conditions explicitly stated in the 2024 paper | Test whether P24's own reported conditions close | A failure remains a P24 reproduction-audit result; missing data are not tuned |
-| `P25_NATIVE_REFERENCE` | 12 V to 1 V, 3 phases, 3 modules | Native 2025 prototype modes and components | Understand the detailed six-mode mechanism in its published context | Not a 48-V P24 result |
-| `P25_EXTENDED_ON_P24_TOPOLOGY` | 48 V to 1 V, 4 phases | P24 system/topology plus explicitly labelled P25 control and device supplements | Build the most complete executable four-phase event model currently supported by the papers | Cross-paper extension, never presented as direct P24 reproduction |
+| H1. Energise | present high side admitted | inductor current rises | fixed `Ton` ends | peak current and volt-second relation |
+| H2. High-side turn-off | high side opens | high/low output capacitances exchange charge | phase node reaches low-side clamp | turn-off overlap and low-side ZVS opportunity |
+| H3. Positive freewheel | low side conducts | inductor current decreases | current reaches zero | DCM boundary and zero-cross detection |
+| H4. Negative-current build | current crosses zero | a small reverse current is established | selected `-Ineg` is reached | P24 1-2% versus P25 5-10% rule |
+| H5. Next-switch commutation | low side opens | reverse-current energy commutates the next high-side capacitance | next high-side `Vds=0` | available energy, participating Coss and commutation time |
+| H6. Next-phase admission | zero-voltage event occurs | next high side turns on and latches | its own fixed `Ton` ends | phase-to-phase handoff and slot timing |
 
-The first and third branches use the same 48-to-1 V target so their results can
-be compared at system level. The native P25 reference remains 12-to-1 V and is
-not numerically transferred without re-derivation.
+The experiments were deliberately built from left to right. A segment is first
+tested locally; its measured terminal state becomes the next segment's initial
+state. A later failure is not repaired by silently modifying an earlier
+segment's published value.
 
-### 2.2 Vertical axis: model hierarchy
+### 2.2 Vertical axis: model depth applied to every horizontal segment
 
-| Layer | Question | Current implementation/output |
+The first four layers mainly establish the design contract. The active
+uncertainty begins at the device layer and propagates into control and
+multiphase behaviour.
+
+| Vertical layer | Role in every horizontal segment | Why it can change the result |
 |---|---|---|
-| 1. System specification | What system is being reproduced? | 48 V, 1 V, 1 kW, 5 MHz, 4 phases per module, 4 modules |
-| 2. Evidence and boundary | Where does every assumption come from? | P24/P25/device/numerical/unknown/sensitivity provenance; conflicts become branches |
-| 3. Analytical design | Are duty, on-time, current, inductance and ZVS energy mutually consistent? | Python equation library and formula/table audit |
-| 4. Power topology | How are switches, flying capacitors and inductors connected? | Modular P24 four-phase SCB power stage |
-| 5. Device model | What nonideal elements participate? | Ideal layer and a separate P25/device-augmented `RDS(on)+Coss` layer |
-| 6. Physical events | What ends each switching interval? | Peak/on-time, node clamp, current zero, negative-current cutoff and `Vds=0` events |
-| 7. Control state machine | Which gate changes after each event? | Latched event controller; high-side admission is blocked unless its own `Vds=0` |
-| 8. Four-phase coordination | Can H1, H2, H3 and H4 hand off in sequence? | Full rotating event machine with 50-ns nominal phase slots |
-| 9. Periodic steady state | Does the stored-energy state close after 200 ns? | Seven-state residual `x(T)-x(0)` under a common ideal 1-V output-isolation boundary |
-| 10. Startup and implementation | Can the orbit be established from zero and realised in package? | Separate future layer; startup, nonlinear devices, loss, thermal, package and FEM are not yet claimed |
+| V1. System specification | Locks 48 V, 1 V, 1 kW, 5 MHz, `nP=4`, `nM=4` | Defines power/current/time targets |
+| V2. Evidence boundary | Labels every value as P24, P25, device data, numerical assumption, unknown or sensitivity | Prevents a successful auxiliary case from becoming a false P24 claim |
+| V3. Analytical design | Supplies `D`, `Ton`, peak current, inductance and first energy/time estimates | Exposes equation/table conflicts before SPICE |
+| V4. Power topology | Fixes switch, flying-capacitor and inductor connections | Determines the possible current and charge paths |
+| V5. Device model | Selects ideal switch, `RDS(on)`, participating `Coss`, reverse conduction and later nonlinear/parasitic models | Directly changes current slope, charge demand, ZVS threshold and commutation time |
+| V6. Physical-event detector | Converts waveform conditions into event boundaries | Detection definition/tolerance decides when a mode is considered complete |
+| V7. Control state machine | Latches gates and enforces `Ton`, negative-current cutoff, dead time and ZVS permission | A physically available zero crossing can still be missed or blocked by control timing |
+| V8. Four-phase coordination | Places the same transition inside the coupled H1-H2-H3-H4 system | Other phase currents and flying-capacitor voltages change the local energy state |
+| V9. Periodic closure | Requires all stored-energy states to return after 200 ns | A complete event chain may still drift and therefore not be steady state |
+| V10. Startup/implementation | Establishes the periodic state from zero and later adds loss, thermal, package and FEM | A valid periodic orbit does not itself provide a startup method or hardware proof |
 
-The framework therefore supports both directions of reasoning: system
-requirements are decomposed downward into physical events, and local event
-results are propagated upward to test four-phase and periodic feasibility.
+### 2.3 The experiment is a matrix, not a one-way chain
+
+The actual reproduction logic is the intersection of both axes:
+
+| Horizontal event | V5 device question | V7 control question | V8/V9 system question |
+|---|---|---|---|
+| Current rise | Do `RDS(on)` and actual voltage reduce the ideal 125-A endpoint? | Is `Ton` fixed, measured or event-adjusted? | Does every phase reach a compatible peak and return periodically? |
+| High-side turn-off | Which high-/low-side capacitances participate? | What dead time permits soft turn-off without excess reverse loss? | Do neighbouring low-side states change the commutation path? |
+| Current zero and negative build | What reverse-conduction model is valid? | How is zero crossing latched and where is `-Ineg` measured? | Does using one common percentage work for all phases? |
+| Next-switch ZVS | How much charge/energy does the selected Coss model require? | Is the zero-voltage event captured, held and aligned with the phase slot? | Does a locally sufficient threshold remain sufficient in the coupled four-phase state? |
+
+This matrix explains the current result: A42 passed H5 locally at 7.77%, but
+A43 failed the same nominal handoff after it was lifted to V8. The local number
+was not wrong; its validity boundary was narrower than the full four-phase
+state.
+
+### 2.4 Evidence provenance is the label on each matrix cell
+
+The source split remains essential, but it is not a geometric axis of the
+decomposition:
+
+| Provenance branch | Electrical target | Use |
+|---|---|---|
+| `P24_PRIMARY_REPRODUCTION_AUDIT` | 48 V to 1 V, 4 phases, 4 modules, 5 MHz | Preserve and test P24-explicit conditions, including failures |
+| `P25_NATIVE_REFERENCE` | 12 V to 1 V, 3 phases, 3 modules | Interpret P25's detailed six-mode mechanism and prototype data |
+| `P25_EXTENDED_ON_P24_TOPOLOGY` | 48 V to 1 V, 4 phases | Apply explicitly labelled P25 device/control supplements to the P24 target |
+
+Thus every experiment has three coordinates: horizontal event, vertical model
+depth, and evidence provenance.
 
 ## 3. System-level meaning of 1 kW and 5 MHz
 
@@ -130,7 +169,7 @@ balance and periodic closure can be studied consistently. It is a
 The zero-start track is separate and cannot use this boundary: it must begin
 with `Vo(0)=0` and stored energy equal to zero.
 
-## 7. Results by vertical layer
+## 7. Results across the horizontal sequence and vertical model depth
 
 ### 7.1 Analytical layer
 
