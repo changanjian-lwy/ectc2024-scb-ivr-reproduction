@@ -1,0 +1,128 @@
+* R04E5 - ramped-duty, event-gated zero start (r04e5_tsoft_50us_ilimit_150a)
+* SENSITIVITY CASE: TSOFT=50 us, I_LIMIT=150 A.
+* Two-parent synthesis -- see BOUNDARY.md. PARENT 1: R03D duty ramp
+* (paper_locked/02_ectc2024_main/spice/R03D_epe2019_duty_ramp_takeover.cir).
+* PARENT 2: R04E3 event-driven latched current-limited controller
+* (paper_locked/02_ectc2024_main/spice/R04E3_P24_minimal_zero_start_event_cycle.cir).
+* Single active phase (phase 1) on the full one-module/four-phase P24
+* power stage, exactly as R04E3/R04E4 already do -- this experiment does
+* NOT claim four-phase interleaving, only the phase-1 startup transient.
+* All capacitor/inductor initial conditions are true zero energy.
+
+.include "../../../../paper_locked/04_component_models/GS61008T_typical_params.lib"
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY={4*10u+2*4.7u+2*2.2u}
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+* P24_EXPLICIT Ton relation (same as R03D): D=NP*Vo/Vin, T=1/fsw, Ton=D*T.
+.param FSW=5Meg T={1/FSW} D={NP*VOUT_REF/VIN} TON_FINAL={D*T}
+* R04E3-inherited: 2% of the commanded gate-off limit is the P24
+* source-native negative-current target used to admit high-side ZVS.
+.param I_LIMIT=150 NEG_FRAC=.02 I_NEG={NEG_FRAC*I_LIMIT}
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+* R04E4-inherited correction: rail present at the DC solution (VRAIL flat
+* at VIN from t=0) with controller enable delayed to TENABLE, so a Coss
+* displacement transient cannot trigger the comparator before a commanded
+* power pulse (R04E4's own documented boundary correction).
+.param TENABLE=10n VGATE=5 RLDAMP=1u
+* SENSITIVITY AXIS 1 (R03D's mechanism): linear on-time ramp duration.
+.param TSOFT=50u
+* Elapsed-on-time timer (NUMERICAL_IDEALIZATION, not a physical part):
+* dV/dt=1 V/s while state==ENERGY (1 pA into 1 pF), reset through a 5-ohm
+* switch (RC~5 ps) the instant the machine leaves ENERGY. V(ton_timer)
+* therefore numerically equals THIS pulse's own elapsed on-time in
+* seconds, independent of prior cycles.
+.param TIMER_C=1p TIMER_RESET_RON=5
+
+VRAIL vin 0 {VIN}
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+XMOD vin out 0 gh1_cmd gl1_cmd SCB4P_P24_R04E5
+
+CTIMER ton_timer 0 {TIMER_C} ic=0
+BTIMER_CHG ton_timer 0 I=1p*(V(state_mon)<0.5)*(time>=TENABLE)
+BRESET_GATE reset_gate 0 V=5*(V(state_mon)>0.5)
+SRESET ton_timer 0 reset_gate 0 SWRESET
+.model SWRESET SW(Ron={TIMER_RESET_RON} Roff=1Meg Vt=2.5 Vh=0)
+
+* Event-driven, latched machine (R04E3's skeleton). CHANGED relative to
+* R04E3: rule 0 now fires at the earlier of the current limit or the
+* ramped on-time ceiling (R03D mechanism); rule 4 loops back to state 0
+* instead of entering R04E3's deliberate BLOCK_P24_HANDOFF_UNKNOWN state,
+* so the cycle repeats and the ramp's effect can be observed.
+.machine 1p
+.state ENERGY 0
+.state HS_OFF_COMMUTATE_LOW 1
+.state LOW_FREEWHEEL_TO_ZERO 2
+.state LOW_BUILD_NEGATIVE 3
+.state COMMUTATE_HIGH_TO_ZVS 4
+.rule ENERGY HS_OFF_COMMUTATE_LOW (time>=TENABLE) & ((I(XMOD:L1)>=I_LIMIT) | (V(ton_timer)>=(TON_FINAL*limit((time-TENABLE)/TSOFT,0,1))))
+.rule HS_OFF_COMMUTATE_LOW LOW_FREEWHEEL_TO_ZERO V(xmod:x1)<=0
+.rule LOW_FREEWHEEL_TO_ZERO LOW_BUILD_NEGATIVE I(XMOD:L1)<=0
+.rule LOW_BUILD_NEGATIVE COMMUTATE_HIGH_TO_ZVS I(XMOD:L1)<=-I_NEG
+.rule COMMUTATE_HIGH_TO_ZVS ENERGY V(vin,xmod:a1)<=0
+.output (state_mon) state
+.output (gh1_cmd) VGATE*(state==ENERGY)*(time>=TENABLE)
+.output (gl1_cmd) VGATE*((state==LOW_FREEWHEEL_TO_ZERO)+(state==LOW_BUILD_NEGATIVE))
+.endmachine
+
+RSTATE state_mon 0 1k
+RGH gh1_cmd 0 1k
+RGL gl1_cmd 0 1k
+
+.meas tran STATE_FINAL FIND V(state_mon) AT 60u
+.meas tran VOUT_FINAL FIND V(out) AT 60u
+.meas tran VOUT_AT_25PCT FIND V(out) AT 12.5u
+.meas tran VOUT_AT_50PCT FIND V(out) AT 25u
+.meas tran VOUT_AT_75PCT FIND V(out) AT 37.5u
+.meas tran VOUT_AT_TSOFT FIND V(out) AT 50u
+.meas tran VOUT_PEAK MAX V(out) FROM 0 TO 60u
+.meas tran IL1_MAX MAX I(XMOD:L1) FROM 0 TO 60u
+.meas tran IL1_MIN MIN I(XMOD:L1) FROM 0 TO 60u
+.meas tran IL1_MAX_LATE MAX I(XMOD:L1) FROM 48u TO 60u
+.meas tran IL1_MIN_LATE MIN I(XMOD:L1) FROM 48u TO 60u
+.meas tran VC1_FINAL FIND V(xmod:a1,xmod:x1) AT 60u
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(state_mon) V(out) V(ton_timer) V(vin,xmod:a1) V(xmod:x1) V(xmod:a1,xmod:x1) I(XMOD:L1) V(gh1_cmd) V(gl1_cmd)
+.tran 0 60u 0 1n UIC
+
+.subckt SCB4P_P24_R04E5 vin out g gh1_in gl1_in
+BGH1 gh1 g V=V(gh1_in,g)
+BGL1 gl1 g V=V(gl1_in,g)
+VGL2 gl2 g {VGATE}
+VGH2 gh2 g 0
+VGH3 gh3 g 0
+VGH4 gh4 g 0
+VGL3 gl3 g 0
+VGL4 gl4 g 0
+
+SH1 vin a1 gh1 g SWH
+CH1 vin a1 {CH} ic=0
+CS1 a1 x1 {CFLY} ic=0
+CL1 x1 g {CL} ic=0
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 a1 a2 gh2 g SWH
+CS2 a2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 a2 a3 gh3 g SWH
+CS3 a3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 a3 x4 gh4 g SWH
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+RNUM_A1 a1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_A2 a2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_A3 a3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_P24_R04E5
+.end
