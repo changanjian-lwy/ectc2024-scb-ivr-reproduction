@@ -65,6 +65,7 @@ causal account.
 | R04E8 | module swap inside R04E7's unchanged ratio-gating framework: replace R04E7's Cfly=53.8uF (found to have a cross-topology provenance problem -- EPE2019's own CSC-buck Table I sum, parts rated only 35V/50V, not enough for P24's 48V Vin) with a first-principles-derived corrected range, sweep CFLY in {1,3,8.7 uF} with TOL fixed at 2% (R04E7's own best cell) | all 3/3 cells reach DONE in exactly 8 cycles each (matching R04E7's own TOL=2% cycle count), LADDER_ERR 0.0442-0.0448 (essentially matching R04E7's 0.045) -- the ratio-gating comparators are scale-invariant in Cfly; convergence time scales close to linearly with Cfly and is 5.7x-49.5x FASTER than R04E7's 53.8uF case (85.60/256.72/741.62 ns at 1/3/8.7 uF vs 4239.5 ns at 53.8uF); peak ICS1/ICS2/ICS3 MAX currents stay roughly flat (~4.2-4.6 kA for ICS1_MAX) across the whole 1-53.8uF range, confirming peak current does NOT shrink with smaller Cfly (V/Ron-dominated) -- so the Cfly correction does not resolve the multi-kilo-amp current-plausibility concern already flagged in R04E6/R04E7; some minimum/reverse currents (ICS3_MIN, IL1) do scale up with Cfly; no cell hit the safety cap without converging |
 | R04E9 | genuinely new synthesis: a single unified rotating `CHARGE_k`/`FREE_k` machine drives ALL FOUR phases (not one phase held statically), replacing BOTH R04E3/R04E5's strict single-phase admission chain AND R04E6/E7/E8's switch-only ladder mechanism -- every phase's own series inductor `Lk` is the charging/current-limiting element (P24's own Interval-1 mechanism), `CHARGE_k` exits at R04E3/R04E4's own current-limit rule, `FREE_k` exits at the earlier of the natural zero-crossing or an A48-style `T_FREEWHEEL_MAX` timeout; `CFLY=3uF` (R04E8's corrected value); sweep `I_LIMIT` in {10,30,60}A x `T_FREEWHEEL_MAX` in {50,200,1000}ns (9 cells) | all 9/9 cells advance CHARGE1->FREE1->CHARGE2 within ~1us then permanently stall in CHARGE2 (I(L2) never reaches its own I_LIMIT, best case 67% of the way) because phase 2 has no direct Vin path, only C1's limited relayed charge from phase 1's single ~0.93ns pulse; zero full rotations complete, handoff condition never reached in any cell; both swept axes have real, monotonic, opposite-direction effects on how close IL2 gets to I_LIMIT (unlike R04E5's TSOFT, which had no effect at all); peak currents stay under 61A everywhere in the grid, roughly two orders of magnitude below R04E6/E7/E8's 4.2-4.6kA figures, directly confirming inductor-mediated charging is far more physically plausible even though it does not reach handoff here; two construct bugs (missing timer capacitor, inverted B-source current sign) were found and fixed during piloting, and are flagged as a latent, never-exercised risk in R04E5's own analogous timer construct (not fixed there, out of scope) |
 | R04E10 | single conceptual change from R04E9: add a timeout fallback `T_CHARGE_MAX` to `CHARGE_k` too (OR'd with the existing `I(Lk)>=I_LIMIT` rule), symmetric with `FREE_k`'s own event-OR-timeout pattern, via an exact mirror of R04E9's own validated `FREE_k` timer construct; `T_FREEWHEEL_MAX` fixed at R04E9's own best value (50ns); an isolated pilot found `T_CHARGE_MAX` near R04E9's own ~1ns pulse width breaks the construct, so the swept range is restricted to the pilot-verified-safe `{5,20,50}ns`; sweep `I_LIMIT` in {10,30,60}A x `T_CHARGE_MAX` in {5,20,50}ns (9 cells), `TSTOP=20us` (extended from R04E9's 3us for multi-rotation observation) | 6/9 cells (`T_CHARGE_MAX in {20,50}ns`) complete 4-17 full rotations with `Vout` rising monotonically across every completed rotation -- a genuine unlock of the R04E9 stall; but the other 3/9 cells (`T_CHARGE_MAX=5ns`, all three `I_LIMIT` values) complete ZERO rotations, reproducing R04E9's own total stall exactly despite this value passing isolated verification -- isolated single-branch pilot verification does not guarantee clean full-machine behavior; no cell reaches handoff, best cell reaches only 1.4-5.5% of target across Vout/VC1-3 (3x-20x further than R04E9's own best cell, still 95-99% short); VC2 specifically regresses (wrong direction) at T_CHARGE_MAX=20ns but progresses correctly at 50ns, a reproducible axis-dependent split; inductor currents stay bounded (max 60.17A, same order as R04E9), but a NEW pervasive numerical artifact contaminates flying-capacitor current (ICS1-3) reporting in every one of the 9 cells (hundreds of A up to ~500kA), traced directly to a newly-found retry/chatter dynamic where the machine repeatedly makes partial forward progress then reverses before eventually completing a rotation (first rotation in a representative cell took 18.86us, 70x longer than a naive estimate, vs 273-347ns for later clean rotations); compared to R04E7/R04E8's switch-only ladder (98.9% of target in 5-8 cycles), R04E10 needs more cycles (11-17) to reach far less (3-5.5%), confirming the inductor-mediated approach trades convergence speed for physical plausibility |
+| R04E11 | diagnostic-only (no mechanism change): fine-time-resolution raw-trace instrumentation of R04E10's own `I_LIMIT=30A/T_CHARGE_MAX={20,5}ns` cells, adding `V(reset_gate)`, `V(reset_gate_chg)`, `V(timer)`, `V(timer_chg)` to `.save` (measurement only); tests two hypotheses for the R04E10-documented CHARGE/FREE reversal directly against the raw trace, then tests one candidate fix (reset-switch `Vh=0->1` hysteresis) in a controlled isolation re-run | the "two reset gates disagree" race hypothesis is REFUTED (0/231 conflicts sampled across two independent reversal episodes in two cells); the reversal is instead a genuine, continuous, monotonic multi-integer sweep of the raw `.machine` state variable itself (e.g. `3.9999995->3.4999995->2.4999998->1.4999998` in ~16 ps), occurring during the same stiff sub-picosecond-timestep solver episodes that separately produce the `ICS1-3` artifact; exact, reproducible retry periods measured directly (143.14ns and 214.71ns, refining R04E10's own "~143ns" estimate); the hysteresis fix-test produced a BIT-IDENTICAL trace to the unmodified baseline (same row, same 15-sig-fig timestamp, same state_mon value), refuting that candidate fix; R04E10's own cited `t=19.275us` "reversal event" is directly shown to actually be a clean forward transition coincident with the ICS artifact, not a reversal (a correction to that specific characterization; the ICS/non-integer-state_mon finding itself is fully reproduced); no working fix found, so per Ground Rule 7 none is forced and the 9-cell grid is not re-run -- R04E10's own grid/results.csv remain the authoritative record |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -243,3 +244,52 @@ progresses correctly at `T_CHARGE_MAX=50 ns` in all three `I_LIMIT`
 values. See `R04E10_timeout_gated_multi_rotation_bootstrap/BOUNDARY.md`
 and `RESULTS.md` for the full pilot-diagnosis trail, the complete 9-cell
 grid, and the per-rotation trend tables.
+
+## R04E11 -- the reversal is a `.machine` state-variable excursion, not a
+   race in this project's own gate logic; the obvious fix does not work
+
+R04E11 is diagnostic-only: it instruments (via `.save` additions alone,
+no circuit/parameter change) two of R04E10's own already-committed cells
+with the four internal nodes R04E10 never recorded
+(`reset_gate`/`reset_gate_chg`/`timer`/`timer_chg`), then directly tests
+two hypotheses for the CHARGE/FREE reversal R04E10 documented but did not
+root-cause. **The "two reset gates briefly disagree" race hypothesis is
+refuted**: across 231 sampled rows spanning two independent reversal
+episodes in two different cells, `reset_gate`/`reset_gate_chg` are
+perfect complements at every single row (0 conflicts) -- this project's
+own B-source gate logic behaves exactly as designed throughout. **What
+actually happens**: the raw `.machine` state variable itself (exposed via
+`V(state_mon)`) sweeps continuously and monotonically backward through
+several half-integer bucket boundaries within picoseconds (e.g.
+`3.9999995 -> 3.4999995 -> 2.4999998 -> 1.4999998` in ~16 ps), during the
+same class of genuinely stiff, sub-picosecond-timestep solver-retry
+episode that separately produces the `ICS1-3` current artifact -- both
+are manifestations of the same underlying solver difficulty. Exact,
+reproducible retry periods were measured directly (`143.14 ns` and
+`214.71 ns`, refining R04E10's own "~143 ns" estimate to 4+ significant
+figures). A well-motivated, minimal candidate fix -- giving the
+zero-hysteresis reset-switch comparators (`Vt=2.5 V, Vh=0`, sitting
+exactly on the same boundaries the `.machine` itself uses) an explicit
+`Vh=1` dead band -- was built and run as a controlled isolation test.
+**The result was bit-identical to the unmodified baseline** (same row,
+same 15-significant-figure timestamp, same state value), directly
+refuting that candidate. A secondary cross-check on the permanently-
+stalled `T_CHARGE_MAX=5 ns` cell confirms the same phenomena, more
+severely (273 reversals across the full non-escaping `20 us` run vs. 113
+in the escaping `T_CHARGE_MAX=20 ns` cell) and the same zero-conflict
+gate consistency. One further correction: R04E10's own cited
+`t=19.275 us` "reversal event" is, on direct inspection, actually a
+**clean forward transition** coincident with the `ICS` artifact, not a
+reversal -- the `ICS`/non-integer-`state_mon` finding itself is fully
+reproduced and confirmed, only the "reversal" label at that specific
+instant is corrected. **No working fix was found**, so per Ground Rule 7
+none is forced onto the construct, and the 9-cell grid is not re-run --
+R04E10's own grid and `results.csv`/`results.json` remain the
+authoritative record for all 9 cells. The reversal is attributed to
+LTspice's own `.machine`/`.rule` event-resolution behavior in this stiff
+regime, not to any defect in this project's own constructed B-source/
+switch logic that a further netlist-level change could be expected to
+fix. See
+`R04E11_charge_free_reversal_root_cause/BOUNDARY.md` and `RESULTS.md`
+for the full row-by-row trace evidence, both fix-test comparisons, and
+the exact scripts used.
