@@ -1,0 +1,85 @@
+* A48 - fixed-delay dead-time turn-on, 777bp row, T_DEAD=20 ns (A42_NATURAL_ZVS_REFERENCE)
+* START EVENT: P24 t2, iL1=0. State values are chained from R04D2A.
+* END EVENT: QH1 forced ON at a FIXED TIME T_DEAD after QL1 release,
+* regardless of V(vin,a1). This replaces R04D3A/A42's ideal
+* V(vin,a1)<0 event-detector rule -- see BOUNDARY.md.
+*
+* P24 EXPLICIT CONTROL
+* QL1 remains ON after iL1 zero. At 1%-2% negative peak current it turns OFF;
+* reverse iL1 commutates the phase-1 output capacitances. This run uses the
+* selected A48 release row: 7.77% of the P24 Eq.(2) phase peak (125 A), reused unchanged from A42 (A42_NATURAL_ZVS_REFERENCE).
+*
+* DEVICE PLUG-IN, NOT P24 DEVICE EVIDENCE
+* P25 Table III population and GS61008T CO(TR) scalar are retained from R04D2.
+* No snubber, nonlinear Coss, detector delay, gate delay or dead time is added.
+
+.include ../../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../../paper_locked/04_component_models/GS61008T_commutation_capacitance.lib
+.include ../../../../paper_locked/04_component_models/GaN_reverse_conduction_ideal.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n IPEAK_P24=125 NEG_FRAC=0.0777 INEG={NEG_FRAC*IPEAK_P24}
+.param VC1_T2=36.0193959392 VX1_T2=-9.6476751536u VA1_T2=36.0193862915
+.param RHS={GS61008T_RDS_TYP_25C/NHS} RLS={GS61008T_RDS_TYP_25C/NLS}
+.param T_DEAD=20n
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+RSTATE state_mon 0 1k
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+
+.machine 1p
+.state P24_QL1_NEGATIVE 0
+.state P24_COMMUTATE_TO_HIGH 1
+.rule P24_QL1_NEGATIVE P24_COMMUTATE_TO_HIGH I(L1)<-INEG
+.output (gl1) 5*(state==P24_QL1_NEGATIVE)
+.output (release_flag) 5*(state==P24_COMMUTATE_TO_HIGH)
+.output (state_mon) state
+.endmachine
+
+* A48 CHANGED VARIABLE: fixed-delay turn-on. QH1's gate is driven by a
+* pure time delay of the release event, NOT by the ideal V(vin,a1)<0
+* detector rule the parent used. The driver does not wait for Vds=0.
+B_GH1_FIXED_DELAY gh1 0 V=delay(V(release_flag),T_DEAD)
+RRELEASE release_flag 0 1k
+
+SH1 vin a1 gh1 0 SWH
+* A48 SUPPORTING ADDITION (not the changed variable): ideal GaN
+* off-state reverse-conduction path, same DGAN_IDEAL model A27 uses
+* (Vf=0, Ron=1 mOhm, P25-labelled), so the run stays well-posed if
+* T_DEAD is long enough for Vds to reach 0 naturally before forced
+* turn-on. Reverse-biased and inactive until Vds<0.
+DH1_REVERSE a1 vin DGAN_IDEAL
+CH1 vin a1 {CH_TOTAL} IC={VIN-VA1_T2}
+CF1 a1 x1 53.8u IC={VC1_T2}
+CL1 x1 0 {CL_TOTAL} IC={VX1_T2}
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran P24_T_QL1_OFF WHEN I(L1)=-INEG FALL=1
+.meas tran P24_IL1_AT_QL1_OFF FIND I(L1) WHEN I(L1)=-INEG FALL=1
+.meas tran P24_T3_HIGH_VDS_ZERO WHEN V(vin,a1)=0 FALL=1
+.meas tran P24_IL1_AT_T3 FIND I(L1) WHEN V(vin,a1)=0 FALL=1
+.meas tran P24_COMMUTATION_DURATION PARAM P24_T3_HIGH_VDS_ZERO-P24_T_QL1_OFF
+* A48 forced (fixed-delay) turn-on event and the residual switching voltage
+* at that instant -- the primary extracted quantity of this experiment.
+.meas tran P24_T_FORCED_ON WHEN V(gh1)=2.5 RISE=1
+.meas tran P24_VDS_AT_FORCED_ON FIND V(vin,a1) WHEN V(gh1)=2.5 RISE=1
+.meas tran P24_IL1_AT_FORCED_ON FIND I(L1) WHEN V(gh1)=2.5 RISE=1
+.meas tran P24_VDS_HS_MIN MIN V(vin,a1)
+.meas tran P24_VDS_HS_MIN_AFTER_2NS MIN V(vin,a1) FROM=2n TO=50n
+.meas tran P24_VDS_HS_END FIND V(vin,a1) AT=50n
+.meas tran P24_VDS_LS_MAX MAX V(x1)
+.meas tran P24_NEGATIVE_TARGET PARAM {INEG}
+.meas tran T_DEAD_NS PARAM {T_DEAD*1e9}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-14
+.save V(x1) V(vin,a1) I(L1) V(gl1) V(gh1) V(release_flag) V(state_mon)
+.tran 0 50n 0 0.5p UIC
+.end
