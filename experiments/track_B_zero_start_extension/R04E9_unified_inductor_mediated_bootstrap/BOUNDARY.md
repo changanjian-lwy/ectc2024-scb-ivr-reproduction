@@ -141,6 +141,29 @@ files from inside this one. Flagged here for a future contributor.
 Outputs: `gh(k)_cmd = VGATE*(state==CHARGE_k)`, `gl(k)_cmd =
 VGATE*(state==FREE_k)` for `k=1..4`.
 
+**Inactive-phase switch state, made explicit here (was not stated when this
+file was first committed, added 2026-09-15 after direct review):** because
+each phase's high/low gate is driven by exactly one `(state==...)`
+comparison and never by an OR of multiple states, at any instant only the
+single phase currently in `CHARGE_k` or `FREE_k` has a switch commanded on
+-- every other phase's high AND low side are both off. This is a **third,
+distinct choice**, not the same as either P24's undrawn inactive-low-side
+connection or P25's explicit "all inactive low-sides on/freewheeling"
+convention (`CURRENT_ASSUMPTION_CROSSCHECK.md`'s "Interleaving / event
+timing" row; also central to A39/A44's findings in Track A). It is a
+deliberate, defensible default *for the zero-start bootstrap phase
+specifically*: there is no steady-state amp-second/charge-balance
+freewheeling relationship to maintain yet at true zero energy, so leaving
+uninvolved phases fully open avoids introducing an unanalyzed current path
+this experiment never intended to study. **This choice is independent of,
+and does not take a position on, the separate P24-vs-P25 steady-state
+inactive-low-side question** -- that question only becomes meaningful once
+multiple phases are genuinely interacting in periodic operation, which this
+bootstrap-only experiment does not reach (no cell completes a full
+rotation). Any future experiment that continues rotating past a full cycle,
+or that attempts the handoff into steady-state control, must revisit this
+choice explicitly rather than carrying it forward silently.
+
 ## 3. Handoff-condition monitor (measurement only -- not built/tested)
 
 A continuously-evaluated behavioral observer (`handoff_flag`), high only
