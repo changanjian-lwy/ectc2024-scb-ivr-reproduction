@@ -19,6 +19,15 @@ The reproduction follows three principles:
    are never made to look good by arbitrarily changing device parameters or
    initial states.
 
+Mihai confirmed directly (2026-09-15) that the 2024 paper's 48 V/1 V/1 kW,
+four-phase/four-module configuration was never physically built or measured
+by the authors; it exists only as an analytical/optimization design. The
+2025 paper's 12 V/200 W, three-phase prototype remains the only real,
+measured hardware in this author line. The work below is therefore
+reproduction and consistency-testing of an analytical design, not an
+attempt to replicate a hardware unit that does not exist, and no device or
+capacitance number for the 48 V case should be read as a "measured value."
+
 ## 2. Macro-level decomposition of the framework
 
 The reproduction is split along two directions.
@@ -88,6 +97,15 @@ capacitance participating in each commutation, any added snubber, and the
 real dead time and detection delay. At this stage the project can state
 which devices the model adopts, but cannot claim to have fully replicated
 the authors' hardware.
+
+A second, paper-native device candidate has since been identified: 2024's
+own Table 3 (Sec. IV, embedded-package concept) names two parallel
+high-side and three parallel low-side EPC2067 GaN switches for exactly this
+project's `nP=4`, `nM=4` configuration. This is not confirmed to be the
+device Sec. II-B's ZVS mechanism assumes, and no validated on-resistance
+figure exists for it in that context, so it is carried as a second,
+separately labelled device-sensitivity branch rather than a replacement for
+GS61008T (Section 5, item 7).
 
 ### 3.3 Commutation path and control
 
@@ -163,10 +181,51 @@ has been achieved.
    four-phase period closure still do not pass (the detailed diagnosis of
    that shortfall is in Section 6, item 3).
 
+7. **EPC2067 device-candidate sensitivity:** re-running the full local
+   commutation chain with 2024's own Table-3 EPC2067 candidate in place of
+   the GS61008T borrowed from 2025 moves the local admission threshold from
+   7.76%-7.77% to 22.04%-22.05%, about 2.8x higher. The direction matches
+   physical expectation (roughly 9-10x more commutation capacitance needs
+   proportionally more negative current), but this candidate's on-resistance
+   has not been validated, and Table 3 is Section IV's embedded-package
+   concept, not confirmed to be the device Section II-B's mechanism assumes.
+8. **Cross-experiment scaling check:** combining three separate local-
+   commutation experiments (a snubber sweep and the two device-capacitance
+   sweeps above) into one 102-point regression shows the admission threshold
+   scales with commutation capacitance close to a simple LC-energy law
+   (threshold roughly proportional to the square root of capacitance, fitted
+   exponent 0.51+/-0.01, R^2=0.95). This is evidence the mechanism is being
+   modeled consistently across a wide range of capacitance assumptions, not
+   evidence favoring either specific device.
+9. **Real, non-constant device capacitance:** the constant "time-equivalent"
+   capacitance used in items 3-8 above is itself an approximation. Digitizing
+   GS61008T's own published capacitance-vs-voltage curve and re-running the
+   same chain with the real, nonlinear capacitance moves the threshold to
+   9.63%-9.64% -- higher, not lower, than the constant-capacitance result.
+   The constant value understates the true capacitance near zero volts
+   (where this event actually happens) in order to average correctly over
+   the full 0-50 V range it is specified for. This directly tests and rules
+   out one candidate explanation for why 1%-2% is not reached in this model.
+10. **Dead-time feasibility:** replacing the idealized "turn on exactly when
+    `Vds` reaches zero" controller with a fixed-delay controller, closer to
+    how a real gate driver behaves, shows that catching the natural
+    zero-voltage instant is only possible inside a narrow window, about
+    0.24 ns wide, centered on the commutation's own natural duration. A
+    driver that is too fast or too slow both miss it; past this window, the
+    circuit's own ringing (this model has no reverse-conduction clamp)
+    produces further, unpredictable near-zero and far-from-zero points
+    rather than a safe "long enough is fine" region.
+
 The most important experimental insight is: a single phase's local
 commutation passing does not mean the same threshold transfers directly to
 the coupled four-phase system. The other phases' currents, flying-capacitor
 voltages, and stored-energy state at that moment all change the ZVS outcome.
+A second insight follows from items 7-10: two of the most likely candidate
+explanations for the gap between the local threshold and P24's stated
+1%-2% -- a larger or more realistically-shaped device capacitance, and a
+longer switching delay -- have now been tested directly, and neither closes
+that gap. Each one that changes the result at all moves it further away,
+not closer.
 
 ## 6. Current reflections and research questions
 
@@ -228,6 +287,13 @@ voltages, and stored-energy state at that moment all change the ZVS outcome.
    can enter that trajectory on its own from a zero state. Steady-state
    reproduction and startup strategy must be verified as two separate
    problems.
+7. Given that neither a larger/nonlinear device capacitance nor a longer
+   switching delay closes the gap toward 1%-2% (Section 5, items 9-10), and
+   that the 48 V/1 kW hardware itself was never built, is 1%-2% a general
+   property of this topology class established elsewhere in the authors'
+   prior work, or specific analytical guidance for this exact configuration
+   that depends on an assumption -- a device, a snubber, a different
+   commutation mechanism entirely -- this project does not yet have?
 
 ## 7. Current bottleneck and next steps
 
@@ -236,18 +302,24 @@ phase 1 establishes its negative current and turns off its low side, phase
 2's high side does not reach `Vds=0` before the adjacent time slot, so the
 next phase cannot be admitted under the ZVS condition.
 
-The next step should not be to keep blindly increasing the negative current,
-but to confirm, in order, around this boundary:
+The next step should not be to keep blindly increasing the negative current.
+Two of the originally planned checks around this boundary have since been
+completed directly: a real nonlinear device capacitance (Section 5, item 9)
+and a realistic fixed-delay controller (Section 5, item 10) have both been
+tested, and neither closes the gap toward 1%-2% -- if anything each moves
+the result further away. What remains is:
 
-1. Recheck the complete conducting devices and current loop for this stage
-   directly against the paper's original figures and references;
-2. Determine the device capacitance actually participating in commutation
-   and any possible added snubber;
-3. Repeat the same event after adding real nonlinear device charge, dead
-   time, and detection delay;
-4. Verify separately in the P24 and P25-to-P24 branches, then check whether
+1. Confirm which device, if either of the two candidates tried (GS61008T,
+   EPC2067), the paper's Section II-B mechanism actually assumes, and obtain
+   a validated on-resistance figure for it -- neither candidate's conduction
+   model is currently confirmed;
+2. Determine the real snubber (if any) and the real dead time/detection
+   delay -- both remain unconfirmed, and item 10 above shows the required
+   timing precision may be much tighter (sub-nanosecond) than originally
+   assumed;
+3. Verify separately in the P24 and P25-to-P24 branches, then check whether
    the four-phase period closes;
-5. Only after the steady-state trajectory is established should the method
+4. Only after the steady-state trajectory is established should the method
    for building the capacitor staircase from a zero state be studied
    separately.
 
@@ -264,12 +336,25 @@ than by further guessing:
 
 1. The real capacitance actually participating in the phase-1-to-phase-2
    commutation -- device `Coss` plus any added snubber -- at the point where
-   phase 2's high-side voltage currently stalls before reaching zero.
+   phase 2's high-side voltage currently stalls before reaching zero. Two
+   candidate devices (GS61008T, borrowed from 2025; EPC2067, named by 2024's
+   own Table 3) and a digitized nonlinear model for the first have all been
+   tried; none reach the stated 1%-2% range (Section 5, items 3, 7, 9), so
+   the real value is not something this project can currently narrow down
+   further by guessing.
 2. Real dead time and gate-driver propagation delay around that same
-   handoff. The zero-voltage-switching window found so far is on the order
-   of 2 ns, at which scale these are unlikely to still be negligible.
+   handoff. This has sharpened since the last version of this report: the
+   zero-voltage-switching window is on the order of 2 ns, and a feasibility
+   sweep (Section 5, item 10) shows the window in which a fixed delay
+   actually catches that instant is only about 0.24 ns wide -- an order of
+   magnitude tighter than "a few nanoseconds" would suggest.
 3. The flying capacitors' (`C1`-`C3`) real values, ESR/ESL, and the intended
    voltage-balancing/regulation tolerance -- today's finding that phase 2's
    admission is highly sensitive to `VC1`/`VC2` specifically (Section 6,
    item 3) suggests this tolerance may be a real design requirement, not
    just a modeling detail.
+4. Whether EPC2067 (2024's own Table 3 candidate for this exact
+   configuration) is the device Section II-B's ZVS mechanism assumes, or is
+   specific to Section IV's separate embedded-package concept -- and, if the
+   former, a validated on-resistance figure for it, which Table 3 does not
+   provide.
