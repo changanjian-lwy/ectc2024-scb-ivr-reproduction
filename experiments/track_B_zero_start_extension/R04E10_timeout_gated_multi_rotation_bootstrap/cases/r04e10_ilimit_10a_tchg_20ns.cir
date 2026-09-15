@@ -1,0 +1,517 @@
+* R04E10 - timeout-gated multi-rotation bootstrap (r04e10_ilimit_10a_tchg_20ns)
+* SENSITIVITY CASE: I_LIMIT=10 A, T_CHARGE_MAX=20 ns,
+* T_FREEWHEEL_MAX=50 ns (FIXED, R04E9's own best-performing value).
+* PARENT: R04E9 (unified inductor-mediated four-phase bootstrap). SINGLE
+* CHANGE from R04E9: CHARGE_k now exits at (I(Lk)>=I_LIMIT) OR
+* (time-in-CHARGE_k>=T_CHARGE_MAX), symmetric with FREE_k's existing
+* event-OR-timeout pattern. Everything else (node topology, CFLY=3uF,
+* COUT=4.672mF, current-limit mechanism, FREE_k timer) is unchanged from
+* R04E9. See build_b06_r04e10_timeout_gated_multi_rotation_bootstrap.py
+* module docstring and BOUNDARY.md for the pilot-verified-safe
+* T_CHARGE_MAX range (values near 1ns were found to break the construct;
+* this grid uses only pilot-confirmed-clean values, >=5ns).
+* Full four-phase P24 power stage, all four phases actively commanded by
+* the machine (unchanged from R04E9). True zero initial energy on every
+* capacitor and inductor (ic=0, UIC).
+* TSTOP=20 us / TMAX=50 ps: pilot-justified multi-
+* rotation window (see BOUNDARY.md) -- fixed across the whole grid.
+* SCOPE: bootstrap-only. Does NOT build or test handoff into the existing
+* strict steady-state controller; only measures whether/when the handoff
+* CONDITION is reached.
+
+.include "../../../../paper_locked/04_component_models/GS61008T_typical_params.lib"
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666667e-09 CFLY=3.000000e-06
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param RLDAMP=1u VGATE=5
+
+.param I_LIMIT=10
+.param T_FREEWHEEL_MAX=5.000000e-08
+.param T_CHARGE_MAX=2.000000e-08
+* Elapsed-time timer components (NUMERICAL_IDEALIZATION, no physical
+* counterpart), same TIMER_C/TIMER_RESET_RON values R04E5/R04E9 used.
+.param TIMER_C=1p TIMER_RESET_RON=5
+
+* Handoff-condition monitor (measurement only -- this experiment does NOT
+* build or exercise the actual handoff/steady-state chain, per BOUNDARY.md).
+.param VOUT_LO=0.950000 VOUT_HI=1.050000
+.param VC1_LO=35.280000 VC1_HI=36.720000
+.param VC2_LO=23.520000 VC2_HI=24.480000
+.param VC3_LO=11.760000 VC3_HI=12.240000
+
+VRAIL vin 0 {VIN}
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+XMOD vin out 0 gh1_cmd gl1_cmd gh2_cmd gl2_cmd gh3_cmd gl3_cmd gh4_cmd gl4_cmd SCB4P_P24_R04E10
+
+BVC1 vc1_mon 0 V=V(xmod:a1,xmod:x1)
+BVC2 vc2_mon 0 V=V(xmod:a2,xmod:x2)
+BVC3 vc3_mon 0 V=V(xmod:a3,xmod:x3)
+RVC1 vc1_mon 0 1k
+RVC2 vc2_mon 0 1k
+RVC3 vc3_mon 0 1k
+
+* Per-state elapsed FREEWHEEL-time timer (unchanged from R04E9): charges
+* only while the machine is in ANY FREE_k state; held reset near 0 by a
+* low-Ron switch throughout ANY CHARGE_k state.
+CTIMER timer 0 {TIMER_C} ic=0
+BTIMER_CHG timer 0 I=-1p*((V(state_mon)>0.5)&(V(state_mon)<1.5)|(V(state_mon)>2.5)&(V(state_mon)<3.5)|(V(state_mon)>4.5)&(V(state_mon)<5.5)|(V(state_mon)>6.5)&(V(state_mon)<7.5))
+BRESET_GATE reset_gate 0 V=5*((V(state_mon)<0.5)|(V(state_mon)>1.5)&(V(state_mon)<2.5)|(V(state_mon)>3.5)&(V(state_mon)<4.5)|(V(state_mon)>5.5)&(V(state_mon)<6.5))
+SRESET timer 0 reset_gate 0 SWRESET
+.model SWRESET SW(Ron={TIMER_RESET_RON} Roff=1Meg Vt=2.5 Vh=0)
+
+* NEW: per-state elapsed CHARGE-time timer -- exact mirror of the
+* freewheel timer above (BOUNDARY.md Section "The mechanism"): charges
+* only while the machine is in ANY CHARGE_k state; held reset near 0 by a
+* low-Ron switch throughout ANY FREE_k state. Same -1p sign convention
+* (verified, not assumed -- R04E9's own diagnosed B-source polarity fix,
+* Section 2 of its BOUNDARY.md, applies identically here).
+CTIMER_CHG timer_chg 0 {TIMER_C} ic=0
+BTIMER_CHG2 timer_chg 0 I=-1p*((V(state_mon)<0.5)|(V(state_mon)>1.5)&(V(state_mon)<2.5)|(V(state_mon)>3.5)&(V(state_mon)<4.5)|(V(state_mon)>5.5)&(V(state_mon)<6.5))
+BRESET_GATE2 reset_gate_chg 0 V=5*((V(state_mon)>0.5)&(V(state_mon)<1.5)|(V(state_mon)>2.5)&(V(state_mon)<3.5)|(V(state_mon)>4.5)&(V(state_mon)<5.5)|(V(state_mon)>6.5)&(V(state_mon)<7.5))
+SRESET_CHG timer_chg 0 reset_gate_chg 0 SWRESET
+
+* Handoff-condition observer: high only while Vout and all three flying
+* capacitor voltages simultaneously sit within their declared bands.
+BHANDOFF handoff_flag 0 V=5*((V(out)>=VOUT_LO)&(V(out)<=VOUT_HI)&(V(vc1_mon)>=VC1_LO)&(V(vc1_mon)<=VC1_HI)&(V(vc2_mon)>=VC2_LO)&(V(vc2_mon)<=VC2_HI)&(V(vc3_mon)>=VC3_LO)&(V(vc3_mon)<=VC3_HI))
+RHANDOFF handoff_flag 0 1k
+
+* Unified event-driven, latched four-phase rotation machine. CHARGE_k
+* exits at the R04E3/R04E4 current-limit rule (I(Lk)>=I_LIMIT) OR the NEW
+* T_CHARGE_MAX timeout (THIS EXPERIMENT'S single change from R04E9);
+* FREE_k exits at the earlier of the natural I(Lk)<=0 event or the
+* T_FREEWHEEL_MAX timeout (unchanged from R04E9).
+.machine 1p
+.state CHARGE1 0
+.state FREE1 1
+.state CHARGE2 2
+.state FREE2 3
+.state CHARGE3 4
+.state FREE3 5
+.state CHARGE4 6
+.state FREE4 7
+.rule CHARGE1 FREE1 (I(XMOD:L1)>=I_LIMIT) | (V(timer_chg)>=T_CHARGE_MAX)
+.rule FREE1 CHARGE2 (I(XMOD:L1)<=0) | (V(timer)>=T_FREEWHEEL_MAX)
+.rule CHARGE2 FREE2 (I(XMOD:L2)>=I_LIMIT) | (V(timer_chg)>=T_CHARGE_MAX)
+.rule FREE2 CHARGE3 (I(XMOD:L2)<=0) | (V(timer)>=T_FREEWHEEL_MAX)
+.rule CHARGE3 FREE3 (I(XMOD:L3)>=I_LIMIT) | (V(timer_chg)>=T_CHARGE_MAX)
+.rule FREE3 CHARGE4 (I(XMOD:L3)<=0) | (V(timer)>=T_FREEWHEEL_MAX)
+.rule CHARGE4 FREE4 (I(XMOD:L4)>=I_LIMIT) | (V(timer_chg)>=T_CHARGE_MAX)
+.rule FREE4 CHARGE1 (I(XMOD:L4)<=0) | (V(timer)>=T_FREEWHEEL_MAX)
+.output (gh1_cmd) VGATE*(state==CHARGE1)
+.output (gl1_cmd) VGATE*(state==FREE1)
+.output (gh2_cmd) VGATE*(state==CHARGE2)
+.output (gl2_cmd) VGATE*(state==FREE2)
+.output (gh3_cmd) VGATE*(state==CHARGE3)
+.output (gl3_cmd) VGATE*(state==FREE3)
+.output (gh4_cmd) VGATE*(state==CHARGE4)
+.output (gl4_cmd) VGATE*(state==FREE4)
+.output (state_mon) state
+.output (rot_flag) VGATE*(state==FREE4)
+.endmachine
+
+RSTATE state_mon 0 1k
+RROT rot_flag 0 1k
+RGH1 gh1_cmd 0 1k
+RGL1 gl1_cmd 0 1k
+RGH2 gh2_cmd 0 1k
+RGL2 gl2_cmd 0 1k
+RGH3 gh3_cmd 0 1k
+RGL3 gl3_cmd 0 1k
+RGH4 gh4_cmd 0 1k
+RGL4 gl4_cmd 0 1k
+
+.meas tran STATE_FINAL FIND V(state_mon) AT 2.000000e-05
+.meas tran VOUT_FINAL FIND V(out) AT 2.000000e-05
+.meas tran VC1_FINAL FIND V(vc1_mon) AT 2.000000e-05
+.meas tran VC2_FINAL FIND V(vc2_mon) AT 2.000000e-05
+.meas tran VC3_FINAL FIND V(vc3_mon) AT 2.000000e-05
+.meas tran T_HANDOFF WHEN V(handoff_flag)=2.5 RISE=1
+.meas tran VOUT_AT_20PCT FIND V(out) AT 4.000000e-06
+.meas tran VC1_AT_20PCT FIND V(vc1_mon) AT 4.000000e-06
+.meas tran VC2_AT_20PCT FIND V(vc2_mon) AT 4.000000e-06
+.meas tran VC3_AT_20PCT FIND V(vc3_mon) AT 4.000000e-06
+.meas tran STATE_AT_20PCT FIND V(state_mon) AT 4.000000e-06
+.meas tran VOUT_AT_40PCT FIND V(out) AT 8.000000e-06
+.meas tran VC1_AT_40PCT FIND V(vc1_mon) AT 8.000000e-06
+.meas tran VC2_AT_40PCT FIND V(vc2_mon) AT 8.000000e-06
+.meas tran VC3_AT_40PCT FIND V(vc3_mon) AT 8.000000e-06
+.meas tran STATE_AT_40PCT FIND V(state_mon) AT 8.000000e-06
+.meas tran VOUT_AT_60PCT FIND V(out) AT 1.200000e-05
+.meas tran VC1_AT_60PCT FIND V(vc1_mon) AT 1.200000e-05
+.meas tran VC2_AT_60PCT FIND V(vc2_mon) AT 1.200000e-05
+.meas tran VC3_AT_60PCT FIND V(vc3_mon) AT 1.200000e-05
+.meas tran STATE_AT_60PCT FIND V(state_mon) AT 1.200000e-05
+.meas tran VOUT_AT_80PCT FIND V(out) AT 1.600000e-05
+.meas tran VC1_AT_80PCT FIND V(vc1_mon) AT 1.600000e-05
+.meas tran VC2_AT_80PCT FIND V(vc2_mon) AT 1.600000e-05
+.meas tran VC3_AT_80PCT FIND V(vc3_mon) AT 1.600000e-05
+.meas tran STATE_AT_80PCT FIND V(state_mon) AT 1.600000e-05
+.meas tran VOUT_AT_100PCT FIND V(out) AT 2.000000e-05
+.meas tran VC1_AT_100PCT FIND V(vc1_mon) AT 2.000000e-05
+.meas tran VC2_AT_100PCT FIND V(vc2_mon) AT 2.000000e-05
+.meas tran VC3_AT_100PCT FIND V(vc3_mon) AT 2.000000e-05
+.meas tran STATE_AT_100PCT FIND V(state_mon) AT 2.000000e-05
+.meas tran IL1_MAX MAX I(XMOD:L1)
+.meas tran IL1_MIN MIN I(XMOD:L1)
+.meas tran IL2_MAX MAX I(XMOD:L2)
+.meas tran IL2_MIN MIN I(XMOD:L2)
+.meas tran IL3_MAX MAX I(XMOD:L3)
+.meas tran IL3_MIN MIN I(XMOD:L3)
+.meas tran IL4_MAX MAX I(XMOD:L4)
+.meas tran IL4_MIN MIN I(XMOD:L4)
+* NOTE: ICS1-3 windowed FROM 2n, not 0, excluding the same sub-2ns t=0
+* ideal-switch/capacitor initial-condition numerical startup spike R04E6/
+* R04E8/R04E9 already documented and excluded.
+.meas tran ICS1_MAX MAX I(XMOD:CS1) FROM 2n TO 2.000000e-05
+.meas tran ICS1_MIN MIN I(XMOD:CS1) FROM 2n TO 2.000000e-05
+.meas tran ICS2_MAX MAX I(XMOD:CS2) FROM 2n TO 2.000000e-05
+.meas tran ICS2_MIN MIN I(XMOD:CS2) FROM 2n TO 2.000000e-05
+.meas tran ICS3_MAX MAX I(XMOD:CS3) FROM 2n TO 2.000000e-05
+.meas tran ICS3_MIN MIN I(XMOD:CS3) FROM 2n TO 2.000000e-05
+.meas tran T_ROT1 WHEN V(rot_flag)=2.5 FALL=1
+.meas tran VOUT_ROT1 FIND V(out) WHEN V(rot_flag)=2.5 FALL=1
+.meas tran VC1_ROT1 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=1
+.meas tran VC2_ROT1 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=1
+.meas tran VC3_ROT1 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=1
+.meas tran T_ROT2 WHEN V(rot_flag)=2.5 FALL=2
+.meas tran VOUT_ROT2 FIND V(out) WHEN V(rot_flag)=2.5 FALL=2
+.meas tran VC1_ROT2 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=2
+.meas tran VC2_ROT2 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=2
+.meas tran VC3_ROT2 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=2
+.meas tran T_ROT3 WHEN V(rot_flag)=2.5 FALL=3
+.meas tran VOUT_ROT3 FIND V(out) WHEN V(rot_flag)=2.5 FALL=3
+.meas tran VC1_ROT3 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=3
+.meas tran VC2_ROT3 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=3
+.meas tran VC3_ROT3 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=3
+.meas tran T_ROT4 WHEN V(rot_flag)=2.5 FALL=4
+.meas tran VOUT_ROT4 FIND V(out) WHEN V(rot_flag)=2.5 FALL=4
+.meas tran VC1_ROT4 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=4
+.meas tran VC2_ROT4 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=4
+.meas tran VC3_ROT4 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=4
+.meas tran T_ROT5 WHEN V(rot_flag)=2.5 FALL=5
+.meas tran VOUT_ROT5 FIND V(out) WHEN V(rot_flag)=2.5 FALL=5
+.meas tran VC1_ROT5 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=5
+.meas tran VC2_ROT5 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=5
+.meas tran VC3_ROT5 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=5
+.meas tran T_ROT6 WHEN V(rot_flag)=2.5 FALL=6
+.meas tran VOUT_ROT6 FIND V(out) WHEN V(rot_flag)=2.5 FALL=6
+.meas tran VC1_ROT6 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=6
+.meas tran VC2_ROT6 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=6
+.meas tran VC3_ROT6 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=6
+.meas tran T_ROT7 WHEN V(rot_flag)=2.5 FALL=7
+.meas tran VOUT_ROT7 FIND V(out) WHEN V(rot_flag)=2.5 FALL=7
+.meas tran VC1_ROT7 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=7
+.meas tran VC2_ROT7 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=7
+.meas tran VC3_ROT7 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=7
+.meas tran T_ROT8 WHEN V(rot_flag)=2.5 FALL=8
+.meas tran VOUT_ROT8 FIND V(out) WHEN V(rot_flag)=2.5 FALL=8
+.meas tran VC1_ROT8 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=8
+.meas tran VC2_ROT8 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=8
+.meas tran VC3_ROT8 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=8
+.meas tran T_ROT9 WHEN V(rot_flag)=2.5 FALL=9
+.meas tran VOUT_ROT9 FIND V(out) WHEN V(rot_flag)=2.5 FALL=9
+.meas tran VC1_ROT9 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=9
+.meas tran VC2_ROT9 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=9
+.meas tran VC3_ROT9 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=9
+.meas tran T_ROT10 WHEN V(rot_flag)=2.5 FALL=10
+.meas tran VOUT_ROT10 FIND V(out) WHEN V(rot_flag)=2.5 FALL=10
+.meas tran VC1_ROT10 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=10
+.meas tran VC2_ROT10 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=10
+.meas tran VC3_ROT10 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=10
+.meas tran T_ROT11 WHEN V(rot_flag)=2.5 FALL=11
+.meas tran VOUT_ROT11 FIND V(out) WHEN V(rot_flag)=2.5 FALL=11
+.meas tran VC1_ROT11 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=11
+.meas tran VC2_ROT11 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=11
+.meas tran VC3_ROT11 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=11
+.meas tran T_ROT12 WHEN V(rot_flag)=2.5 FALL=12
+.meas tran VOUT_ROT12 FIND V(out) WHEN V(rot_flag)=2.5 FALL=12
+.meas tran VC1_ROT12 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=12
+.meas tran VC2_ROT12 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=12
+.meas tran VC3_ROT12 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=12
+.meas tran T_ROT13 WHEN V(rot_flag)=2.5 FALL=13
+.meas tran VOUT_ROT13 FIND V(out) WHEN V(rot_flag)=2.5 FALL=13
+.meas tran VC1_ROT13 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=13
+.meas tran VC2_ROT13 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=13
+.meas tran VC3_ROT13 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=13
+.meas tran T_ROT14 WHEN V(rot_flag)=2.5 FALL=14
+.meas tran VOUT_ROT14 FIND V(out) WHEN V(rot_flag)=2.5 FALL=14
+.meas tran VC1_ROT14 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=14
+.meas tran VC2_ROT14 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=14
+.meas tran VC3_ROT14 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=14
+.meas tran T_ROT15 WHEN V(rot_flag)=2.5 FALL=15
+.meas tran VOUT_ROT15 FIND V(out) WHEN V(rot_flag)=2.5 FALL=15
+.meas tran VC1_ROT15 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=15
+.meas tran VC2_ROT15 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=15
+.meas tran VC3_ROT15 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=15
+.meas tran T_ROT16 WHEN V(rot_flag)=2.5 FALL=16
+.meas tran VOUT_ROT16 FIND V(out) WHEN V(rot_flag)=2.5 FALL=16
+.meas tran VC1_ROT16 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=16
+.meas tran VC2_ROT16 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=16
+.meas tran VC3_ROT16 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=16
+.meas tran T_ROT17 WHEN V(rot_flag)=2.5 FALL=17
+.meas tran VOUT_ROT17 FIND V(out) WHEN V(rot_flag)=2.5 FALL=17
+.meas tran VC1_ROT17 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=17
+.meas tran VC2_ROT17 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=17
+.meas tran VC3_ROT17 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=17
+.meas tran T_ROT18 WHEN V(rot_flag)=2.5 FALL=18
+.meas tran VOUT_ROT18 FIND V(out) WHEN V(rot_flag)=2.5 FALL=18
+.meas tran VC1_ROT18 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=18
+.meas tran VC2_ROT18 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=18
+.meas tran VC3_ROT18 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=18
+.meas tran T_ROT19 WHEN V(rot_flag)=2.5 FALL=19
+.meas tran VOUT_ROT19 FIND V(out) WHEN V(rot_flag)=2.5 FALL=19
+.meas tran VC1_ROT19 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=19
+.meas tran VC2_ROT19 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=19
+.meas tran VC3_ROT19 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=19
+.meas tran T_ROT20 WHEN V(rot_flag)=2.5 FALL=20
+.meas tran VOUT_ROT20 FIND V(out) WHEN V(rot_flag)=2.5 FALL=20
+.meas tran VC1_ROT20 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=20
+.meas tran VC2_ROT20 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=20
+.meas tran VC3_ROT20 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=20
+.meas tran T_ROT21 WHEN V(rot_flag)=2.5 FALL=21
+.meas tran VOUT_ROT21 FIND V(out) WHEN V(rot_flag)=2.5 FALL=21
+.meas tran VC1_ROT21 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=21
+.meas tran VC2_ROT21 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=21
+.meas tran VC3_ROT21 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=21
+.meas tran T_ROT22 WHEN V(rot_flag)=2.5 FALL=22
+.meas tran VOUT_ROT22 FIND V(out) WHEN V(rot_flag)=2.5 FALL=22
+.meas tran VC1_ROT22 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=22
+.meas tran VC2_ROT22 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=22
+.meas tran VC3_ROT22 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=22
+.meas tran T_ROT23 WHEN V(rot_flag)=2.5 FALL=23
+.meas tran VOUT_ROT23 FIND V(out) WHEN V(rot_flag)=2.5 FALL=23
+.meas tran VC1_ROT23 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=23
+.meas tran VC2_ROT23 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=23
+.meas tran VC3_ROT23 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=23
+.meas tran T_ROT24 WHEN V(rot_flag)=2.5 FALL=24
+.meas tran VOUT_ROT24 FIND V(out) WHEN V(rot_flag)=2.5 FALL=24
+.meas tran VC1_ROT24 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=24
+.meas tran VC2_ROT24 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=24
+.meas tran VC3_ROT24 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=24
+.meas tran T_ROT25 WHEN V(rot_flag)=2.5 FALL=25
+.meas tran VOUT_ROT25 FIND V(out) WHEN V(rot_flag)=2.5 FALL=25
+.meas tran VC1_ROT25 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=25
+.meas tran VC2_ROT25 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=25
+.meas tran VC3_ROT25 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=25
+.meas tran T_ROT26 WHEN V(rot_flag)=2.5 FALL=26
+.meas tran VOUT_ROT26 FIND V(out) WHEN V(rot_flag)=2.5 FALL=26
+.meas tran VC1_ROT26 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=26
+.meas tran VC2_ROT26 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=26
+.meas tran VC3_ROT26 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=26
+.meas tran T_ROT27 WHEN V(rot_flag)=2.5 FALL=27
+.meas tran VOUT_ROT27 FIND V(out) WHEN V(rot_flag)=2.5 FALL=27
+.meas tran VC1_ROT27 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=27
+.meas tran VC2_ROT27 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=27
+.meas tran VC3_ROT27 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=27
+.meas tran T_ROT28 WHEN V(rot_flag)=2.5 FALL=28
+.meas tran VOUT_ROT28 FIND V(out) WHEN V(rot_flag)=2.5 FALL=28
+.meas tran VC1_ROT28 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=28
+.meas tran VC2_ROT28 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=28
+.meas tran VC3_ROT28 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=28
+.meas tran T_ROT29 WHEN V(rot_flag)=2.5 FALL=29
+.meas tran VOUT_ROT29 FIND V(out) WHEN V(rot_flag)=2.5 FALL=29
+.meas tran VC1_ROT29 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=29
+.meas tran VC2_ROT29 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=29
+.meas tran VC3_ROT29 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=29
+.meas tran T_ROT30 WHEN V(rot_flag)=2.5 FALL=30
+.meas tran VOUT_ROT30 FIND V(out) WHEN V(rot_flag)=2.5 FALL=30
+.meas tran VC1_ROT30 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=30
+.meas tran VC2_ROT30 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=30
+.meas tran VC3_ROT30 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=30
+.meas tran T_ROT31 WHEN V(rot_flag)=2.5 FALL=31
+.meas tran VOUT_ROT31 FIND V(out) WHEN V(rot_flag)=2.5 FALL=31
+.meas tran VC1_ROT31 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=31
+.meas tran VC2_ROT31 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=31
+.meas tran VC3_ROT31 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=31
+.meas tran T_ROT32 WHEN V(rot_flag)=2.5 FALL=32
+.meas tran VOUT_ROT32 FIND V(out) WHEN V(rot_flag)=2.5 FALL=32
+.meas tran VC1_ROT32 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=32
+.meas tran VC2_ROT32 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=32
+.meas tran VC3_ROT32 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=32
+.meas tran T_ROT33 WHEN V(rot_flag)=2.5 FALL=33
+.meas tran VOUT_ROT33 FIND V(out) WHEN V(rot_flag)=2.5 FALL=33
+.meas tran VC1_ROT33 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=33
+.meas tran VC2_ROT33 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=33
+.meas tran VC3_ROT33 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=33
+.meas tran T_ROT34 WHEN V(rot_flag)=2.5 FALL=34
+.meas tran VOUT_ROT34 FIND V(out) WHEN V(rot_flag)=2.5 FALL=34
+.meas tran VC1_ROT34 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=34
+.meas tran VC2_ROT34 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=34
+.meas tran VC3_ROT34 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=34
+.meas tran T_ROT35 WHEN V(rot_flag)=2.5 FALL=35
+.meas tran VOUT_ROT35 FIND V(out) WHEN V(rot_flag)=2.5 FALL=35
+.meas tran VC1_ROT35 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=35
+.meas tran VC2_ROT35 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=35
+.meas tran VC3_ROT35 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=35
+.meas tran T_ROT36 WHEN V(rot_flag)=2.5 FALL=36
+.meas tran VOUT_ROT36 FIND V(out) WHEN V(rot_flag)=2.5 FALL=36
+.meas tran VC1_ROT36 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=36
+.meas tran VC2_ROT36 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=36
+.meas tran VC3_ROT36 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=36
+.meas tran T_ROT37 WHEN V(rot_flag)=2.5 FALL=37
+.meas tran VOUT_ROT37 FIND V(out) WHEN V(rot_flag)=2.5 FALL=37
+.meas tran VC1_ROT37 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=37
+.meas tran VC2_ROT37 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=37
+.meas tran VC3_ROT37 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=37
+.meas tran T_ROT38 WHEN V(rot_flag)=2.5 FALL=38
+.meas tran VOUT_ROT38 FIND V(out) WHEN V(rot_flag)=2.5 FALL=38
+.meas tran VC1_ROT38 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=38
+.meas tran VC2_ROT38 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=38
+.meas tran VC3_ROT38 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=38
+.meas tran T_ROT39 WHEN V(rot_flag)=2.5 FALL=39
+.meas tran VOUT_ROT39 FIND V(out) WHEN V(rot_flag)=2.5 FALL=39
+.meas tran VC1_ROT39 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=39
+.meas tran VC2_ROT39 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=39
+.meas tran VC3_ROT39 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=39
+.meas tran T_ROT40 WHEN V(rot_flag)=2.5 FALL=40
+.meas tran VOUT_ROT40 FIND V(out) WHEN V(rot_flag)=2.5 FALL=40
+.meas tran VC1_ROT40 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=40
+.meas tran VC2_ROT40 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=40
+.meas tran VC3_ROT40 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=40
+.meas tran T_ROT41 WHEN V(rot_flag)=2.5 FALL=41
+.meas tran VOUT_ROT41 FIND V(out) WHEN V(rot_flag)=2.5 FALL=41
+.meas tran VC1_ROT41 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=41
+.meas tran VC2_ROT41 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=41
+.meas tran VC3_ROT41 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=41
+.meas tran T_ROT42 WHEN V(rot_flag)=2.5 FALL=42
+.meas tran VOUT_ROT42 FIND V(out) WHEN V(rot_flag)=2.5 FALL=42
+.meas tran VC1_ROT42 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=42
+.meas tran VC2_ROT42 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=42
+.meas tran VC3_ROT42 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=42
+.meas tran T_ROT43 WHEN V(rot_flag)=2.5 FALL=43
+.meas tran VOUT_ROT43 FIND V(out) WHEN V(rot_flag)=2.5 FALL=43
+.meas tran VC1_ROT43 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=43
+.meas tran VC2_ROT43 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=43
+.meas tran VC3_ROT43 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=43
+.meas tran T_ROT44 WHEN V(rot_flag)=2.5 FALL=44
+.meas tran VOUT_ROT44 FIND V(out) WHEN V(rot_flag)=2.5 FALL=44
+.meas tran VC1_ROT44 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=44
+.meas tran VC2_ROT44 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=44
+.meas tran VC3_ROT44 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=44
+.meas tran T_ROT45 WHEN V(rot_flag)=2.5 FALL=45
+.meas tran VOUT_ROT45 FIND V(out) WHEN V(rot_flag)=2.5 FALL=45
+.meas tran VC1_ROT45 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=45
+.meas tran VC2_ROT45 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=45
+.meas tran VC3_ROT45 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=45
+.meas tran T_ROT46 WHEN V(rot_flag)=2.5 FALL=46
+.meas tran VOUT_ROT46 FIND V(out) WHEN V(rot_flag)=2.5 FALL=46
+.meas tran VC1_ROT46 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=46
+.meas tran VC2_ROT46 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=46
+.meas tran VC3_ROT46 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=46
+.meas tran T_ROT47 WHEN V(rot_flag)=2.5 FALL=47
+.meas tran VOUT_ROT47 FIND V(out) WHEN V(rot_flag)=2.5 FALL=47
+.meas tran VC1_ROT47 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=47
+.meas tran VC2_ROT47 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=47
+.meas tran VC3_ROT47 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=47
+.meas tran T_ROT48 WHEN V(rot_flag)=2.5 FALL=48
+.meas tran VOUT_ROT48 FIND V(out) WHEN V(rot_flag)=2.5 FALL=48
+.meas tran VC1_ROT48 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=48
+.meas tran VC2_ROT48 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=48
+.meas tran VC3_ROT48 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=48
+.meas tran T_ROT49 WHEN V(rot_flag)=2.5 FALL=49
+.meas tran VOUT_ROT49 FIND V(out) WHEN V(rot_flag)=2.5 FALL=49
+.meas tran VC1_ROT49 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=49
+.meas tran VC2_ROT49 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=49
+.meas tran VC3_ROT49 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=49
+.meas tran T_ROT50 WHEN V(rot_flag)=2.5 FALL=50
+.meas tran VOUT_ROT50 FIND V(out) WHEN V(rot_flag)=2.5 FALL=50
+.meas tran VC1_ROT50 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=50
+.meas tran VC2_ROT50 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=50
+.meas tran VC3_ROT50 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=50
+.meas tran T_ROT51 WHEN V(rot_flag)=2.5 FALL=51
+.meas tran VOUT_ROT51 FIND V(out) WHEN V(rot_flag)=2.5 FALL=51
+.meas tran VC1_ROT51 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=51
+.meas tran VC2_ROT51 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=51
+.meas tran VC3_ROT51 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=51
+.meas tran T_ROT52 WHEN V(rot_flag)=2.5 FALL=52
+.meas tran VOUT_ROT52 FIND V(out) WHEN V(rot_flag)=2.5 FALL=52
+.meas tran VC1_ROT52 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=52
+.meas tran VC2_ROT52 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=52
+.meas tran VC3_ROT52 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=52
+.meas tran T_ROT53 WHEN V(rot_flag)=2.5 FALL=53
+.meas tran VOUT_ROT53 FIND V(out) WHEN V(rot_flag)=2.5 FALL=53
+.meas tran VC1_ROT53 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=53
+.meas tran VC2_ROT53 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=53
+.meas tran VC3_ROT53 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=53
+.meas tran T_ROT54 WHEN V(rot_flag)=2.5 FALL=54
+.meas tran VOUT_ROT54 FIND V(out) WHEN V(rot_flag)=2.5 FALL=54
+.meas tran VC1_ROT54 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=54
+.meas tran VC2_ROT54 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=54
+.meas tran VC3_ROT54 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=54
+.meas tran T_ROT55 WHEN V(rot_flag)=2.5 FALL=55
+.meas tran VOUT_ROT55 FIND V(out) WHEN V(rot_flag)=2.5 FALL=55
+.meas tran VC1_ROT55 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=55
+.meas tran VC2_ROT55 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=55
+.meas tran VC3_ROT55 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=55
+.meas tran T_ROT56 WHEN V(rot_flag)=2.5 FALL=56
+.meas tran VOUT_ROT56 FIND V(out) WHEN V(rot_flag)=2.5 FALL=56
+.meas tran VC1_ROT56 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=56
+.meas tran VC2_ROT56 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=56
+.meas tran VC3_ROT56 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=56
+.meas tran T_ROT57 WHEN V(rot_flag)=2.5 FALL=57
+.meas tran VOUT_ROT57 FIND V(out) WHEN V(rot_flag)=2.5 FALL=57
+.meas tran VC1_ROT57 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=57
+.meas tran VC2_ROT57 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=57
+.meas tran VC3_ROT57 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=57
+.meas tran T_ROT58 WHEN V(rot_flag)=2.5 FALL=58
+.meas tran VOUT_ROT58 FIND V(out) WHEN V(rot_flag)=2.5 FALL=58
+.meas tran VC1_ROT58 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=58
+.meas tran VC2_ROT58 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=58
+.meas tran VC3_ROT58 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=58
+.meas tran T_ROT59 WHEN V(rot_flag)=2.5 FALL=59
+.meas tran VOUT_ROT59 FIND V(out) WHEN V(rot_flag)=2.5 FALL=59
+.meas tran VC1_ROT59 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=59
+.meas tran VC2_ROT59 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=59
+.meas tran VC3_ROT59 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=59
+.meas tran T_ROT60 WHEN V(rot_flag)=2.5 FALL=60
+.meas tran VOUT_ROT60 FIND V(out) WHEN V(rot_flag)=2.5 FALL=60
+.meas tran VC1_ROT60 FIND V(vc1_mon) WHEN V(rot_flag)=2.5 FALL=60
+.meas tran VC2_ROT60 FIND V(vc2_mon) WHEN V(rot_flag)=2.5 FALL=60
+.meas tran VC3_ROT60 FIND V(vc3_mon) WHEN V(rot_flag)=2.5 FALL=60
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vc1_mon) V(vc2_mon) V(vc3_mon) V(state_mon) V(rot_flag) V(handoff_flag) V(out) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:L4) I(XMOD:CS1) I(XMOD:CS2) I(XMOD:CS3)
+.tran 0 2.000000e-05 0 5.000e-11 UIC
+
+.subckt SCB4P_P24_R04E10 vin out g gh1_in gl1_in gh2_in gl2_in gh3_in gl3_in gh4_in gl4_in
+BGH1 gh1 g V=V(gh1_in,g)
+BGL1 gl1 g V=V(gl1_in,g)
+BGH2 gh2 g V=V(gh2_in,g)
+BGL2 gl2 g V=V(gl2_in,g)
+BGH3 gh3 g V=V(gh3_in,g)
+BGL3 gl3 g V=V(gl3_in,g)
+BGH4 gh4 g V=V(gh4_in,g)
+BGL4 gl4 g V=V(gl4_in,g)
+
+SH1 vin a1 gh1 g SWH
+CH1 vin a1 {CH} ic=0
+CS1 a1 x1 {CFLY} ic=0
+CL1 x1 g {CL} ic=0
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 a1 a2 gh2 g SWH
+CS2 a2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 a2 a3 gh3 g SWH
+CS3 a3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 a3 x4 gh4 g SWH
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+RNUM_A1 a1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_A2 a2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_A3 a3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_P24_R04E10
+.end

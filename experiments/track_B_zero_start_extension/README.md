@@ -64,6 +64,7 @@ causal account.
 | R04E7 | replace R04E6's blind fixed-hold-time/fixed-cycle-count gating with voltage-RATIO gating (state (a) exits at V(C1)>=36V, state (b) at 2V(C1)<=3V(C2), state (c) at V(C2)<=2V(C3), cycle repeats until all three voltages are within a swept tolerance band or a fixed 50us safety cap is hit), same EPE2019 truth table/power stage otherwise unchanged, sweep TOL in {2%,5%,10%} | all 3/3 cells reach DONE well inside the cap (5-8 cycles, t=3.90-4.24us) with LADDER_ERR decreasing monotonically on every single cycle (the opposite of R04E6's own finding); final LADDER_ERR 0.207/0.124/0.045 at TOL=10%/5%/2%, all beating both R02B (0.260) and R04E6 (0.836); no cell hit the safety cap without converging; no comparator chatter observed |
 | R04E8 | module swap inside R04E7's unchanged ratio-gating framework: replace R04E7's Cfly=53.8uF (found to have a cross-topology provenance problem -- EPE2019's own CSC-buck Table I sum, parts rated only 35V/50V, not enough for P24's 48V Vin) with a first-principles-derived corrected range, sweep CFLY in {1,3,8.7 uF} with TOL fixed at 2% (R04E7's own best cell) | all 3/3 cells reach DONE in exactly 8 cycles each (matching R04E7's own TOL=2% cycle count), LADDER_ERR 0.0442-0.0448 (essentially matching R04E7's 0.045) -- the ratio-gating comparators are scale-invariant in Cfly; convergence time scales close to linearly with Cfly and is 5.7x-49.5x FASTER than R04E7's 53.8uF case (85.60/256.72/741.62 ns at 1/3/8.7 uF vs 4239.5 ns at 53.8uF); peak ICS1/ICS2/ICS3 MAX currents stay roughly flat (~4.2-4.6 kA for ICS1_MAX) across the whole 1-53.8uF range, confirming peak current does NOT shrink with smaller Cfly (V/Ron-dominated) -- so the Cfly correction does not resolve the multi-kilo-amp current-plausibility concern already flagged in R04E6/R04E7; some minimum/reverse currents (ICS3_MIN, IL1) do scale up with Cfly; no cell hit the safety cap without converging |
 | R04E9 | genuinely new synthesis: a single unified rotating `CHARGE_k`/`FREE_k` machine drives ALL FOUR phases (not one phase held statically), replacing BOTH R04E3/R04E5's strict single-phase admission chain AND R04E6/E7/E8's switch-only ladder mechanism -- every phase's own series inductor `Lk` is the charging/current-limiting element (P24's own Interval-1 mechanism), `CHARGE_k` exits at R04E3/R04E4's own current-limit rule, `FREE_k` exits at the earlier of the natural zero-crossing or an A48-style `T_FREEWHEEL_MAX` timeout; `CFLY=3uF` (R04E8's corrected value); sweep `I_LIMIT` in {10,30,60}A x `T_FREEWHEEL_MAX` in {50,200,1000}ns (9 cells) | all 9/9 cells advance CHARGE1->FREE1->CHARGE2 within ~1us then permanently stall in CHARGE2 (I(L2) never reaches its own I_LIMIT, best case 67% of the way) because phase 2 has no direct Vin path, only C1's limited relayed charge from phase 1's single ~0.93ns pulse; zero full rotations complete, handoff condition never reached in any cell; both swept axes have real, monotonic, opposite-direction effects on how close IL2 gets to I_LIMIT (unlike R04E5's TSOFT, which had no effect at all); peak currents stay under 61A everywhere in the grid, roughly two orders of magnitude below R04E6/E7/E8's 4.2-4.6kA figures, directly confirming inductor-mediated charging is far more physically plausible even though it does not reach handoff here; two construct bugs (missing timer capacitor, inverted B-source current sign) were found and fixed during piloting, and are flagged as a latent, never-exercised risk in R04E5's own analogous timer construct (not fixed there, out of scope) |
+| R04E10 | single conceptual change from R04E9: add a timeout fallback `T_CHARGE_MAX` to `CHARGE_k` too (OR'd with the existing `I(Lk)>=I_LIMIT` rule), symmetric with `FREE_k`'s own event-OR-timeout pattern, via an exact mirror of R04E9's own validated `FREE_k` timer construct; `T_FREEWHEEL_MAX` fixed at R04E9's own best value (50ns); an isolated pilot found `T_CHARGE_MAX` near R04E9's own ~1ns pulse width breaks the construct, so the swept range is restricted to the pilot-verified-safe `{5,20,50}ns`; sweep `I_LIMIT` in {10,30,60}A x `T_CHARGE_MAX` in {5,20,50}ns (9 cells), `TSTOP=20us` (extended from R04E9's 3us for multi-rotation observation) | 6/9 cells (`T_CHARGE_MAX in {20,50}ns`) complete 4-17 full rotations with `Vout` rising monotonically across every completed rotation -- a genuine unlock of the R04E9 stall; but the other 3/9 cells (`T_CHARGE_MAX=5ns`, all three `I_LIMIT` values) complete ZERO rotations, reproducing R04E9's own total stall exactly despite this value passing isolated verification -- isolated single-branch pilot verification does not guarantee clean full-machine behavior; no cell reaches handoff, best cell reaches only 1.4-5.5% of target across Vout/VC1-3 (3x-20x further than R04E9's own best cell, still 95-99% short); VC2 specifically regresses (wrong direction) at T_CHARGE_MAX=20ns but progresses correctly at 50ns, a reproducible axis-dependent split; inductor currents stay bounded (max 60.17A, same order as R04E9), but a NEW pervasive numerical artifact contaminates flying-capacitor current (ICS1-3) reporting in every one of the 9 cells (hundreds of A up to ~500kA), traced directly to a newly-found retry/chatter dynamic where the machine repeatedly makes partial forward progress then reverses before eventually completing a rotation (first rotation in a representative cell took 18.86us, 70x longer than a naive estimate, vs 273-347ns for later clean rotations); compared to R04E7/R04E8's switch-only ladder (98.9% of target in 5-8 cycles), R04E10 needs more cycles (11-17) to reach far less (3-5.5%), confirming the inductor-mediated approach trades convergence speed for physical plausibility |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -167,3 +168,78 @@ directly impacted, but the risk is unverified there). See
 `R04E9_unified_inductor_mediated_bootstrap/BOUNDARY.md` and `RESULTS.md`
 for the full parentage, the exact state machine, the bug-diagnosis trail,
 and the complete 9-cell grid.
+
+## R04E10 -- adding a CHARGE_k timeout unlocks multi-rotation operation,
+   but reveals two new problems
+
+R04E10 makes the single change R04E9's own "next module" note (Section
+11 of its `RESULTS.md`) implicitly called for: `CHARGE_k` now exits at
+`(I(Lk)>=I_LIMIT) | (V(timer_chg)>=T_CHARGE_MAX)`, symmetric with
+`FREE_k`'s existing event-OR-timeout pattern, via an exact mirror of
+R04E9's own validated `FREE_k` timer construct (charge/reset roles
+swapped). Everything else -- node topology, `CFLY=3 uF`, `COUT=4.672 mF`,
+the current-limit mechanism, the `FREE_k` timer -- is reused unchanged.
+`T_FREEWHEEL_MAX` is fixed at R04E9's own best-performing value (`50 ns`)
+rather than re-swept. A pilot, run before committing to any grid cell
+(same discipline R04E9 used for its own timer), found `T_CHARGE_MAX`
+values at or near R04E9's own `~0.93 ns` phase-1 pulse width (`100 ps`,
+`1 ns`) break the construct -- a spurious backward state transition,
+confirmed by direct raw-trace inspection -- so the swept grid is
+restricted to the pilot-verified-clean range `{5, 20, 50} ns`.
+
+**The core question is answered YES, conditionally**: 6 of the 9 cells
+(`T_CHARGE_MAX in {20, 50} ns`, all three `I_LIMIT` values) complete `4`
+to `17` full four-phase rotations -- a genuine unlock of R04E9's own
+permanent `CHARGE2` stall -- and `Vout` rises **monotonically** across
+every single completed rotation in every one of those 6 cells. The best
+cell (`I_LIMIT=60 A`, `T_CHARGE_MAX=50 ns`, 12 rotations) reaches `1.4%`
+of the `Vout` target and `5.5%` of the `VC1` target -- `3x` to `20x`
+further than R04E9's own best single-pass cell, though still `95-99%`
+short of handoff in every variable, and `T_HANDOFF` never fires in any of
+the 9 cells.
+
+**Two genuinely new problems were found, not present in R04E9:**
+
+1. **`T_CHARGE_MAX=5 ns` -- the value closest to the task's own suggested
+   `~1 ns` starting point that survived isolated verification -- is
+   uniformly the WORST value tested: all 3 cells using it (every
+   `I_LIMIT`) complete ZERO rotations within the full `20 us` window,
+   reproducing R04E9's own total stall exactly. This despite `5 ns`
+   passing a dedicated isolated pilot check beforehand. Direct raw-trace
+   inspection of a representative full-machine cell explains why: the
+   machine does not advance cleanly through the 8 states; it repeatedly
+   makes partial forward progress (as far as `CHARGE3`/`CHARGE4`) and then
+   reverses back to `FREE1`, retrying with a ~143 ns period, for many
+   cycles, before eventually escaping. At `T_CHARGE_MAX=5 ns` this retry
+   loop apparently never resolves in `20 us`. **Isolated single-branch
+   pilot verification does not guarantee clean behavior once both
+   OR-branches are live and circuit-coupled in the full machine** -- a
+   methodological lesson for this whole family of dual-timer constructs.
+2. **A pervasive numerical artifact contaminates the flying-capacitor
+   branch current (`ICS1-3`) `.meas` reporting in EVERY ONE of the 9
+   cells** -- from several hundred amps up to `~500 kA` (`I_LIMIT=60 A`,
+   `T_CHARGE_MAX=20 ns`). Diagnosed directly (not assumed): the spike
+   coincides with several raw-trace rows sharing an identical timestamp,
+   an unchanging `VC1-3`/`IL1-4` state, and a non-integer "state" value
+   (e.g. `3.217`) -- a solver-convergence retry artifact at a difficult
+   transition, the same general class R04E6/R04E8/R04E9 already
+   documented finding at `t=0` in their own constructs, but here occurring
+   later in the run and roughly `100x` larger. `IL1-4` (inductor
+   currents) show no such contamination and stay bounded (max `60.17 A`,
+   same order as R04E9) -- the artifact is confined to the capacitor
+   branches, tied to the same retry dynamic as finding 1.
+
+Compared against R04E7/R04E8's switch-only ladder mechanism (`VC1~=35.6 V`,
+`98.9%` of target, in `5-8` cycles), R04E10 needs MORE cycles (`11-17`)
+to reach FAR LESS (`3-5.5%` of target) -- confirming, quantitatively, the
+trade-off R04E9 already identified qualitatively: routing charge through
+a genuinely current-limited series inductor is far more physically
+plausible on the inductor branches, but far less effective per cycle at
+actually moving charge onto the flying capacitors, than a comparatively
+unconstrained switch-only path. `VC2` also shows a real, reproducible,
+axis-dependent split: it regresses (wrong direction, away from its `24 V`
+target) in 3 of the 6 multi-rotation cells at `T_CHARGE_MAX=20 ns`, but
+progresses correctly at `T_CHARGE_MAX=50 ns` in all three `I_LIMIT`
+values. See `R04E10_timeout_gated_multi_rotation_bootstrap/BOUNDARY.md`
+and `RESULTS.md` for the full pilot-diagnosis trail, the complete 9-cell
+grid, and the per-rotation trend tables.
