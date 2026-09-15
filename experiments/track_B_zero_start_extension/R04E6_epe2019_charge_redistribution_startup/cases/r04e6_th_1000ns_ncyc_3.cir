@@ -1,0 +1,113 @@
+* R04E6 - EPE2019 Fig.5 3-state charge-redistribution ladder bootstrap (r04e6_th_1000ns_ncyc_3)
+* SENSITIVITY CASE: TH=1000 ns per state, NCYC=3 cycles.
+* CROSS_PAPER_EXTENSION (startup mechanism only): Roberts/McRae/Prodic,
+* EPE'19 ECCE Europe, Fig. 5 (p.5), "conventional 4-phase SC buck" states
+* (a) Charging / (b) Charge Redistribution I / (c) Charge Redistribution II.
+* See BOUNDARY.md for the full per-item borrowed-fact table and the
+* independent truth-table derivation/cross-check against the rendered figure.
+* Power-stage connectivity (SH1-4/SL1-4/CS1-3/L1-4 node names) is copied
+* UNCHANGED from paper_locked/02_ectc2024_main/spice/
+* R04E3_P24_minimal_zero_start_event_cycle.cir's SCB4P_P24_EVENT subcircuit
+* (already-validated P24 four-phase connectivity; reused, not reinvented).
+* CFLY=53.8uF, COUT=4.672mF: already-approved EPE2019 cross-source
+* candidates, unchanged from R02-R04E5 (not re-derived here).
+* True zero initial energy on every capacitor and inductor (ic=0, UIC),
+* same starting point as R04E3/R04E5. SCOPE: ladder bootstrap ONLY -- no
+* PWM, no P24 steady-state ZVS admission chain, no Vout regulation attempt.
+* Open-loop FIXED hold time per state (the source paper gives no event or
+* threshold to detect; TH and NCYC are free SENSITIVITY_ONLY axes).
+
+.include "../../../../paper_locked/04_component_models/GS61008T_typical_params.lib"
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY={4*10u+2*4.7u+2*2.2u}
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param RLDAMP=1u
+
+VRAIL vin 0 {VIN}
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+XMOD vin out 0 gh1_cmd gl1_cmd gh2_cmd gl2_cmd gh3_cmd gl3_cmd SCB4P_P24_R04E6
+
+VGH1 gh1_cmd 0 PWL(0.000000e+00 0 9.000000e-10 0 1.000000e-09 5 1.000900e-06 5 1.001000e-06 0 3.000900e-06 0 3.001000e-06 5 4.000900e-06 5 4.001000e-06 0 6.000900e-06 0 6.001000e-06 5 7.000900e-06 5 7.001000e-06 0 9.001000e-06 0)
+VGL1 gl1_cmd 0 PWL(0.000000e+00 0 9.000000e-10 0 1.000000e-09 5 2.000900e-06 5 2.001000e-06 0 3.000900e-06 0 3.001000e-06 5 5.000900e-06 5 5.001000e-06 0 6.000900e-06 0 6.001000e-06 5 8.000900e-06 5 8.001000e-06 0 9.001000e-06 0)
+VGH2 gh2_cmd 0 PWL(0.000000e+00 0 1.000900e-06 0 1.001000e-06 5 2.000900e-06 5 2.001000e-06 0 4.000900e-06 0 4.001000e-06 5 5.000900e-06 5 5.001000e-06 0 7.000900e-06 0 7.001000e-06 5 8.000900e-06 5 8.001000e-06 0 9.001000e-06 0)
+VGL2 gl2_cmd 0 PWL(0.000000e+00 0 1.000900e-06 0 1.001000e-06 5 3.000900e-06 5 3.001000e-06 0 4.000900e-06 0 4.001000e-06 5 6.000900e-06 5 6.001000e-06 0 7.000900e-06 0 7.001000e-06 5 9.000900e-06 5 9.001000e-06 0)
+VGH3 gh3_cmd 0 PWL(0.000000e+00 0 2.000900e-06 0 2.001000e-06 5 3.000900e-06 5 3.001000e-06 0 5.000900e-06 0 5.001000e-06 5 6.000900e-06 5 6.001000e-06 0 8.000900e-06 0 8.001000e-06 5 9.000900e-06 5 9.001000e-06 0)
+VGL3 gl3_cmd 0 PWL(0.000000e+00 0 2.000900e-06 0 2.001000e-06 5 3.000900e-06 5 3.001000e-06 0 5.000900e-06 0 5.001000e-06 5 6.000900e-06 5 6.001000e-06 0 8.000900e-06 0 8.001000e-06 5 9.000900e-06 5 9.001000e-06 0)
+
+.meas tran VOUT_FINAL FIND V(out) AT 9.001000e-06
+.meas tran IL1_MAX MAX I(XMOD:L1) FROM 0 TO 9.001000e-06
+.meas tran IL1_MIN MIN I(XMOD:L1) FROM 0 TO 9.001000e-06
+.meas tran IL2_MAX MAX I(XMOD:L2) FROM 0 TO 9.001000e-06
+.meas tran IL2_MIN MIN I(XMOD:L2) FROM 0 TO 9.001000e-06
+.meas tran IL3_MAX MAX I(XMOD:L3) FROM 0 TO 9.001000e-06
+.meas tran IL3_MIN MIN I(XMOD:L3) FROM 0 TO 9.001000e-06
+.meas tran ICS1_MAX MAX I(XMOD:CS1) FROM 0 TO 9.001000e-06
+.meas tran ICS1_MIN MIN I(XMOD:CS1) FROM 0 TO 9.001000e-06
+.meas tran ICS2_MAX MAX I(XMOD:CS2) FROM 0 TO 9.001000e-06
+.meas tran ICS2_MIN MIN I(XMOD:CS2) FROM 0 TO 9.001000e-06
+.meas tran ICS3_MAX MAX I(XMOD:CS3) FROM 0 TO 9.001000e-06
+.meas tran ICS3_MIN MIN I(XMOD:CS3) FROM 0 TO 9.001000e-06
+.meas tran ICS1_INRUSH_CYC1 MAX I(XMOD:CS1) FROM 1.000000e-09 TO 1.001000e-06
+.meas tran ICS1_STATEB_CYC1_MAX MAX I(XMOD:CS1) FROM 1.001000e-06 TO 2.001000e-06
+.meas tran ICS1_STATEB_CYC1_MIN MIN I(XMOD:CS1) FROM 1.001000e-06 TO 2.001000e-06
+.meas tran ICS2_STATEB_CYC1_MAX MAX I(XMOD:CS2) FROM 1.001000e-06 TO 2.001000e-06
+.meas tran ICS2_STATEB_CYC1_MIN MIN I(XMOD:CS2) FROM 1.001000e-06 TO 2.001000e-06
+.meas tran ICS2_STATEC_CYC1_MAX MAX I(XMOD:CS2) FROM 2.001000e-06 TO 3.001000e-06
+.meas tran ICS2_STATEC_CYC1_MIN MIN I(XMOD:CS2) FROM 2.001000e-06 TO 3.001000e-06
+.meas tran ICS3_STATEC_CYC1_MAX MAX I(XMOD:CS3) FROM 2.001000e-06 TO 3.001000e-06
+.meas tran ICS3_STATEC_CYC1_MIN MIN I(XMOD:CS3) FROM 2.001000e-06 TO 3.001000e-06
+.meas tran VC1_CYC1 FIND V(xmod:a1,xmod:x1) AT 3.001000e-06
+.meas tran VC2_CYC1 FIND V(xmod:a2,xmod:x2) AT 3.001000e-06
+.meas tran VC3_CYC1 FIND V(xmod:a3,xmod:x3) AT 3.001000e-06
+.meas tran VC1_CYC2 FIND V(xmod:a1,xmod:x1) AT 6.001000e-06
+.meas tran VC2_CYC2 FIND V(xmod:a2,xmod:x2) AT 6.001000e-06
+.meas tran VC3_CYC2 FIND V(xmod:a3,xmod:x3) AT 6.001000e-06
+.meas tran VC1_CYC3 FIND V(xmod:a1,xmod:x1) AT 9.001000e-06
+.meas tran VC2_CYC3 FIND V(xmod:a2,xmod:x2) AT 9.001000e-06
+.meas tran VC3_CYC3 FIND V(xmod:a3,xmod:x3) AT 9.001000e-06
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(out) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:CS1) I(XMOD:CS2) I(XMOD:CS3) V(gh1_cmd) V(gl1_cmd) V(gh2_cmd) V(gl2_cmd) V(gh3_cmd) V(gl3_cmd)
+.tran 0 9.001000e-06 0 1n UIC
+
+.subckt SCB4P_P24_R04E6 vin out g gh1_in gl1_in gh2_in gl2_in gh3_in gl3_in
+BGH1 gh1 g V=V(gh1_in,g)
+BGL1 gl1 g V=V(gl1_in,g)
+BGH2 gh2 g V=V(gh2_in,g)
+BGL2 gl2 g V=V(gl2_in,g)
+BGH3 gh3 g V=V(gh3_in,g)
+BGL3 gl3 g V=V(gl3_in,g)
+VGH4 gh4 g 0
+VGL4 gl4 g 0
+
+SH1 vin a1 gh1 g SWH
+CH1 vin a1 {CH} ic=0
+CS1 a1 x1 {CFLY} ic=0
+CL1 x1 g {CL} ic=0
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 a1 a2 gh2 g SWH
+CS2 a2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 a2 a3 gh3 g SWH
+CS3 a3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 a3 x4 gh4 g SWH
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+RNUM_A1 a1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_A2 a2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_A3 a3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_P24_R04E6
+.end
