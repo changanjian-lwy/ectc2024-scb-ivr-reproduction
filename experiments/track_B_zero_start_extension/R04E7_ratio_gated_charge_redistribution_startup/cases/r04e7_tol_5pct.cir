@@ -1,0 +1,346 @@
+* R04E7 - voltage-ratio-gated EPE2019 3-state charge-redistribution ladder
+* bootstrap (r04e7_tol_5pct)
+* SENSITIVITY CASE: TOL=+/-5% of each target (36/24/12 V),
+* TCAP_TOTAL=50 us safety cap (fixed across the grid).
+* PARENT: R04E6_epe2019_charge_redistribution_startup (same truth table,
+* same power stage, same Cfly/Cout). SINGLE CHANGE: R04E6's fixed hold-time
+* PWL gate sequencer is replaced by a voltage-ratio-gated .machine, per
+* BOUNDARY.md. See that file for the charge-conservation reasoning check,
+* the borrowed-fact table, and the tolerance/cap justification.
+* Power-stage connectivity (SH1-4/SL1-4/CS1-3/L1-4 node names) is copied
+* UNCHANGED from R04E6's SCB4P_P24_R04E6 subcircuit (itself copied from
+* R04E3's already-validated P24 four-phase connectivity).
+* True zero initial energy on every capacitor and inductor (ic=0, UIC).
+* SCOPE: ladder bootstrap ONLY -- no PWM, no P24 steady-state ZVS admission
+* chain, no Vout regulation attempt, no four-phase claim (H4/L4 off).
+
+.include "../../../../paper_locked/04_component_models/GS61008T_typical_params.lib"
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY={4*10u+2*4.7u+2*2.2u}
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param RLDAMP=1u
+
+.param TOL=0.05
+.param TARGET1=36 TARGET2=24 TARGET3=12
+.param LO1={TARGET1*(1-TOL)} HI1={TARGET1*(1+TOL)}
+.param LO2={TARGET2*(1-TOL)} HI2={TARGET2*(1+TOL)}
+.param LO3={TARGET3*(1-TOL)} HI3={TARGET3*(1+TOL)}
+.param TCAP_TOTAL=5.000000e-05
+.param VGATE=5
+
+VRAIL vin 0 {VIN}
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+XMOD vin out 0 gh1_cmd gl1_cmd gh2_cmd gl2_cmd gh3_cmd gl3_cmd SCB4P_P24_R04E7
+
+BVC1 vc1_mon 0 V=V(xmod:a1,xmod:x1)
+BVC2 vc2_mon 0 V=V(xmod:a2,xmod:x2)
+BVC3 vc3_mon 0 V=V(xmod:a3,xmod:x3)
+RVC1 vc1_mon 0 1k
+RVC2 vc2_mon 0 1k
+RVC3 vc3_mon 0 1k
+
+* Voltage-ratio-gated 3-state machine (THE mechanism change vs R04E6).
+* STATE_A exit: V(C1)>=TARGET1 (final target, direct comparator -- see
+*   BOUNDARY.md for why a single pass cannot reach 36/24/12 and why
+*   re-entering STATE_A on a later cycle still recharges C1 correctly).
+* STATE_B exit: 2*V(C1)<=3*V(C2), i.e. V(C1)/V(C2) has reached 3/2.
+* STATE_C exit: V(C2)<=2*V(C3), i.e. V(C2)/V(C3) has reached 2/1; branches
+*   to DONE if all three absolute voltages are within the tolerance band,
+*   else loops back to STATE_A for another cycle.
+* Every state also has a `time>=TCAP_TOTAL` escape to CAPPED, checked with
+* priority over the local exit condition (listed first) -- this is the
+* single GLOBAL safety-cap fallback (see BOUNDARY.md Section 6 for why one
+* global cap was used instead of three separate per-state timers).
+.machine 1p
+.state STATE_A 0
+.state STATE_B 1
+.state STATE_C 2
+.state DONE 3
+.state CAPPED 4
+.rule STATE_A CAPPED time>=TCAP_TOTAL
+.rule STATE_A STATE_B V(vc1_mon)>=TARGET1
+.rule STATE_B CAPPED time>=TCAP_TOTAL
+.rule STATE_B STATE_C 2*V(vc1_mon)<=3*V(vc2_mon)
+.rule STATE_C CAPPED time>=TCAP_TOTAL
+.rule STATE_C DONE (V(vc2_mon)<=2*V(vc3_mon)) & (V(vc1_mon)>=LO1) & (V(vc1_mon)<=HI1) & (V(vc2_mon)>=LO2) & (V(vc2_mon)<=HI2) & (V(vc3_mon)>=LO3) & (V(vc3_mon)<=HI3)
+.rule STATE_C STATE_A (V(vc2_mon)<=2*V(vc3_mon)) & ((V(vc1_mon)<LO1)|(V(vc1_mon)>HI1)|(V(vc2_mon)<LO2)|(V(vc2_mon)>HI2)|(V(vc3_mon)<LO3)|(V(vc3_mon)>HI3))
+.output (gh1_cmd) VGATE*(state==STATE_A)
+.output (gl1_cmd) VGATE*((state==STATE_A)+(state==STATE_B))
+.output (gh2_cmd) VGATE*(state==STATE_B)
+.output (gl2_cmd) VGATE*((state==STATE_B)+(state==STATE_C))
+.output (gh3_cmd) VGATE*(state==STATE_C)
+.output (gl3_cmd) VGATE*(state==STATE_C)
+.output (state_mon) state
+.output (cyc_end_flag) VGATE*(state==STATE_C)
+.endmachine
+
+RSTATE state_mon 0 1k
+RCYCFLAG cyc_end_flag 0 1k
+RGH1 gh1_cmd 0 1k
+RGL1 gl1_cmd 0 1k
+RGH2 gh2_cmd 0 1k
+RGL2 gl2_cmd 0 1k
+RGH3 gh3_cmd 0 1k
+RGL3 gl3_cmd 0 1k
+
+.meas tran STATE_FINAL FIND V(state_mon) AT 5.250000e-05
+.meas tran VC1_FINAL FIND V(vc1_mon) AT 5.250000e-05
+.meas tran VC2_FINAL FIND V(vc2_mon) AT 5.250000e-05
+.meas tran VC3_FINAL FIND V(vc3_mon) AT 5.250000e-05
+.meas tran VOUT_FINAL FIND V(out) AT 5.250000e-05
+.meas tran T_TERMINAL WHEN V(state_mon)=2.5 RISE=1
+.meas tran IL1_MAX MAX I(XMOD:L1)
+.meas tran IL1_MIN MIN I(XMOD:L1)
+.meas tran ICS1_MAX MAX I(XMOD:CS1) FROM 1n TO 5.250000e-05
+.meas tran ICS1_MIN MIN I(XMOD:CS1) FROM 1n TO 5.250000e-05
+.meas tran ICS2_MAX MAX I(XMOD:CS2) FROM 1n TO 5.250000e-05
+.meas tran ICS2_MIN MIN I(XMOD:CS2) FROM 1n TO 5.250000e-05
+.meas tran ICS3_MAX MAX I(XMOD:CS3) FROM 1n TO 5.250000e-05
+.meas tran ICS3_MIN MIN I(XMOD:CS3) FROM 1n TO 5.250000e-05
+.meas tran VC1_CYC1 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=1
+.meas tran VC2_CYC1 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=1
+.meas tran VC3_CYC1 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=1
+.meas tran T_CYC1 WHEN V(cyc_end_flag)=2.5 FALL=1
+.meas tran VC1_CYC2 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=2
+.meas tran VC2_CYC2 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=2
+.meas tran VC3_CYC2 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=2
+.meas tran T_CYC2 WHEN V(cyc_end_flag)=2.5 FALL=2
+.meas tran VC1_CYC3 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=3
+.meas tran VC2_CYC3 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=3
+.meas tran VC3_CYC3 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=3
+.meas tran T_CYC3 WHEN V(cyc_end_flag)=2.5 FALL=3
+.meas tran VC1_CYC4 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=4
+.meas tran VC2_CYC4 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=4
+.meas tran VC3_CYC4 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=4
+.meas tran T_CYC4 WHEN V(cyc_end_flag)=2.5 FALL=4
+.meas tran VC1_CYC5 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=5
+.meas tran VC2_CYC5 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=5
+.meas tran VC3_CYC5 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=5
+.meas tran T_CYC5 WHEN V(cyc_end_flag)=2.5 FALL=5
+.meas tran VC1_CYC6 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=6
+.meas tran VC2_CYC6 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=6
+.meas tran VC3_CYC6 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=6
+.meas tran T_CYC6 WHEN V(cyc_end_flag)=2.5 FALL=6
+.meas tran VC1_CYC7 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=7
+.meas tran VC2_CYC7 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=7
+.meas tran VC3_CYC7 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=7
+.meas tran T_CYC7 WHEN V(cyc_end_flag)=2.5 FALL=7
+.meas tran VC1_CYC8 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=8
+.meas tran VC2_CYC8 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=8
+.meas tran VC3_CYC8 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=8
+.meas tran T_CYC8 WHEN V(cyc_end_flag)=2.5 FALL=8
+.meas tran VC1_CYC9 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=9
+.meas tran VC2_CYC9 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=9
+.meas tran VC3_CYC9 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=9
+.meas tran T_CYC9 WHEN V(cyc_end_flag)=2.5 FALL=9
+.meas tran VC1_CYC10 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=10
+.meas tran VC2_CYC10 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=10
+.meas tran VC3_CYC10 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=10
+.meas tran T_CYC10 WHEN V(cyc_end_flag)=2.5 FALL=10
+.meas tran VC1_CYC11 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=11
+.meas tran VC2_CYC11 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=11
+.meas tran VC3_CYC11 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=11
+.meas tran T_CYC11 WHEN V(cyc_end_flag)=2.5 FALL=11
+.meas tran VC1_CYC12 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=12
+.meas tran VC2_CYC12 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=12
+.meas tran VC3_CYC12 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=12
+.meas tran T_CYC12 WHEN V(cyc_end_flag)=2.5 FALL=12
+.meas tran VC1_CYC13 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=13
+.meas tran VC2_CYC13 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=13
+.meas tran VC3_CYC13 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=13
+.meas tran T_CYC13 WHEN V(cyc_end_flag)=2.5 FALL=13
+.meas tran VC1_CYC14 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=14
+.meas tran VC2_CYC14 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=14
+.meas tran VC3_CYC14 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=14
+.meas tran T_CYC14 WHEN V(cyc_end_flag)=2.5 FALL=14
+.meas tran VC1_CYC15 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=15
+.meas tran VC2_CYC15 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=15
+.meas tran VC3_CYC15 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=15
+.meas tran T_CYC15 WHEN V(cyc_end_flag)=2.5 FALL=15
+.meas tran VC1_CYC16 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=16
+.meas tran VC2_CYC16 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=16
+.meas tran VC3_CYC16 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=16
+.meas tran T_CYC16 WHEN V(cyc_end_flag)=2.5 FALL=16
+.meas tran VC1_CYC17 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=17
+.meas tran VC2_CYC17 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=17
+.meas tran VC3_CYC17 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=17
+.meas tran T_CYC17 WHEN V(cyc_end_flag)=2.5 FALL=17
+.meas tran VC1_CYC18 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=18
+.meas tran VC2_CYC18 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=18
+.meas tran VC3_CYC18 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=18
+.meas tran T_CYC18 WHEN V(cyc_end_flag)=2.5 FALL=18
+.meas tran VC1_CYC19 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=19
+.meas tran VC2_CYC19 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=19
+.meas tran VC3_CYC19 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=19
+.meas tran T_CYC19 WHEN V(cyc_end_flag)=2.5 FALL=19
+.meas tran VC1_CYC20 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=20
+.meas tran VC2_CYC20 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=20
+.meas tran VC3_CYC20 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=20
+.meas tran T_CYC20 WHEN V(cyc_end_flag)=2.5 FALL=20
+.meas tran VC1_CYC21 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=21
+.meas tran VC2_CYC21 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=21
+.meas tran VC3_CYC21 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=21
+.meas tran T_CYC21 WHEN V(cyc_end_flag)=2.5 FALL=21
+.meas tran VC1_CYC22 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=22
+.meas tran VC2_CYC22 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=22
+.meas tran VC3_CYC22 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=22
+.meas tran T_CYC22 WHEN V(cyc_end_flag)=2.5 FALL=22
+.meas tran VC1_CYC23 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=23
+.meas tran VC2_CYC23 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=23
+.meas tran VC3_CYC23 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=23
+.meas tran T_CYC23 WHEN V(cyc_end_flag)=2.5 FALL=23
+.meas tran VC1_CYC24 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=24
+.meas tran VC2_CYC24 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=24
+.meas tran VC3_CYC24 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=24
+.meas tran T_CYC24 WHEN V(cyc_end_flag)=2.5 FALL=24
+.meas tran VC1_CYC25 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=25
+.meas tran VC2_CYC25 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=25
+.meas tran VC3_CYC25 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=25
+.meas tran T_CYC25 WHEN V(cyc_end_flag)=2.5 FALL=25
+.meas tran VC1_CYC26 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=26
+.meas tran VC2_CYC26 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=26
+.meas tran VC3_CYC26 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=26
+.meas tran T_CYC26 WHEN V(cyc_end_flag)=2.5 FALL=26
+.meas tran VC1_CYC27 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=27
+.meas tran VC2_CYC27 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=27
+.meas tran VC3_CYC27 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=27
+.meas tran T_CYC27 WHEN V(cyc_end_flag)=2.5 FALL=27
+.meas tran VC1_CYC28 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=28
+.meas tran VC2_CYC28 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=28
+.meas tran VC3_CYC28 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=28
+.meas tran T_CYC28 WHEN V(cyc_end_flag)=2.5 FALL=28
+.meas tran VC1_CYC29 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=29
+.meas tran VC2_CYC29 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=29
+.meas tran VC3_CYC29 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=29
+.meas tran T_CYC29 WHEN V(cyc_end_flag)=2.5 FALL=29
+.meas tran VC1_CYC30 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=30
+.meas tran VC2_CYC30 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=30
+.meas tran VC3_CYC30 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=30
+.meas tran T_CYC30 WHEN V(cyc_end_flag)=2.5 FALL=30
+.meas tran VC1_CYC31 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=31
+.meas tran VC2_CYC31 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=31
+.meas tran VC3_CYC31 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=31
+.meas tran T_CYC31 WHEN V(cyc_end_flag)=2.5 FALL=31
+.meas tran VC1_CYC32 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=32
+.meas tran VC2_CYC32 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=32
+.meas tran VC3_CYC32 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=32
+.meas tran T_CYC32 WHEN V(cyc_end_flag)=2.5 FALL=32
+.meas tran VC1_CYC33 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=33
+.meas tran VC2_CYC33 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=33
+.meas tran VC3_CYC33 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=33
+.meas tran T_CYC33 WHEN V(cyc_end_flag)=2.5 FALL=33
+.meas tran VC1_CYC34 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=34
+.meas tran VC2_CYC34 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=34
+.meas tran VC3_CYC34 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=34
+.meas tran T_CYC34 WHEN V(cyc_end_flag)=2.5 FALL=34
+.meas tran VC1_CYC35 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=35
+.meas tran VC2_CYC35 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=35
+.meas tran VC3_CYC35 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=35
+.meas tran T_CYC35 WHEN V(cyc_end_flag)=2.5 FALL=35
+.meas tran VC1_CYC36 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=36
+.meas tran VC2_CYC36 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=36
+.meas tran VC3_CYC36 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=36
+.meas tran T_CYC36 WHEN V(cyc_end_flag)=2.5 FALL=36
+.meas tran VC1_CYC37 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=37
+.meas tran VC2_CYC37 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=37
+.meas tran VC3_CYC37 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=37
+.meas tran T_CYC37 WHEN V(cyc_end_flag)=2.5 FALL=37
+.meas tran VC1_CYC38 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=38
+.meas tran VC2_CYC38 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=38
+.meas tran VC3_CYC38 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=38
+.meas tran T_CYC38 WHEN V(cyc_end_flag)=2.5 FALL=38
+.meas tran VC1_CYC39 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=39
+.meas tran VC2_CYC39 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=39
+.meas tran VC3_CYC39 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=39
+.meas tran T_CYC39 WHEN V(cyc_end_flag)=2.5 FALL=39
+.meas tran VC1_CYC40 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=40
+.meas tran VC2_CYC40 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=40
+.meas tran VC3_CYC40 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=40
+.meas tran T_CYC40 WHEN V(cyc_end_flag)=2.5 FALL=40
+.meas tran VC1_CYC41 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=41
+.meas tran VC2_CYC41 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=41
+.meas tran VC3_CYC41 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=41
+.meas tran T_CYC41 WHEN V(cyc_end_flag)=2.5 FALL=41
+.meas tran VC1_CYC42 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=42
+.meas tran VC2_CYC42 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=42
+.meas tran VC3_CYC42 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=42
+.meas tran T_CYC42 WHEN V(cyc_end_flag)=2.5 FALL=42
+.meas tran VC1_CYC43 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=43
+.meas tran VC2_CYC43 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=43
+.meas tran VC3_CYC43 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=43
+.meas tran T_CYC43 WHEN V(cyc_end_flag)=2.5 FALL=43
+.meas tran VC1_CYC44 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=44
+.meas tran VC2_CYC44 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=44
+.meas tran VC3_CYC44 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=44
+.meas tran T_CYC44 WHEN V(cyc_end_flag)=2.5 FALL=44
+.meas tran VC1_CYC45 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=45
+.meas tran VC2_CYC45 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=45
+.meas tran VC3_CYC45 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=45
+.meas tran T_CYC45 WHEN V(cyc_end_flag)=2.5 FALL=45
+.meas tran VC1_CYC46 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=46
+.meas tran VC2_CYC46 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=46
+.meas tran VC3_CYC46 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=46
+.meas tran T_CYC46 WHEN V(cyc_end_flag)=2.5 FALL=46
+.meas tran VC1_CYC47 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=47
+.meas tran VC2_CYC47 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=47
+.meas tran VC3_CYC47 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=47
+.meas tran T_CYC47 WHEN V(cyc_end_flag)=2.5 FALL=47
+.meas tran VC1_CYC48 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=48
+.meas tran VC2_CYC48 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=48
+.meas tran VC3_CYC48 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=48
+.meas tran T_CYC48 WHEN V(cyc_end_flag)=2.5 FALL=48
+.meas tran VC1_CYC49 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=49
+.meas tran VC2_CYC49 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=49
+.meas tran VC3_CYC49 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=49
+.meas tran T_CYC49 WHEN V(cyc_end_flag)=2.5 FALL=49
+.meas tran VC1_CYC50 FIND V(vc1_mon) WHEN V(cyc_end_flag)=2.5 FALL=50
+.meas tran VC2_CYC50 FIND V(vc2_mon) WHEN V(cyc_end_flag)=2.5 FALL=50
+.meas tran VC3_CYC50 FIND V(vc3_mon) WHEN V(cyc_end_flag)=2.5 FALL=50
+.meas tran T_CYC50 WHEN V(cyc_end_flag)=2.5 FALL=50
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vc1_mon) V(vc2_mon) V(vc3_mon) V(state_mon) V(cyc_end_flag) V(out) I(XMOD:L1) I(XMOD:L2) I(XMOD:L3) I(XMOD:CS1) I(XMOD:CS2) I(XMOD:CS3)
+.tran 0 5.250000e-05 0 1n UIC
+
+.subckt SCB4P_P24_R04E7 vin out g gh1_in gl1_in gh2_in gl2_in gh3_in gl3_in
+BGH1 gh1 g V=V(gh1_in,g)
+BGL1 gl1 g V=V(gl1_in,g)
+BGH2 gh2 g V=V(gh2_in,g)
+BGL2 gl2 g V=V(gl2_in,g)
+BGH3 gh3 g V=V(gh3_in,g)
+BGL3 gl3 g V=V(gl3_in,g)
+VGH4 gh4 g 0
+VGL4 gl4 g 0
+
+SH1 vin a1 gh1 g SWH
+CH1 vin a1 {CH} ic=0
+CS1 a1 x1 {CFLY} ic=0
+CL1 x1 g {CL} ic=0
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser={RLDAMP} ic=0
+SH2 a1 a2 gh2 g SWH
+CS2 a2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 a2 a3 gh3 g SWH
+CS3 a3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 a3 x4 gh4 g SWH
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+RNUM_A1 a1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_A2 a2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_A3 a3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_P24_R04E7
+.end

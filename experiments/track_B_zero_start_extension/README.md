@@ -36,6 +36,7 @@ causal account.
 | R04E4 | sweep QH1 gate-off current | first hard turn-on dominates |
 | R04E5 | ramped on-time ceiling (R03D) grafted onto the event-gated latched controller (R04E3), sweep TSOFT x I_LIMIT | reproduces R04E3's stuck-at-state-4 point (9/12 cells) or an earlier stuck-at-state-3 point (3/12 cells); never returns to ENERGY a second time in any of the 12 cells, so TSOFT has no observed effect and Vout never approaches 1 V; current stays inside the +/-250 A bound in all 12 |
 | R04E6 | replace the P24 admission chain entirely with EPE2019's borrowed 3-state charge-redistribution sequence (open-loop, sweep hold time TH x cycle count NCYC), ladder-bootstrap-only scope | best single cell (TH=20us, NCYC=1) reaches VC1~24/VC2~12/VC3~12 V (LADDER_ERR=0.836); every additional cycle beyond the first makes it worse at every TH>=1us, converging toward ~45-46 V on all three (equalization, not the 3:2:1 target) by NCYC=10; does not outperform R02B's passive divider (0.260) |
+| R04E7 | replace R04E6's blind fixed-hold-time/fixed-cycle-count gating with voltage-RATIO gating (state (a) exits at V(C1)>=36V, state (b) at 2V(C1)<=3V(C2), state (c) at V(C2)<=2V(C3), cycle repeats until all three voltages are within a swept tolerance band or a fixed 50us safety cap is hit), same EPE2019 truth table/power stage otherwise unchanged, sweep TOL in {2%,5%,10%} | all 3/3 cells reach DONE well inside the cap (5-8 cycles, t=3.90-4.24us) with LADDER_ERR decreasing monotonically on every single cycle (the opposite of R04E6's own finding); final LADDER_ERR 0.207/0.124/0.045 at TOL=10%/5%/2%, all beating both R02B (0.260) and R04E6 (0.836); no cell hit the safety cap without converging; no comparator chatter observed |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -55,3 +56,17 @@ future attempt at this same mechanism needs a voltage-monitored/gated stop
 condition per state (matching what the source paper's own wording implies
 but does not detail), not a larger or finer `(TH, NCYC)` grid search over
 the blind version already tested here.
+
+## R04E7 -- the voltage-monitored/gated fix works
+
+R04E7 built exactly the fix R04E6 called for: state (a) exits at
+`V(C1)>=36V`, state (b) exits at the measured ratio `2*V(C1)<=3*V(C2)`,
+state (c) exits at `V(C2)<=2*V(C3)`, with the full cycle repeating until
+all three voltages are simultaneously within a swept tolerance band. All
+three tested tolerances (`2%`, `5%`, `10%`) converge, with `LADDER_ERR`
+decreasing on every single cycle (the direct opposite of R04E6's own
+result), reaching final `LADDER_ERR` of `0.045-0.207` -- beating both
+R02B's `0.260` and R04E6's `0.836`. See
+`R04E7_ratio_gated_charge_redistribution_startup/BOUNDARY.md` and
+`RESULTS.md` for the charge-conservation check, the full per-tolerance and
+per-cycle results, and the chatter check.
