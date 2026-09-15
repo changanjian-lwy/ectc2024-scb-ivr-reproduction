@@ -1,0 +1,650 @@
+[
+  {
+    "case": "r04e9_ilimit_10a_tfw_50ns",
+    "i_limit_a": 10.0,
+    "t_freewheel_max_ns": 50.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 8.98823345779e-05,
+    "vc1_final_v": 0.0106978369877,
+    "vc2_final_v": 0.00826297700405,
+    "vc3_final_v": -9.6632528368e-11,
+    "il1_max_a": 10.158873558,
+    "il1_min_a": -6.81957006454,
+    "il2_max_a": 6.82236051559,
+    "il2_min_a": -8.90922737122,
+    "il3_max_a": 0.0,
+    "il3_min_a": -2.2867421845e-10,
+    "il4_max_a": 0.0,
+    "il4_min_a": -1.07857403564e-10,
+    "ics1_max_a": 5.92955112457,
+    "ics1_min_a": -4.6796541214,
+    "ics2_max_a": 6.82235527039,
+    "ics2_min_a": -8.90921878815,
+    "ics3_max_a": 1.17753612416e-10,
+    "ics3_min_a": -3.97046701073e-10,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.00010159630702,
+        "vc1_v": 0.0561364588922,
+        "vc2_v": -0.0374932310086,
+        "vc3_v": -1.99159898789e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 9.89064228951e-05,
+        "vc1_v": -0.0160532674414,
+        "vc2_v": 0.0349827568799,
+        "vc3_v": -4.00301607892e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 9.59304133606e-05,
+        "vc1_v": 0.0212820776359,
+        "vc2_v": -0.00227720144425,
+        "vc3_v": -5.9506153376e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 9.28280730842e-05,
+        "vc1_v": 0.00498270577065,
+        "vc2_v": 0.0139852729503,
+        "vc3_v": -7.83673640601e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 8.98823345779e-05,
+        "vc1_v": 0.0106978369877,
+        "vc2_v": 0.00826297700405,
+        "vc3_v": -9.6632528368e-11,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_10a_tfw_200ns",
+    "i_limit_a": 10.0,
+    "t_freewheel_max_ns": 200.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.000322297157254,
+    "vc1_final_v": 0.00739442976192,
+    "vc2_final_v": 0.0115717211738,
+    "vc3_final_v": -3.36861427641e-10,
+    "il1_max_a": 10.158873558,
+    "il1_min_a": -4.54997396469,
+    "il2_max_a": 4.54759597778,
+    "il2_min_a": -5.87758731842,
+    "il3_max_a": 0.0,
+    "il3_min_a": -7.59755702795e-10,
+    "il4_max_a": 0.0,
+    "il4_min_a": -3.75610570424e-10,
+    "ics1_max_a": 3.91006755829,
+    "ics1_min_a": -3.12587547302,
+    "ics2_max_a": 4.54759263992,
+    "ics2_min_a": -5.87758159637,
+    "ics3_max_a": 4.6135012477e-10,
+    "ics3_min_a": -1.58818680429e-09,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.000366701583607,
+        "vc1_v": -0.0106502999425,
+        "vc2_v": 0.0297416987845,
+        "vc3_v": -6.17647063157e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.000354693700773,
+        "vc1_v": 0.0258969298556,
+        "vc2_v": -0.00703135913637,
+        "vc3_v": -1.33886543116e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.000343648697251,
+        "vc1_v": -0.000398043762177,
+        "vc2_v": 0.0193530584953,
+        "vc3_v": -2.03728919838e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.000332836013102,
+        "vc1_v": 0.014436443498,
+        "vc2_v": 0.00454117540882,
+        "vc3_v": -2.71363632477e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.000322297157254,
+        "vc1_v": 0.00739442976192,
+        "vc2_v": 0.0115717211738,
+        "vc3_v": -3.36861427641e-10,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_10a_tfw_1000ns",
+    "i_limit_a": 10.0,
+    "t_freewheel_max_ns": 1000.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.000735869340133,
+    "vc1_final_v": 0.00895453803241,
+    "vc2_final_v": 0.0100108273327,
+    "vc3_final_v": -6.98211821692e-10,
+    "il1_max_a": 10.158873558,
+    "il1_min_a": -0.38531690836,
+    "il2_max_a": 0.385428547859,
+    "il2_min_a": -0.299698024988,
+    "il3_max_a": 0.0,
+    "il3_min_a": -1.59725543902e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -7.98628663201e-10,
+    "ics1_max_a": 0.297618120909,
+    "ics1_min_a": -1.7059237957,
+    "ics2_max_a": 1.27961230278,
+    "ics2_min_a": -0.299698024988,
+    "ics3_max_a": 2.82556200659e-11,
+    "ics3_min_a": -4.99517227581e-09,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.000674343434187,
+        "vc1_v": 0.0189653411508,
+        "vc2_v": -8.42372954983e-11,
+        "vc3_v": -8.42471556665e-11,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.000795748824352,
+        "vc1_v": 0.0189644694328,
+        "vc2_v": -2.35352283156e-10,
+        "vc3_v": -2.35367854034e-10,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.000784670110814,
+        "vc1_v": 0.00263912616594,
+        "vc2_v": 0.016326160195,
+        "vc3_v": -3.94232198422e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.000759879836708,
+        "vc1_v": 0.0118934592499,
+        "vc2_v": 0.00707227667776,
+        "vc3_v": -5.48661720235e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.000735869340133,
+        "vc1_v": 0.00895453803241,
+        "vc2_v": 0.0100108273327,
+        "vc3_v": -6.98211821692e-10,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_30a_tfw_50ns",
+    "i_limit_a": 30.0,
+    "t_freewheel_max_ns": 50.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.000268508912995,
+    "vc1_final_v": 0.0145571734756,
+    "vc2_final_v": 0.00844133086503,
+    "vc3_final_v": -2.88655349623e-10,
+    "il1_max_a": 30.1562461853,
+    "il1_min_a": -20.0559158325,
+    "il2_max_a": 20.0518321991,
+    "il2_min_a": -26.4785633087,
+    "il3_max_a": 0.0,
+    "il3_min_a": -6.827864385e-10,
+    "il4_max_a": 0.0,
+    "il4_min_a": -3.22138482556e-10,
+    "ics1_max_a": 17.6342887878,
+    "ics1_min_a": -13.7284955978,
+    "ics2_max_a": 20.0518169403,
+    "ics2_min_a": -26.4785404205,
+    "ics3_max_a": 2.75303474462e-10,
+    "ics3_min_a": -1.58818680429e-09,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.000303459090157,
+        "vc1_v": 0.153313636907,
+        "vc2_v": -0.131286381495,
+        "vc3_v": -5.94569061974e-11,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00029590613416,
+        "vc1_v": -0.0640450083709,
+        "vc2_v": 0.0871780026713,
+        "vc3_v": -1.1954719501e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.0002865583609,
+        "vc1_v": 0.0454158060366,
+        "vc2_v": -0.0222949509957,
+        "vc3_v": -1.77733933711e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.000277253580974,
+        "vc1_v": -0.000924170131404,
+        "vc2_v": 0.0239153203988,
+        "vc3_v": -2.34085110755e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.000268508912995,
+        "vc1_v": 0.0145571734756,
+        "vc2_v": 0.00844133086503,
+        "vc3_v": -2.88655349623e-10,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_30a_tfw_200ns",
+    "i_limit_a": 30.0,
+    "t_freewheel_max_ns": 200.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.000958412070759,
+    "vc1_final_v": 0.00576847139746,
+    "vc2_final_v": 0.0172357708216,
+    "vc3_final_v": -1.00160768568e-09,
+    "il1_max_a": 30.1562461853,
+    "il1_min_a": -13.2905931473,
+    "il2_max_a": 13.2853393555,
+    "il2_min_a": -17.47930336,
+    "il3_max_a": 0.0,
+    "il3_min_a": -2.25920748775e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -1.11691922378e-09,
+    "ics1_max_a": 11.6391019821,
+    "ics1_min_a": -9.10520553589,
+    "ics2_max_a": 13.2853288651,
+    "ics2_min_a": -17.4792881012,
+    "ics3_max_a": 1.11022302463e-16,
+    "ics3_min_a": -6.35274677308e-09,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.00108931955367,
+        "vc1_v": -0.0570762971714,
+        "vc2_v": 0.0798621188501,
+        "vc3_v": -1.83514397407e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00105475861612,
+        "vc1_v": 0.0628710871441,
+        "vc2_v": -0.0401621530015,
+        "vc3_v": -3.97994263501e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.00102205746293,
+        "vc1_v": -0.0180496769689,
+        "vc2_v": 0.0410994541371,
+        "vc3_v": -6.05692962912e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.000989762730116,
+        "vc1_v": 0.0257506923472,
+        "vc2_v": -0.00270662579077,
+        "vc3_v": -8.06827452695e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.000958412070759,
+        "vc1_v": 0.00576847139746,
+        "vc2_v": 0.0172357708216,
+        "vc3_v": -1.00160768568e-09,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_30a_tfw_1000ns",
+    "i_limit_a": 30.0,
+    "t_freewheel_max_ns": 1000.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.00218601245433,
+    "vc1_final_v": 0.010873827152,
+    "vc2_final_v": 0.012136310339,
+    "vc3_final_v": -2.07390327134e-09,
+    "il1_max_a": 30.1562461853,
+    "il1_min_a": -0.466771364212,
+    "il2_max_a": 0.466909199953,
+    "il2_min_a": -0.363122105598,
+    "il3_max_a": 0.0,
+    "il3_min_a": -4.74481609558e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -2.37241071233e-09,
+    "ics1_max_a": 0.360935270786,
+    "ics1_min_a": -1.93903589249,
+    "ics2_max_a": 1.4544711113,
+    "ics2_min_a": -0.363122344017,
+    "ics3_max_a": 2.9167779303e-09,
+    "ics3_min_a": -2.30104930665e-08,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.00200278900317,
+        "vc1_v": 0.0230121388254,
+        "vc2_v": -2.5004440868e-10,
+        "vc3_v": -2.50060368136e-10,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00236381940621,
+        "vc1_v": 0.0230095535517,
+        "vc2_v": -6.98924064743e-10,
+        "vc3_v": -6.98943604668e-10,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.00233098531024,
+        "vc1_v": 0.00321764535828,
+        "vc2_v": 0.0197927059994,
+        "vc3_v": -1.17087204034e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.00225733710849,
+        "vc1_v": 0.0144152277723,
+        "vc2_v": 0.00859532582294,
+        "vc3_v": -1.62963536739e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.00218601245433,
+        "vc1_v": 0.010873827152,
+        "vc2_v": 0.012136310339,
+        "vc3_v": -2.07390327134e-09,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_60a_tfw_50ns",
+    "i_limit_a": 60.0,
+    "t_freewheel_max_ns": 50.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.000540917215403,
+    "vc1_final_v": 0.0241253226995,
+    "vc2_final_v": 0.0126798674464,
+    "vc3_final_v": -5.81318826409e-10,
+    "il1_max_a": 60.1728401184,
+    "il1_min_a": -39.9671974182,
+    "il2_max_a": 39.9658432007,
+    "il2_min_a": -52.840713501,
+    "il3_max_a": 0.0,
+    "il3_min_a": -1.3742899041e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -6.48724796104e-10,
+    "ics1_max_a": 35.1954307556,
+    "ics1_min_a": -27.3595333099,
+    "ics2_max_a": 39.9658088684,
+    "ics2_min_a": -52.8406677246,
+    "ics3_max_a": 6.07908945405e-10,
+    "ics3_min_a": -1.70446634584e-09,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.000614017018065,
+        "vc1_v": 0.303340729986,
+        "vc2_v": -0.267091434219,
+        "vc3_v": -1.19632943746e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00059690774552,
+        "vc1_v": -0.13259187799,
+        "vc2_v": 0.170084602252,
+        "vc3_v": -2.40667106152e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.000576871401347,
+        "vc1_v": 0.0855379746454,
+        "vc2_v": -0.0486958883311,
+        "vc3_v": -3.57879228501e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.000558402157857,
+        "vc1_v": -0.00581466595365,
+        "vc2_v": 0.042537487453,
+        "vc3_v": -4.71393493546e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.000540917215403,
+        "vc1_v": 0.0241253226995,
+        "vc2_v": 0.0126798674464,
+        "vc3_v": -5.81318826409e-10,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_60a_tfw_200ns",
+    "i_limit_a": 60.0,
+    "t_freewheel_max_ns": 200.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.00191750517115,
+    "vc1_final_v": 0.00718887802213,
+    "vc2_final_v": 0.0295910015702,
+    "vc3_final_v": -2.00347627377e-09,
+    "il1_max_a": 60.1728401184,
+    "il1_min_a": -26.4674682617,
+    "il2_max_a": 26.4580554962,
+    "il2_min_a": -34.8883628845,
+    "il3_max_a": 0.0,
+    "il3_min_a": -4.51966508663e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -2.23452478743e-09,
+    "ics1_max_a": 23.2325439453,
+    "ics1_min_a": -18.1238193512,
+    "ics2_max_a": 26.4580345154,
+    "ics2_min_a": -34.8883323669,
+    "ics3_max_a": 2.51135978679e-09,
+    "ics3_min_a": -2.6437106726e-08,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.00217694716613,
+        "vc1_v": -0.123015643413,
+        "vc2_v": 0.158076966907,
+        "vc3_v": -3.66684792715e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00211114368711,
+        "vc1_v": 0.122313989792,
+        "vc2_v": -0.0856710513985,
+        "vc3_v": -7.95801292174e-10,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.00204512539554,
+        "vc1_v": -0.0408568091744,
+        "vc2_v": 0.0778745378855,
+        "vc3_v": -1.21135032276e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.00198014447288,
+        "vc1_v": 0.0466622562038,
+        "vc2_v": -0.00984689707244,
+        "vc3_v": -1.61376993041e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.00191750517115,
+        "vc1_v": 0.00718887802213,
+        "vc2_v": 0.0295910015702,
+        "vc3_v": -2.00347627377e-09,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  },
+  {
+    "case": "r04e9_ilimit_60a_tfw_1000ns",
+    "i_limit_a": 60.0,
+    "t_freewheel_max_ns": 1000.0,
+    "state_final_code": 2.0,
+    "state_final_name": "CHARGE2",
+    "n_rotations_completed": 0,
+    "handoff_reached": false,
+    "t_handoff_s": null,
+    "vout_final_v": 0.00436679460108,
+    "vc1_final_v": 0.0174158327281,
+    "vc2_final_v": 0.019389051944,
+    "vc3_final_v": -4.14207557142e-09,
+    "il1_max_a": 60.1728401184,
+    "il1_min_a": -0.746119856834,
+    "il2_max_a": 0.746339917183,
+    "il2_min_a": -0.580486536026,
+    "il3_max_a": 0.0,
+    "il3_min_a": -9.47804590368e-09,
+    "il4_max_a": 0.0,
+    "il4_min_a": -4.739028725e-09,
+    "ics1_max_a": 0.577213168144,
+    "ics1_min_a": -3.01355981827,
+    "ics2_max_a": 2.26046800613,
+    "ics2_min_a": -0.580486178398,
+    "ics3_max_a": 4.46264891707e-09,
+    "ics3_min_a": -1.56310946409e-08,
+    "grade": "CONTROLLER_GUARD_PASS",
+    "trajectory": [
+      {
+        "fraction": "20PCT",
+        "vout_v": 0.00399942388211,
+        "vc1_v": 0.0368094928563,
+        "vc2_v": -4.98866556282e-10,
+        "vc3_v": -4.98894755947e-10,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "40PCT",
+        "vout_v": 0.00472175581142,
+        "vc1_v": 0.0368043272548,
+        "vc2_v": -1.39542278574e-09,
+        "vc3_v": -1.39545453812e-09,
+        "state_name": "FREE1"
+      },
+      {
+        "fraction": "60PCT",
+        "vout_v": 0.0046563948675,
+        "vc1_v": 0.00518540313684,
+        "vc2_v": 0.0316203992215,
+        "vc3_v": -2.33816970886e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "80PCT",
+        "vout_v": 0.00450927269291,
+        "vc1_v": 0.0230213266055,
+        "vc2_v": 0.0137841319245,
+        "vc3_v": -3.25460049304e-09,
+        "state_name": "CHARGE2"
+      },
+      {
+        "fraction": "100PCT",
+        "vout_v": 0.00436679460108,
+        "vc1_v": 0.0174158327281,
+        "vc2_v": 0.019389051944,
+        "vc3_v": -4.14207557142e-09,
+        "state_name": "CHARGE2"
+      }
+    ],
+    "rotations": []
+  }
+]
