@@ -1,0 +1,77 @@
+* A47 stage 0 - P24 interval 1, re-run unchanged from R04D0
+* This stage has no CH1/CL1 commutation-capacitance element, so it is
+* mathematically identical regardless of the constant-Co(tr) vs nonlinear-
+* Coss(V) choice made downstream in A47 stage 1/2. Rerun here only for the
+* required full-chain provenance trail (see A47 BOUNDARY.md); its output
+* is expected to reproduce R04D0's committed IL1_MAX/VC1_END/IL2_AT_TON
+* values exactly (as A45 stage 0 already confirmed for a different
+* device-swap experiment) and that reproduction is checked, not assumed.
+* PURPOSE: replace the R04C independent Vin/nP phase rail with the P24 Fig.3
+* shared 48-V ladder, but execute only the first interval explicitly described
+* by P24: QH1 and adjacent-phase QS2 conduct.
+*
+* P24-EXPLICIT / DERIVED BOUNDARIES
+* Vin=48 V, Vo=1 V, nP=4, nM=1 interface, fsw=5 MHz.
+* Eq.(1)/(3): D=1/12 and Ton=16.6667 ns.
+* Eq.(4) selected recalculation: Lphase=1.46667 nH.
+* Sec.II-B: QH1+QS2 conduct and iL1 rises through Vin-QH1-C1-L1-output.
+*
+* PERIODIC-STATE INITIAL CONDITION, NOT A BALANCING CLAIM
+* C1/C2/C3 start at 36/24/12 V. They are capacitor IC values, not hidden
+* voltage sources. This run ends after one P24 first interval and therefore
+* tests only whether that proposed state produces the expected local current
+* slope. It cannot establish charge balance, self-balancing or startup.
+*
+* NUMERICAL ENABLER
+* Cfly=53.8 uF comes from the separately labelled EPE2019 component example,
+* because P24/P25 do not publish C1-C3 values. It is not fitted in this run and
+* no conclusion about the required P24 capacitance is allowed.
+* R04D0-D starts directly inside the P24 first interval. QH1 and QS2 are DC-ON
+* for exactly the simulated interval; there is no invented pre-interval all-OFF
+* state. Only the two-phase subnetwork participating in this local causal test
+* is retained. This is a state-equation test, not a full Fig.3 reproduction.
+*
+* OMITTED / BLOCKED
+* Remaining low-side commands are unspecified by P24 in this paragraph and
+* are OFF. No Coss, added CH/CL, dead time, ZCD, negative-current interval,
+* periodic reset, startup, output ripple, loss or ZVS claim is included.
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg T={1/FSW}
+.param D={NP*VO/VIN} TON={D*T}
+.param LPHASE=1.4666667n CFLY=53.8u
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+
+VGH1 gh1 0 5
+VGL2 gl2 0 5
+VZERO gh2 0 0
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY} IC=36
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY} IC=24
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser=1u IC=0
+
+.model SWI SW(Ron=1u Roff=1T Vt=2.5 Vh=0)
+
+.meas tran IL1_AT_TON FIND I(L1) AT {TON-20p}
+.meas tran IL1_MAX MAX I(L1) FROM 0 TO {TON}
+.meas tran IL2_AT_TON FIND I(L2) AT {TON-20p}
+.meas tran VC1_START FIND V(a1,x1) AT 20p
+.meas tran VC1_END FIND V(a1,x1) AT {TON-20p}
+.meas tran VC2_START FIND V(a2,x2) AT 20p
+.meas tran VC2_END FIND V(a2,x2) AT {TON-20p}
+.meas tran Q_C1_INTV INTEG I(CF1) FROM 20p TO {TON-20p}
+.meas tran Q_C2_INTV INTEG I(CF2) FROM 20p TO {TON-20p}
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+.meas tran TON_EXPLICIT PARAM {TON}
+
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(a1,x1) V(a2,x2) V(x1) V(x2) I(CF1) I(CF2) I(L1) I(L2) V(gh1) V(gl2)
+.tran 0 {TON} 0 2p UIC
+.end

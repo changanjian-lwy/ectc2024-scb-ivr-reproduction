@@ -1,0 +1,15 @@
+* A47 standalone nonlinear-capacitor validation (see validate_nlcap_charging.py)
+.param CFLOOR=2.03754e-10 A=4.98502e-10 VKNEE=13.1432
+.param ITEST=10.0
+
+I1 0 n1 {ITEST}
+B1 n1 0 I=ddt(CFLOOR*V(n1)+A*VKNEE*atan(V(n1)/VKNEE))
+RLEAK n1 0 1G
+
+.tran 0 5e-09 0 1p UIC
+.options reltol=1e-7 abstol=1e-10 chgtol=1e-16
+.save V(n1)
+.meas tran V_AT_1NS FIND V(n1) AT 1n
+.meas tran V_AT_2NS FIND V(n1) AT 2n
+.meas tran V_AT_5NS FIND V(n1) AT 5n
+.end

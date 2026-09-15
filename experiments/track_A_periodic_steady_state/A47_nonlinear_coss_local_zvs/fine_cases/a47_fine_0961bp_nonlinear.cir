@@ -1,0 +1,76 @@
+* A47 stage 2 fine refinement - nonlinear Coss(V) 9.61% negative-current row (P25_SUPPLEMENT/SENSITIVITY_ONLY)
+* START EVENT: P24 t2, iL1=0. State values are chained from R04D2A.
+* END EVENT: P24 t3, Vds(QH1)=0 and ideal event logic commands QH1 ON.
+*
+* P24 EXPLICIT CONTROL
+* QL1 remains ON after iL1 zero. At 1%-2% negative peak current it turns OFF;
+* reverse iL1 commutates the phase-1 output capacitances. This run uses the
+* selected final local refinement row: 9.61% of the P24 Eq.(2) phase peak (125 A).
+*
+* DEVICE PLUG-IN, NOT P24 DEVICE EVIDENCE
+* P25 Table III population (1 HS/2 LS GS61008T) retained from R04D2A/A42.
+* Commutation capacitance is the digitized, fitted nonlinear Coss(V) curve
+* from GS61008T_nonlinear_coss.lib, chained from A47 stage 1's own measured
+* interval-2 handoff state. No snubber, detector delay, gate delay or dead
+* time is added.
+
+.include ../../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.include ../../../../paper_locked/04_component_models/GS61008T_nonlinear_coss.lib
+
+.param VIN=48 NP=4 NM=1 VO=1 FSW=5Meg
+.param LPHASE=1.4666667n IPEAK_P24=125 NEG_FRAC=0.0961 INEG={NEG_FRAC*IPEAK_P24}
+.param VC1_T2=36.0194477751 VX1_T2=-1.57071955599e-05 VA1_T2=36.0194320679
+.param RHS={GS61008T_RDS_TYP_25C/1} RLS={GS61008T_RDS_TYP_25C/2}
+
+VIN_SRC vin 0 {VIN}
+VOUT out 0 {VO}
+RSTATE state_mon 0 1k
+RGH1 gh1 0 1k
+RGL1 gl1 0 1k
+
+.machine 1p
+.state P24_QL1_NEGATIVE 0
+.state P24_COMMUTATE_TO_HIGH 1
+.state P24_QH1_ZVS_ON 2
+.rule P24_QL1_NEGATIVE P24_COMMUTATE_TO_HIGH I(L1)<-INEG
+.rule P24_COMMUTATE_TO_HIGH P24_QH1_ZVS_ON V(vin,a1)<0
+.output (gl1) 5*(state==P24_QL1_NEGATIVE)
+.output (gh1) 5*(state==P24_QH1_ZVS_ON)
+.output (state_mon) state
+.endmachine
+
+SH1 vin a1 gh1 0 SWH
+* Split floor/nonlinear-correction construction, see A47 stage 1
+* (build_a47_stage1_interval2.py) and BOUNDARY.md 'LTspice
+* implementation note' for why (native Q=cap and a single full-Q(V)
+* B-source both failed to converge in this stiff capacitor-loop
+* topology; this split plus method=gear below converges normally).
+CH1LIN vin a1 {NHS_NL*GS61008T_NL_CFLOOR} IC={VIN-VA1_T2}
+BCH1 vin a1 I=ddt(NHS_NL*GS61008T_NL_A*GS61008T_NL_VKNEE*atan(V(vin,a1)/GS61008T_NL_VKNEE))
+CF1 a1 x1 53.8u IC={VC1_T2}
+CL1LIN x1 0 {NLS_NL*GS61008T_NL_CFLOOR} IC={VX1_T2}
+BCL1 x1 0 I=ddt(NLS_NL*GS61008T_NL_A*GS61008T_NL_VKNEE*atan(V(x1)/GS61008T_NL_VKNEE))
+SL1 x1 0 gl1 0 SWL
+L1 x1 out {LPHASE} Rser=1u IC=0
+
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+
+.meas tran P24_T_QL1_OFF WHEN I(L1)=-INEG FALL=1
+.meas tran P24_IL1_AT_QL1_OFF FIND I(L1) WHEN I(L1)=-INEG FALL=1
+.meas tran P24_T3_HIGH_VDS_ZERO WHEN V(vin,a1)=0 FALL=1
+.meas tran P24_IL1_AT_T3 FIND I(L1) WHEN V(vin,a1)=0 FALL=1
+.meas tran P24_COMMUTATION_DURATION PARAM P24_T3_HIGH_VDS_ZERO-P24_T_QL1_OFF
+.meas tran P24_VDS_HS_MIN MIN V(vin,a1)
+.meas tran P24_VDS_HS_MIN_AFTER_2NS MIN V(vin,a1) FROM=2n TO=50n
+.meas tran P24_VDS_HS_END FIND V(vin,a1) AT=50n
+.meas tran P24_VDS_LS_MAX MAX V(x1)
+.meas tran P24_NEGATIVE_TARGET PARAM {INEG}
+.meas tran A47_SOURCE_CODE PARAM 2
+.meas tran NP_EXPLICIT PARAM {NP}
+.meas tran NM_EXPLICIT PARAM {NM}
+
+.options reltol=1e-5 abstol=1e-9 method=gear
+.save V(x1) V(vin,a1) I(L1) V(gl1) V(gh1) V(state_mon)
+.tran 0 50n 0 0.5p UIC
+.end

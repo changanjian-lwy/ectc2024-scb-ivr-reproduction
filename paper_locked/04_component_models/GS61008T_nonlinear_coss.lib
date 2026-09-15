@@ -1,0 +1,43 @@
+* Nonlinear (voltage-dependent) Coss(V) model for a single GS61008T device.
+* EXTERNAL_DEVICE_DATA, digitized from the datasheet's own graph, NOT a
+* fabricated curve shape. See experiments/track_A_periodic_steady_state/
+* A47_nonlinear_coss_local_zvs/BOUNDARY.md for full provenance.
+*
+* SOURCE: GS61008T datasheet Rev 200402 (c) 2009-2020 GaN Systems Inc.,
+* page 8, Figure 7 "Typical CISS, COSS, CRSS vs. VDS", retrieved via the
+* Infineon-hosted republication:
+*   https://www.infineon.com/dgdl/Infineon-GS61008T-DataSheet-v01_00-EN.pdf?fileId=8ac78c8c8d2fe47b018e5160eb52522a
+* Digitized and fit by
+*   experiments/track_A_periodic_steady_state/A47_nonlinear_coss_local_zvs/
+*   digitize_gs61008t_coss.py + fit_nonlinear_coss.py
+* Raw digitized points: .../A47_nonlinear_coss_local_zvs/gs61008t_coss_digitized_raw.csv
+* Fit summary: .../A47_nonlinear_coss_local_zvs/fit_results.json
+*
+* MODEL (single device, NOT yet multiplied by parallel count):
+*   Coss(V) = GS61008T_NL_CFLOOR + GS61008T_NL_A / (1 + (V/GS61008T_NL_VKNEE)^2)
+*   Q(V)    = GS61008T_NL_CFLOOR*V
+*             + GS61008T_NL_A*GS61008T_NL_VKNEE*atan(V/GS61008T_NL_VKNEE)
+* Cross-checked against the datasheet's OWN printed values (never against
+* the plot itself): fit gives Coss(50V)=236.0pF (datasheet typ 250pF,
+* -5.6%), CO(TR),0-50V=375.9pF (datasheet 385pF, -2.4%), CO(ER),0-50V=
+* 298.1pF (datasheet 302pF, -1.3%). These residuals are the honest
+* digitization+fit uncertainty; see BOUNDARY.md. Do not treat this model as
+* more precise than that.
+*
+* VALIDITY: digitized over the datasheet's own plotted range, Vds=0-100V.
+* Extension to V<0 (which can occur transiently as a small ZVS-crossing
+* overshoot in this project's simulations) uses the same smooth analytic
+* form (Coss(V) is even, Q(V) is odd) as the least-arbitrary continuation
+* available; the datasheet itself only characterizes V>=0. This is an
+* explicit NUMERICAL_IDEALIZATION, not additional device data.
+*
+* PARALLEL-COUNT POPULATION: same P25 Table III population already used by
+* GS61008T_commutation_capacitance.lib (1 high-side, 2 parallel low-side).
+* Because parallel same-voltage capacitors sum linearly even when each is
+* individually nonlinear (Q_total(V) = N * Q_device(V) exactly), the
+* per-device Coss(V)/Q(V) above is reused unmodified; only the NHS/NLS
+* multiplier changes between CH and CL instantiation sites.
+.param NHS_NL=1 NLS_NL=2
+.param GS61008T_NL_CFLOOR=203.754p
+.param GS61008T_NL_A=498.502p
+.param GS61008T_NL_VKNEE=13.1432

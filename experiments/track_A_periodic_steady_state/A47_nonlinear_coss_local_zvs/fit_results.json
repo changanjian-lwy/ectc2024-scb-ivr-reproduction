@@ -1,0 +1,37 @@
+{
+  "n_points": 854,
+  "v_range": [
+    0.116686,
+    99.649942
+  ],
+  "model": "Coss(V) = C_FLOOR + A_COSS / (1 + (V/V_KNEE)^2)",
+  "params": {
+    "C_FLOOR_pF": 203.7539730020853,
+    "A_COSS_pF": 498.50161363898246,
+    "V_KNEE_V": 13.143188243899417
+  },
+  "param_1sigma": {
+    "C_FLOOR_pF": 0.8011459640350265,
+    "A_COSS_pF": 5.704464883121901,
+    "V_KNEE_V": 0.18088351607975273
+  },
+  "fit_quality": {
+    "rmse_pF": 25.74868814451328,
+    "R2": 0.9616798360285088,
+    "max_rel_error_pct": 18.147317308321316,
+    "max_rel_error_at_V": 18.31972,
+    "mean_rel_error_pct": 4.476654290361696
+  },
+  "datasheet_crosscheck": {
+    "Coss_at_50V_fit_pF": 235.97287674970622,
+    "Coss_at_50V_datasheet_pF": 250.0,
+    "Coss_at_50V_rel_error_pct": -5.610849300117513,
+    "CO_TR_0_50V_fit_pF": 375.9048600488188,
+    "CO_TR_0_50V_datasheet_pF": 385.0,
+    "CO_TR_rel_error_pct": -2.362374013293813,
+    "CO_ER_0_50V_fit_pF": 298.1010667824912,
+    "CO_ER_0_50V_datasheet_pF": 302.0,
+    "CO_ER_rel_error_pct": -1.291037489241319
+  },
+  "Q_of_V_closed_form": "Q(V) = C_FLOOR*V + A_COSS*V_KNEE*atan(V/V_KNEE)   [pF*V units above; multiply by 1e-12 for Farads*Volts=Coulombs]"
+}
