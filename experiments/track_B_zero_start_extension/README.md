@@ -3,23 +3,26 @@
 Canonical records remain at `paper_locked/02_ectc2024_main/STEP_27` through
 `STEP_31`; their netlists remain beside those records to preserve links.
 
-## Boundary-provenance gap found 2026-09-15 -- read before trusting `Cfly=53.8 uF`
+## Boundary-provenance gap found 2026-09-15 -- read before trusting `Cfly=53.8 uF` or `Cout=4.672 mF`
 
-Every experiment in this track (`R00` through `R04E7`) uses `Cfly=53.8 uF`,
-logged everywhere only as an "EPE2019 cross-source candidate." Re-checked
-against the primary source: this number is the literal component sum from
-EPE2019's Table I, but that table is the parts list for EPE2019's own
-**CSC buck prototype** (their proposed topological modification), not the
-conventional 4-phase SC buck this project's P24 model actually is. The same
-paper states its conventional SC buck's `C1` must block the *full* `Vin`,
-while the CSC buck's whole redesign purpose is to avoid exactly that
-stress -- and Table I's individual capacitors are rated only `35 V`/`50 V`,
-not enough to block P24's `48 V Vin` at all. See
-`paper_locked/00_boundaries/CURRENT_ASSUMPTION_CROSSCHECK.md`'s "Flying
-capacitor" row for the full citation and reasoning. This does not
-invalidate any of this track's *qualitative* findings (e.g. R04E7's
-ratio-gating fix, R04E6's blind-cycling failure mode) -- those are
-mechanism-level results that would likely hold at a different capacitance
+Every experiment in this track (`R00` through `R04E7`) uses `Cfly=53.8 uF`
+(and the `R03A`/`R03D`/`R04E3` family also uses `Cout=4.672 mF`), logged
+everywhere only as "EPE2019 cross-source candidates." Re-checked against
+the primary source: both numbers are literal component sums from EPE2019's
+Table I (`Cfly`: `4x10uF+2x4.7uF+2x2.2uF=53.8uF`; `Cout`:
+`8x220uF+32x47uF+64x22uF=4672uF`), but that table is the parts list for
+EPE2019's own **CSC buck prototype** (their proposed topological
+modification), not the conventional 4-phase SC buck this project's P24
+model actually is. The same paper states its conventional SC buck's `C1`
+must block the *full* `Vin`, while the CSC buck's whole redesign purpose is
+to avoid exactly that stress -- and Table I's individual flying capacitors
+are rated only `35 V`/`50 V`, not enough to block P24's `48 V Vin` at all.
+See `paper_locked/00_boundaries/CURRENT_ASSUMPTION_CROSSCHECK.md`'s "Flying
+capacitor" and "Output capacitor value" rows for the full citation and
+reasoning. This does not invalidate any of this track's *qualitative*
+findings (e.g. R04E7's ratio-gating fix, R04E6's blind-cycling failure mode)
+-- those are mechanism-level results that would likely hold at a different
+capacitance
 -- but every *numeric* result quoted from this track (charge budgets,
 inrush currents, `LADDER_ERR` values, convergence times) should be read as
 conditioned on this specific, now-suspect capacitance choice, not as a
