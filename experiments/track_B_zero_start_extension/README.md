@@ -3,6 +3,30 @@
 Canonical records remain at `paper_locked/02_ectc2024_main/STEP_27` through
 `STEP_31`; their netlists remain beside those records to preserve links.
 
+## Lesson from R04E5 -- do not repeat this specific combination
+
+R03D's only successful `Vout` bootstrap (Section 5 history) depended on
+firing gate pulses at a fixed time regardless of whether any physical exit
+condition had been met -- exactly the practice this project's own control
+principle prohibits everywhere else. R04E5 confirmed directly that grafting
+R03D's ramped on-time ceiling onto R04E3's correctly-event-gated latched
+controller cannot inherit R03D's success: once physical-event gating is
+enforced (the right thing to do), the controller permanently stalls at its
+very first unmet event and the ramp mechanism never gets a second chance to
+act, because the machine never returns to a state where a new on-time can be
+issued. This was true across a 12-cell sensitivity grid (`TSOFT` from 50 to
+500 us, per-phase current limit from 10 to 150 A) and held for windows up to
+600 us -- it is not a "wait longer" or "try more grid points" problem.
+**Do not re-attempt "keep the strict full P24 admission chain, just add a
+ramp/timeout on top of it" as a zero-start fix -- this has now been tried
+and it cannot work by construction, not by bad luck.** Any future attempt
+needs a genuinely different, deliberately looser admission rule for the
+bootstrap phase itself (not the steady-state P24 event chain), with an
+explicit handoff into the existing, already-validated strict event-gated
+controller only once `Vout`/the capacitor ladder is already close to target.
+See `R04E5_ramped_duty_event_gated_zero_start/RESULTS.md` for the full
+causal account.
+
 | Experiment | Changed variable | Status |
 |---|---|---|
 | R04E0 | add observer-only voltage-difference detector | static pass only |
