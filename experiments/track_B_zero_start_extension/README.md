@@ -66,6 +66,7 @@ causal account.
 | R04E9 | genuinely new synthesis: a single unified rotating `CHARGE_k`/`FREE_k` machine drives ALL FOUR phases (not one phase held statically), replacing BOTH R04E3/R04E5's strict single-phase admission chain AND R04E6/E7/E8's switch-only ladder mechanism -- every phase's own series inductor `Lk` is the charging/current-limiting element (P24's own Interval-1 mechanism), `CHARGE_k` exits at R04E3/R04E4's own current-limit rule, `FREE_k` exits at the earlier of the natural zero-crossing or an A48-style `T_FREEWHEEL_MAX` timeout; `CFLY=3uF` (R04E8's corrected value); sweep `I_LIMIT` in {10,30,60}A x `T_FREEWHEEL_MAX` in {50,200,1000}ns (9 cells) | all 9/9 cells advance CHARGE1->FREE1->CHARGE2 within ~1us then permanently stall in CHARGE2 (I(L2) never reaches its own I_LIMIT, best case 67% of the way) because phase 2 has no direct Vin path, only C1's limited relayed charge from phase 1's single ~0.93ns pulse; zero full rotations complete, handoff condition never reached in any cell; both swept axes have real, monotonic, opposite-direction effects on how close IL2 gets to I_LIMIT (unlike R04E5's TSOFT, which had no effect at all); peak currents stay under 61A everywhere in the grid, roughly two orders of magnitude below R04E6/E7/E8's 4.2-4.6kA figures, directly confirming inductor-mediated charging is far more physically plausible even though it does not reach handoff here; two construct bugs (missing timer capacitor, inverted B-source current sign) were found and fixed during piloting, and are flagged as a latent, never-exercised risk in R04E5's own analogous timer construct (not fixed there, out of scope) |
 | R04E10 | single conceptual change from R04E9: add a timeout fallback `T_CHARGE_MAX` to `CHARGE_k` too (OR'd with the existing `I(Lk)>=I_LIMIT` rule), symmetric with `FREE_k`'s own event-OR-timeout pattern, via an exact mirror of R04E9's own validated `FREE_k` timer construct; `T_FREEWHEEL_MAX` fixed at R04E9's own best value (50ns); an isolated pilot found `T_CHARGE_MAX` near R04E9's own ~1ns pulse width breaks the construct, so the swept range is restricted to the pilot-verified-safe `{5,20,50}ns`; sweep `I_LIMIT` in {10,30,60}A x `T_CHARGE_MAX` in {5,20,50}ns (9 cells), `TSTOP=20us` (extended from R04E9's 3us for multi-rotation observation) | 6/9 cells (`T_CHARGE_MAX in {20,50}ns`) complete 4-17 full rotations with `Vout` rising monotonically across every completed rotation -- a genuine unlock of the R04E9 stall; but the other 3/9 cells (`T_CHARGE_MAX=5ns`, all three `I_LIMIT` values) complete ZERO rotations, reproducing R04E9's own total stall exactly despite this value passing isolated verification -- isolated single-branch pilot verification does not guarantee clean full-machine behavior; no cell reaches handoff, best cell reaches only 1.4-5.5% of target across Vout/VC1-3 (3x-20x further than R04E9's own best cell, still 95-99% short); VC2 specifically regresses (wrong direction) at T_CHARGE_MAX=20ns but progresses correctly at 50ns, a reproducible axis-dependent split; inductor currents stay bounded (max 60.17A, same order as R04E9), but a NEW pervasive numerical artifact contaminates flying-capacitor current (ICS1-3) reporting in every one of the 9 cells (hundreds of A up to ~500kA), traced directly to a newly-found retry/chatter dynamic where the machine repeatedly makes partial forward progress then reverses before eventually completing a rotation (first rotation in a representative cell took 18.86us, 70x longer than a naive estimate, vs 273-347ns for later clean rotations); compared to R04E7/R04E8's switch-only ladder (98.9% of target in 5-8 cycles), R04E10 needs more cycles (11-17) to reach far less (3-5.5%), confirming the inductor-mediated approach trades convergence speed for physical plausibility |
 | R04E11 | diagnostic-only (no mechanism change): fine-time-resolution raw-trace instrumentation of R04E10's own `I_LIMIT=30A/T_CHARGE_MAX={20,5}ns` cells, adding `V(reset_gate)`, `V(reset_gate_chg)`, `V(timer)`, `V(timer_chg)` to `.save` (measurement only); tests two hypotheses for the R04E10-documented CHARGE/FREE reversal directly against the raw trace, then tests one candidate fix (reset-switch `Vh=0->1` hysteresis) in a controlled isolation re-run | the "two reset gates disagree" race hypothesis is REFUTED (0/231 conflicts sampled across two independent reversal episodes in two cells); the reversal is instead a genuine, continuous, monotonic multi-integer sweep of the raw `.machine` state variable itself (e.g. `3.9999995->3.4999995->2.4999998->1.4999998` in ~16 ps), occurring during the same stiff sub-picosecond-timestep solver episodes that separately produce the `ICS1-3` artifact; exact, reproducible retry periods measured directly (143.14ns and 214.71ns, refining R04E10's own "~143ns" estimate); the hysteresis fix-test produced a BIT-IDENTICAL trace to the unmodified baseline (same row, same 15-sig-fig timestamp, same state_mon value), refuting that candidate fix; R04E10's own cited `t=19.275us` "reversal event" is directly shown to actually be a clean forward transition coincident with the ICS artifact, not a reversal (a correction to that specific characterization; the ICS/non-integer-state_mon finding itself is fully reproduced); no working fix found, so per Ground Rule 7 none is forced and the 9-cell grid is not re-run -- R04E10's own grid/results.csv remain the authoritative record |
+| R04E12 | single conceptual change from R04E10: insert a phase-1 precharge admission gate before the machine's normal round-robin rotation begins -- a counter (implemented as a compile-time-unrolled chain of `N_PRECHARGE-1` extra state pairs electrically mirroring `CHARGE1`/`FREE1`, since this project's own `.machine` convention never uses more than one `.rule` per state) routes `FREE1`'s exit back to `CHARGE1` while below `N_PRECHARGE`, then joins R04E10's own unchanged round-robin permanently; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed (R04E10's own best cell), sweep `N_PRECHARGE` in {1,3,5,10,20} (5 cells) | `N_PRECHARGE=1` confirmed IDENTICAL to R04E10's own committed `I_LIMIT=60A/T_CHARGE_MAX=50ns` cell to full printed precision on every measured quantity (by construction and directly verified); the new construct was pilot-verified directly against the raw state trace at `N_PRECHARGE=3` and `=10` (exact admission order, one-time gating, correct dwell count -- all PASS); `Vout` improves monotonically and substantially with `N_PRECHARGE` (`0.0141->0.0197V`, +40% at `N_PRECHARGE=20`); `VC2` (the axis this experiment targeted) improves at `N_PRECHARGE in {3,20}` but REGRESSES at `N_PRECHARGE=5` and is flat at `10` -- a non-monotonic, mixed result, not a clean "precharge helps" verdict; the single best-`VC2` cell (`N_PRECHARGE=20`) has the only negative `VC3_final` in the whole grid, a new trade-off; the R04E10/R04E11-diagnosed retry/chatter dynamic and `ICS1-3` artifact recur in all 5 cells at essentially uniform severity (19-22% reversal rate, matching R04E10's own ~19% figure), confirming it is a property of the reused construct, not caused or fixed by the precharge stage; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -293,3 +294,50 @@ fix. See
 `R04E11_charge_free_reversal_root_cause/BOUNDARY.md` and `RESULTS.md`
 for the full row-by-row trace evidence, both fix-test comparisons, and
 the exact scripts used.
+
+## R04E12 -- precharging phase 1 helps `Vout` cleanly but `VC2` only
+   improves non-monotonically, with a new trade-off
+
+R04E12 implements R04E9's own Section 11 option (c) (per explicit user
+direction): insert a precharge admission gate before R04E10's normal
+round-robin rotation, so `FREE1`'s exit routes back to `CHARGE1` (repeat
+phase 1 alone, building up `C1`'s charge) `N_PRECHARGE-1` times before the
+machine is permanently admitted into the unchanged round robin. Because
+this project's own `.machine` convention never uses more than one `.rule`
+per state anywhere in R04E5-R04E11, the "counter" was implemented as a
+compile-time-unrolled chain of extra state pairs (one per netlist, since
+this project already generates one file per grid cell) rather than a
+runtime SPICE counter node -- a documented implementation-detail choice,
+not a deviation from the requested mechanism. `N_PRECHARGE=1` was
+confirmed, both by construction and by direct LTspice re-run, IDENTICAL
+to R04E10's own committed `I_LIMIT=60A/T_CHARGE_MAX=50ns` cell to full
+printed precision on every measured quantity -- the required baseline
+sanity check. The construct itself was pilot-verified by direct raw-trace
+inspection at `N_PRECHARGE=3` and `=10` (BOUNDARY.md Section 5's
+requirement): the machine visits every precharge pair exactly once, in
+order, before ever reaching the real `CHARGE1`, and never re-enters the
+precharge chain afterward -- confirmed, not assumed.
+
+**`Vout` improves monotonically and substantially** with `N_PRECHARGE`
+(`0.0141 V` at `N_PRECHARGE=1` to `0.0197 V` at `N_PRECHARGE=20`, `+40%`)
+-- the cleanest result in this experiment. **`VC2`, the axis this
+experiment specifically targeted, does NOT improve monotonically**: it is
+better than baseline at `N_PRECHARGE=3` (`+16%`) and best of the whole
+grid at `N_PRECHARGE=20` (`+38%`), but WORSE than baseline at
+`N_PRECHARGE=5` (`-18%`) and essentially flat at `N_PRECHARGE=10`
+(`+0.5%`) -- reported plainly as a mixed, non-monotonic result, not forced
+into a clean verdict either way. A new trade-off was found: the single
+best-`VC2` cell (`N_PRECHARGE=20`) has the ONLY negative `VC3_final` value
+in the entire grid (`-0.170 V`), where every other cell (including
+baseline) stays positive. The R04E10/R04E11-diagnosed retry/chatter
+dynamic and its coincident `ICS1-3` numerical artifact recur in every one
+of the 5 cells, at essentially uniform severity regardless of
+`N_PRECHARGE` (`19-22%` of settled-state dwell transitions are reversals
+in every cell, matching R04E10's own `~19%` figure) -- confirming this is
+a property of the reused `CHARGE_k`/`FREE_k` construct itself, neither
+caused nor fixed by the precharge stage. No cell reaches handoff; `IL1-4`
+stay safely bounded in every cell (worst case `24%` of the `+/-250 A`
+limit). See
+`R04E12_phase1_precharge_admission_gate/BOUNDARY.md` and `RESULTS.md` for
+the full construct-design rationale, the pilot-verification evidence, and
+the complete 5-cell grid.
