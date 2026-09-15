@@ -91,6 +91,18 @@ to ring with QH1 still off; there is no reason to expect the fixed-delay
 value to land near a favorable point of that ongoing ring for an arbitrary
 `T_DEAD`, and mostly it does not.
 
+**Unconfirmed observation, flagged honestly rather than investigated
+further:** the `T_DEAD=10 ns` point in this same coarse row lands at
+`0.390 V`, close to zero again, about `7.85 ns` after the first exact-zero
+instant (`2.1516 ns`). This coarse-grid coincidence is consistent with a
+periodic LC ring-back producing a second, narrower near-zero recurrence
+window somewhere near `T_DEAD~10 ns` (this zero-snubber local model has no
+reverse-conduction clamp, so nothing damps the ring after the first natural
+crossing). This was not bracketed with a dedicated fine sweep in this
+experiment and must not be read as a second confirmed window -- it is a
+single coarse-grid data point noted for a possible future follow-up, not a
+result.
+
 ## Refinement grid: 7.77% row, T_DEAD = 2.0-3.0 ns (0.1 ns steps)
 
 | T_DEAD (ns) | forced before natural? | Vds_at_forced_on (V) | I at forced (A) |
