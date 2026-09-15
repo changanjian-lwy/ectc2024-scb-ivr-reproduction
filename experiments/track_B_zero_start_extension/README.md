@@ -62,6 +62,7 @@ causal account.
 | R04E5 | ramped on-time ceiling (R03D) grafted onto the event-gated latched controller (R04E3), sweep TSOFT x I_LIMIT | reproduces R04E3's stuck-at-state-4 point (9/12 cells) or an earlier stuck-at-state-3 point (3/12 cells); never returns to ENERGY a second time in any of the 12 cells, so TSOFT has no observed effect and Vout never approaches 1 V; current stays inside the +/-250 A bound in all 12 |
 | R04E6 | replace the P24 admission chain entirely with EPE2019's borrowed 3-state charge-redistribution sequence (open-loop, sweep hold time TH x cycle count NCYC), ladder-bootstrap-only scope | best single cell (TH=20us, NCYC=1) reaches VC1~24/VC2~12/VC3~12 V (LADDER_ERR=0.836); every additional cycle beyond the first makes it worse at every TH>=1us, converging toward ~45-46 V on all three (equalization, not the 3:2:1 target) by NCYC=10; does not outperform R02B's passive divider (0.260) |
 | R04E7 | replace R04E6's blind fixed-hold-time/fixed-cycle-count gating with voltage-RATIO gating (state (a) exits at V(C1)>=36V, state (b) at 2V(C1)<=3V(C2), state (c) at V(C2)<=2V(C3), cycle repeats until all three voltages are within a swept tolerance band or a fixed 50us safety cap is hit), same EPE2019 truth table/power stage otherwise unchanged, sweep TOL in {2%,5%,10%} | all 3/3 cells reach DONE well inside the cap (5-8 cycles, t=3.90-4.24us) with LADDER_ERR decreasing monotonically on every single cycle (the opposite of R04E6's own finding); final LADDER_ERR 0.207/0.124/0.045 at TOL=10%/5%/2%, all beating both R02B (0.260) and R04E6 (0.836); no cell hit the safety cap without converging; no comparator chatter observed |
+| R04E8 | module swap inside R04E7's unchanged ratio-gating framework: replace R04E7's Cfly=53.8uF (found to have a cross-topology provenance problem -- EPE2019's own CSC-buck Table I sum, parts rated only 35V/50V, not enough for P24's 48V Vin) with a first-principles-derived corrected range, sweep CFLY in {1,3,8.7 uF} with TOL fixed at 2% (R04E7's own best cell) | all 3/3 cells reach DONE in exactly 8 cycles each (matching R04E7's own TOL=2% cycle count), LADDER_ERR 0.0442-0.0448 (essentially matching R04E7's 0.045) -- the ratio-gating comparators are scale-invariant in Cfly; convergence time scales close to linearly with Cfly and is 5.7x-49.5x FASTER than R04E7's 53.8uF case (85.60/256.72/741.62 ns at 1/3/8.7 uF vs 4239.5 ns at 53.8uF); peak ICS1/ICS2/ICS3 MAX currents stay roughly flat (~4.2-4.6 kA for ICS1_MAX) across the whole 1-53.8uF range, confirming peak current does NOT shrink with smaller Cfly (V/Ron-dominated) -- so the Cfly correction does not resolve the multi-kilo-amp current-plausibility concern already flagged in R04E6/R04E7; some minimum/reverse currents (ICS3_MIN, IL1) do scale up with Cfly; no cell hit the safety cap without converging |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -95,3 +96,30 @@ R02B's `0.260` and R04E6's `0.836`. See
 `R04E7_ratio_gated_charge_redistribution_startup/BOUNDARY.md` and
 `RESULTS.md` for the charge-conservation check, the full per-tolerance and
 per-cycle results, and the chatter check.
+
+## R04E8 -- the mechanism survives a corrected, physically-appropriate `Cfly`
+
+R04E7's own `Cfly=53.8 uF` was later found to have a cross-topology
+provenance problem (see the "Boundary-provenance gap found 2026-09-15"
+section above): it is EPE2019's own CSC-buck prototype Table I sum, whose
+parts are rated only `35 V`/`50 V`, not enough for P24's `48 V Vin`. R04E8
+reruns R04E7's ratio-gating mechanism unchanged, swapping only `Cfly` to a
+first-principles-derived range (`{1, 3, 8.7} uF`, `TOL` fixed at `2%`). All
+three cells converge in exactly the same 8 cycles as R04E7's own `TOL=2%`
+cell, with essentially the same final `LADDER_ERR` (`0.0442-0.0448` vs
+`0.045`) -- the mechanism's voltage-ratio comparators are scale-invariant
+in `Cfly`, so convergence *quality* is unaffected by the correction.
+Convergence *speed*, however, is dramatically faster (`5.7x`-`49.5x`,
+scaling close to linearly with `Cfly`), confirming the task's physical
+expectation directly. Peak flying-capacitor-to-flying-capacitor currents
+(`ICS1`/`ICS2`/`ICS3` MAX) do **not** shrink with the smaller, corrected
+`Cfly` -- they stay in essentially the same multi-kilo-amp range as
+R04E7's own `53.8 uF` result, confirming the `V/Ron`-dominated peak-current
+hypothesis and showing that the `Cfly` correction does **not** by itself
+resolve the current-plausibility concern already flagged in R04E6/R04E7 --
+that concern is attributable to the zero-dead-time/`Ron`-only idealized
+switch model, not to the (now-corrected) `Cfly` value. See
+`R04E8_corrected_cfly_ratio_gated_startup/BOUNDARY.md` and `RESULTS.md`
+for the pilot-run derivation of the safety cap, the full per-`Cfly`
+results, and the detailed current-scaling breakdown (including the
+asymmetry between flat MAX currents and growing MIN/inductor currents).
