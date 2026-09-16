@@ -1,9 +1,9 @@
-# Track B zero-start: consolidated findings across R04E9-R04E14 and the
-   2026-09-16 literature review (written 2026-09-16)
+# Track B zero-start: consolidated findings across R04E9-R04E15 and the
+   2026-09-16 literature review (written 2026-09-16, updated same day after R04E15)
 
 ## Why this document exists
 
-`R04E9` through `R04E14` and two literature reviews were all produced in
+`R04E9` through `R04E15` and two literature reviews were all produced in
 one working session, each individually documented (`BOUNDARY.md`/
 `RESULTS.md` per experiment, two review notes under
 `paper_locked/00_boundaries/`). This document does not add new results;
@@ -11,7 +11,10 @@ it synthesizes what is already committed into one coherent picture, and
 was written only after re-checking every carried-forward number/assumption
 against its original source (see "Boundary re-audit" below). Read the
 individual `BOUNDARY.md`/`RESULTS.md` files for full detail and caveats --
-this is a map, not a replacement.
+this is a map, not a replacement. (`R04E15` was added as a same-day
+follow-up after this document's first version, per explicit user
+direction to pursue R04E14's own refinement before the higher-setup-cost
+Roberts soft-start mechanism.)
 
 ## The problem, restated
 
@@ -90,13 +93,35 @@ order tuning alone is not the remaining lever.
   NOT_P24_REPRODUCTION` (not a uniform pass: fast-ramp cells still spike
   to 500-2500 A, and the answer is sensitive to exactly which `Cfly` in
   the `0.6-8.7 uF` range is used).
+- **R04E15** (fine-grid follow-up on R04E14, per explicit user direction
+  2026-09-16) mapped the neighborhood around R04E14's two PASS cells more
+  finely: `CDIV` refined/extended to `500 uF` (ladder error keeps
+  improving monotonically, no plateau yet -- `0.0335` at `500 uF` vs.
+  `0.0536` at R04E14's own `300 uF`, at a still-safe `61.44 A` peak
+  current), `TRAMP` refined between `10` and `100 us` (confirms R04E14's
+  own `100 us` sits at or very near a genuine local trade-off frontier
+  between ladder error and peak current -- no intermediate value strictly
+  beats it), and critically, the `Cfly` robustness check was REDONE at the
+  actual winning operating point (`CDIV=500 uF`/`TRAMP=100 us`) rather
+  than R04E14's own secondary grid's `TRAMP=10 us` point. **At this
+  correct operating point, all three `Cfly` values across the full
+  `0.6-8.7 uF` range pass BOTH halves of the bar cleanly** (peak current
+  stays `60-64 A` regardless of `Cfly`) -- a materially more robust result
+  than R04E14's own secondary check, which had failed the current bar at
+  every `Cfly` value because it was run at the wrong `TRAMP`. `12/13`
+  fine-grid cells now pass (vs. R04E14's own `2/14`), simply because this
+  grid was deliberately centered on an already-good neighborhood, not
+  because the underlying physics changed.
 
-**Verdict on this approach**: genuinely revived by the `Cfly` correction.
-This is currently the single most successful zero-start-adjacent result
-in this project's history by ladder-error/peak-current combination, but
-it remains isolated from PWM (see "What remains blocked" below) and only
-addresses part (1) of the zero-start problem (the flying-capacitor
-ladder), not `Vout`/handoff.
+**Verdict on this approach**: genuinely revived by the `Cfly` correction,
+and R04E15 shows the result is not a fragile, single-lucky-cell artifact
+-- it holds across a widened operating-point neighborhood and across the
+entire first-principles `Cfly` range when tested at the correct `TRAMP`.
+This is currently the single most successful and best-substantiated
+zero-start-adjacent result in this project's history by ladder-error/
+peak-current combination, but it remains isolated from PWM (see "What
+remains blocked" below) and only addresses part (1) of the zero-start
+problem (the flying-capacitor ladder), not `Vout`/handoff.
 
 ### Approach 3: input-voltage soft-start ramp (found in literature, not yet built)
 
@@ -181,23 +206,30 @@ No numeric or provenance error was found in this pass. This is reported
 as a genuine (clean) audit outcome, not a formality -- the check was
 performed, not assumed.
 
-## Recommended priority ranking for what to pursue next
+## Recommended priority ranking for what to pursue next (updated after R04E15)
 
-1. **R04E14's passive-precharge success is the most promising open
-   thread with the clearest next step**: it already has a well-defined,
-   narrow follow-up (does the `PASS_TOPOLOGY_PRINCIPLE` result hold up
-   under a finer `(CDIV,TRAMP)` grid near the two winning cells, and does
-   it remain robust across the full `Cfly` range rather than only at
-   `3 uF`?) that does not require inventing anything new.
+1. **The passive-precharge module (R02A/B, revived by R04E14, now further
+   substantiated by R04E15) is the most promising, best-substantiated
+   open thread, and its own narrow, low-setup-cost follow-up is
+   exhausted**: R04E15 confirmed no fine-grid point strictly dominates
+   R04E14's own coarse-grid optimum (a genuine local trade-off frontier,
+   not an artifact of coarse sampling), and confirmed the result is
+   `Cfly`-robust at the correct operating point. The natural next step
+   for THIS approach is no longer more grid refinement -- it is either
+   (a) reconciling the ground-referenced flying-capacitor simplification
+   with the real floating adjacent-capacitor connection (still open, per
+   Section "What this does not establish"), or (b) beginning the
+   precharge-to-PWM handoff design, which requires the still-standing,
+   self-labelled-engineering-hypothesis discipline described above.
 2. **Roberts' soft-start mechanism is the highest-novelty candidate** but
    requires first deriving P24-specific numbers from his Chapter 3
    formula before any SPICE test is meaningful -- more setup cost, but
    potentially addresses both ladder AND Vout bootstrap simultaneously
-   (unlike R04E14, which only addresses the ladder), since it does not
-   change the normal switching pattern.
-3. **Further tuning of the R04E9-R04E13 admission-order family is the
-   lowest-priority thread for now** -- not because it was wrong, but
-   because R04E12/R04E13 already show it has entered diminishing/negative
+   (unlike R04E14/R04E15, which only address the ladder), since it does
+   not change the normal switching pattern.
+3. **Further tuning of the R04E9-R04E13 admission-order family remains
+   the lowest-priority thread** -- not because it was wrong, but because
+   R04E12/R04E13 already show it has entered diminishing/negative
    returns; a topology-level change (R04E9's own option (a), still
    unstarted) would need to precede any further work in this specific
    family.
