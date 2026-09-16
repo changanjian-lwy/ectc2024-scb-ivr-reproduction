@@ -1,0 +1,104 @@
+* R04E16 - Roberts' soft-start mechanism on fixed-timing 4-phase PWM
+* (e16_g1_f0p6_t30p68)
+* PARENT: R03A (paper_locked/02_ectc2024_main/spice/
+* R03A_passive_precharge_to_fixed_pwm_takeover.cir) -- gate-generation
+* B-source formulas and 4-phase power-stage connectivity copied
+* unchanged. CHANGED: TSTART=0 (PWM active from t=0, implementing
+* Roberts' PhD dissertation Sec 3.5's "ordinary switching pattern runs
+* during the Vin ramp"), TRAMP swept (see BOUNDARY.md Section 6),
+* LPHASE=1.4666667n (Eq.-4 branch, replaces R03A's own 2.68n), CFLY
+* swept (replaces R03A's own 53.8uF), R02B passive-divider precharge
+* network REMOVED ENTIRELY (no CIN/RLEAK/DPC/CDIV/DPRE -- true
+* zero-energy start, no auxiliary precharge circuit of any kind).
+* UNCHANGED: power-stage topology, COUT, RLOAD formula, ideal SWI
+* switch, RLDAMP, true-zero-energy IC (UIC), TMAX=50p, IPEC2018 Table
+* II source parasitics LPAR/RPAR.
+* SOLVER OPTIONS: solver=alt/cshunt=1e-15/plotwinsize=0 added (not in
+* R03A) -- diagnosed as REQUIRED after R03A's own default "Normal"
+* solver corrupted every cell (see RESULTS.md); this restores the exact
+* stabilization convention R04E5-R04E10 already use at this same
+* TMAX=50p. TMAX itself is unchanged.
+* Cfly=0.6 uF, Tramp=30.68 us, Tstop=Tramp+300us.
+
+.param VIN=48 VOUT=1 POUT=250 NP=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} LPHASE=1.4666667n
+.param CFLY=6.000000e-07 COUT=4.672m RLOAD={VOUT*VOUT/POUT}
+.param TRAMP=3.068000e-05 TSTART=0 TSTOP={TRAMP+300u}
+.param LPAR=5n RPAR=10m RON=1u ROFF=1T VGATE=5 RLDAMP=1u
+
+VSTEP src 0 PWL(0 0 {TRAMP} {VIN} {TSTOP} {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+* R02B's passive divider/precharge-diode network (CIN1-4/RLEAK1-4/
+* DPC1-3/CDIV/DPRE) is REMOVED ENTIRELY per BOUNDARY.md Section 4 --
+* true zero-energy start via the Vin ramp alone, no auxiliary precharge
+* circuit. a1/a2/a3 keep exactly their R03A power-stage roles below
+* (SH/CF/SL attachments only); no node here is left floating since none
+* of a1/a2/a3/x1-x4 depended on the diode network for anything but the
+* now-removed precharge path.
+
+* Gate-generation formulas copied unchanged from R03A except TSTART=0
+* (PWM active for all time>=0, not delayed to 150us after Vin settles).
+BH1 gh1 0 V=if(time>=TSTART & mod(time-TSTART+T,T)<TON,VGATE,0)
+BL1 gl1 0 V=if(time<TSTART | mod(time-TSTART+T,T)>=TON,VGATE,0)
+BH2 gh2 0 V=if(time>=TSTART & mod(time-TSTART+T-T/4,T)<TON,VGATE,0)
+BL2 gl2 0 V=if(time<TSTART | mod(time-TSTART+T-T/4,T)>=TON,VGATE,0)
+BH3 gh3 0 V=if(time>=TSTART & mod(time-TSTART+T-T/2,T)<TON,VGATE,0)
+BL3 gl3 0 V=if(time<TSTART | mod(time-TSTART+T-T/2,T)>=TON,VGATE,0)
+BH4 gh4 0 V=if(time>=TSTART & mod(time-TSTART+T-3*T/4,T)<TON,VGATE,0)
+BL4 gl4 0 V=if(time<TSTART | mod(time-TSTART+T-3*T/4,T)>=TON,VGATE,0)
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY}
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser={RLDAMP}
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY}
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser={RLDAMP}
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY}
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser={RLDAMP}
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser={RLDAMP}
+
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+
+.meas tran VC1_INIT FIND V(a1,x1) AT 1n
+.meas tran VC2_INIT FIND V(a2,x2) AT 1n
+.meas tran VC3_INIT FIND V(a3,x3) AT 1n
+.meas tran VC1_AT_TRAMP FIND V(a1,x1) AT {TRAMP}
+.meas tran VC2_AT_TRAMP FIND V(a2,x2) AT {TRAMP}
+.meas tran VC3_AT_TRAMP FIND V(a3,x3) AT {TRAMP}
+.meas tran VOUT_AT_TRAMP FIND V(out) AT {TRAMP}
+.meas tran VC1_FINAL FIND V(a1,x1) AT {TSTOP-1n}
+.meas tran VC2_FINAL FIND V(a2,x2) AT {TSTOP-1n}
+.meas tran VC3_FINAL FIND V(a3,x3) AT {TSTOP-1n}
+.meas tran VOUT_FINAL FIND V(out) AT {TSTOP-1n}
+.meas tran VOUT_PK MAX V(out) FROM 0 TO {TSTOP}
+.meas tran VOUT_MIN MIN V(out) FROM 0 TO {TSTOP}
+.meas tran VOUT_OVERSHOOT PARAM (VOUT_PK-VOUT)/VOUT
+.meas tran IIN_PK MAX -I(VSTEP) FROM 0 TO {TSTOP}
+.meas tran IL1_MIN MIN I(L1) FROM 0 TO {TSTOP}
+.meas tran IL1_MAX MAX I(L1) FROM 0 TO {TSTOP}
+.meas tran IL2_MIN MIN I(L2) FROM 0 TO {TSTOP}
+.meas tran IL2_MAX MAX I(L2) FROM 0 TO {TSTOP}
+.meas tran IL3_MIN MIN I(L3) FROM 0 TO {TSTOP}
+.meas tran IL3_MAX MAX I(L3) FROM 0 TO {TSTOP}
+.meas tran IL4_MIN MIN I(L4) FROM 0 TO {TSTOP}
+.meas tran IL4_MAX MAX I(L4) FROM 0 TO {TSTOP}
+.meas tran VOUT_ERR PARAM abs(VOUT_FINAL-1)/1
+.meas tran VC1_ERR PARAM abs(VC1_FINAL-36)/36
+.meas tran VC2_ERR PARAM abs(VC2_FINAL-24)/24
+.meas tran VC3_ERR PARAM abs(VC3_FINAL-12)/12
+.meas tran LADDER_ERR PARAM VC1_ERR+VC2_ERR+VC3_ERR
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vin) V(out) V(a1,x1) V(a2,x2) V(a3,x3) I(VSTEP) I(L1) I(L2) I(L3) I(L4)
+.tran 0 {TSTOP} 0 50p UIC
+.end
