@@ -67,6 +67,7 @@ causal account.
 | R04E10 | single conceptual change from R04E9: add a timeout fallback `T_CHARGE_MAX` to `CHARGE_k` too (OR'd with the existing `I(Lk)>=I_LIMIT` rule), symmetric with `FREE_k`'s own event-OR-timeout pattern, via an exact mirror of R04E9's own validated `FREE_k` timer construct; `T_FREEWHEEL_MAX` fixed at R04E9's own best value (50ns); an isolated pilot found `T_CHARGE_MAX` near R04E9's own ~1ns pulse width breaks the construct, so the swept range is restricted to the pilot-verified-safe `{5,20,50}ns`; sweep `I_LIMIT` in {10,30,60}A x `T_CHARGE_MAX` in {5,20,50}ns (9 cells), `TSTOP=20us` (extended from R04E9's 3us for multi-rotation observation) | 6/9 cells (`T_CHARGE_MAX in {20,50}ns`) complete 4-17 full rotations with `Vout` rising monotonically across every completed rotation -- a genuine unlock of the R04E9 stall; but the other 3/9 cells (`T_CHARGE_MAX=5ns`, all three `I_LIMIT` values) complete ZERO rotations, reproducing R04E9's own total stall exactly despite this value passing isolated verification -- isolated single-branch pilot verification does not guarantee clean full-machine behavior; no cell reaches handoff, best cell reaches only 1.4-5.5% of target across Vout/VC1-3 (3x-20x further than R04E9's own best cell, still 95-99% short); VC2 specifically regresses (wrong direction) at T_CHARGE_MAX=20ns but progresses correctly at 50ns, a reproducible axis-dependent split; inductor currents stay bounded (max 60.17A, same order as R04E9), but a NEW pervasive numerical artifact contaminates flying-capacitor current (ICS1-3) reporting in every one of the 9 cells (hundreds of A up to ~500kA), traced directly to a newly-found retry/chatter dynamic where the machine repeatedly makes partial forward progress then reverses before eventually completing a rotation (first rotation in a representative cell took 18.86us, 70x longer than a naive estimate, vs 273-347ns for later clean rotations); compared to R04E7/R04E8's switch-only ladder (98.9% of target in 5-8 cycles), R04E10 needs more cycles (11-17) to reach far less (3-5.5%), confirming the inductor-mediated approach trades convergence speed for physical plausibility |
 | R04E11 | diagnostic-only (no mechanism change): fine-time-resolution raw-trace instrumentation of R04E10's own `I_LIMIT=30A/T_CHARGE_MAX={20,5}ns` cells, adding `V(reset_gate)`, `V(reset_gate_chg)`, `V(timer)`, `V(timer_chg)` to `.save` (measurement only); tests two hypotheses for the R04E10-documented CHARGE/FREE reversal directly against the raw trace, then tests one candidate fix (reset-switch `Vh=0->1` hysteresis) in a controlled isolation re-run | the "two reset gates disagree" race hypothesis is REFUTED (0/231 conflicts sampled across two independent reversal episodes in two cells); the reversal is instead a genuine, continuous, monotonic multi-integer sweep of the raw `.machine` state variable itself (e.g. `3.9999995->3.4999995->2.4999998->1.4999998` in ~16 ps), occurring during the same stiff sub-picosecond-timestep solver episodes that separately produce the `ICS1-3` artifact; exact, reproducible retry periods measured directly (143.14ns and 214.71ns, refining R04E10's own "~143ns" estimate); the hysteresis fix-test produced a BIT-IDENTICAL trace to the unmodified baseline (same row, same 15-sig-fig timestamp, same state_mon value), refuting that candidate fix; R04E10's own cited `t=19.275us` "reversal event" is directly shown to actually be a clean forward transition coincident with the ICS artifact, not a reversal (a correction to that specific characterization; the ICS/non-integer-state_mon finding itself is fully reproduced); no working fix found, so per Ground Rule 7 none is forced and the 9-cell grid is not re-run -- R04E10's own grid/results.csv remain the authoritative record |
 | R04E12 | single conceptual change from R04E10: insert a phase-1 precharge admission gate before the machine's normal round-robin rotation begins -- a counter (implemented as a compile-time-unrolled chain of `N_PRECHARGE-1` extra state pairs electrically mirroring `CHARGE1`/`FREE1`, since this project's own `.machine` convention never uses more than one `.rule` per state) routes `FREE1`'s exit back to `CHARGE1` while below `N_PRECHARGE`, then joins R04E10's own unchanged round-robin permanently; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed (R04E10's own best cell), sweep `N_PRECHARGE` in {1,3,5,10,20} (5 cells) | `N_PRECHARGE=1` confirmed IDENTICAL to R04E10's own committed `I_LIMIT=60A/T_CHARGE_MAX=50ns` cell to full printed precision on every measured quantity (by construction and directly verified); the new construct was pilot-verified directly against the raw state trace at `N_PRECHARGE=3` and `=10` (exact admission order, one-time gating, correct dwell count -- all PASS); `Vout` improves monotonically and substantially with `N_PRECHARGE` (`0.0141->0.0197V`, +40% at `N_PRECHARGE=20`); `VC2` (the axis this experiment targeted) improves at `N_PRECHARGE in {3,20}` but REGRESSES at `N_PRECHARGE=5` and is flat at `10` -- a non-monotonic, mixed result, not a clean "precharge helps" verdict; the single best-`VC2` cell (`N_PRECHARGE=20`) has the only negative `VC3_final` in the whole grid, a new trade-off; the R04E10/R04E11-diagnosed retry/chatter dynamic and `ICS1-3` artifact recur in all 5 cells at essentially uniform severity (19-22% reversal rate, matching R04E10's own ~19% figure), confirming it is a property of the reused construct, not caused or fixed by the precharge stage; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
+| R04E13 | single conceptual change from R04E12: stack a SECOND, analogous precharge admission gate after phase 1's own (fixed at `N1_PRECHARGE=3`, R04E12's own clean best value), gating phase 2 the same way R04E12 gated phase 1 -- a naive first attempt (hanging the phase-2 mirror chain directly off the real, round-robin-shared `FREE2` state) FAILED its own required pilot check (re-triggered every rotation, not just once) and was corrected to a dedicated one-time-only "ADMIT" duplicate of `CHARGE1`/`FREE1`/`CHARGE2`/`FREE2` positioned strictly upstream of the closed loop, mirroring why R04E12's own phase-1 gate never had this problem; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed, sweep `N2_PRECHARGE` in {1,3,5,10} (4 cells) plus a separate `N1=1,N2=1` identity cell | Both required identities confirmed to full printed precision (`N1=1,N2=1` vs. R04E10; `N1=3,N2=1` vs. R04E12's own `N_PRECHARGE=3`); the corrected construct was proven correct two ways -- an independent, run-independent static rule-graph/walk-simulation check (all 5 cells PASS) and direct raw-trace pilot verification (clean PASS at `N2_PRECHARGE=3`); `N2_PRECHARGE=5`/`10` FAIL the strict admission-order pattern-match, but precisely-timed cross-cell evidence (the same stiff-solver episode recurring at `t=6.1843-6.1844e-7s` in every cell regardless of `N2_PRECHARGE`) attributes this to the already-diagnosed R04E10/R04E11 retry/chatter artifact landing, for the first time in this lineage, inside the admission window itself rather than a new construct defect; stacking the phase-2 gate does NOT further improve `Vout`/`VC1`/`VC3` (WORSE than the `N2_PRECHARGE=1` baseline at every tested value, `-10.6%` to `-35.7%`), and only marginally improves `VC2` (~+4%) at `N2_PRECHARGE in {5,10}`, paired with a larger `VC3` cost -- directly traced to a fixed rotation-count cost (12->10) any phase-2 gate incurs within the fixed 20us window; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -341,3 +342,63 @@ limit). See
 `R04E12_phase1_precharge_admission_gate/BOUNDARY.md` and `RESULTS.md` for
 the full construct-design rationale, the pilot-verification evidence, and
 the complete 5-cell grid.
+
+## R04E13 -- stacking a second (phase-2) precharge gate on phase-1's own
+   costs more rotations than it gains, and a naive generalization of
+   R04E12's own construct failed its own pilot check first
+
+R04E13 stacks a SECOND, analogous precharge admission gate after phase 1's
+own (fixed at R04E12's own clean best `N1_PRECHARGE=3`), gating phase 2 the
+same way R04E12 gated phase 1: repeat `CHARGE2`/`FREE2` `N2_PRECHARGE-1`
+extra times before ever advancing to the real `CHARGE3`. A naive first
+implementation attempt -- hanging the phase-2 mirror chain directly off the
+real, round-robin-shared `FREE2` state's own single rule, the most direct
+generalization of R04E12's own phase-1 pattern -- FAILED its own required
+pilot verification immediately: because `CHARGE2`/`FREE2` are themselves
+part of the closed round-robin cycle (a `.machine` where every state has
+exactly one outgoing rule is a deterministic functional graph, and anything
+reachable from a cyclic state is also on that cycle forever), the mirror
+chain re-triggered on EVERY subsequent rotation, not just once. The fix
+(a dedicated, one-time-only "ADMIT" duplicate of `CHARGE1`/`FREE1`/
+`CHARGE2`/`FREE2`, positioned strictly upstream of the closed loop, exactly
+mirroring the structural position R04E12's own phase-1 mirror chain already
+occupies) was verified two independent ways: a run-independent static
+rule-graph/walk-simulation check (all 5 cells PASS, proving the `.rule`
+graph itself converges correctly with no revisits) and direct raw-trace
+pilot verification against real LTspice runs.
+
+Both required baseline identities (`N1=1,N2=1` vs. R04E10's own committed
+cell; `N1=3,N2=1` vs. R04E12's own committed `N_PRECHARGE=3` cell) matched
+to full printed precision. Pilot verification at `N2_PRECHARGE=3` passed
+all six checks cleanly; at `N2_PRECHARGE=5`/`10` the strict admission-order
+pattern-match FAILED, but precisely-timed cross-cell evidence (the SAME
+stiff-solver episode recurring at `t=6.1843-6.1844e-7 s`, agreeing to 6
+significant figures, in all four `N1=3` cells regardless of
+`N2_PRECHARGE`) attributes this directly to the already-diagnosed
+R04E10/R04E11 retry/chatter artifact landing, for the first time in this
+project's lineage, transiently inside the admission window itself (because
+longer admission chains are still running when that fixed-timing episode
+occurs) rather than a new construct defect -- corroborated by the
+static-analysis proof above and by every cell still completing its
+expected rotations cleanly with `IL1-4` safely bounded.
+
+**Stacking the phase-2 gate does NOT further improve `Vout`, `VC1`, or
+`VC3` at any tested `N2_PRECHARGE` -- all three are WORSE than the
+`N2_PRECHARGE=1` baseline** (`Vout`: `-10.6%` to `-11.9%`; `VC1`: `-6.1%`
+to `-22.2%`; `VC3`: `-18.9%` to `-35.7%`). `VC2` shows only a small
+(`~4%`) improvement at `N2_PRECHARGE in {5,10}`, far smaller than R04E12's
+own phase-1-gate `VC2` gains, and paired with a substantially larger `VC3`
+cost at those same values. The directly-identified root cause: adding ANY
+phase-2 gate costs exactly 2 completed rotations within the fixed
+`TSTOP=20 us` window (`12->10`, regardless of `N2_PRECHARGE`'s exact
+value) -- the one-time admission chain's own wall-clock cost eats into the
+window that would otherwise fund additional round-robin rotations, and
+losing those rotations costs more progress than the extra phase-2
+front-loading gains at nearly every state variable. This directly answers
+the question this experiment was designed to test: the bottleneck does NOT
+"relay" cleanly to `VC3`/phase 3 in an improved sense when phase 2 is
+gated on top of phase 1's own -- `VC3` is in fact the variable that
+worsens most. See
+`R04E13_phase2_precharge_admission_gate/BOUNDARY.md` and `RESULTS.md` for
+the full construct-design-correction narrative, the pilot-verification
+evidence, and the complete 4-cell grid.
