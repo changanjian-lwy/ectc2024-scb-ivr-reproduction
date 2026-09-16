@@ -3,6 +3,11 @@
 Canonical records remain at `paper_locked/02_ectc2024_main/STEP_27` through
 `STEP_31`; their netlists remain beside those records to preserve links.
 
+**Start here for a synthesized view of `R04E9`-`R04E14` and the
+2026-09-16 literature review**: `CONSOLIDATED_FINDINGS_2026-09-16.md`.
+It does not replace the individual experiments' own `BOUNDARY.md`/
+`RESULTS.md` files, which remain the authoritative per-experiment record.
+
 ## Boundary-provenance gap found 2026-09-15 -- read before trusting `Cfly=53.8 uF` or `Cout=4.672 mF`
 
 Every experiment in this track (`R00` through `R04E7`) uses `Cfly=53.8 uF`
