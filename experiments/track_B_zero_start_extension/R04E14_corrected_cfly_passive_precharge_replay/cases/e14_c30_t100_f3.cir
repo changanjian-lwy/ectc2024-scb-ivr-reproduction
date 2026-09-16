@@ -1,0 +1,58 @@
+* R04E14 - corrected-Cfly replay of the R02A/R02B passive-precharge
+* startup module (e14_c30_t100_f3)
+* PARENT: R02B_passive_precharge_charge_ramp_sweep.cir (byte-level-faithful
+* circuit body: four equal input-divider capacitors, LPAR=5nH/RPAR=10mOhm
+* source parasitics (IPEC 2018 Table II), three ideal precharge diodes
+* (Ron=1m Roff=1T Vfwd=0), flying-capacitor lower terminals tied to the
+* module reference (R02A's own "all-low-side-on precharge state"
+* approximation), true-zero-energy initial conditions (UIC, no IC
+* statements), no PWM/switches/load -- unchanged from R02A/R02B.
+* ONLY CHANGE from R02B: CFLY=3 uF (this project's own corrected
+* first-principles candidate; R02B used the cross-topology-suspect
+* 53.8 uF) and this cell's own (CDIV, TRAMP) point from the re-scaled
+* {10,30,100,300} uF x {1,10,100} us grid (BOUNDARY.md Section 4),
+* replacing R02B's own {10,53.8,538,1076} uF x {1,10,100} us grid.
+* CDIV=30 uF, TRAMP=100 us.
+* This file uses fixed .param values (one cell per file) rather than
+* R02B's own .step param lists (one file, 12 cells) -- a packaging
+* difference only; the circuit body and .meas definitions are otherwise
+* an unchanged, direct copy of R02B's own.
+
+.param VIN=48 CFLY=3.000000e-06 CDIV=3.000000e-05 TRAMP=1.000000e-04 LPAR=5n RPAR=10m RLEAK=1G
+
+VSTEP src 0 PWL(0 0 {TRAMP} {VIN} 500u {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+CIN1 vin tap3 {CDIV}
+CIN2 tap3 tap2 {CDIV}
+CIN3 tap2 tap1 {CDIV}
+CIN4 tap1 0 {CDIV}
+RLEAK1 vin tap3 {RLEAK}
+RLEAK2 tap3 tap2 {RLEAK}
+RLEAK3 tap2 tap1 {RLEAK}
+RLEAK4 tap1 0 {RLEAK}
+
+DPC1 tap3 vc1 DPRE
+DPC2 tap2 vc2 DPRE
+DPC3 tap1 vc3 DPRE
+CF1 vc1 0 {CFLY}
+CF2 vc2 0 {CFLY}
+CF3 vc3 0 {CFLY}
+.model DPRE D(Ron=1m Roff=1T Vfwd=0)
+
+.meas tran VC1_FINAL AVG V(vc1) FROM 490u TO 500u
+.meas tran VC2_FINAL AVG V(vc2) FROM 490u TO 500u
+.meas tran VC3_FINAL AVG V(vc3) FROM 490u TO 500u
+.meas tran RATIO21 PARAM VC2_FINAL/VC1_FINAL
+.meas tran RATIO31 PARAM VC3_FINAL/VC1_FINAL
+.meas tran LADDER_ERR PARAM abs(VC1_FINAL-36)/36+abs(VC2_FINAL-24)/24+abs(VC3_FINAL-12)/12
+.meas tran IIN_PK MAX -I(VSTEP) FROM 0 TO 500u
+.meas tran ID1_PK MAX I(DPC1) FROM 0 TO 500u
+.meas tran ID2_PK MAX I(DPC2) FROM 0 TO 500u
+.meas tran ID3_PK MAX I(DPC3) FROM 0 TO 500u
+
+.options reltol=1e-5 abstol=1e-10 chgtol=1e-16
+.save V(vin) V(vc1) V(vc2) V(vc3) I(VSTEP) I(DPC1) I(DPC2) I(DPC3)
+.tran 0 500u 0 10n UIC
+.end

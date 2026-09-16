@@ -68,6 +68,7 @@ causal account.
 | R04E11 | diagnostic-only (no mechanism change): fine-time-resolution raw-trace instrumentation of R04E10's own `I_LIMIT=30A/T_CHARGE_MAX={20,5}ns` cells, adding `V(reset_gate)`, `V(reset_gate_chg)`, `V(timer)`, `V(timer_chg)` to `.save` (measurement only); tests two hypotheses for the R04E10-documented CHARGE/FREE reversal directly against the raw trace, then tests one candidate fix (reset-switch `Vh=0->1` hysteresis) in a controlled isolation re-run | the "two reset gates disagree" race hypothesis is REFUTED (0/231 conflicts sampled across two independent reversal episodes in two cells); the reversal is instead a genuine, continuous, monotonic multi-integer sweep of the raw `.machine` state variable itself (e.g. `3.9999995->3.4999995->2.4999998->1.4999998` in ~16 ps), occurring during the same stiff sub-picosecond-timestep solver episodes that separately produce the `ICS1-3` artifact; exact, reproducible retry periods measured directly (143.14ns and 214.71ns, refining R04E10's own "~143ns" estimate); the hysteresis fix-test produced a BIT-IDENTICAL trace to the unmodified baseline (same row, same 15-sig-fig timestamp, same state_mon value), refuting that candidate fix; R04E10's own cited `t=19.275us` "reversal event" is directly shown to actually be a clean forward transition coincident with the ICS artifact, not a reversal (a correction to that specific characterization; the ICS/non-integer-state_mon finding itself is fully reproduced); no working fix found, so per Ground Rule 7 none is forced and the 9-cell grid is not re-run -- R04E10's own grid/results.csv remain the authoritative record |
 | R04E12 | single conceptual change from R04E10: insert a phase-1 precharge admission gate before the machine's normal round-robin rotation begins -- a counter (implemented as a compile-time-unrolled chain of `N_PRECHARGE-1` extra state pairs electrically mirroring `CHARGE1`/`FREE1`, since this project's own `.machine` convention never uses more than one `.rule` per state) routes `FREE1`'s exit back to `CHARGE1` while below `N_PRECHARGE`, then joins R04E10's own unchanged round-robin permanently; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed (R04E10's own best cell), sweep `N_PRECHARGE` in {1,3,5,10,20} (5 cells) | `N_PRECHARGE=1` confirmed IDENTICAL to R04E10's own committed `I_LIMIT=60A/T_CHARGE_MAX=50ns` cell to full printed precision on every measured quantity (by construction and directly verified); the new construct was pilot-verified directly against the raw state trace at `N_PRECHARGE=3` and `=10` (exact admission order, one-time gating, correct dwell count -- all PASS); `Vout` improves monotonically and substantially with `N_PRECHARGE` (`0.0141->0.0197V`, +40% at `N_PRECHARGE=20`); `VC2` (the axis this experiment targeted) improves at `N_PRECHARGE in {3,20}` but REGRESSES at `N_PRECHARGE=5` and is flat at `10` -- a non-monotonic, mixed result, not a clean "precharge helps" verdict; the single best-`VC2` cell (`N_PRECHARGE=20`) has the only negative `VC3_final` in the whole grid, a new trade-off; the R04E10/R04E11-diagnosed retry/chatter dynamic and `ICS1-3` artifact recur in all 5 cells at essentially uniform severity (19-22% reversal rate, matching R04E10's own ~19% figure), confirming it is a property of the reused construct, not caused or fixed by the precharge stage; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
 | R04E13 | single conceptual change from R04E12: stack a SECOND, analogous precharge admission gate after phase 1's own (fixed at `N1_PRECHARGE=3`, R04E12's own clean best value), gating phase 2 the same way R04E12 gated phase 1 -- a naive first attempt (hanging the phase-2 mirror chain directly off the real, round-robin-shared `FREE2` state) FAILED its own required pilot check (re-triggered every rotation, not just once) and was corrected to a dedicated one-time-only "ADMIT" duplicate of `CHARGE1`/`FREE1`/`CHARGE2`/`FREE2` positioned strictly upstream of the closed loop, mirroring why R04E12's own phase-1 gate never had this problem; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed, sweep `N2_PRECHARGE` in {1,3,5,10} (4 cells) plus a separate `N1=1,N2=1` identity cell | Both required identities confirmed to full printed precision (`N1=1,N2=1` vs. R04E10; `N1=3,N2=1` vs. R04E12's own `N_PRECHARGE=3`); the corrected construct was proven correct two ways -- an independent, run-independent static rule-graph/walk-simulation check (all 5 cells PASS) and direct raw-trace pilot verification (clean PASS at `N2_PRECHARGE=3`); `N2_PRECHARGE=5`/`10` FAIL the strict admission-order pattern-match, but precisely-timed cross-cell evidence (the same stiff-solver episode recurring at `t=6.1843-6.1844e-7s` in every cell regardless of `N2_PRECHARGE`) attributes this to the already-diagnosed R04E10/R04E11 retry/chatter artifact landing, for the first time in this lineage, inside the admission window itself rather than a new construct defect; stacking the phase-2 gate does NOT further improve `Vout`/`VC1`/`VC3` (WORSE than the `N2_PRECHARGE=1` baseline at every tested value, `-10.6%` to `-35.7%`), and only marginally improves `VC2` (~+4%) at `N2_PRECHARGE in {5,10}`, paired with a larger `VC3` cost -- directly traced to a fixed rotation-count cost (12->10) any phase-2 gate incurs within the fixed 20us window; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
+| R04E14 | replay of R02A/R02B's own passive-divider-plus-diode precharge module (NOT the R04E9-R04E13 inductor-mediated/ratio-gating lineage), byte-level-faithful except CFLY and the CDIV sweep range: CFLY=3uF fixed (R04E8's corrected value, vs R02B's cross-topology-suspect 53.8uF) x CDIV in {10,30,100,300}uF (re-scaled around R02A's own found 10:1 CDIV:CFLY ratio) x TRAMP in {1,10,100}us unchanged from R02B (12 cells), plus a secondary 2-cell grid at the primary grid's own best (CDIV,TRAMP) point (CDIV=300uF/TRAMP=10us) re-run at CFLY=0.6uF and 8.7uF (the first-principles range extremes) | 2 of the 12 primary cells (CDIV=100uF and CDIV=300uF, both at TRAMP=100us) simultaneously beat R02A's own best passive LADDER_ERR (~0.236, Step 1) AND R02B's own best peak source current (150.15A) -- LADDER_ERR 0.157/0.054 at 16.45A/39.18A respectively -- graded PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION, reusing R02A's own Step-1 language; 9/12 primary cells beat R02B's own best LADDER_ERR (0.260), the exception being the three CDIV=10uF cells (0.963-1.106, still better than R02B's own worst, 2.732); peak current is NOT uniformly improved by the CFLY correction alone (12-cell span 3.31-2497.83A, overlapping R02B's own 6.01-3429.57A) -- three TRAMP=1us cells exceed the 500A flag threshold (up to 2497.83A), confirming R02B's own CDIV/TRAMP separability finding still holds; at the fixed best (CDIV,TRAMP) point, LADDER_ERR is sensitive to which point in the 0.6-8.7uF CFLY range is used (13x spread, 0.0107 to 0.1389, monotonic with CFLY) while peak current is nearly flat (8% spread) -- consistent with R04E8's own V/Ron-dominated peak-current finding; a reproducible LTspice-runner tooling failure (full .cir path length >=~250-259 characters silently drops all .meas output with no error) was found and worked around with short case filenames, unrelated to the circuit itself |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -402,3 +403,49 @@ worsens most. See
 `R04E13_phase2_precharge_admission_gate/BOUNDARY.md` and `RESULTS.md` for
 the full construct-design-correction narrative, the pilot-verification
 evidence, and the complete 4-cell grid.
+
+## R04E14 -- the corrected `Cfly` also rescues R02A/B's own, much older
+   passive-divider module, not just the R04E7-E13 lineage
+
+R04E14 goes back to R02A/R02B's own original passive-divider-plus-diode
+precharge module (the literature-transferred IPEC 2018 circuit, structurally
+unrelated to R04E9-R04E13's inductor-mediated `CHARGE_k`/`FREE_k` machine)
+and asks the same corrected-`Cfly` question R04E8 already asked of the
+newer ratio-gating lineage: does R02A/B's own `FAILED_CAPACITANCE_TRANSFER`
+verdict survive once `Cfly=53.8 uF` is replaced by this project's own
+first-principles `0.6-8.7 uF` range? The circuit is copied byte-level from
+R02B's own `.cir` file with only `CFLY` (fixed at `3 uF`) and `CDIV`'s
+swept range (`{10,30,100,300} uF`, re-scaled around R02A's own found
+`10:1` ratio) changed; `TRAMP` (`{1,10,100} us`) is unchanged from R02B.
+
+**Yes, the verdict changes -- 2 of the 12 primary cells (`CDIV=100 uF` and
+`CDIV=300 uF`, both at `TRAMP=100 us`) simultaneously beat R02A's own best
+passive `LADDER_ERR` (`~0.236`, its Step-1 `CFLY=1 uF` case) AND R02B's own
+best peak source current (`150.15 A`)** -- `LADDER_ERR` `0.157`/`0.054` at
+only `16.45 A`/`39.18 A` peak. This is graded `PASS_TOPOLOGY_PRINCIPLE /
+NOT_P24_REPRODUCTION`, reusing R02A's own Step-1 language rather than
+inventing a new category. `9` of the `12` primary cells beat R02B's own
+best `LADDER_ERR` (`0.260`); only the three `CDIV=10 uF` cells do not
+(`0.963-1.106`), though even those remain better than R02B's own worst
+(`2.732`). **Peak current is NOT uniformly rescued by the `Cfly` correction
+alone**: the 12-cell peak-current span (`3.31-2497.83 A`) overlaps R02B's
+own old-`Cfly` span (`6.01-3429.57 A`), and the three `TRAMP=1 us` cells
+exceed the `500 A` flag (up to `2497.83 A`) -- confirming R02B's own
+`CDIV`/`TRAMP` separability finding (final charge set by `CDIV`, peak
+current separately controllable by `TRAMP`) still holds at the corrected
+`Cfly`. A secondary 2-cell check at the primary grid's own best `(CDIV,
+TRAMP)` point, sweeping `CFLY` across the full `0.6-8.7 uF` range, found
+`LADDER_ERR` genuinely sensitive to which point is used (`13x` spread,
+monotonic with `Cfly`) while peak current stayed nearly flat (`8%`
+spread) -- the same `V/Ron`-dominated peak-current pattern R04E8 already
+found in the structurally different ratio-gating mechanism, now confirmed
+in this older, purely passive one too. A reproducible LTspice-runner
+tooling failure was also found and is flagged for future experiments in
+this worktree: a full `.cir` absolute path length at or above roughly
+`250-259` characters silently drops ALL `.meas` output with no error
+(`unable to open database file` in the `.log`, otherwise a normal fast
+run) -- paths at or below `~239` characters were confirmed clean. Keep
+generated case filenames short. See
+`R04E14_corrected_cfly_passive_precharge_replay/BOUNDARY.md` and
+`RESULTS.md` for the full 14-cell grid, the direct R02A/R02B comparison,
+and the path-length failure-mode isolation test.
