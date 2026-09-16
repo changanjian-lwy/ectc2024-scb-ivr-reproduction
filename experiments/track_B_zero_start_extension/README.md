@@ -74,6 +74,7 @@ causal account.
 | R04E12 | single conceptual change from R04E10: insert a phase-1 precharge admission gate before the machine's normal round-robin rotation begins -- a counter (implemented as a compile-time-unrolled chain of `N_PRECHARGE-1` extra state pairs electrically mirroring `CHARGE1`/`FREE1`, since this project's own `.machine` convention never uses more than one `.rule` per state) routes `FREE1`'s exit back to `CHARGE1` while below `N_PRECHARGE`, then joins R04E10's own unchanged round-robin permanently; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed (R04E10's own best cell), sweep `N_PRECHARGE` in {1,3,5,10,20} (5 cells) | `N_PRECHARGE=1` confirmed IDENTICAL to R04E10's own committed `I_LIMIT=60A/T_CHARGE_MAX=50ns` cell to full printed precision on every measured quantity (by construction and directly verified); the new construct was pilot-verified directly against the raw state trace at `N_PRECHARGE=3` and `=10` (exact admission order, one-time gating, correct dwell count -- all PASS); `Vout` improves monotonically and substantially with `N_PRECHARGE` (`0.0141->0.0197V`, +40% at `N_PRECHARGE=20`); `VC2` (the axis this experiment targeted) improves at `N_PRECHARGE in {3,20}` but REGRESSES at `N_PRECHARGE=5` and is flat at `10` -- a non-monotonic, mixed result, not a clean "precharge helps" verdict; the single best-`VC2` cell (`N_PRECHARGE=20`) has the only negative `VC3_final` in the whole grid, a new trade-off; the R04E10/R04E11-diagnosed retry/chatter dynamic and `ICS1-3` artifact recur in all 5 cells at essentially uniform severity (19-22% reversal rate, matching R04E10's own ~19% figure), confirming it is a property of the reused construct, not caused or fixed by the precharge stage; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
 | R04E13 | single conceptual change from R04E12: stack a SECOND, analogous precharge admission gate after phase 1's own (fixed at `N1_PRECHARGE=3`, R04E12's own clean best value), gating phase 2 the same way R04E12 gated phase 1 -- a naive first attempt (hanging the phase-2 mirror chain directly off the real, round-robin-shared `FREE2` state) FAILED its own required pilot check (re-triggered every rotation, not just once) and was corrected to a dedicated one-time-only "ADMIT" duplicate of `CHARGE1`/`FREE1`/`CHARGE2`/`FREE2` positioned strictly upstream of the closed loop, mirroring why R04E12's own phase-1 gate never had this problem; `I_LIMIT=60A`, `T_CHARGE_MAX=T_FREEWHEEL_MAX=50ns` fixed, sweep `N2_PRECHARGE` in {1,3,5,10} (4 cells) plus a separate `N1=1,N2=1` identity cell | Both required identities confirmed to full printed precision (`N1=1,N2=1` vs. R04E10; `N1=3,N2=1` vs. R04E12's own `N_PRECHARGE=3`); the corrected construct was proven correct two ways -- an independent, run-independent static rule-graph/walk-simulation check (all 5 cells PASS) and direct raw-trace pilot verification (clean PASS at `N2_PRECHARGE=3`); `N2_PRECHARGE=5`/`10` FAIL the strict admission-order pattern-match, but precisely-timed cross-cell evidence (the same stiff-solver episode recurring at `t=6.1843-6.1844e-7s` in every cell regardless of `N2_PRECHARGE`) attributes this to the already-diagnosed R04E10/R04E11 retry/chatter artifact landing, for the first time in this lineage, inside the admission window itself rather than a new construct defect; stacking the phase-2 gate does NOT further improve `Vout`/`VC1`/`VC3` (WORSE than the `N2_PRECHARGE=1` baseline at every tested value, `-10.6%` to `-35.7%`), and only marginally improves `VC2` (~+4%) at `N2_PRECHARGE in {5,10}`, paired with a larger `VC3` cost -- directly traced to a fixed rotation-count cost (12->10) any phase-2 gate incurs within the fixed 20us window; no cell reaches handoff; all `IL1-4` stay safely bounded (worst case 24% of the +/-250A limit) |
 | R04E14 | replay of R02A/R02B's own passive-divider-plus-diode precharge module (NOT the R04E9-R04E13 inductor-mediated/ratio-gating lineage), byte-level-faithful except CFLY and the CDIV sweep range: CFLY=3uF fixed (R04E8's corrected value, vs R02B's cross-topology-suspect 53.8uF) x CDIV in {10,30,100,300}uF (re-scaled around R02A's own found 10:1 CDIV:CFLY ratio) x TRAMP in {1,10,100}us unchanged from R02B (12 cells), plus a secondary 2-cell grid at the primary grid's own best (CDIV,TRAMP) point (CDIV=300uF/TRAMP=10us) re-run at CFLY=0.6uF and 8.7uF (the first-principles range extremes) | 2 of the 12 primary cells (CDIV=100uF and CDIV=300uF, both at TRAMP=100us) simultaneously beat R02A's own best passive LADDER_ERR (~0.236, Step 1) AND R02B's own best peak source current (150.15A) -- LADDER_ERR 0.157/0.054 at 16.45A/39.18A respectively -- graded PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION, reusing R02A's own Step-1 language; 9/12 primary cells beat R02B's own best LADDER_ERR (0.260), the exception being the three CDIV=10uF cells (0.963-1.106, still better than R02B's own worst, 2.732); peak current is NOT uniformly improved by the CFLY correction alone (12-cell span 3.31-2497.83A, overlapping R02B's own 6.01-3429.57A) -- three TRAMP=1us cells exceed the 500A flag threshold (up to 2497.83A), confirming R02B's own CDIV/TRAMP separability finding still holds; at the fixed best (CDIV,TRAMP) point, LADDER_ERR is sensitive to which point in the 0.6-8.7uF CFLY range is used (13x spread, 0.0107 to 0.1389, monotonic with CFLY) while peak current is nearly flat (8% spread) -- consistent with R04E8's own V/Ron-dominated peak-current finding; a reproducible LTspice-runner tooling failure (full .cir path length >=~250-259 characters silently drops all .meas output with no error) was found and worked around with short case filenames, unrelated to the circuit itself |
+| R04E15 | fine-grid refinement of R04E14's own two PASS cells, same unmodified circuit: Grid A, CFLY=3uF/TRAMP=100us fixed x CDIV in {150,200,250,350,400,500}uF (6 cells, fills the 100-300uF gap and extends beyond 300uF); Grid B, CFLY=3uF/CDIV=300uF fixed x TRAMP in {20,50,75,150,200}us (5 cells, fills the 10-100us gap); Grid C, at the winning (CDIV,TRAMP) point identified from Grids A/B plus R04E14's own CDIV=300/TRAMP=100 cell (CDIV=500uF/TRAMP=100us, the lowest LADDER_ERR still under the 150.15A current bar), re-run at CFLY=0.6uF and 8.7uF (2 cells) -- 13 cells total | No cell beats R04E14's own best PASS cell (CDIV=300uF/TRAMP=100us, LADDER_ERR=0.0536, IIN_PK=39.18A) on BOTH axes simultaneously -- R04E14's coarse-grid optimum sits at a genuine local LADDER_ERR-vs-IIN_PK trade-off frontier; every cell tested either improves one axis at the other's expense; LADDER_ERR decreases monotonically with CDIV through 500uF (no plateau yet) and IIN_PK rises monotonically but stays well under the 150.15A bar throughout; this experiment's own best-LADDER_ERR-while-passing cell is CDIV=500uF/TRAMP=100us (LADDER_ERR=0.0335, a 37.6% improvement over R04E14's best, at IIN_PK=61.44A, 1.57x higher but still 2.4x below the bar); 12 of 13 cells (all except CDIV=300uF/TRAMP=20us, which fails only the current half at 195.90A) simultaneously satisfy both halves of the PASS_TOPOLOGY_PRINCIPLE bar; Grid C's own Cfly-robustness check at the ACTUAL winning (CDIV=500uF/TRAMP=100us) point -- unlike R04E14's own secondary grid, run at a different TRAMP=10us point where all three Cfly values failed the current bar outright (382-412A) -- passes BOTH halves of the bar at all three Cfly values (0.6/3/8.7uF), LADDER_ERR 0.0066-0.0956 (still far under 0.236) and IIN_PK a nearly flat 60.48-63.68A (far under 150.15A), showing the PASS verdict is genuinely robust across the full Cfly range at this operating point; graded PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION, same category as R04E14, not a new one |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -454,3 +455,57 @@ generated case filenames short. See
 `R04E14_corrected_cfly_passive_precharge_replay/BOUNDARY.md` and
 `RESULTS.md` for the full 14-cell grid, the direct R02A/R02B comparison,
 and the path-length failure-mode isolation test.
+
+## R04E15 -- mapping R04E14's own two PASS gaps more finely: a real
+   trade-off frontier, not a further improvement, plus a genuinely
+   Cfly-robust operating point
+
+R04E14 left three explicit gaps in its own coarse 12-point grid: no `CDIV`
+tested between `100` and `300 uF` or above `300 uF`; only three `TRAMP`
+points (`1, 10, 100 us`), leaving the ladder-error-vs-peak-current
+trade-off curve unmapped between `10` and `100 us`; and its own `Cfly`
+sensitivity check run at `(CDIV=300uF, TRAMP=10us)`, not at the actual
+winning `TRAMP=100us` point. R04E15 fills all three gaps with the SAME
+unmodified circuit (no mechanism, topology, or parameter-model change):
+Grid A sweeps `CDIV` in `{150,200,250,350,400,500} uF` at fixed
+`CFLY=3uF/TRAMP=100us` (6 cells); Grid B sweeps `TRAMP` in
+`{20,50,75,150,200} us` at fixed `CFLY=3uF/CDIV=300uF` (5 cells); Grid C
+re-runs the winning `(CDIV,TRAMP)` point at `CFLY=0.6uF` and `8.7uF` (2
+cells).
+
+**The headline finding is a negative-but-informative one, per Ground Rule
+7: no cell in the fine grid beats R04E14's own best PASS cell
+(`CDIV=300uF/TRAMP=100us`, `LADDER_ERR=0.0536`, `IIN_PK=39.18A`) on BOTH
+axes simultaneously.** `LADDER_ERR` decreases monotonically as `CDIV`
+increases all the way to `500 uF` (no plateau yet, `0.1055` at `150uF`
+down to `0.0335` at `500uF`), but `IIN_PK` rises right along with it
+(`22.47A` to `61.44A`) -- confirming R04E14's own coarse-grid optimum
+sits at, or very near, a genuine local trade-off frontier between the two
+axes, not an accident of under-sampling. The best-`LADDER_ERR`-while-
+still-under-the-`150.15A`-bar cell found here, `CDIV=500uF/TRAMP=100us`
+(`LADDER_ERR=0.0335`, a `37.6%` improvement, at `IIN_PK=61.44A`, still
+`2.4x` under the bar), is a legitimate alternative operating point, not a
+strict improvement -- it trades away peak-current margin for ladder
+accuracy. `12` of `13` cells pass the full bar (the lone exception,
+`CDIV=300uF/TRAMP=20us`, fails only the current half at `195.90A`),
+because this grid was deliberately centered on territory R04E14 already
+found good, not because the underlying physics changed.
+
+**The genuinely new, positive result is Grid C's `Cfly`-robustness
+check.** Run at the ACTUAL winning point (`CDIV=500uF/TRAMP=100us`) this
+time, all three `Cfly` values across the full `0.6-8.7 uF` first-
+principles range pass BOTH halves of the bar comfortably (`LADDER_ERR`
+`0.0066-0.0956`, `IIN_PK` a nearly flat `60.48-63.68A`) -- a materially
+more robust result than R04E14's own secondary grid, which was run at a
+different, `TRAMP=10us` point where all three `Cfly` values FAILED the
+current bar outright (`382-412A`, regardless of `Cfly`). The lesson: a
+`Cfly`-sensitivity check is only as informative as the operating point it
+is run at -- `TRAMP`, not `Cfly`, is what determines whether the current
+axis is cleared at all in this circuit, exactly as R02B's own
+`CDIV`/`TRAMP`-separability finding predicts. Graded
+`PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION`, the same category R04E14
+used, not a new one; this does not change or supersede R04E14's own
+committed grid or numbers. See
+`R04E15_passive_precharge_fine_grid_refinement/BOUNDARY.md` and
+`RESULTS.md` for the full 13-cell grid and the explicit before/after
+comparison against R04E14's own best cell.
