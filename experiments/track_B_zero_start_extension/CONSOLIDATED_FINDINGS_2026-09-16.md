@@ -1,11 +1,11 @@
-# Track B zero-start: consolidated findings across R04E9-R04E17 and the
-   2026-09-16/17 literature review (written 2026-09-16, updated 2026-09-17
-   after R04E16/R04E17)
+# Track B zero-start: consolidated findings across R04E9-R04E20 and the
+   2026-09-16/17/18 literature review (written 2026-09-16, updated
+   2026-09-18 after R04E16-R04E20)
 
 ## Why this document exists
 
-`R04E9` through `R04E17` and two literature reviews were produced across
-two consecutive working sessions, each individually documented
+`R04E9` through `R04E20` and two literature reviews were produced across
+three consecutive working sessions, each individually documented
 (`BOUNDARY.md`/`RESULTS.md` per experiment, two review notes under
 `paper_locked/00_boundaries/`). This document does not add new results;
 it synthesizes what is already committed into one coherent picture, and
@@ -16,8 +16,11 @@ this is a map, not a replacement. (`R04E15` was added as a same-day
 follow-up on 2026-09-16 per explicit user direction to pursue R04E14's own
 refinement before the higher-setup-cost Roberts soft-start mechanism;
 `R04E16` and `R04E17` were added on 2026-09-17, building and then
-causally isolating that soft-start mechanism, per further explicit user
-direction.)
+causally isolating that soft-start mechanism; `R04E18` (Tramp-boundary
+localization), `R04E19` (Cfly sensitivity), and `R04E20` (testing a
+charge-conservation law derived by a separate, parallel math-model effort
+in this same repository) were added across 2026-09-17/18, all per
+explicit user direction at each step.)
 
 ## The problem, restated
 
@@ -184,26 +187,100 @@ problem (the flying-capacitor ladder), not `Vout`/handoff.
   is not merely "safe if the ramp is slow enough," it is actively more
   effective than the ramp-only mechanism at achieving the ladder/output
   target, provided the ramp is slow enough not to trigger runaway.
+- **R04E18** located the runaway/safe `Tramp` boundary (at `Cfly=3 uF`,
+  divider present) to a narrow `5-22.87 us` sub-interval -- `5-6x`
+  narrower than R04E17's own untested `1-68.61 us` gap. The complete
+  5-point `max{|IL1-4|}` sequence (`1046/652/205/170/155 A` at
+  `Tramp=1/5/22.87/40/68.61 us`) is smoothly monotonic-decreasing, not a
+  sharp cliff -- the `+/-250 A` engineering bound simply happens to be
+  crossed within that sub-interval. `LADDER_ERR`/`Vout_final` stay
+  essentially flat across the whole range; only the transient peak
+  magnitude varies with `Tramp`.
+- **R04E19** tested whether this boundary scales with `Cfly` the way the
+  underlying `1/√Cfly` resonance-frequency law predicts, holding
+  `CDIV=300 uF` fixed. **The result did not confirm the simple
+  prediction cleanly.** At `Cfly=0.6 uF`, the fast `Tramp=5 us` point
+  (unsafe at `Cfly=3 uF`) remained unsafe on ALL FOUR phases -- one
+  phase (`1022 A`) actually WORSE than the `Cfly=3 uF` reference
+  (`652 A`), the opposite of "smaller `Cfly` = safer." At `Cfly=8.7 uF`,
+  the previously-safe `Tramp=22.87 us` point DID become unsafe (2 of 4
+  phases), consistent with "larger `Cfly` needs more margin." Both
+  `30x`-margin model-recommended cells were only marginally or partially
+  safe, not comfortably so. A NEW finding not seen at `Cfly=3 uF`: real
+  PER-PHASE asymmetry (a `2.2x` spread across phases at the same
+  `Cfly`/`Tramp`), unexplained. Separately, `Cfly=8.7 uF` reached
+  `LADDER_ERR=0.00947` -- the best value anywhere in this project's
+  Track-B lineage to date, independent of the current-safety question.
+  `BOUNDARY.md`'s own pre-run caveat (added by the delegated agent
+  before running anything) already flagged that holding `CDIV` fixed
+  while varying `Cfly` cannot isolate the pure resonance law from the
+  simultaneously-changing `CDIV/Cfly` charge-sharing ratio -- exactly
+  what R04E20 (below) went on to investigate directly.
+- **A parallel, independently-developed effort** in this same repository
+  (`results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md`, backed by a
+  hybrid-DAE solver in `src/scb_ivr/zero_start_descriptor.py`/
+  `zero_start_hybrid_solver.py` -- built and maintained separately from
+  this Track-B SPICE lineage, not touched or modified by it) derived,
+  from first principles, a simple charge-conservation explanation for
+  R04E18's own boundary: the four `CDIV` divider capacitors present a
+  `CDIV/4` series equivalent to `Vin`, so a linear ramp demands an
+  unavoidable `Idiv=(CDIV/4)*Vin/Tramp`. Solved for the `+/-250 A`
+  screen, this predicts `Tramp_threshold=CDIV*Vin/(4*250A)` -- `14.4 us`
+  at `CDIV=300 uF`, matching R04E18's own `5-22.87 us` bracket. Their
+  own 10-period hybrid-DAE solve at this exact operating point
+  independently produced `170.7 A` input current, closely matching
+  R04E18's own SPICE `IIN_PK=173.98 A` at the same point -- a genuine
+  cross-validation between two completely independent methods.
+- **R04E20** tested this law prospectively, holding `Cfly=3 uF` FIXED
+  (directly addressing R04E19's own attribution confound by varying the
+  actually-hypothesized mechanism, `CDIV`/`Tramp`, instead of `Cfly`) at
+  two new `CDIV` values (`100 uF`, `500 uF`), each bracketed at `0.5x`/
+  `2x` its own law-predicted threshold. **The result is genuinely mixed,
+  not a clean confirmation.** At `CDIV=100 uF`: the `0.5x` point matched
+  dramatically (all four phases far over `250 A`), but the `2x` point
+  did NOT match -- still unsafe on all four phases (`261-332 A`),
+  directly contradicting the law's own prediction. At `CDIV=500 uF`: the
+  `0.5x` point matched only marginally (just one of four phases barely
+  over `250 A`), and the `2x` point matched cleanly (all four phases
+  comfortably safe, `143-155 A`). **Conclusion: the law's qualitative
+  DIRECTION (larger `CDIV` needs more `Tramp` margin) holds across this
+  `5x` `CDIV` range, but the specific threshold FORMULA is not an
+  accurate quantitative predictor away from `CDIV=300 uF`** -- it fails
+  outright at the low end. A plausible but explicitly unverified
+  hypothesis (a roughly `CDIV`-independent switching-stage current term
+  becoming proportionally more significant as `CDIV` shrinks) is offered
+  without being claimed as established. All four R04E20 cells show the
+  same phase-SYMMETRIC pattern R04E17/R04E18 found (unlike R04E19's own
+  phase-asymmetric `Cfly`-sweep result) -- the asymmetry appears to be
+  specific to varying `Cfly`, not `CDIV`.
 
 **Verdict on this approach**: this is now the best-substantiated, most
-CAUSALLY CLEAR positive result in the entire Track-B zero-start lineage.
-Unlike Approach 1 (admission-order tuning, diminishing/negative returns)
-and unlike Approach 2 in isolation (ladder-only, no `Vout`/handoff
-story), R04E16+R04E17 together show a real protective mechanism
-(Roberts' own dissertation idea) with a directly confirmed causal role,
-AND demonstrate it combines productively with Approach 2's own passive
-divider (better ladder/`Vout` accuracy than either mechanism alone).
-Both `Vout` and the flying-capacitor ladder bootstrap together in the
-best R04E17 cell (`Vout_final=1.006 V`, within `0.6%` of target) --
-the first time in this project's Track-B history that BOTH halves of the
-zero-start problem (ladder AND `Vout`) have reached anywhere close to
-target simultaneously, in one mechanism. This remains `SENSITIVITY_ONLY`/
-`CROSS_PAPER_EXTENSION` (only two `Tramp` points and one `Cfly` value
-tested in R04E17; the `Cfly`/`Tramp` boundary between runaway and safe
-operation is not mapped), and still does not build or test the handoff
-into the strict steady-state controller (see "What remains blocked"
-below) -- but as a start-up mechanism in isolation, it is the strongest
-result this project has produced.
+CAUSALLY CLEAR positive result in the entire Track-B zero-start lineage,
+though the picture has grown MORE textured (not less) as R04E18-R04E20
+mapped it more finely. R04E16+R04E17 established a real, causally
+confirmed protective mechanism (Roberts' own dissertation idea) that
+combines productively with Approach 2's own passive divider (better
+ladder/`Vout` accuracy than either mechanism alone) -- both `Vout` and
+the flying-capacitor ladder bootstrap together in the best R04E17 cell
+(`Vout_final=1.006 V`, within `0.6%` of target), the first time in this
+project's Track-B history that BOTH halves of the zero-start problem
+have reached anywhere close to target simultaneously, in one mechanism.
+R04E18 shows this safety margin is a smooth, gradual function of `Tramp`,
+not a fragile knife-edge. But R04E19 shows the picture is NOT simply
+"more margin is always better, scaling predictably with `Cfly`" -- there
+is genuine, unexplained per-phase asymmetry away from `Cfly=3 uF`, and
+neither the `1/√Cfly` resonance law (R04E19) nor the simpler `CDIV`
+charge-conservation law (R04E20, independently derived by the parallel
+math-model effort) is a fully accurate quantitative predictor on its
+own, though the charge-conservation law does capture the qualitative
+direction reliably and explains R04E18's own `CDIV=300 uF` result
+closely. This remains `SENSITIVITY_ONLY`/`CROSS_PAPER_EXTENSION`
+throughout, and still does not build or test the handoff into the
+strict steady-state controller (see "What remains blocked" below) -- but
+as a start-up mechanism in isolation, it remains the strongest,
+best-characterized result this project has produced, now with an
+honest, textured picture of where its simple predictive models break
+down rather than a falsely clean one.
 
 ## What remains blocked regardless of which approach is pursued further
 
@@ -290,38 +367,88 @@ above:
 
 No error was found in this pass either.
 
-## Recommended priority ranking for what to pursue next (updated after R04E17)
+## Verification performed on R04E18/R04E19/R04E20 (2026-09-17/18, at
+   merge time, and once directly by the orchestrating session itself)
 
-1. **The combined mechanism (R02B/R04E14/R04E15's corrected passive
-   divider + Roberts' soft-start ramp, causally confirmed by R04E17) is
-   now the clear leading candidate and the most promising open thread.**
-   Concrete, well-motivated next steps for THIS combined mechanism, in
-   rough order of cost:
-   (a) map the actual runaway/safe boundary in `Tramp` (only `1 us` and
-   `68.61 us` are tested; a bisection between them would locate the real
-   threshold, which R04E17 itself flags as untested);
-   (b) test whether the boundary shifts with `Cfly` (R04E17 tested only
-   `Cfly=3 uF` with the divider present);
-   (c) reconcile the ground-referenced-vs-floating flying-capacitor
-   question that still applies to the DIVIDER's own connection (R02A's
-   own simplification, inherited unchanged through R04E14/R04E15/R04E17);
-   (d) begin the precharge-to-PWM handoff design into the strict
-   steady-state controller -- both halves of zero-start (ladder and
-   `Vout`) are now close to target simultaneously in R04E17's own best
-   cell, making this the first point in the project where attempting the
-   actual handoff is well-motivated rather than premature. Any such
-   handoff design must still use the self-labelled-engineering-hypothesis
-   discipline described above (no literature source supplies a four-phase
-   release sequence).
-2. **Further tuning of the R04E9-R04E13 admission-order family remains
-   the lowest-priority thread** -- not because it was wrong, but because
-   R04E12/R04E13 already showed it has entered diminishing/negative
-   returns, and the combined mechanism above now clearly outperforms it
-   on every axis (ladder error, `Vout` accuracy, current plausibility,
-   and causal clarity); a topology-level change (R04E9's own option (a),
-   still unstarted) would need to precede any further work in this
-   specific family, and even then would need to be weighed against
-   simply extending the now-leading combined mechanism instead.
+Same discipline applied to each: independently checked against raw
+`.log` `.meas` output (not just each delegated agent's own summary)
+before merging into `main`:
+
+1. R04E18's three new cells' `IL1-4_max/min`, `VC1-3_final`, and
+   `LADDER_ERR` were read directly from each `.log` and matched the
+   committed `results.csv` exactly; the `max(|IL_min|,IL_max)` sequence
+   (`1046/652/205/170/155 A`) was independently recomputed and confirmed
+   monotonic across all five points.
+2. R04E19's fourth cell (`Cfly=8.7uF`/`Tramp=116.84us`) was run directly
+   by the orchestrating session itself (not a subagent) after the user
+   explicitly paused and later resumed the experiment across two worktree
+   sessions; its `LADDER_ERR=0.00947` claim was hand-recomputed from
+   `VC1-3_final` and confirmed. A first analysis pass's own error (using
+   `IL_max` alone instead of the correct `max(|IL_min|,IL_max)`, which
+   understated one cell's hazard) was caught and corrected before this
+   document's own text was written, not silently inherited.
+3. R04E20's four new cells were checked in real time, cell by cell, as
+   each completed (not only at final merge) -- every `max(|IL_min|,
+   IL_max)` value quoted in this document's own Approach-3 section was
+   independently read from each cell's raw `.log` before the delegated
+   agent's own final write-up was trusted, including the two cells that
+   contradicted the tested law's own prediction (not silently smoothed
+   over).
+
+No error was found in this pass either. The parallel math-model effort's
+own audit document and derived numbers (Section "Approach 3", the
+charge-conservation-law paragraph) were read directly from
+`results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md` and
+`results/ZERO_START_TEN_PERIOD_CONVERGENCE.md` -- quoted, not
+paraphrased from memory -- but that effort's own underlying Python code
+(`src/scb_ivr/zero_start_descriptor.py`/`zero_start_hybrid_solver.py`)
+was not independently re-verified by this session, since it is a
+separate track maintained by a different effort; only the numbers this
+document explicitly quotes from their own published `results/*.md` files
+were checked for faithful transcription.
+
+## Recommended priority ranking for what to pursue next (updated after
+   R04E20)
+
+The three lowest-cost items from the previous ranking (localize the
+`Tramp` boundary, test `Cfly` sensitivity, test the parallel math-model's
+own charge-conservation law) are now DONE (R04E18/R04E19/R04E20) --
+each produced a genuinely informative, honestly-reported result, though
+none resolved into a single clean quantitative model. What remains:
+
+1. **Deeper characterization of WHY the simple predictive models break
+   down is now higher-cost, lower-marginal-value SPICE work** -- R04E19's
+   own unexplained per-phase asymmetry and R04E20's own unexplained
+   `CDIV=100uF` breakdown are both real open questions, but each would
+   need a new round of targeted cells (and, given this session's own
+   observed `20-45`-minute-per-cell real LTspice runtime, non-trivial
+   wall-clock cost) to investigate further via SPICE alone. **The
+   parallel math-model effort's own hybrid-DAE solver is now a
+   genuinely faster, complementary tool for this specific kind of
+   question** (its own 10-period solve took seconds, not the `~20-45`
+   minutes a single new SPICE cell requires) -- coordinating with that
+   effort (e.g. handing over this session's own raw per-phase current
+   traces for their solver to attempt reproducing) is a lower-SPICE-cost
+   way to keep making progress on the "why" question than further
+   bracketing sweeps in LTspice alone.
+2. **Reconciling the ground-referenced-vs-floating flying-capacitor
+   simplification that still applies to the DIVIDER's own connection**
+   (R02A's own simplification, inherited unchanged through R04E14-R04E20)
+   remains open and untouched by any of R04E18-R04E20.
+3. **Beginning the precharge-to-PWM handoff design into the strict
+   steady-state controller** remains the single biggest unstarted
+   structural step -- both halves of zero-start (ladder and `Vout`) are
+   close to target simultaneously in R04E17's own best cell, and R04E18
+   confirms this holds with real margin (not a fragile knife-edge) across
+   a usable `Tramp` range, making this well-motivated rather than
+   premature. Any such handoff design must still use the self-labelled-
+   engineering-hypothesis discipline described above (no literature
+   source supplies a four-phase release sequence) -- unchanged by
+   anything found in R04E18-R04E20.
+4. **Further tuning of the R04E9-R04E13 admission-order family remains
+   the lowest-priority thread**, unchanged from the previous ranking --
+   the combined divider+ramp mechanism continues to outperform it on
+   every axis.
 
 This ranking is a recommendation, not a decision -- next step selection
 remains the user's call, consistent with this project's standing
