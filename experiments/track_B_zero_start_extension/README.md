@@ -745,3 +745,61 @@ scratch. See `R04E19_divider_present_cfly_sensitivity/BOUNDARY.md` and
 `RESULTS.md` for the complete 4-cell table, the corrected per-phase
 hazard analysis, and full discussion of what this does and does not
 establish.
+
+## R04E20 -- testing a parallel math-model effort's own charge-
+   conservation law across `CDIV`: directionally useful, but not a
+   precise predictor, a genuinely mixed result
+
+A parallel, independently-developed hybrid-DAE math-model effort in this
+same repository (`results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md`)
+derived a simple charge-conservation law from first principles: the four
+equal `CDIV` divider capacitors present a `CDIV/4` series equivalent to
+`Vin`, so a linear `0-Vin` ramp of duration `Tramp` demands an
+unavoidable base charging current `Idiv=(CDIV/4)*Vin/Tramp`, giving a
+predicted runaway/safe threshold `Tramp_threshold=CDIV*Vin/(4*250A)`
+against this project's own `+/-250A` engineering bound. At
+`CDIV=300uF` this predicts `14.4us`, already consistent with R04E18's
+own independently-observed `5-22.87us` transition bracket -- but that
+was retrospective corroboration, not a prospective test. R04E20 tests
+the law prospectively at two OTHER `CDIV` values (`100uF`, `500uF`) it
+was not fitted to, holding `Cfly=3uF` fixed throughout (the reverse of
+R04E19's own design, directly addressing R04E19's own attribution
+limit), with four new cells at `0.5x`/`2x` each `CDIV`'s own predicted
+threshold, plus R04E18's own two `CDIV=300uF` cells reused by reference.
+
+**The result is genuinely mixed, not a clean confirmation or refutation.**
+`e20_c100_t2p4` (`CDIV=100uF`, `Tramp=2.4us`, `0.5x` threshold, predicted
+unsafe) confirms dramatically (`851/884/855/942A`, all four phases). But
+`e20_c100_t9p6` (`CDIV=100uF`, `Tramp=9.6us`, `2x` threshold, predicted
+safe) does NOT confirm -- still unsafe on all four phases (`332/288/261/
+309A`), a clear quantitative failure of the law at this `CDIV`.
+`e20_c500_t12` (`CDIV=500uF`, `Tramp=12us`, `0.5x` threshold, predicted
+unsafe) matches only marginally -- just one of four phases (`IL4=
+318.07A`) exceeds `250A`, far weaker than either `CDIV=100uF`'s own
+unsafe cell or R04E18's own `CDIV=300uF` unsafe cell. `e20_c500_t48`
+(`CDIV=500uF`, `Tramp=48us`, `2x` threshold, predicted safe) confirms
+cleanly (`149/155/144/143A`, all four phases comfortably safe). The
+law's qualitative DIRECTION (larger `CDIV` needs more `Tramp` margin)
+holds at both new `CDIV` values -- the `0.5x` cell is always worse than
+the `2x` cell at the same `CDIV` -- but the SPECIFIC threshold formula
+is not an accurate quantitative predictor away from `CDIV=300uF`,
+increasingly so at the smaller `CDIV`. A plausible but NOT independently
+verified explanation is offered (a roughly `CDIV`-independent
+switching-stage current contribution would become proportionally more
+significant relative to the shrinking divider term as `CDIV` drops,
+explaining why the law under-predicts danger more severely at smaller
+`CDIV`) -- flagged as a hypothesis for the parallel math-model effort's
+own next steps, not an established finding. All six rows (new and
+reused) show the SAME phase-symmetric pattern R04E17/R04E18 already
+found at `CDIV=300uF` (when unsafe, usually unsafe on most/all phases
+together), unlike R04E19's own `Cfly`-sweep result -- supporting, though
+not proving, that the divider's own charge demand is a more
+phase-uniform driver than the flying-capacitor resonance mechanism
+R04E19 tested. All four new cells' raw `.raw` traces were directly,
+byte-level parsed and confirmed free of the documented solver-corruption
+fingerprint. All four cells were run strictly one at a time, never
+concurrently, and R04E18's own two reused cells are not re-run or
+modified. See
+`R04E20_divider_charge_conservation_law/BOUNDARY.md` and `RESULTS.md`
+for the complete 6-row table, the full per-`CDIV` discussion, and what
+this does and does not establish.
