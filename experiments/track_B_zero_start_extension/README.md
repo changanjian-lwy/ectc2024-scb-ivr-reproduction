@@ -651,3 +651,51 @@ here purely by reference, not re-run or modified. See
 for the complete 2x2 table, the full forensic corruption-check detail,
 and the discussion of what this experiment does and does not establish
 beyond these two exact `(Cfly, Tramp)` points.
+
+## R04E18 -- localizing R04E17's own untested runaway/safe `Tramp`
+   boundary to a `5-22.87 us` sub-interval, with a gradual (not sharp)
+   underlying transient trend
+
+R04E17 isolated the ramp-vs-divider confound but tested only two `Tramp`
+points (`1 us`, runaway; `68.61 us`, safe), leaving the actual transition
+between them completely unmapped (its own `RESULTS.md` Section 7). R04E18
+adds three new intermediate `Tramp` points -- `5 us` (new, near the fast
+end), `22.87 us` (R04E16's own already-derived `10x`-margin value at
+`Cfly=3 uF`, now tested divider-PRESENT for the first time), and `40 us`
+(new, filling the gap between R04E16's own `10x`/`30x` margin values) --
+to the SAME unmodified R04E17 netlist (divider present, `Cfly=3 uF`,
+`CDIV=300 uF`, `solver=alt cshunt=1e-15 plotwinsize=0`/`TMAX=50 ps`,
+nothing else changed), giving a 5-point picture together with R04E17's
+own two already-completed endpoints, reused here strictly by reference.
+
+**Result: the fast new cell (`Tramp=5 us`) still shows runaway-scale
+current (`max{|IL1-4|}=651.55 A`, all four phases over the `+/-250 A`
+bound); both slower new cells (`22.87 us`, `40 us`) are safe
+(`205.07 A`/`170.41 A`).** This localizes the runaway/safe crossing
+(against this project's own `+/-250 A` engineering bound) to the
+`5-22.87 us` sub-interval -- narrower than, and entirely inside, R04E17's
+own previously-untested `1-68.61 us` gap. The complete 5-point
+`max{|IL1-4|}` sequence (`1046.42/651.55/205.07/170.41/154.73 A` at
+`Tramp=1/5/22.87/40/68.61 us`) is smoothly monotonic-decreasing across
+the full range, with no discontinuous jump anywhere -- so while the
+specific `+/-250 A` bound happens to be crossed within the `5-22.87 us`
+sub-interval, the underlying transient-current relaxation with `Tramp`
+is better described as gradual than as a sharp cliff. `Vout_overshoot`
+and `IIN_PK` show the same gradual, monotonic pattern across all 5
+points, while `LADDER_ERR`/`Vout_final`/`VC1-3_final` stay essentially
+flat (`Tramp`-insensitive) throughout -- confirming, as R04E17 itself
+found, that ramp speed affects the transient's peak magnitude, not the
+divider's own end-state charging accuracy. All three new cells' raw
+`.raw` traces (`6.8`/`7.2`/`7.6` million points) were directly,
+byte-level parsed and confirmed free of the documented solver-corruption
+fingerprint (zero non-monotonic/duplicate timestamps; `V(vin)` stayed
+within `0-48.36 V` throughout, well inside any physically-impossible
+range, across all three cells). All three cells were run strictly one at
+a time, never concurrently, and R04E17's own two endpoint cells are
+reused here purely by reference, not re-run or modified. See
+`R04E18_divider_present_tramp_boundary/BOUNDARY.md` and `RESULTS.md` for
+the complete 5-point table, the full forensic corruption-check detail
+(including a methodological note on why the tight tolerance R04E17 used
+flags physically-plausible small-signal ringing at these particular
+`Tramp` values, distinct from genuine corruption), and the discussion of
+what this experiment does and does not establish.
