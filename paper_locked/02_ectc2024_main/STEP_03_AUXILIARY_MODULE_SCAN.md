@@ -14,7 +14,7 @@ registered as a separate candidate with its own source, topology and
 compatibility. Registering a candidate does not make it part of the 2024
 reproduction.
 
-The executable registry is `framework_modules.py`.
+The executable registry is `src/scb_ivr/framework_modules.py`.
 
 ## Slot 1 - commutation parameters
 

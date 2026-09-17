@@ -1,6 +1,6 @@
 # P24原生：逐阶段方程草案
 
-依据：P24 Fig.3、Sec.II-B；项目转录见p24_operating_sequence.py。nP=4；nM保留。未明确的完整门极向量与低侧参考连接不能自动补成P25。
+依据：P24 Fig.3、Sec.II-B；项目转录见src/scb_ivr/p24_operating_sequence.py。nP=4；nM保留。未明确的完整门极向量与低侧参考连接不能自动补成P25。
 
 ## I1：t0→t1
 

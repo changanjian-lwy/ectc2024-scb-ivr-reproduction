@@ -1,6 +1,6 @@
 import unittest
 
-from r04d4a_regression import validate_existing_result
+from validation.r04d4a_regression import validate_existing_result
 
 
 class R04D4AP25Mode4Tests(unittest.TestCase):

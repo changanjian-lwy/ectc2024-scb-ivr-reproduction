@@ -1,7 +1,7 @@
 import unittest
 
-from interval4_branches import P25_MODE4
-from physical_events import EventId, event_for_label
+from scb_ivr.interval4_branches import P25_MODE4
+from scb_ivr.physical_events import EventId, event_for_label
 
 
 class P25Mode4BoundaryTests(unittest.TestCase):

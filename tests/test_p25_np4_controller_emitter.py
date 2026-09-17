@@ -1,6 +1,6 @@
 import unittest
 
-from p25_np4_controller_emitter import emit_p25_np4_machine
+from scb_ivr.p25_np4_controller_emitter import emit_p25_np4_machine
 
 
 class P25NP4ControllerEmitterTests(unittest.TestCase):

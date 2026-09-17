@@ -1,6 +1,6 @@
 import unittest
 
-from periodic_current_seed import interleaved_initial_currents
+from scb_ivr.periodic_current_seed import interleaved_initial_currents
 
 
 class PeriodicCurrentSeedTests(unittest.TestCase):

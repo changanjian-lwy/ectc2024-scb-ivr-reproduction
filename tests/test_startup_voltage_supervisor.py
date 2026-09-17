@@ -1,7 +1,7 @@
 import unittest
 
-from evidence import Evidence
-from startup_voltage_supervisor import (
+from scb_ivr.evidence import Evidence
+from scb_ivr.startup_voltage_supervisor import (
     ReleaseReason,
     StartupBoundary,
     StartupObservation,

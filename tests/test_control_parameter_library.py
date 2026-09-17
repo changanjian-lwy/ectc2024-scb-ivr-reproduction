@@ -1,13 +1,13 @@
 import unittest
 
-from control_parameter_library import (
+from scb_ivr.control_parameter_library import (
     P24_ONE_PERCENT,
     P25_FIVE_PERCENT,
     R04D3_GS61008T_SCALAR_MIN_ZVS,
     R04D3_IDEAL_OPERATING_EIGHT_PERCENT,
     current_model_default,
 )
-from evidence import Evidence
+from scb_ivr.evidence import Evidence
 
 
 class ControlParameterLibraryTests(unittest.TestCase):

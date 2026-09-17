@@ -1,11 +1,11 @@
 import unittest
 
-from assembly_planner import assemble
-from candidate_adapters import CANDIDATE_ADAPTERS
-from evidence import Evidence
-from four_phase_readiness import P24_SINGLE_MODULE_FOUR_PHASE
-from model_contracts import ExperimentRequest, Slot
-from module_registry import MODULES
+from scb_ivr.assembly_planner import assemble
+from scb_ivr.candidate_adapters import CANDIDATE_ADAPTERS
+from scb_ivr.evidence import Evidence
+from scb_ivr.four_phase_readiness import P24_SINGLE_MODULE_FOUR_PHASE
+from scb_ivr.model_contracts import ExperimentRequest, Slot
+from scb_ivr.module_registry import MODULES
 
 
 class CandidateAdapterTests(unittest.TestCase):

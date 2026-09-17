@@ -34,9 +34,9 @@ ordinary complementary PWM. It remains on disk for provenance only.
 
 ## Current executable foundation
 
-- Track definitions are executable in `reproduction_tracks.py`.
+- Track definitions are executable in `src/scb_ivr/reproduction_tracks.py`.
 - The eight-state interface and periodic residual are executable in
-  `periodic_state_contract.py`.
+  `src/scb_ivr/periodic_state_contract.py`.
 - A planted phase-3 current closure error is detected by unit test.
 - The full suite passes 106 tests.
 

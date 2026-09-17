@@ -1,6 +1,6 @@
 import unittest
 
-from four_phase_event_ring import (
+from scb_ivr.four_phase_event_ring import (
     LocalEvent,
     P24_LOCAL_EVENT_ORDER,
     build_p24_event_rings,

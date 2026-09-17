@@ -1,7 +1,7 @@
 import unittest
 
-from mode56_boundaries import P25_MODE5, P25_MODE6
-from physical_events import EventId, event_for_label
+from scb_ivr.mode56_boundaries import P25_MODE5, P25_MODE6
+from scb_ivr.physical_events import EventId, event_for_label
 
 
 class Mode56BoundaryTests(unittest.TestCase):

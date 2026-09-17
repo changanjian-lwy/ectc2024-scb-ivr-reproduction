@@ -22,7 +22,7 @@ what the papers support and lists what is still unknown.
 
 ## Canonical node map
 
-The executable list is in `ectc2024_mode_spec.py`.
+The executable list is in `src/scb_ivr/ectc2024_mode_spec.py`.
 
 | Part | Proposed connection | Evidence status |
 |---|---|---|

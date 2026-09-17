@@ -75,12 +75,15 @@ validation.
 ## Repository map
 
 ```text
+src/scb_ivr/      Reusable equations, topology, event and controller modules
+scripts/          Human-run analytical and startup workflows
+validation/       LTspice log readers and accepted-result regressions
 paper_locked/     Source hierarchy, formula audit and P24/P25 branch records
 symbolic_derivations/ Equation-first P24, P25 and combined evidence branches
 experiments/      One-change-at-a-time simulation cases and negative evidence
 results/          Parameter provenance and consolidated records
 tests/            Automated boundary and regression checks
-tools/            Local LTspice runner and analysis helpers
+tools/            Local LTspice execution helpers
 reports/          Shareable technical progress summaries
 circuit/          Earlier exploratory netlists retained for traceability
 ```

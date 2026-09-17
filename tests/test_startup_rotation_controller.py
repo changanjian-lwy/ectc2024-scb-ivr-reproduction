@@ -1,7 +1,7 @@
 import unittest
 
-from evidence import Evidence
-from startup_rotation_controller import (
+from scb_ivr.evidence import Evidence
+from scb_ivr.startup_rotation_controller import (
     RotationBranch,
     RotationController,
     StartupEvent,

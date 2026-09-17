@@ -1,7 +1,7 @@
 import unittest
 
-from evidence import Evidence
-from startup_pulse_strategy import PredictivePulseRequest, calculate_predictive_pulse
+from scb_ivr.evidence import Evidence
+from scb_ivr.startup_pulse_strategy import PredictivePulseRequest, calculate_predictive_pulse
 
 
 class StartupPulseStrategyTests(unittest.TestCase):

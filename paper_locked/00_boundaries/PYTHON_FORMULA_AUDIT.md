@@ -2,8 +2,8 @@
 
 ## Locked hierarchy
 
-1. `ivr_framework.py` contains only the P24 analytical core.
-2. `apec2025_supplements.py` may import P24 results and supplement a missing
+1. `src/scb_ivr/ivr_framework.py` contains only the P24 analytical core.
+2. `src/scb_ivr/apec2025_supplements.py` may import P24 results and supplement a missing
    implementation detail; P24 never imports P25.
 3. Cross-paper generalizations return a value together with provenance. They
    are not bare numbers that can silently enter a P24 report.
@@ -25,7 +25,7 @@
 ## Corrections made in this audit
 
 - Removed the P25 Eq. (20) generalization from the P24 formula-core module.
-- Created `apec2025_supplements.py`; its generalized result is tagged
+- Created `src/scb_ivr/apec2025_supplements.py`; its generalized result is tagged
   `CROSS_PAPER_EXTENSION`.
 - Added missing validation of `SystemSpec` and phase count to P24 Eq. (3).
 - Renamed the UI's `(1-margin)*Lcrit` output from a “recommended inductance” to

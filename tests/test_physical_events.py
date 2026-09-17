@@ -1,7 +1,7 @@
 import unittest
 
-from interval2_branches import P24_INTERVAL2, P25_INTERVAL2_EXTENDED_TO_FOUR_PHASE
-from physical_events import EventId, aliases_for_event, event_for_label
+from scb_ivr.interval2_branches import P24_INTERVAL2, P25_INTERVAL2_EXTENDED_TO_FOUR_PHASE
+from scb_ivr.physical_events import EventId, aliases_for_event, event_for_label
 
 
 class PhysicalEventMappingTests(unittest.TestCase):

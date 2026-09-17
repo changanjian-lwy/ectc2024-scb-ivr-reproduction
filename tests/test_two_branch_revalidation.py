@@ -1,6 +1,6 @@
 import unittest
 
-from two_branch_revalidation import revalidate
+from validation.two_branch_revalidation import revalidate
 
 
 class TwoBranchRevalidationTests(unittest.TestCase):

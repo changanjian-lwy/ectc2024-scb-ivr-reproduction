@@ -1,6 +1,6 @@
 import unittest
 
-from r04d3c_regression import validate_existing_result
+from validation.r04d3c_regression import validate_existing_result
 
 
 class R04D3CFivePercentTests(unittest.TestCase):

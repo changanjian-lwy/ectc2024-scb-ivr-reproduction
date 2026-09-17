@@ -1,11 +1,11 @@
 import unittest
 
-from evidence import Evidence
-from inactive_low_side_branches import (
+from scb_ivr.evidence import Evidence
+from scb_ivr.inactive_low_side_branches import (
     P24_MINIMAL_PHASE1,
     P25_EXPANDED_TO_FOUR_PHASE,
 )
-from r04d0e_regression import validate_existing_result
+from validation.r04d0e_regression import validate_existing_result
 
 
 class InactiveLowSideBranchTests(unittest.TestCase):

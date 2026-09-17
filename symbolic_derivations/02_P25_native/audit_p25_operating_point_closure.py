@@ -5,8 +5,13 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from apec2025_supplements import inductance_for_negative_peak_fraction
-from ivr_framework import SystemSpec, duty_cycle, high_side_on_time, inductor_peak_current
+from scb_ivr.apec2025_supplements import inductance_for_negative_peak_fraction
+from scb_ivr.ivr_framework import (
+    SystemSpec,
+    duty_cycle,
+    high_side_on_time,
+    inductor_peak_current,
+)
 
 
 OUT = Path(__file__).parent / "numerical_runs/01_full_ring_calibration"

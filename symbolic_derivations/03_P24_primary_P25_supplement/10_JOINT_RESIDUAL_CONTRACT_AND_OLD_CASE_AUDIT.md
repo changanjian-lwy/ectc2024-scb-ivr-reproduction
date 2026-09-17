@@ -2,7 +2,7 @@
 
 ## 本次工作与复用
 
-只读取旧A37_solver_work/iter_001，不生成新网表、不跑SPICE、不改参数。检查已有periodic_state_contract.py及solve_a37_joint_seven_state.py：旧A37已求过七变量/十五残差，不能说本次才首次考虑联合求解。本次是补充状态完整性及失败分类审计，不覆盖旧求解目标或Mihai曾批准的不加权残差规则。
+只读取旧A37_solver_work/iter_001，不生成新网表、不跑SPICE、不改参数。检查已有src/scb_ivr/periodic_state_contract.py及solve_a37_joint_seven_state.py：旧A37已求过七变量/十五残差，不能说本次才首次考虑联合求解。本次是补充状态完整性及失败分类审计，不覆盖旧求解目标或Mihai曾批准的不加权残差规则。
 
 边界：P24四相功率级/P25下一相控制外延；GS恒定Coss、候选非零稳态初值、理想1 V输出、5 MHz固定时隙；L仍用公式计算1.4667 nH。无零启动/稳压/硬件损耗结论。
 

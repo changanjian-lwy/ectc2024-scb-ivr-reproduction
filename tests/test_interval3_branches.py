@@ -1,7 +1,7 @@
 import unittest
 
-from interval3_branches import P24_INTERVAL3, P25_INTERVAL3_EXTENDED_TO_FOUR_PHASE
-from physical_events import EventId
+from scb_ivr.interval3_branches import P24_INTERVAL3, P25_INTERVAL3_EXTENDED_TO_FOUR_PHASE
+from scb_ivr.physical_events import EventId
 
 
 class Interval3BranchTests(unittest.TestCase):

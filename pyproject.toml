@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scb-ivr-reproduction"
+version = "0.1.0"
+description = "Evidence-bounded analytical reproduction of an SCB-IVR architecture"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26,<3",
+  "scipy>=1.11,<2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

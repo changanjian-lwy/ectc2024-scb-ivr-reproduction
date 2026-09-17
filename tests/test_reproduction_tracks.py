@@ -1,13 +1,13 @@
 import unittest
 
-from evidence import Evidence
-from periodic_state_contract import (
+from scb_ivr.evidence import Evidence
+from scb_ivr.periodic_state_contract import (
     FourPhasePeriodicState,
     p24_voltage_guess,
     phase1_origin_fast_seed,
     residual,
 )
-from reproduction_tracks import TRACK_A, TRACK_B, assert_tracks_do_not_merge
+from scb_ivr.reproduction_tracks import TRACK_A, TRACK_B, assert_tracks_do_not_merge
 
 
 class ReproductionTrackTests(unittest.TestCase):

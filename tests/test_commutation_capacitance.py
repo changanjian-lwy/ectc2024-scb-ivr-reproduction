@@ -1,7 +1,7 @@
 import unittest
 
-from commutation_capacitance import from_device_population
-from device_library import GS61008T
+from scb_ivr.commutation_capacitance import from_device_population
+from scb_ivr.device_library import GS61008T
 
 
 class CommutationCapacitanceTests(unittest.TestCase):

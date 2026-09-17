@@ -1,6 +1,6 @@
 import unittest
-from r04d5a_regression import validate_existing_result as validate5
-from r04d6a_regression import validate_existing_result as validate6
+from validation.r04d5a_regression import validate_existing_result as validate5
+from validation.r04d6a_regression import validate_existing_result as validate6
 
 class Mode56RunTests(unittest.TestCase):
     def test_mode5_zvs_exit(self): self.assertTrue(validate5()["passed"],validate5())

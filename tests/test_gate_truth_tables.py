@@ -1,6 +1,6 @@
 import unittest
 
-from gate_truth_tables import (
+from scb_ivr.gate_truth_tables import (
     Gate,
     assert_no_commanded_shoot_through,
     p24_minimal_rows,

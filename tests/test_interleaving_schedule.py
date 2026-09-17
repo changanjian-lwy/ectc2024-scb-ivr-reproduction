@@ -1,6 +1,6 @@
 import unittest
 
-from interleaving_schedule import (
+from scb_ivr.interleaving_schedule import (
     audit_naive_two_level_interleaving,
     build_single_module_phase_schedule,
     ideal_total_event_spacing_cycles,

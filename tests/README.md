@@ -2,6 +2,9 @@
 
 The test suite has two explicit levels:
 
+Install the editable package first with `python3 -m pip install -r
+requirements.txt`.
+
 1. `python3 tests/run_portable_suite.py` runs equation, event, boundary and
    source-separation checks that work on any Python/SciPy environment. GitHub
    Actions uses this entry point.

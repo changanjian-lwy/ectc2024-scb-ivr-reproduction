@@ -1,6 +1,6 @@
 # P25原生：三相六模态方程草案
 
-依据：P25 Fig.2/3与六模态文字；项目转录见p25_operating_supplement.py。nP=3，nM保留；不是四相外延。
+依据：P25 Fig.2/3与六模态文字；项目转录见src/scb_ivr/p25_operating_supplement.py。nP=3，nM保留；不是四相外延。
 
 ## 开关与事件
 

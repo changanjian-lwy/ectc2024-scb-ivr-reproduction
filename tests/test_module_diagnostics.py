@@ -1,7 +1,7 @@
 import unittest
 
-from module_diagnostics import CheckStatus
-from r04a_module_diagnostics import diagnose
+from scb_ivr.module_diagnostics import CheckStatus
+from validation.r04a_module_diagnostics import diagnose
 
 
 class ModuleDiagnosticTests(unittest.TestCase):

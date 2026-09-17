@@ -1,11 +1,11 @@
 import unittest
 
-from device_library import (
+from scb_ivr.device_library import (
     CapacitanceView,
     GS61008T,
     P25_GS61008T_POPULATION,
 )
-from evidence import Evidence
+from scb_ivr.evidence import Evidence
 
 
 class DeviceLibraryTests(unittest.TestCase):

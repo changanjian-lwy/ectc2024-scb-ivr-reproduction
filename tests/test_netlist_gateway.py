@@ -1,13 +1,13 @@
 import unittest
 
-from assembly_planner import assemble
-from evidence import Evidence
-from experiment_profiles import R04A_LOCAL_BOUNDARY_REPLAY
-from four_phase_readiness import (
+from scb_ivr.assembly_planner import assemble
+from scb_ivr.evidence import Evidence
+from scb_ivr.experiment_profiles import R04A_LOCAL_BOUNDARY_REPLAY
+from scb_ivr.four_phase_readiness import (
     P24_SINGLE_MODULE_FOUR_PHASE,
     readiness_report,
 )
-from netlist_gateway import generate_netlist
+from scb_ivr.netlist_gateway import generate_netlist
 
 
 def tiny_emitter(plan, parameters):

@@ -1,6 +1,6 @@
 import unittest
 
-from commutation_feasibility import (
+from scb_ivr.commutation_feasibility import (
     ideal_current_endpoint_a,
     isolated_lc_minimum_current_a,
     maximum_capacitance_for_time_f,

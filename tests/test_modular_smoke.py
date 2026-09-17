@@ -1,6 +1,6 @@
 import unittest
 
-from modular_smoke_test import run_smoke_test
+from scb_ivr.modular_smoke_test import run_smoke_test
 
 
 class ModularSmokeTests(unittest.TestCase):

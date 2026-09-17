@@ -1,6 +1,6 @@
 import unittest
 
-from phase_local_timeline import (
+from scb_ivr.phase_local_timeline import (
     assert_event_not_replaced_by_global_clock,
     build_phase_frames,
     phase_local_time,

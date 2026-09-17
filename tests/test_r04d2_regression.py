@@ -1,6 +1,6 @@
 import unittest
 
-from r04d2_regression import validate_existing_results
+from validation.r04d2_regression import validate_existing_results
 
 
 class R04D2RegressionTests(unittest.TestCase):

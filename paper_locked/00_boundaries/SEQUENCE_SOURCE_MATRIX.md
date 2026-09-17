@@ -53,13 +53,13 @@ four coincident groups unless an additional scheduling convention is supplied.
 
 ## Code layout
 
-- `p24_operating_sequence.py`: exactly three P24 intervals.
-- `p25_operating_supplement.py`: exactly six P25 modes.
-- `sequence_resolution.py`: comparison, adopted supplements and blockers.
-- `ectc2024_mode_spec.py`: topology plus quarantined legacy candidate; it no
+- `src/scb_ivr/p24_operating_sequence.py`: exactly three P24 intervals.
+- `src/scb_ivr/p25_operating_supplement.py`: exactly six P25 modes.
+- `src/scb_ivr/sequence_resolution.py`: comparison, adopted supplements and blockers.
+- `src/scb_ivr/ectc2024_mode_spec.py`: topology plus quarantined legacy candidate; it no
   longer exports the candidate as a P24-first executable command table.
-- `physical_events.py`: stable observable events plus paper-label aliases.
-- `interval3_branches.py`: separate P24 same-phase and P25 next-phase Mode-3 branches.
+- `src/scb_ivr/physical_events.py`: stable observable events plus paper-label aliases.
+- `src/scb_ivr/interval3_branches.py`: separate P24 same-phase and P25 next-phase Mode-3 branches.
 
 `publication_sequence_ready()` currently returns `False`, and
 `assert_publication_sequence_ready()` raises an error listing the unresolved

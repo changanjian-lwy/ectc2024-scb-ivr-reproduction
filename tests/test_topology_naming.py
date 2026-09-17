@@ -1,6 +1,6 @@
 import unittest
 
-from topology_naming import build_name_map, phase_names
+from scb_ivr.topology_naming import build_name_map, phase_names
 
 
 class TopologyNamingTests(unittest.TestCase):

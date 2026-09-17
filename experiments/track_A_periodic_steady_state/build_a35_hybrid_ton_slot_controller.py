@@ -7,7 +7,7 @@ TRACK = Path(__file__).resolve().parent
 PROJECT = TRACK.parents[1]
 sys.path.insert(0, str(PROJECT))
 
-from p25_np4_controller_emitter import emit_p25_np4_machine
+from scb_ivr.p25_np4_controller_emitter import emit_p25_np4_machine
 
 SOURCE = TRACK / "A27_ideal_gan_reverse_clamp" / "A27_ideal_gan_reverse_clamp.cir"
 NAME = "A35_hybrid_fixed_ton_event_zvs_slot_guard_09pct"

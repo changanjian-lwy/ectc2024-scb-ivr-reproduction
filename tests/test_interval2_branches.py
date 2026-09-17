@@ -1,7 +1,7 @@
 import unittest
 
-from evidence import Evidence
-from interval2_branches import (
+from scb_ivr.evidence import Evidence
+from scb_ivr.interval2_branches import (
     P24_INTERVAL2,
     P25_INTERVAL2_EXTENDED_TO_FOUR_PHASE,
 )

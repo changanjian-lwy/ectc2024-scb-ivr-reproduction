@@ -1,7 +1,7 @@
 import unittest
-import ivr_framework
+from scb_ivr import ivr_framework
 
-from ivr_framework import (
+from scb_ivr.ivr_framework import (
     SystemSpec,
     critical_inductance,
     duty_cycle,
@@ -10,12 +10,12 @@ from ivr_framework import (
     parallel_embedded_inductors,
     unit_embedded_inductance,
 )
-from apec2025_supplements import inductance_for_negative_peak_fraction
-from evidence import Evidence
-from interactive_design import calculate
-from topology_components import paper_topology
-from reproduce_table1_4phase_4module import build_audit
-from ectc2024_mode_spec import (
+from scb_ivr.apec2025_supplements import inductance_for_negative_peak_fraction
+from scb_ivr.evidence import Evidence
+from scb_ivr.interactive_design import calculate
+from scb_ivr.topology_components import paper_topology
+from scripts.reproduce_table1_4phase_4module import build_audit
+from scb_ivr.ectc2024_mode_spec import (
     BLOCKING_UNCERTAINTIES,
     CONNECTIONS,
     CROSS_PAPER_CANDIDATE_COMMAND_TABLE,
@@ -23,17 +23,17 @@ from ectc2024_mode_spec import (
     PROJECT_DECISIONS,
     publication_locked_spice_ready,
 )
-from p24_operating_sequence import P24_PHASE1_INTERVALS
-from p25_operating_supplement import P25_PHASE1_TO_PHASE2_MODES
-from sequence_resolution import (
+from scb_ivr.p24_operating_sequence import P24_PHASE1_INTERVALS
+from scb_ivr.p25_operating_supplement import P25_PHASE1_TO_PHASE2_MODES
+from scb_ivr.sequence_resolution import (
     Resolution,
     SEQUENCE_RESOLUTIONS,
     assert_publication_sequence_ready,
     publication_sequence_ready,
 )
-from assembly_planner import assemble
-from model_contracts import ExperimentRequest, Module, Slot
-from framework_modules import (
+from scb_ivr.assembly_planner import assemble
+from scb_ivr.model_contracts import ExperimentRequest, Module, Slot
+from scb_ivr.framework_modules import (
     CANDIDATE_MODULES,
     PRIMARY_EMPTY_SLOTS,
     Compatibility,
@@ -219,7 +219,7 @@ class PaperEquationTests(unittest.TestCase):
             "Coss and timing table",
             frozenset({"commutation_capacitance", "dead_time"}),
         )
-        from module_registry import MODULES
+        from scb_ivr.module_registry import MODULES
 
         request = ExperimentRequest(
             "EXPLORATORY_NUMERIC_COMMUTATION",

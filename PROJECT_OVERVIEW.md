@@ -34,6 +34,10 @@ The complete local suite contains 205 passing checks. GitHub CI runs the
 portable subset because LTspice-generated log fixtures are intentionally not
 published.
 
+The Python source is organized by responsibility: reusable models live in
+`src/scb_ivr`, human-run workflows in `scripts`, LTspice result readers in
+`validation`, and behavioral contracts in `tests`.
+
 ## Two evidence branches
 
 - **P24 native:** the 2024 four-phase topology and its explicitly reported

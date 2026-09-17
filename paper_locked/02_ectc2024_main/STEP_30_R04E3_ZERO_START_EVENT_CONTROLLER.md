@@ -2,7 +2,7 @@
 
 ## Inserted module
 
-`startup_rotation_controller.py` is a new controller slot. Existing topology,
+`src/scb_ivr/startup_rotation_controller.py` is a new controller slot. Existing topology,
 formula, device, evidence and sequence modules are unchanged. It provides two
 non-merged branches:
 

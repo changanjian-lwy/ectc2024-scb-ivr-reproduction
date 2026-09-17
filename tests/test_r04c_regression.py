@@ -1,6 +1,6 @@
 import unittest
 
-from r04c_regression import validate_existing_result
+from validation.r04c_regression import validate_existing_result
 
 
 class R04CRegressionTests(unittest.TestCase):
