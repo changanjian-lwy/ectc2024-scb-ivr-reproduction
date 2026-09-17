@@ -7,6 +7,8 @@ outputs. Its modules fall into four groups:
   `commutation_feasibility`;
 - parameter-independent audits: `feasibility_envelope` and
   `parameter_contract`;
+- zero-start mathematics: `zero_start_descriptor` compiles the latest
+  cross-paper startup boundary into a mode-dependent MNA descriptor system;
 - topology and event semantics: `physical_events`, `gate_truth_tables`,
   `interval*_branches` and `four_phase_event_ring`;
 - modular assembly and evidence control: `evidence`, `model_contracts`,

@@ -1,0 +1,78 @@
+import unittest
+
+import numpy as np
+
+from scb_ivr.evidence import Evidence
+from scb_ivr.zero_start_descriptor import (
+    Mode,
+    ZeroStartBoundary,
+    assemble_descriptor,
+    commanded_pwm_mode,
+    input_voltage_v,
+    stored_energy_j,
+    true_zero_initial_vector,
+)
+
+
+class ZeroStartDescriptorTests(unittest.TestCase):
+    def setUp(self):
+        self.boundary = ZeroStartBoundary()
+
+    def test_boundary_is_explicitly_cross_paper_not_p24_startup(self):
+        self.assertIs(self.boundary.evidence, Evidence.CROSS_PAPER_EXTENSION)
+
+    def test_true_zero_vector_has_zero_stored_energy(self):
+        z0 = true_zero_initial_vector(self.boundary)
+        self.assertEqual(stored_energy_j(z0, self.boundary), 0.0)
+
+    def test_input_ramp_is_bounded(self):
+        self.assertEqual(input_voltage_v(0, self.boundary), 0)
+        self.assertAlmostEqual(
+            input_voltage_v(self.boundary.input_ramp_s / 2, self.boundary), 24
+        )
+        self.assertEqual(input_voltage_v(2 * self.boundary.input_ramp_s, self.boundary), 48)
+
+    def test_commanded_gate_state_is_complementary_by_construction(self):
+        mode = commanded_pwm_mode(0.0, self.boundary)
+        self.assertEqual(sum(mode.high_side_on), 1)
+        quarter = commanded_pwm_mode(self.boundary.period_s / 4, self.boundary)
+        self.assertEqual(sum(quarter.high_side_on), 1)
+        self.assertNotEqual(mode.high_side_on, quarter.high_side_on)
+
+    def test_descriptor_has_full_matrix_pencil_rank(self):
+        mode = Mode((True, False, False, False), (True, True, True))
+        system = assemble_descriptor(self.boundary, mode, 1e-6)
+        self.assertEqual(system.e.shape, system.a.shape)
+        self.assertEqual(system.pencil_rank_at_one, system.size)
+        self.assertGreater(system.differential_rank, 0)
+        self.assertLess(system.differential_rank, system.size)
+
+    def test_divider_is_a_removable_module(self):
+        no_divider = ZeroStartBoundary(divider_enabled=False)
+        mode = commanded_pwm_mode(0, no_divider)
+        system = assemble_descriptor(no_divider, mode, 0)
+        self.assertNotIn("tap1", system.node_names)
+        self.assertLess(system.size, assemble_descriptor(self.boundary, commanded_pwm_mode(0, self.boundary), 0).size)
+
+    def test_diode_state_is_illegal_without_divider(self):
+        no_divider = ZeroStartBoundary(divider_enabled=False)
+        with self.assertRaises(ValueError):
+            assemble_descriptor(
+                no_divider,
+                Mode((True, False, False, False), (True, False, False)),
+                0,
+            )
+
+    def test_matrices_are_finite(self):
+        system = assemble_descriptor(
+            self.boundary,
+            Mode((False, True, False, False), (False, True, False)),
+            5e-6,
+        )
+        self.assertTrue(np.isfinite(system.e).all())
+        self.assertTrue(np.isfinite(system.a).all())
+        self.assertTrue(np.isfinite(system.rhs).all())
+
+
+if __name__ == "__main__":
+    unittest.main()
