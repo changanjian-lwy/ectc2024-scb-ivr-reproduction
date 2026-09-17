@@ -76,6 +76,7 @@ causal account.
 | R04E14 | replay of R02A/R02B's own passive-divider-plus-diode precharge module (NOT the R04E9-R04E13 inductor-mediated/ratio-gating lineage), byte-level-faithful except CFLY and the CDIV sweep range: CFLY=3uF fixed (R04E8's corrected value, vs R02B's cross-topology-suspect 53.8uF) x CDIV in {10,30,100,300}uF (re-scaled around R02A's own found 10:1 CDIV:CFLY ratio) x TRAMP in {1,10,100}us unchanged from R02B (12 cells), plus a secondary 2-cell grid at the primary grid's own best (CDIV,TRAMP) point (CDIV=300uF/TRAMP=10us) re-run at CFLY=0.6uF and 8.7uF (the first-principles range extremes) | 2 of the 12 primary cells (CDIV=100uF and CDIV=300uF, both at TRAMP=100us) simultaneously beat R02A's own best passive LADDER_ERR (~0.236, Step 1) AND R02B's own best peak source current (150.15A) -- LADDER_ERR 0.157/0.054 at 16.45A/39.18A respectively -- graded PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION, reusing R02A's own Step-1 language; 9/12 primary cells beat R02B's own best LADDER_ERR (0.260), the exception being the three CDIV=10uF cells (0.963-1.106, still better than R02B's own worst, 2.732); peak current is NOT uniformly improved by the CFLY correction alone (12-cell span 3.31-2497.83A, overlapping R02B's own 6.01-3429.57A) -- three TRAMP=1us cells exceed the 500A flag threshold (up to 2497.83A), confirming R02B's own CDIV/TRAMP separability finding still holds; at the fixed best (CDIV,TRAMP) point, LADDER_ERR is sensitive to which point in the 0.6-8.7uF CFLY range is used (13x spread, 0.0107 to 0.1389, monotonic with CFLY) while peak current is nearly flat (8% spread) -- consistent with R04E8's own V/Ron-dominated peak-current finding; a reproducible LTspice-runner tooling failure (full .cir path length >=~250-259 characters silently drops all .meas output with no error) was found and worked around with short case filenames, unrelated to the circuit itself |
 | R04E15 | fine-grid refinement of R04E14's own two PASS cells, same unmodified circuit: Grid A, CFLY=3uF/TRAMP=100us fixed x CDIV in {150,200,250,350,400,500}uF (6 cells, fills the 100-300uF gap and extends beyond 300uF); Grid B, CFLY=3uF/CDIV=300uF fixed x TRAMP in {20,50,75,150,200}us (5 cells, fills the 10-100us gap); Grid C, at the winning (CDIV,TRAMP) point identified from Grids A/B plus R04E14's own CDIV=300/TRAMP=100 cell (CDIV=500uF/TRAMP=100us, the lowest LADDER_ERR still under the 150.15A current bar), re-run at CFLY=0.6uF and 8.7uF (2 cells) -- 13 cells total | No cell beats R04E14's own best PASS cell (CDIV=300uF/TRAMP=100us, LADDER_ERR=0.0536, IIN_PK=39.18A) on BOTH axes simultaneously -- R04E14's coarse-grid optimum sits at a genuine local LADDER_ERR-vs-IIN_PK trade-off frontier; every cell tested either improves one axis at the other's expense; LADDER_ERR decreases monotonically with CDIV through 500uF (no plateau yet) and IIN_PK rises monotonically but stays well under the 150.15A bar throughout; this experiment's own best-LADDER_ERR-while-passing cell is CDIV=500uF/TRAMP=100us (LADDER_ERR=0.0335, a 37.6% improvement over R04E14's best, at IIN_PK=61.44A, 1.57x higher but still 2.4x below the bar); 12 of 13 cells (all except CDIV=300uF/TRAMP=20us, which fails only the current half at 195.90A) simultaneously satisfy both halves of the PASS_TOPOLOGY_PRINCIPLE bar; Grid C's own Cfly-robustness check at the ACTUAL winning (CDIV=500uF/TRAMP=100us) point -- unlike R04E14's own secondary grid, run at a different TRAMP=10us point where all three Cfly values failed the current bar outright (382-412A) -- passes BOTH halves of the bar at all three Cfly values (0.6/3/8.7uF), LADDER_ERR 0.0066-0.0956 (still far under 0.236) and IIN_PK a nearly flat 60.48-63.68A (far under 150.15A), showing the PASS verdict is genuinely robust across the full Cfly range at this operating point; graded PASS_TOPOLOGY_PRINCIPLE/NOT_P24_REPRODUCTION, same category as R04E14, not a new one |
 | R04E16 | Roberts' PhD dissertation Sec. 3.5 soft-start mechanism (Vin ramped slowly through an eFuse while P24's ORDINARY fixed-timing four-phase PWM, R03A's own gate formulas, runs unchanged from t=0) -- genuinely different from R04E5's already-falsified "ramp grafted onto the strict event-gated controller" combination; base netlist copied from R03A with TSTART=0, LPHASE=1.4666667nH (was R03A's 2.68nH), CFLY swept, and R02B's passive-divider precharge network removed entirely (true zero-energy start, no auxiliary precharge circuit); sweep Cfly in {0.6,3,8.7}uF x Tramp at Roberts' own 30x margin (3 cells), plus Cfly=3uF x Tramp at 10x/100x margin (2 cells), plus a Cfly=3uF/Tramp=1us control cell (near-instant ramp) -- 6 cells total, TSTOP=Tramp+300us each | **GRID COMPLETE (6/6).** Pilot confirmed TSTART=0 gating works correctly (correct Ton/T/phase-spacing, one negligible ~5e-17s floating-point boundary artifact at t=0 reported transparently); EVERY cell first attempted at R03A's own default solver options hit a reproducible, forensically-confirmed solver breakdown (an independent PWL source reading physically impossible values after classic retry-chatter, at varying times unrelated to actual circuit stress) -- fixed by adopting solver=alt/cshunt=1e-15/plotwinsize=0, the exact convention R04E5-R04E10 already use at this TMAX=50ps; a second, independent tooling finding -- severe, TSTOP-disproportionate runtime variance (1302.6/1932.1/7937.0/11842.4/2165.2/2525.2s wall-clock across the 6 cells, an 8.3x spread in simulated-ns-per-wall-second that does not scale monotonically with TSTOP: the two LARGEST-TSTOP cells finished FASTER than two smaller-TSTOP ones) -- meant the grid was completed across multiple sessions, all 6 cells run strictly one at a time (never concurrently, since concurrent runs cause ~20x throughput collapse on this 10-core machine); ALL 6 completed cells avoid R03A's own catastrophic runaway (max phase current 75.1-150.1A, 3.75x-7.51x below R03A's own smallest peak of 563A, all within the +/-250A bound) with NO Vout overshoot -- but the control cell (near-instant ramp) equally avoids it, directly undermining a clean "the ramp specifically is responsible" causal claim; most likely explanation is that removing R02B's passive-divider precharge network (which is what let R03A's ladder pre-charge to 34/22/11V before a cold-Vout PWM hit it) eliminates R03A's own diagnosed mismatch independent of ramp speed; all four Cfly=3uF cells (control/10x/30x/100x margin) converge to nearly identical Vout~0.559V/LADDER_ERR~1.34-1.35 despite a 229x Tramp range, while peak IL1 now shows a clean MONOTONIC decrease with margin factor (150.1/111.6/86.9/75.1A at Tramp=1/22.87/68.61/228.71us, diminishing returns at each step) -- so the ramp does not determine WHETHER runaway occurs but does measurably shape the transient's magnitude; the completed 3-point Cfly trend (0.6/3/8.7uF, all at 30x margin) shows LADDER_ERR/Vout_final decreasing modestly but monotonically with Cfly (LADDER_ERR 1.399->1.348->1.333) while IL1_max is small and non-monotonic (92.2/86.9/90.2A) |
+| R04E17 | 2x2 factorial isolation of R04E16's own two simultaneous changes (divider removed vs. Vin ramped), per explicit user direction: reuses R04E16's own two already-completed divider-ABSENT cells (e16_ctrl_f3_t1, e16_g1_f3_t68p61) by reference, and adds R03A's own divider-plus-diode network (CDIV=300uF, R04E15's corrected value, NOT R03A's own 1.076mF) back onto R04E16's netlist at the SAME two Tramp values (1us, 68.61us) -- 2 new cells, run strictly one at a time | Clean third pattern of BOUNDARY.md Section 7: fast-ramp/divider-present (e17_div_f3_t1) shows genuine runaway (IL1-4 813-1046A, all four phases over the +/-250A bound, same order as R03A's own 563-884A), slow-ramp/divider-present (e17_div_f3_t68p61) does NOT (IL1-4 140.8-154.7A) -- directly resolving R04E16's own open question: WITH the divider present, the Vin ramp speed is causally decisive, confirming Roberts' own soft-start mechanism specifically protects against the divider's precharge-vs-cold-Vout mismatch; both divider-present cells also reach Vout_final within 0.6% of the 1V target and LADDER_ERR 0.024-0.029 (46-56x better than either divider-ABSENT cell's ~1.34-1.35), so reintroducing the divider is beneficial for ladder accuracy at either ramp speed, not merely "safe if slow"; both new cells' raw .raw traces were directly parsed and confirmed free of R04E16's own documented solver-corruption fingerprint (zero non-monotonic timestamps, V(vin) never deviates from its commanded PWL value in either 6.7M- or 8.2M-point trace); does not modify or re-run R04E16's own committed cells |
 
 These results are retained but are not Track-A periodic reproduction evidence.
 
@@ -588,3 +589,65 @@ monotonically with `Cfly` (`LADDER_ERR` `1.399->1.348->1.333`) while
 `R04E16_roberts_softstart_fixed_timing/BOUNDARY.md` and `RESULTS.md` for
 the full forensic evidence, the complete 6-cell results table, and the
 final classification.
+
+## R04E17 -- isolating R04E16's own two simultaneous changes: with the
+   divider present, the Vin ramp speed is what decides runaway or not
+
+R04E16 could not tell whether removing R02B's own passive-divider
+precharge network, or ramping `Vin` slowly, was responsible for avoiding
+R03A's own runaway, because both were changed at once (its own control
+cell, fast ramp with the divider already removed, ALSO avoided runaway).
+R04E17 is the factorial isolation experiment R04E16's own `RESULTS.md`
+Section 6 called for: a `2x2` design crossing `{divider present,
+absent}` x `{fast ramp (`Tramp=1 us`), slow ramp (`Tramp=68.61 us`)}`,
+reusing R04E16's own two already-completed divider-ABSENT cells
+(`e16_ctrl_f3_t1`, `e16_g1_f3_t68p61`) by reference and adding two NEW
+divider-PRESENT cells built by grafting R03A's own divider-plus-diode
+network (`CIN1-4`/`RLEAK1-4`/`DPC1-3`, connecting into the SAME real
+`a1`/`a2`/`a3` power-stage nodes) onto R04E16's own unmodified netlist,
+with `CDIV=300 uF` (R04E15's own corrected best-point value at
+`Cfly=3 uF`, not R03A's own cross-topology-suspect `1.076 mF`).
+
+**The result is the clean, unambiguous third pattern BOUNDARY.md Section
+7 anticipated: the fast-ramp/divider-present cell shows genuine
+runaway, and the slow-ramp/divider-present cell does not.**
+`e17_div_f3_t1` (`Tramp=1 us`) reaches phase currents of `813-1046 A`
+across all four inductors -- every phase individually exceeds the
+`+/-250 A` safety bound, in the same order of magnitude as R03A's own
+originally diagnosed runaway (`563-884 A`). `e17_div_f3_t68p61`
+(`Tramp=68.61 us`, the same `30x`-margin value R04E16 itself used) stays
+at `140.8-154.7 A`, comfortably inside the bound and close to
+`e16_g1_f3_t68p61`'s own `86.94 A` at the same `Tramp`. **This directly
+answers R04E16's own open question: with the divider physically
+present, the `Vin` ramp speed is the causally decisive factor** -- it is
+not merely "PWM active from `t=0`" or "the divider happens to be
+removed" that determines runaway, but Roberts' own dissertation
+mechanism doing genuine protective work against the specific mismatch
+(a precharged capacitor ladder suddenly exposed to full-strength PWM
+while `Vout` is still cold) R03A originally diagnosed. R04E16's own
+control-cell surprise is not contradicted by this -- it is explained: an
+experiment where the mismatch has already been removed some other way
+(deleting the divider entirely, as R04E16 did) gives the ramp nothing
+left to protect against, so ramp speed had no effect there.
+
+A second, independent finding: **both divider-present cells reach
+`Vout_final` within `0.6%` of the `1 V` target and `LADDER_ERR`
+`0.024-0.029`** -- roughly `46-56x` better than either of R04E16's own
+divider-ABSENT cells (`LADDER_ERR~=1.34-1.35`, `Vout_final~=0.559 V`).
+Reintroducing the divider is not merely "safe if the ramp is slow
+enough" -- it substantially improves ladder and output accuracy at
+EITHER tested ramp speed, a genuine benefit R04E16's own divider-removal
+approach gives up entirely. Both new cells' raw `.raw` binary traces
+(`6.7` million and `8.2` million points respectively) were directly,
+byte-level parsed and confirmed free of R04E16's own documented
+solver-corruption fingerprint (zero non-monotonic or duplicate
+timestamps; the independent `V(vin)` PWL source never deviates from its
+own commanded ramp value at any point in either trace) -- the large
+currents reported for `e17_div_f3_t1` are a confirmed real result, not a
+numerical artifact. Both cells were run strictly one at a time (never
+concurrently), and R04E16's own two divider-ABSENT cells are reused
+here purely by reference, not re-run or modified. See
+`R04E17_divider_ramp_factorial_isolation/BOUNDARY.md` and `RESULTS.md`
+for the complete 2x2 table, the full forensic corruption-check detail,
+and the discussion of what this experiment does and does not establish
+beyond these two exact `(Cfly, Tramp)` points.
