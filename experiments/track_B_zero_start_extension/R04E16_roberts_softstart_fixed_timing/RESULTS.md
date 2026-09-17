@@ -2,50 +2,53 @@
 
 ## Outcome, stated first
 
-**Every one of the 3 cells that reached completion avoids R03A's diagnosed
+**Every one of the 4 cells that reached completion avoids R03A's diagnosed
 catastrophic current runaway** (R03A's own phase-current maxima were
 `563-884 A`; every completed R04E16 cell stays under `151 A`, well inside
 the `+/-250 A` safety bound). **But the control cell (near-instantaneous
 ramp, `Tramp=1 us`) ALSO avoids it**, settling to essentially the SAME
-steady-state operating point as the slow-ramp cells (`Vout~=0.559 V`,
-`LADDER_ERR~=1.34-1.35` in all three cells directly checked, spanning
-`Tramp` from `1 us` to `68.61 us`, a `69x` range). This is exactly the
-failure mode BOUNDARY.md Section 10 itself flagged as a possible,
-separately-reportable outcome: **the counterfactual this experiment's own
-design depends on did not hold** -- the near-instant-ramp control case
-does not reproduce runaway-like behavior, so the absence of runaway in
-the slow-ramp cells cannot be cleanly attributed to the `Vin` ramp
-mechanism itself. The most likely alternative explanation, developed in
-Section 6 below: removing R02B's passive-divider precharge network (this
-experiment's own explicit scope choice, BOUNDARY.md Section 4) eliminates
-the specific mismatch R03A's own diagnosis identified (a PRE-CHARGED
-capacitor ladder suddenly exposed to full-strength PWM while `Vout` is
-still cold) -- and that mismatch, not the ramp speed, is plausibly what
-R03A's runaway actually depended on.
+steady-state operating point as the slow-ramp cells (`Vout~=0.559-0.564 V`,
+`LADDER_ERR~=1.34-1.40` across all four cells directly checked, spanning
+`Tramp` from `1 us` to `68.61 us` and `Cfly` from `0.6` to `3 uF`). This is
+exactly the failure mode BOUNDARY.md Section 10 itself flagged as a
+possible, separately-reportable outcome: **the counterfactual this
+experiment's own design depends on did not hold** -- the near-instant-ramp
+control case does not reproduce runaway-like behavior, so the absence of
+runaway in the slow-ramp cells cannot be cleanly attributed to the `Vin`
+ramp mechanism itself. The most likely alternative explanation, developed
+in Section 6 below: removing R02B's passive-divider precharge network
+(this experiment's own explicit scope choice, BOUNDARY.md Section 4)
+eliminates the specific mismatch R03A's own diagnosis identified (a
+PRE-CHARGED capacitor ladder suddenly exposed to full-strength PWM while
+`Vout` is still cold) -- and that mismatch, not the ramp speed, is
+plausibly what R03A's runaway actually depended on.
 
 **Grid completion status, reported honestly per this project's own
 transparency convention rather than silently forced to appear complete:
-3 of 6 cells reached completion and are fully verified below (the
-control cell and both Grid-2/Grid-1 `Cfly=3 uF` cells at `10x` and `30x`
-margin). The remaining 3 cells (`Cfly=0.6 uF` and `Cfly=8.7 uF` at `30x`
-margin, and the `100x`-margin cell) were built, launched, and (at the
-time of writing) had not yet completed within a practical session
-time budget** -- Section 3 documents a second, independent, load-bearing
-finding that explains why: this netlist class exhibits extreme and
-UNPREDICTABLE per-cell runtime variance (`1302.6 s`, `1932.1 s`, and
-`7937.0 s` of real LTspice compute time for the three completed cells,
-which do NOT scale proportionally with `TSTOP`: the `368.61 us`-`TSTOP`
-cell took `4.1x` longer than the `322.87 us`-`TSTOP` cell despite only a
-`14%` longer target). Extrapolating the observed variance, the remaining
-3 cells (with `TSTOP` up to `528.71 us`) could plausibly require several
-additional hours each -- reported honestly as a tooling/runtime
-characteristic of this circuit class at `TMAX=50 ps`, not silently
-worked around by coarsening the timestep (explicitly prohibited by this
-experiment's own task instructions). One of the three remaining cells
-(`Cfly=0.6 uF`) was left running in the background past the point this
-report was finalized; if it completes, its result should be added to
-Section 4's table in a follow-up commit without altering the findings
-already established by the 3 completed cells.
+4 of 6 cells reached completion and are fully verified below (the control
+cell, both Grid-2/Grid-1 `Cfly=3 uF` cells at `10x` and `30x` margin, and
+-- added in a same-day follow-up commit once it finished running
+unattended overnight -- the Grid-1 `Cfly=0.6 uF`/`30x`-margin cell, real
+LTspice wall time `11842.4 s`, `~3.29` hours). The remaining 2 cells
+(`Cfly=8.7 uF` at `30x` margin, and the `100x`-margin cell) were built and
+launched but were still running, unfinished, when the background process
+hosting them was terminated (no `.log` `Total elapsed time` line, no
+`.meas` output for either) -- Section 3 documents a second, independent,
+load-bearing finding that explains why completion is so slow: this
+netlist class exhibits extreme and UNPREDICTABLE per-cell runtime
+variance (`1302.6 s`, `1932.1 s`, `7937.0 s`, and `11842.4 s` of real
+LTspice compute time for the four completed cells, which do NOT scale
+proportionally with `TSTOP`: the `368.61 us`-`TSTOP` cell took `4.1x`
+longer than the `322.87 us`-`TSTOP` cell despite only a `14%` longer
+target, and the `330.68 us`-`TSTOP` `Cfly=0.6 uF` cell took LONGER than
+the `368.61 us`-`TSTOP` `Cfly=3 uF` cell despite a SHORTER `TSTOP`).
+Extrapolating the observed variance, the remaining 2 cells (with `TSTOP`
+up to `528.71 us`) could plausibly require several additional hours each
+-- reported honestly as a tooling/runtime characteristic of this circuit
+class at `TMAX=50 ps`, not silently worked around by coarsening the
+timestep (explicitly prohibited by this experiment's own task
+instructions). Completing them would require a further, separately
+launched run; this document does not claim they are complete.
 
 A second, independently important, load-bearing finding: **the netlist
 as literally specified in BOUNDARY.md (R03A's own default LTspice
@@ -101,7 +104,7 @@ Per BOUNDARY.md Section 6, 6 cells total, `TSTOP = TRAMP + 300 us` each:
 | control | `e16_ctrl_f3_t1` | 3 uF | 1 us | n/a | 301 us | **COMPLETE** |
 | 2 | `e16_g2_f3_t22p87` | 3 uF | 22.87 us | 10x | 322.87 us | **COMPLETE** |
 | 1 | `e16_g1_f3_t68p61` | 3 uF | 68.61 us | 30x | 368.61 us | **COMPLETE** |
-| 1 | `e16_g1_f0p6_t30p68` | 0.6 uF | 30.68 us | 30x | 330.68 us | launched, not yet complete (Section 3) |
+| 1 | `e16_g1_f0p6_t30p68` | 0.6 uF | 30.68 us | 30x | 330.68 us | **COMPLETE** (finished unattended overnight, `11842.4 s` wall time, added in a same-day follow-up commit) |
 | 1 | `e16_g1_f8p7_t116p84`| 8.7 uF | 116.84 us| 30x | 416.84 us | built, not yet run to completion |
 | 2 | `e16_g2_f3_t228p71`  | 3 uF | 228.71 us| 100x| 528.71 us | built, not yet run to completion |
 
@@ -223,21 +226,24 @@ worse per the finding above) -- ruling out completing all 6 within a
 practical single-session time budget while still respecting the
 locked `TMAX=50 ps` and the prohibition on parallel-induced slowdown.
 
-## 4. Full results table (3 of 6 cells; see Section 2 for pending-cell status)
+## 4. Full results table (4 of 6 cells; see Section 2 for pending-cell status)
 
 | Case | `Cfly` | `Tramp` | `VC1` final (V) | `VC2` final (V) | `VC3` final (V) | `Vout` final (V) | `Vout` pk (V) | `LADDER_ERR` | `IL1` max (A) | `IL2` max (A) | `IL3` max (A) | `IL4` max (A) | max\|IL\| (A) | Within +/-250A? | LTspice wall time (s) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
 | control (`Tramp=1us`) | 3uF | 1us | 19.877 | 13.157 | 6.660 | 0.5588 | 0.5605 | 1.345 | 150.07 | 94.41 | 86.50 | 84.02 | 150.07 | YES | 1302.6 |
 | g2 10x margin | 3uF | 22.87us | 19.863 | 13.409 | 6.573 | 0.5589 | 0.5591 | 1.342 | 111.59 | 70.77 | 70.81 | 70.78 | 111.59 | YES | 1932.1 |
 | g1 30x margin | 3uF | 68.61us | 19.914 | 13.220 | 6.578 | 0.5588 | 0.5591 | 1.348 | 86.94 | 70.37 | 70.25 | 70.48 | 86.94 | YES | 7937.0 |
+| g1 30x margin | 0.6uF | 30.68us | 18.991 | 13.546 | 6.107 | 0.5642 | 0.5643 | 1.399 | 92.24 | 71.66 | 70.21 | 71.18 | 92.24 | YES | 11842.4 |
 
 Trajectory checkpoints (`VC1-3`/`Vout` at `t=Tramp`, i.e. the instant the
-`Vin` ramp completes) for the 30x-margin cell, the only one with a
-`Tramp` long enough to be well-separated from `t=0`: `VC1=16.01 V`,
-`VC2=10.61 V`, `VC3=5.29 V`, `Vout=0.449 V` at `t=68.61 us` -- all
-continue rising through the remaining `300 us` settling window to their
-final values above, confirming the system is still actively charging at
-`TSTOP`, not stalled.
+`Vin` ramp completes) for the two cells with a `Tramp` long enough to be
+well-separated from `t=0`: `30x`-margin `Cfly=3uF` reaches `VC1=16.01 V`,
+`VC2=10.61 V`, `VC3=5.29 V`, `Vout=0.449 V` at `t=68.61 us`; `30x`-margin
+`Cfly=0.6uF` reaches `VC1=14.12 V`, `VC2=10.52 V`, `VC3=4.41 V`,
+`Vout=0.427 V` at `t=30.68 us` -- both continue rising through their
+remaining `300 us` settling window to their final values above,
+confirming the system is still actively charging at `TSTOP`, not stalled,
+in both cases.
 
 All raw `.meas` values (including `IL1-4` minima, `VOUT_ERR`/`VCk_ERR`
 component breakdowns) are in `results.csv`/`results.json`.
@@ -250,9 +256,10 @@ network pre-charging the ladder first): phase-current maxima
 `884.36/745.07/625.63/563.46 A`, `Vout` overshoot to `1.54 V` (a `54%`
 overshoot past the `1 V` target).
 
-All 3 completed R04E16 cells: phase current maxima `150.07/94.41/86.50/
-84.02 A` (control), `111.59/70.77/70.81/70.78 A` (10x margin), and
-`86.94/70.37/70.25/70.48 A` (30x margin) -- ALL at least `5.9x` BELOW
+All 4 completed R04E16 cells: phase current maxima `150.07/94.41/86.50/
+84.02 A` (control), `111.59/70.77/70.81/70.78 A` (10x margin, `Cfly=3uF`),
+`86.94/70.37/70.25/70.48 A` (30x margin, `Cfly=3uF`), and `92.24/71.66/
+70.21/71.18 A` (30x margin, `Cfly=0.6uF`) -- ALL at least `5.9x` BELOW
 R03A's own SMALLEST phase peak, and all comfortably inside the
 `+/-250 A` safety bound. `Vout` shows NO overshoot in any completed
 cell (`Vout_pk` essentially equal to `Vout_final`, both well BELOW the
@@ -279,7 +286,7 @@ each instant. With no pre-charged ladder to suddenly discharge into a
 cold output, the `Vin` ramp speed may simply not be the dominant factor
 this experiment set out to isolate.
 
-A second, corroborating observation: all three completed cells converge
+A second, corroborating observation: the three `Cfly=3uF` cells converge
 to NEARLY IDENTICAL final state (`Vout` `0.5588-0.5589 V`, `VC1`
 `19.86-19.91 V`, `LADDER_ERR` `1.342-1.348`) despite a `69x` range in
 `Tramp` (`1` to `68.61 us`). Every trajectory shows `VC1`/`Vout` still
@@ -288,7 +295,11 @@ RISING at `TSTOP` (not yet plateaued -- e.g. for the 30x-margin cell,
 the `300 us` post-ramp window), consistent with the same underlying
 charge-accumulation process dominating the LONG (`300 us`) post-ramp
 settling window in all three cells, largely independent of how the
-first `1-69 us` were spent ramping `Vin` up.
+first `1-69 us` were spent ramping `Vin` up. The `Cfly=0.6uF` cell (30x
+margin) reaches a similar but not identical final state (`Vout=0.5642 V`,
+`LADDER_ERR=1.399`, modestly worse than the `Cfly=3uF` group) -- see
+Section 7 for whether this `Cfly` difference is meaningful given only one
+`Cfly=0.6uF` data point exists.
 
 **This experiment's own design cannot cleanly separate "the ramp
 avoided runaway" from "removing the passive divider (or the `Lphase`
@@ -300,11 +311,11 @@ Vin ramp WITH the divider still removed vs. instant Vin step WITH the
 divider still present, holding `Lphase` fixed) would be needed to assign
 causality cleanly.
 
-## 7. Sensitivity to `Tramp` at fixed `Cfly=3 uF` (the only axis with 3
-   completed data points); `Cfly` and the `100x` margin point remain
-   untested (Section 2/3b)
+## 7. Sensitivity to `Tramp` at fixed `Cfly=3 uF` (three completed data
+   points), plus one new `Cfly=0.6 uF` data point; `Cfly=8.7 uF` and the
+   `100x` margin point remain untested (Section 2/3b)
 
-The 3 completed cells hold `Cfly=3 uF` fixed and span `Tramp` from `1` to
+Three completed cells hold `Cfly=3 uF` fixed and span `Tramp` from `1` to
 `68.61 us` (a `69x` range, covering the control point plus the `10x` and
 `30x` margin points). Across this whole range:
 
@@ -330,19 +341,31 @@ The 3 completed cells hold `Cfly=3 uF` fixed and span `Tramp` from `1` to
   `Vin` connection) bearing the brunt of the ramp-related current
   differences, while phases 2-4 (which only see relayed charge through
   the flying capacitors) are comparatively insulated from it.
-- Full `Cfly` sensitivity (the `0.6`/`8.7 uF` cells) and the `100x`
-  margin-factor sensitivity point remain untested (Section 2/3b) -- this
-  is an honest, explicit gap in this experiment's own completed grid,
-  not a claim that `Cfly`/margin-factor sensitivity is small.
+- **One `Cfly=0.6 uF` data point is now available** (30x margin,
+  `Tramp=30.68 us`, the pairing this project's own derivation model
+  specifies for that `Cfly`). Its `LADDER_ERR` (`1.399`) is
+  `~4-4.2%` HIGHER (worse) than the three `Cfly=3 uF` cells' own
+  `1.342-1.348` range, and its `IL1_max` (`92.24 A`) sits between the
+  10x-margin (`111.59 A`) and 30x-margin (`86.94 A`) `Cfly=3uF` cells --
+  a modest, not dramatic, difference. **With only ONE `Cfly=0.6uF` point
+  and no `Cfly=8.7uF` point at all, this cannot establish a `Cfly`-
+  sensitivity trend** (a single point cannot show monotonicity or its
+  absence) -- it only shows the `Cfly=0.6uF`/`Tramp=30.68us` combination
+  does not qualitatively change the picture (still no runaway, still a
+  similar `LADDER_ERR`/`Vout` order of magnitude). Full `Cfly` sensitivity
+  (the `8.7 uF` cell) and the `100x` margin-factor sensitivity point
+  remain untested (Section 2/3b) -- an honest, explicit gap in this
+  experiment's own completed grid, not a claim that `Cfly`/margin-factor
+  sensitivity is small.
 
 ## 8. What this does and does not establish
 
 **Establishes:**
-- On the 3 cells that could be completed (spanning the full `Tramp`
-  range from `1` to `68.61 us` at `Cfly=3 uF`), NONE reproduce R03A's
-  catastrophic current runaway or output overshoot -- all stay at least
-  `5.9x` below R03A's own smallest phase-current peak and well inside
-  the `+/-250 A` safety bound.
+- On the 4 cells that could be completed (spanning the full `Tramp`
+  range from `1` to `68.61 us` at `Cfly=3 uF`, plus one `Cfly=0.6 uF`
+  point), NONE reproduce R03A's catastrophic current runaway or output
+  overshoot -- all stay at least `5.9x` below R03A's own smallest
+  phase-current peak and well inside the `+/-250 A` safety bound.
 - The control cell (near-instantaneous ramp) equally avoids the
   runaway, directly falsifying the clean form of this experiment's own
   hypothesis ("the `Vin` ramp specifically is what avoids R03A's
@@ -368,13 +391,14 @@ The 3 completed cells hold `Cfly=3 uF` fixed and span `Tramp` from `1` to
   responsible for the benign outcome -- the control-cell result
   specifically undermines a clean causal claim here (Section 6).
 - Full `LOCAL_PASS`-style convergence to the `36/24/12/1 V` ladder/`Vout`
-  targets -- all 3 completed cells reach only `~56%` of `Vout` target and
-  `LADDER_ERR~=1.34-1.35` (far from the `<0.05-0.1` range other Track-B
+  targets -- all 4 completed cells reach only `~56%` of `Vout` target and
+  `LADDER_ERR~=1.34-1.40` (far from the `<0.05-0.1` range other Track-B
   passive-divider experiments reached) by `TSTOP`; the system is still
   visibly rising, not stalled, but `300 us` is not enough settling time
   at this operating point.
-- `Cfly` sensitivity (Grid 1's `0.6`/`8.7 uF` points) or the `100x`
-  margin-factor sensitivity point -- these 3 cells were not completed
+- A `Cfly` sensitivity TREND -- only one `Cfly=0.6 uF` point exists
+  (Section 7), not enough to show monotonicity or its absence; `Cfly=8.7
+  uF` and the `100x` margin-factor sensitivity point remain uncompleted
   (Section 2/3b), an explicit, honestly-reported gap.
 - Any GS61008T device-level (`Coss`/dead-time/ZVS) validation -- ideal
   switches only, same limitation as R03A and every other Track-B
@@ -398,15 +422,17 @@ kind. `TMAX=50 ps` itself was never altered from BOUNDARY.md's own
 locked value, despite the severe runtime cost documented in Section 3b.
 
 Overall classification: **`CONTROLLER_GUARD_PASS`-style success on the
-`+/-250 A` current-safety bar for all 3 completed cells**; **NOT
+`+/-250 A` current-safety bar for all 4 completed cells**; **NOT
 `LOCAL_PASS`** (no completed cell reaches the `Vout`/`VCk` handoff
 tolerance bands by `TSTOP`); **the experiment's own core causal
 hypothesis (ramp specifically responsible) is `NOT CONFIRMED` /
 `UNDERMINED`** by the control-cell counterfactual, per BOUNDARY.md
 Section 10's own explicit anticipation of this exact outcome;
-**`SENSITIVITY_ONLY`** for every swept parameter, with the `Cfly` and
-`100x`-margin axes left explicitly untested; **`CROSS_PAPER_EXTENSION`**
-for the overall mechanism, unchanged from BOUNDARY.md Section 7;
-**`GRID_INCOMPLETE`** (3/6 cells) with the incompleteness attributed to
-a documented, honestly-reported tooling/runtime cause (Section 3b), not
-a physical-circuit cause and not a silent omission.
+**`SENSITIVITY_ONLY`** for every swept parameter, with `Cfly=8.7uF` and
+the `100x`-margin axis left explicitly untested and `Cfly=0.6uF`
+represented by only a single point (insufficient for a trend claim);
+**`CROSS_PAPER_EXTENSION`** for the overall mechanism, unchanged from
+BOUNDARY.md Section 7; **`GRID_INCOMPLETE`** (4/6 cells) with the
+remaining incompleteness attributed to a documented, honestly-reported
+tooling/runtime cause (Section 3b), not a physical-circuit cause and not
+a silent omission.
