@@ -10,6 +10,7 @@ from scb_ivr.zero_start_descriptor import (
     commanded_pwm_mode,
     input_voltage_v,
     stored_energy_j,
+    startup_dimensionless_groups,
     true_zero_initial_vector,
 )
 
@@ -72,6 +73,29 @@ class ZeroStartDescriptorTests(unittest.TestCase):
         self.assertTrue(np.isfinite(system.e).all())
         self.assertTrue(np.isfinite(system.a).all())
         self.assertTrue(np.isfinite(system.rhs).all())
+
+    def test_roberts_margin_keeps_ramp_resonance_cycles_near_constant(self):
+        small = ZeroStartBoundary(
+            input_ramp_s=30.68e-6,
+            flying_capacitances_f=(0.6e-6,) * 3,
+        )
+        large = ZeroStartBoundary(
+            input_ramp_s=116.84e-6,
+            flying_capacitances_f=(8.7e-6,) * 3,
+        )
+        small_groups = startup_dimensionless_groups(small)
+        large_groups = startup_dimensionless_groups(large)
+        self.assertAlmostEqual(small_groups.ramp_resonance_cycles, 10.5, places=2)
+        self.assertAlmostEqual(large_groups.ramp_resonance_cycles, 10.5, places=2)
+
+    def test_fixed_divider_cfly_sweep_also_changes_charge_ratio(self):
+        small = ZeroStartBoundary(flying_capacitances_f=(0.6e-6,) * 3)
+        large = ZeroStartBoundary(flying_capacitances_f=(8.7e-6,) * 3)
+        small_ratio = startup_dimensionless_groups(small).divider_to_flying_ratio
+        large_ratio = startup_dimensionless_groups(large).divider_to_flying_ratio
+        self.assertAlmostEqual(small_ratio, 500.0)
+        self.assertAlmostEqual(large_ratio, 300 / 8.7, places=8)
+        self.assertNotEqual(small_ratio, large_ratio)
 
 
 if __name__ == "__main__":

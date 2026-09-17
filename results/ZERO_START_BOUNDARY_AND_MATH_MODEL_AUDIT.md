@@ -79,6 +79,24 @@ result does not yet establish that its trajectory is safe or converges.
    36/24/12/1 V: currents, capacitor charges and controller mode must also
    match the handoff surface.
 
+## R04E19 pre-run boundary correction
+
+R04E19 proposes changing `Cfly` while holding `Cdiv=300 uF`. This is a useful
+system-sensitivity experiment, but it is not a pure test of the Roberts
+`1/sqrt(Cfly)` resonance law. The same change moves at least two independent
+dimensionless groups:
+
+- normalized ramp duration `Tramp * f_res`;
+- passive charge-divider ratio `Cdiv/Cfly`.
+
+For the two 30x-margin cells, `Tramp*f_res` is approximately the same (`10.5`),
+but `Cdiv/Cfly` changes from `500` at `0.6 uF` to about `34.48` at `8.7 uF`.
+Consequently R04E19 may establish whether the complete divider-present model
+is robust across `Cfly`; it cannot attribute a difference uniquely to
+resonance-frequency scaling. A later mechanism-isolation branch would need to
+control the capacitance ratio or include it explicitly in a multi-variable
+fit.
+
 The implementation in `src/scb_ivr/zero_start_descriptor.py` completes the
 model-contract and per-mode matrix construction. It deliberately stops before
 numerical integration so that diode event rules and the startup load boundary

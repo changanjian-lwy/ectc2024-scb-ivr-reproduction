@@ -12,7 +12,7 @@ not yet a transient solver and not a P24-authored startup method.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import floor
+from math import floor, pi, sqrt
 
 import numpy as np
 from numpy.typing import NDArray
@@ -110,6 +110,44 @@ class DescriptorSystem:
     @property
     def pencil_rank_at_one(self) -> int:
         return int(np.linalg.matrix_rank(self.e + self.a))
+
+
+@dataclass(frozen=True)
+class StartupDimensionlessGroups:
+    binding_resonance_hz: float
+    ramp_resonance_cycles: float
+    divider_to_flying_ratio: float | None
+
+
+def startup_dimensionless_groups(
+    boundary: ZeroStartBoundary,
+    *,
+    representative_flying_capacitance_f: float | None = None,
+) -> StartupDimensionlessGroups:
+    """Return independent groups changed by a Cfly/ramp sensitivity case.
+
+    Reporting ``Cdiv/Cfly`` alongside ``Tramp*fres`` prevents a fixed-Cdiv
+    Cfly sweep from being misread as a pure resonance experiment.
+    """
+    cfly = (
+        boundary.flying_capacitances_f[0]
+        if representative_flying_capacitance_f is None
+        else representative_flying_capacitance_f
+    )
+    if cfly <= 0:
+        raise ValueError("representative flying capacitance must be positive")
+    omega = (
+        boundary.duty
+        * sqrt(2 - sqrt(2))
+        / sqrt(boundary.phase_inductance_h * cfly)
+    )
+    frequency = omega / (2 * pi)
+    ratio = boundary.divider_capacitance_f / cfly if boundary.divider_enabled else None
+    return StartupDimensionlessGroups(
+        binding_resonance_hz=frequency,
+        ramp_resonance_cycles=boundary.input_ramp_s * frequency,
+        divider_to_flying_ratio=ratio,
+    )
 
 
 def input_voltage_v(time_s: float, boundary: ZeroStartBoundary) -> float:

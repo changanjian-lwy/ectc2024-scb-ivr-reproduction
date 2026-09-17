@@ -12,10 +12,9 @@ underlying physics (the flying-capacitor resonance frequency
 `f1,4 ∝ 1/√Cfly`) predicts the safe ramp time should scale up with
 `Cfly` (a bigger flying capacitor resonates slower, so needs a
 proportionally slower ramp to stay below it) -- this experiment tests
-whether that predicted scaling actually holds once the divider network
-is physically present and combined with real PWM switching (R04E16/
-R04E17's own construct), not just in the abstract linear-resonance model
-the derivation used.
+whether the complete divider-present ideal-switch PWM model remains
+consistent with that predicted direction, not whether the resonance law is
+uniquely responsible for the result.
 
 Per explicit user direction 2026-09-17 (approving the second item of
 `CONSOLIDATED_FINDINGS_2026-09-16.md`'s updated priority list, after
@@ -24,7 +23,7 @@ enough for practical purposes and does not need further bisection).
 
 ## 2. What changed relative to R04E17/R04E18, exactly
 
-**No mechanism, topology, or fixed-parameter change of any kind.** This
+**No mechanism or topology change is introduced.** This
 experiment reuses R04E17/R04E18's own byte-level-faithful netlist
 (R04E16's fixed-timing four-phase power stage + R03A's divider network
 at `CDIV=300 uF`, `TSTART=0`, `LPHASE=1.4666667 nH`, `solver=alt
@@ -41,8 +40,20 @@ violating this project's single-conceptual-change discipline. This
 experiment tests `Cfly` sensitivity of the RAMP boundary only, holding
 everything else (including `CDIV`) at its already-established value.
 
-## 3. Swept grid -- four cells, chosen to test the resonance-scaling
-   prediction directly
+**Pre-run attribution limit found by the mathematical boundary audit:**
+holding `CDIV` fixed is correct for testing total-system sensitivity, but
+changing `Cfly` changes both the normalized resonance/ramp coordinate
+`Tramp*f_res` and the passive charge-sharing ratio `CDIV/Cfly` (and related
+damping). Therefore this grid cannot attribute an observed difference solely
+to the `1/sqrt(Cfly)` resonance law. In the two 30x-margin cells,
+`Tramp*f_res` stays near `10.5`, while `CDIV/Cfly` changes from `500` at
+`0.6 uF` to about `34.48` at `8.7 uF`. The valid question is whether the
+complete divider-present startup model remains safe across the selected
+`Cfly` range. Pure resonance-law identification would require a separate
+normalized-ratio branch or a multi-variable model.
+
+## 3. Swept grid -- four cells, chosen to test total-system sensitivity
+   against the resonance-scaling prediction
 
 | Cell | `Cfly` | `Tramp` | Why this `Tramp` |
 |---|---:|---:|---|
@@ -83,10 +94,11 @@ introduced.
 
 ## 6. What question this experiment is meant to answer
 
-Does the runaway/safe boundary actually shift with `Cfly` the way the
-underlying `1/√Cfly` resonance-frequency scaling predicts, once the
-divider network and real PWM switching are both present (not just in the
-abstract linear model)? Specifically: (a) is `Tramp=5 us` (runaway at
+Does the runaway/safe boundary shift with `Cfly`, and is its direction
+consistent with the underlying `1/√Cfly` resonance-frequency scaling, once
+the divider network and ideal-switch PWM model are both present? Because
+`CDIV/Cfly` changes too, consistency is not unique proof of that law.
+Specifically: (a) is `Tramp=5 us` (runaway at
 `Cfly=3uF`) safer, equally dangerous, or MORE dangerous at the smaller
 `Cfly=0.6uF`; (b) is `Tramp=22.87 us` (safe at `Cfly=3uF`) still safe,
 or does it become unsafe at the larger `Cfly=8.7uF`; (c) does the
@@ -126,6 +138,8 @@ precedent -- there is no "wrong" result:
 - It does not re-optimize `CDIV` per `Cfly` -- `CDIV=300 uF` is held
   fixed throughout (Section 2); whether a different `CDIV` would change
   the picture at these `Cfly` values is untested.
+- It cannot separate resonance scaling from the simultaneous change in
+  `CDIV/Cfly` and damping caused by the same `Cfly` sweep.
 - It does not address `Vout`/handoff bootstrap beyond what R04E16/R04E17/
   R04E18 already report.
 - It does not modify, overwrite, or invalidate R04E16/R04E17/R04E18's
