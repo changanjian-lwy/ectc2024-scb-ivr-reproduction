@@ -1,0 +1,126 @@
+{
+  "scope": "fixed old device library; geometry calculation and saved data audit only",
+  "position_geometry": [
+    {
+      "phase": 1,
+      "ceq_pf": 1539.9862247160424,
+      "gamma": 0.9999856879883882
+    },
+    {
+      "phase": 2,
+      "ceq_pf": 1539.9834697244407,
+      "gamma": 0.9999785321106031
+    },
+    {
+      "phase": 3,
+      "ceq_pf": 1539.9862247160424,
+      "gamma": 0.999978532059395
+    },
+    {
+      "phase": 4,
+      "ceq_pf": 1154.997244927907,
+      "gamma": 0.9999928439685897
+    }
+  ],
+  "cases": [
+    {
+      "case": "A43 7.77%",
+      "raw_path": "experiments/track_A_periodic_steady_state/A43_p25_device_augmented_7p77_full_event_machine/A43_p25_device_augmented_7p77_full_event_machine.raw",
+      "events": [
+        {
+          "phase": 1,
+          "release_observed": false,
+          "status": "not reached; no invented release state"
+        },
+        {
+          "phase": 2,
+          "release_observed": true,
+          "release_time_ns": 45.34023171297327,
+          "release_current_a": -9.71398639678955,
+          "release_x_v": 0.034121766686439514,
+          "release_vds_v": 11.905675888061523,
+          "ceq_pf": 1539.9834697244407,
+          "gamma": 0.9999785321106031,
+          "ideal_required_current_a": 11.166382500993931,
+          "ideal_required_pct": 8.933106000795146,
+          "ideal_natural_zvs_reachable": false,
+          "unclamped_predicted_min_v": 1.4110140452329514,
+          "saved_min_in_first_10ns_before_admission_v": 1.4184799194335938,
+          "predicted_first_zero_ns": null,
+          "saved_first_zero_ns": null,
+          "saved_high_admission_ns": null
+        },
+        {
+          "phase": 3,
+          "release_observed": false,
+          "status": "not reached; no invented release state"
+        },
+        {
+          "phase": 4,
+          "release_observed": false,
+          "status": "not reached; no invented release state"
+        }
+      ]
+    },
+    {
+      "case": "A37 9% iteration 001 selected seed",
+      "raw_path": "experiments/track_A_periodic_steady_state/A37_solver_work/iter_001.raw",
+      "events": [
+        {
+          "phase": 1,
+          "release_observed": false,
+          "status": "not reached; no invented release state"
+        },
+        {
+          "phase": 2,
+          "release_observed": true,
+          "release_time_ns": 47.680866408708724,
+          "release_current_a": -11.251314163208008,
+          "release_x_v": 0.03946099430322647,
+          "release_vds_v": 11.901668548583984,
+          "ceq_pf": 1539.9834697244407,
+          "gamma": 0.9999785321106031,
+          "ideal_required_current_a": 11.168236047210337,
+          "ideal_required_pct": 8.93458883776827,
+          "ideal_natural_zvs_reachable": true,
+          "unclamped_predicted_min_v": -0.0807639067321233,
+          "saved_min_in_first_10ns_before_admission_v": -0.000530242919921875,
+          "predicted_first_zero_ns": 49.990670858521206,
+          "saved_first_zero_ns": 49.9997679067112,
+          "saved_high_admission_ns": 50.00074646624752
+        },
+        {
+          "phase": 3,
+          "release_observed": true,
+          "release_time_ns": 76.84761029279711,
+          "release_current_a": -11.251160621643066,
+          "release_x_v": 0.03953397646546364,
+          "release_vds_v": 11.89189624786377,
+          "ceq_pf": 1539.9862247160424,
+          "gamma": 0.999978532059395,
+          "ideal_required_current_a": 11.158275062341106,
+          "ideal_required_pct": 8.926620049872886,
+          "ideal_natural_zvs_reachable": true,
+          "unclamped_predicted_min_v": -0.09029781371803303,
+          "saved_min_in_first_10ns_before_admission_v": -0.00128936767578125,
+          "predicted_first_zero_ns": 79.14694804450671,
+          "saved_first_zero_ns": 79.15547046170116,
+          "saved_high_admission_ns": null
+        },
+        {
+          "phase": 4,
+          "release_observed": false,
+          "status": "not reached; no invented release state"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "geometry values use old GS fixture, not a new experiment",
+    "only phases with recorded release events are compared",
+    "ideal inactive-node clamp differs from finite-Ron saved cases",
+    "negative unclamped minimum means a clamp/mode change occurs, not a valid later trajectory",
+    "required percentages freeze each extracted state, not controller thresholds",
+    "no full periodic orbit or hardware conclusion"
+  ]
+}

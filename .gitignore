@@ -27,6 +27,10 @@ tmp/
 *_solver_work/
 *.zip
 
+# Regenerable symbolic-search records (reports and source scripts stay tracked)
+symbolic_derivations/**/numerical_runs/
+symbolic_derivations/**/*_run.txt
+
 # Source papers and personal meeting material must not be published
 *.pdf
 reports/TALKING_POINTS_*.md
@@ -36,3 +40,4 @@ reports/MEETING_NOTES_*.md
 # Local application/runtime state
 .wine/
 .crossover/
+.claude/

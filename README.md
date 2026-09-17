@@ -1,8 +1,31 @@
-# ECTC 2024 SCB-IVR Reproduction
+# Evidence-Bounded SCB-IVR Reproduction
 
-Evidence-bounded analytical and LTspice reproduction of the 2024 ECTC paper
+[![Python regression checks](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction/actions/workflows/tests.yml/badge.svg)](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction/actions/workflows/tests.yml)
+
+Modular analytical, numerical and LTspice reproduction of the 2024 ECTC paper
 *Package Power Delivery Architecture for High Performance Computing Systems
 With a 1 kW IVR Operated in CCM-DCM Boundary Mode Condition*.
+
+This repository turns a research paper into an auditable engineering workflow:
+source claims are separated from assumptions, switching events are encoded as
+testable modules, and unsuccessful cases are retained as evidence rather than
+silently tuned away.
+
+## Project at a glance
+
+- **System target:** 48 V to 1 V, 1 kW package power delivery.
+- **Current validated scope:** one four-phase, 250 W module plus a native
+  three-phase calibration of the 2025 follow-up method.
+- **Tools:** Python/SciPy for equations and event solvers; LTspice for circuit
+  inspection and transient experiments; 205 automated regression checks for
+  boundary and branch integrity.
+- **Design principle:** 2024 is the primary source. The 2025 paper fills only
+  explicitly missing details, and disagreements remain separate branches.
+- **Status:** active research reproduction. Periodic-state and commutation
+  behavior are under test; this is not yet a complete hardware validation.
+
+For a concise portfolio-level explanation, see
+[`PROJECT_OVERVIEW.md`](PROJECT_OVERVIEW.md).
 
 ## Current research question
 
@@ -35,6 +58,15 @@ and full four-module hardware reproduction remain separate later questions.
 - Under an explicit ideal 1 V output-isolation boundary, symmetric C1
   perturbations both moved toward the control trajectory over 20 periods,
   providing early evidence of a passive restoring tendency.
+- Calibrated the event method on the native 2025 three-phase topology. A
+  locally periodic trajectory exists near 563 kHz, but the frozen public
+  parameters do not simultaneously reproduce 0.5 MHz, equal phase spacing,
+  peak current and flying-capacitor charge balance.
+- A strict joint optimization repeatedly places the consistent inductance near
+  31–32 nH rather than the prototype table's 22 nH. Even after a labelled
+  negative-valley correction, the best tested branch misses the fixed
+  per-phase peak-current gate; it remains a diagnostic, not a reproduction
+  claim.
 
 These are periodic-state and local commutation results. They are not claims of
 zero-start operation, closed-loop output regulation or complete 1 kW hardware
@@ -44,6 +76,7 @@ validation.
 
 ```text
 paper_locked/     Source hierarchy, formula audit and P24/P25 branch records
+symbolic_derivations/ Equation-first P24, P25 and combined evidence branches
 experiments/      One-change-at-a-time simulation cases and negative evidence
 results/          Parameter provenance and consolidated records
 tests/            Automated boundary and regression checks
@@ -52,22 +85,32 @@ reports/          Shareable technical progress summaries
 circuit/          Earlier exploratory netlists retained for traceability
 ```
 
-Start with:
+## Recommended reading order
 
-- `paper_locked/00_boundaries/EXPERIMENT_PROTOCOL_AND_ARCHIVE_RULES.md`
-- `reports/MIHAI_MEETING_2026-09-14.md`
-- `paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md`
-- `paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md`
-- `experiments/track_A_periodic_steady_state/PERIODIC_TIGHTENING_SWEEP_1_A13_A16.md`
+1. [`PROJECT_OVERVIEW.md`](PROJECT_OVERVIEW.md) — scope, architecture and
+   selected outcomes.
+2. [`paper_locked/00_boundaries/PAPER_LOCKED_REPRODUCTION_BASELINE.md`](paper_locked/00_boundaries/PAPER_LOCKED_REPRODUCTION_BASELINE.md)
+   — frozen evidence hierarchy.
+3. [`paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md`](paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md)
+   — exact ownership of switching-sequence claims.
+4. [`symbolic_derivations/README.md`](symbolic_derivations/README.md) — ordered
+   analytical branches and strict joint audit.
+5. [`paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md`](paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md)
+   — traceable experiment history.
+6. [`experiments/README.md`](experiments/README.md) — simulation layout and
+   boundaries.
 
 ## Run the checks
 
 ```bash
+python3 -m pip install -r requirements.txt
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 LTspice netlists are supplied for inspection and reproduction. Generated raw
-waveforms and database files are intentionally excluded from version control.
+waveforms, optimizer traces and database files are intentionally excluded from
+version control; the scripts and concise result reports needed to regenerate
+or audit them remain tracked.
 
 ## Current boundaries
 

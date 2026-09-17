@@ -1,0 +1,32 @@
+{
+  "scope": "existing A43 waveform audit; ideal inactive-node clamp; no SPICE run or retuning",
+  "release_time_ns": 45.34023171297327,
+  "release_current_a": -9.71398639678955,
+  "release_x2_v": 0.034121766686439514,
+  "release_high_vds_v": 11.905675888061523,
+  "release_other_x_v": [
+    -0.08102735131978989,
+    -0.007776281796395779,
+    -0.040120385587215424
+  ],
+  "release_a_v": [
+    35.93962478637695,
+    24.03394889831543,
+    11.992828369140625
+  ],
+  "full_module_ceq_pf": 1539.9834697244407,
+  "gamma_h2": 0.9999785321106031,
+  "isolated_cell_ceq_pf": 1154.9972449081918,
+  "predicted_vds_min_v": 1.4110140452329514,
+  "saved_vds_min_v": 1.4184799194335938,
+  "predicted_peak_delay_ns": 2.513311921983528,
+  "saved_peak_delay_ns": 2.511704375166087,
+  "first_swing_vds_rmse_v": 0.004029664013932663,
+  "ideal_required_release_current_a": 11.166382500993931,
+  "ideal_required_fraction_of_125a_pct": 8.933106000795146,
+  "limitations": [
+    "A43 includes finite Ron and reverse clamps; ideal reduction does not",
+    "required current holds the extracted release state fixed; not a controller sweep",
+    "no four-phase periodic closure or hardware threshold claim"
+  ]
+}
