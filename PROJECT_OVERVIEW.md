@@ -30,8 +30,8 @@ localized instead of hidden by retuning unrelated parameters:
 Python/SciPy implements the analytical and event-driven models. LTspice
 provides inspectable circuit netlists and transient experiments. Automated
 tests protect the source hierarchy, branch separation and numerical contracts.
-The complete local suite contains 205 passing checks. GitHub CI runs the
-portable subset because LTspice-generated log fixtures are intentionally not
+The complete local suite contains 217 passing checks. GitHub CI runs 198
+portable checks because LTspice-generated log fixtures are intentionally not
 published.
 
 The Python source is organized by responsibility: reusable models live in

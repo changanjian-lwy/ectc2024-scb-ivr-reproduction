@@ -17,8 +17,8 @@ silently tuned away.
 - **Current validated scope:** one four-phase, 250 W module plus a native
   three-phase calibration of the 2025 follow-up method.
 - **Tools:** Python/SciPy for equations and event solvers; LTspice for circuit
-  inspection and transient experiments; 205 local regression checks for
-  boundary and branch integrity, with the portable subset run by GitHub CI.
+  inspection and transient experiments; 217 local regression checks for
+  boundary and branch integrity, with 198 portable checks run by GitHub CI.
 - **Design principle:** 2024 is the primary source. The 2025 paper fills only
   explicitly missing details, and disagreements remain separate branches.
 - **Status:** active research reproduction. Periodic-state and commutation
@@ -67,6 +67,11 @@ and full four-module hardware reproduction remain separate later questions.
   negative-valley correction, the best tested branch misses the fixed
   per-phase peak-current gate; it remains a diagnostic, not a reproduction
   claim.
+- Added a parameter-only feasibility envelope. Before any unknown device value
+  is fitted, it reports the available negative current, local inductor-energy
+  budget, charge-transfer ceiling and the two explicitly different
+  peak-current conventions. Unknown Qoss/dead-time inputs leave the ZVS verdict
+  `undetermined` rather than producing a false pass.
 
 These are periodic-state and local commutation results. They are not claims of
 zero-start operation, closed-loop output regulation or complete 1 kW hardware
@@ -102,6 +107,8 @@ circuit/          Earlier exploratory netlists retained for traceability
    — traceable experiment history.
 6. [`experiments/README.md`](experiments/README.md) — simulation layout and
    boundaries.
+7. [`results/PARAMETRIC_FEASIBILITY_ENVELOPE.md`](results/PARAMETRIC_FEASIBILITY_ENVELOPE.md)
+   — what can and cannot be proved before missing device data arrive.
 
 ## Run the checks
 
@@ -113,7 +120,7 @@ python3 tests/run_portable_suite.py
 LTspice netlists are supplied for inspection and reproduction. Generated raw
 waveforms, optimizer traces and database files are intentionally excluded from
 version control; the scripts and concise result reports needed to regenerate
-or audit them remain tracked. The complete 205-test local suite additionally
+or audit them remain tracked. The complete 217-test local suite additionally
 checks recorded LTspice `.log` files after those files have been generated:
 
 ```bash
