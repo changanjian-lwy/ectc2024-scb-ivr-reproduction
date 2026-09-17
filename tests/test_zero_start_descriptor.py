@@ -9,6 +9,8 @@ from scb_ivr.zero_start_descriptor import (
     assemble_descriptor,
     commanded_pwm_mode,
     input_voltage_v,
+    ideal_divider_ramp_current_a,
+    minimum_ramp_time_for_divider_current_s,
     stored_energy_j,
     startup_dimensionless_groups,
     true_zero_initial_vector,
@@ -96,6 +98,15 @@ class ZeroStartDescriptorTests(unittest.TestCase):
         self.assertAlmostEqual(small_ratio, 500.0)
         self.assertAlmostEqual(large_ratio, 300 / 8.7, places=8)
         self.assertNotEqual(small_ratio, large_ratio)
+
+    def test_divider_charge_predicts_r04e18_current_scale(self):
+        self.assertAlmostEqual(ideal_divider_ramp_current_a(self.boundary), 157.4115, places=3)
+
+    def test_250a_divider_screen_requires_at_least_14p4us(self):
+        self.assertAlmostEqual(
+            minimum_ramp_time_for_divider_current_s(self.boundary, 250) * 1e6,
+            14.4,
+        )
 
 
 if __name__ == "__main__":

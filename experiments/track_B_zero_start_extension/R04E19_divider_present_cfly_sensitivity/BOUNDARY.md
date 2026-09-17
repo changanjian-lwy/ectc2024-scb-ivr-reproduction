@@ -52,6 +52,15 @@ complete divider-present startup model remains safe across the selected
 `Cfly` range. Pure resonance-law identification would require a separate
 normalized-ratio branch or a multi-variable model.
 
+A second pre-run screen also applies: the fixed four-capacitor divider alone
+draws approximately `Idiv=(CDIV/4)*Vin/Tramp` during the linear ramp. At
+`CDIV=300 uF`, this predicts `720 A` at `5 us`, `157.4 A` at `22.87 us`,
+`117.3 A` at `30.68 us`, and `30.8 A` at `116.84 us`, before the switching
+stage is added. Consequently much of the current trend may be controlled
+directly by `Tramp`, even if changing `Cfly` has little effect. R04E19 must
+compare its result against this charge-demand baseline before interpreting a
+trend as flying-capacitor resonance behavior.
+
 ## 3. Swept grid -- four cells, chosen to test total-system sensitivity
    against the resonance-scaling prediction
 

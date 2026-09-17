@@ -97,7 +97,39 @@ resonance-frequency scaling. A later mechanism-isolation branch would need to
 control the capacitance ratio or include it explicitly in a multi-variable
 fit.
 
-The implementation in `src/scb_ivr/zero_start_descriptor.py` completes the
-model-contract and per-mode matrix construction. It deliberately stops before
-numerical integration so that diode event rules and the startup load boundary
-can be audited before another long simulation.
+## Divider-current analytical screen
+
+Four equal `Cdiv` capacitors in series present the input with
+
+`Ceq,div = Cdiv/4`.
+
+During a linear input ramp, their unavoidable base charging current is
+
+`Idiv = (Cdiv/4) * Vin/Tramp`.
+
+For the active boundary (`Cdiv=300 uF`, `Vin=48 V`, `Tramp=22.87 us`), this is
+`157.4 A` before adding switching-stage and ringing currents. The ten-period
+hybrid solve gives about `170.7 A`, so the large input current has an immediate
+charge-balance explanation and is not merely a numerical anomaly.
+
+Conversely, a `250 A` input-current screen requires at least
+
+`Tramp >= Cdiv*Vin/(4*250 A) = 14.4 us`.
+
+This lies inside R04E18's observed `5-22.87 us` crossing bracket and near its
+informal `17.6 us` estimate. Therefore the passive-divider charge demand is a
+first-order explanation of the ramp/current boundary. Flying-capacitor
+resonance may still modify the transient, but it must not be assumed to be the
+dominant cause without separating it from this simpler law.
+
+The implementation is split deliberately:
+
+- `src/scb_ivr/zero_start_descriptor.py` defines the boundary and constructs
+  every per-mode matrix;
+- `src/scb_ivr/zero_start_hybrid_solver.py` supplies a reference implicit-DAE
+  stepper, clips steps at every PWM/ramp edge, enumerates all eight diode
+  active sets and accepts only complementarity-admissible states.
+
+The solver has passed short-horizon structural tests. No long startup result is
+claimed until at least two step sizes agree and the load/device boundary has
+been frozen for that run.

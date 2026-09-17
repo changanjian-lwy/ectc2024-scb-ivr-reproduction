@@ -119,6 +119,34 @@ class StartupDimensionlessGroups:
     divider_to_flying_ratio: float | None
 
 
+def equal_series_divider_capacitance_f(boundary: ZeroStartBoundary) -> float:
+    if not boundary.divider_enabled:
+        return 0.0
+    return boundary.divider_capacitance_f / boundary.phases
+
+
+def ideal_divider_ramp_current_a(boundary: ZeroStartBoundary) -> float:
+    """Base current required by the equal series divider during a linear ramp."""
+    return (
+        equal_series_divider_capacitance_f(boundary)
+        * boundary.vin_target_v
+        / boundary.input_ramp_s
+    )
+
+
+def minimum_ramp_time_for_divider_current_s(
+    boundary: ZeroStartBoundary, maximum_current_a: float
+) -> float:
+    """Necessary ramp-time screen from the divider charge alone."""
+    if maximum_current_a <= 0:
+        raise ValueError("maximum current must be positive")
+    return (
+        equal_series_divider_capacitance_f(boundary)
+        * boundary.vin_target_v
+        / maximum_current_a
+    )
+
+
 def startup_dimensionless_groups(
     boundary: ZeroStartBoundary,
     *,

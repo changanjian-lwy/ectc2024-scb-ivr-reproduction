@@ -9,6 +9,8 @@ outputs. Its modules fall into four groups:
   `parameter_contract`;
 - zero-start mathematics: `zero_start_descriptor` compiles the latest
   cross-paper startup boundary into a mode-dependent MNA descriptor system;
+  `zero_start_hybrid_solver` advances that DAE with PWM-edge alignment and
+  diode complementarity admission;
 - topology and event semantics: `physical_events`, `gate_truth_tables`,
   `interval*_branches` and `four_phase_event_ring`;
 - modular assembly and evidence control: `evidence`, `model_contracts`,
