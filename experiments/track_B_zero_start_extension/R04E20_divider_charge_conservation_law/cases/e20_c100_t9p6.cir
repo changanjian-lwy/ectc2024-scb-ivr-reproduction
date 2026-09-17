@@ -1,0 +1,125 @@
+* R04E20 - testing the divider charge-conservation law across CDIV
+* (e20_c100_t9p6)
+* PARENT: R04E18's own e18_div_f3_t5.cir (experiments/track_B_zero_
+* start_extension/R04E18_divider_present_tramp_boundary/cases/
+* e18_div_f3_t5.cir), itself derived from R04E17's e17_div_f3_t1.cir,
+* itself derived from R04E16's e16_ctrl_f3_t1.cir, itself derived from
+* R03A (paper_locked/02_ectc2024_main/spice/R03A_passive_precharge_to_
+* fixed_pwm_takeover.cir) -- four-phase power stage, TSTART=0
+* fixed-timing gate B-sources, LPHASE=1.4666667n, CFLY=3u (FIXED, not
+* swept), true-zero-energy IC, solver=alt cshunt=1e-15 plotwinsize=0/
+* TMAX=50p, and R03A's own passive-divider-plus-diode precharge network
+* (CIN1-4/RLEAK1-4/DPC1-3, model DPRE) all copied unchanged.
+* CHANGED relative to e18_div_f3_t5: ONLY CDIV (300u -> 100u) and Tramp
+* (5us -> 9.6us) and the derived Tstop (Tramp+300us). Nothing else.
+* CDIV=100uF is the smaller of two new bracketing divider values tested
+* in this experiment (R04E18/E19's own standard 300uF x 1/3); Tramp=
+* 9.6us = 2x the divider charge-conservation law's own predicted
+* threshold at this CDIV (Idiv=(CDIV/4)*Vin/Tramp=250A =>
+* Tramp_threshold=CDIV*Vin/(4*250A)=4.8us at CDIV=100uF) -- predicted
+* SAFE. See BOUNDARY.md Sections 1-3 for the full law derivation and
+* 6-cell design (this cell plus 3 more new cells plus 2 reused R04E18
+* CDIV=300uF cells).
+* UNCHANGED from e18_div_f3_t5: everything else -- power-stage
+* topology, COUT, RLOAD formula, ideal SWI switch, RLDAMP,
+* true-zero-energy IC (UIC), TMAX=50p, IPEC2018 Table II source
+* parasitics LPAR/RPAR, solver=alt/cshunt=1e-15/plotwinsize=0, the
+* divider network topology, CFLY=3uF (fixed, not swept -- the key
+* difference from R04E19).
+* Cfly=3 uF, Tramp=9.6 us, Cdiv=100 uF, Tstop=Tramp+300us.
+
+.param VIN=48 VOUT=1 POUT=250 NP=4 FSW=5Meg T={1/FSW}
+.param D={NP*VOUT/VIN} TON={D*T} LPHASE=1.4666667n
+.param CFLY=3.000000e-06 COUT=4.672m RLOAD={VOUT*VOUT/POUT}
+.param TRAMP=9.600000e-06 TSTART=0 TSTOP={TRAMP+300u}
+.param LPAR=5n RPAR=10m RON=1u ROFF=1T VGATE=5 RLDAMP=1u
+.param CDIV=100u
+
+VSTEP src 0 PWL(0 0 {TRAMP} {VIN} {TSTOP} {VIN})
+RPAR_IN src src_r {RPAR}
+LPAR_IN src_r vin {LPAR}
+
+* R03A's own passive divider/precharge-diode network, unchanged from
+* e17_div_f3_t1/e18_div_f3_t5 -- wiring copied verbatim from R03A
+* (paper_locked/02_ectc2024_main/spice/R03A_passive_precharge_to_fixed_
+* pwm_takeover.cir), only CDIV changed (100u here). Feeds the SAME real
+* a1/a2/a3 power-stage nodes the four-phase stage below already uses;
+* no new topology invented.
+CIN1 vin tap3 {CDIV}
+CIN2 tap3 tap2 {CDIV}
+CIN3 tap2 tap1 {CDIV}
+CIN4 tap1 0 {CDIV}
+RLEAK1 vin tap3 1G
+RLEAK2 tap3 tap2 1G
+RLEAK3 tap2 tap1 1G
+RLEAK4 tap1 0 1G
+DPC1 tap3 a1 DPRE
+DPC2 tap2 a2 DPRE
+DPC3 tap1 a3 DPRE
+
+* Gate-generation formulas copied unchanged from R03A/e17_div_f3_t1
+* except TSTART=0 (PWM active for all time>=0, not delayed to 150us
+* after Vin settles).
+BH1 gh1 0 V=if(time>=TSTART & mod(time-TSTART+T,T)<TON,VGATE,0)
+BL1 gl1 0 V=if(time<TSTART | mod(time-TSTART+T,T)>=TON,VGATE,0)
+BH2 gh2 0 V=if(time>=TSTART & mod(time-TSTART+T-T/4,T)<TON,VGATE,0)
+BL2 gl2 0 V=if(time<TSTART | mod(time-TSTART+T-T/4,T)>=TON,VGATE,0)
+BH3 gh3 0 V=if(time>=TSTART & mod(time-TSTART+T-T/2,T)<TON,VGATE,0)
+BL3 gl3 0 V=if(time<TSTART | mod(time-TSTART+T-T/2,T)>=TON,VGATE,0)
+BH4 gh4 0 V=if(time>=TSTART & mod(time-TSTART+T-3*T/4,T)<TON,VGATE,0)
+BL4 gl4 0 V=if(time<TSTART | mod(time-TSTART+T-3*T/4,T)>=TON,VGATE,0)
+
+SH1 vin a1 gh1 0 SWI
+CF1 a1 x1 {CFLY}
+SL1 x1 0 gl1 0 SWI
+L1 x1 out {LPHASE} Rser={RLDAMP}
+SH2 a1 a2 gh2 0 SWI
+CF2 a2 x2 {CFLY}
+SL2 x2 0 gl2 0 SWI
+L2 x2 out {LPHASE} Rser={RLDAMP}
+SH3 a2 a3 gh3 0 SWI
+CF3 a3 x3 {CFLY}
+SL3 x3 0 gl3 0 SWI
+L3 x3 out {LPHASE} Rser={RLDAMP}
+SH4 a3 x4 gh4 0 SWI
+SL4 x4 0 gl4 0 SWI
+L4 x4 out {LPHASE} Rser={RLDAMP}
+
+CCO out 0 {COUT}
+RLOAD_MAIN out 0 {RLOAD}
+.model SWI SW(Ron={RON} Roff={ROFF} Vt=2.5 Vh=0)
+.model DPRE D(Ron=1m Roff=1T Vfwd=0)
+
+.meas tran VC1_INIT FIND V(a1,x1) AT 1n
+.meas tran VC2_INIT FIND V(a2,x2) AT 1n
+.meas tran VC3_INIT FIND V(a3,x3) AT 1n
+.meas tran VC1_AT_TRAMP FIND V(a1,x1) AT {TRAMP}
+.meas tran VC2_AT_TRAMP FIND V(a2,x2) AT {TRAMP}
+.meas tran VC3_AT_TRAMP FIND V(a3,x3) AT {TRAMP}
+.meas tran VOUT_AT_TRAMP FIND V(out) AT {TRAMP}
+.meas tran VC1_FINAL FIND V(a1,x1) AT {TSTOP-1n}
+.meas tran VC2_FINAL FIND V(a2,x2) AT {TSTOP-1n}
+.meas tran VC3_FINAL FIND V(a3,x3) AT {TSTOP-1n}
+.meas tran VOUT_FINAL FIND V(out) AT {TSTOP-1n}
+.meas tran VOUT_PK MAX V(out) FROM 0 TO {TSTOP}
+.meas tran VOUT_MIN MIN V(out) FROM 0 TO {TSTOP}
+.meas tran VOUT_OVERSHOOT PARAM (VOUT_PK-VOUT)/VOUT
+.meas tran IIN_PK MAX -I(VSTEP) FROM 0 TO {TSTOP}
+.meas tran IL1_MIN MIN I(L1) FROM 0 TO {TSTOP}
+.meas tran IL1_MAX MAX I(L1) FROM 0 TO {TSTOP}
+.meas tran IL2_MIN MIN I(L2) FROM 0 TO {TSTOP}
+.meas tran IL2_MAX MAX I(L2) FROM 0 TO {TSTOP}
+.meas tran IL3_MIN MIN I(L3) FROM 0 TO {TSTOP}
+.meas tran IL3_MAX MAX I(L3) FROM 0 TO {TSTOP}
+.meas tran IL4_MIN MIN I(L4) FROM 0 TO {TSTOP}
+.meas tran IL4_MAX MAX I(L4) FROM 0 TO {TSTOP}
+.meas tran VOUT_ERR PARAM abs(VOUT_FINAL-1)/1
+.meas tran VC1_ERR PARAM abs(VC1_FINAL-36)/36
+.meas tran VC2_ERR PARAM abs(VC2_FINAL-24)/24
+.meas tran VC3_ERR PARAM abs(VC3_FINAL-12)/12
+.meas tran LADDER_ERR PARAM VC1_ERR+VC2_ERR+VC3_ERR
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(vin) V(out) V(a1,x1) V(a2,x2) V(a3,x3) I(VSTEP) I(L1) I(L2) I(L3) I(L4)
+.tran 0 {TSTOP} 0 50p UIC
+.end
