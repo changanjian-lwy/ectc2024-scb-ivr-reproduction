@@ -699,3 +699,49 @@ the complete 5-point table, the full forensic corruption-check detail
 flags physically-plausible small-signal ringing at these particular
 `Tramp` values, distinct from genuine corruption), and the discussion of
 what this experiment does and does not establish.
+
+## R04E19 -- testing whether the divider-present runaway/safe boundary
+   R04E18 localized at `Cfly=3 uF` scales with `Cfly` the way the
+   underlying `1/√Cfly` resonance-frequency law predicts
+
+**The picture is genuinely more complex than a clean scaling law at
+`Cfly=0.6/8.7 uF`, and reported honestly as such rather than forced into
+either "confirmed" or "refuted."** Four cells reused R04E17/R04E18's own
+`Tramp` values at the two untested `Cfly` extremes: `Tramp=5 us`
+(unsafe at `Cfly=3uF`) at `Cfly=0.6uF` remains unsafe on ALL FOUR phases
+(`max(|IL_min|,IL_max)` = `412/321/398/1022 A` -- phase 4 actually WORSE
+than the `Cfly=3uF` reference, `1022A` vs `652A`), contradicting the
+simple "smaller `Cfly` = safer" direction of the prediction; `Tramp=
+22.87 us` (safe at `Cfly=3uF`) at `Cfly=8.7uF` becomes unsafe on 2 of 4
+phases (`372/225/167/300 A`), consistent with the "larger `Cfly` needs
+more margin" direction. Unlike `Cfly=3uF`'s own phase-symmetric pattern
+(all four phases moving together), both new `Cfly` values show genuine
+PER-PHASE asymmetry (e.g. a `2.2x` spread across phases at the same
+`Cfly`/`Tramp` for the `8.7uF` cell) -- an unexplained new finding, not
+diagnosed further here. Neither `Cfly`'s own `30x`-margin
+model-recommended `Tramp` is comfortably safe across the board: only
+`Cfly=8.7uF`'s (`116.84 us`) is uniformly safe (`170/141/132/158 A`);
+`Cfly=0.6uF`'s (`30.68 us`) has one phase marginally OVER the `250A`
+bound (`251.0A`, phase 4). A first analysis pass that checked only each
+phase's own `IL_max` (not the correct `max(|IL_min|,IL_max)`) understated
+the `Cfly=0.6uF`/`Tramp=5us` cell's own hazard -- caught and corrected
+before this document was finalized (see `RESULTS.md` Section 3). Separate
+from the current-safety question, `Cfly=8.7uF` reaches substantially
+better `LADDER_ERR` (`0.009-0.019`) than `Cfly=0.6uF` (`0.134-0.138`) at
+comparable `Tramp` fractions; `e19_f8p7_t116p84`'s own `LADDER_ERR=
+0.00947` is the best value reached anywhere in this project's Track-B
+lineage to date. All four cells' raw traces were confirmed free of the
+documented solver-corruption fingerprint. Because `CDIV=300 uF` was
+deliberately held fixed while `Cfly` varied (per this experiment's own
+single-conceptual-change scope), the results cannot cleanly isolate the
+pure resonance law from the simultaneously-changing `CDIV/Cfly`
+charge-sharing ratio -- this is reported as this experiment's own
+explicit attribution limit, not resolved here. Cells were run across two
+sessions with an explicit user-directed pause between the third and
+fourth cell (not a technical failure); the fourth cell was later run to
+completion in the same already-existing worktree, reusing the first
+three cells' already-invested compute rather than restarting from
+scratch. See `R04E19_divider_present_cfly_sensitivity/BOUNDARY.md` and
+`RESULTS.md` for the complete 4-cell table, the corrected per-phase
+hazard analysis, and full discussion of what this does and does not
+establish.
