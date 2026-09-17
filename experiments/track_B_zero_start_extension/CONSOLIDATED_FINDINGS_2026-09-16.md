@@ -1,20 +1,23 @@
-# Track B zero-start: consolidated findings across R04E9-R04E15 and the
-   2026-09-16 literature review (written 2026-09-16, updated same day after R04E15)
+# Track B zero-start: consolidated findings across R04E9-R04E17 and the
+   2026-09-16/17 literature review (written 2026-09-16, updated 2026-09-17
+   after R04E16/R04E17)
 
 ## Why this document exists
 
-`R04E9` through `R04E15` and two literature reviews were all produced in
-one working session, each individually documented (`BOUNDARY.md`/
-`RESULTS.md` per experiment, two review notes under
+`R04E9` through `R04E17` and two literature reviews were produced across
+two consecutive working sessions, each individually documented
+(`BOUNDARY.md`/`RESULTS.md` per experiment, two review notes under
 `paper_locked/00_boundaries/`). This document does not add new results;
 it synthesizes what is already committed into one coherent picture, and
 was written only after re-checking every carried-forward number/assumption
 against its original source (see "Boundary re-audit" below). Read the
 individual `BOUNDARY.md`/`RESULTS.md` files for full detail and caveats --
 this is a map, not a replacement. (`R04E15` was added as a same-day
-follow-up after this document's first version, per explicit user
-direction to pursue R04E14's own refinement before the higher-setup-cost
-Roberts soft-start mechanism.)
+follow-up on 2026-09-16 per explicit user direction to pursue R04E14's own
+refinement before the higher-setup-cost Roberts soft-start mechanism;
+`R04E16` and `R04E17` were added on 2026-09-17, building and then
+causally isolating that soft-start mechanism, per further explicit user
+direction.)
 
 ## The problem, restated
 
@@ -123,7 +126,8 @@ peak-current combination, but it remains isolated from PWM (see "What
 remains blocked" below) and only addresses part (1) of the zero-start
 problem (the flying-capacitor ladder), not `Vout`/handoff.
 
-### Approach 3: input-voltage soft-start ramp (found in literature, not yet built)
+### Approach 3: input-voltage soft-start ramp (built, tested, and causally
+   isolated -- R04E16/R04E17, 2026-09-17)
 
 - The Roberts & Prodić 2024 OJPEL paper P25 cites for phase-activation
   modulation (PHACTS/star-sequencing) does **not** address start-up at
@@ -131,23 +135,75 @@ problem (the flying-capacitor ladder), not `Vout`/handoff.
   conversion-ratio-extension technique, explicitly stating it provides
   zero benefit for this project's own `N=4` case.
 - Roberts' PhD dissertation (obtained separately), Chapter 3 Section 3.5
-  "Converter Start-Up," describes a THIRD, different mechanism from both
-  approaches above: ramp `Vin` itself slowly through an eFuse (bandwidth
-  kept well below the flying-capacitor LC resonance, per an explicit
-  design rule using the same chapter's own `N`-inductor resonance
-  formula) while the converter's normal multiphase switching pattern
-  runs unchanged. The FCs are not independently precharged by any
-  divider network -- they track `Vin` organically via the same charge-
-  balance mechanism that holds them in steady state.
+  "Converter Start-Up," describes a THIRD, different mechanism from
+  Approaches 1/2 above: ramp `Vin` itself slowly through an eFuse
+  (bandwidth kept well below the flying-capacitor LC resonance, per an
+  explicit design rule using the same chapter's own `N`-inductor
+  resonance formula) while the converter's normal multiphase switching
+  pattern runs unchanged. `ROBERTS_SOFTSTART_P24_MODEL_DERIVATION.md`
+  applied this formula to P24's own `LOCKED` operating point (validated
+  first against Roberts' own worked example, reproducing his stated
+  `65.7 kHz` resonance to printed precision), giving a P24-specific
+  candidate ramp-time range of `~31-117 us` depending on `Cfly`.
+- **R04E16** built and ran this mechanism for the first time: R03A's own
+  fixed-timing, non-event-gated four-phase PWM (explicitly NOT R04E9-
+  R04E13's admission-order machine, and NOT a repeat of R04E5's already-
+  falsified "ramp grafted onto the strict event-gated controller"
+  combination), with `TSTART=0` and R02B's passive-divider network
+  REMOVED entirely, `Vin` ramped per the derived candidate range. Across
+  a `6`-cell grid (`Cfly` in `{0.6,3,8.7} uF`, margin factor in
+  `{10x,30x,100x}`, plus a near-instantaneous-ramp control cell), NONE
+  showed R03A's own catastrophic runaway -- but the control cell (fast
+  ramp) ALSO avoided it, undermining a clean "the ramp is what saved it"
+  claim (BOUNDARY.md's own Section 10 had explicitly anticipated this
+  possible outcome). A secondary, genuine finding survived: peak current
+  decreases monotonically with margin factor (`150.07 -> 111.59 -> 86.94
+  -> 75.05 A` at `10x/30x/50x-equivalent/100x`), so the ramp does have a
+  real, confirmed effect on transient MAGNITUDE even when it does not
+  determine whether runaway occurs.
+- **R04E17** resolved the ambiguity R04E16 left open with a `2x2`
+  factorial crossing `{divider present, divider absent}` x `{fast ramp,
+  slow ramp}`, reusing R04E16's own two divider-absent cells and adding
+  two new divider-present cells (R03A's own divider wiring, reintroduced
+  at R04E15's own corrected `CDIV=300 uF`/`Cfly=3 uF`, not the old
+  cross-topology `1.076 mF`/`53.8 uF`). **Result: the clean pattern
+  occurred.** With the divider physically present, a fast ramp (`Tramp=
+  1 us`) reproduces R03A's own runaway (`813-1046 A` across all four
+  phases, the same order of magnitude as R03A's original `563-884 A`),
+  while a `68.61x`-slower ramp avoids it entirely (`141-155 A`). This
+  cleanly isolates the two factors R04E16 could not: **the `Vin` ramp
+  causally matters specifically when there is a precharged-ladder/cold-
+  `Vout` mismatch (the divider's own doing) for it to protect against; if
+  that mismatch is removed some other way (R04E16's own divider deletion),
+  the ramp's protective role becomes moot, not wrong.** R04E16 and R04E17
+  are a coherent, non-contradictory pair, not two conflicting results.
+- A further, unplanned positive finding from R04E17: with the divider
+  reintroduced, BOTH ramp speeds reach `LADDER_ERR` around `0.024-0.029`
+  and `Vout_final` within `0.6%` of target -- `46-56x` better than either
+  of R04E16's own divider-absent cells. The divider's own precharge work
+  is not merely "safe if the ramp is slow enough," it is actively more
+  effective than the ramp-only mechanism at achieving the ladder/output
+  target, provided the ramp is slow enough not to trigger runaway.
 
-**Verdict on this approach**: a well-justified, primary-source-backed,
-author-native candidate mechanism, but **not yet built or tested in this
-project's own SPICE model**. The dissertation's own worked example
-(2-inductor, 5 V) is illustrative, not a P24-specific number -- any future
-experiment must derive P24's own ramp-rate target from the chapter's own
-formula before testing, and must be labelled `CROSS_PAPER_EXTENSION`
-(applying Roberts' general method to an operating point he did not
-himself work out numerically).
+**Verdict on this approach**: this is now the best-substantiated, most
+CAUSALLY CLEAR positive result in the entire Track-B zero-start lineage.
+Unlike Approach 1 (admission-order tuning, diminishing/negative returns)
+and unlike Approach 2 in isolation (ladder-only, no `Vout`/handoff
+story), R04E16+R04E17 together show a real protective mechanism
+(Roberts' own dissertation idea) with a directly confirmed causal role,
+AND demonstrate it combines productively with Approach 2's own passive
+divider (better ladder/`Vout` accuracy than either mechanism alone).
+Both `Vout` and the flying-capacitor ladder bootstrap together in the
+best R04E17 cell (`Vout_final=1.006 V`, within `0.6%` of target) --
+the first time in this project's Track-B history that BOTH halves of the
+zero-start problem (ladder AND `Vout`) have reached anywhere close to
+target simultaneously, in one mechanism. This remains `SENSITIVITY_ONLY`/
+`CROSS_PAPER_EXTENSION` (only two `Tramp` points and one `Cfly` value
+tested in R04E17; the `Cfly`/`Tramp` boundary between runaway and safe
+operation is not mapped), and still does not build or test the handoff
+into the strict steady-state controller (see "What remains blocked"
+below) -- but as a start-up mechanism in isolation, it is the strongest
+result this project has produced.
 
 ## What remains blocked regardless of which approach is pursued further
 
@@ -206,33 +262,66 @@ No numeric or provenance error was found in this pass. This is reported
 as a genuine (clean) audit outcome, not a formality -- the check was
 performed, not assumed.
 
-## Recommended priority ranking for what to pursue next (updated after R04E15)
+## Verification performed on R04E16/R04E17 (2026-09-17, at merge time)
 
-1. **The passive-precharge module (R02A/B, revived by R04E14, now further
-   substantiated by R04E15) is the most promising, best-substantiated
-   open thread, and its own narrow, low-setup-cost follow-up is
-   exhausted**: R04E15 confirmed no fine-grid point strictly dominates
-   R04E14's own coarse-grid optimum (a genuine local trade-off frontier,
-   not an artifact of coarse sampling), and confirmed the result is
-   `Cfly`-robust at the correct operating point. The natural next step
-   for THIS approach is no longer more grid refinement -- it is either
-   (a) reconciling the ground-referenced flying-capacitor simplification
-   with the real floating adjacent-capacitor connection (still open, per
-   Section "What this does not establish"), or (b) beginning the
-   precharge-to-PWM handoff design, which requires the still-standing,
-   self-labelled-engineering-hypothesis discipline described above.
-2. **Roberts' soft-start mechanism is the highest-novelty candidate** but
-   requires first deriving P24-specific numbers from his Chapter 3
-   formula before any SPICE test is meaningful -- more setup cost, but
-   potentially addresses both ladder AND Vout bootstrap simultaneously
-   (unlike R04E14/R04E15, which only address the ladder), since it does
-   not change the normal switching pattern.
-3. **Further tuning of the R04E9-R04E13 admission-order family remains
+Each R04E16/R04E17 result was independently checked against its own raw
+`.log` `.meas` output (not just the delegated agent's own summary) before
+being merged into `main`, following the same discipline as the audit
+above:
+
+1. R04E16's own self-correction (an arithmetic slip claiming "`5.9x`
+   below R03A's smallest peak" that did not reconcile with its own
+   table) was independently re-derived by hand (`563.46/[each cell's own
+   max current]`) and confirmed to match the corrected `3.75x-7.51x`
+   range exactly.
+2. R04E16's `results.csv`/`results.json` were confirmed to contain all 6
+   grid rows (a prior revision's analysis script would have silently
+   dropped the first 4 cells; this was caught and the fix verified).
+3. R04E17's two new cells' `VC1-3_final`, `Vout_final/pk`, `IL1-4_max/
+   min`, and `LADDER_ERR` were read directly from each cell's own `.log`
+   and matched the committed `RESULTS.md`/`results.csv` exactly, including
+   the `1046.42 A` runaway peak and the `0.0242`/`0.0291` `LADDER_ERR`
+   values (hand-recomputed from `VC1-3_final` and confirmed).
+4. R04E17's netlist was checked directly to confirm `CDIV=300 uF` (the
+   corrected value) was actually used, not R03A's own `1.076 mF`.
+5. R04E17's reuse of R04E16's own `e16_ctrl_f3_t1`/`e16_g1_f3_t68p61`
+   numbers was checked against R04E16's own already-verified committed
+   values -- copied verbatim, not silently altered.
+
+No error was found in this pass either.
+
+## Recommended priority ranking for what to pursue next (updated after R04E17)
+
+1. **The combined mechanism (R02B/R04E14/R04E15's corrected passive
+   divider + Roberts' soft-start ramp, causally confirmed by R04E17) is
+   now the clear leading candidate and the most promising open thread.**
+   Concrete, well-motivated next steps for THIS combined mechanism, in
+   rough order of cost:
+   (a) map the actual runaway/safe boundary in `Tramp` (only `1 us` and
+   `68.61 us` are tested; a bisection between them would locate the real
+   threshold, which R04E17 itself flags as untested);
+   (b) test whether the boundary shifts with `Cfly` (R04E17 tested only
+   `Cfly=3 uF` with the divider present);
+   (c) reconcile the ground-referenced-vs-floating flying-capacitor
+   question that still applies to the DIVIDER's own connection (R02A's
+   own simplification, inherited unchanged through R04E14/R04E15/R04E17);
+   (d) begin the precharge-to-PWM handoff design into the strict
+   steady-state controller -- both halves of zero-start (ladder and
+   `Vout`) are now close to target simultaneously in R04E17's own best
+   cell, making this the first point in the project where attempting the
+   actual handoff is well-motivated rather than premature. Any such
+   handoff design must still use the self-labelled-engineering-hypothesis
+   discipline described above (no literature source supplies a four-phase
+   release sequence).
+2. **Further tuning of the R04E9-R04E13 admission-order family remains
    the lowest-priority thread** -- not because it was wrong, but because
-   R04E12/R04E13 already show it has entered diminishing/negative
-   returns; a topology-level change (R04E9's own option (a), still
-   unstarted) would need to precede any further work in this specific
-   family.
+   R04E12/R04E13 already showed it has entered diminishing/negative
+   returns, and the combined mechanism above now clearly outperforms it
+   on every axis (ladder error, `Vout` accuracy, current plausibility,
+   and causal clarity); a topology-level change (R04E9's own option (a),
+   still unstarted) would need to precede any further work in this
+   specific family, and even then would need to be weighed against
+   simply extending the now-leading combined mechanism instead.
 
 This ranking is a recommendation, not a decision -- next step selection
 remains the user's call, consistent with this project's standing
