@@ -1,0 +1,70 @@
+{
+  "experiment": "R04E21_phase1_handoff_into_r04e3_stall",
+  "outcome": "SAME_STALL_RECURS",
+  "step1_verification": {
+    "description": "R04E17's own e17_div_f3_t68p61.cir re-run unmodified except one added .meas line (IL1_AT_TSTOP FIND I(L1) AT 368.61u). The re-run's own .log did not print .meas results (a benign LTspice/wine post-processing hiccup after an 'unable to open database file' message), so all values were independently extracted directly from the .raw binary trace using the same FIND-AT/MAX/MIN semantics LTspice itself uses, then cross-checked against R04E17's own already-committed results.json.",
+    "raw_point_count": 8208737,
+    "raw_point_count_matches_r04e17_published": true,
+    "all_18_published_meas_values_reproduced_exactly": true,
+    "vc1_final_reproduced": 35.85894624845418,
+    "vc1_final_r04e17_published": 35.8589462485,
+    "vc2_final_reproduced": 23.798443662380787,
+    "vc2_final_r04e17_published": 23.7984436624,
+    "vc3_final_reproduced": 11.857047256378324,
+    "vc3_final_r04e17_published": 11.8570472564,
+    "vout_final_reproduced": 1.005894050468494,
+    "vout_final_r04e17_published": 1.00589405047,
+    "il1_max_reproduced": 154.7286834716797,
+    "il1_max_r04e17_published": 154.728683472,
+    "il1_min_reproduced": -22.616397857666016,
+    "il1_min_r04e17_published": -22.6163978577,
+    "il1_at_tstop_newly_extracted": 75.96527862548828,
+    "note": "IL1_AT_TSTOP is not in R04E17's own published .meas set (only IL1_MIN/IL1_MAX envelope); this is the new value this Step-1 re-run was built to obtain."
+  },
+  "step2_initial_conditions_used": {
+    "cfly_corrected_from_53p8uf_to": 3e-06,
+    "vc1_ic": 35.85894624845418,
+    "il1_ic": 75.96527862548828,
+    "phases_2_4_ic": 0.0,
+    "phases_2_4_gate_config": "R04E3's own hardcoded single-phase-isolation config, unchanged (BOUNDARY.md Section 4)"
+  },
+  "step3_r04e21_cell_meas": {
+    "t_energy_end_s": 2.98294522065e-13,
+    "il1_energy_end_a": 75.9550563853,
+    "t_low_side_zvs_s": 1.39754948686e-12,
+    "t_il1_zero_s": 1.63068387739e-06,
+    "t_neg_target_s": 1.68678613822e-06,
+    "t_high_side_zvs_s": null,
+    "t_high_side_zvs_status": "FAILED (never reached within TSTOP=20us)",
+    "state_final": 4,
+    "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+    "il1_min_a": -0.200048059225,
+    "il1_max_a": 75.9670639038,
+    "vout_final_v": 0.000644895655569,
+    "vc1_final_v": 35.86026322,
+    "vc2_final_v": -1.60653144121e-08,
+    "vc3_final_v": -1.65891833603e-08
+  },
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "il1_max_abs_a_observed_full_trace": 75.9670639038086,
+    "within_bound_throughout": true,
+    "points_over_bound": 0,
+    "points_scanned": 193606
+  },
+  "corruption_fingerprint_check": {
+    "raw_points": 193606,
+    "non_monotonic_or_duplicate_timestamps": 0,
+    "vin_min_v": 0.0,
+    "vin_max_v": 48.0,
+    "vin_stayed_within_commanded_0_48v": true,
+    "implausible_value_count": 0,
+    "clean": true
+  },
+  "outcome_classification": {
+    "stall_avoided": false,
+    "same_stall_recurs": true,
+    "different_failure_mode": false,
+    "reasoning": "STATE_FINAL=4 (COMMUTATE_HIGH_TO_ZVS) at TSTOP=20us, identical to R04E3's own documented stuck state. T_HIGH_SIDE_ZVS (the state-4-to-5 transition on V(vin,xmod:a1)<=0) FAILED to occur. The bootstrapped state reached this same stall point in ~1.69us (much faster than zero-start, since IL1_IC already exceeded I_LIMIT at t=0), but the SAME event (high-side Vds=0) never occurred, so the controller parks in the same place R04E3 always parks."
+  }
+}

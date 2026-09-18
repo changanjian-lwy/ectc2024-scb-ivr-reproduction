@@ -803,3 +803,46 @@ modified. See
 `R04E20_divider_charge_conservation_law/BOUNDARY.md` and `RESULTS.md`
 for the complete 6-row table, the full per-`CDIV` discussion, and what
 this does and does not establish.
+
+## R04E21 -- does a Track-B-bootstrapped phase-1 state avoid R04E3's own
+   documented zero-energy stall? A narrow negative result: the same
+   stall recurs
+
+**This experiment does NOT test P24 periodicity** (a 2026-09-18 research
+pass, recorded in `R04E21_phase1_handoff_into_r04e3_stall/BOUNDARY.md`
+Section 0, established that no genuinely closed periodic orbit has ever
+been found anywhere in this project by either SPICE or symbolic methods
+-- that question remains independently unresolved regardless of this
+experiment's own outcome). It asks one narrow question instead: does
+R04E3's own event-gated phase-1 local commutation controller
+(`paper_locked/02_ectc2024_main/spice/
+R04E3_P24_minimal_zero_start_event_cycle.cir`, unmodified except `Cfly`
+corrected `53.8uF->3uF`) avoid its own documented permanent stall at
+state `COMMUTATE_HIGH_TO_ZVS` (waiting forever for `V(vin,a1)<=0`) when
+phase 1 is started from R04E17's own real bootstrapped state (`e17_div_
+f3_t68p61`'s own `VC1`/`IL1` at `TSTOP=368.61us`) instead of true zero
+energy? Step 1 re-ran R04E17's own unmodified cell with one added
+`.meas` line to extract the missing instantaneous `IL1_AT_TSTOP=
+75.96527862548828 A` (the re-run's own `.log` failed to print `.meas`
+results due to a benign post-processing hiccup, so all values were
+independently re-extracted from the `.raw` trace and cross-checked --
+all 18 of R04E17's own already-published values reproduced exactly).
+Step 2 built the new handoff cell with `VC1_IC=35.85894624845418V`,
+`IL1_IC=75.96527862548828A` on phase 1 only; phases 2-4 deliberately
+kept R04E3's own hardcoded zero-energy, single-phase-isolation
+configuration (an explicit, stated scope limit, not an oversight --
+their own real R04E17-bootstrapped currents were discarded). **RESULT:
+the same stall recurs.** `STATE_FINAL=4` (`COMMUTATE_HIGH_TO_ZVS`) at
+`TSTOP=20us`; `T_HIGH_SIDE_ZVS` `FAIL`s to trigger, exactly as in
+R04E3's own zero-start cell. The bootstrapped state reaches this same
+parked state far faster (`~1.69us`, vs. needing to first build current
+from zero) but does not avoid it -- bootstrapped current/voltage
+magnitude alone is not sufficient to unblock the high-side ZVS event.
+Phase 1's own current stayed well within the `+/-250A` bound throughout
+(`max|IL1|=75.97A`), and the `.raw` trace was confirmed free of the
+documented solver-corruption fingerprint (zero non-monotonic timestamps,
+`V(vin)` exactly within its commanded `0-48V` step). See
+`R04E21_phase1_handoff_into_r04e3_stall/BOUNDARY.md` and `RESULTS.md`
+for the complete Step-1 verification table, state-transition timeline,
+and full discussion of what this narrow negative result does and does
+not establish.
