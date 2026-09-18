@@ -1,0 +1,70 @@
+{
+  "maximum_step_ns": 0.0625,
+  "start_time_us": 23.0,
+  "map_size": 20,
+  "least_squares_rank": 17,
+  "numerical_nullity": 3,
+  "fixed_point_residual_inf": 2.573585788923083e-11,
+  "orbit_closure_inf": 2.2228078933039797e-08,
+  "diode_complementarity_valid": true,
+  "maximum_off_diode_forward_voltage_v": -11.839466126750427,
+  "average_output_v": 1.0060079937506097,
+  "average_load_power_w": 253.01302135384827,
+  "average_flying_capacitor_v": [
+    35.84478256507729,
+    23.88631071494739,
+    11.927838961696613
+  ],
+  "average_phase_currents_a": [
+    63.02141274756478,
+    62.723889418846426,
+    62.72388944773304,
+    63.03280682803745
+  ],
+  "maximum_phase_currents_a": [
+    125.87897118728735,
+    125.5543781585899,
+    125.55437480794959,
+    125.89085137712313
+  ],
+  "minimum_phase_currents_a": [
+    0.11088801335147373,
+    -0.2136240933081225,
+    -0.21362071361338256,
+    0.12349436705354273
+  ],
+  "average_input_inductor_current_a": 5.298268101741384,
+  "imported_solver_copy_modules": [
+    "solver_copy",
+    "solver_copy.commutation_capacitance",
+    "solver_copy.device_library",
+    "solver_copy.evidence",
+    "solver_copy.periodic_affine_solver",
+    "solver_copy.zero_start_descriptor",
+    "solver_copy.zero_start_hybrid_solver"
+  ],
+  "published_reference": {
+    "map_residual_inf": 2.6e-11,
+    "orbit_closure_inf": 2.3e-08,
+    "average_output_v": 1.00601,
+    "average_load_power_w": 253.013,
+    "average_flying_capacitor_v": [
+      35.8448,
+      23.8863,
+      11.9278
+    ],
+    "maximum_phase_currents_a": [
+      125.879,
+      125.554,
+      125.554,
+      125.891
+    ],
+    "minimum_phase_currents_a": [
+      0.111,
+      -0.214,
+      -0.214,
+      0.123
+    ],
+    "average_input_inductor_current_a": 5.298
+  }
+}
