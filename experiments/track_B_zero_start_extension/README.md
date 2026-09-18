@@ -902,3 +902,54 @@ actually be exercised. See `R04E22_phase1_handoff_rescaled_ilimit/
 BOUNDARY.md` and `RESULTS.md` for the complete state-transition
 timeline, current-safety and fingerprint checks for both cells, and full
 discussion of what this inconclusive result does and does not establish.
+
+## R04E23 -- extending TSTOP so R04E22's own question can actually be
+   tested: still inconclusive, I_NEG not reached even at 100us
+
+Direct, minimal, one-parameter follow-up to R04E22's own inconclusive
+result (`R04E23_phase1_handoff_extended_tstop/BOUNDARY.md`): R04E22
+found neither swept `NEG_FRAC` cell's own `I_NEG` target was reached by
+`TSTOP=20us` (inherited byte-identical from R04E3/R04E21, sized for the
+OLD `I_LIMIT=10A` regime), so R04E21/R04E22's own actual question (does
+a correctly-scaled `I_NEG` avoid R04E3's own documented ZVS stall) was
+never actually tested. This experiment extends `TSTOP` from `20us` to
+`100us` (a `5x` margin over a naive linear extrapolation of R04E22's own
+observed rate) and updates the five `AT 20u` `.meas` lines to `AT 100u`
+to match -- the ONLY changes; everything else is byte-identical to
+R04E22's own two netlists (`r04e22_neg2pct.cir`, `r04e22_neg7p77pct.cir`).
+**RESULT: `I_NEG` is STILL not reached in EITHER cell, even at the
+extended `100us` -- both remain parked at state `3` (`LOW_BUILD_
+NEGATIVE`), `t_neg_target` `FAIL`s in both.** Direct byte-level parsing
+of both full `100,356`-point `.raw` traces reveals WHY the naive linear
+extrapolation reasoning was wrong: `IL1` reaches its own GLOBAL minimum
+of `-2.2150912284851074A` at `t~=2.82us` (well inside the ORIGINAL
+`20us` window, essentially the same value R04E22's own `20us`-window
+`IL1_MIN` already captured), then **relaxes back toward zero** for the
+entire remainder of the window (`IL1=-0.098A` at `20us`, `-0.0024A` at
+`40us`, `-0.0000236A` at the final point, `t=100us`) instead of
+continuing to build more negative. Extending the observation window did
+not help because the trajectory itself was never still ramping past
+`20us` -- it had already peaked and begun relaxing back by `~2.82us`.
+Neither swept `I_NEG` target (`-2.5A`, `-9.7125A`) is reached, and both
+cells remain confirmed numerically AND physically identical (`0` of
+`100,356` differing rows in either `time` or `I(xmod:L1)` between the two
+`.raw` files, same reason as R04E22: the `3->4` rule never fires in
+either cell, so `NEG_FRAC` never enters the simulated physics). Phase 1's
+own current stayed well within the `+/-250A` bound throughout both cells
+(`max|IL1|=125.390A`, `0` points over bound across all `100,356` scanned
+points per cell), and both `.raw` traces were confirmed free of the
+documented solver-corruption fingerprint. **R04E21's own diagnosed
+hypothesis remains UNTESTED by this run too** -- state 4 is never reached
+in either cell at either tested `TSTOP`, so whether a rescaled `I_NEG`
+would unblock the state-4 ZVS event still cannot be determined. Per
+BOUNDARY.md Section 6's own explicit instruction, this is reported
+plainly as the third anticipated outcome ("`I_NEG` still not reached even
+at `100us`") with NO further `TSTOP` extension attempted or recommended
+here -- a future attempt would need either a circuit-level intervention
+that changes state 3's own negative-current trajectory, or a `NEG_FRAC`
+target within the trajectory's own observed `~-2.215A` reach. See
+`R04E23_phase1_handoff_extended_tstop/BOUNDARY.md` and `RESULTS.md` for
+the complete state-transition timeline, full-trace relaxation-curve
+evidence, current-safety and fingerprint checks for both cells, and full
+discussion of what this still-inconclusive result does and does not
+establish.

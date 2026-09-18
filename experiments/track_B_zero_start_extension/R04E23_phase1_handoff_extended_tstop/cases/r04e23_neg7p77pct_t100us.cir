@@ -1,0 +1,136 @@
+* R04E23 (cell 2/2, NEG_FRAC=.0777) - extending TSTOP so R04E22's own
+* question can actually be tested. R04E22 raised I_LIMIT to P24's own
+* real 125A but found neither swept NEG_FRAC cell's own I_NEG target was
+* reached by TSTOP=20u (inherited byte-identical from R04E3/R04E21,
+* sized for the OLD I_LIMIT=10A regime): both cells parked at state 3
+* (LOW_BUILD_NEGATIVE) with IL1 only reaching -2.215A by 20u, short of
+* this cell's own 9.7125A target (A42's own found local single-phase
+* natural-ZVS threshold, 7.77%). Because state 3's own exit rule never
+* fired, R04E22's own actual question (does a correctly-scaled I_NEG
+* avoid R04E3's own documented ZVS stall) was never actually tested,
+* only prepared for. See BOUNDARY.md for the full scope statement,
+* provenance and explicit limitations (Section 0/7: a narrow
+* phase-1-only test, NOT a four-phase handoff and NOT a P24 periodicity
+* claim).
+*
+* Literal starting template: experiments/track_B_zero_start_extension/
+* R04E22_phase1_handoff_rescaled_ilimit/cases/r04e22_neg7p77pct.cir
+* (read-only, never modified). Per BOUNDARY.md Section 2, the ONLY
+* change relative to R04E22's own netlist is:
+*   1. TSTOP extended from 20u to 100u (a 5x margin over a naive linear
+*      extrapolation of R04E22's own observed rate) -- a pure
+*      numerical-resolution/observation-window choice, not a physics
+*      change.
+*   2. The five .meas ... AT 20u measurements (STATE_FINAL, VOUT_FINAL,
+*      VC1_FINAL, VC2_FINAL, VC3_FINAL) changed to AT 100u to match the
+*      new stop time, so they measure the FINAL state at the new TSTOP
+*      rather than an arbitrary earlier point.
+* Everything else -- I_LIMIT=125, NEG_FRAC=.0777, phase 1's own
+* bootstrapped initial conditions (VC1_IC=35.85894624845418,
+* IL1_IC=75.96527862548828), CFLY=3u, the 5-state .machine block's own
+* rule structure, phases 2-4's own hardcoded R04E3 configuration, the
+* WHEN-based .meas lines, the FROM 0 TO 20u window on IL1_MIN/IL1_MAX,
+* .options -- is byte-identical to R04E22's own file.
+
+.include ../../../../paper_locked/04_component_models/GS61008T_typical_params.lib
+.param VIN=48 VOUT_REF=1 POUT_MODULE=250 NP=4 NM=4
+.param LPHASE=1.466666666666667n CFLY=3u
+.param COUT={8*220u+32*47u+64*22u} RLOAD={VOUT_REF*VOUT_REF/POUT_MODULE}
+.param I_LIMIT=125 NEG_FRAC=.0777 I_NEG={NEG_FRAC*I_LIMIT}
+.param CH={GS61008T_COTR_0_50V} CL={2*GS61008T_COTR_0_50V}
+.param RHS={GS61008T_RDS_TYP_25C} RLS={GS61008T_RDS_TYP_25C/2}
+.param TRAIL=10p VGATE=5 RLDAMP=1u
+* Phase-1 bootstrapped initial conditions, from R04E21's own Step 1
+* (R04E17's own e17_div_f3_t68p61 cell re-run unmodified except one
+* added .meas line, AT TSTOP=368.61us). VC1_IC = VC1_FINAL (matches
+* R04E17's own already-published value to full precision, re-verified
+* directly from the .raw trace this re-run produced). IL1_IC =
+* IL1_AT_TSTOP (newly extracted; R04E17's own committed .meas set only
+* had the IL1_MIN/IL1_MAX envelope, not this instantaneous value).
+.param VC1_IC=35.85894624845418 IL1_IC=75.96527862548828
+
+VRAIL vin 0 PWL(0 0 {TRAIL} {VIN} 20u {VIN})
+CCO out 0 {COUT} ic=0
+RLOAD_MAIN out 0 {RLOAD}
+XMOD vin out 0 gh1_cmd gl1_cmd SCB4P_P24_EVENT
+
+* Physical-event state machine. State 5 is a deliberate P24 handoff blocker.
+.machine 1p
+.state ENERGY 0
+.state HS_OFF_COMMUTATE_LOW 1
+.state LOW_FREEWHEEL_TO_ZERO 2
+.state LOW_BUILD_NEGATIVE 3
+.state COMMUTATE_HIGH_TO_ZVS 4
+.state BLOCK_P24_HANDOFF_UNKNOWN 5
+.rule ENERGY HS_OFF_COMMUTATE_LOW I(XMOD:L1)>=I_LIMIT
+.rule HS_OFF_COMMUTATE_LOW LOW_FREEWHEEL_TO_ZERO V(xmod:x1)<=0
+.rule LOW_FREEWHEEL_TO_ZERO LOW_BUILD_NEGATIVE I(XMOD:L1)<=0
+.rule LOW_BUILD_NEGATIVE COMMUTATE_HIGH_TO_ZVS I(XMOD:L1)<=-I_NEG
+.rule COMMUTATE_HIGH_TO_ZVS BLOCK_P24_HANDOFF_UNKNOWN V(vin,xmod:a1)<=0
+.output (state_mon) state
+.output (gh1_cmd) VGATE*(state==ENERGY)
+.output (gl1_cmd) VGATE*((state==LOW_FREEWHEEL_TO_ZERO)+(state==LOW_BUILD_NEGATIVE))
+.endmachine
+
+RSTATE state_mon 0 1k
+RGH gh1_cmd 0 1k
+RGL gl1_cmd 0 1k
+
+.meas tran T_ENERGY_END WHEN V(state_mon)=.5 RISE=1
+.meas tran IL1_ENERGY_END FIND I(XMOD:L1) WHEN V(state_mon)=.5 RISE=1
+.meas tran T_LOW_SIDE_ZVS WHEN V(state_mon)=1.5 RISE=1
+.meas tran T_IL1_ZERO WHEN V(state_mon)=2.5 RISE=1
+.meas tran T_NEG_TARGET WHEN V(state_mon)=3.5 RISE=1
+.meas tran T_HIGH_SIDE_ZVS WHEN V(state_mon)=4.5 RISE=1
+.meas tran STATE_FINAL FIND V(state_mon) AT 100u
+.meas tran IL1_MIN MIN I(XMOD:L1) FROM 0 TO 20u
+.meas tran IL1_MAX MAX I(XMOD:L1) FROM 0 TO 20u
+.meas tran VOUT_FINAL FIND V(out) AT 100u
+.meas tran VC1_FINAL FIND V(xmod:a1,xmod:x1) AT 100u
+.meas tran VC2_FINAL FIND V(xmod:a2,xmod:x2) AT 100u
+.meas tran VC3_FINAL FIND V(xmod:a3,xmod:x3) AT 100u
+
+.options plotwinsize=0 reltol=1e-5 abstol=1e-9 chgtol=1e-16 solver=alt cshunt=1e-15
+.save V(state_mon) V(gh1_cmd) V(gl1_cmd) V(out) V(xmod:a1) V(xmod:x1) V(xmod:a2) V(xmod:x2) V(xmod:a3) V(xmod:x3) V(vin,xmod:a1) V(xmod:a1,xmod:x1) V(xmod:a2,xmod:x2) V(xmod:a3,xmod:x3) I(XMOD:L1)
+.tran 0 100u 0 1n UIC
+
+.subckt SCB4P_P24_EVENT vin out g gh1_in gl1_in
+* Controller is a plug-in: power connections below match the existing stage.
+BGH1 gh1 g V=V(gh1_in,g)
+BGL1 gl1 g V=V(gl1_in,g)
+VGL2 gl2 g {VGATE}
+VGH2 gh2 g 0
+VGH3 gh3 g 0
+VGH4 gh4 g 0
+VGL3 gl3 g 0
+VGL4 gl4 g 0
+
+SH1 vin a1 gh1 g SWH
+CH1 vin a1 {CH} ic=0
+CS1 a1 x1 {CFLY} ic={VC1_IC}
+CL1 x1 g {CL} ic=0
+SL1 x1 g gl1 g SWL
+L1 x1 out {LPHASE} Rser={RLDAMP} ic={IL1_IC}
+SH2 a1 a2 gh2 g SWH
+CS2 a2 x2 {CFLY} ic=0
+SL2 x2 g gl2 g SWL
+L2 x2 out {LPHASE} Rser={RLDAMP} ic=0
+SH3 a2 a3 gh3 g SWH
+CS3 a3 x3 {CFLY} ic=0
+SL3 x3 g gl3 g SWL
+L3 x3 out {LPHASE} Rser={RLDAMP} ic=0
+SH4 a3 x4 gh4 g SWH
+SL4 x4 g gl4 g SWL
+L4 x4 out {LPHASE} Rser={RLDAMP} ic=0
+
+RNUM_A1 a1 g 1Meg
+RNUM_X1 x1 g 1Meg
+RNUM_A2 a2 g 1Meg
+RNUM_X2 x2 g 1Meg
+RNUM_A3 a3 g 1Meg
+RNUM_X3 x3 g 1Meg
+RNUM_X4 x4 g 1Meg
+.model SWH SW(Ron={RHS} Roff=1T Vt=2.5 Vh=0)
+.model SWL SW(Ron={RLS} Roff=1T Vt=2.5 Vh=0)
+.ends SCB4P_P24_EVENT
+.end
