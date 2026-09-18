@@ -47,3 +47,17 @@ portable without its complete local energy state.
 
 No result may be promoted to the four-module assembly until the complete
 single-module periodic orbit and its paper-defined event alignment are closed.
+
+`A49_math_model_affine_periodic_seed_crosscheck` is a separate cross-check,
+not part of the A00-A43 narrative chain above: it imports the parallel
+`src/scb_ivr/` ideal-switch effort's own already-published periodic-orbit
+state into `A37`'s own unmodified real-device, event-driven four-phase
+construct (`CFLY` corrected to `3 uF` to match the orbit's own frozen
+boundary; seven initial conditions replaced). The rotation stalls one
+transition earlier than A37's own best candidate -- H1-to-H2 itself is
+missed (`Vds(H2)` bottoms at `0.252 V`, never crosses zero) because the
+imported phase-2 seed is a period-average current, not an instantaneous
+snapshot at A37's own `t=0` reference instant. `1/15` residuals converge
+(vs. A37's `3/15`), `0/4` phase transitions achieve ZVS admission (vs.
+A37's `1/4`) -- worse than A37 on both of BOUNDARY.md's own named metrics.
+See `A49_math_model_affine_periodic_seed_crosscheck/RESULTS.md`.

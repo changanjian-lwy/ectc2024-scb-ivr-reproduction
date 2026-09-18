@@ -1,0 +1,118 @@
+{
+  "experiment": "A49_math_model_affine_periodic_seed_crosscheck",
+  "parent": "A37_p25_9pct_joint_seven_state_200ns_periodic_solve",
+  "branch": "CROSS_PAPER_EXTENSION",
+  "scope": "Cross-check only, not a P24/P25 periodic reproduction claim (see BOUNDARY.md Section 0)",
+  "run": {
+    "simulator": "LTspice 26.0.2 for MacOS",
+    "completed_normally": true,
+    "elapsed_seconds": 6.952,
+    "tran_window_s": [0.0, 2.05e-7],
+    "n_raw_points": 41858,
+    "note": "Committed netlist path is 261 chars, at/above this project's own documented ~250-259 char LTspice-runner path-length bug (see R04E14 in paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md) which silently drops all .meas output from .log. Values below are cross-validated two independent ways: (1) direct binary parse of the committed run's own .raw file, (2) a byte-for-byte electrically identical short-path verification copy (/tmp/a49chk/a49chk.cir, not committed) re-run through the same LTspice build, whose real .meas log matches (1) to full double precision."
+  },
+  "param_changes_vs_A37": {
+    "CFLY": {"A37": "4*10u+2*4.7u+2*2.2u = 53.8uF", "A49": "3uF"},
+    "IL1_INIT": {"A37": 5.2947, "A49": 0.111},
+    "IL2_INIT": {"A37": 21.205095337, "A49": 62.724},
+    "IL3_INIT": {"A37": 41.5782701063, "A49": 62.724},
+    "IL4_INIT": {"A37": 84.1447433786, "A49": 63.033},
+    "VC1_INIT": {"A37": 36.000066454, "A49": 35.8448},
+    "VC2_INIT": {"A37": 23.9999142326, "A49": 23.8863},
+    "VC3_INIT": {"A37": 12.0006048777, "A49": 11.9278}
+  },
+  "meas_initial_final_samples": {
+    "VC1_I": 35.8455052538, "VC1_F": 36.1894638803, "DVC1": 0.34395862649,
+    "VC2_I": 23.8865625159, "VC2_F": 23.8844027052, "DVC2": -0.00215981068469,
+    "VC3_I": 11.927849109, "VC3_F": 11.9279917666, "DVC3": 0.000142657556422,
+    "VO_I": 1.0, "VO_F": 1.0, "DVO": 0.0,
+    "IL1_I": 0.144862720949, "IL1_F": -9.00934813755, "DIL1": -9.1542108585,
+    "IL2_I": 62.7245985884, "IL2_F": 0.703233330863, "DIL2": -62.0213652575,
+    "IL3_I": 62.7225272077, "IL3_F": -66.0566763934, "DIL3": -128.779203601,
+    "IL4_I": 63.0309840233, "IL4_F": -65.8316092547, "DIL4": -128.862593278
+  },
+  "meas_peak_current_edges": {
+    "T_H1_OFF_s": 1.66680578649e-08, "IL1_H1_OFF_A": 120.708066182, "PEAK_ERROR_H1_A": -4.29193381758,
+    "T_H2_OFF": "FAILED", "IL2_H2_OFF": "FAILED", "PEAK_ERROR_H2": "FAILED",
+    "T_H3_OFF": "FAILED", "IL3_H3_OFF": "FAILED", "PEAK_ERROR_H3": "FAILED",
+    "T_H4_OFF": "FAILED", "IL4_H4_OFF": "FAILED", "PEAK_ERROR_H4": "FAILED"
+  },
+  "meas_zvs_slot_voltages": {
+    "VDS_H2_SLOT_V_at_50ns": 12.2506980896,
+    "VDS_H3_SLOT_V_at_100ns": 11.9569921494,
+    "VDS_H4_SLOT_V_at_150ns": 11.9296473069,
+    "VDS_H1_SLOT_V_at_200ns": 11.7796310583
+  },
+  "meas_admission_diagnostics": {
+    "T_H2_ON": "FAILED", "VDS_H2_ON": "FAILED",
+    "T_H3_ON": "FAILED", "VDS_H3_ON": "FAILED",
+    "T_H4_ON": "FAILED", "VDS_H4_ON": "FAILED",
+    "T_H1_ON2": "FAILED", "VDS_H1_ON2": "FAILED"
+  },
+  "state_machine_trace": {
+    "transitions": [
+      {"time_ns": 16.6681, "from": "P1_M1", "to": "P1_M2", "trigger": "V(gh1_ton)>=2.5"},
+      {"time_ns": 16.8083, "from": "P1_M2", "to": "P1_M3", "trigger": "V(x1)<=0"},
+      {"time_ns": 89.8196, "from": "P1_M3", "to": "P1_M4", "trigger": "I(LIND2)<=0"},
+      {"time_ns": 106.6532, "from": "P1_M4", "to": "P1_M5", "trigger": "I(LIND2)<=-INEG(-11.25A)"}
+    ],
+    "final_state": "P1_M5",
+    "final_state_never_reached": "P2_M1 (requires (time>=50ns)*(V(a1,a2)<=0), never satisfied within 205ns)",
+    "vds_h2_min_V": 0.25208282,
+    "vds_h2_min_time_ns": 109.144,
+    "gh2_gh3_gh4_max_V_entire_run": 0.0
+  },
+  "residual_convergence_table": {
+    "tolerance": "2e-4 in residual's own unit, same as A37",
+    "residuals": [
+      {"n": 1, "name": "peak_error_h1_a", "A37_value": -0.0000076, "A37_converged": true, "A49_value": -4.29193381758, "A49_converged": false},
+      {"n": 2, "name": "peak_error_h2_a", "A37_value": -7.2343, "A37_converged": false, "A49_value": "FAILED (H2 never conducts)", "A49_converged": false},
+      {"n": 3, "name": "peak_error_h3_a", "A37_value": -125.0, "A37_converged": false, "A49_value": "FAILED", "A49_converged": false},
+      {"n": 4, "name": "peak_error_h4_a", "A37_value": -125.0, "A37_converged": false, "A49_value": "FAILED", "A49_converged": false},
+      {"n": 5, "name": "zvs_error_h2_v", "A37_value": -0.000175, "A37_converged": true, "A49_value": 12.2506980896, "A49_converged": false},
+      {"n": 6, "name": "zvs_error_h3_v", "A37_value": 11.246, "A37_converged": false, "A49_value": 11.9569921494, "A49_converged": false},
+      {"n": 7, "name": "zvs_error_h4_v", "A37_value": 13.916, "A37_converged": false, "A49_value": 11.9296473069, "A49_converged": false},
+      {"n": 8, "name": "zvs_error_h1_v", "A37_value": 11.978, "A37_converged": false, "A49_value": 11.7796310583, "A49_converged": false},
+      {"n": 9, "name": "periodic_error_il1_a", "A37_value": -11.003, "A37_converged": false, "A49_value": -9.1542108585, "A49_converged": false},
+      {"n": 10, "name": "periodic_error_il2_a", "A37_value": 1.249, "A37_converged": false, "A49_value": -62.0213652575, "A49_converged": false},
+      {"n": 11, "name": "periodic_error_il3_a", "A37_value": -40.615, "A37_converged": false, "A49_value": -128.779203601, "A49_converged": false},
+      {"n": 12, "name": "periodic_error_il4_a", "A37_value": -134.059, "A37_converged": false, "A49_value": -128.862593278, "A49_converged": false},
+      {"n": 13, "name": "periodic_error_vc1_v", "A37_value": 0.002247, "A37_converged": false, "A49_value": 0.34395862649, "A49_converged": false},
+      {"n": 14, "name": "periodic_error_vc2_v", "A37_value": 0.018205, "A37_converged": false, "A49_value": -0.00215981068469, "A49_converged": false},
+      {"n": 15, "name": "periodic_error_vc3_v", "A37_value": -0.0000139, "A37_converged": true, "A49_value": 0.000142657556422, "A49_converged": true}
+    ],
+    "A37_converged_count": 3,
+    "A49_converged_count": 1
+  },
+  "zvs_admission_comparison": {
+    "A37": {"H1_to_H2": "admitted (t=50.0007ns, Vds=-0.000531V)", "H2_to_H3": "MISSED_ZVS_SLOT", "H3_to_H4": "cascade blocked", "H4_to_H1_next": "cascade blocked", "admitted_count_of_4": 1},
+    "A49": {"H1_to_H2": "MISSED_ZVS_SLOT (Vds min 0.252V at t=109.14ns, never crosses)", "H2_to_H3": "never reached (H2 never turned on)", "H3_to_H4": "never reached", "H4_to_H1_next": "never reached", "admitted_count_of_4": 0}
+  },
+  "verdict": "WORSE_THAN_A37",
+  "verdict_detail": "A49 converges fewer residuals (1/15) than A37 (3/15) and achieves fewer ZVS admissions (0/4 vs 1/4). A49's rotation stalls one phase-transition earlier than A37's own best candidate (fails H1->H2, which A37 had already solved).",
+  "boundary_section6_outcome": "COMPARABLE_OR_WORSE -- specifically WORSE, not merely comparable",
+  "safety_check": {
+    "bound_A": 250,
+    "IL1_min_A": -12.291161, "IL1_max_A": 121.132202,
+    "IL2_min_A": -11.293266, "IL2_max_A": 62.725754,
+    "IL3_min_A": -68.661919, "IL3_max_A": 62.724010,
+    "IL4_min_A": -68.438370, "IL4_max_A": 63.032532,
+    "all_within_bound": true,
+    "max_abs_current_A": 121.132202,
+    "pct_of_bound": 48.45
+  },
+  "fingerprint_check": {
+    "n_points": 41858,
+    "non_monotonic_or_duplicate_dt_count": 0,
+    "unique_timestamps": 41858,
+    "min_dt_s": 4.999999999999588e-21,
+    "max_dt_s": 5.00000000000567e-12,
+    "raw_file_quirk_noted": "First stored point (index 0, t=0.0) is an all-zero placeholder row, a known LTspice artifact of UIC+skip-op-point; true t=0+ state is at index 1 (t=5e-17s) and correctly matches seeded .param values. Does not affect any reported .meas value (all sampled at t>=2ps) and is independently proven harmless by exact agreement with LTspice's own real .meas engine output.",
+    "solver_corruption_found": false
+  },
+  "ltspice_path_length_bug": {
+    "description": "Committed netlist absolute path is 261 characters. This project's own R04E14 experiment (paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md) already documented that LTspice-runner paths at/above ~250-259 characters silently drop all .meas output from .log (symptom: 'unable to open database file', .raw otherwise complete/correct).",
+    "reproduced_here": true,
+    "workaround": "Byte-for-byte electrically identical copy re-run from a short path (/tmp/a49chk/a49chk.cir, not committed, .include paths only rewritten to absolute Windows-style paths); its real .meas log cross-validates the raw-parsed values to full double precision."
+  }
+}
