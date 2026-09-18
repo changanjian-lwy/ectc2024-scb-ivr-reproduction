@@ -1067,3 +1067,75 @@ modified. See
 the complete 4-cell table, the full 5-point scaling-fit derivation
 (including residuals), the extrapolation/ratio calculation, and the
 current-safety and fingerprint checks.
+
+## R04E26 -- swapping R04E21's own bootstrap IC for the math model's own
+   periodic-orbit state: same stall recurs, but not every value matches
+   to "a fraction of a percent"
+
+Minimal, single-cell, single-variable-change follow-up to R04E21
+(`R04E26_periodic_orbit_ic_swap/BOUNDARY.md`), prompted by a cross-track
+finding (`CONSOLIDATED_FINDINGS_2026-09-16.md`): the parallel math-model
+effort's own newly-solved ideal-switch periodic orbit
+(`results/ZERO_START_AFFINE_PERIOD_FIXED_POINT.md`) reports phase-current
+minima of only `0.111` to `-0.214A` -- much closer to R04E3's own
+original `I_NEG=0.2A` than to the `125A`-scale values R04E22-R04E25
+tested -- raising the possibility that R04E17's own zero-start-ramp
+bootstrap (`IL1=75.97A`), not R04E3's own small-current parameters, was
+the mismatched piece. This experiment re-runs R04E21's own exact netlist
+(`I_LIMIT=10A`, `NEG_FRAC=.02`, `CFLY=3uF`, `TSTOP=20us`, same 5-state
+`.machine`, phases 2-4 still hardcoded), changing ONLY `VC1_IC`
+(`35.85894624845418V -> 35.8448V`, the orbit's own reported average
+flying-cap voltage) and `IL1_IC` (`75.96527862548828A -> 0.111A`, the
+orbit's own reported phase-current minimum, used as an explicit,
+flagged proxy for the true instantaneous pre-commutation value). `diff`
+against R04E21's own committed netlist confirms exactly one changed
+line, nothing else.
+
+**RESULT: the SAME stall recurs -- `STATE_FINAL=4`
+(`COMMUTATE_HIGH_TO_ZVS`) at `TSTOP=20us`, `T_HIGH_SIDE_ZVS` FAILs to
+trigger, identical to R04E21.** This confirms BOUNDARY.md Section 3's
+pre-registered structural expectation: state `ENERGY`'s own unconditional
+`I(XMOD:L1)>=I_LIMIT` exit rule funnels every trajectory through the same
+`I_LIMIT=10A` gate regardless of starting `IL1_IC`, so the bootstrap
+current's specific magnitude cannot change WHETHER the stall occurs.
+Direct confirmation: `il1_energy_end` (the `I(L1)` value at the `0->1`
+transition) is `10.016A` here, essentially exactly `I_LIMIT`, versus
+R04E21's own `75.955A` (already above the gate at `t=0`, no charging
+needed) -- both trajectories are funneled through the same threshold via
+different physical routes.
+
+**However, the stronger claim BOUNDARY.md Section 6 also anticipated
+alongside this ("all measured values within a fraction of a percent of
+R04E21's own committed numbers") does NOT hold**, and this is reported
+plainly rather than rounded away: `IL1_MAX` (`75.967A` vs `14.663A`,
+`-80.7%`, `61.3A` absolute), `IL1_ENERGY_END` (`-86.8%`), `VOUT_FINAL`
+(`-80.9%`), and `T_NEG_TARGET` (`+24.2%`, `408ns` absolute) all diverge
+substantially from R04E21's own published values. This happens because
+starting BELOW `I_LIMIT` (charging up, R04E26) and starting already ABOVE
+it (no charging needed, R04E21) are genuinely different physical
+trajectories through states 0-1, even though both converge onto the same
+final parked state. Three values DO stay within a fraction of a percent
+(`T_IL1_ZERO` `+0.05%`, `IL1_MIN` `-0.02%`, `VC1_FINAL` `-0.03%`) --
+these are the quantities dominated by the near-identical `NEG_FRAC`/
+`VC1_IC` inputs rather than by the very different `IL1_IC` starting
+regime. The correct summary is a **partial, nuanced confirmation**: the
+structural/final-state claim holds exactly; the "everything matches
+closely" claim does not hold uniformly, and the pattern of which values
+do/don't match is itself informative about where the erasure argument
+does and does not apply.
+
+Phase 1's own current stayed within the `+/-250A` bound throughout
+(`max|IL1|=14.663A`, smaller than R04E21's own `75.967A` peak, `0` of
+`189,804` scanned points over bound). The `.raw` trace was directly,
+byte-level parsed and confirmed free of the documented solver-corruption
+fingerprint (zero non-monotonic/duplicate timestamps; `V(vin)` stayed
+exactly within its commanded `0-48V` step). Neither R04E21's, R04E17's,
+nor R04E3's own committed files or results were modified. **Cross-track
+takeaway**: this small-scope IC swap cannot resolve the cross-track
+discrepancy on its own -- the larger, full-four-phase, real-
+instantaneous-checkpoint alternative (not chosen this round) remains the
+next step if that discrepancy is still worth pursuing. See
+`R04E26_periodic_orbit_ic_swap/BOUNDARY.md` and `RESULTS.md` for the
+complete 13-row comparison table, the full discussion of which values
+match and which don't (and why), and the current-safety and fingerprint
+checks.

@@ -1,0 +1,100 @@
+{
+  "experiment": "R04E26_periodic_orbit_ic_swap",
+  "parent": "R04E21_phase1_handoff_into_r04e3_stall",
+  "outcome": "SAME_STALL_RECURS_PARTIAL_QUANTITATIVE_MATCH",
+  "netlist_diff_against_r04e21": {
+    "only_changed_line": ".param VC1_IC=35.85894624845418 IL1_IC=75.96527862548828  ->  .param VC1_IC=35.8448 IL1_IC=0.111",
+    "everything_else_confirmed_unchanged_via_diff": true
+  },
+  "initial_conditions": {
+    "vc1_ic_v": 35.8448,
+    "vc1_ic_r04e21_v": 35.85894624845418,
+    "vc1_ic_abs_diff_v": -0.014146248454181887,
+    "vc1_ic_rel_diff_pct": -0.039449704841206,
+    "il1_ic_a": 0.111,
+    "il1_ic_r04e21_a": 75.96527862548828,
+    "il1_ic_abs_diff_a": -75.85427862548828,
+    "il1_ic_rel_diff_pct": -99.85388061228969,
+    "vc1_ic_source": "results/ZERO_START_AFFINE_PERIOD_FIXED_POINT.md, 'Average flying-capacitor voltages' row",
+    "il1_ic_source": "results/ZERO_START_AFFINE_PERIOD_FIXED_POINT.md, 'Phase-current minima' row (period minimum used as proxy for pre-commutation instantaneous value, explicit approximation per BOUNDARY.md Section 7)"
+  },
+  "run": {
+    "total_elapsed_time_s": 33.112,
+    "r04e21_total_elapsed_time_s": 35.444,
+    "raw_points": 189804,
+    "r04e21_raw_points": 193606
+  },
+  "meas_r04e26": {
+    "t_energy_end_s": 1.22179360512e-09,
+    "il1_energy_end_a": 10.0157430792,
+    "t_low_side_zvs_s": 2.28994133495e-09,
+    "t_il1_zero_s": 1.63157274983e-06,
+    "t_neg_target_s": 2.09463020044e-06,
+    "t_high_side_zvs_s": null,
+    "t_high_side_zvs_status": "FAILED (never reached within TSTOP=20us)",
+    "state_final": 4,
+    "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+    "il1_min_a": -0.200000599027,
+    "il1_max_a": 14.6630678177,
+    "vout_final_v": 0.000123416466522,
+    "vc1_final_v": 35.8512362662,
+    "vc2_final_v": -2.69210431725e-09,
+    "vc3_final_v": -3.18686943501e-09
+  },
+  "meas_r04e21_published": {
+    "t_energy_end_s": 2.98294522065e-13,
+    "il1_energy_end_a": 75.9550563853,
+    "t_low_side_zvs_s": 1.39754948686e-12,
+    "t_il1_zero_s": 1.63068387739e-06,
+    "t_neg_target_s": 1.68678613822e-06,
+    "t_high_side_zvs_s": null,
+    "t_high_side_zvs_status": "FAILED (never reached within TSTOP=20us)",
+    "state_final": 4,
+    "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+    "il1_min_a": -0.200048059225,
+    "il1_max_a": 75.9670639038,
+    "vout_final_v": 0.000644895655569,
+    "vc1_final_v": 35.86026322,
+    "vc2_final_v": -1.60653144121e-08,
+    "vc3_final_v": -1.65891833603e-08
+  },
+  "comparison": {
+    "t_energy_end": {"abs_diff": 1.2215e-09, "rel_diff_pct": 4.10e+05, "note": "both sub-ns, negligible vs 20us window"},
+    "il1_energy_end": {"abs_diff": -65.9393, "rel_diff_pct": -86.81, "note": "R04E26 climbs to I_LIMIT=10A from below; R04E21 already exceeded it at t=0"},
+    "t_low_side_zvs": {"abs_diff": 2.2885e-09, "rel_diff_pct": 1.64e+05, "note": "both sub-ns, negligible vs 20us window"},
+    "t_il1_zero": {"abs_diff": 8.889e-10, "rel_diff_pct": 0.0545, "note": "close match"},
+    "t_neg_target": {"abs_diff": 4.0784e-07, "rel_diff_pct": 24.18, "note": "meaningful divergence, 408ns absolute"},
+    "state_final": {"abs_diff": 0, "rel_diff_pct": 0.0, "note": "identical, both state 4"},
+    "il1_min": {"abs_diff": 4.746e-05, "rel_diff_pct": -0.0237, "note": "close match, both at -I_NEG=-0.2A threshold"},
+    "il1_max": {"abs_diff": -61.3040, "rel_diff_pct": -80.70, "note": "large real divergence, 61.3A absolute"},
+    "vout_final": {"abs_diff": -0.000521479, "rel_diff_pct": -80.86, "note": "both numerically near-zero vs 1V nominal"},
+    "vc1_final": {"abs_diff": -0.0090270, "rel_diff_pct": -0.0252, "note": "close match, tracks 0.039% VC1_IC diff"},
+    "vc2_final": {"abs_diff": 1.337e-08, "rel_diff_pct": -83.24, "note": "both numerically zero (nV scale), rel% not physically meaningful"},
+    "vc3_final": {"abs_diff": 1.340e-08, "rel_diff_pct": -80.79, "note": "both numerically zero (nV scale), rel% not physically meaningful"}
+  },
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "il1_max_abs_a_observed_full_trace": 14.663067817687988,
+    "r04e21_il1_max_abs_a": 75.9670639038086,
+    "within_bound_throughout": true,
+    "points_over_bound": 0,
+    "points_scanned": 189804
+  },
+  "corruption_fingerprint_check": {
+    "raw_points": 189804,
+    "non_monotonic_or_duplicate_timestamps": 0,
+    "vin_min_v": 0.0,
+    "vin_max_v": 48.0,
+    "vin_stayed_within_commanded_0_48v": true,
+    "implausible_value_count": 0,
+    "clean": true
+  },
+  "outcome_classification": {
+    "structural_expectation_held": true,
+    "state_final_matches_r04e21": true,
+    "t_high_side_zvs_status_matches_r04e21": true,
+    "all_values_within_fraction_of_percent": false,
+    "genuine_surprise_per_section6_second_bullet": false,
+    "reasoning": "STATE_FINAL=4 (COMMUTATE_HIGH_TO_ZVS) at TSTOP=20us, identical to R04E21's own documented stall. T_HIGH_SIDE_ZVS FAILED in both cells, confirming the pre-registered structural-insensitivity expectation (BOUNDARY.md Section 3): whatever IL1_IC is set to, state ENERGY's own unconditional I(XMOD:L1)>=I_LIMIT exit rule funnels every trajectory through the same I_LIMIT=10A gate before the interesting states, so the specific bootstrap value cannot change WHETHER the stall occurs. However, the stronger claim that 'all measured values would be within a fraction of a percent' does NOT hold: il1_max, il1_energy_end, vout_final, and t_neg_target diverge by 24%-87% because starting below I_LIMIT (charging up) versus already above it (no charging needed) are physically different trajectories through states 0-1, even though both trajectories converge to the same final parked state. This is a partial/nuanced confirmation, reported explicitly rather than rounded to a clean match."
+  }
+}
