@@ -16,6 +16,8 @@
   deliberately rejected as restart states.
 - `solve_zero_start_affine_period.py` constructs the fixed-diode one-period
   affine map and reports its rank, closure and diode-complementarity audit.
+- `export_synchronized_model_data.py` exports the finest audited affine-period
+  solution as a canonical JSON model interface and a flat event-state CSV.
 
 Install the project first with `python3 -m pip install -e .`, then run a script
 from the repository root, for example `python3 scripts/run_reproduction.py`.

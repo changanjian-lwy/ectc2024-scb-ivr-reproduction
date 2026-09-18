@@ -1,0 +1,2324 @@
+{
+  "schema": "scb_ivr.synchronized_four_phase_period.v1",
+  "classification": "THEORETICAL_FIXED_DIODE_FAST_PERIODIC_MANIFOLD",
+  "scope": {
+    "topology": "P24-connected single-module four-phase stage",
+    "control": "fixed 5 MHz interleaved PWM",
+    "diode_branch": "three precharge diodes forced off and audited",
+    "modules_simulated": 1,
+    "nominal_module_power_w": 250.0,
+    "not_claimed": [
+      "P24/P25 event-driven ZVS sequence",
+      "four-module coupling or current sharing",
+      "hardware loss or device-level ZVS",
+      "unique full zero-start asymptotic state"
+    ]
+  },
+  "boundary": {
+    "vin_target_v": 48.0,
+    "vout_target_v": 1.0,
+    "module_power_w": 250.0,
+    "phases": 4,
+    "switching_frequency_hz": 5000000.0,
+    "input_ramp_s": 2.287e-05,
+    "phase_inductance_h": 1.4666667e-09,
+    "phase_inductor_resistance_ohm": 1e-06,
+    "flying_capacitances_f": [
+      3e-06,
+      3e-06,
+      3e-06
+    ],
+    "output_capacitance_f": 0.004672,
+    "divider_enabled": true,
+    "divider_capacitance_f": 0.0003,
+    "divider_leakage_ohm": 1000000000.0,
+    "source_inductance_h": 5e-09,
+    "source_resistance_ohm": 0.01,
+    "switch_on_resistance_ohm": 1e-06,
+    "switch_off_resistance_ohm": 1000000000000.0,
+    "diode_on_resistance_ohm": 0.001,
+    "diode_off_resistance_ohm": 1000000000000.0,
+    "evidence": "CROSS_PAPER_EXTENSION"
+  },
+  "topology": {
+    "high_side_pairs": [
+      [
+        "vin",
+        "a1"
+      ],
+      [
+        "a1",
+        "a2"
+      ],
+      [
+        "a2",
+        "a3"
+      ],
+      [
+        "a3",
+        "x4"
+      ]
+    ],
+    "low_side_pairs": [
+      [
+        "x1",
+        "ground"
+      ],
+      [
+        "x2",
+        "ground"
+      ],
+      [
+        "x3",
+        "ground"
+      ],
+      [
+        "x4",
+        "ground"
+      ]
+    ],
+    "inductor_pairs": [
+      [
+        "x1",
+        "out"
+      ],
+      [
+        "x2",
+        "out"
+      ],
+      [
+        "x3",
+        "out"
+      ],
+      [
+        "x4",
+        "out"
+      ]
+    ],
+    "flying_capacitor_pairs": [
+      [
+        "a1",
+        "x1"
+      ],
+      [
+        "a2",
+        "x2"
+      ],
+      [
+        "a3",
+        "x3"
+      ]
+    ],
+    "precharge_diode_pairs": [
+      [
+        "tap3",
+        "a1"
+      ],
+      [
+        "tap2",
+        "a2"
+      ],
+      [
+        "tap1",
+        "a3"
+      ]
+    ]
+  },
+  "state_schema": {
+    "variable_order": [
+      "src",
+      "src_r",
+      "vin",
+      "tap3",
+      "tap2",
+      "tap1",
+      "a1",
+      "a2",
+      "a3",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "out",
+      "LPAR_IN",
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "I_VSTEP"
+    ],
+    "units": {
+      "src": "V",
+      "src_r": "V",
+      "vin": "V",
+      "tap3": "V",
+      "tap2": "V",
+      "tap1": "V",
+      "a1": "V",
+      "a2": "V",
+      "a3": "V",
+      "x1": "V",
+      "x2": "V",
+      "x3": "V",
+      "x4": "V",
+      "out": "V",
+      "LPAR_IN": "A",
+      "L1": "A",
+      "L2": "A",
+      "L3": "A",
+      "L4": "A",
+      "I_VSTEP": "A"
+    },
+    "reliability": {
+      "src": "FAST_PERIODIC_MANIFOLD_STATE",
+      "src_r": "FAST_PERIODIC_MANIFOLD_STATE",
+      "vin": "FAST_PERIODIC_MANIFOLD_STATE",
+      "tap3": "NONUNIQUE_SLOW_COORDINATE_DO_NOT_USE_AS_PHYSICAL_STARTUP_STATE",
+      "tap2": "NONUNIQUE_SLOW_COORDINATE_DO_NOT_USE_AS_PHYSICAL_STARTUP_STATE",
+      "tap1": "NONUNIQUE_SLOW_COORDINATE_DO_NOT_USE_AS_PHYSICAL_STARTUP_STATE",
+      "a1": "FAST_PERIODIC_MANIFOLD_STATE",
+      "a2": "FAST_PERIODIC_MANIFOLD_STATE",
+      "a3": "FAST_PERIODIC_MANIFOLD_STATE",
+      "x1": "FAST_PERIODIC_MANIFOLD_STATE",
+      "x2": "FAST_PERIODIC_MANIFOLD_STATE",
+      "x3": "FAST_PERIODIC_MANIFOLD_STATE",
+      "x4": "FAST_PERIODIC_MANIFOLD_STATE",
+      "out": "FAST_PERIODIC_MANIFOLD_STATE",
+      "LPAR_IN": "FAST_PERIODIC_MANIFOLD_STATE",
+      "L1": "FAST_PERIODIC_MANIFOLD_STATE",
+      "L2": "FAST_PERIODIC_MANIFOLD_STATE",
+      "L3": "FAST_PERIODIC_MANIFOLD_STATE",
+      "L4": "FAST_PERIODIC_MANIFOLD_STATE",
+      "I_VSTEP": "FAST_PERIODIC_MANIFOLD_STATE"
+    },
+    "sampling_side": "left_limit_at_each_pwm_event"
+  },
+  "solver_audit": {
+    "maximum_step_s": 6.25e-11,
+    "map_size": 20,
+    "least_squares_rank": 17,
+    "numerical_nullity": 3,
+    "fixed_point_residual_inf": 2.573585788923083e-11,
+    "orbit_closure_inf": 2.2228078933039797e-08,
+    "diode_complementarity_valid_for_minimum_norm_slow_coordinates": true
+  },
+  "affine_period_map": {
+    "equation": "z_next = matrix_M @ z_current + offset_c",
+    "variable_order": [
+      "src",
+      "src_r",
+      "vin",
+      "tap3",
+      "tap2",
+      "tap1",
+      "a1",
+      "a2",
+      "a3",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "out",
+      "LPAR_IN",
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "I_VSTEP"
+    ],
+    "discretization": "backward_euler",
+    "maximum_step_s": 6.25e-11,
+    "matrix_M": [
+      [
+        0.0,
+        0.0,
+        1.8761880937745445e-10,
+        1.8474111129762605e-13,
+        -9.947598300641403e-14,
+        -1.7053025658242404e-13,
+        5.562128535530064e-11,
+        -7.105427357601002e-15,
+        -2.1316282072803006e-14,
+        1.7695356291369535e-10,
+        -2.842170943040401e-14,
+        -2.842170943040401e-14,
+        0.0,
+        3.4440006402292056e-11,
+        5.6708415741013596e-11,
+        1.2881429256594856e-10,
+        5.314149120749789e-11,
+        5.314149120749789e-11,
+        5.314149120749789e-11,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.32345420901411615,
+        3.552713678800501e-13,
+        -2.842170943040401e-14,
+        -9.947598300641403e-14,
+        0.00039029691491521135,
+        -7.105427357601002e-15,
+        -1.4210854715202004e-14,
+        -0.00039029668209877855,
+        -2.1316282072803006e-14,
+        -2.842170943040401e-14,
+        0.0,
+        0.00039017644097327775,
+        -0.006296717156224929,
+        -6.885156575719975e-05,
+        5.19108311891614e-10,
+        5.19108311891614e-10,
+        5.19108311891614e-10,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.952305822684238,
+        3.5438318946034997e-13,
+        -3.2862601528904634e-14,
+        -1.0347278589506459e-13,
+        0.001207577934323023,
+        -1.2878587085651816e-14,
+        -1.4210854715202004e-14,
+        -0.0012075779343390103,
+        -2.220446049250313e-14,
+        -2.842170943040401e-14,
+        0.0,
+        0.001207202801859708,
+        0.0021588735961910466,
+        -0.00021031760220147078,
+        1.4504260015257842e-09,
+        1.4504260015257842e-09,
+        1.4504260015257842e-09,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.035770632986444006,
+        0.9999999999998621,
+        -2.2870594307278225e-14,
+        -1.0547118733938987e-13,
+        0.0009056834507346068,
+        -1.2434497875801753e-14,
+        -2.398081733190338e-14,
+        -0.0009056834507652489,
+        -2.6423307986078726e-14,
+        -3.019806626980426e-14,
+        0.0,
+        0.0009054021013890079,
+        0.001619155197133182,
+        -0.00015773820164644015,
+        1.0878118406054682e-09,
+        1.0878118406054682e-09,
+        1.0878118406054682e-09,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.023847088657639848,
+        2.2071233729548112e-13,
+        0.9999999999995508,
+        -1.0191847366058937e-13,
+        0.0006037889671530738,
+        -1.1546319456101628e-14,
+        -2.19824158875781e-14,
+        -0.0006037889671732799,
+        -2.0872192862952943e-14,
+        -2.4424906541753444e-14,
+        0.0,
+        0.0006036014009329627,
+        0.0010794367980782038,
+        -0.00010515880110406606,
+        7.252034528448803e-10,
+        7.252034528448803e-10,
+        7.252034528448803e-10,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.011923544328819924,
+        1.1035616864774056e-13,
+        2.2426505097428162e-14,
+        0.9999999999994872,
+        0.0003018944835765369,
+        -5.773159728050814e-15,
+        -1.0103029524088925e-14,
+        -0.00030189448358663995,
+        -1.0436096431476471e-14,
+        -1.2212453270876722e-14,
+        0.0,
+        0.00030180070046648133,
+        0.0005397183990391019,
+        -5.257940055203303e-05,
+        3.6260172642244015e-10,
+        3.6260172642244015e-10,
+        3.6260172642244015e-10,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.030518433483135855,
+        6.238581970897245e-14,
+        5.765922678549473e-15,
+        -1.945465273253677e-16,
+        0.9381343819135258,
+        0.03134527889651521,
+        -5.442859276699958e-09,
+        -0.938134381913706,
+        -0.03134527889651632,
+        5.442859259271408e-09,
+        0.0,
+        0.18593416693718684,
+        2.263418424540596e-06,
+        0.005322368355018916,
+        -0.005436297546780596,
+        1.3309107265447722e-06,
+        1.3309355477809167e-06,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.000990105608834763,
+        4.498189642217643e-16,
+        5.972548149812571e-14,
+        6.534238736433063e-15,
+        0.02937318179128338,
+        0.9382913670908027,
+        0.03134528306099395,
+        -0.029373181791284713,
+        -0.9382913670908561,
+        -0.03134528306099419,
+        0.0,
+        0.19011075066780123,
+        7.45246457263115e-08,
+        0.00017004545763623884,
+        0.005269566568013068,
+        -0.005433910955082065,
+        3.346770184988829e-06,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        8.869607195952314e-05,
+        1.9313251169904505e-17,
+        8.8476874151051225e-16,
+        5.869715877738485e-14,
+        0.0008964846434086972,
+        0.029372966983940863,
+        0.9381278405217564,
+        -0.0008964846434087175,
+        -0.029372966983942938,
+        -0.9381278405217849,
+        0.0,
+        0.19534329408651546,
+        8.551461275580859e-09,
+        1.0724550392547173e-05,
+        0.0001703409317629278,
+        0.0052704199876805365,
+        -0.0054899380676105515,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.1203435335193808e-05,
+        5.131166775788941e-20,
+        1.2477854104239912e-19,
+        1.0562765550057142e-19,
+        1.1221396978869172e-05,
+        -9.67145089142274e-09,
+        -5.442866217093189e-09,
+        -1.1221396978877057e-05,
+        9.671450890890254e-09,
+        5.44286621709483e-09,
+        0.0,
+        0.00013496844985692614,
+        -1.2426169783406995e-09,
+        -9.640590537987627e-07,
+        2.8634343407663607e-09,
+        2.8746438292275533e-09,
+        2.899464901449567e-09,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -3.198364444331645e-07,
+        -1.7149160158237654e-19,
+        1.1564548480283629e-18,
+        1.852884572118782e-21,
+        -1.078480149646468e-05,
+        1.111161250389218e-05,
+        -5.5069738000404765e-09,
+        1.0784801496466107e-05,
+        -1.1111612503894683e-05,
+        5.506973801447618e-09,
+        0.0,
+        0.00013307008742340486,
+        -2.2714121915091622e-11,
+        -5.8196079977373394e-08,
+        -9.342025816954941e-07,
+        2.8720663128395017e-09,
+        2.885767113727464e-09,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.9191580343604556e-08,
+        -2.4374427712523497e-21,
+        -3.35395992393687e-19,
+        1.3389067478234319e-18,
+        -3.513073839382688e-07,
+        -1.078290898737272e-05,
+        1.1116535610624681e-05,
+        3.5130738393829267e-07,
+        1.0782908987373525e-05,
+        -1.1116535610625793e-05,
+        0.0,
+        0.0001330119173122988,
+        2.4180260919024165e-12,
+        9.589209650836866e-10,
+        -5.764924990715927e-08,
+        -9.342022830008372e-07,
+        2.8749741531866986e-09,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        3.0129224224495055e-08,
+        2.5550058158114488e-21,
+        -1.0628107648570003e-20,
+        -5.20525088090678e-19,
+        -2.478914950065376e-08,
+        -3.50781588980373e-07,
+        -1.0895522701582058e-05,
+        2.4789149500653943e-08,
+        3.5078158898039644e-07,
+        1.0895522701582199e-05,
+        0.0,
+        0.00013634916954878584,
+        3.2381552474622807e-12,
+        2.845060485927356e-09,
+        9.349725572446696e-10,
+        -5.824489457678249e-08,
+        -9.65313095432744e-07,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0004679103757194913,
+        4.349725942387646e-17,
+        -3.1539271791013873e-18,
+        -6.3612174338797955e-18,
+        -0.00012544126869356258,
+        -0.00012158322206142611,
+        -0.00012062539419329979,
+        0.00012544126869356486,
+        0.00012158322206142532,
+        0.00012062539419330052,
+        0.0,
+        0.977872451166502,
+        5.076882228678226e-08,
+        4.297731558347565e-05,
+        4.175619216584808e-05,
+        4.176479718755752e-05,
+        4.214700149168341e-05,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -32.34542088264948,
+        -1.7053025658242404e-11,
+        -7.048583938740194e-12,
+        -7.048583938740194e-12,
+        -0.03902968592842626,
+        0.0,
+        0.0,
+        0.0390296859047794,
+        0.0,
+        0.0,
+        0.0,
+        -0.03901764065312818,
+        0.6296717212933345,
+        0.006885169457518714,
+        -4.659659680328332e-08,
+        -4.659659680328332e-08,
+        -4.659659680328332e-08,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        11.20343533519445,
+        9.48782719056851e-13,
+        -1.2477519018005978e-13,
+        -1.0562384300527583e-13,
+        -11.221396978873077,
+        0.009671450892065794,
+        0.00544286621712517,
+        11.221396978873154,
+        -0.009671450892066204,
+        -0.0054428662171268,
+        0.0,
+        -134.96844985693005,
+        0.0012426169783460311,
+        0.9640590537988373,
+        -0.0028634343406917506,
+        -0.002874643829232873,
+        -0.0028994649014495583,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.3198364444331575,
+        1.7149161864876694e-13,
+        -1.5642142529165293e-13,
+        -1.7973903615464693e-15,
+        10.784801496466294,
+        -11.111612503893268,
+        0.005506973801682042,
+        -10.784801496466317,
+        11.111612503893536,
+        -0.005506973801682309,
+        0.0,
+        -133.07008742340577,
+        2.271412191620181e-05,
+        0.058196079977380515,
+        0.9342025816955157,
+        -0.002872066312812915,
+        -0.0028857671137328426,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.019191580343615178,
+        2.4374491140732868e-15,
+        3.353959904944803e-13,
+        -3.389080465918126e-13,
+        0.35130738393830796,
+        10.78290898737398,
+        -11.11653561062524,
+        -0.3513073839383104,
+        -10.782908987374084,
+        11.116535610625235,
+        0.0,
+        -133.01191731229937,
+        -2.4180260913611573e-06,
+        -0.0009589209650836451,
+        0.05764924990716286,
+        0.934202283000848,
+        -0.0028749741531759994,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.030129224224494967,
+        -2.5550037346250276e-15,
+        1.0628108636223654e-14,
+        5.205250835395303e-13,
+        0.02478914950065466,
+        0.35078158898040235,
+        10.895522701582998,
+        -0.02478914950065484,
+        -0.35078158898042583,
+        -10.895522701583138,
+        0.0,
+        -136.34916954878565,
+        -3.2381552474622637e-06,
+        -0.0028450604859273456,
+        -0.0009349725572444991,
+        0.05824489457678776,
+        0.9653130954327386,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        32.34542088264948,
+        1.7053025658242404e-11,
+        7.048583938740194e-12,
+        7.048583938740194e-12,
+        0.03902968592842626,
+        0.0,
+        0.0,
+        -0.03902968590500677,
+        0.0,
+        0.0,
+        0.0,
+        0.03901764065312818,
+        -0.6296717212935619,
+        -0.006885169457518714,
+        4.6596369429607876e-08,
+        4.6596369429607876e-08,
+        4.6596369429607876e-08,
+        0.0
+      ]
+    ],
+    "offset_c": [
+      47.9999999999287,
+      32.4554637270162,
+      2.2313567702772255,
+      1.6735175777079456,
+      1.1156783851386474,
+      0.5578391925693237,
+      9.180475599756001e-05,
+      3.0670834595452707e-06,
+      4.2692436950469e-07,
+      -6.71078080802337e-08,
+      -8.804140236666628e-10,
+      1.3846153354536734e-10,
+      1.7208933319657773e-10,
+      2.711143080948669e-06,
+      1554.4536272912492,
+      0.06710780808413888,
+      0.0008804140247824313,
+      -0.00013846153298752498,
+      -0.00017208933319657732,
+      -1554.4536272912492
+    ],
+    "warning": "This is the selected discrete one-period map, not a continuous-time state matrix."
+  },
+  "period_metrics": {
+    "average_output_v": 1.0060079937506097,
+    "average_load_power_w": 253.01302135384827,
+    "average_phase_currents_a": [
+      63.02141274756478,
+      62.723889418846426,
+      62.72388944773304,
+      63.03280682803745
+    ],
+    "minimum_phase_currents_a": [
+      0.11088801335147373,
+      -0.2136240933081225,
+      -0.21362071361338256,
+      0.12349436705354273
+    ],
+    "maximum_phase_currents_a": [
+      125.87897118728735,
+      125.5543781585899,
+      125.55437480794959,
+      125.89085137712313
+    ],
+    "average_input_inductor_current_a": 5.298268101741384,
+    "average_flying_capacitor_v": [
+      35.84478256507729,
+      23.88631071494739,
+      11.927838961696613
+    ]
+  },
+  "event_snapshots": [
+    {
+      "label": "P1_high_side_turn_on_0.000000ns",
+      "absolute_time_s": 2.3e-05,
+      "relative_time_s": 0.0,
+      "sampling_side": "left_limit",
+      "transition_phase": 1,
+      "transition": "high_side_turn_on",
+      "global": {
+        "input_source_v": 48.00000002218143,
+        "input_bus_v": 47.9533036125399,
+        "output_v": 1.0059798667014976,
+        "input_inductor_current_a": 5.264999623447561,
+        "output_load_current_a": 251.4949666753744,
+        "sum_phase_currents_a": 205.59779788484812,
+        "source_current_variable_a": -5.26499962349542
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.75647334918139,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.797972164670206,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.839470970667888,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -1.1088817223268539e-07,
+          "high_side_voltage_first_minus_second_v": 12.196830263298388,
+          "low_side_voltage_first_minus_ground_v": -1.1088817223268539e-07,
+          "inductor_current_first_to_second_a": 0.1108880133312274,
+          "inductor_voltage_first_minus_second_v": -1.0059799775896698,
+          "flying_capacitor_voltage_first_minus_second_v": 35.75647346012968,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -3.408323877706546e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501185466865,
+          "low_side_voltage_first_minus_ground_v": -3.408323877706546e-05,
+          "inductor_current_first_to_second_a": 34.08323877735973,
+          "inductor_voltage_first_minus_second_v": -1.0060139499402747,
+          "flying_capacitor_voltage_first_minus_second_v": 23.798006247013422,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -6.838245679584927e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501193988532,
+          "low_side_voltage_first_minus_ground_v": -6.838245679584927e-05,
+          "inductor_current_first_to_second_a": 68.38245679258311,
+          "inductor_voltage_first_minus_second_v": -1.0060482491582934,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352242909,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00010302121460988678,
+          "high_side_voltage_first_minus_second_v": 11.839573991000723,
+          "low_side_voltage_first_minus_ground_v": -0.00010302121460988678,
+          "inductor_current_first_to_second_a": 103.02121430157403,
+          "inductor_voltage_first_minus_second_v": -1.0060828879161074,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 48.00000002218143,
+        "src_r": 47.94735002594821,
+        "vin": 47.9533036125399,
+        "tap3": 6.011723548967957e-11,
+        "tap2": -8.955596809777312e-10,
+        "tap1": -8.817743683405886e-10,
+        "a1": 35.75647334924151,
+        "a2": 23.797972163774645,
+        "a3": 11.839470969786113,
+        "x1": -1.1088817223268539e-07,
+        "x2": -3.408323877706546e-05,
+        "x3": -6.838245679584927e-05,
+        "x4": -0.00010302121460988678,
+        "out": 1.0059798667014976,
+        "LPAR_IN": 5.264999623447561,
+        "L1": 0.1108880133312274,
+        "L2": 34.08323877735973,
+        "L3": 68.38245679258311,
+        "L4": 103.02121430157403,
+        "I_VSTEP": -5.26499962349542
+      }
+    },
+    {
+      "label": "P1_high_side_turn_off_16.666667ns",
+      "absolute_time_s": 2.3016666666666666e-05,
+      "relative_time_s": 1.6666666666666664e-08,
+      "sampling_side": "left_limit",
+      "transition_phase": 1,
+      "transition": "high_side_turn_off",
+      "global": {
+        "input_source_v": 47.99999999999987,
+        "input_bus_v": 47.940343451084274,
+        "output_v": 1.0059811667171443,
+        "input_inductor_current_a": 5.259280609738237,
+        "output_load_current_a": 251.49529167928608,
+        "sum_phase_currents_a": 297.0677407744906,
+        "source_current_variable_a": -5.259280609738237
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -47.94993769314315,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.80446367732839,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.842722443742206,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": true,
+          "low_side_on_left_limit": false,
+          "switch_node_v": 11.830526239209318,
+          "high_side_voltage_first_minus_second_v": 0.000125878971182658,
+          "low_side_voltage_first_minus_ground_v": 11.830526239209318,
+          "inductor_current_first_to_second_a": 125.87897118728735,
+          "inductor_voltage_first_minus_second_v": 10.824545072492175,
+          "flying_capacitor_voltage_first_minus_second_v": 36.10969133290377,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -2.2651307440255153e-05,
+          "high_side_voltage_first_minus_second_v": 24.142233976407137,
+          "low_side_voltage_first_minus_ground_v": -2.2651307440255153e-05,
+          "inductor_current_first_to_second_a": 22.651307440268393,
+          "inductor_voltage_first_minus_second_v": -1.0060038180245845,
+          "flying_capacitor_voltage_first_minus_second_v": 23.798006247013394,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -5.694974593671789e-05,
+          "high_side_voltage_first_minus_second_v": 11.95850119320899,
+          "low_side_voltage_first_minus_ground_v": -5.694974593671789e-05,
+          "inductor_current_first_to_second_a": 56.94974593671799,
+          "inductor_voltage_first_minus_second_v": -1.006038116463081,
+          "flying_capacitor_voltage_first_minus_second_v": 11.8395393522429,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -9.1587716210205e-05,
+          "high_side_voltage_first_minus_second_v": 11.839573990213173,
+          "low_side_voltage_first_minus_ground_v": -9.1587716210205e-05,
+          "inductor_current_first_to_second_a": 91.58771621021684,
+          "inductor_voltage_first_minus_second_v": -1.0060727544333545,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.99999999999987,
+        "src_r": 47.94740719390249,
+        "vin": 47.940343451084274,
+        "tap3": -0.009720121030058761,
+        "tap2": -0.006480081622435114,
+        "tap1": -0.0032400412452413094,
+        "a1": 47.94021757211309,
+        "a2": 23.797983595705954,
+        "a3": 11.839482402496964,
+        "x1": 11.830526239209318,
+        "x2": -2.2651307440255153e-05,
+        "x3": -5.694974593671789e-05,
+        "x4": -9.1587716210205e-05,
+        "out": 1.0059811667171443,
+        "LPAR_IN": 5.259280609738237,
+        "L1": 125.87897118728735,
+        "L2": 22.651307440268393,
+        "L3": 56.94974593671799,
+        "L4": 91.58771621021684,
+        "I_VSTEP": -5.259280609738237
+      }
+    },
+    {
+      "label": "P2_high_side_turn_on_50.000000ns",
+      "absolute_time_s": 2.305e-05,
+      "relative_time_s": 5e-08,
+      "sampling_side": "left_limit",
+      "transition_phase": 2,
+      "transition": "high_side_turn_on",
+      "global": {
+        "input_source_v": 48.00000000000012,
+        "input_bus_v": 47.9426900195783,
+        "output_v": 1.005979300632651,
+        "input_inductor_current_a": 5.29717845489806,
+        "output_load_current_a": 251.49482515816274,
+        "sum_phase_currents_a": 205.59863019448107,
+        "source_current_variable_a": -5.29717845489806
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -36.11754851821229,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.803313258010714,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.842158668108116,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.0001030093475941175,
+          "high_side_voltage_first_minus_second_v": 11.833101696022261,
+          "low_side_voltage_first_minus_ground_v": -0.0001030093475941175,
+          "inductor_current_first_to_second_a": 103.0093475941175,
+          "inductor_voltage_first_minus_second_v": -1.0060823099802452,
+          "flying_capacitor_voltage_first_minus_second_v": 36.10969133290364,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": 2.1362409331996188e-07,
+          "high_side_voltage_first_minus_second_v": 12.311581862918551,
+          "low_side_voltage_first_minus_ground_v": 2.1362409331996188e-07,
+          "inductor_current_first_to_second_a": -0.2136240933081225,
+          "inductor_voltage_first_minus_second_v": -1.0059790870085576,
+          "flying_capacitor_voltage_first_minus_second_v": 23.798006247013394,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -3.408325541874173e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501191650008,
+          "low_side_voltage_first_minus_ground_v": -3.408325541874173e-05,
+          "inductor_current_first_to_second_a": 34.083255418741736,
+          "inductor_voltage_first_minus_second_v": -1.0060133838880696,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352242898,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -6.871965127491811e-05,
+          "high_side_voltage_first_minus_second_v": 11.839573988638755,
+          "low_side_voltage_first_minus_ground_v": -6.871965127491811e-05,
+          "inductor_current_first_to_second_a": 68.71965127492996,
+          "inductor_voltage_first_minus_second_v": -1.006048020283926,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 48.00000000000012,
+        "src_r": 47.947028215451134,
+        "vin": 47.9426900195783,
+        "tap3": -0.00796019465624594,
+        "tap2": -0.005306797373224422,
+        "tap1": -0.002653399120635315,
+        "a1": 36.10958832355604,
+        "a2": 23.798006460637488,
+        "a3": 11.83950526898748,
+        "x1": -0.0001030093475941175,
+        "x2": 2.1362409331996188e-07,
+        "x3": -3.408325541874173e-05,
+        "x4": -6.871965127491811e-05,
+        "out": 1.005979300632651,
+        "LPAR_IN": 5.29717845489806,
+        "L1": 103.0093475941175,
+        "L2": -0.2136240933081225,
+        "L3": 34.083255418741736,
+        "L4": 68.71965127492996,
+        "I_VSTEP": -5.29717845489806
+      }
+    },
+    {
+      "label": "P2_high_side_turn_off_66.666667ns",
+      "absolute_time_s": 2.3066666666666667e-05,
+      "relative_time_s": 6.666666666666665e-08,
+      "sampling_side": "left_limit",
+      "transition_phase": 2,
+      "transition": "high_side_turn_off",
+      "global": {
+        "input_source_v": 47.999999999999886,
+        "input_bus_v": 47.94386861937139,
+        "output_v": 1.0059817604178027,
+        "input_inductor_current_a": 5.309450817494205,
+        "output_load_current_a": 251.4954401044507,
+        "sum_phase_currents_a": 297.06776294428846,
+        "source_current_variable_a": -5.309450817494204
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.763332575433246,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.7608482737209,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.841875450090404,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00021712950565889975,
+          "high_side_voltage_first_minus_second_v": 12.187612288747914,
+          "low_side_voltage_first_minus_ground_v": -0.00021712950565889975,
+          "inductor_current_first_to_second_a": 91.57512750752599,
+          "inductor_voltage_first_minus_second_v": -1.0061988899234617,
+          "flying_capacitor_voltage_first_minus_second_v": 35.756473460129136,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": true,
+          "low_side_on_left_limit": false,
+          "switch_node_v": 11.604906656451346,
+          "high_side_voltage_first_minus_second_v": 0.00012555437815109372,
+          "low_side_voltage_first_minus_ground_v": 11.604906656451346,
+          "inductor_current_first_to_second_a": 125.5543781585899,
+          "inductor_voltage_first_minus_second_v": 10.598924896033544,
+          "flying_capacitor_voltage_first_minus_second_v": 24.15122411979398,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -2.265132430189569e-05,
+          "high_side_voltage_first_minus_second_v": 23.916614075326734,
+          "low_side_voltage_first_minus_ground_v": -2.265132430189569e-05,
+          "inductor_current_first_to_second_a": 22.65132430190169,
+          "inductor_voltage_first_minus_second_v": -1.0060044117421045,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352242898,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -5.7286932976259014e-05,
+          "high_side_voltage_first_minus_second_v": 11.839573987851573,
+          "low_side_voltage_first_minus_ground_v": -5.7286932976259014e-05,
+          "inductor_current_first_to_second_a": 57.286932976270855,
+          "inductor_voltage_first_minus_second_v": -1.006039047350779,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.999999999999886,
+        "src_r": 47.94690549182494,
+        "vin": 47.94386861937139,
+        "tap3": -0.00707624480976896,
+        "tap2": -0.004717497475571567,
+        "tap1": -0.0023587491718085663,
+        "a1": 35.75625633062348,
+        "a2": 35.75613077624533,
+        "a3": 11.839516700918596,
+        "x1": -0.00021712950565889975,
+        "x2": 11.604906656451346,
+        "x3": -2.265132430189569e-05,
+        "x4": -5.7286932976259014e-05,
+        "out": 1.0059817604178027,
+        "LPAR_IN": 5.309450817494205,
+        "L1": 91.57512750752599,
+        "L2": 125.5543781585899,
+        "L3": 22.65132430190169,
+        "L4": 57.286932976270855,
+        "I_VSTEP": -5.309450817494204
+      }
+    },
+    {
+      "label": "P3_high_side_turn_on_100.000000ns",
+      "absolute_time_s": 2.31e-05,
+      "relative_time_s": 1e-07,
+      "sampling_side": "left_limit",
+      "transition_phase": 3,
+      "transition": "high_side_turn_on",
+      "global": {
+        "input_source_v": 47.99999999999999,
+        "input_bus_v": 47.946231630495554,
+        "output_v": 1.0059798932406436,
+        "input_inductor_current_a": 5.321319808371319,
+        "output_load_current_a": 251.4949733101609,
+        "sum_phase_currents_a": 205.59859843858288,
+        "source_current_variable_a": -5.321319808371319
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.76170873954289,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -24.15465742694947,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.84130756225332,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -6.870704966326793e-05,
+          "high_side_voltage_first_minus_second_v": 12.189826877416138,
+          "low_side_voltage_first_minus_ground_v": -6.870704966326793e-05,
+          "inductor_current_first_to_second_a": 68.70704966326794,
+          "inductor_voltage_first_minus_second_v": -1.0060486002903068,
+          "flying_capacitor_voltage_first_minus_second_v": 35.75647346012908,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00010268475583812825,
+          "high_side_voltage_first_minus_second_v": 11.605283318041316,
+          "low_side_voltage_first_minus_ground_v": -0.00010268475583812825,
+          "inductor_current_first_to_second_a": 102.68475583814009,
+          "inductor_voltage_first_minus_second_v": -1.0060825779964817,
+          "flying_capacitor_voltage_first_minus_second_v": 24.151224119793937,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": 2.136207136133824e-07,
+          "high_side_voltage_first_minus_second_v": 12.311581869174487,
+          "low_side_voltage_first_minus_ground_v": 2.136207136133824e-07,
+          "inductor_current_first_to_second_a": -0.21362071361338256,
+          "inductor_voltage_first_minus_second_v": -1.00597967961993,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352242898,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -3.442041365077641e-05,
+          "high_side_voltage_first_minus_second_v": 11.839573986277262,
+          "low_side_voltage_first_minus_ground_v": -3.442041365077641e-05,
+          "inductor_current_first_to_second_a": 34.42041365078825,
+          "inductor_voltage_first_minus_second_v": -1.0060143136542945,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.99999999999999,
+        "src_r": 47.94678680191628,
+        "vin": 47.946231630495554,
+        "tap3": -0.005303986463471377,
+        "tap2": -0.00353599191137112,
+        "tap1": -0.0017679963897077005,
+        "a1": 35.756404753079416,
+        "a2": 24.1511214350381,
+        "a3": 11.839539565863612,
+        "x1": -6.870704966326793e-05,
+        "x2": -0.00010268475583812825,
+        "x3": 2.136207136133824e-07,
+        "x4": -3.442041365077641e-05,
+        "out": 1.0059798932406436,
+        "LPAR_IN": 5.321319808371319,
+        "L1": 68.70704966326794,
+        "L2": 102.68475583814009,
+        "L3": -0.21362071361338256,
+        "L4": 34.42041365078825,
+        "I_VSTEP": -5.321319808371319
+      }
+    },
+    {
+      "label": "P3_high_side_turn_off_116.666667ns",
+      "absolute_time_s": 2.3116666666666665e-05,
+      "relative_time_s": 1.1666666666666665e-07,
+      "sampling_side": "left_limit",
+      "transition_phase": 3,
+      "transition": "high_side_turn_off",
+      "global": {
+        "input_source_v": 47.9999999999998,
+        "input_bus_v": 47.94741420369829,
+        "output_v": 1.0059823523360996,
+        "input_inductor_current_a": 5.321183376667621,
+        "output_load_current_a": 251.4955880840249,
+        "sum_phase_currents_a": 297.0677042680685,
+        "source_current_variable_a": -5.321183376667621
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.76083324236399,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.80073414740908,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.799136240813805,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -5.7274324920721894e-05,
+          "high_side_voltage_first_minus_second_v": 12.190998017894202,
+          "low_side_voltage_first_minus_ground_v": -5.7274324920721894e-05,
+          "inductor_current_first_to_second_a": 57.27432492074408,
+          "inductor_voltage_first_minus_second_v": -1.0060396266610203,
+          "flying_capacitor_voltage_first_minus_second_v": 35.75647346012901,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00021680491120183926,
+          "high_side_voltage_first_minus_second_v": 11.958626743703991,
+          "low_side_voltage_first_minus_ground_v": -0.00021680491120183926,
+          "inductor_current_first_to_second_a": 91.2505363982879,
+          "inductor_voltage_first_minus_second_v": -1.0061991572473015,
+          "flying_capacitor_voltage_first_minus_second_v": 23.798006247011294,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": true,
+          "low_side_on_left_limit": false,
+          "switch_node_v": 11.604906662695731,
+          "high_side_voltage_first_minus_second_v": 0.00012555437480443743,
+          "low_side_voltage_first_minus_ground_v": 11.604906662695731,
+          "inductor_current_first_to_second_a": 125.55437480794959,
+          "inductor_voltage_first_minus_second_v": 10.598924310359632,
+          "flying_capacitor_voltage_first_minus_second_v": 12.192757225029558,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -2.2988468141063106e-05,
+          "high_side_voltage_first_minus_second_v": 23.79768687619343,
+          "low_side_voltage_first_minus_ground_v": -2.2988468141063106e-05,
+          "inductor_current_first_to_second_a": 22.988468141086905,
+          "inductor_voltage_first_minus_second_v": -1.0060053408042406,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.9999999999998,
+        "src_r": 47.94678816623312,
+        "vin": 47.94741420369829,
+        "tap3": -0.004417056559898922,
+        "tap2": -0.002944705308988166,
+        "tap1": -0.0014723530885155595,
+        "a1": 35.756416185804085,
+        "a2": 23.797789442100093,
+        "a3": 23.79766388772529,
+        "x1": -5.7274324920721894e-05,
+        "x2": -0.00021680491120183926,
+        "x3": 11.604906662695731,
+        "x4": -2.2988468141063106e-05,
+        "out": 1.0059823523360996,
+        "LPAR_IN": 5.321183376667621,
+        "L1": 57.27432492074408,
+        "L2": 91.2505363982879,
+        "L3": 125.55437480794959,
+        "L4": 22.988468141086905,
+        "I_VSTEP": -5.321183376667621
+      }
+    },
+    {
+      "label": "P4_high_side_turn_on_150.000000ns",
+      "absolute_time_s": 2.315e-05,
+      "relative_time_s": 1.5e-07,
+      "sampling_side": "left_limit",
+      "transition_phase": 4,
+      "transition": "high_side_turn_on",
+      "global": {
+        "input_source_v": 47.99999999999991,
+        "input_bus_v": 47.94977711062492,
+        "output_v": 1.0059804834938062,
+        "input_inductor_current_a": 5.309425282944384,
+        "output_load_current_a": 251.49512087345155,
+        "sum_phase_currents_a": 205.59848602843996,
+        "source_current_variable_a": -5.3094252829443835
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.759083928697876,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.799701116394903,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -12.193536166646265,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -3.440779273419447e-05,
+          "high_side_voltage_first_minus_second_v": 12.193338058288695,
+          "low_side_voltage_first_minus_ground_v": -3.440779273419447e-05,
+          "inductor_current_first_to_second_a": 34.40779273419447,
+          "inductor_voltage_first_minus_second_v": -1.0060148912865403,
+          "flying_capacitor_voltage_first_minus_second_v": 35.75647346012896,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -6.838245987367519e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501187784808,
+          "low_side_voltage_first_minus_ground_v": -6.838245987367519e-05,
+          "inductor_current_first_to_second_a": 68.38245987368738,
+          "inductor_voltage_first_minus_second_v": -1.00604886595368,
+          "flying_capacitor_voltage_first_minus_second_v": 23.79800624701129,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00010268473905350457,
+          "high_side_voltage_first_minus_second_v": 11.605283324260917,
+          "low_side_voltage_first_minus_ground_v": -0.00010268473905350457,
+          "inductor_current_first_to_second_a": 102.68473905350457,
+          "inductor_voltage_first_minus_second_v": -1.0060831682328597,
+          "flying_capacitor_voltage_first_minus_second_v": 12.192757225029554,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -1.2349436704135007e-07,
+          "high_side_voltage_first_minus_second_v": 12.192654663784868,
+          "low_side_voltage_first_minus_ground_v": -1.2349436704135007e-07,
+          "inductor_current_first_to_second_a": 0.12349436705354273,
+          "inductor_voltage_first_minus_second_v": -1.0059806069881732,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.99999999999991,
+        "src_r": 47.94690574717046,
+        "vin": 47.94977711062492,
+        "tap3": -0.0026448763616499873,
+        "tap2": -0.0017632518434866312,
+        "tap1": -0.0008816263557641178,
+        "a1": 35.756439052336226,
+        "a2": 23.797937864551418,
+        "a3": 12.192654540290501,
+        "x1": -3.440779273419447e-05,
+        "x2": -6.838245987367519e-05,
+        "x3": -0.00010268473905350457,
+        "x4": -1.2349436704135007e-07,
+        "out": 1.0059804834938062,
+        "LPAR_IN": 5.309425282944384,
+        "L1": 34.40779273419447,
+        "L2": 68.38245987368738,
+        "L3": 102.68473905350457,
+        "L4": 0.12349436705354273,
+        "I_VSTEP": -5.3094252829443835
+      }
+    },
+    {
+      "label": "P4_high_side_turn_off_166.666667ns",
+      "absolute_time_s": 2.3166666666666666e-05,
+      "relative_time_s": 1.6666666666666665e-07,
+      "sampling_side": "left_limit",
+      "transition_phase": 4,
+      "transition": "high_side_turn_off",
+      "global": {
+        "input_source_v": 47.99999999999996,
+        "input_bus_v": 47.9509557813043,
+        "output_v": 1.0059817395561954,
+        "input_inductor_current_a": 5.298061798230969,
+        "output_load_current_a": 251.49543488904885,
+        "sum_phase_currents_a": 297.0669601989331,
+        "source_current_variable_a": -5.298061798230968
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.758211357632305,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.79912321377182,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.839909169556254,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -2.2975847240770297e-05,
+          "high_side_voltage_first_minus_second_v": 12.19450529702258,
+          "low_side_voltage_first_minus_ground_v": -2.2975847240770297e-05,
+          "inductor_current_first_to_second_a": 22.975847240770293,
+          "inductor_voltage_first_minus_second_v": -1.0060047154034362,
+          "flying_capacitor_voltage_first_minus_second_v": 35.756473460128966,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -5.6949742237549634e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501187012672,
+          "low_side_voltage_first_minus_ground_v": -5.6949742237549634e-05,
+          "inductor_current_first_to_second_a": 56.94974223756146,
+          "inductor_voltage_first_minus_second_v": -1.006038689298433,
+          "flying_capacitor_voltage_first_minus_second_v": 23.798006247011287,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00021714137071961854,
+          "high_side_voltage_first_minus_second_v": 11.958627086398202,
+          "low_side_voltage_first_minus_ground_v": -0.00021714137071961854,
+          "inductor_current_first_to_second_a": 91.25051934347819,
+          "inductor_voltage_first_minus_second_v": -1.0061988809269151,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352241566,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": true,
+          "low_side_on_left_limit": false,
+          "switch_node_v": 11.83919632001947,
+          "high_side_voltage_first_minus_second_v": 0.00012589085137726386,
+          "low_side_voltage_first_minus_ground_v": 11.83919632001947,
+          "inductor_current_first_to_second_a": 125.89085137712313,
+          "inductor_voltage_first_minus_second_v": 10.833214580463274,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 47.99999999999996,
+        "src_r": 47.94701938201764,
+        "vin": 47.9509557813043,
+        "tap3": -0.001760873350581082,
+        "tap2": -0.0011739165027729458,
+        "tap1": -0.0005869586854069398,
+        "a1": 35.75645048428172,
+        "a2": 23.79794929726905,
+        "a3": 11.839322210870847,
+        "x1": -2.2975847240770297e-05,
+        "x2": -5.6949742237549634e-05,
+        "x3": -0.00021714137071961854,
+        "x4": 11.83919632001947,
+        "out": 1.0059817395561954,
+        "LPAR_IN": 5.298061798230969,
+        "L1": 22.975847240770293,
+        "L2": 56.94974223756146,
+        "L3": 91.25051934347819,
+        "L4": 125.89085137712313,
+        "I_VSTEP": -5.298061798230968
+      }
+    },
+    {
+      "label": "P1_next_period_high_side_turn_on_200.000000ns",
+      "absolute_time_s": 2.3199999999999998e-05,
+      "relative_time_s": 2e-07,
+      "sampling_side": "left_limit",
+      "transition_phase": 1,
+      "transition": "next_period_high_side_turn_on",
+      "global": {
+        "input_source_v": 48.00000000000015,
+        "input_bus_v": 47.95330361253643,
+        "output_v": 1.0059798667015045,
+        "input_inductor_current_a": 5.264999628000926,
+        "output_load_current_a": 251.49496667537613,
+        "sum_phase_currents_a": 205.59779788492605,
+        "source_current_variable_a": -5.2649996280009255
+      },
+      "precharge_diodes": [
+        {
+          "diode": 1,
+          "pair": [
+            "tap3",
+            "a1"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -35.75647334916416,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 2,
+          "pair": [
+            "tap2",
+            "a2"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -23.797972164657143,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        },
+        {
+          "diode": 3,
+          "pair": [
+            "tap1",
+            "a3"
+          ],
+          "on_left_limit": false,
+          "anode_minus_cathode_v": -11.839470970661091,
+          "reliability": "INVALID_WITHOUT_PHYSICAL_SLOW_COORDINATES"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "high_side_pair": [
+            "vin",
+            "a1"
+          ],
+          "low_side_pair": [
+            "x1",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x1",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -1.1088801335147375e-07,
+          "high_side_voltage_first_minus_second_v": 12.196830263295624,
+          "low_side_voltage_first_minus_ground_v": -1.1088801335147375e-07,
+          "inductor_current_first_to_second_a": 0.11088801335147373,
+          "inductor_voltage_first_minus_second_v": -1.005979977589518,
+          "flying_capacitor_voltage_first_minus_second_v": 35.75647346012882,
+          "flying_capacitor_pair": [
+            "a1",
+            "x1"
+          ]
+        },
+        {
+          "phase": 2,
+          "high_side_pair": [
+            "a1",
+            "a2"
+          ],
+          "low_side_pair": [
+            "x2",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x2",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -3.408323877737208e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501185468283,
+          "low_side_voltage_first_minus_ground_v": -3.408323877737208e-05,
+          "inductor_current_first_to_second_a": 34.08323877738392,
+          "inductor_voltage_first_minus_second_v": -1.0060139499402818,
+          "flying_capacitor_voltage_first_minus_second_v": 23.7980062470113,
+          "flying_capacitor_pair": [
+            "a2",
+            "x2"
+          ]
+        },
+        {
+          "phase": 3,
+          "high_side_pair": [
+            "a2",
+            "a3"
+          ],
+          "low_side_pair": [
+            "x3",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x3",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -6.838245679260298e-05,
+          "high_side_voltage_first_minus_second_v": 11.958501193987763,
+          "low_side_voltage_first_minus_ground_v": -6.838245679260298e-05,
+          "inductor_current_first_to_second_a": 68.38245679260298,
+          "inductor_voltage_first_minus_second_v": -1.0060482491582972,
+          "flying_capacitor_voltage_first_minus_second_v": 11.839539352241554,
+          "flying_capacitor_pair": [
+            "a3",
+            "x3"
+          ]
+        },
+        {
+          "phase": 4,
+          "high_side_pair": [
+            "a3",
+            "x4"
+          ],
+          "low_side_pair": [
+            "x4",
+            "ground"
+          ],
+          "inductor_pair": [
+            "x4",
+            "out"
+          ],
+          "high_side_on_left_limit": false,
+          "low_side_on_left_limit": true,
+          "switch_node_v": -0.00010302121430157584,
+          "high_side_voltage_first_minus_second_v": 11.839573990999062,
+          "low_side_voltage_first_minus_ground_v": -0.00010302121430157584,
+          "inductor_current_first_to_second_a": 103.02121430158768,
+          "inductor_voltage_first_minus_second_v": -1.0060828879158061,
+          "flying_capacitor_voltage_first_minus_second_v": null
+        }
+      ],
+      "raw_state_by_variable": {
+        "src": 48.00000000000015,
+        "src_r": 47.94735000372013,
+        "vin": 47.95330361253643,
+        "tap3": 7.664670905407274e-11,
+        "tap2": -8.846188972464884e-10,
+        "tap1": -8.763292606602858e-10,
+        "a1": 35.75647334924081,
+        "a2": 23.797972163772524,
+        "a3": 11.839470969784761,
+        "x1": -1.1088801335147375e-07,
+        "x2": -3.408323877737208e-05,
+        "x3": -6.838245679260298e-05,
+        "x4": -0.00010302121430157584,
+        "out": 1.0059798667015045,
+        "LPAR_IN": 5.264999628000926,
+        "L1": 0.11088801335147373,
+        "L2": 34.08323877738392,
+        "L3": 68.38245679260298,
+        "L4": 103.02121430158768,
+        "I_VSTEP": -5.2649996280009255
+      }
+    }
+  ],
+  "warnings": [
+    "tap3/tap2/tap1 are numerically nonunique slow coordinates; their minimum-norm values and derived diode voltages are not physical zero-start initial conditions.",
+    "Each event row is the left limit. Stored-energy states are continuous, but algebraic switch-node right limits are not invented by this export."
+  ]
+}
