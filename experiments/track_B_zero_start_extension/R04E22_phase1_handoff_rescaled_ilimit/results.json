@@ -1,0 +1,101 @@
+{
+  "experiment": "R04E22_phase1_handoff_rescaled_ilimit",
+  "parent": "R04E21_phase1_handoff_into_r04e3_stall",
+  "outcome_summary": "NEITHER cell reaches state 4 (COMMUTATE_HIGH_TO_ZVS, R04E21's own stall point) or state 5. Both cells park one state EARLIER, at state 3 (LOW_BUILD_NEGATIVE), at TSTOP=20us, because I_LIMIT=125A (vs R04E21's I_LIMIT=10A) changes the post-zero-crossing negative-current-build rate: IL1 only reaches -2.21509122849A by t=20us in both cells, which is LESS negative than BOTH swept I_NEG targets (2.5A for NEG_FRAC=.02, 9.7125A for NEG_FRAC=.0777), so the 3->4 transition rule (I(L1)<=-I_NEG) never fires in either cell. Because this rule never fires, the two cells' entire measured trajectory (all .meas values, IL1_MIN/IL1_MAX, VC1-3_FINAL, VOUT_FINAL) is numerically IDENTICAL between the two NEG_FRAC values -- NEG_FRAC has no effect on the observed physics under this TSTOP=20us window. The diagnosed R04E21 hypothesis (I_LIMIT/I_NEG rescaling) is therefore UNTESTED, not confirmed or refuted, by this specific netlist/TSTOP=20us combination -- the run never reaches the state-4 blocking condition R04E21 documented, so whether a rescaled I_NEG would unblock it cannot be determined from this data.",
+  "cells": {
+    "r04e22_neg2pct": {
+      "i_limit": 125,
+      "neg_frac": 0.02,
+      "i_neg": 2.5,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": null,
+        "t_neg_target_status": "FAILED (never reaches I_NEG=-2.5A within TSTOP=20us)",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 never reached, so this transition is never attempted)",
+        "state_final": 3,
+        "state_final_name": "LOW_BUILD_NEGATIVE",
+        "il1_min_a": -2.21509122849,
+        "il1_max_a": 125.390205383,
+        "vout_final_v": 0.000317616097163,
+        "vc1_final_v": 36.0765751745,
+        "vc2_final_v": -2.04890966415e-08,
+        "vc3_final_v": -2.10129655898e-08
+      }
+    },
+    "r04e22_neg7p77pct": {
+      "i_limit": 125,
+      "neg_frac": 0.0777,
+      "i_neg": 9.7125,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": null,
+        "t_neg_target_status": "FAILED (never reaches I_NEG=-9.7125A within TSTOP=20us)",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 never reached, so this transition is never attempted)",
+        "state_final": 3,
+        "state_final_name": "LOW_BUILD_NEGATIVE",
+        "il1_min_a": -2.21509122849,
+        "il1_max_a": 125.390205383,
+        "vout_final_v": 0.000317616097163,
+        "vc1_final_v": 36.0765751745,
+        "vc2_final_v": -2.04890966415e-08,
+        "vc3_final_v": -2.10129655898e-08
+      }
+    }
+  },
+  "cells_numerically_identical": true,
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "cells": {
+      "r04e22_neg2pct": {
+        "il1_max_abs_a_observed_full_trace": 125.39020538330078,
+        "within_bound_throughout": true,
+        "points_over_bound": 0,
+        "points_scanned": 20353
+      },
+      "r04e22_neg7p77pct": {
+        "il1_max_abs_a_observed_full_trace": 125.39020538330078,
+        "within_bound_throughout": true,
+        "points_over_bound": 0,
+        "points_scanned": 20353
+      }
+    }
+  },
+  "corruption_fingerprint_check": {
+    "cells": {
+      "r04e22_neg2pct": {
+        "raw_points": 20353,
+        "non_monotonic_or_duplicate_timestamps": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "vin_stayed_within_commanded_0_48v": true,
+        "implausible_value_count": 0,
+        "clean": true
+      },
+      "r04e22_neg7p77pct": {
+        "raw_points": 20353,
+        "non_monotonic_or_duplicate_timestamps": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "vin_stayed_within_commanded_0_48v": true,
+        "implausible_value_count": 0,
+        "clean": true
+      }
+    }
+  },
+  "outcome_classification": {
+    "stall_avoided_either_cell": false,
+    "same_r04e21_state4_stall_reproduced_either_cell": false,
+    "new_earlier_state3_stall_both_cells": true,
+    "neg_frac_dependent_split": false,
+    "hypothesis_status": "UNTESTED_NOT_CONFIRMED_NOT_REFUTED",
+    "reasoning": "Both cells park at state 3 (LOW_BUILD_NEGATIVE) at TSTOP=20us, one state EARLIER than R04E21's own documented state-4 (COMMUTATE_HIGH_TO_ZVS) stall. Raising I_LIMIT from R04E3/R04E21's own 10A to P24's own locked 125A does exactly what BOUNDARY.md Section 2 predicted to state 0 (ENERGY dwells and charges further, t_energy_end=6.37ns vs R04E21's ~0.3ps), and the zero-crossing timing (t_il1_zero=1.632us) is close to R04E21's own (1.631us) -- but the previously-unexamined knock-on effect is that the POST-zero-crossing negative-current-build rate (state 3, LOW_BUILD_NEGATIVE) is far slower under this larger-I_LIMIT trajectory than under R04E21's: only -2.215A is reached by t=20us, versus R04E21's own -0.2A reached in just ~56ns after crossing zero. TSTOP=20us, inherited byte-identical from R04E3/R04E21 per this experiment's own stated scope, is not long enough for IL1 to reach EITHER swept I_NEG target (2.5A or 9.7125A) under this new trajectory. Because neither target is reached, NEG_FRAC has zero observed effect and both cells' full measured state is numerically identical. The specific question this experiment set out to answer (BOUNDARY.md Section 6: does a rescaled I_NEG unblock the state-4 ZVS event) is therefore UNTESTED by this run -- state 4 itself is never reached in either cell, so nothing can be concluded about whether the high-side ZVS event would or would not occur once it is."
+  }
+}

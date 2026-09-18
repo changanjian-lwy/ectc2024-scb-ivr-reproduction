@@ -846,3 +846,59 @@ documented solver-corruption fingerprint (zero non-monotonic timestamps,
 for the complete Step-1 verification table, state-transition timeline,
 and full discussion of what this narrow negative result does and does
 not establish.
+
+## R04E22 -- rescaling I_LIMIT/I_NEG to P24's own real current scale: an
+   inconclusive result, neither confirming nor refuting R04E21's own
+   diagnosed hypothesis
+
+Direct, narrowly-scoped follow-up to R04E21's own negative result,
+testing one specific diagnosed hypothesis (`R04E22_phase1_handoff_
+rescaled_ilimit/BOUNDARY.md` Section 1): R04E21's own `I_LIMIT=10A`/
+`I_NEG=0.2A` are leftover values sized for true-zero-energy startup's
+tiny first-pulse scale, not P24's own real current scale -- did rescaling
+`I_LIMIT` to P24's own `LOCKED` Table-1 peak current (`125A`,
+`SOURCE_COVERAGE_MATRIX.md`) let the state-4 high-side ZVS event
+(`V(vin,a1)<=0`) actually occur, when phase 1 starts from the SAME
+R04E21 bootstrapped state (`VC1_IC=35.85894624845418V`, `IL1_IC=
+75.96527862548828A`)? Two cells were built, both from R04E21's own
+netlist as the literal template with ONLY the `I_LIMIT`/`NEG_FRAC`
+`.param` line changed: `r04e22_neg2pct` (`NEG_FRAC=.02`, `I_NEG=2.5A`,
+"main P24 branch" convention) and `r04e22_neg7p77pct` (`NEG_FRAC=.0777`,
+`I_NEG=9.7125A`, A42's own found local natural-ZVS threshold). **RESULT:
+neither cell reaches state 4 or state 5 -- both park one state EARLIER
+than R04E21's own stall, at state 3 (`LOW_BUILD_NEGATIVE`), at
+`TSTOP=20us` (unchanged from R04E3/R04E21).** `STATE_FINAL=3` in both
+cells; `t_neg_target` (the `3->4` transition) `FAIL`s in both, since
+`IL1` only reaches `-2.21509122849A` by `TSTOP` -- less negative than
+EITHER swept `I_NEG` target. Because this rule never fires in either
+cell, `NEG_FRAC` never actually enters the simulated physics before
+`TSTOP`, so both cells' entire measured state (all `.meas` values) is
+numerically IDENTICAL. Correcting `I_LIMIT` to `125A` does what
+BOUNDARY.md Section 2 predicted to state 0 (genuine dwell/charging,
+`t_energy_end=6.37ns` vs R04E21's near-instant `~0.3ps`), and the
+zero-crossing timing is close to R04E21's own (`~1.63us` in both) -- but
+a previously-unexamined knock-on effect is that the POST-zero-crossing
+negative-current-build rate (state 3) is far slower under this
+larger-`I_LIMIT` trajectory than under R04E21's (`-2.215A` over
+`~18.37us` here, vs. R04E21's own `-0.2A` reached in just `~56ns`).
+`TSTOP=20us`, inherited byte-identical from R04E3/R04E21 (sized for the
+OLD `I_LIMIT=10A` regime, not re-derived for this new one), is
+consequently not long enough for either swept `I_NEG` target to be
+reached. **This means R04E21's own diagnosed hypothesis is UNTESTED by
+this run -- not confirmed and not refuted**: the mechanism the
+hypothesis is about (does a larger `I_NEG` unblock the state-4 ZVS
+event) is never exercised, because state 4 itself is never entered in
+either cell. Phase 1's own current stayed well within the `+/-250A`
+bound throughout both cells (`max|IL1|=125.390A`, `0` points over
+bound), and both `.raw` traces were confirmed free of the documented
+solver-corruption fingerprint (zero non-monotonic timestamps in either,
+`V(vin)` exactly within its commanded `0-48V` step in both). Per this
+project's own Ground Rule 7, this inconclusive result is reported as
+exactly that -- not forced into a false positive or negative -- and a
+follow-up would need either a longer `TSTOP` or an explicit accounting
+of how the corrected `I_LIMIT` reshapes the entire downstream timescale
+before the state-4 ZVS question this experiment set out to answer can
+actually be exercised. See `R04E22_phase1_handoff_rescaled_ilimit/
+BOUNDARY.md` and `RESULTS.md` for the complete state-transition
+timeline, current-safety and fingerprint checks for both cells, and full
+discussion of what this inconclusive result does and does not establish.
