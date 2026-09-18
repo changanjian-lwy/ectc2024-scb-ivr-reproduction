@@ -1,0 +1,360 @@
+{
+  "script": "run_stability_and_divider_checks.py",
+  "cases": [
+    {
+      "label": "baseline",
+      "source": "fixed_point_search.json",
+      "stability": {
+        "dead_time_s": 2.1500000000000002e-09,
+        "module_power_w": 250.0,
+        "relative_residual": 2.258171322999336e-11,
+        "natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "finite_difference_increment": 0.0001,
+        "excluded_directions": [
+          "tap3",
+          "tap2",
+          "tap1"
+        ],
+        "spectral_radius": 0.9825324662360543,
+        "locally_stable": true,
+        "eigenvalue_magnitudes": [
+          0.9825324662360543,
+          0.9747264728478487,
+          0.9305775366256707,
+          0.8732762935629655,
+          0.8179916513139691,
+          0.8179916513139691,
+          0.1573930544223579,
+          0.1468818213551602,
+          0.1415520049350081,
+          0.08258684831259623,
+          0.00018034276595411969,
+          1.5597030031097925e-10,
+          1.4179171421197802e-11,
+          1.1977007914557706e-15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_real": [
+          0.9825324662360543,
+          0.9747264728478487,
+          0.9305775366256707,
+          0.8732762935629655,
+          0.7907328721841325,
+          0.7907328721841325,
+          0.1573930544223579,
+          0.1468818213551602,
+          0.1415520049350081,
+          -0.08258684831259623,
+          0.00018034276595411969,
+          1.5597030031097925e-10,
+          1.4179171421197802e-11,
+          -1.1977007914557706e-15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_imag": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2094083724849283,
+          -0.2094083724849283,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "divider": {
+        "label": "baseline",
+        "failed": false,
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+          "--output",
+          "_checks/divider_baseline.json",
+          "--picard-iterations",
+          "0",
+          "--dead-time-ns",
+          "2.15",
+          "--switch-on-resistance-ohm",
+          "1e-06",
+          "--module-power-w",
+          "250",
+          "--tap-voltages",
+          "30.5986,18.5986,6.59856"
+        ],
+        "tap_voltages_v": [
+          30.598555558365312,
+          18.598555558365312,
+          6.598555558365312
+        ],
+        "original_maximum_off_diode_forward_voltage_v": 0.4014444416346876,
+        "new_maximum_off_diode_forward_voltage_v": -4.999955556460545,
+        "all_diodes_reverse_biased": true,
+        "converged": true,
+        "final_relative_residual": 5.662112137281922e-11,
+        "natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "stage_state_inf_difference": 1.0149044271656749e-08,
+        "average_output_v": 0.8779032724636108
+      }
+    },
+    {
+      "label": "deadtime_5p00ns",
+      "source": "_sweeps/sweep_deadtime_5p00ns.json",
+      "stability": {
+        "dead_time_s": 5e-09,
+        "module_power_w": 250.0,
+        "relative_residual": 3.6437529426957603e-09,
+        "natural_zvs_flags": [
+          true,
+          false,
+          true,
+          true
+        ],
+        "finite_difference_increment": 0.0001,
+        "excluded_directions": [
+          "tap3",
+          "tap2",
+          "tap1"
+        ],
+        "spectral_radius": 0.9933617967908018,
+        "locally_stable": true,
+        "eigenvalue_magnitudes": [
+          0.9933617967908018,
+          0.9623816988698582,
+          0.8859438755206837,
+          0.8163646000217095,
+          0.8163646000217095,
+          0.806232403446099,
+          0.806232403446099,
+          0.799122888961502,
+          0.799122888961502,
+          0.7018240933938061,
+          1.9773068233282654e-09,
+          1.9773068233282654e-09,
+          1.1252930530641831e-09,
+          2.406269251202305e-13,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_real": [
+          0.9933617967908018,
+          -0.9623816988698582,
+          0.8859438755206837,
+          0.7880604889007201,
+          0.7880604889007201,
+          0.7671758478024874,
+          0.7671758478024874,
+          0.7968803151228929,
+          0.7968803151228929,
+          0.7018240933938061,
+          -1.2079221966631869e-09,
+          -1.2079221966631869e-09,
+          1.1252930530641831e-09,
+          -2.406269251202305e-13,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_imag": [
+          0.0,
+          0.0,
+          0.0,
+          0.21310050680879128,
+          -0.21310050680879128,
+          0.2478949513705513,
+          -0.2478949513705513,
+          -0.05982603974705284,
+          0.05982603974705284,
+          0.0,
+          -1.5654603924689043e-09,
+          1.5654603924689043e-09,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "divider": {
+        "label": "deadtime_5p00ns",
+        "failed": false,
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+          "--output",
+          "_checks/divider_deadtime_5p00ns.json",
+          "--picard-iterations",
+          "0",
+          "--dead-time-ns",
+          "5",
+          "--switch-on-resistance-ohm",
+          "1e-06",
+          "--module-power-w",
+          "250",
+          "--tap-voltages",
+          "-12.3416,-24.3416,-36.3416"
+        ],
+        "tap_voltages_v": [
+          -12.341644043228598,
+          -24.341644043228598,
+          -36.3416440432286
+        ],
+        "original_maximum_off_diode_forward_voltage_v": 43.3416440432286,
+        "new_maximum_off_diode_forward_voltage_v": -4.999956000303737,
+        "all_diodes_reverse_biased": true,
+        "converged": true,
+        "final_relative_residual": 3.476644092772144e-09,
+        "natural_zvs_flags": [
+          true,
+          false,
+          true,
+          true
+        ],
+        "stage_state_inf_difference": 5.541624812366308e-07,
+        "average_output_v": 0.7214837713547745
+      }
+    },
+    {
+      "label": "deadtime_10p0ns",
+      "source": "_sweeps/sweep_deadtime_10p0ns.json",
+      "stability": {
+        "dead_time_s": 1e-08,
+        "module_power_w": 250.0,
+        "relative_residual": 7.037599838551963e-11,
+        "natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "finite_difference_increment": 0.0001,
+        "excluded_directions": [
+          "tap3",
+          "tap2",
+          "tap1"
+        ],
+        "spectral_radius": 0.9927108505900133,
+        "locally_stable": true,
+        "eigenvalue_magnitudes": [
+          0.9927108505900133,
+          0.8526929000233879,
+          0.8526929000233879,
+          0.8419652334794955,
+          0.8419652334794955,
+          0.8349338827446172,
+          0.8262072157222594,
+          0.8262072157222594,
+          0.8187839170402037,
+          0.8187839170402037,
+          5.347718229337362e-10,
+          5.5951370874281873e-11,
+          5.5951370874281873e-11,
+          6.46625898582823e-15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_real": [
+          0.9927108505900133,
+          0.8482014914219189,
+          0.8482014914219189,
+          0.7908101056606825,
+          0.7908101056606825,
+          -0.8349338827446172,
+          0.8159189057339553,
+          0.8159189057339553,
+          0.7892622299945219,
+          0.7892622299945219,
+          5.347718229337362e-10,
+          -7.652650891161134e-13,
+          -7.652650891161134e-13,
+          6.46625898582823e-15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_imag": [
+          0.0,
+          -0.08740372818094212,
+          0.08740372818094212,
+          0.2890066282511895,
+          -0.2890066282511895,
+          0.0,
+          0.12997962370092092,
+          -0.12997962370092092,
+          0.217881240834941,
+          -0.217881240834941,
+          0.0,
+          5.594613723980252e-11,
+          -5.594613723980252e-11,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "divider": {
+        "label": "deadtime_10p0ns",
+        "failed": false,
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+          "--output",
+          "_checks/divider_deadtime_10p0ns.json",
+          "--picard-iterations",
+          "0",
+          "--dead-time-ns",
+          "10",
+          "--switch-on-resistance-ohm",
+          "1e-06",
+          "--module-power-w",
+          "250",
+          "--tap-voltages",
+          "-15.2519,-27.2519,-39.2519"
+        ],
+        "tap_voltages_v": [
+          -15.251876937357586,
+          -27.251876937357586,
+          -39.251876937357586
+        ],
+        "original_maximum_off_diode_forward_voltage_v": 46.251876937357586,
+        "new_maximum_off_diode_forward_voltage_v": -5.000023071422419,
+        "all_diodes_reverse_biased": true,
+        "converged": true,
+        "final_relative_residual": 1.1026353882635334e-10,
+        "natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "stage_state_inf_difference": 9.172758552722371e-09,
+        "average_output_v": 0.7061904128701498
+      }
+    }
+  ],
+  "wall_clock_s": 1674.008642911911
+}

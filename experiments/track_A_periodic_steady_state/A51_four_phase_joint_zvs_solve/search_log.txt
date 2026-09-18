@@ -1,0 +1,40 @@
+wrote fixed_point_search.json  (112.8 s, 67 F-evals)
+
+Newton residual history (relative |F(z)-z|_inf / max(|z|_inf,1)):
+  it   1  rel=9.326867e-02  abs=7.848068e+00  zvs=[False, False, True, True]  rank=17  unreach=1.605e-07  alpha=1.0
+  it   2  rel=8.583253e-02  abs=7.673113e+00  zvs=[False, False, False, False]  rank=17  unreach=3.576e-08  alpha=1.0
+  it   3  rel=4.267798e-06  abs=3.826619e-04  zvs=[False, False, False, False]  rank=17  unreach=3.764e-12  alpha=1.0
+  it   4  rel=2.258171e-11  abs=2.024738e-09  zvs=[False, False, False, False]  rank=-  unreach=nan  alpha=-
+
+converged = True   reason = None
+final relative residual = 2.258171e-11
+final natural-ZVS flags = [False, False, False, False]
+
+Picard (damping 0.50):
+  it   1  rel=9.326867e-02  zvs=[False, False, True, True]
+  it   3  rel=5.256234e-02  zvs=[True, True, True, True]
+  it   5  rel=3.703449e-02  zvs=[True, True, True, True]
+  it   7  rel=2.539377e-02  zvs=[True, True, True, True]
+  it   9  rel=2.306156e-02  zvs=[True, True, True, True]
+  it  11  rel=1.885292e-02  zvs=[True, True, True, True]
+  it  13  rel=1.331248e-02  zvs=[True, True, True, True]
+  it  15  rel=1.226227e-02  zvs=[True, True, True, True]
+  it  17  rel=1.203557e-02  zvs=[True, True, True, True]
+  it  19  rel=1.433940e-02  zvs=[True, True, True, True]
+  it  21  rel=1.574396e-02  zvs=[True, True, True, True]
+  it  23  rel=1.548134e-02  zvs=[True, True, True, True]
+  it  25  rel=1.367665e-02  zvs=[True, True, False, True]
+
+tap degeneracy (1 V perturbation propagated one period):
+  tap3: identity defect = -2.771e-13 V,  max effect on any stage variable = 1.833e-10 V
+  tap2: identity defect = -5.222e-13 V,  max effect on any stage variable = 1.247e-10 V
+  tap1: identity defect = +2.984e-13 V,  max effect on any stage variable = 5.575e-10 V
+precharge diodes (frozen off): max forward = 0.401444 V  -> 4.014e-13 A, 8.029e-20 C per period
+
+final orbit metrics:
+  phase current minima = [-0.7939768619383135, -0.837196314182667, -0.8372049992110848, -0.8672939771335012]
+  phase current maxima = [110.33758114499086, 110.02869994684079, 110.02865410083838, 110.83704372779097]
+  average output = 0.877903 V, load power = 192.6785 W
+  flying-capacitor voltages at z* = [35.81912173424507, 23.880779863951517, 11.942392138953712]
+
+safety: max |iL| = 117.2950 A over 92 evaluations (limit 250.0 A) -> within = True

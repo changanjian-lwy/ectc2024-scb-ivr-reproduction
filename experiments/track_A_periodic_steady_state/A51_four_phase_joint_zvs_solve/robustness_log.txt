@@ -1,0 +1,37 @@
+wrote robustness_sweeps.json  (1358.1 s)
+
+case               conv     residual ZVS 1/2/3/4              min|Vds| per phase (V)                       iL minima (A)                              Vout(V)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+deadtime_1p00ns    True    1.344e-07 [0, 0, 0, 0]             [12.17179, 12.1325, 12.13249, 12.19087]      [-0.2987, -0.518, -0.5181, -0.126]         0.94876
+deadtime_2p15ns    True    2.258e-11 [0, 0, 0, 0]             [12.04378, 11.81019, 11.81016, 12.21429]     [-0.794, -0.8372, -0.8372, -0.8673]        0.87790
+deadtime_5p00ns    True    3.644e-09 [1, 0, 1, 1]             [0.00057, 13.15878, 0.00527, 0.01252]        [-11.1261, -38.5232, -11.3001, -11.5253]   0.72148
+deadtime_10p0ns    True    7.038e-11 [1, 1, 1, 1]             [0.01286, 0.01506, 0.00082, 0.00655]         [-11.923, -41.0437, -12.0842, -12.2461]    0.70619
+substep_20ps       True    1.666e-07 [0, 0, 0, 0]             [12.03718, 11.80536, 11.80534, 12.21397]     [-0.7882, -0.8311, -0.8311, -0.8583]       0.87754
+substep_1ps        True    9.725e-08 [0, 0, 0, 0]             [12.04562, 11.81142, 11.81139, 12.21437]     [-0.7955, -0.8388, -0.8388, -0.8697]       0.87800
+taps_lowered_1v    True    1.427e-11 [0, 0, 0, 0]             [12.04378, 11.81019, 11.81016, 12.21429]     [-0.794, -0.8372, -0.8372, -0.8673]        0.87790
+rds_3p5mohm        True    9.444e-11 [0, 0, 0, 0]             [5.45243, 5.16571, 5.166, 4.54739]           [-6.0894, -6.5768, -6.5767, -5.8013]       0.72912
+rds_7mohm          True    1.027e-10 [0, 0, 0, 0]             [1.97808, 1.77677, 1.77755, 0.91467]         [-9.5413, -10.0484, -10.0479, -8.9003]     0.61262
+
+any natural ZVS at any fixed point in any sweep: True
+
+stage-state inf difference from the reference case:
+  deadtime_1p00ns    7.370580e+00
+  deadtime_2p15ns    0.000000e+00
+  deadtime_5p00ns    3.184726e+01
+  deadtime_10p0ns    4.041871e+01
+  substep_20ps       4.081596e-02
+  substep_1ps        1.131631e-02
+  taps_lowered_1v    1.701207e-09
+  rds_3p5mohm        1.241044e+01
+  rds_7mohm          2.285973e+01
+
+safety:
+  deadtime_1p00ns    max |iL| = 121.9725 A   within limit = True
+  deadtime_2p15ns    max |iL| = 117.2950 A   within limit = True
+  deadtime_5p00ns    max |iL| = 129.6240 A   within limit = True
+  deadtime_10p0ns    max |iL| = 129.6865 A   within limit = True
+  substep_20ps       max |iL| = 117.2512 A   within limit = True
+  substep_1ps        max |iL| = 117.2975 A   within limit = True
+  taps_lowered_1v    max |iL| = 117.2949 A   within limit = True
+  rds_3p5mohm        max |iL| = 112.6184 A   within limit = True
+  rds_7mohm          max |iL| = 109.5735 A   within limit = True

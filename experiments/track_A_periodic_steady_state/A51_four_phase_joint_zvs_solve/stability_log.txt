@@ -1,0 +1,23 @@
+wrote stability_and_divider.json  (1674.0 s)
+
+baseline  (d = 2.15 ns)
+  residual 2.258e-11, natural ZVS [False, False, False, False]
+  spectral radius of dF/dz = 0.982532  -> locally stable = True
+  five largest |eigenvalue|: 0.982532, 0.974726, 0.930578, 0.873276, 0.817992
+  divider check: taps -> [30.598555558365312, 18.598555558365312, 6.598555558365312], max off-diode forward 0.4014 V -> -5.0000 V (all reverse-biased = True)
+                  stage |z*| difference = 1.015e-08 V/A, natural ZVS [False, False, False, False], Vout 0.87790 V
+
+deadtime_5p00ns  (d = 5 ns)
+  residual 3.644e-09, natural ZVS [True, False, True, True]
+  spectral radius of dF/dz = 0.993362  -> locally stable = True
+  five largest |eigenvalue|: 0.993362, 0.962382, 0.885944, 0.816365, 0.816365
+  divider check: taps -> [-12.341644043228598, -24.341644043228598, -36.3416440432286], max off-diode forward 43.3416 V -> -5.0000 V (all reverse-biased = True)
+                  stage |z*| difference = 5.542e-07 V/A, natural ZVS [True, False, True, True], Vout 0.72148 V
+
+deadtime_10p0ns  (d = 10 ns)
+  residual 7.038e-11, natural ZVS [True, True, True, True]
+  spectral radius of dF/dz = 0.992711  -> locally stable = True
+  five largest |eigenvalue|: 0.992711, 0.852693, 0.852693, 0.841965, 0.841965
+  divider check: taps -> [-15.251876937357586, -27.251876937357586, -39.251876937357586], max off-diode forward 46.2519 V -> -5.0000 V (all reverse-biased = True)
+                  stage |z*| difference = 9.173e-09 V/A, natural ZVS [True, True, True, True], Vout 0.70619 V
+

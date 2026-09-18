@@ -1,0 +1,630 @@
+{
+  "script": "run_load_sweep.py",
+  "classification": "SENSITIVITY_ONLY",
+  "rated_module_power_w": 250.0,
+  "rows": [
+    {
+      "module_power_w": 250.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_250w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "250"
+      ],
+      "wall_clock_s": 144.91890811920166,
+      "converged": true,
+      "final_relative_residual": 2.258171322999336e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "average_output_v": 0.8779032724811819,
+      "average_load_power_w": 192.67853895829208,
+      "phase_current_minima_a": [
+        -0.7939768619383135,
+        -0.837196314182667,
+        -0.8372049992110848,
+        -0.8672939771335012
+      ],
+      "phase_current_maxima_a": [
+        110.33758114499086,
+        110.02869994684079,
+        110.02865410083838,
+        110.83704372779097
+      ],
+      "phase_current_ripple_a": [
+        111.13155800692918,
+        110.86589626102345,
+        110.86585910004946,
+        111.70433770492447
+      ],
+      "minimum_abs_vds_v": [
+        12.04378224553271,
+        11.810188833779414,
+        11.810163081017897,
+        12.214287197199052
+      ],
+      "hard_switch_residual_v": [
+        12.04378224553271,
+        11.810188833779414,
+        11.810163081017897,
+        12.558534648184821
+      ],
+      "flying_capacitor_v": [
+        35.81912173424507,
+        23.880779863951517,
+        11.942392138953712
+      ],
+      "maximum_abs_phase_current_a": 117.29496466344942,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 225.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_225w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "225"
+      ],
+      "wall_clock_s": 109.06416893005371,
+      "converged": true,
+      "final_relative_residual": 8.313993062080281e-07,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "average_output_v": 0.9184616840619505,
+      "average_load_power_w": 189.8036696452307,
+      "phase_current_minima_a": [
+        -5.0314109373380544,
+        -5.332822241735876,
+        -5.332686543639768,
+        -5.75948010843116
+      ],
+      "phase_current_maxima_a": [
+        109.77819503398622,
+        109.47335653425348,
+        109.47341903080084,
+        109.044610375577
+      ],
+      "phase_current_ripple_a": [
+        114.80960597132427,
+        114.80617877598937,
+        114.80610557444061,
+        114.80409048400816
+      ],
+      "minimum_abs_vds_v": [
+        6.651101714929965,
+        6.417491950003953,
+        6.417760971839492,
+        4.641768139125869
+      ],
+      "hard_switch_residual_v": [
+        6.651101714929965,
+        6.417491950003953,
+        6.417760971839492,
+        4.641768139125869
+      ],
+      "flying_capacitor_v": [
+        35.75652915260854,
+        23.756230107236007,
+        11.753065597401369
+      ],
+      "maximum_abs_phase_current_a": 113.6410163815702,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 200.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_200w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "200"
+      ],
+      "wall_clock_s": 163.83912801742554,
+      "converged": true,
+      "final_relative_residual": 1.0481058865064095e-08,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "average_output_v": 0.960142150887418,
+      "average_load_power_w": 184.37458998214348,
+      "phase_current_minima_a": [
+        -11.368039815071068,
+        -11.667358014711864,
+        -11.667186322593764,
+        -12.420011597368923
+      ],
+      "phase_current_maxima_a": [
+        108.59906550225111,
+        108.29997276432614,
+        108.30015041402991,
+        107.56040242770331
+      ],
+      "phase_current_ripple_a": [
+        119.96710531732218,
+        119.96733077903801,
+        119.96733673662368,
+        119.98041402507224
+      ],
+      "minimum_abs_vds_v": [
+        0.4734387289111055,
+        0.2414022604481545,
+        0.24184740889008793,
+        0.00904991268253319
+      ],
+      "hard_switch_residual_v": [
+        0.4734387289111055,
+        0.2414022604481545,
+        0.24184740889008793,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.745654693693346,
+        23.73402014055911,
+        11.716319209788807
+      ],
+      "maximum_abs_phase_current_a": 113.64012498564536,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 190.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_190w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "190"
+      ],
+      "wall_clock_s": 191.41077876091003,
+      "converged": true,
+      "final_relative_residual": 4.778831638007181e-07,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9716127031534746,
+      "average_load_power_w": 179.36593653654836,
+      "phase_current_minima_a": [
+        -14.12625167465024,
+        -14.369423191194803,
+        -14.369336718716019,
+        -14.738344474468546
+      ],
+      "phase_current_maxima_a": [
+        107.264324426879,
+        107.02188858647092,
+        107.0219779407912,
+        106.66949036074368
+      ],
+      "phase_current_ripple_a": [
+        121.39057610152923,
+        121.39131177766572,
+        121.39131465950722,
+        121.40783483521223
+      ],
+      "minimum_abs_vds_v": [
+        0.011787727472345466,
+        0.010681537301856281,
+        0.011097108515333076,
+        0.01926995191022307
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.77820511762448,
+        23.78629668105762,
+        11.786927791225763
+      ],
+      "maximum_abs_phase_current_a": 113.63976842149408,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 185.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_185w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "185"
+      ],
+      "wall_clock_s": 198.2933759689331,
+      "converged": true,
+      "final_relative_residual": 1.3302642146429856e-08,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9753489235395043,
+      "average_load_power_w": 175.9915216901889,
+      "phase_current_minima_a": [
+        -15.448609678248202,
+        -15.679665166917554,
+        -15.679594114081462,
+        -15.957252126516554
+      ],
+      "phase_current_maxima_a": [
+        106.40466484500364,
+        106.17459231972335,
+        106.17466401551819,
+        105.91464864595424
+      ],
+      "phase_current_ripple_a": [
+        121.85327452325184,
+        121.8542574866409,
+        121.85425812959966,
+        121.8719007724708
+      ],
+      "minimum_abs_vds_v": [
+        0.010814718971460024,
+        0.012537765108000087,
+        0.012947396970314884,
+        0.007651990119288854
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.78673668393114,
+        23.800108503816336,
+        11.80529914347302
+      ],
+      "maximum_abs_phase_current_a": 113.63959013818527,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 180.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_180w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "180"
+      ],
+      "wall_clock_s": 211.98262405395508,
+      "converged": true,
+      "final_relative_residual": 1.7110586578029635e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9784060016217957,
+      "average_load_power_w": 172.31009472171885,
+      "phase_current_minima_a": [
+        -16.7570058417608,
+        -16.978802679457498,
+        -16.97874339528276,
+        -17.190126908828894
+      ],
+      "phase_current_maxima_a": [
+        105.47443594606317,
+        105.25370199802772,
+        105.25376120007489,
+        105.06112286753734
+      ],
+      "phase_current_ripple_a": [
+        122.23144178782397,
+        122.23250467748522,
+        122.23250459535765,
+        122.25124977636622
+      ],
+      "minimum_abs_vds_v": [
+        0.0035994184203644863,
+        0.01800304677398401,
+        0.01759759442282771,
+        0.004632723268679584
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.79362847245583,
+        23.811127077336003,
+        11.819702903206323
+      ],
+      "maximum_abs_phase_current_a": 113.63941185406652,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 175.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_175w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "175"
+      ],
+      "wall_clock_s": 202.75952696800232,
+      "converged": true,
+      "final_relative_residual": 4.904958732560725e-08,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9809760031308568,
+      "average_load_power_w": 168.4049357757534,
+      "phase_current_minima_a": [
+        -18.056685202891888,
+        -18.27078443773071,
+        -18.270734134037397,
+        -18.43141297180911
+      ],
+      "phase_current_maxima_a": [
+        104.49248778230842,
+        104.27936427630182,
+        104.27941401957534,
+        104.13826553831022
+      ],
+      "phase_current_ripple_a": [
+        122.5491729852003,
+        122.55014871403253,
+        122.55014815361274,
+        122.56967851011933
+      ],
+      "minimum_abs_vds_v": [
+        0.014447510996653534,
+        0.0037769396905673602,
+        0.003375325333209389,
+        0.003621747933449271
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.79958562193421,
+        23.820464649570514,
+        11.831660826754332
+      ],
+      "maximum_abs_phase_current_a": 113.63923356910281,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 150.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_150w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "150"
+      ],
+      "wall_clock_s": 275.43572998046875,
+      "converged": true,
+      "final_relative_residual": 2.496695430427524e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9896297086585552,
+      "average_load_power_w": 146.90504403894252,
+      "phase_current_minima_a": [
+        -24.493105784122022,
+        -24.67571523274823,
+        -24.675687871497914,
+        -24.69924650646378
+      ],
+      "phase_current_maxima_a": [
+        99.12200762056723,
+        98.9406199036715,
+        98.94064536221869,
+        98.94040855452019
+      ],
+      "phase_current_ripple_a": [
+        123.61511340468925,
+        123.61633513641974,
+        123.6163332337166,
+        123.63965506098397
+      ],
+      "minimum_abs_vds_v": [
+        0.031811135902700016,
+        0.010281750358608122,
+        0.009887662643834005,
+        0.0039916969044728745
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.82337506739683,
+        23.85580494358218,
+        11.87455074871156
+      ],
+      "maximum_abs_phase_current_a": 113.63834213195621,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 100.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_100w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "100"
+      ],
+      "wall_clock_s": 310.1570818424225,
+      "converged": true,
+      "final_relative_residual": 1.3210151046968729e-10,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9983530350095354,
+      "average_load_power_w": 99.67087825127506,
+      "phase_current_minima_a": [
+        -37.27337391550208,
+        -37.397925836795615,
+        -37.397915624961286,
+        -37.350872259294775
+      ],
+      "phase_current_maxima_a": [
+        87.40440527732292,
+        87.2810656310039,
+        87.28107356381099,
+        87.35757863549742
+      ],
+      "phase_current_ripple_a": [
+        124.677779192825,
+        124.6789914677995,
+        124.67898918877228,
+        124.7084508947922
+      ],
+      "minimum_abs_vds_v": [
+        0.0537592671488909,
+        0.036517743193819285,
+        0.036904762061098495,
+        0.07401758589997343
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        35.86249204721139,
+        23.908897749486883,
+        11.933090288545573
+      ],
+      "maximum_abs_phase_current_a": 113.63655919582294,
+      "safety_within_limit": true
+    },
+    {
+      "module_power_w": 50.0,
+      "failed": false,
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_load_sweep/load_50w.json",
+        "--picard-iterations",
+        "0",
+        "--module-power-w",
+        "50"
+      ],
+      "wall_clock_s": 61.564733028411865,
+      "converged": false,
+      "final_relative_residual": 0.09563941477266014,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 1.0081492887438737,
+      "average_load_power_w": 50.81824941973891,
+      "phase_current_minima_a": [
+        -13.409263356782564,
+        -13.277442363023905,
+        -26.032038415326177,
+        -17.99525857340132
+      ],
+      "phase_current_maxima_a": [
+        112.5778561681963,
+        106.87832048182412,
+        98.96188470778787,
+        106.1423186499603
+      ],
+      "phase_current_ripple_a": [
+        125.98711952497887,
+        120.15576284484803,
+        124.99392312311406,
+        124.13757722336162
+      ],
+      "minimum_abs_vds_v": [
+        0.0008192350855509289,
+        0.00046431737964525155,
+        0.02612696647515733,
+        0.009197675402232264
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flying_capacitor_v": [
+        36.0436670258321,
+        24.109070992133386,
+        12.049751450661343
+      ],
+      "maximum_abs_phase_current_a": 113.63477617721203,
+      "safety_within_limit": true
+    }
+  ],
+  "highest_power_with_all_four_phases_zvs_w": 190.0,
+  "highest_power_with_any_phase_zvs_w": 200.0,
+  "wall_clock_s": 1869.427451133728
+}

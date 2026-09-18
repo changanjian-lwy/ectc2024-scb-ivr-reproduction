@@ -1,0 +1,682 @@
+{
+  "script": "run_fixed_point_search.py",
+  "boundary": {
+    "vin_v": 48.0,
+    "vout_v": 1.0,
+    "module_power_w": 250.0,
+    "switching_frequency_hz": 5000000.0,
+    "period_s": 2e-07,
+    "on_time_s": 1.6666666666666664e-08,
+    "phase_inductance_h": 1.4666667e-09,
+    "flying_capacitances_f": [
+      3e-06,
+      3e-06,
+      3e-06
+    ],
+    "dead_time_s": 2.1500000000000002e-09,
+    "switch_on_resistance_ohm": 1e-06,
+    "switch_high_total_f": 3.85e-10,
+    "switch_low_total_f": 7.7e-10,
+    "divider_enabled": true,
+    "period_start_s": 2.3001075e-05,
+    "base_period_index": 115
+  },
+  "numerics": {
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "tolerance_relative": 1e-06,
+    "max_iterations": 50
+  },
+  "variable_names": [
+    "src",
+    "src_r",
+    "vin",
+    "tap3",
+    "tap2",
+    "tap1",
+    "a1",
+    "a2",
+    "a3",
+    "x1",
+    "x2",
+    "x3",
+    "x4",
+    "out",
+    "LPAR_IN",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "I_VSTEP"
+  ],
+  "seed_conversion": [
+    {
+      "variable": "src",
+      "value": 48.0,
+      "source": "A37 `V1 vin 0 {VIN}` hard 48 V source; equals `input_voltage_v(t0)` post-ramp"
+    },
+    {
+      "variable": "src_r",
+      "value": 48.0,
+      "source": "A37 has no source impedance; seeded equal to `src` (zero drop across `source_resistance_ohm`)"
+    },
+    {
+      "variable": "vin",
+      "value": 48.0,
+      "source": "A37 `.ic V(xmod:a1)=48` with `SH1` closed at T0 => `vin = a1 = 48 V`"
+    },
+    {
+      "variable": "tap3",
+      "value": 36.0,
+      "source": "no A37 analog (Track-B precharge divider); seeded at the equal-series divider equilibrium 3*48/4"
+    },
+    {
+      "variable": "tap2",
+      "value": 24.0,
+      "source": "no A37 analog; equal-series divider equilibrium 2*48/4"
+    },
+    {
+      "variable": "tap1",
+      "value": 12.0,
+      "source": "no A37 analog; equal-series divider equilibrium 1*48/4"
+    },
+    {
+      "variable": "a1",
+      "value": 48.0,
+      "source": "A37 `.ic V(xmod:a1)=48`"
+    },
+    {
+      "variable": "a2",
+      "value": 24.0,
+      "source": "A37 `.ic V(xmod:a2)=24`"
+    },
+    {
+      "variable": "a3",
+      "value": 12.0,
+      "source": "A37 `.ic V(xmod:a3)=12`"
+    },
+    {
+      "variable": "x1",
+      "value": 11.999933546000001,
+      "source": "A37 `.ic V(xmod:x1)={48-VC1_INIT}` => carries `VC1_INIT`"
+    },
+    {
+      "variable": "x2",
+      "value": 8.576740000165728e-05,
+      "source": "A37 `.ic V(xmod:x2)={24-VC2_INIT}` => carries `VC2_INIT`"
+    },
+    {
+      "variable": "x3",
+      "value": -0.0006048777000007277,
+      "source": "A37 `.ic V(xmod:x3)={12-VC3_INIT}` => carries `VC3_INIT`"
+    },
+    {
+      "variable": "x4",
+      "value": 0.0,
+      "source": "A37 `.ic V(xmod:x4)=0` (phase 4's low side conducting)"
+    },
+    {
+      "variable": "out",
+      "value": 1.0,
+      "source": "A37 `.ic V(out)=1`"
+    },
+    {
+      "variable": "LPAR_IN",
+      "value": 5.208333333333333,
+      "source": "no A37 analog (A37 has no input inductor); seeded at the 250 W average input current 250/48"
+    },
+    {
+      "variable": "L1",
+      "value": 5.2947,
+      "source": "A37 `IL1_INIT` (`LIND1 x1 out ... ic={IL1_INIT}`)"
+    },
+    {
+      "variable": "L2",
+      "value": 21.205095337,
+      "source": "A37 `IL2_INIT`"
+    },
+    {
+      "variable": "L3",
+      "value": 41.5782701063,
+      "source": "A37 `IL3_INIT`"
+    },
+    {
+      "variable": "L4",
+      "value": 84.1447433786,
+      "source": "A37 `IL4_INIT`"
+    },
+    {
+      "variable": "I_VSTEP",
+      "value": -5.208333333333333,
+      "source": "purely algebraic (its column of `E` is exactly zero, so it cannot influence propagation); seeded at `-LPAR_IN` for MNA sign consistency"
+    }
+  ],
+  "seed_state": [
+    48.0,
+    48.0,
+    48.0,
+    30.5986,
+    18.5986,
+    6.59856,
+    48.0,
+    24.0,
+    12.0,
+    11.999933546000001,
+    8.576740000165728e-05,
+    -0.0006048777000007277,
+    0.0,
+    1.0,
+    5.208333333333333,
+    5.2947,
+    21.205095337,
+    41.5782701063,
+    84.1447433786,
+    -5.208333333333333
+  ],
+  "newton": {
+    "history": [
+      {
+        "iteration": 1,
+        "relative_residual": 0.09326866787060253,
+        "absolute_residual_inf": 7.848068123235724,
+        "absolute_residual_by_variable": {
+          "src": -9.521272659185342e-13,
+          "src_r": -0.03641540323685177,
+          "vin": 0.0001853363282222631,
+          "tap3": 0.0001390022539951019,
+          "tap2": 9.2668169006771e-05,
+          "tap1": 4.633408623355706e-05,
+          "a1": -0.4234954751647706,
+          "a2": 0.051874359127573655,
+          "a3": -0.04125761080156387,
+          "x1": -0.4551826316811347,
+          "x2": -0.00010112346605537615,
+          "x3": 0.0005636901563590938,
+          "x4": -8.279719161127947e-05,
+          "out": -0.002953250730259316,
+          "LPAR_IN": -1.566793009743345,
+          "L1": -7.848068123235724,
+          "L2": -5.210905096672985,
+          "L3": -0.3906458092922023,
+          "L4": -1.3475522805377835,
+          "I_VSTEP": 1.566793009743345
+        },
+        "natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ],
+        "maximum_abs_phase_current_a": 113.64092139718178,
+        "event_signature_changed": true,
+        "jacobian_rebuilt": true,
+        "full_singular_values": [
+          270.3568300150046,
+          46.98611352449954,
+          26.559793798835027,
+          22.030651392104545,
+          12.449740007851485,
+          1.0152558316098217,
+          1.0000000513953444,
+          1.0,
+          0.9999999994909445,
+          0.9999110409397104,
+          0.9992150494031992,
+          0.9784291185132811,
+          0.0061207459428674945,
+          0.0034601999910904655,
+          0.002612770452813984,
+          0.00198992628963686,
+          8.089195944395418e-05,
+          4.528402106959766e-09,
+          1.406422567898243e-09,
+          6.220048352551052e-10
+        ],
+        "pinned_variables": [
+          "tap1",
+          "tap2",
+          "tap3"
+        ],
+        "jacobian_rank": 17,
+        "jacobian_nullity": 0,
+        "unreachable_residual_inf": 7.28731095211196e-08,
+        "newton_step_inf": 15.974801138911277,
+        "singular_value_extremes": [
+          270.3568300150048,
+          8.089195944172622e-05
+        ],
+        "accepted_damping": 1.0,
+        "next_relative_residual": 0.08583258349836662
+      },
+      {
+        "iteration": 2,
+        "relative_residual": 0.08583258349836662,
+        "absolute_residual_inf": 7.6731190953171975,
+        "absolute_residual_by_variable": {
+          "src": 1.020907802740112e-07,
+          "src_r": -1.098525359566338e-08,
+          "vin": -3.7820547049705056e-07,
+          "tap3": -2.8364704007799446e-07,
+          "tap2": -1.8909853238824326e-07,
+          "tap1": -9.454748806092539e-08,
+          "a1": -0.007736355301403819,
+          "a2": 0.040794821611605414,
+          "a3": -0.0025765010979288405,
+          "x1": -0.007743505860802635,
+          "x2": -7.1230682513448895e-09,
+          "x3": 7.672920125867978e-06,
+          "x4": 7.597188852668111e-06,
+          "out": -0.00024823642765581244,
+          "LPAR_IN": 1.1210819648610482e-05,
+          "L1": 0.0016648557879790915,
+          "L2": 0.007892610697318503,
+          "L3": -7.6731190953171975,
+          "L4": -7.597188886472139,
+          "I_VSTEP": -1.121089736155767e-05
+        },
+        "natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "maximum_abs_phase_current_a": 117.29395822331409,
+        "event_signature_changed": true,
+        "jacobian_rebuilt": true,
+        "full_singular_values": [
+          228.32734294554325,
+          46.52583396600738,
+          25.72249555940978,
+          21.126128225876126,
+          10.224688780420989,
+          1.0094268839437863,
+          1.0001747086313266,
+          1.0000000192638991,
+          0.9999999999999997,
+          0.999999999583453,
+          0.9999106600246599,
+          0.9878455637664018,
+          0.004202074751535809,
+          0.0029580157603664677,
+          0.002610019385745594,
+          0.0016083217272798835,
+          0.00010136421909609352,
+          1.6393519930751583e-08,
+          3.505416788960449e-09,
+          8.31843912886551e-10
+        ],
+        "pinned_variables": [
+          "tap1",
+          "tap2",
+          "tap3"
+        ],
+        "jacobian_rank": 17,
+        "jacobian_nullity": 0,
+        "unreachable_residual_inf": 3.110531835218299e-08,
+        "newton_step_inf": 4.097740650199434,
+        "singular_value_extremes": [
+          228.3273429455432,
+          0.00010136421909579554
+        ],
+        "accepted_damping": 1.0,
+        "next_relative_residual": 3.8954349740088685e-06
+      },
+      {
+        "iteration": 3,
+        "relative_residual": 3.8954349740088685e-06,
+        "absolute_residual_inf": 0.0003492750783493648,
+        "absolute_residual_by_variable": {
+          "src": 1.6086374898804934e-08,
+          "src_r": -1.3024184397636418e-08,
+          "vin": -1.5226140703816782e-07,
+          "tap3": -1.1418871537216546e-07,
+          "tap2": -7.612585051219867e-08,
+          "tap1": -3.806113113569154e-08,
+          "a1": -0.0002751018288407181,
+          "a2": 3.952018445829708e-08,
+          "a3": 1.505599200868346e-08,
+          "x1": -0.00027512374039941057,
+          "x2": 1.4836125962469898e-10,
+          "x3": -3.3066748758624545e-10,
+          "x4": -1.3414019562815998e-10,
+          "out": 1.6077004505454795e-08,
+          "LPAR_IN": 2.916940559316572e-06,
+          "L1": -5.232130520593792e-05,
+          "L2": 9.719454858725385e-07,
+          "L3": 0.0003492750783493648,
+          "L4": 0.00013414997805227813,
+          "I_VSTEP": -2.916916728601393e-06
+        },
+        "natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "maximum_abs_phase_current_a": 110.83707002960281,
+        "event_signature_changed": true,
+        "jacobian_rebuilt": true,
+        "full_singular_values": [
+          228.32587431835938,
+          46.5258506038063,
+          25.722600318195763,
+          21.126551208055556,
+          10.225032055366585,
+          1.009421073118479,
+          1.000174658192163,
+          1.0000000194414354,
+          0.999999999999999,
+          0.9999999997268594,
+          0.9999108304041933,
+          0.9878519326223963,
+          0.0042019647302371345,
+          0.002957978994349402,
+          0.0026099823148924804,
+          0.001608286265816371,
+          0.00010136694704250025,
+          9.701563821052305e-09,
+          3.305178656269334e-09,
+          3.3952534721528244e-10
+        ],
+        "pinned_variables": [
+          "tap1",
+          "tap2",
+          "tap3"
+        ],
+        "jacobian_rank": 17,
+        "jacobian_nullity": 0,
+        "unreachable_residual_inf": 5.166699034002843e-12,
+        "newton_step_inf": 0.00020666889009242326,
+        "singular_value_extremes": [
+          228.3258743183594,
+          0.00010136694704129176
+        ],
+        "accepted_damping": 1.0,
+        "next_relative_residual": 5.662112137281922e-11
+      },
+      {
+        "iteration": 4,
+        "relative_residual": 5.662112137281922e-11,
+        "absolute_residual_inf": 5.076805226211789e-09,
+        "absolute_residual_by_variable": {
+          "src": 1.3926637620897964e-12,
+          "src_r": 1.2292389328649733e-12,
+          "vin": -1.092104184863274e-11,
+          "tap3": -1.3180567748349858e-12,
+          "tap2": -1.1013412404281553e-12,
+          "tap1": 1.2327916465437738e-12,
+          "a1": 5.068486075288092e-09,
+          "a2": 5.165645688975928e-12,
+          "a3": 1.3713474800169934e-12,
+          "x1": 5.076805226211789e-09,
+          "x2": -1.6164603970679828e-14,
+          "x3": -8.41849105617104e-16,
+          "x4": -7.71138795180315e-18,
+          "out": 7.138734048339757e-14,
+          "LPAR_IN": 1.5206502723685844e-11,
+          "L1": 4.9915895861119e-09,
+          "L2": 1.1008545186541596e-09,
+          "L3": 1.7265477936234674e-10,
+          "L4": 7.30437932361383e-12,
+          "I_VSTEP": -1.5203838188426744e-11
+        },
+        "natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "maximum_abs_phase_current_a": 110.83704372383696,
+        "event_signature_changed": false,
+        "status": "converged"
+      }
+    ],
+    "iterations_used": 4,
+    "jacobian_rebuilds": 3,
+    "converged": true,
+    "stalled_reason": null,
+    "final_state": [
+      47.99999999999873,
+      47.959462104981945,
+      47.96411652547972,
+      30.5986,
+      18.5986,
+      6.59856,
+      35.920334271800655,
+      23.880751050402917,
+      11.942333195891718,
+      0.10121253819189614,
+      -2.8812750193049427e-05,
+      -5.8942635648297926e-05,
+      -8.96627464987719e-05,
+      0.8778709554577498,
+      4.053789501679488,
+      -0.7939768657402028,
+      29.011179027634903,
+      58.942660695663,
+      89.66274604107174,
+      -4.053789501679491
+    ],
+    "final_image": [
+      48.00000000000012,
+      47.959462104983174,
+      47.964116525468796,
+      30.598599999998683,
+      18.5985999999989,
+      6.598560000001233,
+      35.92033427686914,
+      23.880751050408083,
+      11.94233319589309,
+      0.10121254326870137,
+      -2.881275020921403e-05,
+      -5.8942635649139775e-05,
+      -8.966274649877962e-05,
+      0.8778709554578212,
+      4.053789501694695,
+      -0.7939768607486132,
+      29.011179028735757,
+      58.942660695835656,
+      89.66274604107905,
+      -4.053789501694695
+    ],
+    "final_relative_residual": 5.662112137281922e-11,
+    "final_absolute_residual_inf": 5.076805226211789e-09,
+    "final_verdicts": {
+      "turn_on": [
+        {
+          "phase": 1,
+          "natural_zvs": false,
+          "minimum_abs_vds_v": 12.043782248599655,
+          "minimum_signed_vds_v": 12.043782248599655,
+          "initial_vds_v": 12.144852760156397,
+          "free_resonance_vds_at_window_end_v": 12.043782248599655,
+          "hard_switch_residual_v": 12.043782248599655,
+          "sign_change_time_s": null,
+          "switch_on_delay_s": 2.150000000001326e-09,
+          "phase_current_at_crossing_a": null
+        },
+        {
+          "phase": 2,
+          "natural_zvs": false,
+          "minimum_abs_vds_v": 11.810188834829724,
+          "minimum_signed_vds_v": 11.810188834829724,
+          "initial_vds_v": 12.210238853226922,
+          "free_resonance_vds_at_window_end_v": 11.810188834829724,
+          "hard_switch_residual_v": 11.810188834829724,
+          "sign_change_time_s": null,
+          "switch_on_delay_s": 2.150000000001326e-09,
+          "phase_current_at_crossing_a": null
+        },
+        {
+          "phase": 3,
+          "natural_zvs": false,
+          "minimum_abs_vds_v": 11.810163079318079,
+          "minimum_signed_vds_v": 11.810163079318079,
+          "initial_vds_v": 12.210234141782754,
+          "free_resonance_vds_at_window_end_v": 11.810163079318079,
+          "hard_switch_residual_v": 11.810163079318079,
+          "sign_change_time_s": null,
+          "switch_on_delay_s": 2.150000000001326e-09,
+          "phase_current_at_crossing_a": null
+        },
+        {
+          "phase": 4,
+          "natural_zvs": false,
+          "minimum_abs_vds_v": 12.214287196763788,
+          "minimum_signed_vds_v": 12.214287196763788,
+          "initial_vds_v": 12.214287196763788,
+          "free_resonance_vds_at_window_end_v": 12.558534645778591,
+          "hard_switch_residual_v": 12.558534645778591,
+          "sign_change_time_s": null,
+          "switch_on_delay_s": 2.150000000001326e-09,
+          "phase_current_at_crossing_a": null
+        }
+      ],
+      "turn_off": [
+        {
+          "phase": 1,
+          "natural": true,
+          "minimum_signed_switch_node_v": -0.00011032635787611687,
+          "sign_change_time_s": 2.301575749616417e-05,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase": 2,
+          "natural": true,
+          "minimum_signed_switch_node_v": -0.00011001753581414203,
+          "sign_change_time_s": 2.3065755212579526e-05,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase": 3,
+          "natural": true,
+          "minimum_signed_switch_node_v": -0.00011001748943191093,
+          "sign_change_time_s": 2.3115755217835346e-05,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase": 4,
+          "natural": true,
+          "minimum_signed_switch_node_v": -0.00011082681030015625,
+          "sign_change_time_s": 2.316571625509597e-05,
+          "hard_switch_residual_v": 0.0
+        }
+      ]
+    },
+    "final_natural_zvs_flags": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "final_orbit_metrics": {
+      "minimum_phase_currents_a": [
+        -0.7939768657402028,
+        -0.8371963139815469,
+        -0.8372049990482351,
+        -0.8672939769744726
+      ],
+      "maximum_phase_currents_a": [
+        110.33758114587238,
+        110.02869994866336,
+        110.02865409760257,
+        110.83704372383696
+      ],
+      "average_output_v": 0.8779032724636108,
+      "average_input_inductor_current_a": 4.080807891778479,
+      "average_flying_capacitor_v": [
+        35.887037449400005,
+        23.948780329607178,
+        12.010468099655752
+      ],
+      "flying_capacitor_v_at_z_star": [
+        35.81912173360876,
+        23.880779863153112,
+        11.942392138527367
+      ],
+      "average_load_power_w": 192.6785389505792
+    }
+  },
+  "tap_degeneracy": {
+    "perturbation_v": 1.0,
+    "rows": [
+      {
+        "tap": "tap3",
+        "d_same_tap_per_period_v": 1.0000000000012754,
+        "identity_defect_v": 1.2754242106893798e-12,
+        "maximum_effect_on_stage_variables_v": 8.362976977593917e-11
+      },
+      {
+        "tap": "tap2",
+        "d_same_tap_per_period_v": 1.0000000000022595,
+        "identity_defect_v": 2.2595258997171186e-12,
+        "maximum_effect_on_stage_variables_v": 1.5763390592837823e-10
+      },
+      {
+        "tap": "tap1",
+        "d_same_tap_per_period_v": 0.9999999999999103,
+        "identity_defect_v": -8.970602038971265e-14,
+        "maximum_effect_on_stage_variables_v": 2.449478397892335e-10
+      }
+    ]
+  },
+  "precharge_diode_audit": {
+    "frozen_diode_state": [
+      false,
+      false,
+      false
+    ],
+    "diode_off_resistance_ohm": 1000000000000.0,
+    "maximum_off_diode_forward_voltage_v": -4.999955556460545,
+    "implied_maximum_branch_current_a": -4.9999555564605454e-12,
+    "implied_maximum_charge_per_period_c": -9.99991111292109e-19,
+    "tap_voltages_v": [
+      30.5986,
+      18.5986,
+      6.59856
+    ]
+  },
+  "picard": {
+    "damping": 0.5,
+    "iterations": 0,
+    "history": [],
+    "final_state": [
+      48.0,
+      48.0,
+      48.0,
+      30.5986,
+      18.5986,
+      6.59856,
+      48.0,
+      24.0,
+      12.0,
+      11.999933546000001,
+      8.576740000165728e-05,
+      -0.0006048777000007277,
+      0.0,
+      1.0,
+      5.208333333333333,
+      5.2947,
+      21.205095337,
+      41.5782701063,
+      84.1447433786,
+      -5.208333333333333
+    ]
+  },
+  "safety": {
+    "limit_a": 250.0,
+    "evaluations": 67,
+    "maximum_abs_phase_current_a": 117.29494458833629,
+    "worst_evaluation": {
+      "label": "jacobian[2][9]",
+      "maximum_abs_phase_current_a": 117.29494458833629,
+      "argmax_phase": 1,
+      "argmax_time_s": 2.3015741666666676e-05,
+      "maximum_abs_input_current_a": 4.3964075550365855,
+      "maximum_off_diode_forward_voltage_v": -1.3176848792410283,
+      "maximum_relative_backward_error": 1.848096349595715e-17
+    },
+    "within_limit": true
+  },
+  "wall_clock_s": 147.1614100933075
+}

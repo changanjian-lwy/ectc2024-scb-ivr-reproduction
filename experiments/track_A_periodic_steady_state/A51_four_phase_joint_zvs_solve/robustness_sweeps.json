@@ -1,0 +1,719 @@
+{
+  "script": "run_robustness_sweeps.py",
+  "reference_case": "deadtime_2p15ns",
+  "rows": [
+    {
+      "label": "deadtime_1p00ns",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_deadtime_1p00ns.json",
+        "--picard-iterations",
+        "0",
+        "--dead-time-ns",
+        "1.0"
+      ],
+      "failed": false,
+      "wall_clock_s": 46.596928119659424,
+      "dead_time_s": 1e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 3,
+      "final_relative_residual": 1.3444332618077523e-07,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        12.17178771837321,
+        12.132502491626052,
+        12.132489423878736,
+        12.190873263812763
+      ],
+      "hard_switch_residual_v": [
+        12.198992426634042,
+        12.132502491626052,
+        12.132489423878736,
+        12.422336522051872
+      ],
+      "phase_current_minima_a": [
+        -0.29870942294391106,
+        -0.5180463886685184,
+        -0.5180673676977141,
+        -0.12599565720749398
+      ],
+      "phase_current_maxima_a": [
+        118.8999630778711,
+        118.62223785778234,
+        118.62220325037049,
+        119.17871593233913
+      ],
+      "average_output_v": 0.9487583948088187,
+      "flying_capacitor_v": [
+        35.78626017687297,
+        23.83000826738057,
+        11.873773952058269
+      ],
+      "maximum_abs_phase_current_a": 121.97252096454373,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999999278351,
+        "src_r": 47.95271549720215,
+        "vin": 47.95810345553863,
+        "a1": 35.75912407068201,
+        "a2": 23.829976540157883,
+        "a3": 11.873709802909383,
+        "x1": -0.02713610619096138,
+        "x2": -3.172722268857931e-05,
+        "x3": -6.414914888470456e-05,
+        "x4": -9.703332672448825e-05,
+        "out": 0.9487283423916235,
+        "LPAR_IN": 4.728449559263659,
+        "L1": -0.29870454130440766,
+        "L2": 31.801885684163523,
+        "L3": 64.14916236854873,
+        "L4": 97.03332622819063,
+        "I_VSTEP": -4.728449559264903
+      },
+      "stage_state_inf_difference_from_reference": 7.370580183567185
+    },
+    {
+      "label": "deadtime_2p15ns",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_deadtime_2p15ns.json",
+        "--picard-iterations",
+        "0",
+        "--dead-time-ns",
+        "2.15"
+      ],
+      "failed": false,
+      "wall_clock_s": 88.74448680877686,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 2.258171322999336e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        12.04378224553271,
+        11.810188833779414,
+        11.810163081017897,
+        12.214287197199052
+      ],
+      "hard_switch_residual_v": [
+        12.04378224553271,
+        11.810188833779414,
+        11.810163081017897,
+        12.558534648184821
+      ],
+      "phase_current_minima_a": [
+        -0.7939768619383135,
+        -0.837196314182667,
+        -0.8372049992110848,
+        -0.8672939771335012
+      ],
+      "phase_current_maxima_a": [
+        110.33758114499086,
+        110.02869994684079,
+        110.02865410083838,
+        110.83704372779097
+      ],
+      "average_output_v": 0.8779032724811819,
+      "flying_capacitor_v": [
+        35.81912173424507,
+        23.880779863951517,
+        11.942392138953712
+      ],
+      "maximum_abs_phase_current_a": 117.29496466344942,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.999999999998586,
+        "src_r": 47.95946210497747,
+        "vin": 47.96411652547223,
+        "a1": 35.9203342819497,
+        "a2": 23.88075105120129,
+        "a3": 11.942333196318057,
+        "x1": 0.10121254770463034,
+        "x2": -2.8812750226661317e-05,
+        "x3": -5.8942635655509436e-05,
+        "x4": -8.966274650232416e-05,
+        "out": 0.8778709554753718,
+        "LPAR_IN": 4.053789502111183,
+        "L1": -0.7939768599367959,
+        "L2": 29.011179027137313,
+        "L3": 58.94266069795329,
+        "L4": 89.66274604462345,
+        "I_VSTEP": -4.053789502111182
+      },
+      "stage_state_inf_difference_from_reference": 0.0
+    },
+    {
+      "label": "deadtime_5p00ns",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_deadtime_5p00ns.json",
+        "--picard-iterations",
+        "0",
+        "--dead-time-ns",
+        "5.0"
+      ],
+      "failed": false,
+      "wall_clock_s": 177.86500191688538,
+      "dead_time_s": 5e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 3.6437529426957603e-09,
+      "natural_zvs_flags": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "minimum_abs_vds_v": [
+        0.000565383493537297,
+        13.158779853831032,
+        0.005273264236127062,
+        0.01251975143215489
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        13.158779853831032,
+        0.0,
+        0.0
+      ],
+      "phase_current_minima_a": [
+        -11.126082247234518,
+        -38.52316847844489,
+        -11.300108151324403,
+        -11.525345158331172
+      ],
+      "phase_current_maxima_a": [
+        79.01165309095715,
+        128.80276217861902,
+        78.83939756355934,
+        78.62641812334871
+      ],
+      "average_output_v": 0.7214837710131403,
+      "flying_capacitor_v": [
+        38.958383441473025,
+        17.622543560572495,
+        8.738664396985042
+      ],
+      "maximum_abs_phase_current_a": 129.62399514808814,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999999981468,
+        "src_r": 47.97272584643919,
+        "vin": 47.97583172637647,
+        "a1": 47.97581856289657,
+        "a2": 17.6224827020751,
+        "a3": 8.738628939534703,
+        "x1": 9.017435121423548,
+        "x2": -6.0858497393800205e-05,
+        "x3": -3.545745033961233e-05,
+        "x4": -5.982411502715722e-05,
+        "out": 0.7214857665335442,
+        "LPAR_IN": 2.727415337469469,
+        "L1": 13.166983742687076,
+        "L2": 60.85843976416268,
+        "L3": 35.45744997855322,
+        "L4": 59.82411464831363,
+        "I_VSTEP": -2.727415337469538
+      },
+      "stage_state_inf_difference_from_reference": 31.84726073702537
+    },
+    {
+      "label": "deadtime_10p0ns",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_deadtime_10p0ns.json",
+        "--picard-iterations",
+        "0",
+        "--dead-time-ns",
+        "10.0"
+      ],
+      "failed": false,
+      "wall_clock_s": 400.93935775756836,
+      "dead_time_s": 1e-08,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 5,
+      "final_relative_residual": 7.037599838551963e-11,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "minimum_abs_vds_v": [
+        0.01285931333657686,
+        0.015057523744332002,
+        0.000823859907804092,
+        0.006551917544118879
+      ],
+      "hard_switch_residual_v": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "phase_current_minima_a": [
+        -11.922988078216196,
+        -41.043655775387364,
+        -12.084188645025595,
+        -12.246121307387332
+      ],
+      "phase_current_maxima_a": [
+        76.30148433856726,
+        129.42589701197315,
+        76.1421380830572,
+        75.99307822108756
+      ],
+      "average_output_v": 0.706190412835476,
+      "flying_capacitor_v": [
+        39.23161392008545,
+        17.19425622160239,
+        8.53416218297801
+      ],
+      "maximum_abs_phase_current_a": 129.6864994460284,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999999999853,
+        "src_r": 47.97407811383204,
+        "vin": 47.97550074545851,
+        "a1": 47.975461131453784,
+        "a2": 17.19419570522988,
+        "a3": 8.53413091027673,
+        "x1": 8.743847211368337,
+        "x2": -6.051637251196558e-05,
+        "x3": -3.12727012808304e-05,
+        "x4": -5.518189151346067e-05,
+        "out": 0.706200707213809,
+        "LPAR_IN": 2.5921886166459855,
+        "L1": 39.624734755647644,
+        "L2": 60.51617986867485,
+        "L3": 31.27270088213466,
+        "L4": 55.181891142635266,
+        "I_VSTEP": -2.5921886166459793
+      },
+      "stage_state_inf_difference_from_reference": 40.41871161558444
+    },
+    {
+      "label": "substep_20ps",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_substep_20ps.json",
+        "--picard-iterations",
+        "0",
+        "--sub-step-ps",
+        "20"
+      ],
+      "failed": false,
+      "wall_clock_s": 38.632018089294434,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 2e-11,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 3,
+      "final_relative_residual": 1.665890103312751e-07,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        12.037180525322803,
+        11.80536163462492,
+        11.805344820596916,
+        12.213965262908435
+      ],
+      "hard_switch_residual_v": [
+        12.037180525322803,
+        11.80536163462492,
+        11.805344820596916,
+        12.542980012976754
+      ],
+      "phase_current_minima_a": [
+        -0.7881548986922445,
+        -0.8311317957575595,
+        -0.8311394681433225,
+        -0.8583493480233544
+      ],
+      "phase_current_maxima_a": [
+        110.29453340420501,
+        109.98627405963094,
+        109.9862330732427,
+        110.79184532178789
+      ],
+      "average_output_v": 0.8775360566120102,
+      "flying_capacitor_v": [
+        35.818923264320496,
+        23.880502558838007,
+        11.942032057127214
+      ],
+      "maximum_abs_phase_current_a": 117.2512111562088,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999994845674,
+        "src_r": 47.959456612583956,
+        "vin": 47.964111778458445,
+        "a1": 35.926943977516345,
+        "a2": 23.880473758629567,
+        "a3": 11.941973141044985,
+        "x1": 0.10802071319585194,
+        "x2": -2.8800208441439417e-05,
+        "x3": -5.891608223055699e-05,
+        "x4": -8.962193053027032e-05,
+        "out": 0.8775037198056775,
+        "LPAR_IN": 4.054333593726372,
+        "L1": -0.7881399686636081,
+        "L2": 28.997170269039508,
+        "L3": 58.9161403469246,
+        "L4": 89.62193008233633,
+        "I_VSTEP": -4.054333593655184
+      },
+      "stage_state_inf_difference_from_reference": 0.040815962287112484
+    },
+    {
+      "label": "substep_1ps",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_substep_1ps.json",
+        "--picard-iterations",
+        "0",
+        "--sub-step-ps",
+        "1"
+      ],
+      "failed": false,
+      "wall_clock_s": 292.82952785491943,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 1e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 9.724503535232412e-08,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        12.045619987779169,
+        11.811417328288105,
+        11.811391694450212,
+        12.214370735402644
+      ],
+      "hard_switch_residual_v": [
+        12.045619987779169,
+        11.811417328288105,
+        11.811391694450212,
+        12.562943764613609
+      ],
+      "phase_current_minima_a": [
+        -0.795523126408509,
+        -0.8388331431848379,
+        -0.8388417594456874,
+        -0.869692056839513
+      ],
+      "phase_current_maxima_a": [
+        110.34941377232498,
+        110.04050955785767,
+        110.04046346525078,
+        110.84958035655032
+      ],
+      "average_output_v": 0.8780037102729668,
+      "flying_capacitor_v": [
+        35.819180069408134,
+        23.88085544236838,
+        11.942485939146518
+      ],
+      "maximum_abs_phase_current_a": 117.29752263280734,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.999993499471856,
+        "src_r": 47.9594571343583,
+        "vin": 47.964117878027835,
+        "a1": 35.91849793022165,
+        "a2": 23.88082662634854,
+        "a3": 11.94242698935648,
+        "x1": 0.09931786081351603,
+        "x2": -2.8816019840415562e-05,
+        "x3": -5.894979003837088e-05,
+        "x4": -8.967406286434655e-05,
+        "out": 0.8779713985718643,
+        "LPAR_IN": 4.053636511355603,
+        "L1": -0.7955230891290872,
+        "L2": 29.014908696377073,
+        "L3": 58.94981496962183,
+        "L4": 89.67406235821767,
+        "I_VSTEP": -4.053636511355603
+      },
+      "stage_state_inf_difference_from_reference": 0.011316313594221583
+    },
+    {
+      "label": "taps_lowered_1v",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_taps_lowered_1v.json",
+        "--picard-iterations",
+        "0",
+        "--tap-voltages",
+        "35,23,11"
+      ],
+      "failed": false,
+      "wall_clock_s": 100.70101404190063,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 1e-06,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 1.4271716384869807e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        12.043782244872268,
+        11.810188835320002,
+        11.810163079473213,
+        12.214287197109174
+      ],
+      "hard_switch_residual_v": [
+        12.043782244872268,
+        11.810188835320002,
+        11.810163079473213,
+        12.558534647267873
+      ],
+      "phase_current_minima_a": [
+        -0.7939768602649542,
+        -0.8371963142887131,
+        -0.8372049989121312,
+        -0.8672939770732685
+      ],
+      "phase_current_maxima_a": [
+        110.33758114623326,
+        110.02869994858655,
+        110.02865409882533,
+        110.83704372697373
+      ],
+      "average_output_v": 0.8779032724806322,
+      "flying_capacitor_v": [
+        35.819121734105835,
+        23.88077986362578,
+        11.942392138868794
+      ],
+      "maximum_abs_phase_current_a": 117.29490694778409,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999999999878,
+        "src_r": 47.959462104994685,
+        "vin": 47.964116525491136,
+        "a1": 35.92033428077421,
+        "a2": 23.88075105087557,
+        "a3": 11.942333196233143,
+        "x1": 0.10121254666837731,
+        "x2": -2.8812750208119396e-05,
+        "x3": -5.894263564982719e-05,
+        "x4": -8.966274650152861e-05,
+        "out": 0.8778709554747958,
+        "LPAR_IN": 4.053789500409978,
+        "L1": -0.7939768602649542,
+        "L2": 29.01117902837138,
+        "L3": 58.94266069701867,
+        "L4": 89.66274604382768,
+        "I_VSTEP": -4.053789500409975
+      },
+      "stage_state_inf_difference_from_reference": 1.7012071751310032e-09
+    },
+    {
+      "label": "rds_3p5mohm",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_rds_3p5mohm.json",
+        "--picard-iterations",
+        "0",
+        "--switch-on-resistance-ohm",
+        "3.5e-3"
+      ],
+      "failed": false,
+      "wall_clock_s": 103.848140001297,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 0.0035,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 9.44370887864456e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        5.45242864529542,
+        5.165707283513058,
+        5.166000337745,
+        4.54738704397639
+      ],
+      "hard_switch_residual_v": [
+        5.45242864529542,
+        5.165707283513058,
+        5.166000337745,
+        4.54738704397639
+      ],
+      "phase_current_minima_a": [
+        -6.089436696149971,
+        -6.576786451810069,
+        -6.576679714294857,
+        -5.801343603622344
+      ],
+      "phase_current_maxima_a": [
+        106.91688325773711,
+        106.15949393976676,
+        106.15943333528152,
+        105.3094660330867
+      ],
+      "average_output_v": 0.7291181927757019,
+      "flying_capacitor_v": [
+        36.05233734296295,
+        23.933233880878237,
+        11.813187810524731
+      ],
+      "maximum_abs_phase_current_a": 112.61844412212216,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 47.99999999999764,
+        "src_r": 47.96128289343106,
+        "vin": 47.96575535187414,
+        "a1": 42.51332671404216,
+        "a2": 23.87204687552145,
+        "a3": 11.650314931136785,
+        "x1": 6.460989371079205,
+        "x2": -0.061187005356789156,
+        "x3": -0.1628728793879461,
+        "x4": -0.27974455586510993,
+        "out": 0.7290759535208162,
+        "LPAR_IN": 3.871710656662169,
+        "L1": -1.5574727230962544,
+        "L2": 17.874264379224844,
+        "L3": 46.532220836129866,
+        "L4": 79.92505403946241,
+        "I_VSTEP": -3.871710656662164
+      },
+      "stage_state_inf_difference_from_reference": 12.410439861823427
+    },
+    {
+      "label": "rds_7mohm",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+        "--output",
+        "_sweeps/sweep_rds_7mohm.json",
+        "--picard-iterations",
+        "0",
+        "--switch-on-resistance-ohm",
+        "7e-3"
+      ],
+      "failed": false,
+      "wall_clock_s": 107.93810606002808,
+      "dead_time_s": 2.1500000000000002e-09,
+      "sub_step_s": 5e-12,
+      "switch_on_resistance_ohm": 0.007,
+      "converged": true,
+      "iterations_used": 4,
+      "final_relative_residual": 1.0271771930399725e-10,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "minimum_abs_vds_v": [
+        1.9780815387900859,
+        1.776765541150091,
+        1.7775525893891881,
+        0.9146665324278729
+      ],
+      "hard_switch_residual_v": [
+        1.9780815387900859,
+        1.776765541150091,
+        1.7775525893891881,
+        0.9185307613057994
+      ],
+      "phase_current_minima_a": [
+        -9.541320023635894,
+        -10.0483510563172,
+        -10.047948163813247,
+        -8.90026264716507
+      ],
+      "phase_current_maxima_a": [
+        103.88258640621424,
+        102.67045621577326,
+        102.66974196862047,
+        100.99247929218974
+      ],
+      "average_output_v": 0.6126226543959676,
+      "flying_capacitor_v": [
+        36.269031606995846,
+        24.02519353384387,
+        11.783344243382851
+      ],
+      "maximum_abs_phase_current_a": 109.57352009201772,
+      "safety_within_limit": true,
+      "stage_state": {
+        "src": 48.000000000000604,
+        "src_r": 47.96256495566081,
+        "vin": 47.966904649381036,
+        "a1": 45.98882310321354,
+        "a2": 23.95953204319397,
+        "a3": 11.530713520031517,
+        "x1": 9.719791496217695,
+        "x2": -0.06566149064989901,
+        "x3": -0.2526307233513345,
+        "x4": -0.5020355429566246,
+        "out": 0.612571511704794,
+        "LPAR_IN": 3.7435044339789196,
+        "L1": -1.8758801620707743,
+        "L2": 9.861596894028969,
+        "L3": 36.08293217859282,
+        "L4": 71.71480570879064,
+        "I_VSTEP": -3.743504433978917
+      },
+      "stage_state_inf_difference_from_reference": 22.859728519360473
+    }
+  ],
+  "any_natural_zvs_anywhere": true,
+  "wall_clock_s": 1358.095456123352
+}

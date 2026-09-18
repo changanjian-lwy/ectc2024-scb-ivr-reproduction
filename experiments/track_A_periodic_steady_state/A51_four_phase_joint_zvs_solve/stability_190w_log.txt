@@ -1,0 +1,9 @@
+wrote stability_and_divider_190w.json  (187.2 s)
+
+load_190w  (d = 2.15 ns)
+  residual 4.779e-07, natural ZVS [True, True, True, True]
+  spectral radius of dF/dz = 0.950810  -> locally stable = True
+  five largest |eigenvalue|: 0.950810, 0.916725, 0.816018, 0.816018, 0.785805
+  divider check: taps -> [30.782696425670288, 18.782696425670288, 6.782696425670288], max off-diode forward 0.2173 V -> -5.0000 V (all reverse-biased = True)
+                  stage |z*| difference = 4.166e-07 V/A, natural ZVS [True, True, True, True], Vout 0.97161 V
+

@@ -1,0 +1,107 @@
+wrote final_verification.json  (1266.1 s)
+
+phase 1:  natural ZVS = False
+  iL at window entry = +0.678743 A   (orbit min -0.7940 A, max 110.3376 A)
+  sub-step ladder:  sub-step |  min|Vds| (V) |  Vds at window end (V) | crossed
+         50.0 ps |  12.027732692 |          12.027732692 | False
+         20.0 ps |  12.038336244 |          12.038336244 | False
+         10.0 ps |  12.041948710 |          12.041948710 | False
+          5.0 ps |  12.043782246 |          12.043782246 | False
+          2.0 ps |  12.044888417 |          12.044888417 | False
+          1.0 ps |  12.045258152 |          12.045258152 | False
+          0.5 ps |  12.045443242 |          12.045443242 | False
+         0.25 ps |  12.045535850 |          12.045535850 | False
+        0.125 ps |  12.045582219 |          12.045582219 | False
+       0.0625 ps |  12.045605471 |          12.045605471 | False
+     Richardson  |  12.045628724 |          12.045628724 |
+  free-resonance probe (10.0 ns, dead-time mode held): Vds start = 12.144853 V -> minimum 10.170849 V at 5.6920 ns; crossed zero = False; downward excursion = 1.974004 V
+     sub-step convergence of the minimum: 4.0 ps -> 10.173610 V, 2.0 ps -> 10.170849 V, 1.0 ps -> 10.169466 V, 0.5 ps -> 10.168774 V
+  measured participating capacitance = 1539.1625 pF  (step ladder: 2.0 ps -> 1539.6798 pF, 1.0 ps -> 1539.6039 pF, 0.5 ps -> 1539.4560 pF, 0.25 ps -> 1539.1625 pF)
+  threshold current = -11.525290 A  (9.2202% of 125 A); orbit minimum is -0.7940 A, deficit 10.7313 A
+     crosses inside the commanded 2.15 ns dead time = False (at 2.4760 ns)
+     threshold sub-step convergence: 2.0 ps -> -11.525290 A, 1.0 ps -> -11.518932 A, 0.5 ps -> -11.515755 A
+  sensitivity of the free probe's minimum signed Vds (V per unit):
+     d/dVC1   = -1.000000
+     d/dVC2   = -0.000000
+     d/dVC3   = -0.000000
+     d/diL1   = -0.756315
+
+phase 2:  natural ZVS = False
+  iL at window entry = +0.368614 A   (orbit min -0.8372 A, max 110.0287 A)
+  sub-step ladder:  sub-step |  min|Vds| (V) |  Vds at window end (V) | crossed
+         50.0 ps |  11.800492880 |          11.800492880 | False
+         20.0 ps |  11.806866372 |          11.806866372 | False
+         10.0 ps |  11.809066643 |          11.809066643 | False
+          5.0 ps |  11.810188834 |          11.810188834 | False
+          2.0 ps |  11.810867579 |          11.810867579 | False
+          1.0 ps |  11.811094734 |          11.811094734 | False
+          0.5 ps |  11.811208487 |          11.811208487 | False
+         0.25 ps |  11.811265412 |          11.811265412 | False
+        0.125 ps |  11.811293867 |          11.811293867 | False
+       0.0625 ps |  11.811308094 |          11.811308094 | False
+     Richardson  |  11.811322322 |          11.811322322 |
+  free-resonance probe (10.0 ns, dead-time mode held): Vds start = 12.210239 V -> minimum 10.386588 V at 5.3040 ns; crossed zero = False; downward excursion = 1.823651 V
+     sub-step convergence of the minimum: 4.0 ps -> 10.388807 V, 2.0 ps -> 10.386588 V, 1.0 ps -> 10.385476 V, 0.5 ps -> 10.384919 V
+  measured participating capacitance = 1538.5264 pF  (step ladder: 2.0 ps -> 1539.5584 pF, 1.0 ps -> 1539.4087 pF, 0.5 ps -> 1539.1134 pF, 0.25 ps -> 1538.5264 pF)
+  threshold current = -11.593830 A  (9.2751% of 125 A); orbit minimum is -0.8372 A, deficit 10.7566 A
+     crosses inside the commanded 2.15 ns dead time = False (at 2.4760 ns)
+     threshold sub-step convergence: 2.0 ps -> -11.593830 A, 1.0 ps -> -11.587438 A, 0.5 ps -> -11.584242 A
+  sensitivity of the free probe's minimum signed Vds (V per unit):
+     d/dVC1   = +1.000000
+     d/dVC2   = -1.000000
+     d/dVC3   = +0.000000
+     d/diL2   = -0.647244
+
+phase 3:  natural ZVS = False
+  iL at window entry = +0.368580 A   (orbit min -0.8372 A, max 110.0287 A)
+  sub-step ladder:  sub-step |  min|Vds| (V) |  Vds at window end (V) | crossed
+         50.0 ps |  11.800467858 |          11.800467858 | False
+         20.0 ps |  11.806840869 |          11.806840869 | False
+         10.0 ps |  11.809040975 |          11.809040975 | False
+          5.0 ps |  11.810163081 |          11.810163081 | False
+          2.0 ps |  11.810841780 |          11.810841780 | False
+          1.0 ps |  11.811068922 |          11.811068922 | False
+          0.5 ps |  11.811182661 |          11.811182661 | False
+         0.25 ps |  11.811239554 |          11.811239554 | False
+        0.125 ps |  11.811268026 |          11.811268026 | False
+       0.0625 ps |  11.811282245 |          11.811282245 | False
+     Richardson  |  11.811296463 |          11.811296463 |
+  free-resonance probe (10.0 ns, dead-time mode held): Vds start = 12.210234 V -> minimum 10.386596 V at 5.3040 ns; crossed zero = False; downward excursion = 1.823638 V
+     sub-step convergence of the minimum: 4.0 ps -> 10.388816 V, 2.0 ps -> 10.386596 V, 1.0 ps -> 10.385484 V, 0.5 ps -> 10.384928 V
+  measured participating capacitance = 1538.5746 pF  (step ladder: 2.0 ps -> 1539.6078 pF, 1.0 ps -> 1539.4579 pF, 0.5 ps -> 1539.1624 pF, 0.25 ps -> 1538.5746 pF)
+  threshold current = -11.594010 A  (9.2752% of 125 A); orbit minimum is -0.8372 A, deficit 10.7568 A
+     crosses inside the commanded 2.15 ns dead time = False (at 2.4760 ns)
+     threshold sub-step convergence: 2.0 ps -> -11.594010 A, 1.0 ps -> -11.587618 A, 0.5 ps -> -11.584422 A
+  sensitivity of the free probe's minimum signed Vds (V per unit):
+     d/dVC1   = -0.000000
+     d/dVC2   = +1.000000
+     d/dVC3   = -1.000000
+     d/diL3   = -0.647212
+
+phase 4:  natural ZVS = False
+  iL at window entry = +1.154924 A   (orbit min -0.8673 A, max 110.8370 A)
+  sub-step ladder:  sub-step |  min|Vds| (V) |  Vds at window end (V) | crossed
+         50.0 ps |  12.214287197 |          12.524921139 | False
+         20.0 ps |  12.214287197 |          12.547112247 | False
+         10.0 ps |  12.214287197 |          12.554687196 | False
+          5.0 ps |  12.214287197 |          12.558534648 | False
+          2.0 ps |  12.214287197 |          12.560856681 | False
+          1.0 ps |  12.214287197 |          12.561632953 | False
+          0.5 ps |  12.214287197 |          12.562021513 | False
+         0.25 ps |  12.214287197 |          12.562215899 | False
+        0.125 ps |  12.214287197 |          12.562313119 | False
+       0.0625 ps |  12.214287197 |          12.562361735 | False
+     Richardson  |  12.214287197 |          12.562410352 |
+  free-resonance probe (10.0 ns, dead-time mode held): Vds start = 12.214287 V -> minimum 9.771847 V at 5.3600 ns; crossed zero = False; downward excursion = 2.442440 V
+     sub-step convergence of the minimum: 4.0 ps -> 9.776791 V, 2.0 ps -> 9.771847 V, 1.0 ps -> 9.769370 V, 0.5 ps -> 9.768129 V
+  measured participating capacitance = 1154.3617 pF  (step ladder: 2.0 ps -> 1154.8793 pF, 1.0 ps -> 1154.8034 pF, 0.5 ps -> 1154.6554 pF, 0.25 ps -> 1154.3617 pF)
+  threshold current = -10.043825 A  (8.0351% of 125 A); orbit minimum is -0.8673 A, deficit 9.1765 A
+     crosses inside the commanded 2.15 ns dead time = True (at 2.1440 ns)
+     threshold sub-step convergence: 2.0 ps -> -10.043825 A, 1.0 ps -> -10.037432 A, 0.5 ps -> -10.034236 A
+  sensitivity of the free probe's minimum signed Vds (V per unit):
+     d/dVC1   = -0.000000
+     d/dVC2   = +0.000000
+     d/dVC3   = +1.000000
+     d/diL4   = -1.008481
+
+safety at the final state: max |iL| = 110.8370 A (limit 250.0 A)

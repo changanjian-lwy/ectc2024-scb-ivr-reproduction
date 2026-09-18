@@ -1,0 +1,22 @@
+  [PASS] import_isolation  offenders=[]
+  [PASS] kernel_bitwise_identity  max |advance_fixed_diode_step - _advance_forced| = 0.0 over 8 samples
+  [PASS] interval_cover  gaps=[] total=2.0000000000000147e-07 T=2e-07 turn_on=[0, 1, 2, 3] turn_off=[0, 1, 2, 3]
+  [PASS] seed_roundtrip  worst deviation = 0.0
+  [PASS] ivstep_algebraic  |E[:,I_VSTEP]|inf = 0.0, |F(z)-F(z+1e6 e_IVSTEP)|inf = 0.0
+  [PASS] step_convergence  
+
+  sub-step ladder (F at the A37 seed):
+     50.0 ps  rel=9.296797e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=nan  (0.7 s)
+     20.0 ps  rel=9.316088e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=8.012e-02  (0.8 s)
+     10.0 ps  rel=9.323116e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=2.773e-02  (0.9 s)
+      5.0 ps  rel=9.326867e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=1.440e-02  (1.3 s)
+      2.0 ps  rel=9.329183e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=8.582e-03  (2.5 s)
+      1.0 ps  rel=9.329964e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=2.895e-03  (4.4 s)
+  coarse-step ladder (F at the A37 seed):
+         0.5 ns  rel=9.341170e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=nan
+        0.25 ns  rel=9.332934e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=4.871e-02
+       0.125 ns  rel=9.328879e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=2.363e-02
+      0.0625 ns  rel=9.326867e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=1.172e-02
+     0.03125 ns  rel=9.325865e-02  zvs=[False, False, True, True]  dz_inf_vs_previous=5.839e-03
+
+wrote map_selftests.json   all_passed = True

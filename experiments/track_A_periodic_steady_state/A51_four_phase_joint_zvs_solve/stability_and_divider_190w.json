@@ -1,0 +1,124 @@
+{
+  "script": "run_stability_and_divider_checks.py",
+  "cases": [
+    {
+      "label": "load_190w",
+      "source": "_load_sweep/load_190w.json",
+      "stability": {
+        "dead_time_s": 2.1500000000000002e-09,
+        "module_power_w": 190.0,
+        "relative_residual": 4.778831638007181e-07,
+        "natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "finite_difference_increment": 0.0001,
+        "excluded_directions": [
+          "tap3",
+          "tap2",
+          "tap1"
+        ],
+        "spectral_radius": 0.9508099231064203,
+        "locally_stable": true,
+        "eigenvalue_magnitudes": [
+          0.9508099231064203,
+          0.9167246186716883,
+          0.8160183905584971,
+          0.8160183905584971,
+          0.7858049359738668,
+          0.7858049359738668,
+          0.7429145726379489,
+          0.7429145726379489,
+          0.6255199653652936,
+          0.549263649706042,
+          2.0213400665914495e-10,
+          1.0803899515712794e-10,
+          5.3329135033543645e-12,
+          1.5329907386888476e-14,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_real": [
+          0.9508099231064203,
+          0.9167246186716883,
+          0.7883276582051153,
+          0.7883276582051153,
+          0.7675512413964282,
+          0.7675512413964282,
+          0.7052455562346414,
+          0.7052455562346414,
+          0.6255199653652936,
+          0.549263649706042,
+          -2.0213400665914495e-10,
+          1.0803899515712794e-10,
+          -5.3329135033543645e-12,
+          1.5329907386888476e-14,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eigenvalues_imag": [
+          0.0,
+          0.0,
+          -0.21077361561286273,
+          0.21077361561286273,
+          0.16838791296199074,
+          -0.16838791296199074,
+          0.23356105764685528,
+          -0.23356105764685528,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "divider": {
+        "label": "load_190w",
+        "failed": false,
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/lawyer/Mihai RA \u9762\u8bd5/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-a754b394f87450cf5/experiments/track_A_periodic_steady_state/A51_four_phase_joint_zvs_solve/run_fixed_point_search.py",
+          "--output",
+          "_checks190/divider_load_190w.json",
+          "--picard-iterations",
+          "0",
+          "--dead-time-ns",
+          "2.15",
+          "--switch-on-resistance-ohm",
+          "1e-06",
+          "--module-power-w",
+          "190",
+          "--tap-voltages",
+          "30.7827,18.7827,6.7827"
+        ],
+        "tap_voltages_v": [
+          30.782696425670288,
+          18.782696425670288,
+          6.782696425670288
+        ],
+        "original_maximum_off_diode_forward_voltage_v": 0.21730357432971203,
+        "new_maximum_off_diode_forward_voltage_v": -4.999996516539213,
+        "all_diodes_reverse_biased": true,
+        "converged": true,
+        "final_relative_residual": 4.864752982731942e-07,
+        "natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "stage_state_inf_difference": 4.1664908678740176e-07,
+        "average_output_v": 0.9716127047801416
+      }
+    }
+  ],
+  "wall_clock_s": 187.2469470500946
+}
