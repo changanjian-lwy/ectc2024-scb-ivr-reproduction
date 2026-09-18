@@ -1,0 +1,123 @@
+{
+  "script": "build_results.py",
+  "classification": "SENSITIVITY_ONLY",
+  "not_a_p24_reproduction": true,
+  "module_power_w": 250.0,
+  "search": {
+    "outcome": "CRITICAL_LPHASE_FOUND",
+    "nominal_lphase_h": 1.4666667e-09,
+    "critical_lphase_h": 1.1962500271875001e-09,
+    "critical_lphase_bracket_h": [
+      1.1962500271875001e-09,
+      1.198312527234375e-09
+    ],
+    "reduction_from_nominal_pct": 18.437499999999996,
+    "margin_lphase_h": 1.0766250244687502e-09,
+    "margin_reduction_from_nominal_pct": 26.593749999999993,
+    "bracket_was_widened_past_proposed_start": false,
+    "ladder_step_count": 2,
+    "bisection_step_count": 6,
+    "safety_maximum_over_whole_search_a": 150.13186999915158,
+    "safety_limit_a": 250.0
+  },
+  "three_point_table": {
+    "nominal": {
+      "phase_inductance_h": 1.4666667e-09,
+      "converged": true,
+      "final_relative_residual": 2.258171322999336e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        110.35247080459833,
+        110.04180686156324,
+        110.04168656158014,
+        110.84985191641222
+      ],
+      "rms_currents_a": [
+        63.578864765701866,
+        63.32938762941149,
+        63.326825908105214,
+        63.97639673011703
+      ],
+      "conduction_loss_w_total": 113.0930472040352,
+      "maximum_abs_phase_current_a": 110.8370437278073
+    },
+    "critical": {
+      "phase_inductance_h": 1.1962500271875001e-09,
+      "converged": true,
+      "final_relative_residual": 6.231860258084123e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        135.25971130685437,
+        134.76389068642516,
+        134.76349856239233,
+        134.1131168920968
+      ],
+      "rms_currents_a": [
+        74.42111823082652,
+        74.1358584012606,
+        74.28010161239987,
+        73.42694892421721
+      ],
+      "conduction_loss_w_total": 153.60575064440533,
+      "maximum_abs_phase_current_a": 135.24140715891312
+    },
+    "margin": {
+      "phase_inductance_h": 1.0766250244687502e-09,
+      "converged": true,
+      "final_relative_residual": 2.946027001483147e-08,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        146.13660402223377,
+        145.69072899664994,
+        145.68916019864292,
+        145.69252040604135
+      ],
+      "rms_currents_a": [
+        78.5076330421172,
+        78.22017310872674,
+        78.28232772682775,
+        78.1600620293723
+      ],
+      "conduction_loss_w_total": 171.6327344046049,
+      "maximum_abs_phase_current_a": 146.1163956090681
+    }
+  },
+  "capacitive_switching_loss_at_nominal_w": 2.086949858246632,
+  "tradeoff": {
+    "capacitive_switching_loss_eliminated_w": 2.086949858246632,
+    "conduction_loss_increase_critical_w": 40.51270344037013,
+    "conduction_loss_increase_margin_w": 58.53968720056969,
+    "net_watts_critical": -38.4257535821235,
+    "net_watts_margin": -56.452737342323054,
+    "critical_all_four_zvs": true,
+    "margin_all_four_zvs": true
+  },
+  "safety": {
+    "limit_a": 250.0,
+    "maximum_a_three_point_analysis": 146.1163956090681,
+    "maximum_a_whole_bisection_search": 150.13186999915158,
+    "within_limit": true
+  },
+  "plain_verdict": "at the critical LPHASE, the conduction-loss increase meets or exceeds the capacitive switching-loss eliminated under this partial loss model (net Watts non-positive) -- achieving ZVS this way is not shown to be a net efficiency win"
+}

@@ -113,3 +113,31 @@ project's history. This remains `SENSITIVITY_ONLY` (a `76%`-of-rated-load
 finding, not a P24 operating point) and does not by itself constitute a
 P24/P25 reproduction claim. See
 `A52_spice_crosscheck_reduced_load_zvs/RESULTS.md`.
+
+`A53_lphase_zvs_load_tradeoff` asks the complementary question: instead of
+reducing LOAD (A51/A52's own lever), can P24's own RATED `250 W` load be
+kept fixed and `LPHASE` reduced instead to unlock ZVS, and is that actually
+a net efficiency win? A local wrapper exposes `phase_inductance_h` as an
+overridable parameter on A51's own boundary construction, and A51's own
+Newton+Picard search (embedded in that script's `main()`) is re-expressed
+as an importable function, reproducing A51's own published nominal residual
+bit-for-bit as a fidelity check. Because a raw, un-converged evaluation of
+A37's own fixed seed state turns out to exceed the `+/-250 A` safety bound
+once `LPHASE` drops much below nominal, every candidate is instead solved
+by continuation (warm-started from the previous, nearby candidate's own
+converged fixed point) rather than re-seeded from A37's own values.
+**Result: a critical `LPHASE` of `1.19625 nH` (`18.44%` below the paper's
+own nominal `1.4667 nH`) is found, at which all four phases achieve natural
+ZVS at the FULL rated load** -- confirmed converged and step-size-consistent.
+But the net Watts comparison does not favor it: RMS current (integrated from
+the actual solved waveform) rises enough that the conduction-loss increase
+(`+40.5 W` at critical, `+58.5 W` at a `10%`-further margin point) is
+`18x`-`27x` LARGER than the capacitive switching loss eliminated (`2.09 W`,
+computed from A51's own already-published measured capacitances and
+hard-switch residual voltages). **Achieving ZVS at rated load by shrinking
+`LPHASE` alone is therefore not shown to be a net efficiency win** under
+this project's own conduction/switching loss model -- a genuine, quantified
+negative finding, distinct from and not superseding A51/A52's own positive
+load-reduction result. Every phase current stayed at or below `150.13 A`
+(`60%` of the `+/-250 A` bound) throughout the entire search. See
+`A53_lphase_zvs_load_tradeoff/RESULTS.md`.

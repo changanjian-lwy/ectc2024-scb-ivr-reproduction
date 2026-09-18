@@ -1,0 +1,602 @@
+{
+  "script": "run_three_point_analysis.py",
+  "classification": "SENSITIVITY_ONLY",
+  "module_power_w": 250.0,
+  "points": {
+    "nominal": {
+      "label": "nominal",
+      "phase_inductance_h": 1.4666667e-09,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 2.258171322999336e-11,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 8.946177037989451e-12,
+        "final_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "nominal",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.04378224553271,
+              11.810188833779414,
+              11.810163081017897,
+              12.214287197199052
+            ],
+            "maximum_abs_phase_current_a": 110.83704372779097
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.056487983755304,
+              11.810866532691403,
+              11.810829373752712,
+              12.214281668331243
+            ],
+            "maximum_abs_phase_current_a": 110.84665309073219
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.060752493725275,
+              11.811093337455969,
+              11.811052361480202,
+              12.21427982591204
+            ],
+            "maximum_abs_phase_current_a": 110.84985191641222
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.062886403383999,
+              11.811206916271217,
+              11.811164030200965,
+              12.214278904804534
+            ],
+            "maximum_abs_phase_current_a": 110.85145343544652
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 63.578864765701866,
+          "peak_a": 110.35247080459833,
+          "minimum_a": -0.7939768599367959,
+          "maximum_a": 110.35247080459833,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 63.32938762941149,
+          "peak_a": 110.04180686156324,
+          "minimum_a": -0.8387947815803694,
+          "maximum_a": 110.04180686156324,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 63.326825908105214,
+          "peak_a": 110.04168656158014,
+          "minimum_a": -0.8388048397177863,
+          "maximum_a": 110.04168656158014,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 63.97639673011703,
+          "peak_a": 110.84985191641222,
+          "minimum_a": -0.8695052336175347,
+          "maximum_a": 110.84985191641222,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        28.295904314267844,
+        28.0742793626138,
+        28.07200815716826,
+        28.650855369985305
+      ],
+      "conduction_loss_w_total": 113.0930472040352,
+      "average_output_v": 0.8779032724811819,
+      "average_load_power_w": 192.67853895829208,
+      "maximum_abs_phase_current_a": 110.8370437278073,
+      "z_star": [
+        47.999999999998586,
+        47.95946210497747,
+        47.96411652547223,
+        36.0,
+        24.0,
+        12.0,
+        35.9203342819497,
+        23.88075105120129,
+        11.942333196318057,
+        0.10121254770463034,
+        -2.8812750226661317e-05,
+        -5.8942635655509436e-05,
+        -8.966274650232416e-05,
+        0.8778709554753718,
+        4.053789502111183,
+        -0.7939768599367959,
+        29.011179027137313,
+        58.94266069795329,
+        89.66274604462345,
+        -4.053789502111182
+      ]
+    },
+    "critical": {
+      "label": "critical",
+      "phase_inductance_h": 1.1962500271875001e-09,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 6.231860258084123e-09,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 1.3306869817865193e-10,
+        "final_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "critical",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0019564142922945393,
+              0.003842453920547939,
+              0.0033892341762964406,
+              0.013859308071490162
+            ],
+            "maximum_abs_phase_current_a": 135.24140715891312
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              1.507898608110736e-05,
+              0.0019553861324652644,
+              0.0023257326661614286,
+              0.004527870537106793
+            ],
+            "maximum_abs_phase_current_a": 135.25515849298537
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.00027746650626880864,
+              0.0009143316445090477,
+              0.0010535360166556984,
+              0.001368435518065425
+            ],
+            "maximum_abs_phase_current_a": 135.25971130685437
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              6.948300000431118e-05,
+              0.0004089655247128121,
+              0.00038753547133296706,
+              0.00022045435090234378
+            ],
+            "maximum_abs_phase_current_a": 135.26199949388592
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 74.42111823082652,
+          "peak_a": 135.25971130685437,
+          "minimum_a": -12.892567858538998,
+          "maximum_a": 135.25971130685437,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 74.1358584012606,
+          "peak_a": 134.76389068642516,
+          "minimum_a": -13.401157060539713,
+          "maximum_a": 134.76389068642516,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 74.28010161239987,
+          "peak_a": 134.76349856239233,
+          "minimum_a": -13.400979225690756,
+          "maximum_a": 134.76349856239233,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 73.42694892421721,
+          "peak_a": 134.1131168920968,
+          "minimum_a": -14.05553236709723,
+          "maximum_a": 134.1131168920968,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        38.769519871086615,
+        38.47287850624234,
+        38.622734468839155,
+        37.740617798237224
+      ],
+      "conduction_loss_w_total": 153.60575064440533,
+      "average_output_v": 0.9669415293829297,
+      "average_load_power_w": 233.74398031134973,
+      "maximum_abs_phase_current_a": 135.24140715891312,
+      "z_star": [
+        48.00000000000897,
+        47.95132852401336,
+        47.956968145214795,
+        36.0,
+        24.0,
+        12.0,
+        47.956969067685776,
+        23.710602641565323,
+        11.713520397428548,
+        12.255636448847017,
+        -2.5321611788740226e-05,
+        -6.574114616327103e-05,
+        -0.00010549631168263403,
+        0.966892191970123,
+        4.867147599562251,
+        -0.9227855766899635,
+        25.32163696851619,
+        65.74114554030855,
+        105.49631106011762,
+        -4.867147599562243
+      ]
+    },
+    "margin": {
+      "label": "margin",
+      "phase_inductance_h": 1.0766250244687502e-09,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 2.946027001483147e-08,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 3.318155447310586e-09,
+        "final_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "margin",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.013852767079697514,
+              0.016557333828025378,
+              0.01615097152106415,
+              0.03632026533375665
+            ],
+            "maximum_abs_phase_current_a": 146.1163956090681
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.008988473368610528,
+              0.002941741304844925,
+              0.0026244660381031792,
+              0.012352362392991978
+            ],
+            "maximum_abs_phase_current_a": 146.13157931339083
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.002050188143584819,
+              0.005467028370908622,
+              0.005754453722900621,
+              0.0011940415826803275
+            ],
+            "maximum_abs_phase_current_a": 146.13660402223377
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0019796107455647416,
+              0.0018441542404161737,
+              0.0015713695546288875,
+              0.0002980823767515517
+            ],
+            "maximum_abs_phase_current_a": 146.13913026356295
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 78.5076330421172,
+          "peak_a": 146.13660402223377,
+          "minimum_a": -21.87948686540187,
+          "maximum_a": 146.13660402223377,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 78.22017310872674,
+          "peak_a": 145.69072899664994,
+          "minimum_a": -22.330477202805778,
+          "maximum_a": 145.69072899664994,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 78.28232772682775,
+          "peak_a": 145.68916019864292,
+          "minimum_a": -22.330425323469722,
+          "maximum_a": 145.68916019864292,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 78.1600620293723,
+          "peak_a": 145.69252040604135,
+          "minimum_a": -22.34259089794465,
+          "maximum_a": 145.69252040604135,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        43.14413912113013,
+        42.82876836811425,
+        42.89685984031325,
+        42.76296707504728
+      ],
+      "conduction_loss_w_total": 171.6327344046049,
+      "average_output_v": 0.9869954435287996,
+      "average_load_power_w": 243.540001386653,
+      "maximum_abs_phase_current_a": 146.1163956090681,
+      "z_star": [
+        48.000000000638494,
+        47.94926484007259,
+        47.9553027529505,
+        36.0,
+        24.0,
+        12.0,
+        47.95530718152073,
+        23.767948486088653,
+        11.797623039500246,
+        12.227767896639632,
+        -2.156680749632315e-05,
+        -6.740855824498811e-05,
+        -0.00011323450434155946,
+        0.9869376313158382,
+        5.0735160566489315,
+        -4.42982994857676,
+        21.566851262866805,
+        67.40855868027015,
+        113.23450363577665,
+        -5.0735160566493045
+      ]
+    }
+  },
+  "capacitive_switching_loss_at_nominal": {
+    "source": "A51_four_phase_joint_zvs_solve/final_verification.json (read-only, already published)",
+    "switching_frequency_hz": 5000000.0,
+    "per_phase": [
+      {
+        "phase": 1,
+        "measured_capacitance_f_a51_published": 1.539162452932458e-09,
+        "vds_at_forced_turn_on_v_a51_published": 12.045628724159691,
+        "capacitive_switching_loss_w": 0.5583202954612053
+      },
+      {
+        "phase": 2,
+        "measured_capacitance_f_a51_published": 1.5385263916857404e-09,
+        "vds_at_forced_turn_on_v_a51_published": 11.811322322228499,
+        "capacitive_switching_loss_w": 0.5365892918264679
+      },
+      {
+        "phase": 3,
+        "measured_capacitance_f_a51_published": 1.5385745573103404e-09,
+        "vds_at_forced_turn_on_v_a51_published": 11.811296463187954,
+        "capacitive_switching_loss_w": 0.5366037408438538
+      },
+      {
+        "phase": 4,
+        "measured_capacitance_f_a51_published": 1.1543616818273507e-09,
+        "vds_at_forced_turn_on_v_a51_published": 12.562410351629165,
+        "capacitive_switching_loss_w": 0.45543653011510515
+      }
+    ],
+    "total_w": 2.086949858246632,
+    "capacitance_cross_check_at_this_runs_own_nominal_z_star": [
+      {
+        "phase": 1,
+        "measured_here_f": 1.539162452932458e-09,
+        "a51_published_f": 1.539162452932458e-09,
+        "relative_difference": 0.0
+      },
+      {
+        "phase": 2,
+        "measured_here_f": 1.5385263916857404e-09,
+        "a51_published_f": 1.5385263916857404e-09,
+        "relative_difference": 0.0
+      },
+      {
+        "phase": 3,
+        "measured_here_f": 1.5385745573103404e-09,
+        "a51_published_f": 1.5385745573103404e-09,
+        "relative_difference": 0.0
+      },
+      {
+        "phase": 4,
+        "measured_here_f": 1.1543616818273507e-09,
+        "a51_published_f": 1.1543616818273507e-09,
+        "relative_difference": 0.0
+      }
+    ],
+    "caveat": "node-capacitance charge/discharge energy only -- NOT a complete device switching-loss model (no gate-drive loss, no reverse recovery); BOUNDARY.md Section 5"
+  },
+  "tradeoff": {
+    "capacitive_switching_loss_eliminated_w": 2.086949858246632,
+    "conduction_loss_increase_critical_w": 40.51270344037013,
+    "conduction_loss_increase_margin_w": 58.53968720056969,
+    "net_watts_critical": -38.4257535821235,
+    "net_watts_margin": -56.452737342323054,
+    "critical_all_four_zvs": true,
+    "margin_all_four_zvs": true
+  },
+  "safety_log": [
+    {
+      "label": "nominal",
+      "maximum_abs_phase_current_a": 110.8370437278073
+    },
+    {
+      "label": "critical",
+      "maximum_abs_phase_current_a": 135.24140715891312
+    },
+    {
+      "label": "margin",
+      "maximum_abs_phase_current_a": 146.1163956090681
+    }
+  ],
+  "safety_limit_a": 250.0,
+  "safety_maximum_a": 146.1163956090681,
+  "safety_within_limit": true,
+  "wall_clock_s": 153.75985407829285
+}
