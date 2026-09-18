@@ -994,3 +994,76 @@ See `R04E24_phase1_handoff_reachable_ineg/BOUNDARY.md` and `RESULTS.md`
 for the complete state-transition timeline, state-4 ring dynamics,
 current-safety and fingerprint checks, and full discussion of what this
 negative result does and does not establish.
+
+## R04E25 -- state 4's ring depth scales linearly with I_NEG to 4+
+   significant figures; extrapolation confirms a ~4.8x shortfall at the
+   natural ceiling (energy-insufficiency conclusion now confirmed
+   quantitatively, not just suspected)
+
+Direct follow-up to R04E24's own single-cell finding
+(`R04E25_state4_ring_amplitude_vs_ineg/BOUNDARY.md`): R04E24 found that
+`I_NEG=2.0A` enters state 4 but its resonant ring only pulls
+`V(vin,xmod:a1)` down to `9.66V`, far short of the `<=0V` ZVS threshold,
+and flagged (but did not SPICE-confirm) a back-of-envelope estimate that
+ring amplitude scales roughly linearly with `I_NEG`, implying `~10.6A`
+would be needed to close the gap -- about `5x` R04E23's own observed
+natural ceiling (`~2.215A`). R04E25 tests this directly: four new cells
+sweep `NEG_FRAC` in `{.004,.008,.012,.0172}` (`I_NEG` in
+`{0.5,1.0,1.5,2.15}A`) on R04E24's own unmodified netlist, changing only
+`NEG_FRAC` in each (`diff`-confirmed). All four ran cleanly on real
+LTspice (one at a time, each confirmed complete via its own process exit
+and `.log`'s `Total elapsed time` line before the next was launched).
+
+**In all four new cells, `t_neg_target` PASSES (state 3 exits, state 4 is
+entered) but `t_high_side_zvs` FAILs -- `STATE_FINAL=4` at `t=100us` in
+every cell.** The same stall R04E24 documented recurs at every tested
+`I_NEG`; no cell reaches state 5, so R04E21's own diagnosed hypothesis
+(already REFUTED by R04E24) is NOT reversed by this sweep.
+
+**The scaling question is answered cleanly.** Direct `.raw` analysis of
+each cell's state-4 window (`state_mon` in `[3.9,4.1]`, between
+`t_neg_target` and `TSTOP`) gives the ring's closest approach to `0V`
+(`ring_min`): `11.35V`/`10.79V`/`10.23V`/`9.49V` at `I_NEG=0.5/1.0/1.5/
+2.15A` respectively. Combined with R04E24's own already-committed point
+(`9.66V` at `2.0A`), all five `(I_NEG, ring_min)` pairs fit a straight
+line to `R^2=0.99999998` (`ring_min = 11.9135 - 1.1254*I_NEG`) -- linear
+to 4+ significant figures, not merely "roughly linear." The equivalent
+fit on ring amplitude (`ring_max-ring_min`) is even cleaner
+(`R^2=0.9999999995`) with an intercept numerically indistinguishable from
+`0`, exactly as the LC-tank stored-energy hypothesis (`0.5*L*I_NEG^2`)
+predicts. All four new cells settle to the IDENTICAL final DC value
+(`11.924385V` at `t=100us`, matching R04E24's own `~11.92V` to full
+precision), confirming `I_NEG` controls only the initial ring's
+amplitude, not the eventual DC operating point.
+
+**Extrapolating the fitted line to `ring_min=0V` gives `I_NEG=10.586A`**
+-- within `2%` of BOUNDARY.md's own pre-registered back-of-envelope
+estimate (`~10.6A`), now confirmed by real SPICE data spanning the actual
+reachable range rather than a single-point guess. This is **`4.78x`**
+R04E23's own observed natural ceiling (`~2.215A`) -- a large, multi-x
+shortfall, matching BOUNDARY.md Section 6's FIRST anticipated outcome.
+**The diagnosed energy-insufficiency conclusion is now confirmed
+quantitatively, not merely suspected**: closing this stall via
+`I_NEG`/`I_LIMIT` tuning alone, within this bootstrapped operating
+point's own reachable range, is infeasible -- even the largest
+safely-reachable cell tested (`I_NEG=2.15A`, `97%` of R04E23's own
+ceiling) only reaches `ring_min=9.49V`, barely `1.7%` closer to `0V` than
+R04E24's own `2.0A` cell. A circuit-level change (e.g. larger `LPHASE`)
+would be required to close the remaining `~9.5V` gap -- explicitly out of
+this experiment's own minimal scope, and BOUNDARY.md Section 7 flags this
+as a stopping point for this sub-investigation pending a fresh, explicit
+boundary decision for any such circuit-level follow-up.
+
+Phase 1's own current stayed within the `+/-250A` bound throughout all
+four cells (`max|IL1|=125.390A` in every cell, identical to R04E24's own
+value and unaffected by `NEG_FRAC`, as expected). All four `.raw` traces
+(`413,175`-`469,218` points) were directly, byte-level parsed and
+confirmed free of the documented solver-corruption fingerprint (zero
+non-monotonic/duplicate timestamps in any; `V(vin)` stayed exactly within
+its commanded `0-48V` step in all four). Neither R04E24's, R04E23's,
+R04E22's, R04E21's, nor R04E3's own committed files or results were
+modified. See
+`R04E25_state4_ring_amplitude_vs_ineg/BOUNDARY.md` and `RESULTS.md` for
+the complete 4-cell table, the full 5-point scaling-fit derivation
+(including residuals), the extrapolation/ratio calculation, and the
+current-safety and fingerprint checks.

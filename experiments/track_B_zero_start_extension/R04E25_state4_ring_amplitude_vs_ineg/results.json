@@ -1,0 +1,257 @@
+{
+  "experiment": "R04E25_state4_ring_amplitude_vs_ineg",
+  "parent": "R04E24_phase1_handoff_reachable_ineg",
+  "outcome_summary": "Four new cells sweep NEG_FRAC in {.004,.008,.012,.0172} (I_NEG in {0.5,1.0,1.5,2.15}A) on R04E24's own unmodified netlist, changing only NEG_FRAC. In all four, t_neg_target PASSES and state 4 (COMMUTATE_HIGH_TO_ZVS) is entered, but t_high_side_zvs FAILs and state_final=4 at t=100us in every cell -- the same stall R04E24 documented recurs at every tested I_NEG; no cell reverses R04E24's own refutation of R04E21's hypothesis. Direct .raw analysis (scripts/state4_ring_analysis.py) of the state-4 window's V(vin,xmod:a1)=V(vin)-V(xmod:a1) closest approach (ring_min) gives, combined with R04E24's own already-committed 2.0A point, five (I_NEG, ring_min) pairs that fit a straight line to R^2=0.99999998: ring_min = 11.913528 - 1.125425*I_NEG. Extrapolating to ring_min=0V gives I_NEG=10.5858A, within 2% of BOUNDARY.md's own pre-registered ~10.6A back-of-envelope estimate, and 4.78x R04E23's own observed natural ceiling (~2.215A) for this bootstrapped operating point -- a large, multi-x shortfall, confirming BOUNDARY.md Section 6's FIRST anticipated outcome (linear scaling, large shortfall at ceiling -> energy-insufficiency conclusion confirmed cleanly, not merely suspected).",
+  "cells": [
+    {
+      "name": "r04e25_neg0p4pct",
+      "i_limit": 125,
+      "neg_frac": 0.004,
+      "i_neg": 0.5,
+      "tstop_s": 1.0e-4,
+      "solver_total_elapsed_time_s": 70.990,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": 1.71916498415e-06,
+        "t_neg_target_status": "PASSED",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 entered, V(vin,xmod:a1)<=0 never fires within TSTOP=100us)",
+        "state_final": 4,
+        "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+        "il1_min_a_meas_window_0_to_20us": -0.500049471855,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": 1.95343918818e-08,
+        "vc1_final_v": 36.0756149097,
+        "vc2_final_v": -2.83908612175e-08,
+        "vc3_final_v": -3.08046246289e-08
+      },
+      "raw_scan": {
+        "points": 413175,
+        "il1_min_full_trace_a": -0.5000494718551636,
+        "il1_max_full_trace_a": 125.39020538330078
+      },
+      "state4_ring": {
+        "state4_n_points": 411055,
+        "ring_min_v": 11.350894927978516,
+        "ring_min_t_s": 1.7212332246571946e-06,
+        "ring_max_v": 12.476264953613281,
+        "ring_max_t_s": 1.7253016714323123e-06,
+        "ring_amplitude_v": 1.1253700256347656,
+        "vin_a1_settled_value_v": 11.924385070800781
+      },
+      "fingerprint_check": {
+        "dt_nonpos_count": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "implausible_vin_count": 0,
+        "il1_over_250a_count": 0,
+        "clean": true
+      }
+    },
+    {
+      "name": "r04e25_neg0p8pct",
+      "i_limit": 125,
+      "neg_frac": 0.008,
+      "i_neg": 1.0,
+      "tstop_s": 1.0e-4,
+      "solver_total_elapsed_time_s": 84.678,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": 1.8313932808e-06,
+        "t_neg_target_status": "PASSED",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 entered, V(vin,xmod:a1)<=0 never fires within TSTOP=100us)",
+        "state_final": 4,
+        "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+        "il1_min_a_meas_window_0_to_20us": -1.00001692772,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": 1.93568716611e-08,
+        "vc1_final_v": 36.0756149099,
+        "vc2_final_v": -2.83376606625e-08,
+        "vc3_final_v": -3.07514094189e-08
+      },
+      "raw_scan": {
+        "points": 439005,
+        "il1_min_full_trace_a": -1.0000169277191162,
+        "il1_max_full_trace_a": 125.39020538330078
+      },
+      "state4_ring": {
+        "state4_n_points": 436779,
+        "ring_min_v": 10.78805923461914,
+        "ring_min_t_s": 1.833454686969502e-06,
+        "ring_max_v": 13.038650512695312,
+        "ring_max_t_s": 1.8375549515951712e-06,
+        "ring_amplitude_v": 2.250591278076172,
+        "vin_a1_settled_value_v": 11.924385070800781
+      },
+      "fingerprint_check": {
+        "dt_nonpos_count": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "implausible_vin_count": 0,
+        "il1_over_250a_count": 0,
+        "clean": true
+      }
+    },
+    {
+      "name": "r04e25_neg1p2pct",
+      "i_limit": 125,
+      "neg_frac": 0.012,
+      "i_neg": 1.5,
+      "tstop_s": 1.0e-4,
+      "solver_total_elapsed_time_s": 81.303,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": 1.99112055056e-06,
+        "t_neg_target_status": "PASSED",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 entered, V(vin,xmod:a1)<=0 never fires within TSTOP=100us)",
+        "state_final": 4,
+        "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+        "il1_min_a_meas_window_0_to_20us": -1.50000607967,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": 1.89297804098e-08,
+        "vc1_final_v": 36.0756149103,
+        "vc2_final_v": -2.82116903172e-08,
+        "vc3_final_v": -3.06254026583e-08
+      },
+      "raw_scan": {
+        "points": 454445,
+        "il1_min_full_trace_a": -1.500006079673767,
+        "il1_max_full_trace_a": 125.39020538330078
+      },
+      "state4_ring": {
+        "state4_n_points": 452056,
+        "ring_min_v": 10.22528076171875,
+        "ring_min_t_s": 1.9931795937313962e-06,
+        "ring_max_v": 13.601112365722656,
+        "ring_max_t_s": 1.997280146372366e-06,
+        "ring_amplitude_v": 3.375831604003906,
+        "vin_a1_settled_value_v": 11.924385070800781
+      },
+      "fingerprint_check": {
+        "dt_nonpos_count": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "implausible_vin_count": 0,
+        "il1_over_250a_count": 0,
+        "clean": true
+      }
+    },
+    {
+      "name": "r04e25_neg1p72pct",
+      "i_limit": 125,
+      "neg_frac": 0.0172,
+      "i_neg": 2.15,
+      "tstop_s": 1.0e-4,
+      "solver_total_elapsed_time_s": 89.772,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": 2.49643794178e-06,
+        "t_neg_target_status": "PASSED",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 entered, V(vin,xmod:a1)<=0 never fires within TSTOP=100us)",
+        "state_final": 4,
+        "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+        "il1_min_a_meas_window_0_to_20us": -2.15000104904,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": 1.68115477095e-08,
+        "vc1_final_v": 36.0756149124,
+        "vc2_final_v": -2.76116143283e-08,
+        "vc3_final_v": -3.00251548069e-08
+      },
+      "raw_scan": {
+        "points": 469218,
+        "il1_min_full_trace_a": -2.150001049041748,
+        "il1_max_full_trace_a": 125.39020538330078
+      },
+      "state4_ring": {
+        "state4_n_points": 466334,
+        "ring_min_v": 9.494003295898438,
+        "ring_min_t_s": 2.49848066564832e-06,
+        "ring_max_v": 14.332759857177734,
+        "ring_max_t_s": 2.5025961144143737e-06,
+        "ring_amplitude_v": 4.838756561279297,
+        "vin_a1_settled_value_v": 11.924385070800781
+      },
+      "fingerprint_check": {
+        "dt_nonpos_count": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "implausible_vin_count": 0,
+        "il1_over_250a_count": 0,
+        "clean": true
+      }
+    }
+  ],
+  "cited_r04e24_point": {
+    "name": "r04e24_neg1p6pct_t100us",
+    "source": "experiments/track_B_zero_start_extension/R04E24_phase1_handoff_reachable_ineg/results.json (already committed, not re-run)",
+    "neg_frac": 0.016,
+    "i_neg": 2.0,
+    "t_neg_target_s": 2.2888839867e-06,
+    "state_final": 4,
+    "ring_min_v": 9.662612915039062,
+    "ring_min_t_s": 2.2909270415129772e-06,
+    "ring_max_v": 14.163780212402344,
+    "ring_amplitude_v": 4.501167297363281,
+    "il1_min_full_trace_a": -2.000001907348633,
+    "il1_max_full_trace_a": 125.39020538330078
+  },
+  "scaling_analysis": {
+    "points_used": "4 new cells (0.5, 1.0, 1.5, 2.15 A) + 1 cited R04E24 point (2.0 A) = 5 total",
+    "ring_min_fit": {
+      "form": "ring_min = intercept + slope * I_NEG",
+      "slope_v_per_a": -1.1254248503513156,
+      "intercept_v": 11.91352776305316,
+      "r_squared": 0.9999999817649746,
+      "max_abs_residual_v": 0.00013896110060507283
+    },
+    "ring_amplitude_fit": {
+      "form": "ring_amplitude = intercept + slope * I_NEG",
+      "slope_v_per_a": 2.2505426356614087,
+      "intercept_v": 6.738427567116796e-05,
+      "r_squared": 0.9999999995290917,
+      "max_abs_residual_v": 4.9733763877846116e-05
+    },
+    "extrapolation": {
+      "i_neg_for_ring_min_zero_a": 10.585804782375476,
+      "boundary_md_preregistered_estimate_a": 10.6,
+      "agreement_with_preregistered_estimate": "within 2%",
+      "r04e23_natural_ceiling_a": 2.215,
+      "ratio_extrapolated_to_ceiling": 4.77914437127561
+    },
+    "conclusion": "Linear-amplitude LC-tank hypothesis (BOUNDARY.md Section 4) CONFIRMED directly by SPICE data (R^2=0.99999998 on ring_min, 0.9999999995 on ring_amplitude). Extrapolated I_NEG needed for ring_min=0V (10.586A) is 4.78x R04E23's own observed natural ceiling (~2.215A) -- a large, multi-x shortfall. This matches BOUNDARY.md Section 6's FIRST anticipated outcome: energy-insufficiency conclusion confirmed cleanly, not merely suspected; closing this stall via I_NEG/I_LIMIT tuning alone is infeasible for this bootstrapped operating point."
+  },
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "cells": {
+      "r04e25_neg0p4pct": {"il1_max_abs_a": 125.39020538330078, "within_bound": true},
+      "r04e25_neg0p8pct": {"il1_max_abs_a": 125.39020538330078, "within_bound": true},
+      "r04e25_neg1p2pct": {"il1_max_abs_a": 125.39020538330078, "within_bound": true},
+      "r04e25_neg1p72pct": {"il1_max_abs_a": 125.39020538330078, "within_bound": true}
+    },
+    "within_bound_throughout_all_cells": true,
+    "note": "Identical to R04E24's own 125.39A max under the same I_LIMIT=125A; not materially different, as BOUNDARY.md Section 6 anticipated."
+  },
+  "outcome_classification": {
+    "boundary_section_6_outcome": "RING_DEPTH_SCALES_LINEARLY_LARGE_SHORTFALL_AT_CEILING",
+    "state3_exits_all_cells": true,
+    "state4_entered_all_cells": true,
+    "state5_reached_any_cell": false,
+    "r04e21_hypothesis_status": "REFUTED (unchanged from R04E24; no cell in this sweep reverses that finding)",
+    "reasoning": "All four new cells exit state 3 and enter state 4 (t_neg_target PASSES in all four), but t_high_side_zvs FAILs and state_final=4 in every cell -- the SAME documented stall recurs at every tested I_NEG value, matching R04E24's own single-cell finding exactly. Combined with R04E24's own cited point, the 5-point (I_NEG, ring_min) dataset fits a straight line to R^2=0.99999998, directly confirming BOUNDARY.md Section 4's LC-tank linear-amplitude hypothesis with real SPICE data. Extrapolating to ring_min=0V gives I_NEG=10.586A, agreeing with BOUNDARY.md's own pre-registered ~10.6A estimate to within 2%, and this is 4.78x R04E23's own observed natural ceiling (~2.215A) -- a large, multi-x shortfall. This is BOUNDARY.md Section 6's FIRST anticipated outcome: ring depth scales linearly and extrapolation confirms a large shortfall, cleanly confirming the diagnosed energy-insufficiency conclusion. Closing this stall via I_NEG/I_LIMIT tuning alone is infeasible for this bootstrapped operating point; a circuit-level change would be required, out of this experiment's own scope."
+  }
+}
