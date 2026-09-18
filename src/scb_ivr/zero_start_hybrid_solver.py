@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from itertools import product
 from math import floor
+from typing import Mapping
 
 import numpy as np
 from numpy.typing import NDArray
@@ -46,6 +47,7 @@ class HybridStep:
     mode: Mode
     diode_observation: DiodeObservation
     descriptor_residual_inf: float
+    descriptor_relative_backward_error: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -97,6 +99,72 @@ class ZeroStartSummary:
     diode_transition_count: int
     diode_transitions: tuple[DiodeTransition, ...]
     maximum_descriptor_residual_inf: float
+    maximum_descriptor_relative_backward_error: float
+
+
+@dataclass(frozen=True)
+class PoincareSample:
+    """Left-limit state sampled immediately before one phase-1 PWM rising edge."""
+
+    sample_index: int
+    checkpoint: PeriodCheckpoint
+    diode_state: tuple[bool, bool, bool]
+    full_state: NDArray[np.float64]
+
+
+@dataclass(frozen=True)
+class PoincareSummary:
+    boundary: ZeroStartBoundary
+    initial_step: HybridStep
+    samples: tuple[PoincareSample, ...]
+    final_step: HybridStep
+    maximum_step_s: float
+    diode_transition_count: int
+    maximum_descriptor_residual_inf: float
+    maximum_descriptor_relative_backward_error: float
+
+
+def named_hybrid_state(
+    step: HybridStep,
+    boundary: ZeroStartBoundary,
+) -> dict[str, float]:
+    """Serialize all MNA variables without discarding algebraic state."""
+    system = assemble_descriptor(boundary, step.mode, step.time_s)
+    return {
+        name: float(value)
+        for name, value in zip(system.variable_names, step.state, strict=True)
+    }
+
+
+def hybrid_step_from_named_state(
+    boundary: ZeroStartBoundary,
+    *,
+    time_s: float,
+    state_by_variable: Mapping[str, float],
+    high_side_on: tuple[bool, bool, bool, bool],
+    precharge_diode_on: tuple[bool, bool, bool],
+) -> HybridStep:
+    """Restore a checkpoint only when its complete variable set is present."""
+    mode = Mode(high_side_on, precharge_diode_on)
+    system = assemble_descriptor(boundary, mode, time_s)
+    expected = set(system.variable_names)
+    supplied = set(state_by_variable)
+    if supplied != expected:
+        missing = sorted(expected - supplied)
+        extra = sorted(supplied - expected)
+        raise ValueError(f"checkpoint variables differ: missing={missing}, extra={extra}")
+    state = np.array(
+        [state_by_variable[name] for name in system.variable_names], dtype=float
+    )
+    if not np.isfinite(state).all():
+        raise ValueError("checkpoint state must be finite")
+    return HybridStep(
+        time_s=time_s,
+        state=state,
+        mode=mode,
+        diode_observation=diode_observation(state, boundary, mode),
+        descriptor_residual_inf=0.0,
+    )
 
 
 def diode_observation(
@@ -180,12 +248,18 @@ def _candidate_step(
     except np.linalg.LinAlgError as error:
         raise ComplementarityFailure("singular descriptor step") from error
     residual = matrix @ state - vector
+    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+    scale = float(
+        np.linalg.norm(matrix, ord=np.inf) * np.linalg.norm(state, ord=np.inf)
+        + np.linalg.norm(vector, ord=np.inf)
+    )
     return HybridStep(
         time_s=next_time_s,
         state=state,
         mode=mode,
         diode_observation=diode_observation(state, boundary, mode),
-        descriptor_residual_inf=float(np.linalg.norm(residual, ord=np.inf)),
+        descriptor_residual_inf=residual_inf,
+        descriptor_relative_backward_error=residual_inf / max(scale, np.finfo(float).tiny),
     )
 
 
@@ -349,6 +423,7 @@ def simulate_zero_start_checkpoints(
     maximum_abs_input_current = 0.0
     maximum_output = 0.0
     maximum_residual = 0.0
+    maximum_relative_error = 0.0
     tolerance = max(1e-18, stop_time_s * 1e-14)
     next_checkpoint_period = checkpoint_every_periods
 
@@ -392,6 +467,10 @@ def simulate_zero_start_checkpoints(
         )
         maximum_output = max(maximum_output, float(following.state[index["out"]]))
         maximum_residual = max(maximum_residual, following.descriptor_residual_inf)
+        maximum_relative_error = max(
+            maximum_relative_error,
+            following.descriptor_relative_backward_error,
+        )
         current = following
 
         checkpoint_time = next_checkpoint_period * boundary.period_s
@@ -412,4 +491,116 @@ def simulate_zero_start_checkpoints(
         diode_transition_count=transitions,
         diode_transitions=tuple(transition_records),
         maximum_descriptor_residual_inf=maximum_residual,
+        maximum_descriptor_relative_backward_error=maximum_relative_error,
+    )
+
+
+def next_periodic_sample_s(
+    time_s: float,
+    period_s: float,
+    *,
+    phase_s: float = 0.0,
+) -> float:
+    """Return the first periodic sampling event strictly after ``time_s``."""
+    if period_s <= 0:
+        raise ValueError("sampling period must be positive")
+    normalized_phase = phase_s % period_s
+    cycle = floor((time_s - normalized_phase) / period_s)
+    candidate = normalized_phase + (cycle + 1) * period_s
+    tolerance = max(1e-18, period_s * 1e-12)
+    if candidate <= time_s + tolerance:
+        candidate += period_s
+    return candidate
+
+
+def continue_zero_start_poincare(
+    boundary: ZeroStartBoundary,
+    initial_step: HybridStep,
+    periods: int,
+    maximum_step_s: float,
+    *,
+    sampling_phase_s: float = 0.0,
+    voltage_tolerance_v: float = 1e-9,
+    current_tolerance_a: float = 1e-9,
+) -> PoincareSummary:
+    """Continue an existing state and sample a fixed absolute PWM event.
+
+    Samples are the left limits immediately before phase-1 rising edges by
+    default.  This avoids treating the arbitrary end of an input ramp as a
+    Poincare section.  Stored-energy variables remain continuous through the
+    ideal switching event; algebraic node voltages must not be interpreted as
+    right-limit switch-node values.
+    """
+    if periods <= 0:
+        raise ValueError("period count must be positive")
+    if maximum_step_s <= 0 or maximum_step_s > boundary.on_time_s:
+        raise ValueError("maximum step must be positive and no larger than on-time")
+    expected_size = assemble_descriptor(
+        boundary, initial_step.mode, initial_step.time_s
+    ).size
+    if initial_step.state.shape != (expected_size,):
+        raise ValueError("initial state dimension does not match the boundary")
+
+    current = initial_step
+    target = next_periodic_sample_s(
+        current.time_s,
+        boundary.period_s,
+        phase_s=sampling_phase_s,
+    )
+    samples: list[PoincareSample] = []
+    transitions = 0
+    maximum_residual = initial_step.descriptor_residual_inf
+    maximum_relative_error = initial_step.descriptor_relative_backward_error
+    tolerance = max(1e-18, boundary.period_s * 1e-12)
+
+    for sample_index in range(1, periods + 1):
+        while current.time_s < target - tolerance:
+            boundary_times = [
+                target,
+                current.time_s + maximum_step_s,
+                next_pwm_edge_s(current.time_s, boundary),
+            ]
+            if boundary.input_ramp_s > current.time_s + tolerance:
+                boundary_times.append(boundary.input_ramp_s)
+            next_time = min(
+                value
+                for value in boundary_times
+                if value > current.time_s + tolerance
+            )
+            following = advance_complementarity_step(
+                current,
+                next_time,
+                boundary,
+                voltage_tolerance_v=voltage_tolerance_v,
+                current_tolerance_a=current_tolerance_a,
+            )
+            if following.mode.precharge_diode_on != current.mode.precharge_diode_on:
+                transitions += 1
+            maximum_residual = max(
+                maximum_residual, following.descriptor_residual_inf
+            )
+            maximum_relative_error = max(
+                maximum_relative_error,
+                following.descriptor_relative_backward_error,
+            )
+            current = following
+        samples.append(
+            PoincareSample(
+                sample_index=sample_index,
+                checkpoint=_checkpoint(current, boundary, transitions),
+                diode_state=current.mode.precharge_diode_on,
+                full_state=current.state.copy(),
+            )
+        )
+        target += boundary.period_s
+
+    return PoincareSummary(
+        boundary=boundary,
+        initial_step=initial_step,
+        samples=tuple(samples),
+        final_step=current,
+        maximum_step_s=maximum_step_s,
+        diode_transition_count=transitions,
+        maximum_descriptor_residual_inf=maximum_residual,
+        maximum_descriptor_relative_backward_error=maximum_relative_error,
     )

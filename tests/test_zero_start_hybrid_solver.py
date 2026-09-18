@@ -5,7 +5,11 @@ import numpy as np
 from scb_ivr.zero_start_descriptor import ZeroStartBoundary
 from scb_ivr.zero_start_hybrid_solver import (
     complementarity_admissible,
+    continue_zero_start_poincare,
+    hybrid_step_from_named_state,
+    named_hybrid_state,
     next_pwm_edge_s,
+    next_periodic_sample_s,
     simulate_zero_start,
     simulate_zero_start_checkpoints,
 )
@@ -58,6 +62,13 @@ class ZeroStartHybridSolverTests(unittest.TestCase):
             max(step.descriptor_residual_inf for step in trajectory.steps),
             1e-4,
         )
+        self.assertLess(
+            max(
+                step.descriptor_relative_backward_error
+                for step in trajectory.steps
+            ),
+            1e-12,
+        )
 
     def test_timestep_larger_than_on_interval_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -92,6 +103,66 @@ class ZeroStartHybridSolverTests(unittest.TestCase):
         self.assertGreaterEqual(summary.diode_transition_count, 0)
         self.assertEqual(summary.diode_transition_count, len(summary.diode_transitions))
         self.assertTrue(np.isfinite(summary.maximum_descriptor_residual_inf))
+        self.assertLess(
+            summary.maximum_descriptor_relative_backward_error,
+            1e-12,
+        )
+
+    def test_next_periodic_sample_is_strictly_after_initial_time(self):
+        period = self.boundary.period_s
+        self.assertAlmostEqual(next_periodic_sample_s(0.35 * period, period), period)
+        self.assertAlmostEqual(next_periodic_sample_s(period, period), 2 * period)
+
+    def test_continuation_samples_one_fixed_pwm_section(self):
+        ramp = simulate_zero_start(
+            self.boundary,
+            stop_time_s=0.35 * self.boundary.period_s,
+            maximum_step_s=2e-9,
+        )
+        continuation = continue_zero_start_poincare(
+            self.boundary,
+            ramp.final,
+            periods=3,
+            maximum_step_s=2e-9,
+        )
+        expected = np.array([1.0, 2.0, 3.0]) * self.boundary.period_s
+        actual = np.array(
+            [sample.checkpoint.time_s for sample in continuation.samples]
+        )
+        np.testing.assert_allclose(actual, expected, rtol=0.0, atol=1e-18)
+        self.assertTrue(
+            all(
+                sample.checkpoint.time_s > ramp.final.time_s
+                for sample in continuation.samples
+            )
+        )
+
+    def test_named_checkpoint_round_trip_preserves_full_state(self):
+        trajectory = simulate_zero_start(
+            self.boundary,
+            stop_time_s=50e-9,
+            maximum_step_s=2e-9,
+        )
+        original = trajectory.final
+        restored = hybrid_step_from_named_state(
+            self.boundary,
+            time_s=original.time_s,
+            state_by_variable=named_hybrid_state(original, self.boundary),
+            high_side_on=original.mode.high_side_on,
+            precharge_diode_on=original.mode.precharge_diode_on,
+        )
+        np.testing.assert_array_equal(restored.state, original.state)
+        self.assertEqual(restored.mode, original.mode)
+
+    def test_incomplete_named_checkpoint_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "checkpoint variables differ"):
+            hybrid_step_from_named_state(
+                self.boundary,
+                time_s=0.0,
+                state_by_variable={"out": 0.0},
+                high_side_on=(True, False, False, False),
+                precharge_diode_on=(False, False, False),
+            )
 
 
 if __name__ == "__main__":
