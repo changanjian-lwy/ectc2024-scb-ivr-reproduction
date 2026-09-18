@@ -9,6 +9,8 @@
   unpublished device values.
 - `audit_zero_start_one_period.py` performs the mandatory first-period
   time-step refinement for the hybrid zero-start DAE solver.
+- `run_zero_start_full_ramp.py` runs the memory-bounded theoretical full-ramp
+  trajectory at either the exploratory or reference step size.
 
 Install the project first with `python3 -m pip install -e .`, then run a script
 from the repository root, for example `python3 scripts/run_reproduction.py`.

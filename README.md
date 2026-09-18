@@ -17,8 +17,8 @@ silently tuned away.
 - **Current validated scope:** one four-phase, 250 W module plus a native
   three-phase calibration of the 2025 follow-up method.
 - **Tools:** Python/SciPy for equations and event solvers; LTspice for circuit
-  inspection and transient experiments; 234 local regression checks for
-  boundary and branch integrity, with 215 portable checks run by GitHub CI.
+  inspection and transient experiments; 236 local regression checks for
+  boundary and branch integrity, with 217 portable checks run by GitHub CI.
 - **Design principle:** 2024 is the primary source. The 2025 paper fills only
   explicitly missing details, and disagreements remain separate branches.
 - **Status:** active research reproduction. Periodic-state and commutation
@@ -115,6 +115,8 @@ circuit/          Earlier exploratory netlists retained for traceability
    — first-period step-size and diode-event convergence gate.
 10. [`results/ZERO_START_TEN_PERIOD_CONVERGENCE.md`](results/ZERO_START_TEN_PERIOD_CONVERGENCE.md)
     — multi-period convergence and passive-divider current law.
+11. [`results/ZERO_START_FULL_RAMP_REFERENCE.md`](results/ZERO_START_FULL_RAMP_REFERENCE.md)
+    — complete input-ramp reference solve and handoff-state audit.
 
 ## Run the checks
 
@@ -126,7 +128,7 @@ python3 tests/run_portable_suite.py
 LTspice netlists are supplied for inspection and reproduction. Generated raw
 waveforms, optimizer traces and database files are intentionally excluded from
 version control; the scripts and concise result reports needed to regenerate
-or audit them remain tracked. The complete 234-test local suite additionally
+or audit them remain tracked. The complete 236-test local suite additionally
 checks recorded LTspice `.log` files after those files have been generated:
 
 ```bash

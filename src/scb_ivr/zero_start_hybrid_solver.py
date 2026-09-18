@@ -66,6 +66,39 @@ class HybridTrajectory:
         )
 
 
+@dataclass(frozen=True)
+class PeriodCheckpoint:
+    time_s: float
+    completed_periods: int
+    input_command_v: float
+    flying_capacitor_v: tuple[float, float, float]
+    output_v: float
+    phase_currents_a: tuple[float, float, float, float]
+    input_inductor_current_a: float
+    cumulative_diode_transitions: int
+
+
+@dataclass(frozen=True)
+class DiodeTransition:
+    time_s: float
+    previous_state: tuple[bool, bool, bool]
+    next_state: tuple[bool, bool, bool]
+
+
+@dataclass(frozen=True)
+class ZeroStartSummary:
+    boundary: ZeroStartBoundary
+    checkpoints: tuple[PeriodCheckpoint, ...]
+    final_step: HybridStep
+    maximum_step_s: float
+    maximum_abs_phase_current_a: float
+    maximum_abs_input_inductor_current_a: float
+    maximum_output_v: float
+    diode_transition_count: int
+    diode_transitions: tuple[DiodeTransition, ...]
+    maximum_descriptor_residual_inf: float
+
+
 def diode_observation(
     state: NDArray[np.float64],
     boundary: ZeroStartBoundary,
@@ -251,3 +284,132 @@ def simulate_zero_start(
         steps.append(step)
         time_s = next_time
     return HybridTrajectory(boundary, tuple(steps), maximum_step_s)
+
+
+def _checkpoint(
+    step: HybridStep,
+    boundary: ZeroStartBoundary,
+    cumulative_diode_transitions: int,
+) -> PeriodCheckpoint:
+    system = assemble_descriptor(boundary, step.mode, step.time_s)
+    index = {name: position for position, name in enumerate(system.variable_names)}
+    state = step.state
+    return PeriodCheckpoint(
+        time_s=step.time_s,
+        completed_periods=int(round(step.time_s / boundary.period_s)),
+        input_command_v=min(
+            boundary.vin_target_v * step.time_s / boundary.input_ramp_s,
+            boundary.vin_target_v,
+        ),
+        flying_capacitor_v=(
+            float(state[index["a1"]] - state[index["x1"]]),
+            float(state[index["a2"]] - state[index["x2"]]),
+            float(state[index["a3"]] - state[index["x3"]]),
+        ),
+        output_v=float(state[index["out"]]),
+        phase_currents_a=tuple(
+            float(state[index[f"L{phase}"]]) for phase in range(1, 5)
+        ),  # type: ignore[arg-type]
+        input_inductor_current_a=float(state[index["LPAR_IN"]]),
+        cumulative_diode_transitions=cumulative_diode_transitions,
+    )
+
+
+def simulate_zero_start_checkpoints(
+    boundary: ZeroStartBoundary,
+    stop_time_s: float,
+    maximum_step_s: float,
+    *,
+    checkpoint_every_periods: int = 1,
+    initial_diode_state: tuple[bool, bool, bool] = (False, False, False),
+    voltage_tolerance_v: float = 1e-9,
+    current_tolerance_a: float = 1e-9,
+) -> ZeroStartSummary:
+    """Memory-bounded period map for ramp and post-ramp reachability studies."""
+    if checkpoint_every_periods <= 0:
+        raise ValueError("checkpoint period interval must be positive")
+    if stop_time_s <= 0 or maximum_step_s <= 0:
+        raise ValueError("stop time and maximum step must be positive")
+    if maximum_step_s > boundary.on_time_s:
+        raise ValueError("maximum step must not exceed the shortest on interval")
+
+    mode = commanded_pwm_mode(0.0, boundary, precharge_diode_on=initial_diode_state)
+    state = true_zero_initial_vector(boundary)
+    current = HybridStep(
+        0.0,
+        state,
+        mode,
+        diode_observation(state, boundary, mode),
+        0.0,
+    )
+    checkpoints = [_checkpoint(current, boundary, 0)]
+    transitions = 0
+    transition_records: list[DiodeTransition] = []
+    maximum_abs_phase_current = 0.0
+    maximum_abs_input_current = 0.0
+    maximum_output = 0.0
+    maximum_residual = 0.0
+    tolerance = max(1e-18, stop_time_s * 1e-14)
+    next_checkpoint_period = checkpoint_every_periods
+
+    while current.time_s < stop_time_s - tolerance:
+        boundary_times = [
+            stop_time_s,
+            current.time_s + maximum_step_s,
+            next_pwm_edge_s(current.time_s, boundary),
+            next_checkpoint_period * boundary.period_s,
+        ]
+        if boundary.input_ramp_s > current.time_s + tolerance:
+            boundary_times.append(boundary.input_ramp_s)
+        next_time = min(
+            value for value in boundary_times if value > current.time_s + tolerance
+        )
+        following = advance_complementarity_step(
+            current,
+            next_time,
+            boundary,
+            voltage_tolerance_v=voltage_tolerance_v,
+            current_tolerance_a=current_tolerance_a,
+        )
+        if following.mode.precharge_diode_on != current.mode.precharge_diode_on:
+            transitions += 1
+            transition_records.append(
+                DiodeTransition(
+                    following.time_s,
+                    current.mode.precharge_diode_on,
+                    following.mode.precharge_diode_on,
+                )
+            )
+        system = assemble_descriptor(boundary, following.mode, following.time_s)
+        index = {name: position for position, name in enumerate(system.variable_names)}
+        maximum_abs_phase_current = max(
+            maximum_abs_phase_current,
+            *(abs(float(following.state[index[f"L{phase}"]])) for phase in range(1, 5)),
+        )
+        maximum_abs_input_current = max(
+            maximum_abs_input_current,
+            abs(float(following.state[index["LPAR_IN"]])),
+        )
+        maximum_output = max(maximum_output, float(following.state[index["out"]]))
+        maximum_residual = max(maximum_residual, following.descriptor_residual_inf)
+        current = following
+
+        checkpoint_time = next_checkpoint_period * boundary.period_s
+        if abs(current.time_s - checkpoint_time) <= tolerance:
+            checkpoints.append(_checkpoint(current, boundary, transitions))
+            next_checkpoint_period += checkpoint_every_periods
+
+    if abs(checkpoints[-1].time_s - current.time_s) > tolerance:
+        checkpoints.append(_checkpoint(current, boundary, transitions))
+    return ZeroStartSummary(
+        boundary=boundary,
+        checkpoints=tuple(checkpoints),
+        final_step=current,
+        maximum_step_s=maximum_step_s,
+        maximum_abs_phase_current_a=maximum_abs_phase_current,
+        maximum_abs_input_inductor_current_a=maximum_abs_input_current,
+        maximum_output_v=maximum_output,
+        diode_transition_count=transitions,
+        diode_transitions=tuple(transition_records),
+        maximum_descriptor_residual_inf=maximum_residual,
+    )

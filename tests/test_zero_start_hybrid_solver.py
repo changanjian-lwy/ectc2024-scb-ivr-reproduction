@@ -7,6 +7,7 @@ from scb_ivr.zero_start_hybrid_solver import (
     complementarity_admissible,
     next_pwm_edge_s,
     simulate_zero_start,
+    simulate_zero_start_checkpoints,
 )
 
 
@@ -65,6 +66,32 @@ class ZeroStartHybridSolverTests(unittest.TestCase):
                 stop_time_s=50e-9,
                 maximum_step_s=20e-9,
             )
+
+    def test_period_map_records_exact_period_boundaries(self):
+        summary = simulate_zero_start_checkpoints(
+            self.boundary,
+            stop_time_s=2 * self.boundary.period_s,
+            maximum_step_s=2e-9,
+        )
+        self.assertEqual(
+            [point.completed_periods for point in summary.checkpoints],
+            [0, 1, 2],
+        )
+        self.assertAlmostEqual(
+            summary.checkpoints[-1].time_s, 2 * self.boundary.period_s
+        )
+
+    def test_period_map_summary_is_finite(self):
+        summary = simulate_zero_start_checkpoints(
+            self.boundary,
+            stop_time_s=2 * self.boundary.period_s,
+            maximum_step_s=2e-9,
+        )
+        self.assertTrue(np.isfinite(summary.maximum_abs_phase_current_a))
+        self.assertTrue(np.isfinite(summary.maximum_abs_input_inductor_current_a))
+        self.assertGreaterEqual(summary.diode_transition_count, 0)
+        self.assertEqual(summary.diode_transition_count, len(summary.diode_transitions))
+        self.assertTrue(np.isfinite(summary.maximum_descriptor_residual_inf))
 
 
 if __name__ == "__main__":
