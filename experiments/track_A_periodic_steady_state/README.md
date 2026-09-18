@@ -61,3 +61,55 @@ snapshot at A37's own `t=0` reference instant. `1/15` residuals converge
 (vs. A37's `3/15`), `0/4` phase transitions achieve ZVS admission (vs.
 A37's `1/4`) -- worse than A37 on both of BOUNDARY.md's own named metrics.
 See `A49_math_model_affine_periodic_seed_crosscheck/RESULTS.md`.
+
+`A50_zvs_capable_solver_prototype` builds, on a byte-for-byte COPY of the
+parallel `src/scb_ivr/` fast affine-periodic solver (never modifying the
+original), a real-device extension: switch capacitance and genuine
+event-driven dead time added to the same linear MNA descriptor framework.
+Validated against two independent gates: (1) exact regression at
+`dead_time_s=0`/no capacitance, reproducing the original ideal periodic
+orbit bit-for-bit; (2) reproducing `A42`'s own already-SPICE-verified
+single-phase local ZVS threshold (no crossing at `7.76%`, crossing at
+`7.77%` within `1.9%` of A42's own timing, against a pre-declared `20%`
+tolerance), cross-checked further against a closed-form lossless-LC
+solution fitted to all 28 of A42's own published rows. Both gates passed.
+See `A50_zvs_capable_solver_prototype/RESULTS.md`.
+
+`A51_four_phase_joint_zvs_solve` uses A50's own validated solver to
+search for a genuine four-phase joint periodic fixed point (`z*=F(z*)`,
+now non-affine since dead-time crossings depend on the state) -- the
+first attempt to do this search with a fast (seconds, not SPICE's
+20-100+ minute) evaluator, seeded from A37's own best SPICE candidate.
+At P24's own rated `250 W`, a genuine fixed point is found (residual
+`2.26e-11`) but ALL FOUR phases hard-switch. A load sweep (an engineering
+diagnostic, not a P24 claim) locates a sharp boundary: below `~190-225 W`
+(phase-dependent), the same ripple/load-balance mechanism that starves
+ZVS at `250 W` reverses, and at `190 W` a converged state (residual
+`4.78e-07`) exists at which ALL FOUR phases achieve natural ZVS --
+the first self-consistent four-phase joint ZVS periodic state found by
+any method in this project's history. Extensive robustness checks
+(dead-time, sub-step, `Rds(on)`, divider admissibility, local stability)
+support the finding; the result rests on a Python solver validated only
+against A42's own single-phase case, so a SPICE cross-check was flagged
+as the required next step. See
+`A51_four_phase_joint_zvs_solve/RESULTS.md`.
+
+`A52_spice_crosscheck_reduced_load_zvs` performs that SPICE cross-check.
+First, A51's own headline state (idealized `1 uOhm` switch resistance)
+was corrected to GS61008T's real `7 mOhm` (uniform on both sides,
+matching A51's own model simplification, not A37/A42's more detailed
+asymmetric `RHS`/`RLS`) and re-solved -- still ZVS on all four phases, at
+`89.9 W` actual delivered power. A real LTspice netlist was then built
+with an exact, independently-piloted event-gated switching sequence
+(natural zero-voltage crossing OR commanded dead-time timeout, whichever
+comes first -- confirmed correct on 8 isolated pilot runs before the full
+build), seeded from that corrected state, with every timing window
+derived programmatically from the solver's own code (no hand arithmetic).
+**Result: SPICE independently confirms natural ZVS on all four phases**,
+at crossing times agreeing with the Python solver's own predictions to
+within `0.107%-0.242%` (against a pre-declared `20%` tolerance) -- the
+first SPICE-confirmed four-phase joint ZVS periodic state in this
+project's history. This remains `SENSITIVITY_ONLY` (a `76%`-of-rated-load
+finding, not a P24 operating point) and does not by itself constitute a
+P24/P25 reproduction claim. See
+`A52_spice_crosscheck_reduced_load_zvs/RESULTS.md`.

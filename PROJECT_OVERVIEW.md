@@ -64,6 +64,15 @@ merged.
   phase-specific timing, period, power and capacitor charge balance nearly
   close, but the fixed per-phase peak-current gate still fails. The repository
   reports this as a negative result rather than relaxing the tolerance.
+- A fast, validated real-device solver (`A50`) found a four-phase joint
+  periodic state at which all four phases achieve zero-voltage switching --
+  the first in this project's history -- and a subsequent LTspice build
+  (`A52`) independently confirmed it, with the two methods' own predicted
+  switching-transition times agreeing to within `0.11%-0.24%`. This holds at
+  a reduced load (`76%` of the paper's rated power per module), not yet at
+  the rated operating point, and remains an engineering finding pending
+  device/timing data from the author, not a P24/P25 reproduction claim. See
+  `experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A49_A52_2026-09-19.md`.
 
 ## What is deliberately not claimed
 
