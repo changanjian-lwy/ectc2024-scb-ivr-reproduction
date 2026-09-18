@@ -578,11 +578,62 @@ Distinguishing them would need either (a) confirming whether R04E3's own
 periodic orbit, or (b) bootstrapping R04E3's controller from a state
 actually taken from/near the affine-map periodic solution instead of
 R04E17's zero-energy-ramp state, and rerunning an R04E24-style single
-cell. Neither has been attempted. This cross-check was performed by
-reading the parallel effort's own already-published `results/*.md` files
-directly (`ZERO_START_AFFINE_PERIOD_FIXED_POINT.md`, `ZERO_START_POST_
+cell. This cross-check was performed by reading the parallel effort's own
+already-published `results/*.md` files directly
+(`ZERO_START_AFFINE_PERIOD_FIXED_POINT.md`, `ZERO_START_POST_
 RAMP_POINCARE_AUDIT.md`, `ZERO_START_FULL_RAMP_REFERENCE.md`) -- quoted,
 not paraphrased from memory -- but, consistent with this project's
 standing practice, their underlying Python solver code was not
 independently re-verified; only the numbers explicitly quoted here were
 checked for faithful transcription against the source files.
+
+## A49 (Track A): the larger, four-phase version of option (b) was
+   attempted, and made things worse, not better (added 2026-09-18, per
+   explicit user direction)
+
+Per explicit user direction ("那就来吧 做好分类就行" -- proceed with the
+larger option, keep the provenance classification rigorous), option (b)
+above was attempted in its full four-phase form: the periodic orbit's own
+state (flying-capacitor voltages at their period averages, phase 1's
+current at its own period minimum -- physically motivated, since A37's
+own construct samples `T0` exactly at phase 1's own post-commutation
+instant -- phases 2-4's currents at their own period averages, the
+weakest approximation here, explicitly flagged in advance) was fed into
+`A37` (`experiments/track_A_periodic_steady_state/A37_p25_9pct_joint_
+seven_state_200ns_periodic_solve/`), this project's own best prior
+real-device, real-event-driven-dead-time four-phase periodic-seed
+construct, as `experiments/track_A_periodic_steady_state/
+A49_math_model_affine_periodic_seed_crosscheck/`.
+
+**Result: worse than A37's own best optimizer-found candidate, not
+comparable.** A37's own 174-point search found 3 of 15 residuals
+converged with phase 1's own admission into phase 2 succeeding (though
+H3/H4 never admitted). A49's imported seed converged only 1 of 15
+residuals (a near-trivial `VC3` residual) and phase 1 never even admits
+into phase 2 -- the state machine permanently stalls one step earlier
+than A37's own stall point, at `t=106.65 ns` (state `P1_M5`, waiting on
+phase 2's own `Vds<=0` event). Every number in this result was
+independently re-derived from the raw `.raw` trace before merging
+(state-transition timestamps, the `Vds(H2)` minimum of `0.252 V` at
+`t=109.14 ns`, all four phase-current safety bounds, and the `DIL2`
+residual), not merely trusted from the delegated agent's own summary.
+
+**Direct mechanistic cause, confirmed from the raw trace, not inferred**:
+phase 2's own imported current (`62.724 A`, its OWN period average) takes
+until `t~=107 ns` just to decay down to its own negative-current
+admission threshold (`-11.25 A`) -- by which point `V(a1,a2)` has already
+passed its own natural closest approach to zero (`0.252 V` at `109.14
+ns`) and is rising back up, so the timing never lines up. **This is a
+direct, observed symptom of the exact approximation A49's own BOUNDARY.md
+flagged in advance as its weakest assumption** (phases 2-4's own
+period-average current substituting for their true instantaneous value at
+`T0`) -- not necessarily evidence that the periodic orbit's own TRUE
+instantaneous state (if it were available) would also fail this way. This
+result should therefore be read narrowly: **it shows the specific
+approximation used here performs worse than an arbitrary optimizer seed,
+not that the underlying periodic orbit itself is physically incompatible
+with real ZVS commutation.** It does not cleanly favor explanation 1 or 2
+above -- resolving that still requires the true simultaneous four-phase
+snapshot `MINIMUM_INFORMATION_REQUEST.md` Item 9 already asks for, which
+remains unavailable from the parallel math-model effort's own published
+outputs.
