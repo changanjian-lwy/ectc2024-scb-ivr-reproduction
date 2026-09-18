@@ -1,0 +1,36 @@
+
+=== nominal: L=1.46667 nH ===
+  converged=True  residual=2.633e-08  zvs=[False, False, False, False]  ladder_consistent=True
+    phase 1: peak=113.531 A  rms=65.524 A
+    phase 2: peak=113.343 A  rms=65.372 A
+    phase 3: peak=113.340 A  rms=65.367 A
+    phase 4: peak=115.837 A  rms=67.375 A
+  conduction loss total = 26.9377 W
+
+=== critical: L=0.62741 nH ===
+  converged=True  residual=2.571e-09  zvs=[True, True, True, True]  ladder_consistent=True
+    phase 1: peak=204.552 A  rms=103.086 A
+    phase 2: peak=203.912 A  rms=102.831 A
+    phase 3: peak=203.910 A  rms=103.115 A
+    phase 4: peak=203.795 A  rms=102.632 A
+  conduction loss total = 65.6690 W
+
+=== margin: L=0.56467 nH ===
+  converged=True  residual=5.379e-10  zvs=[True, True, True, True]  ladder_consistent=True
+    phase 1: peak=222.737 A  rms=111.671 A
+    phase 2: peak=221.992 A  rms=111.369 A
+    phase 3: peak=221.988 A  rms=111.609 A
+    phase 4: peak=222.214 A  rms=111.368 A
+  conduction loss total = 77.0859 W
+
+capacitive switching loss @ nominal L (hard-switching) = 17.9825 W
+
+--- net Watts comparison ---
+  capacitive switching loss eliminated (nominal, hard-switch) : 17.9825 W
+  conduction loss increase, nominal->critical                : 38.7313 W
+  conduction loss increase, nominal->margin                  : 50.1483 W
+  net Watts (critical) = switching_saved - conduction_added  : -20.7488 W
+  net Watts (margin)   = switching_saved - conduction_added  : -32.1657 W
+
+wrote three_point_analysis.json  (146.1 s)
+safety: max |iL| = 222.6982 A (limit 250.0 A)

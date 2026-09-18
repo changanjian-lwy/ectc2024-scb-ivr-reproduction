@@ -141,3 +141,35 @@ negative finding, distinct from and not superseding A51/A52's own positive
 load-reduction result. Every phase current stayed at or below `150.13 A`
 (`60%` of the `+/-250 A` bound) throughout the entire search. See
 `A53_lphase_zvs_load_tradeoff/RESULTS.md`.
+
+`A54_epc2067_lphase_joint_tradeoff` asks whether a JOINT change -- swapping
+GS61008T for EPC2067 (P24's own printed Table 3, `nP=4`/`nM=4` row's own
+specified device and population, `NHS=2`/`NLS=3`, already present in this
+repository since `A45` but never before fed into the A50-A53 ZVS-search
+chain) AND re-bisecting `LPHASE` -- can find a genuinely better net-Watts
+balance than A53's own GS61008T result. EPC2067 offers `4.5x` lower per-
+device resistance (`1.55 mOhm` vs `7 mOhm`) but `~7-9x` higher total switch
+capacitance (`CH=3720 pF`/`CL=5580 pF` vs `385/770 pF`), so the outcome was
+genuinely uncertain, not assumed. A sibling local wrapper reuses A51's own
+boundary-construction functions and A53's own generic Newton+Picard search
+machinery (`a53_solve.py`, verified device-agnostic), both imported
+read-only, with only the device parameters changed. **Result: confirmed
+first (not assumed) that EPC2067 at nominal `LPHASE` still hard-switches all
+four phases at `250 W`**, exactly like GS61008T. The critical `LPHASE` was
+found much deeper than A53's: `0.62741 nH`, a `57.22%` reduction from
+nominal -- more than `3x` A53's own `18.44%`, directly confirming
+`BOUNDARY.md`'s own `~3x`-higher-threshold estimate from the capacitance
+increase. The net Watts comparison remains negative (`-20.75 W` at critical,
+`-32.17 W` at a `10%` margin point) but is a genuine, quantified IMPROVEMENT
+over A53's own GS61008T result (`-38.43 W`/`-56.45 W`) -- roughly HALVING
+the net loss at both points, because EPC2067's lower resistance cuts
+conduction loss sharply while its higher capacitance (measured fresh at this
+run's own nominal point, since A51's own published capacitance numbers are
+GS61008T-specific and do not transfer) raises the switching-loss "prize"
+eliminated (`17.98 W` vs `2.09 W`). The improvement does not flip the sign of
+the tradeoff, however: EPC2067 is a genuine improvement on this lever, but
+"less bad," not "good." Safety held throughout (`+/-250 A` bound never
+violated by any accepted candidate) but with much less margin than A53's own
+search: maximum observed `232.54 A`, `93%` of the limit, only `7%` headroom
+-- a direct, quantified cost of the much deeper `LPHASE` cut this device
+requires. See `A54_epc2067_lphase_joint_tradeoff/RESULTS.md`.

@@ -1,0 +1,581 @@
+{
+  "script": "run_three_point_analysis.py",
+  "classification": "SENSITIVITY_ONLY",
+  "module_power_w": 250.0,
+  "ron_ohm_epc2067": 0.00155,
+  "points": {
+    "nominal": {
+      "label": "nominal",
+      "phase_inductance_h": 1.4666667e-09,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 2.6325113313994623e-08,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 5.277286037749832e-09,
+        "final_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "nominal",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.068227557319268,
+              12.169315646394942,
+              12.168740919482184,
+              12.30490238744893
+            ],
+            "maximum_abs_phase_current_a": 115.82149946128968
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.070302959144911,
+              12.169456647890517,
+              12.168880519809766,
+              12.30490202869031
+            ],
+            "maximum_abs_phase_current_a": 115.8330874919791
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.070994977232658,
+              12.16950366635687,
+              12.16892707150584,
+              12.304901909555038
+            ],
+            "maximum_abs_phase_current_a": 115.83695059650455
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "minimum_abs_vds_v": [
+              12.071341027163577,
+              12.169527178838724,
+              12.168950350654173,
+              12.304901850072165
+            ],
+            "maximum_abs_phase_current_a": 115.83888404188889
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 65.52389674494694,
+          "peak_a": 113.53080807873027,
+          "minimum_a": -0.9136222003183003,
+          "maximum_a": 113.53080807873027,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 65.37215575640423,
+          "peak_a": 113.34255635972308,
+          "minimum_a": -1.088497518229956,
+          "maximum_a": 113.34255635972308,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 65.36722011505562,
+          "peak_a": 113.3398333432242,
+          "minimum_a": -1.090645326567034,
+          "maximum_a": 113.3398333432242,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 67.37483142339336,
+          "peak_a": 115.83695059650455,
+          "minimum_a": 0.815152641753493,
+          "maximum_a": 115.83695059650455,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        6.654740619195825,
+        6.623954059771339,
+        6.622953871633704,
+        7.036020259462544
+      ],
+      "conduction_loss_w_total": 26.93766881006341,
+      "average_output_v": 0.9111956182692261,
+      "average_load_power_w": 207.5693636882593,
+      "maximum_abs_phase_current_a": 115.82149946128968,
+      "z_star": [
+        47.99999999653346,
+        47.95306420077766,
+        47.95849048933687,
+        36.0,
+        24.0,
+        12.0,
+        35.89026320017921,
+        23.919385781698093,
+        11.99066638554506,
+        0.04213758824696037,
+        -2.9688427370779564e-05,
+        -6.1012538789780516e-05,
+        -9.43509992601698e-05,
+        0.9111653382937679,
+        4.6935795752384,
+        -0.9136222003183003,
+        29.94869879740842,
+        61.0128590565886,
+        94.35099619999288,
+        -4.693579575239235
+      ]
+    },
+    "critical": {
+      "label": "critical",
+      "phase_inductance_h": 6.274059728342265e-10,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 2.5709295795955874e-09,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 2.530179466715361e-10,
+        "final_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "critical",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0038078319082330836,
+              0.004023624786448465,
+              0.00034016303754924593,
+              0.005155844975382351
+            ],
+            "maximum_abs_phase_current_a": 204.51699074552297
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.003499639149389111,
+              0.0037038216340690155,
+              0.0005280214265539485,
+              0.0008451514110845437
+            ],
+            "maximum_abs_phase_current_a": 204.5433825869744
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0013442308019051552,
+              0.000403518339545883,
+              0.00100057459415126,
+              0.0005896488837091596
+            ],
+            "maximum_abs_phase_current_a": 204.55218982734903
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0009764978700346205,
+              0.0011451505781394644,
+              0.0006275221265674702,
+              0.0013066914622754666
+            ],
+            "maximum_abs_phase_current_a": 204.55659860299747
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 103.08580819402945,
+          "peak_a": 204.55218982734903,
+          "minimum_a": -80.41883792852353,
+          "maximum_a": 204.55218982734903,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 102.83148780777839,
+          "peak_a": 203.91245432916244,
+          "minimum_a": -81.09100047343873,
+          "maximum_a": 203.91245432916244,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 103.11495897024942,
+          "peak_a": 203.90959505966407,
+          "minimum_a": -81.08962394649105,
+          "maximum_a": 203.90959505966407,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 102.63242424128417,
+          "peak_a": 203.79461562760463,
+          "minimum_a": -81.47682469909122,
+          "maximum_a": 203.79461562760463,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        16.471359969075156,
+        16.390188071379978,
+        16.48067688332614,
+        16.326792483746548
+      ],
+      "conduction_loss_w_total": 65.66901740752782,
+      "average_output_v": 0.9785871382867095,
+      "average_load_power_w": 239.40819680504288,
+      "maximum_abs_phase_current_a": 204.51699074552297,
+      "z_star": [
+        48.00000000006113,
+        47.94989320219636,
+        47.956089704280224,
+        36.0,
+        24.0,
+        12.0,
+        47.95615120577899,
+        23.750497032787656,
+        11.766272212407017,
+        12.282555330132645,
+        6.346046086973862e-06,
+        -7.165098823054651e-05,
+        -0.000149232369859981,
+        0.9784980897554068,
+        5.010679786473131,
+        -61.62453762349508,
+        -6.342382475146513,
+        71.65086197827526,
+        149.23237237304835,
+        -5.010679786473074
+      ]
+    },
+    "margin": {
+      "label": "margin",
+      "phase_inductance_h": 5.646653755508038e-10,
+      "module_power_w": 250.0,
+      "newton": {
+        "converged": true,
+        "final_relative_residual": 5.379032283348327e-10,
+        "iterations_used": 1
+      },
+      "picard": {
+        "damping": 0.5,
+        "iterations": 25,
+        "final_relative_residual": 5.572793377913849e-11,
+        "final_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "sub_step_ladder": {
+        "label": "margin",
+        "rungs": [
+          {
+            "sub_step_s": 5e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              0.0002671700379650588,
+              0.009737187869163222,
+              0.005395302110084543,
+              0.021164191801982923
+            ],
+            "maximum_abs_phase_current_a": 222.6981877487847
+          },
+          {
+            "sub_step_s": 2e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              3.909827599812843e-05,
+              0.005047574294877677,
+              0.0032944170149278307,
+              0.0029030917560231018
+            ],
+            "maximum_abs_phase_current_a": 222.72747057836207
+          },
+          {
+            "sub_step_s": 1e-12,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              3.095514139772604e-05,
+              0.0025462876938959766,
+              0.0015848952166273023,
+              0.0015751535222641166
+            ],
+            "maximum_abs_phase_current_a": 222.73724318580483
+          },
+          {
+            "sub_step_s": 5e-13,
+            "natural_zvs_flags": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "minimum_abs_vds_v": [
+              6.558060475470029e-05,
+              7.78498500935143e-05,
+              0.0008943977327540154,
+              0.0009116152686914347
+            ],
+            "maximum_abs_phase_current_a": 222.74212965165512
+          }
+        ],
+        "identical_across_all_rungs": true,
+        "finest_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "per_phase_currents": [
+        {
+          "phase": 1,
+          "rms_a": 111.6705717955699,
+          "peak_a": 222.73724318580483,
+          "minimum_a": -97.41960584567418,
+          "maximum_a": 222.73724318580483,
+          "average_a": null
+        },
+        {
+          "phase": 2,
+          "rms_a": 111.36911827985095,
+          "peak_a": 221.99226814987819,
+          "minimum_a": -98.19952819762224,
+          "maximum_a": 221.99226814987819,
+          "average_a": null
+        },
+        {
+          "phase": 3,
+          "rms_a": 111.60903224888911,
+          "peak_a": 221.9877326574876,
+          "minimum_a": -98.19848282768821,
+          "maximum_a": 221.9877326574876,
+          "average_a": null
+        },
+        {
+          "phase": 4,
+          "rms_a": 111.36827111300983,
+          "peak_a": 222.21393057084447,
+          "minimum_a": -98.2520515121303,
+          "maximum_a": 222.21393057084447,
+          "average_a": null
+        }
+      ],
+      "conduction_loss_w_per_phase": [
+        19.328990737981773,
+        19.22477478496872,
+        19.30769292327703,
+        19.22448230658633
+      ],
+      "conduction_loss_w_total": 77.08594075281385,
+      "average_output_v": 0.9892115171200683,
+      "average_load_power_w": 244.63485640074677,
+      "maximum_abs_phase_current_a": 222.69818776682578,
+      "z_star": [
+        48.00000000000678,
+        47.948743688822574,
+        47.95545373559311,
+        36.0,
+        24.0,
+        12.0,
+        47.955526129545134,
+        23.767372910821614,
+        11.80233798608623,
+        12.294735324446343,
+        1.4272243097045186e-05,
+        -7.3330464586602e-05,
+        -0.0001608574920192944,
+        0.98910906340229,
+        5.125631118420752,
+        -72.53795372400403,
+        -14.268498033005557,
+        73.33045944835355,
+        160.8574822463838,
+        -5.125631118420751
+      ]
+    }
+  },
+  "capacitive_switching_loss_at_nominal": {
+    "source": "measured directly at this run's own EPC2067 nominal z* via M.measure_node_capacitance_f (A51's own function, read-only), fed each phase's own turn-on-window ENTRY state -- NOT reused from A51's own published (GS61008T-specific) final_verification.json",
+    "switching_frequency_hz": 5000000.0,
+    "per_phase": [
+      {
+        "phase": 1,
+        "natural_zvs": false,
+        "measured_capacitance_f": 1.2944719497059705e-08,
+        "vds_at_forced_turn_on_v": 12.068227557319268,
+        "capacitive_switching_loss_w": 4.7132408585890255
+      },
+      {
+        "phase": 2,
+        "natural_zvs": false,
+        "measured_capacitance_f": 1.2888223592030703e-08,
+        "vds_at_forced_turn_on_v": 12.169315646394942,
+        "capacitive_switching_loss_w": 4.771614859790846
+      },
+      {
+        "phase": 3,
+        "natural_zvs": false,
+        "measured_capacitance_f": 1.2891795569182895e-08,
+        "vds_at_forced_turn_on_v": 12.168740919482184,
+        "capacitive_switching_loss_w": 4.772486497478472
+      },
+      {
+        "phase": 4,
+        "natural_zvs": false,
+        "measured_capacitance_f": 9.243028174763654e-09,
+        "vds_at_forced_turn_on_v": 12.696911919012637,
+        "capacitive_switching_loss_w": 3.7252077616856765
+      }
+    ],
+    "total_w": 17.98254997754402,
+    "caveat": "node-capacitance charge/discharge energy only -- NOT a complete device switching-loss model (no gate-drive loss, no reverse recovery); BOUNDARY.md Section 6. Also inherits the EPC2067 Co(tr) 0-20V-vs-~12V-actual extrapolation caveat, BOUNDARY.md Section 1."
+  },
+  "tradeoff": {
+    "capacitive_switching_loss_eliminated_w": 17.98254997754402,
+    "conduction_loss_increase_critical_w": 38.731348597464404,
+    "conduction_loss_increase_margin_w": 50.14827194275044,
+    "net_watts_critical": -20.748798619920382,
+    "net_watts_margin": -32.165721965206416,
+    "critical_all_four_zvs": true,
+    "margin_all_four_zvs": true
+  },
+  "safety_log": [
+    {
+      "label": "nominal",
+      "maximum_abs_phase_current_a": 115.82149946128968
+    },
+    {
+      "label": "critical",
+      "maximum_abs_phase_current_a": 204.51699074552297
+    },
+    {
+      "label": "margin",
+      "maximum_abs_phase_current_a": 222.69818776682578
+    }
+  ],
+  "safety_limit_a": 250.0,
+  "safety_maximum_a": 222.69818776682578,
+  "safety_within_limit": true,
+  "wall_clock_s": 146.0539948940277
+}

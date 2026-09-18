@@ -1,0 +1,22 @@
+[nominal] L=1.4667 nH  converged=True  residual=2.633e-08  zvs=[False, False, False, False]  max|iL|=117.51 A
+  [ladder] L=1.3200 nH  converged=True  residual=2.435e-11  zvs=[False, False, False, False]  max|iL|=125.57 A
+  [ladder] L=1.1880 nH  converged=True  residual=1.242e-11  zvs=[False, False, False, False]  max|iL|=133.91 A
+  [ladder] L=1.0692 nH  converged=True  residual=1.762e-11  zvs=[False, False, False, False]  max|iL|=143.29 A
+  [ladder] L=0.9623 nH  converged=True  residual=1.554e-11  zvs=[False, False, False, False]  max|iL|=153.88 A
+  [ladder] L=0.8661 nH  converged=True  residual=1.266e-11  zvs=[False, False, False, False]  max|iL|=165.84 A
+  [ladder] L=0.7794 nH  converged=True  residual=2.983e-11  zvs=[False, False, False, False]  max|iL|=179.39 A
+  [ladder] L=0.7015 nH  converged=True  residual=2.404e-07  zvs=[False, False, False, True]  max|iL|=194.76 A
+  [ladder] L=0.6314 nH  converged=True  residual=1.762e-09  zvs=[False, False, False, True]  max|iL|=212.12 A
+  [ladder] L=0.5682 nH  converged=True  residual=1.698e-12  zvs=[True, True, True, True]  max|iL|=231.33 A
+  [bisect 1] L=0.5998 nH  converged=True  residual=6.631e-10  zvs=[True, True, True, True]  max|iL|=215.34 A
+  [bisect 2] L=0.6156 nH  converged=True  residual=8.362e-08  zvs=[True, True, True, True]  max|iL|=208.79 A
+  [bisect 3] L=0.6235 nH  converged=True  residual=1.909e-09  zvs=[True, True, True, True]  max|iL|=205.71 A
+  [bisect 4] L=0.6274 nH  converged=True  residual=2.571e-09  zvs=[True, True, True, True]  max|iL|=204.52 A
+  [bisect 5] L=0.6294 nH  converged=True  residual=2.948e-10  zvs=[False, True, True, True]  max|iL|=204.00 A
+
+[margin] L=0.5647 nH  converged=True  residual=5.379e-10  zvs=[True, True, True, True]  max|iL|=232.54 A
+
+wrote bisection_search.json  (2520.8 s)
+critical LPHASE ~ 0.62741 nH (57.22% below nominal)
+bracket: [0.62741, 0.62938] nH
+safety: max |iL| over whole search = 232.54075190884095 A (limit 250.0 A)

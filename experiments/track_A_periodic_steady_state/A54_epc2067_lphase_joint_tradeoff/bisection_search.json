@@ -1,0 +1,505 @@
+{
+  "script": "run_bisection.py",
+  "classification": "SENSITIVITY_ONLY",
+  "outcome": "CRITICAL_LPHASE_FOUND",
+  "module_power_w": 250.0,
+  "nominal_lphase_h": 1.4666667e-09,
+  "diagnostic_probe": {
+    "description": "one evaluate_period_map call from A37's fixed seed, NOT Newton-solved, at each L, under EPC2067's own device parameters -- shows the seed itself becomes unsafe near the same 0.6-0.7 nH region A53 already found with GS61008T (confirming this is driven by the inductance dynamics, not the switch capacitance), and motivates continuation seeding below",
+    "rows": [
+      {
+        "phase_inductance_h": 1.4666667e-09,
+        "raw_one_shot_max_abs_phase_current_a": 117.51172074478525,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "phase_inductance_h": 1.3e-09,
+        "raw_one_shot_max_abs_phase_current_a": 131.21122803516653,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "phase_inductance_h": 1.2e-09,
+        "raw_one_shot_max_abs_phase_current_a": 141.23442987159012,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "phase_inductance_h": 1.1000000000000001e-09,
+        "raw_one_shot_max_abs_phase_current_a": 153.05594208831022,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "phase_inductance_h": 1e-09,
+        "raw_one_shot_max_abs_phase_current_a": 167.20843247365028,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 9.000000000000001e-10,
+        "raw_one_shot_max_abs_phase_current_a": 184.45795584127998,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          false,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 8.000000000000001e-10,
+        "raw_one_shot_max_abs_phase_current_a": 205.94747377896104,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 7e-10,
+        "raw_one_shot_max_abs_phase_current_a": 233.4613967793699,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 6.5e-10,
+        "raw_one_shot_max_abs_phase_current_a": 250.32936486239748,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 6e-10,
+        "raw_one_shot_max_abs_phase_current_a": 269.94809153534004,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 5.500000000000001e-10,
+        "raw_one_shot_max_abs_phase_current_a": 293.05036256366304,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 5e-10,
+        "raw_one_shot_max_abs_phase_current_a": 320.65437802716525,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 4.0000000000000007e-10,
+        "raw_one_shot_max_abs_phase_current_a": 395.90447901574333,
+        "raw_one_shot_natural_zvs_flags": [
+          false,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 3e-10,
+        "raw_one_shot_max_abs_phase_current_a": 519.1906562008134,
+        "raw_one_shot_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "phase_inductance_h": 2.0000000000000003e-10,
+        "raw_one_shot_max_abs_phase_current_a": 775.3190227893331,
+        "raw_one_shot_natural_zvs_flags": [
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    ]
+  },
+  "nominal": {
+    "kind": "nominal",
+    "phase_inductance_h": 1.4666667e-09,
+    "converged": true,
+    "final_relative_residual": 2.6325113313994623e-08,
+    "natural_zvs_flags": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "all_four_zvs": false,
+    "maximum_abs_phase_current_a": 117.51274398272587,
+    "sub_step_convergence_disagreement": false
+  },
+  "ladder": [
+    {
+      "phase_inductance_h": 1.3200000300000001e-09,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 2.4354926737010706e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 125.57486942236731,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 1.1880000270000001e-09,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.2422180633255791e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 133.9079545178299,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 1.0692000243e-09,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.7619801730025753e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 143.2930389604476,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 9.622800218700002e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.5537477539237422e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 153.87960079664856,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 8.660520196830002e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.2663821781422038e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 165.84247318010912,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 7.794468177147002e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 2.982567430112653e-11,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 179.38695884776087,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 7.015021359432301e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 2.404498123026655e-07,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 194.75573084632126,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 6.313519223489071e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.7619958873118636e-09,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 212.11566295865322,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "phase_inductance_h": 5.682167301140164e-10,
+      "step_ratio_used": 0.9,
+      "attempts": 1,
+      "converged": true,
+      "final_relative_residual": 1.6978098720284202e-12,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "maximum_abs_phase_current_a": 231.3318394845492,
+      "sub_step_convergence_disagreement": false
+    }
+  ],
+  "bisection": [
+    {
+      "iteration": 1,
+      "phase_inductance_h": 5.997843262314617e-10,
+      "converged": true,
+      "final_relative_residual": 6.630942608462253e-10,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "maximum_abs_phase_current_a": 215.33710725509565,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "iteration": 2,
+      "phase_inductance_h": 6.155681242901844e-10,
+      "converged": true,
+      "final_relative_residual": 8.361560975193172e-08,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "maximum_abs_phase_current_a": 208.78849968079675,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "iteration": 3,
+      "phase_inductance_h": 6.234600233195458e-10,
+      "converged": true,
+      "final_relative_residual": 1.908863796299973e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "maximum_abs_phase_current_a": 205.70768241621118,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "iteration": 4,
+      "phase_inductance_h": 6.274059728342265e-10,
+      "converged": true,
+      "final_relative_residual": 2.5709295795955874e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "maximum_abs_phase_current_a": 204.5194342852,
+      "sub_step_convergence_disagreement": false
+    },
+    {
+      "iteration": 5,
+      "phase_inductance_h": 6.293789475915668e-10,
+      "converged": true,
+      "final_relative_residual": 2.94798384194566e-10,
+      "natural_zvs_flags": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": false,
+      "maximum_abs_phase_current_a": 203.99882211392074,
+      "sub_step_convergence_disagreement": false
+    }
+  ],
+  "critical_lphase_h": 6.274059728342265e-10,
+  "critical_lphase_bracket_h": [
+    6.274059728342265e-10,
+    6.293789475915668e-10
+  ],
+  "reduction_from_nominal_pct": 57.22232100625,
+  "proposed_start_candidate_h": 5e-10,
+  "floor_lphase_h": 8e-11,
+  "bracket_was_widened_past_proposed_start": false,
+  "margin_lphase_h": 5.646653755508038e-10,
+  "margin_reduction_from_nominal_pct": 61.50008890562499,
+  "margin_natural_zvs_flags": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "margin_all_four_zvs": true,
+  "margin_final_relative_residual": 5.379032283348327e-10,
+  "key_states_file": "key_states.json",
+  "safety_log": [
+    {
+      "phase_inductance_h": 1.4666667e-09,
+      "maximum_abs_phase_current_a": 117.51274398272587,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 1.3200000300000001e-09,
+      "maximum_abs_phase_current_a": 125.57486942236731,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 1.1880000270000001e-09,
+      "maximum_abs_phase_current_a": 133.9079545178299,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 1.0692000243e-09,
+      "maximum_abs_phase_current_a": 143.2930389604476,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 9.622800218700002e-10,
+      "maximum_abs_phase_current_a": 153.87960079664856,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 8.660520196830002e-10,
+      "maximum_abs_phase_current_a": 165.84247318010912,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 7.794468177147002e-10,
+      "maximum_abs_phase_current_a": 179.38695884776087,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 7.015021359432301e-10,
+      "maximum_abs_phase_current_a": 194.75573084632126,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 6.313519223489071e-10,
+      "maximum_abs_phase_current_a": 212.11566295865322,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 5.682167301140164e-10,
+      "maximum_abs_phase_current_a": 231.3318394845492,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 5.997843262314617e-10,
+      "maximum_abs_phase_current_a": 215.33710725509565,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 6.155681242901844e-10,
+      "maximum_abs_phase_current_a": 208.78849968079675,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 6.234600233195458e-10,
+      "maximum_abs_phase_current_a": 205.70768241621118,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 6.274059728342265e-10,
+      "maximum_abs_phase_current_a": 204.5194342852,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 6.293789475915668e-10,
+      "maximum_abs_phase_current_a": 203.99882211392074,
+      "outcome": "solved"
+    },
+    {
+      "phase_inductance_h": 5.646653755508038e-10,
+      "maximum_abs_phase_current_a": 232.54075190884095,
+      "outcome": "solved"
+    }
+  ],
+  "safety_limit_a": 250.0,
+  "safety_maximum_over_whole_search_a": 232.54075190884095,
+  "wall_clock_s": 2520.808379173279
+}

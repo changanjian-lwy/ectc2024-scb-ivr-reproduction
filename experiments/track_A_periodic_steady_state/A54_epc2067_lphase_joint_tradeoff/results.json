@@ -1,0 +1,171 @@
+{
+  "script": "build_results.py",
+  "classification": "SENSITIVITY_ONLY",
+  "not_a_p24_reproduction": true,
+  "device": "EPC2067",
+  "ron_ohm": 0.00155,
+  "ch_total_f": 3.72e-09,
+  "cl_total_f": 5.58e-09,
+  "nhs": 2,
+  "nls": 3,
+  "module_power_w": 250.0,
+  "search": {
+    "outcome": "CRITICAL_LPHASE_FOUND",
+    "nominal_lphase_h": 1.4666667e-09,
+    "nominal_hard_switch_confirmed": true,
+    "critical_lphase_h": 6.274059728342265e-10,
+    "critical_lphase_bracket_h": [
+      6.274059728342265e-10,
+      6.293789475915668e-10
+    ],
+    "reduction_from_nominal_pct": 57.22232100625,
+    "margin_lphase_h": 5.646653755508038e-10,
+    "margin_reduction_from_nominal_pct": 61.50008890562499,
+    "bracket_was_widened_past_proposed_start": false,
+    "floor_lphase_h": 8e-11,
+    "ladder_step_count": 9,
+    "bisection_step_count": 5,
+    "safety_maximum_over_whole_search_a": 232.54075190884095,
+    "safety_limit_a": 250.0
+  },
+  "three_point_table": {
+    "nominal": {
+      "phase_inductance_h": 1.4666667e-09,
+      "converged": true,
+      "final_relative_residual": 2.6325113313994623e-08,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "all_four_zvs": false,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        113.53080807873027,
+        113.34255635972308,
+        113.3398333432242,
+        115.83695059650455
+      ],
+      "rms_currents_a": [
+        65.52389674494694,
+        65.37215575640423,
+        65.36722011505562,
+        67.37483142339336
+      ],
+      "conduction_loss_w_total": 26.93766881006341,
+      "maximum_abs_phase_current_a": 115.82149946128968
+    },
+    "critical": {
+      "phase_inductance_h": 6.274059728342265e-10,
+      "converged": true,
+      "final_relative_residual": 2.5709295795955874e-09,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        204.55218982734903,
+        203.91245432916244,
+        203.90959505966407,
+        203.79461562760463
+      ],
+      "rms_currents_a": [
+        103.08580819402945,
+        102.83148780777839,
+        103.11495897024942,
+        102.63242424128417
+      ],
+      "conduction_loss_w_total": 65.66901740752782,
+      "maximum_abs_phase_current_a": 204.51699074552297
+    },
+    "margin": {
+      "phase_inductance_h": 5.646653755508038e-10,
+      "converged": true,
+      "final_relative_residual": 5.379032283348327e-10,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "all_four_zvs": true,
+      "sub_step_ladder_consistent": true,
+      "peak_currents_a": [
+        222.73724318580483,
+        221.99226814987819,
+        221.9877326574876,
+        222.21393057084447
+      ],
+      "rms_currents_a": [
+        111.6705717955699,
+        111.36911827985095,
+        111.60903224888911,
+        111.36827111300983
+      ],
+      "conduction_loss_w_total": 77.08594075281385,
+      "maximum_abs_phase_current_a": 222.69818776682578
+    }
+  },
+  "capacitive_switching_loss_at_nominal_w": 17.98254997754402,
+  "tradeoff": {
+    "capacitive_switching_loss_eliminated_w": 17.98254997754402,
+    "conduction_loss_increase_critical_w": 38.731348597464404,
+    "conduction_loss_increase_margin_w": 50.14827194275044,
+    "net_watts_critical": -20.748798619920382,
+    "net_watts_margin": -32.165721965206416,
+    "critical_all_four_zvs": true,
+    "margin_all_four_zvs": true
+  },
+  "safety": {
+    "limit_a": 250.0,
+    "maximum_a_three_point_analysis": 222.69818776682578,
+    "maximum_a_whole_bisection_search": 232.54075190884095,
+    "within_limit": true
+  },
+  "comparison_vs_a53_gs61008t": {
+    "gs61008t_a53_reference": {
+      "device": "GS61008T",
+      "ron_ohm": 0.007,
+      "ch_total_f": 3.85e-10,
+      "cl_total_f": 7.7e-10,
+      "critical_lphase_h": 1.19625e-09,
+      "critical_reduction_from_nominal_pct": 18.44,
+      "margin_lphase_h": 1.07663e-09,
+      "margin_reduction_from_nominal_pct": 26.59,
+      "conduction_loss_w_nominal": 113.09,
+      "conduction_loss_w_critical": 153.61,
+      "conduction_loss_w_margin": 171.63,
+      "capacitive_switching_loss_eliminated_w": 2.087,
+      "conduction_loss_increase_critical_w": 40.513,
+      "conduction_loss_increase_margin_w": 58.54,
+      "net_watts_critical": -38.426,
+      "net_watts_margin": -56.453,
+      "safety_maximum_a": 150.13
+    },
+    "epc2067_a54_result": {
+      "critical_lphase_h": 6.274059728342265e-10,
+      "critical_reduction_from_nominal_pct": 57.22232100625,
+      "margin_lphase_h": 5.646653755508038e-10,
+      "margin_reduction_from_nominal_pct": 61.50008890562499,
+      "conduction_loss_w_nominal": 26.93766881006341,
+      "conduction_loss_w_critical": 65.66901740752782,
+      "conduction_loss_w_margin": 77.08594075281385,
+      "capacitive_switching_loss_eliminated_w": 17.98254997754402,
+      "conduction_loss_increase_critical_w": 38.731348597464404,
+      "conduction_loss_increase_margin_w": 50.14827194275044,
+      "net_watts_critical": -20.748798619920382,
+      "net_watts_margin": -32.165721965206416,
+      "safety_maximum_a": 232.54075190884095
+    },
+    "net_watts_critical_delta_epc2067_minus_gs61008t": 17.67720138007962,
+    "net_watts_margin_delta_epc2067_minus_gs61008t": 24.287278034793587,
+    "epc2067_less_bad_at_critical": true,
+    "epc2067_less_bad_at_margin": true
+  },
+  "plain_verdict": "net Watts is still negative, but LESS negative than A53's own GS61008T result -- the joint EPC2067+LPHASE change is a genuine (partial) improvement, BOUNDARY.md Section 5's first named outcome (the 'less bad' case)."
+}
