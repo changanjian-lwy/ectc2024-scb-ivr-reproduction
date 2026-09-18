@@ -1,0 +1,77 @@
+{
+  "experiment": "R04E24_phase1_handoff_reachable_ineg",
+  "parent": "R04E23_phase1_handoff_extended_tstop",
+  "outcome_summary": "With NEG_FRAC lowered to .016 (I_NEG=2.0A, chosen ~10% below R04E23's own observed natural peak of -2.2150912284851074A), state 3 (LOW_BUILD_NEGATIVE) DOES exit this time: t_neg_target PASSES at t=2.2888839867e-06s (~2.29us), the 3->4 transition R04E22/R04E23 never reached. State 4 (COMMUTATE_HIGH_TO_ZVS) IS entered. However, the SAME documented stall recurs at state 4: t_high_side_zvs FAILs, state_final=4 at t=100us (never advances to state 5). Direct full-trace .raw analysis (465,821 points, vs R04E23's 100,356 -- state 4's resonant ring forces a much finer solver step) shows a brief damped LC-style ring immediately after entering state 4 (IL1 oscillating roughly -2.0A to +2.0A and V(vin,xmod:a1) oscillating roughly 9.66V to 14.16V between t~2.29us and t~5us), which then damps out by ~20-30us into a near-DC steady state: IL1 relaxes toward ~0A and V(vin,xmod:a1) settles at ~11.92V. The minimum value V(vin,xmod:a1) EVER reaches anywhere in the full 100us run is 9.662612915039062V at t=2.2909270415129772e-06s -- nowhere near the <=0V ZVS threshold the 4->5 rule requires. This is BOUNDARY.md Section 6's SECOND anticipated outcome ('state 3 exits, state 4 entered, but the SAME stall recurs'): R04E21's own diagnosed hypothesis (that too-small I_NEG under the old I_LIMIT=10A regime was the blocker) is REFUTED -- reaching state 4 at all, even with a reachable, correctly-scaled, nonzero I_NEG, is not sufficient to unblock the state-4 ZVS event. Something else blocks it.",
+  "cell": {
+    "name": "r04e24_neg1p6pct_t100us",
+    "i_limit": 125,
+    "neg_frac": 0.016,
+    "i_neg": 2.0,
+    "tstop_s": 1.0e-4,
+    "meas": {
+      "t_energy_end_s": 6.3702883197e-09,
+      "il1_energy_end_a": 125.01597397,
+      "t_low_side_zvs_s": 6.47330761463e-09,
+      "t_il1_zero_s": 1.63197919454e-06,
+      "t_neg_target_s": 2.2888839867e-06,
+      "t_neg_target_status": "PASSED (I_NEG=-2.0A reached; state 3 exits for the first time in this experiment chain)",
+      "t_high_side_zvs_s": null,
+      "t_high_side_zvs_status": "FAILED (state 4 entered, but V(vin,xmod:a1)<=0 never fires within TSTOP=100us -- the same documented stall recurs one state further in)",
+      "state_final": 4,
+      "state_final_name": "COMMUTATE_HIGH_TO_ZVS",
+      "il1_min_a_meas_window_0_to_20us": -2.00000190735,
+      "il1_max_a_meas_window_0_to_20us": 125.390205383,
+      "vout_final_v": 1.77769621246e-08,
+      "vc1_final_v": 36.0756149115,
+      "vc2_final_v": -2.78807852361e-08,
+      "vc3_final_v": -3.02944034303e-08
+    },
+    "full_trace_direct_scan": {
+      "points": 465821,
+      "il1_global_min_a": -2.000001907348633,
+      "il1_global_min_t_s": 2.2888839847736898e-06,
+      "il1_global_max_a": 125.39020538330078,
+      "il1_global_max_t_s": 6.4716551489923386e-09,
+      "note": "465,821 saved points vs R04E23's 100,356 at the same .options settings -- state 4's own resonant ring forces the solver to a much finer time step than state 3's smooth trajectory did."
+    },
+    "state4_dynamics": {
+      "state4_entry_t_s": 2.288884e-06,
+      "description": "A brief damped ring immediately after state-4 entry (IL1 oscillating roughly -2.0A to +2.0A, V(vin,xmod:a1) oscillating roughly 9.66V to 14.16V, over approximately t=2.29us to t=5us), then monotonic decay to a near-DC steady state by ~20-30us: IL1 -> ~0A, V(vin,xmod:a1) settles at ~11.92V for the remainder of the 100us window.",
+      "vin_a1_min_v_in_state4": 9.662612915039062,
+      "vin_a1_min_v_t_s": 2.2909270415129772e-06,
+      "vin_a1_max_v_in_state4": 14.163780212402344,
+      "vin_a1_max_v_t_s": 2.2950425403989066e-06,
+      "vin_a1_settled_value_v_approx": 11.92,
+      "zvs_threshold_v": 0.0,
+      "margin_from_threshold_v_closest_approach": 9.662612915039062,
+      "note": "V(vin,xmod:a1) never comes remotely close to the <=0V ZVS threshold at any point in the 100us window; its closest approach (9.66V) is the very first trough of the initial ring, immediately after state-4 entry, not a near-miss late in the run."
+    },
+    "solver_total_elapsed_time_s": 101.778
+  },
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "il1_max_abs_a_observed_full_trace": 125.39020538330078,
+    "il1_min_a_observed_full_trace": -2.000001907348633,
+    "within_bound_throughout": true,
+    "points_over_bound": 0,
+    "points_scanned": 465821
+  },
+  "corruption_fingerprint_check": {
+    "raw_points": 465821,
+    "non_monotonic_or_duplicate_timestamps": 0,
+    "vin_min_v": 0.0,
+    "vin_max_v": 48.0,
+    "vin_stayed_within_commanded_0_48v": true,
+    "implausible_value_count": 0,
+    "il1_over_250a_count": 0,
+    "clean": true
+  },
+  "outcome_classification": {
+    "boundary_section_6_outcome": "STATE3_EXITS_STATE4_ENTERED_SAME_STALL_RECURS",
+    "state3_exits": true,
+    "state4_entered": true,
+    "state5_reached": false,
+    "hypothesis_status": "REFUTED",
+    "reasoning": "State 3 (LOW_BUILD_NEGATIVE) exits for the first time in the R04E21-R04E24 chain (t_neg_target PASSES at t=2.289us), and state 4 (COMMUTATE_HIGH_TO_ZVS) is entered. But the SAME documented stall (state 4, V(vin,xmod:a1)<=0 never fires) recurs, now confirmed under a directly-observed, reachable, correctly-scaled I_NEG=2.0A rather than remaining untested. R04E21's own diagnosed hypothesis -- that R04E3's leftover I_LIMIT=10A/I_NEG=0.2A were too small to store meaningful magnetic energy for the state-4 resonant ZVS ring, and that rescaling to P24's real 125A scale might unblock the state-4 V(vin,a1)<=0 event -- is REFUTED by this result: reaching state 4 at all, with a reachable nonzero I_NEG that is itself now known to actually fire the 3->4 rule, is not sufficient. The observed state-4 ring only swings V(vin,xmod:a1) down to a minimum of 9.66V before damping to a ~11.92V steady state, nowhere near the 0V threshold. This is a specific, falsifiable finding: the mechanism blocking the ZVS event is NOT insufficient I_NEG magnitude alone. This directly matches BOUNDARY.md Section 6's SECOND anticipated outcome, not the first (stall avoided) or third (state 3 still does not exit)."
+  }
+}

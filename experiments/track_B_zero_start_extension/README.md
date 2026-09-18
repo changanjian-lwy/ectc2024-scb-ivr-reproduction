@@ -953,3 +953,44 @@ the complete state-transition timeline, full-trace relaxation-curve
 evidence, current-safety and fingerprint checks for both cells, and full
 discussion of what this still-inconclusive result does and does not
 establish.
+
+## R04E24 -- a reachable I_NEG target: state 4 finally entered, but the
+   same ZVS stall recurs (R04E21's hypothesis REFUTED)
+
+Direct, single-cell follow-up to R04E23's own inconclusive result
+(`R04E24_phase1_handoff_reachable_ineg/BOUNDARY.md`): R04E23 found `IL1`
+peaks negative at `-2.2150912284851074A` (`~2.82us`) then relaxes back
+toward zero, so BOTH swept `I_NEG` targets (`2.5A`, `9.7125A`) sat above
+this natural ceiling and state 3 (`LOW_BUILD_NEGATIVE`) never exited in
+either R04E22 or R04E23 cell. This experiment picks `NEG_FRAC=.016`
+(`I_NEG=2.0A`), `~10%` below that observed ceiling, and changes NOTHING
+else relative to R04E23's own `r04e23_neg2pct_t100us.cir` (`diff`
+confirms only the `NEG_FRAC` line differs). **RESULT: `t_neg_target`
+PASSES for the first time in the R04E21-R04E24 chain, at `t=2.289us` --
+state 3 exits and state 4 (`COMMUTATE_HIGH_TO_ZVS`) IS entered.** But
+`t_high_side_zvs` `FAIL`s: `STATE_FINAL=4` at `t=100us`, the SAME
+documented stall recurs one state further in. Direct byte-level parsing
+of the full `465,821`-point `.raw` trace (`4.6x` more points than
+R04E23's own `100,356` -- state 4's own resonant ring forces a much finer
+solver step) shows why: immediately after state-4 entry, `V(vin,xmod:a1)`
+(the `4->5` rule's own quantity, needing `<=0V`) rings down to only
+`9.662612915039062V` at its CLOSEST approach to the threshold
+(`t=2.291us`), then damps to a `~11.92V` steady state for the rest of the
+run -- nowhere near `0V`. **This is a clean REFUTATION of R04E21's own
+diagnosed hypothesis** (that too-small `I_NEG` under the old
+`I_LIMIT=10A` regime was the blocker): a directly reachable,
+correctly-`125A`-scaled, nonzero `I_NEG=2.0A` IS enough to exit state 3,
+but the resulting state-4 ring is roughly `9.66V` short of what the ZVS
+condition needs -- reaching state 4 at all is not sufficient. Phase 1's
+own current stayed within the `+/-250A` bound throughout
+(`max|IL1|=125.390A`, `min IL1=-2.000A`, `0` of `465,821` points over
+bound), and the `.raw` trace was confirmed free of the documented
+solver-corruption fingerprint (zero non-monotonic timestamps, `V(vin)`
+exactly within its commanded `0-48V` step). This result does not
+establish what WOULD unblock the ZVS event, nor characterize the full
+reachable `I_NEG` range (`0` to `~2.2A`) -- a follow-up sweep or a
+circuit-level intervention is a natural next step, not performed here.
+See `R04E24_phase1_handoff_reachable_ineg/BOUNDARY.md` and `RESULTS.md`
+for the complete state-transition timeline, state-4 ring dynamics,
+current-safety and fingerprint checks, and full discussion of what this
+negative result does and does not establish.
