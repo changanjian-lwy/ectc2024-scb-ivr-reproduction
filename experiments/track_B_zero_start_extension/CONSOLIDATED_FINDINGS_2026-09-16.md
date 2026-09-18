@@ -453,3 +453,136 @@ none resolved into a single clean quantitative model. What remains:
 This ranking is a recommendation, not a decision -- next step selection
 remains the user's call, consistent with this project's standing
 practice.
+
+## R04E21-R04E25: minimal-scope phase-1 handoff test into R04E3's
+   controller (added 2026-09-18, per explicit user direction to test
+   "only whether phase 1 can avoid R04E3's stall point")
+
+This is a separate, narrower thread from R04E9-R04E20 above: instead of
+testing zero-start bootstrap mechanisms, it feeds R04E17's own best
+bootstrapped phase-1 state (`VC1=35.86 V`, `IL1=75.97 A`, extracted from
+`e17_div_f3_t68p61`) into `R04E3`'s own pre-existing single-phase-isolated
+event-driven state machine (`paper_locked/02_ectc2024_main/spice/
+R04E3_P24_minimal_zero_start_event_cycle.cir`) to see whether a realistic
+starting current/voltage, rather than true zero energy, lets that
+machine's own documented ZVS stall be avoided. Phases 2-4 stay hardcoded
+at R04E3's own zero-energy configuration throughout -- this is NOT a
+four-phase handoff test.
+
+- **R04E21**: the bootstrapped state alone does not avoid the stall --
+  same permanent parking at state `COMMUTATE_HIGH_TO_ZVS` R04E3/R04E5
+  already documented from zero energy.
+- **R04E22**: diagnosed cause -- R04E3's own `I_LIMIT=10 A`/`I_NEG=0.2 A`
+  are leftover true-zero-energy-era values, mismatched to the bootstrapped
+  state's much larger (`~76 A`) scale. Rescaling to P24's own real
+  `I_LIMIT=125 A` and testing two established `NEG_FRAC` values (`2%`,
+  `7.77%`) turned out inconclusive: neither cell's own `I_NEG` target was
+  reached within the inherited `TSTOP=20 us`.
+- **R04E23**: extending `TSTOP` to `100 us` revealed why -- `IL1` does not
+  keep ramping negative, it peaks at `-2.215 A` near `t=2.82 us` then
+  relaxes back toward zero. Neither original target (`2.5 A`, `9.7125 A`)
+  is reachable at all from this bootstrapped state; TSTOP was never the
+  limiting factor.
+- **R04E24**: using a reachable target (`I_NEG=2.0 A`, `NEG_FRAC=1.6%`)
+  let the machine progress for the first time in this chain -- state 3
+  exits into state 4 (`COMMUTATE_HIGH_TO_ZVS`). But state 4 also stalls:
+  the resonant ring there only pulls `V(vin,xmod:a1)` down to `9.66 V`,
+  nowhere near the `<=0 V` ZVS threshold.
+- **R04E25**: sweeping `I_NEG` across the full reachable range
+  (`0.5-2.15 A`, plus R04E24's `2.0 A` point) shows the ring's closest
+  approach to `0 V` scales almost exactly linearly with `I_NEG`
+  (`R^2=0.99999998`). Extrapolating, reaching `0 V` would need
+  `I_NEG~=10.6 A` -- about `4.78x` above the `~2.215 A` ceiling this
+  bootstrapped state can naturally reach (R04E23). Every cell's current
+  stayed within the `+/-250 A` safety bound; every `.raw` trace passed
+  the solver-corruption fingerprint check; every number in this
+  five-experiment chain was independently re-derived from raw `.log`/
+  `.raw` data before merging, not merely trusted from agent summaries.
+
+**Conclusion of this five-experiment chain**: for R04E17's specific
+bootstrapped operating point, R04E3's phase-1 ZVS stall is not an
+`I_LIMIT`/`I_NEG` tuning problem -- it is a genuine, quantified (`~4.78x`)
+energy shortfall in the state-4 resonant commutation. Closing it would
+need a circuit-level change (larger `LPHASE`, a different negative-
+current-build mechanism, or additional stored energy from elsewhere),
+which is a new design decision outside this experiment's own minimal
+scope ("test only whether phase 1 can avoid the stall"), not a further
+parameter sweep. This chain is intentionally stopped here per R04E25's
+own boundary.
+
+## Cross-check against the parallel math-model effort's newly-found
+   periodic orbit (2026-09-18) -- an important, partially unresolved
+   discrepancy
+
+Independently, and on a different timeline from R04E21-R04E25, the
+parallel math-model effort (`results/`, `src/scb_ivr/`) landed two new
+results after this document's previous update: `ZERO_START_POST_RAMP_
+POINCARE_AUDIT.md` (a 1000-period damped approach toward a candidate
+periodic regime after the ramp) and `ZERO_START_AFFINE_PERIOD_FIXED_
+POINT.md` (solving that regime's fixed point directly via a one-period
+affine Poincare map). The latter reports a genuinely self-consistent
+result for one 250 W module under their **ideal-switch, ideal-diode**
+boundary: map residual `2.6e-11`, one-period closure error `2.3e-8`,
+diode complementarity satisfied throughout -- this is the "single-module
+already self-consistent" result.
+
+**Its headline numbers**: `VC1/VC2/VC3 = 35.8448/23.8863/11.9278 V`,
+`Vout=1.006 V`, average phase currents `~63 A`, phase-current **maxima**
+`125.6-125.9 A`, phase-current **minima only `0.111` to `-0.214 A`**.
+
+**The discrepancy worth flagging plainly**: this periodic orbit's own
+natural per-phase current minimum (`~0.1-0.2 A` magnitude) is roughly
+**50x smaller** than the `~10.6 A` R04E25 found would be needed to close
+its own observed ZVS-ring gap, and is even smaller than the `2.0-2.15 A`
+R04E24/R04E25 actually tested. Two explanations are both plausible and
+have NOT been distinguished yet:
+
+1. **The two models are testing genuinely different commutation
+   mechanisms, not the same one at different operating points.** The
+   affine-map result is an *ideal*-switch model -- switches transition
+   instantaneously regardless of voltage, so it structurally cannot need
+   or show a "ZVS gap" at all; its own document explicitly disclaims any
+   hardware-ZVS claim ("cannot establish hardware ZVS...without the real
+   device capacitance"). R04E3's own `.machine` construct, by contrast,
+   models a *real* half-bridge resonant commutation that genuinely needs
+   stored inductor energy to swing a real switching-node capacitance down
+   to `0 V`. If this is the right explanation, the two results are not
+   in tension -- they answer different questions -- but it also means
+   R04E25's own `4.78x` shortfall says nothing about whether the real
+   converter's *actual* periodic-orbit-adjacent ZVS transition would face
+   a similar shortfall, since that transition's own real current minimum
+   might naturally be much smaller than what R04E17's bootstrap state
+   produces.
+2. **Alternatively, R04E17's own zero-start bootstrap trajectory (used as
+   the starting point for the entire R04E21-R04E25 chain) may simply not
+   be representative of the true periodic orbit's own state at any
+   comparable phase.** Some rough support for this: the math model's own
+   end-of-`22.87 us`-ramp reference state (`ZERO_START_FULL_RAMP_
+   REFERENCE.md`) has `VC1=34.27 V` (close to R04E17's `35.86 V`, but at
+   a *different* `Tramp=22.87 us` vs R04E17's own `68.61 us`) alongside
+   phase currents `IL1..IL4 ~= 161.7/197.6/73.6/95.8 A` -- individually
+   much larger, and far less uniform across phases, than either the
+   periodic orbit's own `~63 A` average or R04E17's single-phase `76 A`.
+   No experiment in this project has yet bootstrapped R04E3's controller
+   from a state actually confirmed to lie on or near this periodic orbit
+   -- R04E17's own state was derived from a single-phase-only zero-
+   energy SPICE ramp, not from this cross-track periodic solution.
+
+**This is not yet resolved and should not be treated as resolved.**
+Both explanations are consistent with everything committed so far; they
+have different implications (the first says R04E21-R04E25's negative
+result is scoped correctly and simply doesn't generalize; the second
+says R04E21-R04E25 may have tested the wrong starting state entirely).
+Distinguishing them would need either (a) confirming whether R04E3's own
+`.machine` mechanism is even the right model of commutation near the true
+periodic orbit, or (b) bootstrapping R04E3's controller from a state
+actually taken from/near the affine-map periodic solution instead of
+R04E17's zero-energy-ramp state, and rerunning an R04E24-style single
+cell. Neither has been attempted. This cross-check was performed by
+reading the parallel effort's own already-published `results/*.md` files
+directly (`ZERO_START_AFFINE_PERIOD_FIXED_POINT.md`, `ZERO_START_POST_
+RAMP_POINCARE_AUDIT.md`, `ZERO_START_FULL_RAMP_REFERENCE.md`) -- quoted,
+not paraphrased from memory -- but, consistent with this project's
+standing practice, their underlying Python solver code was not
+independently re-verified; only the numbers explicitly quoted here were
+checked for faithful transcription against the source files.
