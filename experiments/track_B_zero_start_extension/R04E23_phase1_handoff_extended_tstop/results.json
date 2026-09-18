@@ -1,0 +1,126 @@
+{
+  "experiment": "R04E23_phase1_handoff_extended_tstop",
+  "parent": "R04E22_phase1_handoff_rescaled_ilimit",
+  "outcome_summary": "I_NEG is STILL not reached in EITHER cell, even at TSTOP=100us (a 5x extension over R04E22's own 20us). Both cells remain parked at state 3 (LOW_BUILD_NEGATIVE) at t=100us; t_neg_target FAILs in both. Direct byte-level parsing of both full 100,356-point .raw traces shows IL1 reaches its GLOBAL minimum of -2.2150912284851074A at t=2.817428674148355e-06s (~2.82us into the run, essentially the same value R04E22's own 20us-window IL1_MIN already captured), then RELAXES BACK TOWARD ZERO for the remainder of the window (IL1=-0.098A at 20us, -0.0024A at 40us, -0.0000236A at the final point t=100us) instead of continuing to build more negative. This refutes the 'naive linear extrapolation' assumption BOUNDARY.md Section 2 used to justify TSTOP=100us: the trajectory was never still linearly ramping past 20us, it had already peaked and begun relaxing back toward 0 by ~2.82us. Both swept I_NEG targets (-2.5A, -9.7125A) remain far out of reach. Both cells are confirmed numerically and physically IDENTICAL (0 of 100,356 differing rows in time or I(xmod:L1) between the two .raw files), for the same reason R04E22 found at 20us: the 3->4 rule never fires in either cell, so NEG_FRAC never enters the simulated physics. Per BOUNDARY.md Section 6's third anticipated outcome ('I_NEG still not reached even at 100us'), this is reported plainly with no further TSTOP extension attempted or recommended.",
+  "cells": {
+    "r04e23_neg2pct_t100us": {
+      "i_limit": 125,
+      "neg_frac": 0.02,
+      "i_neg": 2.5,
+      "tstop_s": 1.0e-4,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": null,
+        "t_neg_target_status": "FAILED (never reaches I_NEG=-2.5A within TSTOP=100us)",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 never reached, so this transition is never attempted)",
+        "state_final": 3,
+        "state_final_name": "LOW_BUILD_NEGATIVE",
+        "il1_min_a_meas_window_0_to_20us": -2.21509122849,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": -4.38002665248e-08,
+        "vc1_final_v": 36.075614973,
+        "vc2_final_v": -1.9172674115e-08,
+        "vc3_final_v": -2.15837978601e-08
+      },
+      "full_trace_direct_scan": {
+        "points": 100356,
+        "il1_global_min_a": -2.2150912284851074,
+        "il1_global_min_t_s": 2.817428674148355e-06,
+        "il1_at_100us_final_point_a": -2.3552565835416317e-05,
+        "note": "IL1 reaches its global minimum near t=2.82us (well inside the original 20us window) then relaxes back toward 0 for the remainder of the extended window, rather than continuing to build negative."
+      },
+      "solver_total_elapsed_time_s": 13.671
+    },
+    "r04e23_neg7p77pct_t100us": {
+      "i_limit": 125,
+      "neg_frac": 0.0777,
+      "i_neg": 9.7125,
+      "tstop_s": 1.0e-4,
+      "meas": {
+        "t_energy_end_s": 6.3702883197e-09,
+        "il1_energy_end_a": 125.01597397,
+        "t_low_side_zvs_s": 6.47330761463e-09,
+        "t_il1_zero_s": 1.63197919454e-06,
+        "t_neg_target_s": null,
+        "t_neg_target_status": "FAILED (never reaches I_NEG=-9.7125A within TSTOP=100us)",
+        "t_high_side_zvs_s": null,
+        "t_high_side_zvs_status": "FAILED (state 4 never reached, so this transition is never attempted)",
+        "state_final": 3,
+        "state_final_name": "LOW_BUILD_NEGATIVE",
+        "il1_min_a_meas_window_0_to_20us": -2.21509122849,
+        "il1_max_a_meas_window_0_to_20us": 125.390205383,
+        "vout_final_v": -4.38002665248e-08,
+        "vc1_final_v": 36.075614973,
+        "vc2_final_v": -1.9172674115e-08,
+        "vc3_final_v": -2.15837978601e-08
+      },
+      "full_trace_direct_scan": {
+        "points": 100356,
+        "il1_global_min_a": -2.2150912284851074,
+        "il1_global_min_t_s": 2.817428674148355e-06,
+        "il1_at_100us_final_point_a": -2.3552565835416317e-05,
+        "note": "IL1 reaches its global minimum near t=2.82us (well inside the original 20us window) then relaxes back toward 0 for the remainder of the extended window, rather than continuing to build negative."
+      },
+      "solver_total_elapsed_time_s": 14.04
+    }
+  },
+  "cells_numerically_identical": true,
+  "cells_physically_identical_full_trace": {
+    "checked": true,
+    "differing_rows_time": 0,
+    "differing_rows_il1": 0,
+    "total_rows_compared": 100356
+  },
+  "current_bound_check": {
+    "engineering_bound_a": 250,
+    "cells": {
+      "r04e23_neg2pct_t100us": {
+        "il1_max_abs_a_observed_full_trace": 125.39020538330078,
+        "within_bound_throughout": true,
+        "points_over_bound": 0,
+        "points_scanned": 100356
+      },
+      "r04e23_neg7p77pct_t100us": {
+        "il1_max_abs_a_observed_full_trace": 125.39020538330078,
+        "within_bound_throughout": true,
+        "points_over_bound": 0,
+        "points_scanned": 100356
+      }
+    }
+  },
+  "corruption_fingerprint_check": {
+    "cells": {
+      "r04e23_neg2pct_t100us": {
+        "raw_points": 100356,
+        "non_monotonic_or_duplicate_timestamps": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "vin_stayed_within_commanded_0_48v": true,
+        "implausible_value_count": 0,
+        "clean": true
+      },
+      "r04e23_neg7p77pct_t100us": {
+        "raw_points": 100356,
+        "non_monotonic_or_duplicate_timestamps": 0,
+        "vin_min_v": 0.0,
+        "vin_max_v": 48.0,
+        "vin_stayed_within_commanded_0_48v": true,
+        "implausible_value_count": 0,
+        "clean": true
+      }
+    }
+  },
+  "outcome_classification": {
+    "boundary_section_6_outcome": "I_NEG_STILL_NOT_REACHED_AT_100US",
+    "stall_avoided_either_cell": false,
+    "same_r04e21_state4_stall_recurred_either_cell": false,
+    "state3_parking_persists_both_cells_at_100us": true,
+    "neg_frac_dependent_split": false,
+    "hypothesis_status": "UNTESTED_NOT_CONFIRMED_NOT_REFUTED",
+    "reasoning": "Both cells remain parked at state 3 (LOW_BUILD_NEGATIVE) at TSTOP=100us, the SAME state R04E22 found parked at TSTOP=20us. Direct full-trace .raw analysis shows this is not a not-yet-arrived linear ramp (BOUNDARY.md Section 2's own 'naive linear extrapolation' framing) but a trajectory that reaches its own most-negative point early (IL1=-2.215091A at t=2.817us, well inside the ORIGINAL 20us window) and then relaxes back toward 0 for the entire remainder of the window, however long that window is extended. Neither swept I_NEG target (-2.5A, -9.7125A) is reached. Because the 3->4 rule never fires in either cell, NEG_FRAC has zero observed effect and both cells' full 100,356-point trajectories are byte-identical in time and I(xmod:L1). The specific question this experiment (and R04E22 before it) set out to answer (does a rescaled I_NEG unblock the state-4 ZVS event) remains UNTESTED -- state 4 itself is never reached in either cell at either tested TSTOP. Per BOUNDARY.md Section 6's own explicit instruction, no further TSTOP extension is attempted or recommended without a separately-justified basis for one; a future attempt would need a circuit-level intervention or a smaller NEG_FRAC target within the trajectory's own observed ~-2.215A reach, not simply more observation time."
+  }
+}
