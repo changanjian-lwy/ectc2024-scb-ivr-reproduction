@@ -14,6 +14,8 @@
 - `run_zero_start_post_ramp.py` resumes a complete saved MNA state and samples
   the left limit of one fixed PWM event; partial voltage/current snapshots are
   deliberately rejected as restart states.
+- `solve_zero_start_affine_period.py` constructs the fixed-diode one-period
+  affine map and reports its rank, closure and diode-complementarity audit.
 
 Install the project first with `python3 -m pip install -e .`, then run a script
 from the repository root, for example `python3 scripts/run_reproduction.py`.

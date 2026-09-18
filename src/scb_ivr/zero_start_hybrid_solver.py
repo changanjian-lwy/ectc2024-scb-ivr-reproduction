@@ -315,6 +315,31 @@ def advance_complementarity_step(
     return min(candidates, key=score)
 
 
+def advance_fixed_diode_step(
+    previous: HybridStep,
+    next_time_s: float,
+    boundary: ZeroStartBoundary,
+    diode_state: tuple[bool, bool, bool],
+) -> HybridStep:
+    """Advance one linear mode step without changing the selected diodes.
+
+    This is used only to construct and audit a candidate affine period map.
+    Physical validity must subsequently be checked with diode complementarity.
+    """
+    if next_time_s <= previous.time_s:
+        raise ValueError("time must advance strictly")
+    midpoint = 0.5 * (previous.time_s + next_time_s)
+    high = commanded_pwm_mode(midpoint, boundary).high_side_on
+    return _candidate_step(
+        previous.state,
+        previous.time_s,
+        next_time_s,
+        boundary,
+        high,
+        diode_state,
+    )
+
+
 def simulate_zero_start(
     boundary: ZeroStartBoundary,
     stop_time_s: float,
