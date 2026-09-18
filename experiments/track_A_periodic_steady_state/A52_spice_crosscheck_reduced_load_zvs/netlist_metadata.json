@@ -1,0 +1,598 @@
+{
+  "main": {
+    "netlist": "A52_spice_crosscheck_reduced_load_zvs.cir",
+    "tag": "",
+    "max_step_s": 1e-12,
+    "t0_absolute_s": 2.3001075e-05,
+    "toffset_s": 2.3001075e-05,
+    "run_span_s": 2.5e-07,
+    "period_s": 2e-07,
+    "rload_ohm": 0.0052631590627742,
+    "ic_mapping": [
+      {
+        "variable": "src",
+        "value": 48.00000000687211,
+        "target": "V(src)",
+        "how": "NOT an initial condition: V_SRC pins V(src) to exactly 48 V for the whole run.  z*'s 48.00000000687211 is the solver's own residual on an algebraically-pinned variable (6.9e-9 V); SPICE enforces the same equation exactly."
+      },
+      {
+        "variable": "src_r",
+        "value": 47.96569022236729,
+        "target": ".ic V(src_r)",
+        "how": "node between R_SRC and L_PAR_IN"
+      },
+      {
+        "variable": "vin",
+        "value": 47.969789939303524,
+        "target": ".ic V(vin)",
+        "how": "node after the input inductor; NOT the 48 V rail (that is `src`).  This is the descriptor's own naming."
+      },
+      {
+        "variable": "tap3",
+        "value": 36.0,
+        "target": ".ic V(tap3)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "tap2",
+        "value": 24.0,
+        "target": ".ic V(tap2)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "tap1",
+        "value": 12.0,
+        "target": ".ic V(tap1)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "a1",
+        "value": 48.00677396673983,
+        "target": ".ic V(a1)",
+        "how": "ladder node; with V(x1) it carries VC1 = a1-x1"
+      },
+      {
+        "variable": "a2",
+        "value": 24.036209731129393,
+        "target": ".ic V(a2)",
+        "how": "ladder node; with V(x2) it carries VC2 = a2-x2"
+      },
+      {
+        "variable": "a3",
+        "value": 11.636445707833776,
+        "target": ".ic V(a3)",
+        "how": "ladder node; with V(x3) it carries VC3 = a3-x3"
+      },
+      {
+        "variable": "x1",
+        "value": 11.742411388577601,
+        "target": ".ic V(x1)",
+        "how": "phase 1 switching node"
+      },
+      {
+        "variable": "x2",
+        "value": -0.02167367897568295,
+        "target": ".ic V(x2)",
+        "how": "phase 2 switching node"
+      },
+      {
+        "variable": "x3",
+        "value": -0.21253311225322608,
+        "target": ".ic V(x3)",
+        "how": "phase 3 switching node"
+      },
+      {
+        "variable": "x4",
+        "value": -0.4715756542261936,
+        "target": ".ic V(x4)",
+        "how": "phase 4 switching node"
+      },
+      {
+        "variable": "out",
+        "value": 0.6878908393606893,
+        "target": ".ic V(out)",
+        "how": "output node across COUT and RLOAD"
+      },
+      {
+        "variable": "LPAR_IN",
+        "value": 3.4309784504693295,
+        "target": "L_PAR_IN ic=",
+        "how": "descriptor branch ('src_r','vin'): current positive from src_r to vin.  LTspice's `L_PAR_IN src_r vin` uses the same first-node-to-second-node convention, so the sign transfers unchanged."
+      },
+      {
+        "variable": "L1",
+        "value": -5.202377626634099,
+        "target": "LIND1 ic=",
+        "how": "descriptor branch ('x1','out'), same sign convention"
+      },
+      {
+        "variable": "L2",
+        "value": 3.07242026743103,
+        "target": "LIND2 ic=",
+        "how": "descriptor branch ('x2','out'), same sign convention"
+      },
+      {
+        "variable": "L3",
+        "value": 30.358686656836504,
+        "target": "LIND3 ic=",
+        "how": "descriptor branch ('x3','out'), same sign convention"
+      },
+      {
+        "variable": "L4",
+        "value": 67.36321312878287,
+        "target": "LIND4 ic=",
+        "how": "descriptor branch ('x4','out'), same sign convention"
+      },
+      {
+        "variable": "I_VSTEP",
+        "value": -3.43097845046932,
+        "target": "(none)",
+        "how": "the MNA source-branch current.  Purely algebraic (its column of E is exactly zero, per A51's own seed table), so it is not an initial condition anywhere; SPICE determines V_SRC's current from the circuit."
+      }
+    ],
+    "schedule_netlist_time": {
+      "1": [
+        {
+          "kind": "HIGH",
+          "start_s": 0.0,
+          "end_s": 1.4516666666668004e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.4516666666668004e-08,
+          "end_s": 1.666666666666933e-08
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.666666666666933e-08,
+          "end_s": 1.9785000000000015e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 1.9785000000000015e-07,
+          "end_s": 1.9999999999999809e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 1.9999999999999809e-07,
+          "end_s": 2.145166666666661e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 2.145166666666661e-07,
+          "end_s": 2.1666666666666742e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 2.1666666666666742e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "2": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 4.784999999999989e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 4.784999999999989e-08,
+          "end_s": 5.0000000000001215e-08
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 5.0000000000001215e-08,
+          "end_s": 6.451666666666922e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 6.451666666666922e-08,
+          "end_s": 6.666666666667055e-08
+        },
+        {
+          "kind": "LOW",
+          "start_s": 6.666666666667055e-08,
+          "end_s": 2.4785000000000136e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 2.4785000000000136e-07,
+          "end_s": 2.499999999999993e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 2.499999999999993e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "3": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 9.784999999999772e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 9.784999999999772e-08,
+          "end_s": 9.999999999999904e-08
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 9.999999999999904e-08,
+          "end_s": 1.1451666666666705e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.1451666666666705e-07,
+          "end_s": 1.1666666666666837e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.1666666666666837e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "4": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 1.4784999999999893e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 1.4784999999999893e-07,
+          "end_s": 1.5000000000000026e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 1.5000000000000026e-07,
+          "end_s": 1.6451666666666826e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.6451666666666826e-07,
+          "end_s": 1.666666666666696e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.666666666666696e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ]
+    },
+    "turn_on_windows_netlist_time": {
+      "1": [
+        1.9785000000000015e-07,
+        1.9999999999999809e-07
+      ],
+      "2": [
+        4.784999999999989e-08,
+        5.0000000000001215e-08
+      ],
+      "3": [
+        9.784999999999772e-08,
+        9.999999999999904e-08
+      ],
+      "4": [
+        1.4784999999999893e-07,
+        1.5000000000000026e-07
+      ]
+    },
+    "turn_on_state_index": {
+      "1": 3,
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "vds_probe": {
+      "1": "V(vin,a1)",
+      "2": "V(a1,a2)",
+      "3": "V(a2,a3)",
+      "4": "V(a3,x4)"
+    },
+    "low_side_node": {
+      "1": "x1",
+      "2": "x2",
+      "3": "x3",
+      "4": "x4"
+    }
+  },
+  "_step250f": {
+    "netlist": "A52_spice_crosscheck_reduced_load_zvs_step250f.cir",
+    "tag": "_step250f",
+    "max_step_s": 2.5e-13,
+    "t0_absolute_s": 2.3001075e-05,
+    "toffset_s": 2.3001075e-05,
+    "run_span_s": 2.5e-07,
+    "period_s": 2e-07,
+    "rload_ohm": 0.0052631590627742,
+    "ic_mapping": [
+      {
+        "variable": "src",
+        "value": 48.00000000687211,
+        "target": "V(src)",
+        "how": "NOT an initial condition: V_SRC pins V(src) to exactly 48 V for the whole run.  z*'s 48.00000000687211 is the solver's own residual on an algebraically-pinned variable (6.9e-9 V); SPICE enforces the same equation exactly."
+      },
+      {
+        "variable": "src_r",
+        "value": 47.96569022236729,
+        "target": ".ic V(src_r)",
+        "how": "node between R_SRC and L_PAR_IN"
+      },
+      {
+        "variable": "vin",
+        "value": 47.969789939303524,
+        "target": ".ic V(vin)",
+        "how": "node after the input inductor; NOT the 48 V rail (that is `src`).  This is the descriptor's own naming."
+      },
+      {
+        "variable": "tap3",
+        "value": 36.0,
+        "target": ".ic V(tap3)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "tap2",
+        "value": 24.0,
+        "target": ".ic V(tap2)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "tap1",
+        "value": 12.0,
+        "target": ".ic V(tap1)",
+        "how": "precharge divider tap"
+      },
+      {
+        "variable": "a1",
+        "value": 48.00677396673983,
+        "target": ".ic V(a1)",
+        "how": "ladder node; with V(x1) it carries VC1 = a1-x1"
+      },
+      {
+        "variable": "a2",
+        "value": 24.036209731129393,
+        "target": ".ic V(a2)",
+        "how": "ladder node; with V(x2) it carries VC2 = a2-x2"
+      },
+      {
+        "variable": "a3",
+        "value": 11.636445707833776,
+        "target": ".ic V(a3)",
+        "how": "ladder node; with V(x3) it carries VC3 = a3-x3"
+      },
+      {
+        "variable": "x1",
+        "value": 11.742411388577601,
+        "target": ".ic V(x1)",
+        "how": "phase 1 switching node"
+      },
+      {
+        "variable": "x2",
+        "value": -0.02167367897568295,
+        "target": ".ic V(x2)",
+        "how": "phase 2 switching node"
+      },
+      {
+        "variable": "x3",
+        "value": -0.21253311225322608,
+        "target": ".ic V(x3)",
+        "how": "phase 3 switching node"
+      },
+      {
+        "variable": "x4",
+        "value": -0.4715756542261936,
+        "target": ".ic V(x4)",
+        "how": "phase 4 switching node"
+      },
+      {
+        "variable": "out",
+        "value": 0.6878908393606893,
+        "target": ".ic V(out)",
+        "how": "output node across COUT and RLOAD"
+      },
+      {
+        "variable": "LPAR_IN",
+        "value": 3.4309784504693295,
+        "target": "L_PAR_IN ic=",
+        "how": "descriptor branch ('src_r','vin'): current positive from src_r to vin.  LTspice's `L_PAR_IN src_r vin` uses the same first-node-to-second-node convention, so the sign transfers unchanged."
+      },
+      {
+        "variable": "L1",
+        "value": -5.202377626634099,
+        "target": "LIND1 ic=",
+        "how": "descriptor branch ('x1','out'), same sign convention"
+      },
+      {
+        "variable": "L2",
+        "value": 3.07242026743103,
+        "target": "LIND2 ic=",
+        "how": "descriptor branch ('x2','out'), same sign convention"
+      },
+      {
+        "variable": "L3",
+        "value": 30.358686656836504,
+        "target": "LIND3 ic=",
+        "how": "descriptor branch ('x3','out'), same sign convention"
+      },
+      {
+        "variable": "L4",
+        "value": 67.36321312878287,
+        "target": "LIND4 ic=",
+        "how": "descriptor branch ('x4','out'), same sign convention"
+      },
+      {
+        "variable": "I_VSTEP",
+        "value": -3.43097845046932,
+        "target": "(none)",
+        "how": "the MNA source-branch current.  Purely algebraic (its column of E is exactly zero, per A51's own seed table), so it is not an initial condition anywhere; SPICE determines V_SRC's current from the circuit."
+      }
+    ],
+    "schedule_netlist_time": {
+      "1": [
+        {
+          "kind": "HIGH",
+          "start_s": 0.0,
+          "end_s": 1.4516666666668004e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.4516666666668004e-08,
+          "end_s": 1.666666666666933e-08
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.666666666666933e-08,
+          "end_s": 1.9785000000000015e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 1.9785000000000015e-07,
+          "end_s": 1.9999999999999809e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 1.9999999999999809e-07,
+          "end_s": 2.145166666666661e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 2.145166666666661e-07,
+          "end_s": 2.1666666666666742e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 2.1666666666666742e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "2": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 4.784999999999989e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 4.784999999999989e-08,
+          "end_s": 5.0000000000001215e-08
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 5.0000000000001215e-08,
+          "end_s": 6.451666666666922e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 6.451666666666922e-08,
+          "end_s": 6.666666666667055e-08
+        },
+        {
+          "kind": "LOW",
+          "start_s": 6.666666666667055e-08,
+          "end_s": 2.4785000000000136e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 2.4785000000000136e-07,
+          "end_s": 2.499999999999993e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 2.499999999999993e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "3": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 9.784999999999772e-08
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 9.784999999999772e-08,
+          "end_s": 9.999999999999904e-08
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 9.999999999999904e-08,
+          "end_s": 1.1451666666666705e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.1451666666666705e-07,
+          "end_s": 1.1666666666666837e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.1666666666666837e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ],
+      "4": [
+        {
+          "kind": "LOW",
+          "start_s": 0.0,
+          "end_s": 1.4784999999999893e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_ON",
+          "start_s": 1.4784999999999893e-07,
+          "end_s": 1.5000000000000026e-07
+        },
+        {
+          "kind": "HIGH",
+          "start_s": 1.5000000000000026e-07,
+          "end_s": 1.6451666666666826e-07
+        },
+        {
+          "kind": "DEADTIME_TURN_OFF",
+          "start_s": 1.6451666666666826e-07,
+          "end_s": 1.666666666666696e-07
+        },
+        {
+          "kind": "LOW",
+          "start_s": 1.666666666666696e-07,
+          "end_s": 2.499999999999993e-07
+        }
+      ]
+    },
+    "turn_on_windows_netlist_time": {
+      "1": [
+        1.9785000000000015e-07,
+        1.9999999999999809e-07
+      ],
+      "2": [
+        4.784999999999989e-08,
+        5.0000000000001215e-08
+      ],
+      "3": [
+        9.784999999999772e-08,
+        9.999999999999904e-08
+      ],
+      "4": [
+        1.4784999999999893e-07,
+        1.5000000000000026e-07
+      ]
+    },
+    "turn_on_state_index": {
+      "1": 3,
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "vds_probe": {
+      "1": "V(vin,a1)",
+      "2": "V(a1,a2)",
+      "3": "V(a2,a3)",
+      "4": "V(a3,x4)"
+    },
+    "low_side_node": {
+      "1": "x1",
+      "2": "x2",
+      "3": "x3",
+      "4": "x4"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+==============================================================================
+A52 -- SPICE vs A51 per-phase ZVS comparison
+==============================================================================
+Ph   Python tcross   SPICE tcross         err       rel   <=20%   natural
+1         1.128389       1.131116   +0.002727    0.242%    True      True
+2         1.122660       1.124222   +0.001562    0.139%    True      True
+3         1.122732       1.123930   +0.001198    0.107%    True      True
+4         0.858292       0.859292   +0.001000    0.116%    True      True
+
+Entry-condition agreement (SPICE .meas vs A51 Section 4):
+  phase 1: Vds_entry 11.579063 V vs 11.579036 V (d=+2.742e-05); iL_entry -17.137197 A vs -17.157444 A (d=+2.025e-02)
+  phase 2: Vds_entry 11.821337 V vs 11.822603 V (d=-1.266e-03); iL_entry -17.639929 A vs -17.636990 A (d=-2.939e-03)
+  phase 3: Vds_entry 11.821525 V vs 11.822824 V (d=-1.299e-03); iL_entry -17.642408 A vs -17.636853 A (d=-5.555e-03)
+  phase 4: Vds_entry 11.471093 V vs 11.472413 V (d=-1.320e-03); iL_entry -16.491518 A vs -16.483221 A (d=-8.297e-03)
+
+Cross-check, `.raw` scan vs LTspice `.meas` crossing instants:
+  phase 1: raw 1.131115715 ns, meas 1.131115715 ns, difference +0.0000 ps
+  phase 2: raw 1.124222471 ns, meas 1.124222471 ns, difference +0.0000 ps
+  phase 3: raw 1.123929858 ns, meas 1.123929858 ns, difference +0.0000 ps
+  phase 4: raw 0.859291504 ns, meas 0.859291504 ns, difference +0.0000 ps
+
+Step-size convergence (1 ps vs 0.25 ps maximum timestep):
+  phase 1: 1 ps -> 1.131115715 ns, 0.25 ps -> 1.130895710 ns, difference -0.2200 ps
+  phase 2: 1 ps -> 1.124222471 ns, 0.25 ps -> 1.123367859 ns, difference -0.8546 ps
+  phase 3: 1 ps -> 1.123929858 ns, 0.25 ps -> 1.123170886 ns, difference -0.7590 ps
+  phase 4: 1 ps -> 0.859291504 ns, 0.25 ps -> 0.858828647 ns, difference -0.4629 ps
+
+Safety:
+  phase 1 max |iL| = 100.3009 A
+  phase 2 max |iL| = 99.1349 A
+  phase 3 max |iL| = 99.1344 A
+  phase 4 max |iL| = 97.8309 A
+  worst = 100.3009 A, limit 250.0 A -> within: True
+
+Solver fingerprint:
+  points = 252547
+  non_monotonic_timestamps = 0
+  duplicate_timestamps = 0
+  t_first_s = 0.0
+  t_second_s = 9.99999983775159e-18
+  t_last_s = 2.5e-07
+  v_src_at_t0_v = 0.0
+  v_src_min_after_t0_v = 48.0
+  v_src_max_after_t0_v = 48.0
+  v_src_constant_48v_after_t0 = True
+  v_src_t0_row_is_uic_artifact = True
+
+Periodicity (SPICE at t=T versus the seed z*):
+  max |drift| = 2.520455e-02, relative residual = 3.741589e-04
+    src      seed        48.000000006872  t=T        48.000000000000  drift -6.872114e-09
+    src_r    seed        47.965690222367  t=T        47.965702056885  drift +1.183452e-05
+    vin      seed        47.969789939304  t=T        47.969825744629  drift +3.580533e-05
+    tap3     seed        36.000000000000  t=T        36.000026702881  drift +2.670288e-05
+    tap2     seed        24.000000000000  t=T        24.000019073486  drift +1.907349e-05
+    tap1     seed        12.000000000000  t=T        12.000009536743  drift +9.536743e-06
+    a1       seed        48.006773966740  t=T        48.006816789453  drift +4.282271e-05
+    a2       seed        24.036209731129  t=T        24.036094395712  drift -1.153354e-04
+    a3       seed        11.636445707834  t=T        11.636267941184  drift -1.777666e-04
+    x1       seed        11.742411388578  t=T        11.742302550216  drift -1.088384e-04
+    x2       seed        -0.021673678976  t=T        -0.021788204417  drift -1.145254e-04
+    x3       seed        -0.212533112253  t=T        -0.212709544334  drift -1.764321e-04
+    x4       seed        -0.471575654226  t=T        -0.471652755491  drift -7.710127e-05
+    out      seed         0.687890839361  t=T         0.687893331051  drift +2.491690e-06
+    LPAR_IN  seed         3.430978450469  t=T         3.429772716614  drift -1.205734e-03
+    L1       seed        -5.202377626634  t=T        -5.203108755520  drift -7.311289e-04
+    L2       seed         3.072420267431  t=T         3.088780885793  drift +1.636062e-02
+    L3       seed        30.358686656837  t=T        30.383891201874  drift +2.520455e-02
+    L4       seed        67.363213128783  t=T        67.374227233474  drift +1.101410e-02
+
+Average output 0.687945333889 V (A51: 0.687944 V); average load power 89.9210490281 W (A51: 89.9207 W)
+
+verdict: {'all_four_phases_natural_zvs_in_spice': True, 'all_four_crossing_times_within_20pct': True, 'safety_within_limit': True, 'fingerprint_clean': True}
+wrote /Users/lawyer/Mihai RA 面试/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-af3cfd88dbef16e5d/experiments/track_A_periodic_steady_state/A52_spice_crosscheck_reduced_load_zvs/results.json

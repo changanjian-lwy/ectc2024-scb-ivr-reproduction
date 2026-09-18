@@ -1,0 +1,266 @@
+{
+  "t0_absolute_s": 2.3001075e-05,
+  "toffset_s": 2.3001075e-05,
+  "run_span_s": 2.5e-07,
+  "boundary": {
+    "period_s": 2e-07,
+    "duty": 0.08333333333333333,
+    "on_time_s": 1.6666666666666664e-08,
+    "dead_time_s": 2.15e-09,
+    "switch_on_resistance_ohm": 0.007,
+    "switch_off_resistance_ohm": 1000000000000.0,
+    "flying_capacitances_f": [
+      3e-06,
+      3e-06,
+      3e-06
+    ],
+    "ch_total_f": 3.85e-10,
+    "cl_total_f": 7.7e-10,
+    "output_capacitance_f": 0.004672,
+    "source_inductance_h": 5e-09,
+    "source_resistance_ohm": 0.01,
+    "phase_inductance_h": 1.4666667e-09,
+    "phase_inductor_resistance_ohm": 1e-06,
+    "divider_capacitance_f": 0.0003,
+    "divider_leakage_ohm": 1000000000.0,
+    "diode_off_resistance_ohm": 1000000000000.0,
+    "vin_target_v": 48.0,
+    "nominal_load_resistance_ohm": 0.005263157894736842,
+    "rload_used_ohm": 0.0052631590627742
+  },
+  "cross_check": [
+    {
+      "phase": 1,
+      "bisection_window_s": [
+        2.3198925e-05,
+        2.3201075e-05
+      ],
+      "a51_period_intervals_window_s": [
+        2.3198925e-05,
+        2.3201075000000002e-05
+      ],
+      "boundary_md_section4_window_s": [
+        2.3198925e-05,
+        2.3201075e-05
+      ],
+      "bisection_equals_a51_bitwise": false,
+      "bisection_equals_a51_within_1_ulp": true,
+      "ulp_s": 3.3881317890172014e-21,
+      "bisection_matches_boundary_md": true,
+      "delta_start_s": 0.0,
+      "delta_end_s": 0.0
+    },
+    {
+      "phase": 2,
+      "bisection_window_s": [
+        2.3048925e-05,
+        2.3051075000000002e-05
+      ],
+      "a51_period_intervals_window_s": [
+        2.3048925e-05,
+        2.3051075000000002e-05
+      ],
+      "boundary_md_section4_window_s": [
+        2.3048925e-05,
+        2.3051075e-05
+      ],
+      "bisection_equals_a51_bitwise": true,
+      "bisection_equals_a51_within_1_ulp": true,
+      "ulp_s": 3.3881317890172014e-21,
+      "bisection_matches_boundary_md": true,
+      "delta_start_s": 0.0,
+      "delta_end_s": 3.3881317890172014e-21
+    },
+    {
+      "phase": 3,
+      "bisection_window_s": [
+        2.3098925e-05,
+        2.3101075e-05
+      ],
+      "a51_period_intervals_window_s": [
+        2.3098925e-05,
+        2.3101075e-05
+      ],
+      "boundary_md_section4_window_s": [
+        2.3098925e-05,
+        2.3101075e-05
+      ],
+      "bisection_equals_a51_bitwise": true,
+      "bisection_equals_a51_within_1_ulp": true,
+      "ulp_s": 3.3881317890172014e-21,
+      "bisection_matches_boundary_md": true,
+      "delta_start_s": 0.0,
+      "delta_end_s": 0.0
+    },
+    {
+      "phase": 4,
+      "bisection_window_s": [
+        2.3148925e-05,
+        2.3151075e-05
+      ],
+      "a51_period_intervals_window_s": [
+        2.3148925e-05,
+        2.3151075e-05
+      ],
+      "boundary_md_section4_window_s": [
+        2.3148925e-05,
+        2.3151075e-05
+      ],
+      "bisection_equals_a51_bitwise": true,
+      "bisection_equals_a51_within_1_ulp": true,
+      "ulp_s": 3.3881317890172014e-21,
+      "bisection_matches_boundary_md": true,
+      "delta_start_s": 0.0,
+      "delta_end_s": 0.0
+    }
+  ],
+  "all_windows_match_boundary_md": true,
+  "netlist_time_segments": {
+    "1": [
+      {
+        "kind": "HIGH",
+        "start_s": 0.0,
+        "end_s": 1.4516666666668004e-08
+      },
+      {
+        "kind": "DEADTIME_TURN_OFF",
+        "start_s": 1.4516666666668004e-08,
+        "end_s": 1.666666666666933e-08
+      },
+      {
+        "kind": "LOW",
+        "start_s": 1.666666666666933e-08,
+        "end_s": 1.9785000000000015e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_ON",
+        "start_s": 1.9785000000000015e-07,
+        "end_s": 1.9999999999999809e-07
+      },
+      {
+        "kind": "HIGH",
+        "start_s": 1.9999999999999809e-07,
+        "end_s": 2.145166666666661e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_OFF",
+        "start_s": 2.145166666666661e-07,
+        "end_s": 2.1666666666666742e-07
+      },
+      {
+        "kind": "LOW",
+        "start_s": 2.1666666666666742e-07,
+        "end_s": 2.499999999999993e-07
+      }
+    ],
+    "2": [
+      {
+        "kind": "LOW",
+        "start_s": 0.0,
+        "end_s": 4.784999999999989e-08
+      },
+      {
+        "kind": "DEADTIME_TURN_ON",
+        "start_s": 4.784999999999989e-08,
+        "end_s": 5.0000000000001215e-08
+      },
+      {
+        "kind": "HIGH",
+        "start_s": 5.0000000000001215e-08,
+        "end_s": 6.451666666666922e-08
+      },
+      {
+        "kind": "DEADTIME_TURN_OFF",
+        "start_s": 6.451666666666922e-08,
+        "end_s": 6.666666666667055e-08
+      },
+      {
+        "kind": "LOW",
+        "start_s": 6.666666666667055e-08,
+        "end_s": 2.4785000000000136e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_ON",
+        "start_s": 2.4785000000000136e-07,
+        "end_s": 2.499999999999993e-07
+      },
+      {
+        "kind": "HIGH",
+        "start_s": 2.499999999999993e-07,
+        "end_s": 2.499999999999993e-07
+      }
+    ],
+    "3": [
+      {
+        "kind": "LOW",
+        "start_s": 0.0,
+        "end_s": 9.784999999999772e-08
+      },
+      {
+        "kind": "DEADTIME_TURN_ON",
+        "start_s": 9.784999999999772e-08,
+        "end_s": 9.999999999999904e-08
+      },
+      {
+        "kind": "HIGH",
+        "start_s": 9.999999999999904e-08,
+        "end_s": 1.1451666666666705e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_OFF",
+        "start_s": 1.1451666666666705e-07,
+        "end_s": 1.1666666666666837e-07
+      },
+      {
+        "kind": "LOW",
+        "start_s": 1.1666666666666837e-07,
+        "end_s": 2.499999999999993e-07
+      }
+    ],
+    "4": [
+      {
+        "kind": "LOW",
+        "start_s": 0.0,
+        "end_s": 1.4784999999999893e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_ON",
+        "start_s": 1.4784999999999893e-07,
+        "end_s": 1.5000000000000026e-07
+      },
+      {
+        "kind": "HIGH",
+        "start_s": 1.5000000000000026e-07,
+        "end_s": 1.6451666666666826e-07
+      },
+      {
+        "kind": "DEADTIME_TURN_OFF",
+        "start_s": 1.6451666666666826e-07,
+        "end_s": 1.666666666666696e-07
+      },
+      {
+        "kind": "LOW",
+        "start_s": 1.666666666666696e-07,
+        "end_s": 2.499999999999993e-07
+      }
+    ]
+  },
+  "section4_turn_on_windows_netlist_time_s": {
+    "1": [
+      1.9785000000000015e-07,
+      1.9999999999999809e-07
+    ],
+    "2": [
+      4.784999999999989e-08,
+      4.999999999999783e-08
+    ],
+    "3": [
+      9.784999999999772e-08,
+      9.999999999999904e-08
+    ],
+    "4": [
+      1.4784999999999893e-07,
+      1.5000000000000026e-07
+    ]
+  }
+}

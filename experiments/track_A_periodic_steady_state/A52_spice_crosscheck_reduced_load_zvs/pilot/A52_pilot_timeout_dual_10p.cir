@@ -1,0 +1,57 @@
+* A52_pilot_timeout_dual_10p
+* A52 pilot for BOUNDARY.md Section 2's event-gated dead-time transition.
+* Case        : timeout  (expected branch: commanded_timeout)
+* Mechanism   : dual
+* Max timestep: 10p
+* Commanded window : [1.000000000000e-09, 3.150000000000e-09] s
+*                    (length 2.150000000000e-09 s = the real dead_time_s)
+* Analytic natural crossing instant          : 6.000000000000e-09 s
+* Analytic Vds at window end if never crossing: 5.700000000 V
+* EXPECTED transition instant                 : 3.150000000000e-09 s
+.param VG=5.0 VTH=2.5 RON=0.007
+.param TWSTART=1.000000000000e-09 TWEND=3.150000000000e-09
+
+* The commutating node: held at V0 until the commanded window opens, then
+* discharged by a constant current.  The current ramp is centered on
+* TWSTART, so the charge removed is first-order identical to an ideal step.
+C_NODE vds 0 1.000000000000e-09
+I_PULL vds 0 PWL(0 0 {TWSTART-5.000000000000e-14} 0
++ {TWSTART+5.000000000000e-14} 2.0)
+S_HIGH vds 0 gh 0 SWU
+R_NUM vds 0 1G
+
+* Commanded instants are `time>=` rules: no waveform, no threshold, no ramp.
+.machine 1p
+.state S_WAIT 0
+.state S_DT 1
+.state S_ON 2
+.rule S_WAIT S_DT time>=1.000000000000e-09
+.rule S_DT S_ON V(vds)<=0
+.rule S_DT S_ON time>=3.150000000000e-09
+.output (gh) VG*(state==S_ON)
+.output (pstate) state
+.endmachine
+R_GH gh 0 1k
+R_PSTATE pstate 0 1k
+
+.model SWU SW(Ron={RON} Roff=1T Vt={VTH} Vh=0)
+
+* Branch (i)/(ii) discriminators.
+*  - T_VDS_CROSS is the DIRECT physical crossing instant and carries no
+*    gate-ramp latency at all; FALL=1 is used so the t=0 sample cannot be
+*    mistaken for a crossing.
+*  - T_GH_ON is the instant the switch actually closes, which lags the
+*    state change by the `.machine` output ramp (measured, see RESULTS.md).
+.meas tran T_DT_ENTER WHEN V(pstate)=0.5 RISE=1
+.meas tran T_GH_ON WHEN V(gh)={VTH} RISE=1
+.meas tran VDS_AT_ON FIND V(vds) WHEN V(gh)={VTH} RISE=1
+.meas tran T_VDS_CROSS WHEN V(vds)=0 FALL=1
+.meas tran VDS_BEFORE_WEND FIND V(vds) AT {TWEND-1f}
+.meas tran VDS_AT_WSTART FIND V(vds) AT {TWSTART}
+
+.options plotwinsize=0 reltol=1e-6 abstol=1e-12 vntol=1e-9 chgtol=1e-16
++ cshunt=1e-15
+.save V(vds) V(gh) V(pstate)
+.ic V(vds)=10.0
+.tran 0 4n 0 1.000000000000e-11 UIC
+.end

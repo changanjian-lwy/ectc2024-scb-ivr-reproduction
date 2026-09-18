@@ -1,0 +1,175 @@
+==============================================================================
+A52 -- commanded switching-sequence derivation
+==============================================================================
+Boundary, read back off the object actually built (not re-typed):
+  period_s                   = 2e-07
+  duty  (= nP*Vout/Vin)      = 0.08333333333333333
+  on_time_s (Ton)            = 1.6666666666666664e-08
+  dead_time_s (d)            = 2.15e-09
+  switch_on_resistance_ohm   = 0.007
+  flying_capacitances_f      = (3e-06, 3e-06, 3e-06)
+  switch_capacitance.high_total_f = 3.85e-10
+  switch_capacitance.low_total_f  = 7.7e-10
+  output_capacitance_f       = 0.004672
+  source_inductance_h        = 5e-09
+  source_resistance_ohm      = 0.01
+  phase_inductance_h         = 1.4666667e-09
+  phase_inductor_resistance_ohm = 1e-06
+  divider_enabled            = True
+  divider_capacitance_f      = 0.0003
+  divider_leakage_ohm        = 1000000000.0
+  diode_off_resistance_ohm   = 1000000000000.0
+  switch_off_resistance_ohm  = 1000000000000.0
+  boundary.load_resistance_ohm (nominal 190 W) = 0.005263157894736842
+
+RLOAD actually used by the netlist -- sized from Section 1's own
+ACTUAL delivered power, NOT from the 190 W nominal target:
+  Vout_avg = 0.687944 V, P_avg = 89.9207 W
+  RLOAD = Vout^2 / P = 0.687944^2 / 89.9207 = 0.0052631590627742 ohm
+  (cross-check: boundary.load_resistance_ohm = 0.005263157894736842 ohm, relative difference 2.219e-07)
+
+Period start t0 (A51's own `period_start_s`, = BASE_PERIOD_INDEX*T + d/2) = 2.3001075e-05 s
+
+------------------------------------------------------------------------------
+(a) Commanded segments, found by BISECTING `commanded_pwm_mode`
+    (absolute solver time; no T/4 formula used anywhere here)
+------------------------------------------------------------------------------
+  phase 1:
+    HIGH               [2.3001075e-05, 2.301559166666667e-05)   len = 14.516667 ns
+    DEADTIME_TURN_OFF  [2.301559166666667e-05, 2.301774166666667e-05)   len = 2.150000 ns
+    LOW                [2.301774166666667e-05, 2.3198925e-05)   len = 181.183333 ns
+    DEADTIME_TURN_ON   [2.3198925e-05, 2.3201075e-05)   len = 2.150000 ns
+    HIGH               [2.3201075e-05, 2.3215591666666667e-05)   len = 14.516667 ns
+    DEADTIME_TURN_OFF  [2.3215591666666667e-05, 2.3217741666666668e-05)   len = 2.150000 ns
+    LOW                [2.3217741666666668e-05, 2.3251075e-05)   len = 33.333333 ns
+
+  phase 2:
+    LOW                [2.3001075e-05, 2.3048925e-05)   len = 47.850000 ns
+    DEADTIME_TURN_ON   [2.3048925e-05, 2.3051075000000002e-05)   len = 2.150000 ns
+    HIGH               [2.3051075000000002e-05, 2.306559166666667e-05)   len = 14.516667 ns
+    DEADTIME_TURN_OFF  [2.306559166666667e-05, 2.306774166666667e-05)   len = 2.150000 ns
+    LOW                [2.306774166666667e-05, 2.3248925000000002e-05)   len = 181.183333 ns
+    DEADTIME_TURN_ON   [2.3248925000000002e-05, 2.3251075e-05)   len = 2.150000 ns
+    HIGH               [2.3251075e-05, 2.3251075e-05)   len = 0.000000 ns
+
+  phase 3:
+    LOW                [2.3001075e-05, 2.3098925e-05)   len = 97.850000 ns
+    DEADTIME_TURN_ON   [2.3098925e-05, 2.3101075e-05)   len = 2.150000 ns
+    HIGH               [2.3101075e-05, 2.3115591666666668e-05)   len = 14.516667 ns
+    DEADTIME_TURN_OFF  [2.3115591666666668e-05, 2.311774166666667e-05)   len = 2.150000 ns
+    LOW                [2.311774166666667e-05, 2.3251075e-05)   len = 133.333333 ns
+
+  phase 4:
+    LOW                [2.3001075e-05, 2.3148925e-05)   len = 147.850000 ns
+    DEADTIME_TURN_ON   [2.3148925e-05, 2.3151075e-05)   len = 2.150000 ns
+    HIGH               [2.3151075e-05, 2.316559166666667e-05)   len = 14.516667 ns
+    DEADTIME_TURN_OFF  [2.316559166666667e-05, 2.316774166666667e-05)   len = 2.150000 ns
+    LOW                [2.316774166666667e-05, 2.3251075e-05)   len = 83.333333 ns
+
+------------------------------------------------------------------------------
+(b) A51's own already-committed `period_intervals(boundary, t0)`
+------------------------------------------------------------------------------
+    normal     phase=None  [2.3001075e-05, 2.3015591666666665e-05)
+    turn_off   phase=1  [2.3015591666666665e-05, 2.3017741666666667e-05)
+    normal     phase=None  [2.3017741666666667e-05, 2.3048925e-05)
+    turn_on    phase=2  [2.3048925e-05, 2.3051075000000002e-05)
+    normal     phase=None  [2.3051075000000002e-05, 2.3065591666666667e-05)
+    turn_off   phase=2  [2.3065591666666667e-05, 2.3067741666666668e-05)
+    normal     phase=None  [2.3067741666666668e-05, 2.3098925e-05)
+    turn_on    phase=3  [2.3098925e-05, 2.3101075e-05)
+    normal     phase=None  [2.3101075e-05, 2.3115591666666664e-05)
+    turn_off   phase=3  [2.3115591666666664e-05, 2.3117741666666666e-05)
+    normal     phase=None  [2.3117741666666666e-05, 2.3148925e-05)
+    turn_on    phase=4  [2.3148925e-05, 2.3151075e-05)
+    normal     phase=None  [2.3151075e-05, 2.3165591666666666e-05)
+    turn_off   phase=4  [2.3165591666666666e-05, 2.3167741666666667e-05)
+    normal     phase=None  [2.3167741666666667e-05, 2.3198925e-05)
+    turn_on    phase=1  [2.3198925e-05, 2.3201075000000002e-05)
+
+------------------------------------------------------------------------------
+Cross-check: (a) bisection vs (b) A51 `period_intervals` vs
+             BOUNDARY.md Section 4's own quoted turn-on windows
+------------------------------------------------------------------------------
+  phase 1:
+    (a) bisection        [2.3198925e-05, 2.3201075e-05)
+    (b) period_intervals [2.3198925e-05, 2.3201075000000002e-05)
+    (c) BOUNDARY Sec. 4  [2.3198925e-05, 2.3201075e-05]
+    (a) vs (b): bit-for-bit False; |dstart| 0.000e+00 s, |dend| 3.388e-21 s (1 ULP = 3.388e-21 s) -> within 1 ULP: True
+    (a) vs (c) |dstart|  : 0.000e+00 s   |dend| : 0.000e+00 s   -> match: True
+  phase 2:
+    (a) bisection        [2.3048925e-05, 2.3051075000000002e-05)
+    (b) period_intervals [2.3048925e-05, 2.3051075000000002e-05)
+    (c) BOUNDARY Sec. 4  [2.3048925e-05, 2.3051075e-05]
+    (a) vs (b): bit-for-bit True; |dstart| 0.000e+00 s, |dend| 0.000e+00 s (1 ULP = 3.388e-21 s) -> within 1 ULP: True
+    (a) vs (c) |dstart|  : 0.000e+00 s   |dend| : 3.388e-21 s   -> match: True
+  phase 3:
+    (a) bisection        [2.3098925e-05, 2.3101075e-05)
+    (b) period_intervals [2.3098925e-05, 2.3101075e-05)
+    (c) BOUNDARY Sec. 4  [2.3098925e-05, 2.3101075e-05]
+    (a) vs (b): bit-for-bit True; |dstart| 0.000e+00 s, |dend| 0.000e+00 s (1 ULP = 3.388e-21 s) -> within 1 ULP: True
+    (a) vs (c) |dstart|  : 0.000e+00 s   |dend| : 0.000e+00 s   -> match: True
+  phase 4:
+    (a) bisection        [2.3148925e-05, 2.3151075e-05)
+    (b) period_intervals [2.3148925e-05, 2.3151075e-05)
+    (c) BOUNDARY Sec. 4  [2.3148925e-05, 2.3151075e-05]
+    (a) vs (b): bit-for-bit True; |dstart| 0.000e+00 s, |dend| 0.000e+00 s (1 ULP = 3.388e-21 s) -> within 1 ULP: True
+    (a) vs (c) |dstart|  : 0.000e+00 s   |dend| : 0.000e+00 s   -> match: True
+
+  ALL FOUR WINDOWS MATCH BOUNDARY.md SECTION 4 EXACTLY: True
+
+------------------------------------------------------------------------------
+Offset conversion to netlist time (explicit, per the task)
+------------------------------------------------------------------------------
+  common reference TOFFSET := t0 = 2.3001075e-05 s
+  netlist time  tau := t_absolute - TOFFSET
+  so the netlist's `.tran` starts at tau = 0, which is EXACTLY the
+  instant A51's own period map starts from, i.e. the instant at
+  which phase 1's turn-on dead-time window ends and phase 1 goes
+  HIGH.  The seed state z* (BOUNDARY Section 1) is the state at
+  tau = 0.
+
+  phase 1 (netlist time, ns):
+    HIGH               [   0.0000000,   14.5166667) ns
+    DEADTIME_TURN_OFF  [  14.5166667,   16.6666667) ns
+    LOW                [  16.6666667,  197.8500000) ns
+    DEADTIME_TURN_ON   [ 197.8500000,  200.0000000) ns
+    HIGH               [ 200.0000000,  214.5166667) ns
+    DEADTIME_TURN_OFF  [ 214.5166667,  216.6666667) ns
+    LOW                [ 216.6666667,  250.0000000) ns
+
+  phase 2 (netlist time, ns):
+    LOW                [   0.0000000,   47.8500000) ns
+    DEADTIME_TURN_ON   [  47.8500000,   50.0000000) ns
+    HIGH               [  50.0000000,   64.5166667) ns
+    DEADTIME_TURN_OFF  [  64.5166667,   66.6666667) ns
+    LOW                [  66.6666667,  247.8500000) ns
+    DEADTIME_TURN_ON   [ 247.8500000,  250.0000000) ns
+    HIGH               [ 250.0000000,  250.0000000) ns
+
+  phase 3 (netlist time, ns):
+    LOW                [   0.0000000,   97.8500000) ns
+    DEADTIME_TURN_ON   [  97.8500000,  100.0000000) ns
+    HIGH               [ 100.0000000,  114.5166667) ns
+    DEADTIME_TURN_OFF  [ 114.5166667,  116.6666667) ns
+    LOW                [ 116.6666667,  250.0000000) ns
+
+  phase 4 (netlist time, ns):
+    LOW                [   0.0000000,  147.8500000) ns
+    DEADTIME_TURN_ON   [ 147.8500000,  150.0000000) ns
+    HIGH               [ 150.0000000,  164.5166667) ns
+    DEADTIME_TURN_OFF  [ 164.5166667,  166.6666667) ns
+    LOW                [ 166.6666667,  250.0000000) ns
+
+  BOUNDARY.md Section 4's four turn-on windows, in netlist time:
+    phase 1: [ 197.8500000,  200.0000000) ns    (target crossing at +1.128389 ns -> tau = 198.9783890 ns)
+    phase 2: [  47.8500000,   50.0000000) ns    (target crossing at +1.122660 ns -> tau = 48.9726600 ns)
+    phase 3: [  97.8500000,  100.0000000) ns    (target crossing at +1.122732 ns -> tau = 98.9727320 ns)
+    phase 4: [ 147.8500000,  150.0000000) ns    (target crossing at +0.858292 ns -> tau = 148.7082920 ns)
+
+  Vds node pair per phase (from `solver_copy.HIGH_SIDE_BRANCHES`):
+    phase 1: V(vin) - V(a1)
+    phase 2: V(a1) - V(a2)
+    phase 3: V(a2) - V(a3)
+    phase 4: V(a3) - V(x4)
+
+wrote /Users/lawyer/Mihai RA 面试/Simulation_Files/01_ECTC2024_IVR_Reproduction/project/.claude/worktrees/agent-af3cfd88dbef16e5d/experiments/track_A_periodic_steady_state/A52_spice_crosscheck_reduced_load_zvs/window_derivation.json
