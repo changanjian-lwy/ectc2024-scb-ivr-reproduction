@@ -1,0 +1,3026 @@
+{
+ "experiment": "A57_datasheet_reverse_conduction_pricing",
+ "classification": "SENSITIVITY_ONLY (post-processing of A56) + EXTERNAL_DEVICE_DATA",
+ "scenario_a": "A56 as computed: gate follows the natural zero crossing with zero delay (ideal adaptive)",
+ "scenario_b": "fixed symmetric dead time: remainder of each window conducted at VSD(I) of the OFF device",
+ "first_order": true,
+ "orbits_resolved_with_clamp": false,
+ "f_sw_hz": 5000000.0,
+ "parallel_devices": {
+  "high": 2,
+  "low": 3
+ },
+ "ron_ohm": {
+  "high": 0.000775,
+  "low": 0.0005166666666666667
+ },
+ "c_node_for_recharge_estimate_f": 1.3e-08,
+ "curve_source": {
+  "source": "EPC EPC2067 datasheet, Figure 8, VGS = 0 V, typical, per device",
+  "category": "EXTERNAL_DEVICE_DATA",
+  "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/epc2067_datasheet.pdf",
+  "revision": "Revised October 21, 2021",
+  "sha256": "8271d9eb71a3f78285c4c024ccfd06c33af129583c1bdef484d7dde01ae2324f",
+  "method": "PDF vector Bezier paths; axis map least-squares on tick labels; ISD=0 anchored to the curves' flat segment",
+  "volts_per_point": 0.023213966881587365,
+  "amps_per_point": 2.479869225646299,
+  "tick_fit_max_residual_pt": {
+   "voltage_axis": 0.3816930597478745,
+   "current_axis": 4.547473508864641e-13
+  },
+  "tick_fit_max_residual": {
+   "volts": 0.008860610047918905,
+   "amps": 1.1277139609075215e-12
+  },
+  "label_center_vs_curve_zero_offset_a": 1.7606102803169634,
+  "table_value_for_comparison": {
+   "vsd_v": 1.2,
+   "is_a": 0.5,
+   "note": "typ, defined by design"
+  },
+  "note": "negative OFF gate bias raises VSD (datasheet note); 0 V OFF assumed"
+ },
+ "candidates": [
+  {
+   "name": "new_passing_dt_x0.5",
+   "label": "new_passing_dt_x0.5",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6215240418389055,
+   "dead_time_ns": 1.075,
+   "all_eight_zvs": false,
+   "exposure_a": 1.8685698006343523,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.41306117860034,
+     "channel_metered_in_intervals_w": 0.2075469138070148,
+     "reverse_loss_w": 4.7100034166157965,
+     "reverse_loss_rms_eval_w": 4.712045660838376,
+     "scenario_b_proxy_w": 35.91551768140912,
+     "scenario_b_proxy_rms_eval_w": 35.9175599256317,
+     "turn_on_recharge_estimate_w": 0.8256979148267174,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.37747452208850635,
+       "branch_mean_current_a": 213.65654861183415,
+       "per_device_current_a": 71.21884953727805,
+       "vsd_v": 2.5204166602209135,
+       "reverse_loss_w": 1.016356803120189,
+       "ron_loss_replaced_w": 0.04481651287183647
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.39519136077256356,
+       "branch_mean_current_a": 212.44445490566926,
+       "per_device_current_a": 70.81481830188976,
+       "vsd_v": 2.5181995237287325,
+       "reverse_loss_w": 1.0570924807580724,
+       "ron_loss_replaced_w": 0.04639578883742004
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3949473475719405,
+       "branch_mean_current_a": 212.43814383950945,
+       "per_device_current_a": 70.81271461316982,
+       "vsd_v": 2.5181879544274937,
+       "reverse_loss_w": 1.056403535885886,
+       "ron_loss_replaced_w": 0.046367274535083415
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.5805680981942714,
+       "branch_mean_current_a": 215.6611124219303,
+       "per_device_current_a": 71.88703747397678,
+       "vsd_v": 2.524082037241546,
+       "reverse_loss_w": 1.5801505968516483,
+       "ron_loss_replaced_w": 0.06996733756267487
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.41306117860034,
+     "channel_metered_in_intervals_w": 0.2075469138070148,
+     "reverse_loss_w": 4.837225246799265,
+     "reverse_loss_rms_eval_w": 4.840400340353562,
+     "scenario_b_proxy_w": 36.04273951159259,
+     "scenario_b_proxy_rms_eval_w": 36.04591460514689,
+     "turn_on_recharge_estimate_w": 0.8707565457211144,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.37747452208850635,
+       "branch_mean_current_a": 213.65654861183415,
+       "per_device_current_a": 71.21884953727805,
+       "vsd_v": 2.588376751275841,
+       "reverse_loss_w": 1.0437616770739617,
+       "ron_loss_replaced_w": 0.04481651287183647
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.39519136077256356,
+       "branch_mean_current_a": 212.44445490566926,
+       "per_device_current_a": 70.81481830188976,
+       "vsd_v": 2.584927646603777,
+       "reverse_loss_w": 1.0851036833183303,
+       "ron_loss_replaced_w": 0.04639578883742004
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3949473475719405,
+       "branch_mean_current_a": 212.43814383950945,
+       "per_device_current_a": 70.81271461316982,
+       "vsd_v": 2.584909687985836,
+       "reverse_loss_w": 1.0843939307758075,
+       "ron_loss_replaced_w": 0.046367274535083415
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.5805680981942714,
+       "branch_mean_current_a": 215.6611124219303,
+       "per_device_current_a": 71.88703747397678,
+       "vsd_v": 2.5940712903361702,
+       "reverse_loss_w": 1.6239659556311647,
+       "ron_loss_replaced_w": 0.06996733756267487
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.41306117860034,
+     "channel_metered_in_intervals_w": 0.2075469138070148,
+     "reverse_loss_w": 2.2422837607612225,
+     "reverse_loss_rms_eval_w": 2.2422837607612225,
+     "scenario_b_proxy_w": 33.44779802555455,
+     "scenario_b_proxy_rms_eval_w": 33.44779802555455,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.37747452208850635,
+       "branch_mean_current_a": 213.65654861183415,
+       "per_device_current_a": 71.21884953727805,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.48389942146999093,
+       "ron_loss_replaced_w": 0.04481651287183647
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.39519136077256356,
+       "branch_mean_current_a": 212.44445490566926,
+       "per_device_current_a": 70.81481830188976,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.5037372793365417,
+       "ron_loss_replaced_w": 0.04639578883742004
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3949473475719405,
+       "branch_mean_current_a": 212.43814383950945,
+       "per_device_current_a": 70.81271461316982,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.5034112885951237,
+       "ron_loss_replaced_w": 0.046367274535083415
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.5805680981942714,
+       "branch_mean_current_a": 215.6611124219303,
+       "per_device_current_a": 71.88703747397678,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7512357713595662,
+       "ron_loss_replaced_w": 0.06996733756267487
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 10.292677417429742,
+    "fig8_125C": 10.582499115430062,
+    "table_floor_1p2V": 4.653946152492678
+   }
+  },
+  {
+   "name": "new_passing_dt_x1",
+   "label": "new_passing_dt_x1",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6215240418389055,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": true,
+   "exposure_a": 6.887875782732612,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.546207978485054,
+     "channel_metered_in_intervals_w": 0.7439256490933228,
+     "reverse_loss_w": 17.291790357394877,
+     "reverse_loss_rms_eval_w": 17.294433290963717,
+     "scenario_b_proxy_w": 45.0940726867866,
+     "scenario_b_proxy_rms_eval_w": 45.09671562035545,
+     "turn_on_recharge_estimate_w": 1.5050236565799795,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.1369652451622006,
+       "branch_mean_current_a": 60.29693217539866,
+       "per_device_current_a": 30.14846608769933,
+       "vsd_v": 2.279454891542277,
+       "reverse_loss_w": 0.09412534959622249,
+       "ron_loss_replaced_w": 0.0019832005502711395
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.1438880908749573,
+       "branch_mean_current_a": 59.570653272661914,
+       "per_device_current_a": 29.785326636330957,
+       "vsd_v": 2.2770233244329083,
+       "reverse_loss_w": 0.09758761333017452,
+       "ron_loss_replaced_w": 0.0020440094634275657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.14304817221502522,
+       "branch_mean_current_a": 59.527697190451875,
+       "per_device_current_a": 29.763848595225937,
+       "vsd_v": 2.2768799177117924,
+       "reverse_loss_w": 0.09694189975889342,
+       "ron_loss_replaced_w": 0.002029900127137455
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7733776444162548,
+       "branch_mean_current_a": 65.53353201625451,
+       "per_device_current_a": 32.766766008127256,
+       "vsd_v": 2.2965611740696894,
+       "reverse_loss_w": 0.581973503363302,
+       "ron_loss_replaced_w": 0.012949973487179797
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4515412847082956,
+       "branch_mean_current_a": 216.20554199411066,
+       "per_device_current_a": 72.06851399803689,
+       "vsd_v": 2.5250773614330395,
+       "reverse_loss_w": 3.962241178297179,
+       "ron_loss_replaced_w": 0.17559467941235485
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.469311803539567,
+       "branch_mean_current_a": 215.00564260352652,
+       "per_device_current_a": 71.66854753450885,
+       "vsd_v": 2.5228836472412395,
+       "reverse_loss_w": 3.9850250088989982,
+       "ron_loss_replaced_w": 0.17579447410241647
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4690629913077629,
+       "branch_mean_current_a": 215.00617167053107,
+       "per_device_current_a": 71.66872389017702,
+       "vsd_v": 2.522884614706398,
+       "reverse_loss_w": 3.9843615198000517,
+       "ron_loss_replaced_w": 0.17576833439111647
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6568259634227915,
+       "branch_mean_current_a": 214.8375070398466,
+       "per_device_current_a": 71.61250234661553,
+       "vsd_v": 2.5225761903436417,
+       "reverse_loss_w": 4.489534284350055,
+       "ron_loss_replaced_w": 0.19776107755941905
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.546207978485054,
+     "channel_metered_in_intervals_w": 0.7439256490933228,
+     "reverse_loss_w": 17.72538518463668,
+     "reverse_loss_rms_eval_w": 17.729420149845986,
+     "scenario_b_proxy_w": 45.52766751402841,
+     "scenario_b_proxy_rms_eval_w": 45.531702479237715,
+     "turn_on_recharge_estimate_w": 1.5197909997319603,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.1369652451622006,
+       "branch_mean_current_a": 60.29693217539866,
+       "per_device_current_a": 30.14846608769933,
+       "vsd_v": 2.224369943999599,
+       "reverse_loss_w": 0.09185073123716558,
+       "ron_loss_replaced_w": 0.0019832005502711395
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.1438880908749573,
+       "branch_mean_current_a": 59.570653272661914,
+       "per_device_current_a": 29.785326636330957,
+       "vsd_v": 2.2209518121270357,
+       "reverse_loss_w": 0.09518452636877663,
+       "ron_loss_replaced_w": 0.0020440094634275657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.14304817221502522,
+       "branch_mean_current_a": 59.527697190451875,
+       "per_device_current_a": 29.763848595225937,
+       "vsd_v": 2.220747466391826,
+       "reverse_loss_w": 0.09455196850834689,
+       "ron_loss_replaced_w": 0.002029900127137455
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7733776444162548,
+       "branch_mean_current_a": 65.53353201625451,
+       "per_device_current_a": 32.766766008127256,
+       "vsd_v": 2.248825370236664,
+       "reverse_loss_w": 0.5698767330676783,
+       "ron_loss_replaced_w": 0.012949973487179797
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4515412847082956,
+       "branch_mean_current_a": 216.20554199411066,
+       "per_device_current_a": 72.06851399803689,
+       "vsd_v": 2.5956174838768318,
+       "reverse_loss_w": 4.072929659425654,
+       "ron_loss_replaced_w": 0.17559467941235485
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.469311803539567,
+       "branch_mean_current_a": 215.00564260352652,
+       "per_device_current_a": 71.66854753450885,
+       "vsd_v": 2.5922097397314596,
+       "reverse_loss_w": 4.094529152161756,
+       "ron_loss_replaced_w": 0.17579447410241647
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4690629913077629,
+       "branch_mean_current_a": 215.00617167053107,
+       "per_device_current_a": 71.66872389017702,
+       "vsd_v": 2.5922112422949257,
+       "reverse_loss_w": 4.09384823419479,
+       "ron_loss_replaced_w": 0.17576833439111647
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6568259634227915,
+       "branch_mean_current_a": 214.8375070398466,
+       "per_device_current_a": 71.61250234661553,
+       "vsd_v": 2.5917322305442267,
+       "reverse_loss_w": 4.612614179672513,
+       "ron_loss_replaced_w": 0.19776107755941905
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.546207978485054,
+     "channel_metered_in_intervals_w": 0.7439256490933228,
+     "reverse_loss_w": 8.265450939279134,
+     "reverse_loss_rms_eval_w": 8.265450939279134,
+     "scenario_b_proxy_w": 36.067733268670864,
+     "scenario_b_proxy_rms_eval_w": 36.067733268670864,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.1369652451622006,
+       "branch_mean_current_a": 60.29693217539866,
+       "per_device_current_a": 30.14846608769933,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.04955150458759236,
+       "ron_loss_replaced_w": 0.0019832005502711395
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.1438880908749573,
+       "branch_mean_current_a": 59.570653272661914,
+       "per_device_current_a": 29.785326636330957,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.0514290454294641,
+       "ron_loss_replaced_w": 0.0020440094634275657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.14304817221502522,
+       "branch_mean_current_a": 59.527697190451875,
+       "per_device_current_a": 29.763848595225937,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.0510919696755818,
+       "ron_loss_replaced_w": 0.002029900127137455
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7733776444162548,
+       "branch_mean_current_a": 65.53353201625451,
+       "per_device_current_a": 32.766766008127256,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.3040930117260488,
+       "ron_loss_replaced_w": 0.012949973487179797
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4515412847082956,
+       "branch_mean_current_a": 216.20554199411066,
+       "per_device_current_a": 72.06851399803689,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8829876211231085,
+       "ron_loss_replaced_w": 0.17559467941235485
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.469311803539567,
+       "branch_mean_current_a": 215.00564260352652,
+       "per_device_current_a": 71.66854753450885,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8954619710298268,
+       "ron_loss_replaced_w": 0.17579447410241647
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4690629913077629,
+       "branch_mean_current_a": 215.00617167053107,
+       "per_device_current_a": 71.66872389017702,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8951456582236443,
+       "ron_loss_replaced_w": 0.17576833439111647
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6568259634227915,
+       "branch_mean_current_a": 214.8375070398466,
+       "per_device_current_a": 71.61250234661553,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.1356901574838676,
+       "ron_loss_replaced_w": 0.19776107755941905
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 13.122337441802003,
+    "fig8_125C": 13.356278587696812,
+    "table_floor_1p2V": 6.098855662702485
+   }
+  },
+  {
+   "name": "new_passing_dt_x2",
+   "label": "new_passing_dt_x2",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6215240418389055,
+   "dead_time_ns": 4.3,
+   "all_eight_zvs": true,
+   "exposure_a": 17.930886179158037,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.54765562290696,
+     "channel_metered_in_intervals_w": 1.8204579479658496,
+     "reverse_loss_w": 44.54298948241143,
+     "reverse_loss_rms_eval_w": 44.56017614546866,
+     "scenario_b_proxy_w": 71.27018715735254,
+     "scenario_b_proxy_rms_eval_w": 71.28737382040977,
+     "turn_on_recharge_estimate_w": 1.4721869987473795,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2869539683021918,
+       "branch_mean_current_a": 45.66372683254665,
+       "per_device_current_a": 22.831863416273325,
+       "vsd_v": 2.2273303388542094,
+       "reverse_loss_w": 1.1630099055547993,
+       "ron_loss_replaced_w": 0.019709449081160842
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.293893449931768,
+       "branch_mean_current_a": 46.035398773489696,
+       "per_device_current_a": 23.017699386744848,
+       "vsd_v": 2.2287524404338552,
+       "reverse_loss_w": 1.176784628462816,
+       "ron_loss_replaced_w": 0.020089611002078057
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2930535035196487,
+       "branch_mean_current_a": 46.03302780935278,
+       "per_device_current_a": 23.01651390467639,
+       "vsd_v": 2.228743291709525,
+       "reverse_loss_w": 1.17628831527756,
+       "ron_loss_replaced_w": 0.020079751214121762
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.92339893957804,
+       "branch_mean_current_a": 46.86666171678447,
+       "per_device_current_a": 23.433330858392235,
+       "vsd_v": 2.2319203803146332,
+       "reverse_loss_w": 1.5289764892295978,
+       "ron_loss_replaced_w": 0.027414389699825167
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.60153047160899,
+       "branch_mean_current_a": 214.93722081514466,
+       "per_device_current_a": 71.64574027171489,
+       "vsd_v": 2.522758529447457,
+       "reverse_loss_w": 9.76437410205166,
+       "ron_loss_replaced_w": 0.4301512969604044
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6193018740345386,
+       "branch_mean_current_a": 213.77337464954272,
+       "per_device_current_a": 71.25779154984757,
+       "vsd_v": 2.52063029123583,
+       "reverse_loss_w": 9.751189045489701,
+       "ron_loss_replaced_w": 0.4276245165493083
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.619053061192871,
+       "branch_mean_current_a": 213.77447903958776,
+       "per_device_current_a": 71.25815967986259,
+       "vsd_v": 2.5206323107510924,
+       "reverse_loss_w": 9.750576874359306,
+       "ron_loss_replaced_w": 0.4276022562176756
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8068172394150537,
+       "branch_mean_current_a": 213.32924340435684,
+       "per_device_current_a": 71.10974780145229,
+       "vsd_v": 2.5198181417310948,
+       "reverse_loss_w": 10.231790121985991,
+       "ron_loss_replaced_w": 0.4477866772412754
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.54765562290696,
+     "channel_metered_in_intervals_w": 1.8204579479658496,
+     "reverse_loss_w": 45.44565024756001,
+     "reverse_loss_rms_eval_w": 45.469120161474706,
+     "scenario_b_proxy_w": 72.17284792250112,
+     "scenario_b_proxy_rms_eval_w": 72.19631783641582,
+     "turn_on_recharge_estimate_w": 1.4755036793027145,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2869539683021918,
+       "branch_mean_current_a": 45.66372683254665,
+       "per_device_current_a": 22.831863416273325,
+       "vsd_v": 2.152973931724054,
+       "reverse_loss_w": 1.124184394796336,
+       "ron_loss_replaced_w": 0.019709449081160842
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.293893449931768,
+       "branch_mean_current_a": 46.035398773489696,
+       "per_device_current_a": 23.017699386744848,
+       "vsd_v": 2.1548697416506566,
+       "reverse_loss_w": 1.137774452787813,
+       "ron_loss_replaced_w": 0.020089611002078057
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2930535035196487,
+       "branch_mean_current_a": 46.03302780935278,
+       "per_device_current_a": 23.01651390467639,
+       "vsd_v": 2.154857662684203,
+       "reverse_loss_w": 1.1372928856950193,
+       "ron_loss_replaced_w": 0.020079751214121762
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.92339893957804,
+       "branch_mean_current_a": 46.86666171678447,
+       "per_device_current_a": 23.433330858392235,
+       "vsd_v": 2.159091702869702,
+       "reverse_loss_w": 1.4790852222573914,
+       "ron_loss_replaced_w": 0.027414389699825167
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.60153047160899,
+       "branch_mean_current_a": 214.93722081514466,
+       "per_device_current_a": 71.64574027171489,
+       "vsd_v": 2.5920154201488312,
+       "reverse_loss_w": 10.032433919136587,
+       "ron_loss_replaced_w": 0.4301512969604044
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6193018740345386,
+       "branch_mean_current_a": 213.77337464954272,
+       "per_device_current_a": 71.25779154984757,
+       "vsd_v": 2.5887091886364426,
+       "reverse_loss_w": 10.01455579184281,
+       "ron_loss_replaced_w": 0.4276245165493083
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.619053061192871,
+       "branch_mean_current_a": 213.77447903958776,
+       "per_device_current_a": 71.25815967986259,
+       "vsd_v": 2.5887123312621694,
+       "reverse_loss_w": 10.013931220318398,
+       "ron_loss_replaced_w": 0.4276022562176756
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8068172394150537,
+       "branch_mean_current_a": 213.32924340435684,
+       "per_device_current_a": 71.10974780145229,
+       "vsd_v": 2.587445379456518,
+       "reverse_loss_w": 10.506392360725657,
+       "ron_loss_replaced_w": 0.4477866772412754
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.54765562290696,
+     "channel_metered_in_intervals_w": 1.8204579479658496,
+     "reverse_loss_w": 21.517063414989643,
+     "reverse_loss_rms_eval_w": 21.517063414989643,
+     "scenario_b_proxy_w": 48.24426108993075,
+     "scenario_b_proxy_rms_eval_w": 48.24426108993075,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2869539683021918,
+       "branch_mean_current_a": 45.66372683254665,
+       "per_device_current_a": 22.831863416273325,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.626585047722959,
+       "ron_loss_replaced_w": 0.019709449081160842
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.293893449931768,
+       "branch_mean_current_a": 46.035398773489696,
+       "per_device_current_a": 23.017699386744848,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.6336017982690297,
+       "ron_loss_replaced_w": 0.020089611002078057
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2930535035196487,
+       "branch_mean_current_a": 46.03302780935278,
+       "per_device_current_a": 23.01651390467639,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.6333371741751228,
+       "ron_loss_replaced_w": 0.020079751214121762
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.92339893957804,
+       "branch_mean_current_a": 46.86666171678447,
+       "per_device_current_a": 23.433330858392235,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.8220596949864627,
+       "ron_loss_replaced_w": 0.027414389699825167
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.60153047160899,
+       "branch_mean_current_a": 214.93722081514466,
+       "per_device_current_a": 71.64574027171489,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.6446177014921615,
+       "ron_loss_replaced_w": 0.4301512969604044
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6193018740345386,
+       "branch_mean_current_a": 213.77337464954272,
+       "per_device_current_a": 71.25779154984757,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.642262252926665,
+       "ron_loss_replaced_w": 0.4276245165493083
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.619053061192871,
+       "branch_mean_current_a": 213.77447903958776,
+       "per_device_current_a": 71.25815967986259,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.641967096638787,
+       "ron_loss_replaced_w": 0.4276022562176756
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8068172394150537,
+       "branch_mean_current_a": 213.32924340435684,
+       "per_device_current_a": 71.10974780145229,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.872632648778455,
+       "ron_loss_replaced_w": 0.4477866772412754
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 12.338882830152444,
+    "fig8_125C": 12.562927586430135,
+    "table_floor_1p2V": 5.73644023652761
+   }
+  },
+  {
+   "name": "nominal_dt_x0.5",
+   "label": "nominal_dt_x0.5",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 1.4666667,
+   "dead_time_ns": 1.075,
+   "all_eight_zvs": false,
+   "exposure_a": 0.14012597011293196,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.569214540379434,
+     "channel_metered_in_intervals_w": 0.009158938972598145,
+     "reverse_loss_w": 0.32961244177381266,
+     "reverse_loss_rms_eval_w": 0.32974815195190815,
+     "scenario_b_proxy_w": 31.88966804318065,
+     "scenario_b_proxy_rms_eval_w": 31.889803753358745,
+     "turn_on_recharge_estimate_w": 0.17982633346096158,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.22325983725670598,
+       "branch_mean_current_a": 125.52725276048102,
+       "per_device_current_a": 41.842417586827004,
+       "vsd_v": 2.352258054007887,
+       "reverse_loss_w": 0.32961244177381266,
+       "ron_loss_replaced_w": 0.009158938972598145
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.569214540379434,
+     "channel_metered_in_intervals_w": 0.009158938972598145,
+     "reverse_loss_w": 0.32685826639309573,
+     "reverse_loss_rms_eval_w": 0.32707221200626335,
+     "scenario_b_proxy_w": 31.886913867799933,
+     "scenario_b_proxy_rms_eval_w": 31.8871278134131,
+     "turn_on_recharge_estimate_w": 0.17683370335386137,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.22325983725670598,
+       "branch_mean_current_a": 125.52725276048102,
+       "per_device_current_a": 41.842417586827004,
+       "vsd_v": 2.3326030580175137,
+       "reverse_loss_w": 0.32685826639309573,
+       "ron_loss_replaced_w": 0.009158938972598145
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.569214540379434,
+     "channel_metered_in_intervals_w": 0.009158938972598145,
+     "reverse_loss_w": 0.1681511641355183,
+     "reverse_loss_rms_eval_w": 0.1681511641355183,
+     "scenario_b_proxy_w": 31.728206765542357,
+     "scenario_b_proxy_rms_eval_w": 31.728206765542357,
+     "turn_on_recharge_estimate_w": 0.0468,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.22325983725670598,
+       "branch_mean_current_a": 125.52725276048102,
+       "per_device_current_a": 41.842417586827004,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.1681511641355183,
+       "ron_loss_replaced_w": 0.009158938972598145
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 1.4356566376205093,
+    "fig8_125C": 1.4233204493720601,
+    "table_floor_1p2V": 0.712457697666769
+   }
+  },
+  {
+   "name": "nominal_dt_x1",
+   "label": "nominal_dt_x1",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 1.4666667,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": false,
+   "exposure_a": 2.6350191640895826,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.38225935781156,
+     "channel_metered_in_intervals_w": 0.17206215252956553,
+     "reverse_loss_w": 6.20116687350279,
+     "reverse_loss_rms_eval_w": 6.201940835859242,
+     "scenario_b_proxy_w": 37.411364078784786,
+     "scenario_b_proxy_rms_eval_w": 37.41213804114123,
+     "turn_on_recharge_estimate_w": 0.7197975153719718,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475425468192145,
+       "branch_mean_current_a": 125.58388609446254,
+       "per_device_current_a": 41.86129536482085,
+       "vsd_v": 2.352370254768623,
+       "reverse_loss_w": 1.3996141394897375,
+       "ron_loss_replaced_w": 0.03871035870335928
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681579673498212,
+       "branch_mean_current_a": 125.20444006557896,
+       "per_device_current_a": 41.73481335519299,
+       "vsd_v": 2.3516185043399287,
+       "reverse_loss_w": 1.4252886519905006,
+       "ron_loss_replaced_w": 0.039318906210960514
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677320581199265,
+       "branch_mean_current_a": 125.20109638853512,
+       "per_device_current_a": 41.73369879617837,
+       "vsd_v": 2.3516118799178507,
+       "reverse_loss_w": 1.424619583409585,
+       "ron_loss_replaced_w": 0.039300477506632285
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2965851456863764,
+       "branch_mean_current_a": 127.74245271553237,
+       "per_device_current_a": 42.58081757184412,
+       "vsd_v": 2.356646349869705,
+       "reverse_loss_w": 1.9516444986129668,
+       "ron_loss_replaced_w": 0.05473241010861342
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.38225935781156,
+     "channel_metered_in_intervals_w": 0.17206215252956553,
+     "reverse_loss_w": 6.151001927273535,
+     "reverse_loss_rms_eval_w": 6.152203862225295,
+     "scenario_b_proxy_w": 37.36119913255553,
+     "scenario_b_proxy_rms_eval_w": 37.362401067507285,
+     "turn_on_recharge_estimate_w": 0.7080947883843426,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475425468192145,
+       "branch_mean_current_a": 125.58388609446254,
+       "per_device_current_a": 41.86129536482085,
+       "vsd_v": 2.3327786193802567,
+       "reverse_loss_w": 1.3879575008931138,
+       "ron_loss_replaced_w": 0.03871035870335928
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681579673498212,
+       "branch_mean_current_a": 125.20444006557896,
+       "per_device_current_a": 41.73481335519299,
+       "vsd_v": 2.3316028798133797,
+       "reverse_loss_w": 1.4131574145267944,
+       "ron_loss_replaced_w": 0.039318906210960514
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677320581199265,
+       "branch_mean_current_a": 125.20109638853512,
+       "per_device_current_a": 41.73369879617837,
+       "vsd_v": 2.3315925253507177,
+       "reverse_loss_w": 1.4124917468362497,
+       "ron_loss_replaced_w": 0.039300477506632285
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2965851456863764,
+       "branch_mean_current_a": 127.74245271553237,
+       "per_device_current_a": 42.58081757184412,
+       "vsd_v": 2.3394401402524547,
+       "reverse_loss_w": 1.9373952650173771,
+       "ron_loss_replaced_w": 0.05473241010861342
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.38225935781156,
+     "channel_metered_in_intervals_w": 0.17206215252956553,
+     "reverse_loss_w": 3.1620229969074996,
+     "reverse_loss_rms_eval_w": 3.1620229969074996,
+     "scenario_b_proxy_w": 34.372220202189496,
+     "scenario_b_proxy_rms_eval_w": 34.372220202189496,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475425468192145,
+       "branch_mean_current_a": 125.58388609446254,
+       "per_device_current_a": 41.86129536482085,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.713976451616407,
+       "ron_loss_replaced_w": 0.03871035870335928
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681579673498212,
+       "branch_mean_current_a": 125.20444006557896,
+       "per_device_current_a": 41.73481335519299,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7273060571823807,
+       "ron_loss_replaced_w": 0.039318906210960514
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677320581199265,
+       "branch_mean_current_a": 125.20109638853512,
+       "per_device_current_a": 41.73369879617837,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7269666881216902,
+       "ron_loss_replaced_w": 0.039300477506632285
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2965851456863764,
+       "branch_mean_current_a": 127.74245271553237,
+       "per_device_current_a": 42.58081757184412,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.9937737999870215,
+       "ron_loss_replaced_w": 0.05473241010861342
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 5.762716208555142,
+    "fig8_125C": 5.714361971916805,
+    "table_floor_1p2V": 2.8585022262793878
+   }
+  },
+  {
+   "name": "nominal_dt_x1_step1p25ps",
+   "label": "nominal_dt_x1",
+   "step_s": 1.5625e-11,
+   "phase_inductance_nh": 1.4666667,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": false,
+   "exposure_a": 2.635623665275902,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.377498495805746,
+     "channel_metered_in_intervals_w": 0.17223553793659094,
+     "reverse_loss_w": 6.202724328472019,
+     "reverse_loss_rms_eval_w": 6.203687526613829,
+     "scenario_b_proxy_w": 37.407987286341175,
+     "scenario_b_proxy_rms_eval_w": 37.408950484482986,
+     "turn_on_recharge_estimate_w": 0.7198287503060095,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475538418341595,
+       "branch_mean_current_a": 125.60812791813197,
+       "per_device_current_a": 41.86937597271066,
+       "vsd_v": 2.352418268583285,
+       "reverse_loss_w": 1.3999295712958695,
+       "ron_loss_replaced_w": 0.038751316973405774
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681925228618917,
+       "branch_mean_current_a": 125.23065534608313,
+       "per_device_current_a": 41.74355178202771,
+       "vsd_v": 2.351670441497936,
+       "reverse_loss_w": 1.4256694469451854,
+       "ron_loss_replaced_w": 0.039361881877840545
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677666004928218,
+       "branch_mean_current_a": 125.22730896719081,
+       "per_device_current_a": 41.742436322396934,
+       "vsd_v": 2.351663811723013,
+       "reverse_loss_w": 1.425000176712272,
+       "ron_loss_replaced_w": 0.03934362381378079
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966077506511515,
+       "branch_mean_current_a": 127.76884726344281,
+       "per_device_current_a": 42.58961575448094,
+       "vsd_v": 2.3566986810675448,
+       "reverse_loss_w": 1.9521251335186924,
+       "ron_loss_replaced_w": 0.05477871527156383
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.377498495805746,
+     "channel_metered_in_intervals_w": 0.17223553793659094,
+     "reverse_loss_w": 6.152620685900511,
+     "reverse_loss_rms_eval_w": 6.154116997126911,
+     "scenario_b_proxy_w": 37.35788364376967,
+     "scenario_b_proxy_rms_eval_w": 37.359379954996065,
+     "turn_on_recharge_estimate_w": 0.7081426454336557,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475538418341595,
+       "branch_mean_current_a": 125.60812791813197,
+       "per_device_current_a": 41.86937597271066,
+       "vsd_v": 2.3328537681892634,
+       "reverse_loss_w": 1.3882866917046837,
+       "ron_loss_replaced_w": 0.038751316973405774
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681925228618917,
+       "branch_mean_current_a": 125.23065534608313,
+       "per_device_current_a": 41.74355178202771,
+       "vsd_v": 2.3316840614405496,
+       "reverse_loss_w": 1.4135529654433383,
+       "ron_loss_replaced_w": 0.039361881877840545
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677666004928218,
+       "branch_mean_current_a": 125.22730896719081,
+       "per_device_current_a": 41.742436322396934,
+       "vsd_v": 2.3316736986109947,
+       "reverse_loss_w": 1.4128870870031383,
+       "ron_loss_replaced_w": 0.03934362381378079
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966077506511515,
+       "branch_mean_current_a": 127.76884726344281,
+       "per_device_current_a": 42.58961575448094,
+       "vsd_v": 2.3395181067811146,
+       "reverse_loss_w": 1.9378939417493513,
+       "ron_loss_replaced_w": 0.05477871527156383
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.377498495805746,
+     "channel_metered_in_intervals_w": 0.17223553793659094,
+     "reverse_loss_w": 3.1627483983310825,
+     "reverse_loss_rms_eval_w": 3.1627483983310825,
+     "scenario_b_proxy_w": 34.36801135620024,
+     "scenario_b_proxy_rms_eval_w": 34.36801135620024,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.9475538418341595,
+       "branch_mean_current_a": 125.60812791813197,
+       "per_device_current_a": 41.86937597271066,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.714122785046535,
+       "ron_loss_replaced_w": 0.038751316973405774
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681925228618917,
+       "branch_mean_current_a": 125.23065534608313,
+       "per_device_current_a": 41.74355178202771,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7274843048350336,
+       "ron_loss_replaced_w": 0.039361881877840545
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677666004928218,
+       "branch_mean_current_a": 125.22730896719081,
+       "per_device_current_a": 41.742436322396934,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7271448425282551,
+       "ron_loss_replaced_w": 0.03934362381378079
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966077506511515,
+       "branch_mean_current_a": 127.76884726344281,
+       "per_device_current_a": 42.58961575448094,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.9939964659212587,
+       "ron_loss_replaced_w": 0.05477871527156383
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 5.763990353004947,
+    "fig8_125C": 5.715696263086957,
+    "table_floor_1p2V": 2.859053540429866
+   }
+  },
+  {
+   "name": "nominal_dt_x1_step2p5ps",
+   "label": "nominal_dt_x1",
+   "step_s": 3.125e-11,
+   "phase_inductance_nh": 1.4666667,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": false,
+   "exposure_a": 2.635422486900338,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.379079065386872,
+     "channel_metered_in_intervals_w": 0.17217271344001922,
+     "reverse_loss_w": 6.202205934041838,
+     "reverse_loss_rms_eval_w": 6.203096388247025,
+     "scenario_b_proxy_w": 37.40911228598869,
+     "scenario_b_proxy_rms_eval_w": 37.410002740193875,
+     "turn_on_recharge_estimate_w": 0.7198183400405946,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.947550183105837,
+       "branch_mean_current_a": 125.60004676706605,
+       "per_device_current_a": 41.86668225568868,
+       "vsd_v": 2.3524022702639265,
+       "reverse_loss_w": 1.3998245800337041,
+       "ron_loss_replaced_w": 0.03873639937385296
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681811564014116,
+       "branch_mean_current_a": 125.22191752587979,
+       "per_device_current_a": 41.74063917529326,
+       "vsd_v": 2.3516531303137787,
+       "reverse_loss_w": 1.425542742714513,
+       "ron_loss_replaced_w": 0.03934638488026791
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677552304341458,
+       "branch_mean_current_a": 125.21857083146759,
+       "per_device_current_a": 41.739523610489194,
+       "vsd_v": 2.3516464999137545,
+       "reverse_loss_w": 1.4248735126464833,
+       "ron_loss_replaced_w": 0.03932807104689067
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966003172526366,
+       "branch_mean_current_a": 127.76005070875345,
+       "per_device_current_a": 42.58668356958449,
+       "vsd_v": 2.356681240562584,
+       "reverse_loss_w": 1.9519650986471369,
+       "ron_loss_replaced_w": 0.05476185813900768
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.379079065386872,
+     "channel_metered_in_intervals_w": 0.17217271344001922,
+     "reverse_loss_w": 6.152081843558342,
+     "reverse_loss_rms_eval_w": 6.15346507195452,
+     "scenario_b_proxy_w": 37.35898819550519,
+     "scenario_b_proxy_rms_eval_w": 37.36037142390137,
+     "turn_on_recharge_estimate_w": 0.7081266933785935,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.947550183105837,
+       "branch_mean_current_a": 125.60004676706605,
+       "per_device_current_a": 41.86668225568868,
+       "vsd_v": 2.332828716902434,
+       "reverse_loss_w": 1.3881771073797418,
+       "ron_loss_replaced_w": 0.03873639937385296
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681811564014116,
+       "branch_mean_current_a": 125.22191752587979,
+       "per_device_current_a": 41.74063917529326,
+       "vsd_v": 2.331657002776733,
+       "reverse_loss_w": 1.413421340061467,
+       "ron_loss_replaced_w": 0.03934638488026791
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677552304341458,
+       "branch_mean_current_a": 125.21857083146759,
+       "per_device_current_a": 41.739523610489194,
+       "vsd_v": 2.331646638970098,
+       "reverse_loss_w": 1.412755504214402,
+       "ron_loss_replaced_w": 0.03932807104689067
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966003172526366,
+       "branch_mean_current_a": 127.76005070875345,
+       "per_device_current_a": 42.58668356958449,
+       "vsd_v": 2.339492122747002,
+       "reverse_loss_w": 1.9377278919027319,
+       "ron_loss_replaced_w": 0.05476185813900768
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.379079065386872,
+     "channel_metered_in_intervals_w": 0.17217271344001922,
+     "reverse_loss_w": 3.162506984280406,
+     "reverse_loss_rms_eval_w": 3.162506984280406,
+     "scenario_b_proxy_w": 34.36941333622726,
+     "scenario_b_proxy_rms_eval_w": 34.36941333622726,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.947550183105837,
+       "branch_mean_current_a": 125.60004676706605,
+       "per_device_current_a": 41.86668225568868,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7140740838734109,
+       "ron_loss_replaced_w": 0.03873639937385296
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.9681811564014116,
+       "branch_mean_current_a": 125.22191752587979,
+       "per_device_current_a": 41.74063917529326,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7274250055020509,
+       "ron_loss_replaced_w": 0.03934638488026791
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.9677552304341458,
+       "branch_mean_current_a": 125.21857083146759,
+       "per_device_current_a": 41.739523610489194,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.727085561217848,
+       "ron_loss_replaced_w": 0.03932807104689067
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.2966003172526366,
+       "branch_mean_current_a": 127.76005070875345,
+       "per_device_current_a": 42.58668356958449,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.9939223336870961,
+       "ron_loss_replaced_w": 0.05476185813900768
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 5.763565651906763,
+    "fig8_125C": 5.7152515058126,
+    "table_floor_1p2V": 2.858869776343776
+   }
+  },
+  {
+   "name": "nominal_dt_x2",
+   "label": "nominal_dt_x2",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 1.4666667,
+   "dead_time_ns": 4.3,
+   "all_eight_zvs": false,
+   "exposure_a": 8.040645046607047,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.697690229635302,
+     "channel_metered_in_intervals_w": 0.5231085921299865,
+     "reverse_loss_w": 18.918337700805786,
+     "reverse_loss_rms_eval_w": 18.91912260683719,
+     "scenario_b_proxy_w": 50.092919338311106,
+     "scenario_b_proxy_rms_eval_w": 50.093704244342504,
+     "turn_on_recharge_estimate_w": 0.7195944942724033,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.0988959117063843,
+       "branch_mean_current_a": 125.41879157013084,
+       "per_device_current_a": 41.80626385671028,
+       "vsd_v": 2.352043172996792,
+       "reverse_loss_w": 4.570722916103795,
+       "ron_loss_replaced_w": 0.12603132730260463
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.12037974758571,
+       "branch_mean_current_a": 125.04707881564778,
+       "per_device_current_a": 41.68235960521593,
+       "vsd_v": 2.351306743567405,
+       "reverse_loss_w": 4.587333293645195,
+       "ron_loss_replaced_w": 0.12616041177853843
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.1199599396866002,
+       "branch_mean_current_a": 125.04441413368998,
+       "per_device_current_a": 41.68147137789666,
+       "vsd_v": 2.351301464355998,
+       "reverse_loss_w": 4.586608087279825,
+       "ron_loss_replaced_w": 0.12613899295232398
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.4428496469304606,
+       "branch_mean_current_a": 127.551690866113,
+       "per_device_current_a": 42.51723028870433,
+       "vsd_v": 2.3562682335138443,
+       "reverse_loss_w": 5.17367340377697,
+       "ron_loss_replaced_w": 0.14477786009651947
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.697690229635302,
+     "channel_metered_in_intervals_w": 0.5231085921299865,
+     "reverse_loss_w": 18.76293032632233,
+     "reverse_loss_rms_eval_w": 18.764151633298848,
+     "scenario_b_proxy_w": 49.937511963827646,
+     "scenario_b_proxy_rms_eval_w": 49.938733270804164,
+     "turn_on_recharge_estimate_w": 0.7077837768798882,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.0988959117063843,
+       "branch_mean_current_a": 125.41879157013084,
+       "per_device_current_a": 41.80626385671028,
+       "vsd_v": 2.332266832105247,
+       "reverse_loss_w": 4.532291574558948,
+       "ron_loss_replaced_w": 0.12603132730260463
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.12037974758571,
+       "branch_mean_current_a": 125.04707881564778,
+       "per_device_current_a": 41.68235960521593,
+       "vsd_v": 2.331114401301611,
+       "reverse_loss_w": 4.54793860207381,
+       "ron_loss_replaced_w": 0.12616041177853843
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.1199599396866002,
+       "branch_mean_current_a": 125.04441413368998,
+       "per_device_current_a": 41.68147137789666,
+       "vsd_v": 2.3311060567860857,
+       "reverse_loss_w": 4.5472135557447375,
+       "ron_loss_replaced_w": 0.12613899295232398
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.4428496469304606,
+       "branch_mean_current_a": 127.551690866113,
+       "per_device_current_a": 42.51723028870433,
+       "vsd_v": 2.3388766511845454,
+       "reverse_loss_w": 5.135486593944837,
+       "ron_loss_replaced_w": 0.14477786009651947
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.697690229635302,
+     "channel_metered_in_intervals_w": 0.5231085921299865,
+     "reverse_loss_w": 9.648774055928454,
+     "reverse_loss_rms_eval_w": 9.648774055928454,
+     "scenario_b_proxy_w": 40.82335569343377,
+     "scenario_b_proxy_rms_eval_w": 40.82335569343377,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.0988959117063843,
+       "branch_mean_current_a": 125.41879157013084,
+       "per_device_current_a": 41.80626385671028,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.3319586826870013,
+       "ron_loss_replaced_w": 0.12603132730260463
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.12037974758571,
+       "branch_mean_current_a": 125.04707881564778,
+       "per_device_current_a": 41.68235960521593,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.341166233386608,
+       "ron_loss_replaced_w": 0.12616041177853843
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.1199599396866002,
+       "branch_mean_current_a": 125.04441413368998,
+       "per_device_current_a": 41.68147137789666,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.340801376672162,
+       "ron_loss_replaced_w": 0.12613899295232398
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.4428496469304606,
+       "branch_mean_current_a": 127.551690866113,
+       "per_device_current_a": 42.51723028870433,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.634847763182683,
+       "ron_loss_replaced_w": 0.14477786009651947
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 5.754434674291897,
+    "fig8_125C": 5.705689840132947,
+    "table_floor_1p2V": 2.854918708897614
+   }
+  },
+  {
+   "name": "old_critical_dt_x0.5",
+   "label": "old_critical_dt_x0.5",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6274059728342265,
+   "dead_time_ns": 1.075,
+   "all_eight_zvs": false,
+   "exposure_a": 1.83621047858777,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 31.205275740101655,
+     "channel_metered_in_intervals_w": 0.20254028076629765,
+     "reverse_loss_w": 4.6234189412198905,
+     "reverse_loss_rms_eval_w": 4.625435331166683,
+     "scenario_b_proxy_w": 35.62615440055525,
+     "scenario_b_proxy_rms_eval_w": 35.62817079050204,
+     "turn_on_recharge_estimate_w": 0.8238965698228701,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.3725588547551456,
+       "branch_mean_current_a": 212.12759839339805,
+       "per_device_current_a": 70.70919946446601,
+       "vsd_v": 2.5176186696626943,
+       "reverse_loss_w": 0.9948372076416805,
+       "ron_loss_replaced_w": 0.043605919124943944
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.3902975873536999,
+       "branch_mean_current_a": 210.93400237242957,
+       "per_device_current_a": 70.31133412414319,
+       "vsd_v": 2.515430596906932,
+       "reverse_loss_w": 1.0354396789536449,
+       "ron_loss_replaced_w": 0.045175860722830065
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3900517918737831,
+       "branch_mean_current_a": 210.9275737095617,
+       "per_device_current_a": 70.30919123652056,
+       "vsd_v": 2.515418812030114,
+       "reverse_loss_w": 1.0347512108052757,
+       "ron_loss_replaced_w": 0.04514751041171865
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.577080826650282,
+       "branch_mean_current_a": 214.202871749953,
+       "per_device_current_a": 71.40095724998433,
+       "vsd_v": 2.521415680377361,
+       "reverse_loss_w": 1.5583908438192895,
+       "ron_loss_replaced_w": 0.068610990506805
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 31.205275740101655,
+     "channel_metered_in_intervals_w": 0.20254028076629765,
+     "reverse_loss_w": 4.745661285429686,
+     "reverse_loss_rms_eval_w": 4.7487927716597715,
+     "scenario_b_proxy_w": 35.748396744765046,
+     "scenario_b_proxy_rms_eval_w": 35.75152823099513,
+     "turn_on_recharge_estimate_w": 0.8678840406307065,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.3725588547551456,
+       "branch_mean_current_a": 212.12759839339805,
+       "per_device_current_a": 70.70919946446601,
+       "vsd_v": 2.5840260073400056,
+       "reverse_loss_w": 1.021078072145067,
+       "ron_loss_replaced_w": 0.043605919124943944
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.3902975873536999,
+       "branch_mean_current_a": 210.93400237242957,
+       "per_device_current_a": 70.31133412414319,
+       "vsd_v": 2.580628968860249,
+       "reverse_loss_w": 1.0622776212950689,
+       "ron_loss_replaced_w": 0.045175860722830065
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3900517918737831,
+       "branch_mean_current_a": 210.9275737095617,
+       "per_device_current_a": 70.30919123652056,
+       "vsd_v": 2.5806106670627007,
+       "reverse_loss_w": 1.061568753318273,
+       "ron_loss_replaced_w": 0.04514751041171865
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.577080826650282,
+       "branch_mean_current_a": 214.202871749953,
+       "per_device_current_a": 71.40095724998433,
+       "vsd_v": 2.589929850519241,
+       "reverse_loss_w": 1.600736838671278,
+       "ron_loss_replaced_w": 0.068610990506805
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 31.205275740101655,
+     "channel_metered_in_intervals_w": 0.20254028076629765,
+     "reverse_loss_w": 2.2034525743053237,
+     "reverse_loss_rms_eval_w": 2.2034525743053237,
+     "scenario_b_proxy_w": 33.206188033640686,
+     "scenario_b_proxy_rms_eval_w": 33.206188033640686,
+     "turn_on_recharge_estimate_w": 0.1872,
+     "events": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 0.3725588547551456,
+       "branch_mean_current_a": 212.12759839339805,
+       "per_device_current_a": 70.70919946446601,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.47418009071642303,
+       "ron_loss_replaced_w": 0.043605919124943944
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 0.3902975873536999,
+       "branch_mean_current_a": 210.93400237242957,
+       "per_device_current_a": 70.31133412414319,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.4939621933009133,
+       "ron_loss_replaced_w": 0.045175860722830065
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 0.3900517918737831,
+       "branch_mean_current_a": 210.9275737095617,
+       "per_device_current_a": 70.30919123652056,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.49363606848602404,
+       "ron_loss_replaced_w": 0.04514751041171865
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 0.577080826650282,
+       "branch_mean_current_a": 214.202871749953,
+       "per_device_current_a": 71.40095724998433,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7416742218019633,
+       "ron_loss_replaced_w": 0.068610990506805
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 10.211909387610696,
+    "fig8_125C": 10.493239759656051,
+    "table_floor_1p2V": 4.6245021046693955
+   }
+  },
+  {
+   "name": "old_critical_dt_x1",
+   "label": "old_critical_dt_x1",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6274059728342265,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": true,
+   "exposure_a": 6.773189475920862,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.20585791635716,
+     "channel_metered_in_intervals_w": 0.7290195111164012,
+     "reverse_loss_w": 16.995398292125508,
+     "reverse_loss_rms_eval_w": 16.997961179866152,
+     "scenario_b_proxy_w": 44.47223669736627,
+     "scenario_b_proxy_rms_eval_w": 44.47479958510691,
+     "turn_on_recharge_estimate_w": 1.4978979323035415,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.09951003666501577,
+       "branch_mean_current_a": 57.3152938348373,
+       "per_device_current_a": 28.65764691741865,
+       "vsd_v": 2.269401972854161,
+       "reverse_loss_w": 0.06471706926689146,
+       "ron_loss_replaced_w": 0.0013143158366044855
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10647628586387281,
+       "branch_mean_current_a": 56.28248992126012,
+       "per_device_current_a": 28.14124496063006,
+       "vsd_v": 2.2658687112962794,
+       "reverse_loss_w": 0.06789392910401343,
+       "ron_loss_replaced_w": 0.0013636277971445657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.1056157134608749,
+       "branch_mean_current_a": 56.207448583343954,
+       "per_device_current_a": 28.103724291671977,
+       "vsd_v": 2.2656094458042553,
+       "reverse_loss_w": 0.06724770384241191,
+       "ron_loss_replaced_w": 0.0013497589205006793
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7499193298407449,
+       "branch_mean_current_a": 64.35938305531764,
+       "per_device_current_a": 32.17969152765882,
+       "vsd_v": 2.2927747560493184,
+       "reverse_loss_w": 0.5532963638642582,
+       "ron_loss_replaced_w": 0.012110704904366039
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4465720763376355,
+       "branch_mean_current_a": 214.72881611160008,
+       "per_device_current_a": 71.57627203720003,
+       "vsd_v": 2.522377435393384,
+       "reverse_loss_w": 3.9175133414300998,
+       "ron_loss_replaced_w": 0.17261228532035017
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4643668364319296,
+       "branch_mean_current_a": 213.54568478816026,
+       "per_device_current_a": 71.18189492938676,
+       "vsd_v": 2.5202139318597236,
+       "reverse_loss_w": 3.9404706500470206,
+       "ron_loss_replaced_w": 0.17283264520225955
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4641160037961531,
+       "branch_mean_current_a": 213.54623363915624,
+       "per_device_current_a": 71.18207787971875,
+       "vsd_v": 2.520214935502384,
+       "reverse_loss_w": 3.939807378455269,
+       "ron_loss_replaced_w": 0.17280665616094124
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6534126874573472,
+       "branch_mean_current_a": 213.3493826005693,
+       "per_device_current_a": 71.11646086685643,
+       "vsd_v": 2.5198549687690637,
+       "reverse_loss_w": 4.444451856115544,
+       "ron_loss_replaced_w": 0.1946295169742345
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.20585791635716,
+     "channel_metered_in_intervals_w": 0.7290195111164012,
+     "reverse_loss_w": 17.416873679835202,
+     "reverse_loss_rms_eval_w": 17.42078904328936,
+     "scenario_b_proxy_w": 44.89371208507596,
+     "scenario_b_proxy_rms_eval_w": 44.897627448530116,
+     "turn_on_recharge_estimate_w": 1.5096262912428378,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.09951003666501577,
+       "branch_mean_current_a": 57.3152938348373,
+       "per_device_current_a": 28.65764691741865,
+       "vsd_v": 2.2102569858108985,
+       "reverse_loss_w": 0.06303041777497694,
+       "ron_loss_replaced_w": 0.0013143158366044855
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10647628586387281,
+       "branch_mean_current_a": 56.28248992126012,
+       "per_device_current_a": 28.14124496063006,
+       "vsd_v": 2.2053235123396977,
+       "reverse_loss_w": 0.06607976775165736,
+       "ron_loss_replaced_w": 0.0013636277971445657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.1056157134608749,
+       "branch_mean_current_a": 56.207448583343954,
+       "per_device_current_a": 28.103724291671977,
+       "vsd_v": 2.204964718557189,
+       "reverse_loss_w": 0.06544765014601374,
+       "ron_loss_replaced_w": 0.0013497589205006793
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7499193298407449,
+       "branch_mean_current_a": 64.35938305531764,
+       "per_device_current_a": 32.17969152765882,
+       "vsd_v": 2.243369335224245,
+       "reverse_loss_w": 0.541373762385167,
+       "ron_loss_replaced_w": 0.012110704904366039
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4465720763376355,
+       "branch_mean_current_a": 214.72881611160008,
+       "per_device_current_a": 71.57627203720003,
+       "vsd_v": 2.5914235456017276,
+       "reverse_loss_w": 4.024749100091593,
+       "ron_loss_replaced_w": 0.17261228532035017
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4643668364319296,
+       "branch_mean_current_a": 213.54568478816026,
+       "per_device_current_a": 71.18189492938676,
+       "vsd_v": 2.5880612798479707,
+       "reverse_loss_w": 4.046553106005008,
+       "ron_loss_replaced_w": 0.17283264520225955
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4641160037961531,
+       "branch_mean_current_a": 213.54623363915624,
+       "per_device_current_a": 71.18207787971875,
+       "vsd_v": 2.5880628416451525,
+       "reverse_loss_w": 4.045872808616976,
+       "ron_loss_replaced_w": 0.17280665616094124
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6534126874573472,
+       "branch_mean_current_a": 213.3493826005693,
+       "per_device_current_a": 71.11646086685643,
+       "vsd_v": 2.587502687068458,
+       "reverse_loss_w": 4.563767067063812,
+       "ron_loss_replaced_w": 0.1946295169742345
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.20585791635716,
+     "channel_metered_in_intervals_w": 0.7290195111164012,
+     "reverse_loss_w": 8.127827371105035,
+     "reverse_loss_rms_eval_w": 8.127827371105035,
+     "scenario_b_proxy_w": 35.6046657763458,
+     "scenario_b_proxy_rms_eval_w": 35.6046657763458,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.09951003666501577,
+       "branch_mean_current_a": 57.3152938348373,
+       "per_device_current_a": 28.65764691741865,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.03422068194582487,
+       "ron_loss_replaced_w": 0.0013143158366044855
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10647628586387281,
+       "branch_mean_current_a": 56.28248992126012,
+       "per_device_current_a": 28.14124496063006,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.0359565029159198,
+       "ron_loss_replaced_w": 0.0013636277971445657
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.1056157134608749,
+       "branch_mean_current_a": 56.207448583343954,
+       "per_device_current_a": 28.103724291671977,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.03561833870367188,
+       "ron_loss_replaced_w": 0.0013497589205006793
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7499193298407449,
+       "branch_mean_current_a": 64.35938305531764,
+       "per_device_current_a": 32.17969152765882,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.28958607245884554,
+       "ron_loss_replaced_w": 0.012110704904366039
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4465720763376355,
+       "branch_mean_current_a": 214.72881611160008,
+       "per_device_current_a": 71.57627203720003,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8637242562324776,
+       "ron_loss_replaced_w": 0.17261228532035017
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4643668364319296,
+       "branch_mean_current_a": 213.54568478816026,
+       "per_device_current_a": 71.18189492938676,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8762553132015694,
+       "ron_loss_replaced_w": 0.17283264520225955
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4641160037961531,
+       "branch_mean_current_a": 213.54623363915624,
+       "per_device_current_a": 71.18207787971875,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8759387493288864,
+       "ron_loss_replaced_w": 0.17280665616094124
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6534126874573472,
+       "branch_mean_current_a": 213.3493826005693,
+       "per_device_current_a": 71.11646086685643,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.1165274563178382,
+       "ron_loss_replaced_w": 0.1946295169742345
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 12.914919847973092,
+    "fig8_125C": 13.139169982904026,
+    "table_floor_1p2V": 6.010399699794209
+   }
+  },
+  {
+   "name": "old_critical_dt_x1_step1p25ps",
+   "label": "old_critical_dt_x1",
+   "step_s": 1.5625e-11,
+   "phase_inductance_nh": 0.6274059728342265,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": true,
+   "exposure_a": 6.776187139760758,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.18428237014418,
+     "channel_metered_in_intervals_w": 0.7296756101656218,
+     "reverse_loss_w": 17.002910894367748,
+     "reverse_loss_rms_eval_w": 17.00607789791033,
+     "scenario_b_proxy_w": 44.457517654346304,
+     "scenario_b_proxy_rms_eval_w": 44.46068465788889,
+     "turn_on_recharge_estimate_w": 1.4982734761142662,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10106752127165956,
+       "branch_mean_current_a": 57.49927296473677,
+       "per_device_current_a": 28.749636482368384,
+       "vsd_v": 2.2700313946623485,
+       "reverse_loss_w": 0.06595926929628565,
+       "ron_loss_replaced_w": 0.0013540769407333105
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10814176846555787,
+       "branch_mean_current_a": 56.47546294237367,
+       "per_device_current_a": 28.237731471186834,
+       "vsd_v": 2.266530633291817,
+       "reverse_loss_w": 0.06921255227012148,
+       "ron_loss_replaced_w": 0.001404533533701615
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10728219578166626,
+       "branch_mean_current_a": 56.40220463724657,
+       "per_device_current_a": 28.201102318623285,
+       "vsd_v": 2.2662807600030117,
+       "reverse_loss_w": 0.06856578457046779,
+       "ron_loss_replaced_w": 0.0013906889615855186
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7510059095940558,
+       "branch_mean_current_a": 64.45139269989743,
+       "per_device_current_a": 32.22569634994871,
+       "vsd_v": 2.2930709992231546,
+       "reverse_loss_w": 0.5549618980134691,
+       "ron_loss_replaced_w": 0.012175040359286342
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464616643495165,
+       "branch_mean_current_a": 214.76004593171064,
+       "per_device_current_a": 71.58668197723688,
+       "vsd_v": 2.5224345430236412,
+       "reverse_loss_w": 3.9178727444558272,
+       "ron_loss_replaced_w": 0.17272410985245537
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642609422227837,
+       "branch_mean_current_a": 213.5861816474409,
+       "per_device_current_a": 71.1953938824803,
+       "vsd_v": 2.520287985429619,
+       "reverse_loss_w": 3.941048716486118,
+       "ron_loss_replaced_w": 0.17295882425673267
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640100834407943,
+       "branch_mean_current_a": 213.5867365284697,
+       "per_device_current_a": 71.19557884282322,
+       "vsd_v": 2.5202890000989484,
+       "reverse_loss_w": 3.9403853549190124,
+       "ron_loss_replaced_w": 0.17293336025720932
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6533263467395143,
+       "branch_mean_current_a": 213.3778494677697,
+       "per_device_current_a": 71.1259498225899,
+       "vsd_v": 2.519907023994515,
+       "reverse_loss_w": 4.444904574356445,
+       "ron_loss_replaced_w": 0.19473497600391765
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.18428237014418,
+     "channel_metered_in_intervals_w": 0.7296756101656218,
+     "reverse_loss_w": 17.42457734903501,
+     "reverse_loss_rms_eval_w": 17.42941631336327,
+     "scenario_b_proxy_w": 44.87918410901357,
+     "scenario_b_proxy_rms_eval_w": 44.88402307334183,
+     "turn_on_recharge_estimate_w": 1.5101485117258098,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10106752127165956,
+       "branch_mean_current_a": 57.49927296473677,
+       "per_device_current_a": 28.749636482368384,
+       "vsd_v": 2.2111348557708252,
+       "reverse_loss_w": 0.06424793936556328,
+       "ron_loss_replaced_w": 0.0013540769407333105
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10814176846555787,
+       "branch_mean_current_a": 56.47546294237367,
+       "per_device_current_a": 28.237731471186834,
+       "vsd_v": 2.2062461707315935,
+       "reverse_loss_w": 0.06737165876762961,
+       "ron_loss_replaced_w": 0.001404533533701615
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10728219578166626,
+       "branch_mean_current_a": 56.40220463724657,
+       "per_device_current_a": 28.201102318623285,
+       "vsd_v": 2.205895902131291,
+       "reverse_loss_w": 0.06673885507910803,
+       "ron_loss_replaced_w": 0.0013906889615855186
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7510059095940558,
+       "branch_mean_current_a": 64.45139269989743,
+       "per_device_current_a": 32.22569634994871,
+       "vsd_v": 2.243801065645331,
+       "reverse_loss_w": 0.5430377422142768,
+       "ron_loss_replaced_w": 0.012175040359286342
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464616643495165,
+       "branch_mean_current_a": 214.76004593171064,
+       "per_device_current_a": 71.58668197723688,
+       "vsd_v": 2.5915122390684284,
+       "reverse_loss_w": 4.025164972645528,
+       "ron_loss_replaced_w": 0.17272410985245537
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642609422227837,
+       "branch_mean_current_a": 213.5861816474409,
+       "per_device_current_a": 71.1953938824803,
+       "vsd_v": 2.5881765167358766,
+       "reverse_loss_w": 4.047208016818237,
+       "ron_loss_replaced_w": 0.17295882425673267
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640100834407943,
+       "branch_mean_current_a": 213.5867365284697,
+       "per_device_current_a": 71.19557884282322,
+       "vsd_v": 2.588178095691975,
+       "reverse_loss_w": 4.04652762591371,
+       "ron_loss_replaced_w": 0.17293336025720932
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6533263467395143,
+       "branch_mean_current_a": 213.3778494677697,
+       "per_device_current_a": 71.1259498225899,
+       "vsd_v": 2.5875836917004933,
+       "reverse_loss_w": 4.564280538230959,
+       "ron_loss_replaced_w": 0.19473497600391765
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.18428237014418,
+     "channel_metered_in_intervals_w": 0.7296756101656218,
+     "reverse_loss_w": 8.131424567712909,
+     "reverse_loss_rms_eval_w": 8.131424567712909,
+     "scenario_b_proxy_w": 35.58603132769147,
+     "scenario_b_proxy_rms_eval_w": 35.58603132769147,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10106752127165956,
+       "branch_mean_current_a": 57.49927296473677,
+       "per_device_current_a": 28.749636482368384,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.034867853960810956,
+       "ron_loss_replaced_w": 0.0013540769407333105
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10814176846555787,
+       "branch_mean_current_a": 56.47546294237367,
+       "per_device_current_a": 28.237731471186834,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.03664413862499619,
+       "ron_loss_replaced_w": 0.001404533533701615
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10728219578166626,
+       "branch_mean_current_a": 56.40220463724657,
+       "per_device_current_a": 28.201102318623285,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.03630571416246415,
+       "ron_loss_replaced_w": 0.0013906889615855186
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.7510059095940558,
+       "branch_mean_current_a": 64.45139269989743,
+       "per_device_current_a": 32.22569634994871,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.2904202607951409,
+       "ron_loss_replaced_w": 0.012175040359286342
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464616643495165,
+       "branch_mean_current_a": 214.76004593171064,
+       "per_device_current_a": 71.58668197723688,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.863853040844965,
+       "ron_loss_replaced_w": 0.17272410985245537
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642609422227837,
+       "branch_mean_current_a": 213.5861816474409,
+       "per_device_current_a": 71.1953938824803,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8764754215090909,
+       "ron_loss_replaced_w": 0.17295882425673267
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640100834407943,
+       "branch_mean_current_a": 213.5867365284697,
+       "per_device_current_a": 71.19557884282322,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8761588158013514,
+       "ron_loss_replaced_w": 0.17293336025720932
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.6533263467395143,
+       "branch_mean_current_a": 213.3778494677697,
+       "per_device_current_a": 71.1259498225899,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.11669932201409,
+       "ron_loss_replaced_w": 0.19473497600391765
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 12.924703127094261,
+    "fig8_125C": 13.149221314578785,
+    "table_floor_1p2V": 6.01477369652715
+   }
+  },
+  {
+   "name": "old_critical_dt_x1_step2p5ps",
+   "label": "old_critical_dt_x1",
+   "step_s": 3.125e-11,
+   "phase_inductance_nh": 0.6274059728342265,
+   "dead_time_ns": 2.15,
+   "all_eight_zvs": true,
+   "exposure_a": 6.775189150260804,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.191456086153302,
+     "channel_metered_in_intervals_w": 0.7294409452295858,
+     "reverse_loss_w": 17.000409886650047,
+     "reverse_loss_rms_eval_w": 17.003346698326535,
+     "scenario_b_proxy_w": 44.46242502757376,
+     "scenario_b_proxy_rms_eval_w": 44.46536183925025,
+     "turn_on_recharge_estimate_w": 1.4981483255769308,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10054922513838006,
+       "branch_mean_current_a": 57.438096825584246,
+       "per_device_current_a": 28.719048412792123,
+       "vsd_v": 2.26982101304007,
+       "reverse_loss_w": 0.06554512349964527,
+       "ron_loss_replaced_w": 0.0013403978837276172
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10758739093101101,
+       "branch_mean_current_a": 56.41083632822748,
+       "per_device_current_a": 28.20541816411374,
+       "vsd_v": 2.2663102014296133,
+       "reverse_loss_w": 0.06877225616921717,
+       "ron_loss_replaced_w": 0.0013905393321113743
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10672759223501216,
+       "branch_mean_current_a": 56.337094369752165,
+       "per_device_current_a": 28.168547184876083,
+       "vsd_v": 2.266057367970029,
+       "reverse_loss_w": 0.06812586988375388,
+       "ron_loss_replaced_w": 0.0013766931296895794
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.750644261331856,
+       "branch_mean_current_a": 64.42074566203964,
+       "per_device_current_a": 32.21037283101982,
+       "vsd_v": 2.2929723250482335,
+       "reverse_loss_w": 0.554407036378781,
+       "ron_loss_replaced_w": 0.012153074127975989
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464986603261385,
+       "branch_mean_current_a": 214.7496573344834,
+       "per_device_current_a": 71.58321911149447,
+       "vsd_v": 2.5224155461748845,
+       "reverse_loss_w": 3.9177539216988047,
+       "ron_loss_replaced_w": 0.1726831816079217
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642964836134422,
+       "branch_mean_current_a": 213.5727048174002,
+       "per_device_current_a": 71.19090160580006,
+       "vsd_v": 2.520263341361088,
+       "reverse_loss_w": 3.94085716298608,
+       "ron_loss_replaced_w": 0.1729133999650682
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640456240454063,
+       "branch_mean_current_a": 213.57326098221503,
+       "per_device_current_a": 71.19108699407168,
+       "vsd_v": 2.5202643583779807,
+       "reverse_loss_w": 3.940193875949392,
+       "ron_loss_replaced_w": 0.17288777139220915
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.653355269340184,
+       "branch_mean_current_a": 213.36838478248623,
+       "per_device_current_a": 71.1227949274954,
+       "vsd_v": 2.5198897166342498,
+       "reverse_loss_w": 4.444754640084375,
+       "ron_loss_replaced_w": 0.19469588779088215
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.191456086153302,
+     "channel_metered_in_intervals_w": 0.7294409452295858,
+     "reverse_loss_w": 17.42201277041723,
+     "reverse_loss_rms_eval_w": 17.426499402034874,
+     "scenario_b_proxy_w": 44.884027911340944,
+     "scenario_b_proxy_rms_eval_w": 44.88851454295859,
+     "turn_on_recharge_estimate_w": 1.5099742432944938,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10054922513838006,
+       "branch_mean_current_a": 57.438096825584246,
+       "per_device_current_a": 28.719048412792123,
+       "vsd_v": 2.2108429493200465,
+       "reverse_loss_w": 0.0638420268906658,
+       "ron_loss_replaced_w": 0.0013403978837276172
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10758739093101101,
+       "branch_mean_current_a": 56.41083632822748,
+       "per_device_current_a": 28.20541816411374,
+       "vsd_v": 2.2059371726781984,
+       "reverse_loss_w": 0.06694020802488782,
+       "ron_loss_replaced_w": 0.0013905393321113743
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10672759223501216,
+       "branch_mean_current_a": 56.337094369752165,
+       "per_device_current_a": 28.168547184876083,
+       "vsd_v": 2.2055845915949495,
+       "reverse_loss_w": 0.06630783978748647,
+       "ron_loss_replaced_w": 0.0013766931296895794
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.750644261331856,
+       "branch_mean_current_a": 64.42074566203964,
+       "per_device_current_a": 32.21037283101982,
+       "vsd_v": 2.243657262692719,
+       "reverse_loss_w": 0.5424833784825696,
+       "ron_loss_replaced_w": 0.012153074127975989
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464986603261385,
+       "branch_mean_current_a": 214.7496573344834,
+       "per_device_current_a": 71.58321911149447,
+       "vsd_v": 2.591482735193639,
+       "reverse_loss_w": 4.025027384649535,
+       "ron_loss_replaced_w": 0.1726831816079217
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642964836134422,
+       "branch_mean_current_a": 213.5727048174002,
+       "per_device_current_a": 71.19090160580006,
+       "vsd_v": 2.5881381673927346,
+       "reverse_loss_w": 4.046990910981157,
+       "ron_loss_replaced_w": 0.1729133999650682
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640456240454063,
+       "branch_mean_current_a": 213.57326098221503,
+       "per_device_current_a": 71.19108699407168,
+       "vsd_v": 2.5881397500019436,
+       "reverse_loss_w": 4.046310601964804,
+       "ron_loss_replaced_w": 0.17288777139220915
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.653355269340184,
+       "branch_mean_current_a": 213.36838478248623,
+       "per_device_current_a": 71.1227949274954,
+       "vsd_v": 2.58755675921989,
+       "reverse_loss_w": 4.564110419636122,
+       "ron_loss_replaced_w": 0.19469588779088215
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.191456086153302,
+     "channel_metered_in_intervals_w": 0.7294409452295858,
+     "reverse_loss_w": 8.130226980312965,
+     "reverse_loss_rms_eval_w": 8.130226980312965,
+     "scenario_b_proxy_w": 35.59224212123668,
+     "scenario_b_proxy_rms_eval_w": 35.59224212123668,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 0.10054922513838006,
+       "branch_mean_current_a": 57.438096825584246,
+       "per_device_current_a": 28.719048412792123,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.03465213677541446,
+       "ron_loss_replaced_w": 0.0013403978837276172
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 0.10758739093101101,
+       "branch_mean_current_a": 56.41083632822748,
+       "per_device_current_a": 28.20541816411374,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.036414568204741725,
+       "ron_loss_replaced_w": 0.0013905393321113743
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 0.10672759223501216,
+       "branch_mean_current_a": 56.337094369752165,
+       "per_device_current_a": 28.168547184876083,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.036076334613601845,
+       "ron_loss_replaced_w": 0.0013766931296895794
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 0.750644261331856,
+       "branch_mean_current_a": 64.42074566203964,
+       "per_device_current_a": 32.21037283101982,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.2901423782515747,
+       "ron_loss_replaced_w": 0.012153074127975989
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 1.4464986603261385,
+       "branch_mean_current_a": 214.7496573344834,
+       "per_device_current_a": 71.58321911149447,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8638105498389652,
+       "ron_loss_replaced_w": 0.1726831816079217
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 1.4642964836134422,
+       "branch_mean_current_a": 213.5727048174002,
+       "per_device_current_a": 71.19090160580006,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8764025639595847,
+       "ron_loss_replaced_w": 0.1729133999650682
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 1.4640456240454063,
+       "branch_mean_current_a": 213.57326098221503,
+       "per_device_current_a": 71.19108699407168,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 1.8760859889247166,
+       "ron_loss_replaced_w": 0.17288777139220915
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 1.653355269340184,
+       "branch_mean_current_a": 213.36838478248623,
+       "per_device_current_a": 71.1227949274954,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 2.1166424597443654,
+       "ron_loss_replaced_w": 0.19469588779088215
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 12.921439467969678,
+    "fig8_125C": 13.145867904428053,
+    "table_floor_1p2V": 6.013314470576078
+   }
+  },
+  {
+   "name": "old_critical_dt_x2",
+   "label": "old_critical_dt_x2",
+   "step_s": 6.25e-11,
+   "phase_inductance_nh": 0.6274059728342265,
+   "dead_time_ns": 4.3,
+   "all_eight_zvs": true,
+   "exposure_a": 17.72521966719802,
+   "priced": {
+    "fig8_25C": {
+     "scenario_a_proxy_w": 28.207267151447905,
+     "channel_metered_in_intervals_w": 1.7899448397342401,
+     "reverse_loss_w": 43.998045046888095,
+     "reverse_loss_rms_eval_w": 44.014513191991625,
+     "scenario_b_proxy_w": 70.41536735860176,
+     "scenario_b_proxy_rms_eval_w": 70.43183550370529,
+     "turn_on_recharge_estimate_w": 1.4682023583107242,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2494989263045793,
+       "branch_mean_current_a": 44.64916970225576,
+       "per_device_current_a": 22.32458485112788,
+       "vsd_v": 2.223408678202879,
+       "reverse_loss_w": 1.1165764868184804,
+       "ron_loss_replaced_w": 0.018525962305251727
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.2564820676782156,
+       "branch_mean_current_a": 45.01446729432015,
+       "per_device_current_a": 22.507233647160074,
+       "vsd_v": 2.2248202588243084,
+       "reverse_loss_w": 1.1299232274175226,
+       "ron_loss_replaced_w": 0.018886023534791387
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2556214650395296,
+       "branch_mean_current_a": 45.012006108927864,
+       "per_device_current_a": 22.506003054463932,
+       "vsd_v": 2.224810792726646,
+       "reverse_loss_w": 1.1294257235802059,
+       "ron_loss_replaced_w": 0.018876335123647284
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.899942066642442,
+       "branch_mean_current_a": 45.89451702741657,
+       "per_device_current_a": 22.947258513708285,
+       "vsd_v": 2.228213295385564,
+       "reverse_loss_w": 1.4827805867449642,
+       "ron_loss_replaced_w": 0.026091973170662065
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.596562139876773,
+       "branch_mean_current_a": 213.47872099650695,
+       "per_device_current_a": 71.15957366550232,
+       "vsd_v": 2.52009148019523,
+       "reverse_loss_w": 9.674498706287649,
+       "ron_loss_replaced_w": 0.42374816197359233
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6143578369487486,
+       "branch_mean_current_a": 212.3315016113656,
+       "per_device_current_a": 70.77716720378854,
+       "vsd_v": 2.5179924603491655,
+       "reverse_loss_w": 9.66206618719631,
+       "ron_loss_replaced_w": 0.42129934442813516
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.614107004204552,
+       "branch_mean_current_a": 212.3326266310954,
+       "per_device_current_a": 70.77754221036513,
+       "vsd_v": 2.5179945227094427,
+       "reverse_loss_w": 9.66145475292138,
+       "ron_loss_replaced_w": 0.42127725331036203
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8034045181511575,
+       "branch_mean_current_a": 211.8590065082136,
+       "per_device_current_a": 70.6196688360712,
+       "vsd_v": 2.517126293200251,
+       "reverse_loss_w": 10.141319375921583,
+       "ron_loss_replaced_w": 0.4412397858877983
+      }
+     ]
+    },
+    "fig8_125C": {
+     "scenario_a_proxy_w": 28.207267151447905,
+     "channel_metered_in_intervals_w": 1.7899448397342401,
+     "reverse_loss_w": 44.87230745044761,
+     "reverse_loss_rms_eval_w": 44.89471924777875,
+     "scenario_b_proxy_w": 71.28962976216127,
+     "scenario_b_proxy_rms_eval_w": 71.31204155949241,
+     "turn_on_recharge_estimate_w": 1.4698442380903853,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2494989263045793,
+       "branch_mean_current_a": 44.64916970225576,
+       "per_device_current_a": 22.32458485112788,
+       "vsd_v": 2.147772274356293,
+       "reverse_loss_w": 1.0785925431060421,
+       "ron_loss_replaced_w": 0.018525962305251727
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.2564820676782156,
+       "branch_mean_current_a": 45.01446729432015,
+       "per_device_current_a": 22.507233647160074,
+       "vsd_v": 2.1496540088463068,
+       "reverse_loss_w": 1.0917484169216412,
+       "ron_loss_replaced_w": 0.018886023534791387
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2556214650395296,
+       "branch_mean_current_a": 45.012006108927864,
+       "per_device_current_a": 22.506003054463932,
+       "vsd_v": 2.1496414040425553,
+       "reverse_loss_w": 1.0912659656883619,
+       "ron_loss_replaced_w": 0.018876335123647284
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.899942066642442,
+       "branch_mean_current_a": 45.89451702741657,
+       "per_device_current_a": 22.947258513708285,
+       "vsd_v": 2.154151585260747,
+       "reverse_loss_w": 1.4334956882921843,
+       "ron_loss_replaced_w": 0.026091973170662065
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.596562139876773,
+       "branch_mean_current_a": 213.47872099650695,
+       "per_device_current_a": 71.15957366550232,
+       "vsd_v": 2.587870729294432,
+       "reverse_loss_w": 9.934699680290615,
+       "ron_loss_replaced_w": 0.42374816197359233
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6143578369487486,
+       "branch_mean_current_a": 212.3315016113656,
+       "per_device_current_a": 70.77716720378854,
+       "vsd_v": 2.5846062294285814,
+       "reverse_loss_w": 9.91767721699847,
+       "ron_loss_replaced_w": 0.42129934442813516
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.614107004204552,
+       "branch_mean_current_a": 212.3326266310954,
+       "per_device_current_a": 70.77754221036513,
+       "vsd_v": 2.5846094307576424,
+       "reverse_loss_w": 9.91705376799992,
+       "ron_loss_replaced_w": 0.42127725331036203
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8034045181511575,
+       "branch_mean_current_a": 211.8590065082136,
+       "per_device_current_a": 70.6196688360712,
+       "vsd_v": 2.583261708737219,
+       "reverse_loss_w": 10.407774171150374,
+       "ron_loss_replaced_w": 0.4412397858877983
+      }
+     ]
+    },
+    "table_floor_1p2V": {
+     "scenario_a_proxy_w": 28.207267151447905,
+     "channel_metered_in_intervals_w": 1.7899448397342401,
+     "reverse_loss_w": 21.27026360063762,
+     "reverse_loss_rms_eval_w": 21.27026360063762,
+     "scenario_b_proxy_w": 47.68758591235128,
+     "scenario_b_proxy_rms_eval_w": 47.68758591235128,
+     "turn_on_recharge_estimate_w": 0.3744,
+     "events": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "duration_ns": 2.2494989263045793,
+       "branch_mean_current_a": 44.64916970225576,
+       "per_device_current_a": 22.32458485112788,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.6026295558336916,
+       "ron_loss_replaced_w": 0.018525962305251727
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "duration_ns": 2.2564820676782156,
+       "branch_mean_current_a": 45.01446729432015,
+       "per_device_current_a": 22.507233647160074,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.6094460294143257,
+       "ron_loss_replaced_w": 0.018886023534791387
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "duration_ns": 2.2556214650395296,
+       "branch_mean_current_a": 45.012006108927864,
+       "per_device_current_a": 22.506003054463932,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.6091802829827287,
+       "ron_loss_replaced_w": 0.018876335123647284
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "duration_ns": 2.899942066642442,
+       "branch_mean_current_a": 45.89451702741657,
+       "per_device_current_a": 22.947258513708285,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 0.7985486433362589,
+       "ron_loss_replaced_w": 0.026091973170662065
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "duration_ns": 3.596562139876773,
+       "branch_mean_current_a": 213.47872099650695,
+       "per_device_current_a": 71.15957366550232,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.606736913632122,
+       "ron_loss_replaced_w": 0.42374816197359233
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "duration_ns": 3.6143578369487486,
+       "branch_mean_current_a": 212.3315016113656,
+       "per_device_current_a": 70.77716720378854,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.604652161280811,
+       "ron_loss_replaced_w": 0.42129934442813516
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "duration_ns": 3.614107004204552,
+       "branch_mean_current_a": 212.3326266310954,
+       "per_device_current_a": 70.77754221036513,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.604356998771551,
+       "ron_loss_replaced_w": 0.42127725331036203
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "duration_ns": 3.8034045181511575,
+       "branch_mean_current_a": 211.8590065082136,
+       "per_device_current_a": 70.6196688360712,
+       "vsd_v": 1.2,
+       "reverse_loss_w": 4.834713015386131,
+       "ron_loss_replaced_w": 0.4412397858877983
+      }
+     ]
+    }
+   },
+   "residual_time_slope_w_per_ns": {
+    "fig8_25C": 12.213748339769749,
+    "fig8_125C": 12.429879880381836,
+    "table_floor_1p2V": 5.685221870513524
+   }
+  }
+ ],
+ "comparisons_vs_baseline": [
+  {
+   "model": "fig8_25C",
+   "zvs_label": "old_critical_dt_x1",
+   "scenario_a_delta_w": -3.1764014414543986,
+   "scenario_b_delta_w": 7.0608726185814845,
+   "scenario_b_delta_with_recharge_w": 7.838973035513057,
+   "scenario_b_delta_rms_eval_w": 7.062661543965675,
+   "break_even_residual_reverse_time_ns": 0.44411507300327596
+  },
+  {
+   "model": "fig8_25C",
+   "zvs_label": "old_critical_dt_x2",
+   "scenario_a_delta_w": -3.1749922063636546,
+   "scenario_b_delta_w": 33.00400327981697,
+   "scenario_b_delta_with_recharge_w": 33.75240812275572,
+   "scenario_b_delta_rms_eval_w": 33.019697462564054,
+   "break_even_residual_reverse_time_ns": 0.4921680967919569
+  },
+  {
+   "model": "fig8_25C",
+   "zvs_label": "new_passing_dt_x1",
+   "scenario_a_delta_w": -2.8360513793265056,
+   "scenario_b_delta_w": 7.682708608001818,
+   "scenario_b_delta_with_recharge_w": 8.467934749209824,
+   "scenario_b_delta_rms_eval_w": 7.6845775792142135,
+   "break_even_residual_reverse_time_ns": 0.385352899210999
+  },
+  {
+   "model": "fig8_25C",
+   "zvs_label": "new_passing_dt_x2",
+   "scenario_a_delta_w": -2.8346037349046007,
+   "scenario_b_delta_w": 33.85882307856775,
+   "scenario_b_delta_with_recharge_w": 34.611212561943155,
+   "scenario_b_delta_rms_eval_w": 33.875235779268536,
+   "break_even_residual_reverse_time_ns": 0.4310419577258364
+  },
+  {
+   "model": "fig8_125C",
+   "zvs_label": "old_critical_dt_x1",
+   "scenario_a_delta_w": -3.1764014414543986,
+   "scenario_b_delta_w": 7.532512952520435,
+   "scenario_b_delta_with_recharge_w": 8.33404445537893,
+   "scenario_b_delta_rms_eval_w": 7.535226381022831,
+   "break_even_residual_reverse_time_ns": 0.4278092358420533
+  },
+  {
+   "model": "fig8_125C",
+   "zvs_label": "old_critical_dt_x2",
+   "scenario_a_delta_w": -3.1749922063636546,
+   "scenario_b_delta_w": 33.92843062960574,
+   "scenario_b_delta_with_recharge_w": 34.69018007931179,
+   "scenario_b_delta_rms_eval_w": 33.94964049198513,
+   "break_even_residual_reverse_time_ns": 0.4727844150875571
+  },
+  {
+   "model": "fig8_125C",
+   "zvs_label": "new_passing_dt_x1",
+   "scenario_a_delta_w": -2.8360513793265056,
+   "scenario_b_delta_w": 8.166468381472882,
+   "scenario_b_delta_with_recharge_w": 8.978164592820498,
+   "scenario_b_delta_rms_eval_w": 8.16930141173043,
+   "break_even_residual_reverse_time_ns": 0.371117812705554
+  },
+  {
+   "model": "fig8_125C",
+   "zvs_label": "new_passing_dt_x2",
+   "scenario_a_delta_w": -2.8346037349046007,
+   "scenario_b_delta_w": 34.81164878994559,
+   "scenario_b_delta_with_recharge_w": 35.57905768086397,
+   "scenario_b_delta_rms_eval_w": 34.83391676890853,
+   "break_even_residual_reverse_time_ns": 0.4138974340696351
+  },
+  {
+   "model": "table_floor_1p2V",
+   "zvs_label": "old_critical_dt_x1",
+   "scenario_a_delta_w": -3.1764014414543986,
+   "scenario_b_delta_w": 1.2324455741563014,
+   "scenario_b_delta_with_recharge_w": 1.4196455741563057,
+   "scenario_b_delta_rms_eval_w": 1.2324455741563014,
+   "break_even_residual_reverse_time_ns": 1.0077743543835047
+  },
+  {
+   "model": "table_floor_1p2V",
+   "zvs_label": "old_critical_dt_x2",
+   "scenario_a_delta_w": -3.1749922063636546,
+   "scenario_b_delta_w": 13.315365710161785,
+   "scenario_b_delta_with_recharge_w": 13.50256571016179,
+   "scenario_b_delta_rms_eval_w": 13.315365710161785,
+   "break_even_residual_reverse_time_ns": 1.123207323669298
+  },
+  {
+   "model": "table_floor_1p2V",
+   "zvs_label": "new_passing_dt_x1",
+   "scenario_a_delta_w": -2.8360513793265056,
+   "scenario_b_delta_w": 1.695513066481368,
+   "scenario_b_delta_with_recharge_w": 1.8827130664813723,
+   "scenario_b_delta_rms_eval_w": 1.695513066481368,
+   "break_even_residual_reverse_time_ns": 0.8752290251575503
+  },
+  {
+   "model": "table_floor_1p2V",
+   "zvs_label": "new_passing_dt_x2",
+   "scenario_a_delta_w": -2.8346037349046007,
+   "scenario_b_delta_w": 13.872040887741257,
+   "scenario_b_delta_with_recharge_w": 14.059240887741261,
+   "scenario_b_delta_rms_eval_w": 13.872040887741257,
+   "break_even_residual_reverse_time_ns": 0.9849425959873667
+  }
+ ],
+ "step_ladder_scenario_b": [
+  {
+   "name": "nominal_dt_x1",
+   "step_ps": 62.50000000000001,
+   "fig8_25C": 37.411364078784786,
+   "fig8_125C": 37.36119913255553,
+   "table_floor_1p2V": 34.372220202189496
+  },
+  {
+   "name": "nominal_dt_x1_step2p5ps",
+   "step_ps": 31.250000000000004,
+   "fig8_25C": 37.40911228598869,
+   "fig8_125C": 37.35898819550519,
+   "table_floor_1p2V": 34.36941333622726
+  },
+  {
+   "name": "nominal_dt_x1_step1p25ps",
+   "step_ps": 15.625000000000002,
+   "fig8_25C": 37.407987286341175,
+   "fig8_125C": 37.35788364376967,
+   "table_floor_1p2V": 34.36801135620024
+  },
+  {
+   "name": "old_critical_dt_x1",
+   "step_ps": 62.50000000000001,
+   "fig8_25C": 44.47223669736627,
+   "fig8_125C": 44.89371208507596,
+   "table_floor_1p2V": 35.6046657763458
+  },
+  {
+   "name": "old_critical_dt_x1_step2p5ps",
+   "step_ps": 31.250000000000004,
+   "fig8_25C": 44.46242502757376,
+   "fig8_125C": 44.884027911340944,
+   "table_floor_1p2V": 35.59224212123668
+  },
+  {
+   "name": "old_critical_dt_x1_step1p25ps",
+   "step_ps": 15.625000000000002,
+   "fig8_25C": 44.457517654346304,
+   "fig8_125C": 44.87918410901357,
+   "table_floor_1p2V": 35.58603132769147
+  }
+ ]
+}

@@ -224,3 +224,16 @@ of only ~0.9 V under the fixed symmetric dead time would erase it. Coss
 nonlinearity and magnetic loss are unresolved, and negative currents remain
 ~39% of peak. This is a partial electrical-loss proxy result, not a hardware
 efficiency or native-P24 claim. See `A56_equal_power_regulated_loss_comparison/RESULTS.md`.
+
+`A57_datasheet_reverse_conduction_pricing` prices A56's dead-time conduction
+with the EPC2067 datasheet's Fig. 8 reverse characteristic (`VGS=0`, digitized
+from the PDF vector paths; 2.27-2.52 V at the 22-72 A per-device operating
+currents, far above A56's 0.9 V break-even). A56's model turns each gate on at
+the natural zero crossing, so its numbers are the ideal adaptive-dead-time
+limit and stand unchanged there (ZVS -3.18 W). Under the fixed symmetric dead
+time of the A51 scheduler, the best ZVS point becomes 44.47 W vs the baseline's
+37.41 W (+7.06 W). Even the table's 1.2 V floor leaves ZVS +1.23 W. The ZVS
+advantage survives only if every edge's residual reverse conduction stays
+below ~0.44 ns. This is first-order post-processing (orbits not re-solved with
+the clamp), and 8 tests tie it to A56's accounting. See
+`A57_datasheet_reverse_conduction_pricing/RESULTS.md`.

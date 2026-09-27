@@ -1,0 +1,25 @@
+{
+ "source": "EPC EPC2067 datasheet, Figure 8, VGS = 0 V, typical, per device",
+ "category": "EXTERNAL_DEVICE_DATA",
+ "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/epc2067_datasheet.pdf",
+ "revision": "Revised October 21, 2021",
+ "sha256": "8271d9eb71a3f78285c4c024ccfd06c33af129583c1bdef484d7dde01ae2324f",
+ "method": "PDF vector Bezier paths; axis map least-squares on tick labels; ISD=0 anchored to the curves' flat segment",
+ "volts_per_point": 0.023213966881587365,
+ "amps_per_point": 2.479869225646299,
+ "tick_fit_max_residual_pt": {
+  "voltage_axis": 0.3816930597478745,
+  "current_axis": 4.547473508864641e-13
+ },
+ "tick_fit_max_residual": {
+  "volts": 0.008860610047918905,
+  "amps": 1.1277139609075215e-12
+ },
+ "label_center_vs_curve_zero_offset_a": 1.7606102803169634,
+ "table_value_for_comparison": {
+  "vsd_v": 1.2,
+  "is_a": 0.5,
+  "note": "typ, defined by design"
+ },
+ "note": "negative OFF gate bias raises VSD (datasheet note); 0 V OFF assumed"
+}
