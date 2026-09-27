@@ -1,0 +1,4776 @@
+{
+ "experiment": "A58_asymmetric_fixed_deadtime_tuning",
+ "classification": "SENSITIVITY_ONLY",
+ "points": [
+  {
+   "name": "baseline_r0.500_f0.900",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.458448440223684,
+   "load_power_w": 250.00831386208637,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.93081692345515,
+   "probe_peak_a": 129.2585740923182,
+   "within_screen": true,
+   "p_a_w": 32.33214869849249,
+   "p_b_w": {
+    "fig8_25C": 32.397410380842935,
+    "fig8_125C": 32.39650620495593,
+    "table_floor_1p2V": 32.364901698719194
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1765141705168978,
+    "fig8_125C": 0.1717832694517155,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.739265796941332,
+   "exposure_a": 0.028756157790868653,
+   "source_minus_load_coarse_w": 33.72929669773666,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.849836895171522
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.05016310483045138
+   ],
+   "high_residual_v": [
+    12.063185340518196,
+    12.23813830790792,
+    12.237968417491507,
+    12.260642608993022
+   ],
+   "low_residual_v": [
+    2.947893533652536,
+    2.7419954658520087,
+    2.7451839870668495,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.000",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.0,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.493901411721296,
+   "load_power_w": 250.0116309665085,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.87986641318082,
+   "probe_peak_a": 129.2290860053358,
+   "within_screen": true,
+   "p_a_w": 31.884064987686237,
+   "p_b_w": {
+    "fig8_25C": 32.095208010241215,
+    "fig8_125C": 32.09323129234582,
+    "table_floor_1p2V": 31.988989236439373
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1793603450567154,
+    "fig8_125C": 0.17610950423768054,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.371188922890752,
+   "exposure_a": 0.0924277780180159,
+   "source_minus_load_coarse_w": 33.28398730676787,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.85090804404113
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.14909195596106276
+   ],
+   "high_residual_v": [
+    12.05986037991935,
+    12.235466734631164,
+    12.235282708362268,
+    12.26675113661151
+   ],
+   "low_residual_v": [
+    1.9765155170841964,
+    1.7738840056142229,
+    1.7774218582780228,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.100",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.53552099987472,
+   "load_power_w": 250.01541638047064,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.85074727566277,
+   "probe_peak_a": 129.22062800749433,
+   "within_screen": true,
+   "p_a_w": 31.622376969193105,
+   "p_b_w": {
+    "fig8_25C": 31.980010564507587,
+    "fig8_125C": 31.976994706471473,
+    "table_floor_1p2V": 31.79975758155561
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17992337979067252,
+    "fig8_125C": 0.17698539912831956,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.151427631343552,
+   "exposure_a": 0.15634844863141142,
+   "source_minus_load_coarse_w": 33.02523545871972,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8515276577967785
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.2484723422056334
+   ],
+   "high_residual_v": [
+    12.057708652290508,
+    12.23403054732303,
+    12.233831172182196,
+    12.270307494339585
+   ],
+   "low_residual_v": [
+    1.0032925456145871,
+    0.8037666023168077,
+    0.8076535402880365,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.200",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.583198832807536,
+   "load_power_w": 250.01736885100428,
+   "h_zvs": "FFFF",
+   "l_zvs": "FTTT",
+   "peak_a": 128.84276847389884,
+   "probe_peak_a": 129.2194568183782,
+   "within_screen": true,
+   "p_a_w": 31.54610058016717,
+   "p_b_w": {
+    "fig8_25C": 32.08129787766515,
+    "fig8_125C": 32.076355929168614,
+    "table_floor_1p2V": 31.8121559527547
+   },
+   "recharge_w": {
+    "fig8_25C": 0.5111270707837581,
+    "fig8_125C": 0.48977995603394875,
+    "table_floor_1p2V": 0.1404
+   },
+   "missed_capacitive_w": 13.080361353078676,
+   "exposure_a": 0.23430405660116588,
+   "source_minus_load_coarse_w": 32.95276942742311,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    1.1826501948942796,
+    1.1830790301994907,
+    0.8517003745706585
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.017349805108351567,
+    0.016920969803140486,
+    0.34829962543197274
+   ],
+   "high_residual_v": [
+    12.05677525891435,
+    12.23379688475572,
+    12.233584369108815,
+    12.27130718337492
+   ],
+   "low_residual_v": [
+    0.027620331499785118,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.300",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.3,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.63305864213176,
+   "load_power_w": 250.01344215566291,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.84177795217028,
+   "probe_peak_a": 129.22058433147902,
+   "within_screen": true,
+   "p_a_w": 31.54576949649354,
+   "p_b_w": {
+    "fig8_25C": 32.64208883224318,
+    "fig8_125C": 32.63150771664773,
+    "table_floor_1p2V": 32.090977732769865
+   },
+   "recharge_w": {
+    "fig8_25C": 0.712773468978219,
+    "fig8_125C": 0.6973280853467123,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.080068194059377,
+   "exposure_a": 0.48012451578554916,
+   "source_minus_load_coarse_w": 32.952338510257874,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2028389446683263,
+    1.1826605370174879,
+    1.183089379444552,
+    0.8517074708805534
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0971610553345242,
+    0.11733946298536266,
+    0.11691062055829855,
+    0.44829252912229706
+   ],
+   "high_residual_v": [
+    12.056768388678208,
+    12.233788108748634,
+    12.233575569647678,
+    12.27130187402985
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.400",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.4,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.683230774038844,
+   "load_power_w": 250.0182837930571,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.84290580349034,
+   "probe_peak_a": 129.59372915624644,
+   "within_screen": true,
+   "p_a_w": 31.54607100829739,
+   "p_b_w": {
+    "fig8_25C": 33.22408249751274,
+    "fig8_125C": 33.20884725836141,
+    "table_floor_1p2V": 32.379523577801145
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7166481570060943,
+    "fig8_125C": 0.7032346101507742,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.080078730925715,
+   "exposure_a": 0.7342273173675936,
+   "source_minus_load_coarse_w": 32.95317627557094,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2028273722805842,
+    1.1826487411180797,
+    1.1830775772872644,
+    0.8516993842976636
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.19717262772248556,
+    0.21735125888499002,
+    0.2169224227158053,
+    0.5483006157054062
+   ],
+   "high_residual_v": [
+    12.056772987002539,
+    12.233794748489064,
+    12.23358222090952,
+    12.271303178300068
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f1.600",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 1.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.782719232492646,
+   "load_power_w": 250.00393332943588,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.83936686385897,
+   "probe_peak_a": 130.8877447009484,
+   "within_screen": true,
+   "p_a_w": 31.54514363955797,
+   "p_b_w": {
+    "fig8_25C": 34.385195885763935,
+    "fig8_125C": 34.36071728593344,
+    "table_floor_1p2V": 32.954414892403854
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7187004889180871,
+    "fig8_125C": 0.7063931064385227,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.080027287925736,
+   "exposure_a": 1.241814763395382,
+   "source_minus_load_coarse_w": 32.95386225089473,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.202863651518255,
+    1.1826857159392068,
+    1.1831145590066277,
+    0.8517247344623393
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.3971363484784772,
+    0.41731428405752535,
+    0.41688544099010433,
+    0.7482752655343927
+   ],
+   "high_residual_v": [
+    12.056751266707629,
+    12.233766070540142,
+    12.233553552529653,
+    12.271288206482593
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r0.500_f2.150",
+   "design": "baseline",
+   "rise_ns": 0.5,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.053938337251218,
+   "load_power_w": 249.8978192675324,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.81361376842548,
+   "probe_peak_a": 130.7186035906911,
+   "within_screen": true,
+   "p_a_w": 31.538368546209558,
+   "p_b_w": {
+    "fig8_25C": 37.56466021643129,
+    "fig8_125C": 37.514471232796325,
+    "table_floor_1p2V": 34.52698372293069
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7197733019786934,
+    "fig8_125C": 0.70805679455278,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.079693064347026,
+   "exposure_a": 2.633815168457417,
+   "source_minus_load_coarse_w": 32.94211029077593,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2031279374766886,
+    1.1829549662425478,
+    1.1833839314012977,
+    0.8519093412138827
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.9468720625246376,
+    0.9670450337587785,
+    0.9666160686000285,
+    1.2980906587874435
+   ],
+   "high_residual_v": [
+    12.056607534917156,
+    12.233573672439785,
+    12.233361049485742,
+    12.271201769449313
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f0.900",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.706134248450084,
+   "load_power_w": 249.99492703105494,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.89657120455576,
+   "probe_peak_a": 129.22487346063662,
+   "within_screen": true,
+   "p_a_w": 32.23449594680671,
+   "p_b_w": {
+    "fig8_25C": 32.29904727787964,
+    "fig8_125C": 32.29814795620618,
+    "table_floor_1p2V": 32.26689812425989
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1764649352249451,
+    "fig8_125C": 0.171709023071897,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.672339912046683,
+   "exposure_a": 0.028446309231695072,
+   "source_minus_load_coarse_w": 33.630624444784104,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8503072753692593
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.049692724632714125
+   ],
+   "high_residual_v": [
+    12.018983065546472,
+    12.182036424994706,
+    12.181792557650384,
+    12.30981238289064
+   ],
+   "low_residual_v": [
+    2.9471076086344237,
+    2.740268900527459,
+    2.743450635241083,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.000",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.0,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.741504882880058,
+   "load_power_w": 249.99596755571648,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.8460499894161,
+   "probe_peak_a": 129.19543027773207,
+   "within_screen": true,
+   "p_a_w": 31.78667222325844,
+   "p_b_w": {
+    "fig8_25C": 31.997078014728952,
+    "fig8_125C": 31.995103168745096,
+    "table_floor_1p2V": 31.89123544141822
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1793460633532153,
+    "fig8_125C": 0.1760871905656358,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.304460213124866,
+   "exposure_a": 0.09210791819193402,
+   "source_minus_load_coarse_w": 33.185137347550295,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8513673668132757
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.14863263318891698
+   ],
+   "high_residual_v": [
+    12.016580667148162,
+    12.180054541153456,
+    12.17980063848735,
+    12.312858507174651
+   ],
+   "low_residual_v": [
+    1.9758247494838184,
+    1.7721919779899773,
+    1.7757230455908064,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.100",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.783048526285818,
+   "load_power_w": 249.99755123089764,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.81697510135305,
+   "probe_peak_a": 129.18697452434006,
+   "within_screen": true,
+   "p_a_w": 31.52518405554794,
+   "p_b_w": {
+    "fig8_25C": 31.88204703379106,
+    "fig8_125C": 31.879030729817302,
+    "table_floor_1p2V": 31.702189789693936
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1799118374881081,
+    "fig8_125C": 0.17696727231762768,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.084893403931195,
+   "exposure_a": 0.1560154045270347,
+   "source_minus_load_coarse_w": 32.926475840094184,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8519818074168429
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.24801819258556904
+   ],
+   "high_residual_v": [
+    12.015035312187422,
+    12.178982600247725,
+    12.178718054512863,
+    12.314636174349001
+   ],
+   "low_residual_v": [
+    1.0026828962277936,
+    0.8020923506899327,
+    0.8059726005526815,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.200",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.83070548507049,
+   "load_power_w": 249.99877399861197,
+   "h_zvs": "FFFF",
+   "l_zvs": "FTTT",
+   "peak_a": 128.80899588950382,
+   "probe_peak_a": 129.18582137187414,
+   "within_screen": true,
+   "p_a_w": 31.44909613832306,
+   "p_b_w": {
+    "fig8_25C": 31.983914465052578,
+    "fig8_125C": 31.978961430213456,
+    "table_floor_1p2V": 31.71497887405225
+   },
+   "recharge_w": {
+    "fig8_25C": 0.5113181285377537,
+    "fig8_125C": 0.4900336565356753,
+    "table_floor_1p2V": 0.1404
+   },
+   "missed_capacitive_w": 13.014008997894006,
+   "exposure_a": 0.23414673982426124,
+   "source_minus_load_coarse_w": 32.85454072955153,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    1.1824756144954498,
+    1.1829036825954868,
+    0.8521529480860247
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.017524385507181398,
+    0.017096317407144485,
+    0.34784705191660653
+   ],
+   "high_residual_v": [
+    12.014377488562623,
+    12.178797016589648,
+    12.178523577321226,
+    12.315134683791074
+   ],
+   "low_residual_v": [
+    0.027040662440543758,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.300",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.3,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.88056741005187,
+   "load_power_w": 249.9949134341559,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.80802153996413,
+   "probe_peak_a": 129.18271464090668,
+   "within_screen": true,
+   "p_a_w": 31.44876048532815,
+   "p_b_w": {
+    "fig8_25C": 32.54484185777945,
+    "fig8_125C": 32.53425178883898,
+    "table_floor_1p2V": 31.993862324788882
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7127765261325213,
+    "fig8_125C": 0.697332098472655,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.013711942937846,
+   "exposure_a": 0.4800265367624578,
+   "source_minus_load_coarse_w": 32.853944207355596,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2027793841913874,
+    1.1824857805543896,
+    1.1829138537230717,
+    0.8521599336853254
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0972206158114631,
+    0.11751421944846091,
+    0.11708614627977884,
+    0.44784006631752515
+   ],
+   "high_residual_v": [
+    12.014367494460046,
+    12.17878533686605,
+    12.178511904753261,
+    12.315125237934428
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.400",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.4,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.930112480527633,
+   "load_power_w": 249.9821596286504,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.80491498927285,
+   "probe_peak_a": 129.54059646126547,
+   "within_screen": true,
+   "p_a_w": 31.447925770244147,
+   "p_b_w": {
+    "fig8_25C": 33.125379918623125,
+    "fig8_125C": 33.11013368682498,
+    "table_floor_1p2V": 32.28111886549968
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7166388121417614,
+    "fig8_125C": 0.7032199541807792,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.013656930536929,
+   "exposure_a": 0.7339924463119967,
+   "source_minus_load_coarse_w": 32.852498069350986,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.202811235323769,
+    1.1825182298716028,
+    1.1829463163115972,
+    0.8521822166996534
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.19718876467930083,
+    0.2174817701314669,
+    0.21705368369147263,
+    0.5478177833034165
+   ],
+   "high_residual_v": [
+    12.01434290561054,
+    12.178755898851858,
+    12.178482457336482,
+    12.315106319755069
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f1.600",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 1.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.027323373813854,
+   "load_power_w": 249.90392632493516,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.78600212132363,
+   "probe_peak_a": 130.88355246289885,
+   "within_screen": true,
+   "p_a_w": 31.44284167558604,
+   "p_b_w": {
+    "fig8_25C": 34.28102030144835,
+    "fig8_125C": 34.25651868041107,
+    "table_floor_1p2V": 32.851230175732525
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7186706874144204,
+    "fig8_125C": 0.7063479800925558,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.013343795814245,
+   "exposure_a": 1.241019785750006,
+   "source_minus_load_coarse_w": 32.8459759592167,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2030052213084068,
+    1.1827158904274675,
+    1.1831440470288948,
+    0.8523179400109053
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.39699477868832533,
+    0.41728410956926465,
+    0.4168559529678373,
+    0.7476820599858268
+   ],
+   "high_residual_v": [
+    12.014203202468806,
+    12.178586609423629,
+    12.178313247588969,
+    12.315005467274482
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r1.000_f2.150",
+   "design": "baseline",
+   "rise_ns": 1.0,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.305728089976046,
+   "load_power_w": 249.9995298425726,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.80879035960865,
+   "probe_peak_a": 133.3137929629374,
+   "within_screen": true,
+   "p_a_w": 31.448963154692652,
+   "p_b_w": {
+    "fig8_25C": 37.477914080728866,
+    "fig8_125C": 37.42776712675502,
+    "table_floor_1p2V": 34.43882712966874
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7198028613854969,
+    "fig8_125C": 0.7081027273333633,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 13.013666798595686,
+   "exposure_a": 2.634941359679784,
+   "source_minus_load_coarse_w": 32.8526947208517,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2027714670794616,
+    1.1824776761194333,
+    1.1829057460693901,
+    0.8521543957601992
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.9472285329218647,
+    0.9675223238818929,
+    0.9670942539319359,
+    1.2978456042411268
+   ],
+   "high_residual_v": [
+    12.014348410748312,
+    12.17876697649837,
+    12.1784935430328,
+    12.31509320106904
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f0.900",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.279536997271784,
+   "load_power_w": 249.96777805037303,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.87720910477975,
+   "probe_peak_a": 129.2053273950698,
+   "within_screen": true,
+   "p_a_w": 32.16384778009095,
+   "p_b_w": {
+    "fig8_25C": 32.22639251086635,
+    "fig8_125C": 32.22550913342189,
+    "table_floor_1p2V": 32.195256722843204
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17633908156848266,
+    "fig8_125C": 0.17152116531968248,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.63039016941081,
+   "exposure_a": 0.027569933855958868,
+   "source_minus_load_coarse_w": 33.558038077438994,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8516647570114093
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.04833524299056413
+   ],
+   "high_residual_v": [
+    11.965584082947416,
+    12.101991342346764,
+    12.101565026275333,
+    12.487424114134232
+   ],
+   "low_residual_v": [
+    2.9437062417013347,
+    2.734040783874209,
+    2.7372015837259105,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.000",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.0,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.314720052257833,
+   "load_power_w": 249.964134236795,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.8259439769679,
+   "probe_peak_a": 129.17501863980576,
+   "within_screen": true,
+   "p_a_w": 31.717098717870723,
+   "p_b_w": {
+    "fig8_25C": 31.925521215774584,
+    "fig8_125C": 31.923558605320487,
+    "table_floor_1p2V": 31.820683097524416
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17932728500261655,
+    "fig8_125C": 0.17605814346294965,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.263317857914327,
+   "exposure_a": 0.09124357158212429,
+   "source_minus_load_coarse_w": 33.113270047371486,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8526883078945383
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.1473116921076544
+   ],
+   "high_residual_v": [
+    11.965309696809669,
+    12.101607349959693,
+    12.101180257080262,
+    12.483574065735922
+   ],
+   "low_residual_v": [
+    1.97278767360507,
+    1.7662370224655002,
+    1.7697476929455347,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.100",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.356097324941107,
+   "load_power_w": 249.96105861367178,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.79602785590737,
+   "probe_peak_a": 129.16631160510676,
+   "within_screen": true,
+   "p_a_w": 31.45645935601189,
+   "p_b_w": {
+    "fig8_25C": 31.81134074218076,
+    "fig8_125C": 31.80833479502849,
+    "table_floor_1p2V": 31.63248883601358
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17990115814040344,
+    "fig8_125C": 0.1769505010584258,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.044495501294014,
+   "exposure_a": 0.15515273227269077,
+   "source_minus_load_coarse_w": 32.85597282082463,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8532840280501436
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.24671597195226846
+   ],
+   "high_residual_v": [
+    11.965158137482753,
+    12.101376076739818,
+    12.100949050068998,
+    12.481350979889072
+   ],
+   "low_residual_v": [
+    0.9999473299183699,
+    0.7963439636713481,
+    0.800204510770239,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.100_step1p25ps",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 15.625,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.356097324941107,
+   "load_power_w": 250.04858250052277,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.81934788573375,
+   "probe_peak_a": 128.81934788573375,
+   "within_screen": true,
+   "p_a_w": 31.451261360039418,
+   "p_b_w": {
+    "fig8_25C": 31.806230854913533,
+    "fig8_125C": 31.803228613484457,
+    "table_floor_1p2V": 31.627318140651667
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1799089189996599,
+    "fig8_125C": 0.17696268898140538,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 7.509390916223948,
+   "exposure_a": 0.1551986505016051,
+   "source_minus_load_coarse_w": 32.075898524328835,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8532612987680369
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.24673870123437508
+   ],
+   "high_residual_v": [
+    11.965079062738795,
+    12.100631150559998,
+    12.100203541586563,
+    12.481688249674269
+   ],
+   "low_residual_v": [
+    1.00005571870391,
+    0.7961948213062122,
+    0.8000565256304486,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.100_step2p5ps",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 31.25,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.356097324941107,
+   "load_power_w": 250.0194215590634,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.8115805870394,
+   "probe_peak_a": 128.8115805870394,
+   "within_screen": true,
+   "p_a_w": 31.452990759498036,
+   "p_b_w": {
+    "fig8_25C": 31.80793243554268,
+    "fig8_125C": 31.804928957880666,
+    "table_floor_1p2V": 31.629039928323607
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1799063326277216,
+    "fig8_125C": 0.1769586272356415,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 10.40419888733261,
+   "exposure_a": 0.15518339840896395,
+   "source_minus_load_coarse_w": 32.33595025176723,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8532687922211877
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.24673120778122434
+   ],
+   "high_residual_v": [
+    11.965105690752893,
+    12.100879260126415,
+    12.10045181357459,
+    12.481575910335874
+   ],
+   "low_residual_v": [
+    1.000018575186443,
+    0.7962432157905593,
+    0.800104547960013,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.200",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.403712893630015,
+   "load_power_w": 249.9606782878595,
+   "h_zvs": "FFFF",
+   "l_zvs": "FTTT",
+   "peak_a": 128.7877943176747,
+   "probe_peak_a": 129.16561236519541,
+   "within_screen": true,
+   "p_a_w": 31.381091792233697,
+   "p_b_w": {
+    "fig8_25C": 31.915359835442526,
+    "fig8_125C": 31.910387110959118,
+    "table_floor_1p2V": 31.64672698252669
+   },
+   "recharge_w": {
+    "fig8_25C": 0.5119689275250942,
+    "fig8_125C": 0.49090176737623525,
+    "table_floor_1p2V": 0.1404
+   },
+   "missed_capacitive_w": 12.974271069154735,
+   "exposure_a": 0.2339208112751087,
+   "source_minus_load_coarse_w": 32.78399536502201,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    1.1818919845730376,
+    1.182317907446939,
+    0.8534493278816648
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.01810801542959377,
+    0.01768209255569226,
+    0.34655067212096646
+   ],
+   "high_residual_v": [
+    11.965129927869206,
+    12.101300900338696,
+    12.100874335392039,
+    12.480729874384979
+   ],
+   "low_residual_v": [
+    0.02447109572446287,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.300",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.3,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.453639508051438,
+   "load_power_w": 249.95865323960328,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.78726583237545,
+   "probe_peak_a": 129.15223820773954,
+   "within_screen": true,
+   "p_a_w": 31.380863264608923,
+   "p_b_w": {
+    "fig8_25C": 32.47700192350488,
+    "fig8_125C": 32.46640111005556,
+    "table_floor_1p2V": 31.92600430471419
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7127978462488711,
+    "fig8_125C": 0.6973639595838463,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.973982754639813,
+   "exposure_a": 0.4800572675300799,
+   "source_minus_load_coarse_w": 32.78408473131742,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2025118254704403,
+    1.1818974838023104,
+    1.182323410484472,
+    0.8534531157316898
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.09748817453241018,
+    0.11810251620054013,
+    0.11767658951837849,
+    0.4465468842711608
+   ],
+   "high_residual_v": [
+    11.965118243152567,
+    12.101288406305674,
+    12.10086181147894,
+    12.480715909488445
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.400",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.4,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.501660843516213,
+   "load_power_w": 249.90338216571266,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.77389521626816,
+   "probe_peak_a": 129.55281807045785,
+   "within_screen": true,
+   "p_a_w": 31.37710624466478,
+   "p_b_w": {
+    "fig8_25C": 33.053856054949335,
+    "fig8_125C": 33.038594886805626,
+    "table_floor_1p2V": 32.20997274602978
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7166219853710543,
+    "fig8_125C": 0.703193797134306,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.973640530536308,
+   "exposure_a": 0.7336963033038327,
+   "source_minus_load_coarse_w": 32.7796588627661,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2026485824024453,
+    1.1820368618540535,
+    1.1824628514504345,
+    0.8535492345775367
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.19735141760062455,
+    0.21796313814901616,
+    0.2175371485526353,
+    0.5464507654255331
+   ],
+   "high_residual_v": [
+    11.964959872820288,
+    12.1011192302438,
+    12.100692383363667,
+    12.48057381928802
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f1.600",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 1.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.6051096628476,
+   "load_power_w": 249.99983086695093,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.79706553755213,
+   "probe_peak_a": 130.8704976633369,
+   "within_screen": true,
+   "p_a_w": 31.38357620413015,
+   "p_b_w": {
+    "fig8_25C": 34.224214500867745,
+    "fig8_125C": 34.199719109693994,
+    "table_floor_1p2V": 32.79315475428305
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7187014373863306,
+    "fig8_125C": 0.706395637425409,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.974178404694028,
+   "exposure_a": 1.2420794755575626,
+   "source_minus_load_coarse_w": 32.78621368481018,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2024115852875326,
+    1.181795300942562,
+    1.1822211860862277,
+    0.8533826424278479
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.3975884147091994,
+    0.4182046990541702,
+    0.41777881391050425,
+    0.7466173575688843
+   ],
+   "high_residual_v": [
+    11.965210803297815,
+    12.101388776102972,
+    12.100962268895916,
+    12.480785426294057
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.150_f2.150",
+   "design": "baseline",
+   "rise_ns": 2.15,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.879471882680587,
+   "load_power_w": 249.98215492413627,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.79257649927374,
+   "probe_peak_a": 128.79257649927374,
+   "within_screen": true,
+   "p_a_w": 31.38225935781161,
+   "p_b_w": {
+    "fig8_25C": 37.411364078784835,
+    "fig8_125C": 37.361199132555576,
+    "table_floor_1p2V": 34.372220202189546
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7197975153719718,
+    "fig8_125C": 0.7080947883843426,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.97398943585106,
+   "exposure_a": 2.6350191640895826,
+   "source_minus_load_coarse_w": 32.784016350454436,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2024574531821117,
+    1.181842032651505,
+    1.1822679418813997,
+    0.8534148543149498
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.9475425468192145,
+    0.9681579673498212,
+    0.9677320581199265,
+    1.2965851456863764
+   ],
+   "high_residual_v": [
+    11.965126267892735,
+    12.10130021676536,
+    12.100873567839649,
+    12.480691549366856
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f0.900",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.456654261005813,
+   "load_power_w": 249.96048335537498,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.8892317595571,
+   "probe_peak_a": 129.2169225401258,
+   "within_screen": true,
+   "p_a_w": 32.18091174894788,
+   "p_b_w": {
+    "fig8_25C": 32.24271914482235,
+    "fig8_125C": 32.24184215419356,
+    "table_floor_1p2V": 32.21195517581736
+   },
+   "recharge_w": {
+    "fig8_25C": 0.1762955739318964,
+    "fig8_125C": 0.1714566662727903,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.645771587931366,
+   "exposure_a": 0.027247631220446242,
+   "source_minus_load_coarse_w": 33.57449992472698,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8521706135849441
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.047829386417029336
+   ],
+   "high_residual_v": [
+    11.961236140442047,
+    12.089614159553747,
+    12.089128584955652,
+    12.558881259619117
+   ],
+   "low_residual_v": [
+    2.9421496761332713,
+    2.7314261550208503,
+    2.7345788415773478,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.000",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.0,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.491781294236237,
+   "load_power_w": 249.95554399643436,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.83728285795652,
+   "probe_peak_a": 129.18609181707336,
+   "within_screen": true,
+   "p_a_w": 31.734651788410588,
+   "p_b_w": {
+    "fig8_25C": 31.942369286388416,
+    "fig8_125C": 31.94041278231176,
+    "table_floor_1p2V": 31.837886271806042
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17932570834379918,
+    "fig8_125C": 0.17605570994477907,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.279062685942304,
+   "exposure_a": 0.09093533210195485,
+   "source_minus_load_coarse_w": 33.13094450876304,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.8531797749097348
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.1468202250924579
+   ],
+   "high_residual_v": [
+    11.961623191793755,
+    12.089729399771382,
+    12.08924571131853,
+    12.552949634746742
+   ],
+   "low_residual_v": [
+    1.97138561950481,
+    1.7637618184817976,
+    1.7672647468071232,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.100",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.1,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.533111407903963,
+   "load_power_w": 249.95118456024474,
+   "h_zvs": "FFFF",
+   "l_zvs": "FFFT",
+   "peak_a": 128.80684394754658,
+   "probe_peak_a": 129.17723854605674,
+   "within_screen": true,
+   "p_a_w": 31.474400771391444,
+   "p_b_w": {
+    "fig8_25C": 31.828601503835188,
+    "fig8_125C": 31.825602230374532,
+    "table_floor_1p2V": 31.650091593111203
+   },
+   "recharge_w": {
+    "fig8_25C": 0.17990268127421175,
+    "fig8_125C": 0.17695289302830036,
+    "table_floor_1p2V": 0.0468
+   },
+   "missed_capacitive_w": 13.060565044404177,
+   "exposure_a": 0.15485471575793633,
+   "source_minus_load_coarse_w": 32.87329826385292,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.853767767912411
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.24623223209000095
+   ],
+   "high_residual_v": [
+    11.961903106151858,
+    12.08975917070741,
+    12.089278709118798,
+    12.54951994672916
+   ],
+   "low_residual_v": [
+    0.9986719740110344,
+    0.7939798947733997,
+    0.7978331274752594,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.200",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.5807158204645,
+   "load_power_w": 249.95030980834977,
+   "h_zvs": "FFFF",
+   "l_zvs": "FTTT",
+   "peak_a": 128.79845927897077,
+   "probe_peak_a": 129.17677488520573,
+   "within_screen": true,
+   "p_a_w": 31.39934534862597,
+   "p_b_w": {
+    "fig8_25C": 31.933542528565468,
+    "fig8_125C": 31.928565583018738,
+    "table_floor_1p2V": 31.66495018522167
+   },
+   "recharge_w": {
+    "fig8_25C": 0.512233068175701,
+    "fig8_125C": 0.49125721197895994,
+    "table_floor_1p2V": 0.1404
+   },
+   "missed_capacitive_w": 12.990620936115068,
+   "exposure_a": 0.2338929508647248,
+   "source_minus_load_coarse_w": 32.80194061887852,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    null,
+    1.1816549909241838,
+    1.1820801317935514,
+    0.853930656922146
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.018345009078447536,
+    0.017919868209079856,
+    0.3460693430804853
+   ],
+   "high_residual_v": [
+    11.962068526068869,
+    12.089718300078442,
+    12.089241229368005,
+    12.548565758101685
+   ],
+   "low_residual_v": [
+    0.023276494338010083,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.300",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.3,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.630677229940776,
+   "load_power_w": 249.94927046040135,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.7981630587794,
+   "probe_peak_a": 129.16037431796406,
+   "within_screen": true,
+   "p_a_w": 31.39917764068127,
+   "p_b_w": {
+    "fig8_25C": 32.495518899412474,
+    "fig8_125C": 32.484917723727285,
+    "table_floor_1p2V": 31.944417667620396
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7128089081283937,
+    "fig8_125C": 0.6973808646332155,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.990339308253741,
+   "exposure_a": 0.4801451030827344,
+   "source_minus_load_coarse_w": 32.801633188213714,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2023872359464942,
+    1.181658065572467,
+    1.1820832084577733,
+    0.8539327734338644
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.09761276405635634,
+    0.11834193443038343,
+    0.11791679154507734,
+    0.44606722656898606
+   ],
+   "high_residual_v": [
+    11.962056965572117,
+    12.089706650748674,
+    12.089229539669892,
+    12.548551061579614
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.400",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.4,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.67824523018292,
+   "load_power_w": 249.88146046182248,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.78176695386162,
+   "probe_peak_a": 129.56654152379815,
+   "within_screen": true,
+   "p_a_w": 31.394514563933242,
+   "p_b_w": {
+    "fig8_25C": 33.07124515497307,
+    "fig8_125C": 33.05598257750072,
+    "table_floor_1p2V": 32.22737333929332
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7166187324013772,
+    "fig8_125C": 0.7031888239218052,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.98987958968126,
+   "exposure_a": 0.733688831744844,
+   "source_minus_load_coarse_w": 32.79588989690669,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.202554806365027,
+    1.181828859791621,
+    1.1822540710494265,
+    0.8540507150874866
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.19744519363804275,
+    0.21817114021144887,
+    0.21774592895364325,
+    0.5459492849155831
+   ],
+   "high_residual_v": [
+    11.961842851549598,
+    12.089483052770102,
+    12.089005852143465,
+    12.548353087265834
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f1.600",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 1.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 18.78248608984269,
+   "load_power_w": 249.99983642530702,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.81023527622455,
+   "probe_peak_a": 130.88947371715403,
+   "within_screen": true,
+   "p_a_w": 31.402563055270747,
+   "p_b_w": {
+    "fig8_25C": 34.243550797002754,
+    "fig8_125C": 34.21905439472432,
+    "table_floor_1p2V": 32.8123118313302
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7187024314265947,
+    "fig8_125C": 0.706396891319293,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.990618055271483,
+   "exposure_a": 1.2422306028990968,
+   "source_minus_load_coarse_w": 32.80490302833465,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2022638523535194,
+    1.181532292675731,
+    1.1819573868193731,
+    0.8538459050721039
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.39773614764321263,
+    0.4184677073210011,
+    0.4180426131773589,
+    0.7461540949246283
+   ],
+   "high_residual_v": [
+    11.96218931030186,
+    12.089845608721948,
+    12.089368578041958,
+    12.548659113937445
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "baseline_r2.500_f2.150",
+   "design": "baseline",
+   "rise_ns": 2.5,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 19.057483053253335,
+   "load_power_w": 249.99993589403712,
+   "h_zvs": "FFFF",
+   "l_zvs": "TTTT",
+   "peak_a": 128.8100335505801,
+   "probe_peak_a": 129.0433167735007,
+   "within_screen": true,
+   "p_a_w": 31.402432499624123,
+   "p_b_w": {
+    "fig8_25C": 37.432343482498695,
+    "fig8_125C": 37.382185375136764,
+    "table_floor_1p2V": 34.392775986411436
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7198028643556982,
+    "fig8_125C": 0.7081027058218511,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 12.990523170327943,
+   "exposure_a": 2.635362657323134,
+   "source_minus_load_coarse_w": 32.8037223926367,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "low_transition_ns": [
+    1.2022658752511566,
+    1.1815343362443602,
+    1.1819594317466433,
+    0.8538472839434862
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_reverse_ns": [
+    0.9477341247501696,
+    0.968465663756966,
+    0.968040568254683,
+    1.29615271605784
+   ],
+   "high_residual_v": [
+    11.962148884826227,
+    12.08980459679288,
+    12.089327571779743,
+    12.548600823680292
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f0.500",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 0.5,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.128099641887633,
+   "load_power_w": 249.95381868460774,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.16631974697844,
+   "probe_peak_a": 217.68699962686202,
+   "within_screen": true,
+   "p_a_w": 29.743158187036254,
+   "p_b_w": {
+    "fig8_25C": 29.889226312417406,
+    "fig8_125C": 29.88618806453834,
+    "table_floor_1p2V": 29.817789592325077
+   },
+   "recharge_w": {
+    "fig8_25C": 0.3416345138144913,
+    "fig8_125C": 0.3270574108214488,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 1.26584533764789,
+   "exposure_a": 0.06501480002306084,
+   "source_minus_load_coarse_w": 32.48906610556543,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4094921359824784
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.49610004526043666
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19050786401425374
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0038999547406597113
+   ],
+   "high_residual_v": [
+    2.3531914644306227,
+    2.347979925287099,
+    2.351369328246655,
+    0.0
+   ],
+   "low_residual_v": [
+    3.381542640697143,
+    3.0683329745914576,
+    3.0713819544440764,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f0.600",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.16335738802943,
+   "load_power_w": 249.9425584753141,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.09285466302876,
+   "probe_peak_a": 217.8222318723369,
+   "within_screen": true,
+   "p_a_w": 28.971682692484208,
+   "p_b_w": {
+    "fig8_25C": 29.36731288103136,
+    "fig8_125C": 29.370494183068907,
+    "table_floor_1p2V": 29.159967989138302
+   },
+   "recharge_w": {
+    "fig8_25C": 0.37546424692746483,
+    "fig8_125C": 0.3781957725573886,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.6232310286565411,
+   "exposure_a": 0.1690898581938739,
+   "source_minus_load_coarse_w": 31.72768897225174,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4081392948442113
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.49681025022656244
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19186070515252088
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10318974977475319
+   ],
+   "high_residual_v": [
+    2.355653255858641,
+    2.3493811019230932,
+    2.3527809537863185,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7209107207113759,
+    1.416841952473757,
+    1.4204675509406832,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f0.700",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 0.7,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.209076590540533,
+   "load_power_w": 249.93896264150933,
+   "h_zvs": "FFFT",
+   "l_zvs": "FTTT",
+   "peak_a": 217.01548969584087,
+   "probe_peak_a": 217.84261521889127,
+   "within_screen": true,
+   "p_a_w": 28.74009474951037,
+   "p_b_w": {
+    "fig8_25C": 29.437977995104763,
+    "fig8_125C": 29.448338627891207,
+    "table_floor_1p2V": 29.066610714439513
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7389654274822827,
+    "fig8_125C": 0.737836164343447,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 0.4097739154100772,
+   "exposure_a": 0.29536493214149195,
+   "source_minus_load_coarse_w": 31.50690427380016,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4077480673952825
+   ],
+   "low_transition_ns": [
+    null,
+    0.6854890689129425,
+    0.6857370972564115,
+    0.49701673993538475
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19225193260144968
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.014510931088592425,
+    0.014262902745123358,
+    0.20298326006615014
+   ],
+   "high_residual_v": [
+    2.356829104768842,
+    2.3495546548555026,
+    2.352966589193546,
+    0.0
+   ],
+   "low_residual_v": [
+    0.054368586378358,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f0.800",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 0.8,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.25916591567515,
+   "load_power_w": 249.9417023392276,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.0165148857791,
+   "probe_peak_a": 217.77724823098075,
+   "within_screen": true,
+   "p_a_w": 28.740176515599654,
+   "p_b_w": {
+    "fig8_25C": 30.437156087836662,
+    "fig8_125C": 30.47329719519129,
+    "table_floor_1p2V": 29.520645235623476
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9856329573495435,
+    "fig8_125C": 1.016768064639958,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.40888004515115955,
+   "exposure_a": 0.7115044298660768,
+   "source_minus_load_coarse_w": 31.506855712954916,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4077389399850833
+   ],
+   "low_transition_ns": [
+    0.7032533827772537,
+    0.685485445072213,
+    0.6857334710101085,
+    0.49701428799861913
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19226106001164886
+   ],
+   "low_residual_reverse_ns": [
+    0.09674661722450044,
+    0.11451455492954114,
+    0.11426652899164565,
+    0.302985712003135
+   ],
+   "high_residual_v": [
+    2.356773998877415,
+    2.349498223445522,
+    2.3529102244677986,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f0.900",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.30389702745754,
+   "load_power_w": 249.782252935697,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 216.95111893751556,
+   "probe_peak_a": 219.51235265910023,
+   "within_screen": true,
+   "p_a_w": 28.722525431106714,
+   "p_b_w": {
+    "fig8_25C": 31.456954232753088,
+    "fig8_125C": 31.523023554837483,
+    "table_floor_1p2V": 29.971229930862886
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9923058451171326,
+    "fig8_125C": 1.0273838442952348,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.409738196221751,
+   "exposure_a": 1.1416392335227514,
+   "source_minus_load_coarse_w": 31.48683511742894,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4081565895629282
+   ],
+   "low_transition_ns": [
+    0.7034795740861821,
+    0.685717224013549,
+    0.6859653384765518,
+    0.49717174514191737
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19184341043380382
+   ],
+   "low_residual_reverse_ns": [
+    0.1965204259157913,
+    0.21428277598842443,
+    0.21403466152542155,
+    0.4028282548600561
+   ],
+   "high_residual_v": [
+    2.3592897250998632,
+    2.3520808427116506,
+    2.3554916438636013,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f1.200",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.461055901328255,
+   "load_power_w": 249.99895714176023,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.0395572070075,
+   "probe_peak_a": 224.93882260646222,
+   "within_screen": true,
+   "p_a_w": 28.746523637725506,
+   "p_b_w": {
+    "fig8_25C": 34.60372626486392,
+    "fig8_125C": 34.76006839631291,
+    "table_floor_1p2V": 31.40453120063183
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9966929503399395,
+    "fig8_125C": 1.03437018906522,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.4085537921451425,
+   "exposure_a": 2.4361663994017406,
+   "source_minus_load_coarse_w": 31.512148343062506,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4075838979021242
+   ],
+   "low_transition_ns": [
+    0.7031735903525517,
+    0.6854036883510012,
+    0.68565166069204,
+    0.49695835232802726
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.19241610209460788
+   ],
+   "low_residual_reverse_ns": [
+    0.4968264096500796,
+    0.51459631165163,
+    0.5143483393105913,
+    0.703041647674604
+   ],
+   "high_residual_v": [
+    2.355816836222715,
+    2.348515064031865,
+    2.351928688856958,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.600_f2.150",
+   "design": "zvs",
+   "rise_ns": 1.6,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.942522316269095,
+   "load_power_w": 250.19514567711607,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.11898506483038,
+   "probe_peak_a": 218.80712989600593,
+   "within_screen": true,
+   "p_a_w": 28.768182384218544,
+   "p_b_w": {
+    "fig8_25C": 44.452687021207126,
+    "fig8_125C": 44.88928692773395,
+    "table_floor_1p2V": 35.86569405985596
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9979866185441861,
+    "fig8_125C": 1.0364324151388962,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.4074593284304443,
+   "exposure_a": 6.51209560161594,
+   "source_minus_load_coarse_w": 31.530489670668175,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.40705210419041
+   ],
+   "low_transition_ns": [
+    0.7028992830185701,
+    0.685122546148926,
+    0.6853704480947506,
+    0.496767364280981
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.1929478958063221
+   ],
+   "low_residual_reverse_ns": [
+    1.447100716982756,
+    1.4648774538524,
+    1.4646295519065757,
+    1.6532326357203453
+   ],
+   "high_residual_v": [
+    2.3526027231981885,
+    2.3452169528310307,
+    2.3486301678343686,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f0.500",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 0.5,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.049609923766624,
+   "load_power_w": 249.9517025074055,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.23844274436382,
+   "probe_peak_a": 217.75910129615966,
+   "within_screen": true,
+   "p_a_w": 29.362877631570317,
+   "p_b_w": {
+    "fig8_25C": 29.66304854766103,
+    "fig8_125C": 29.656848796039856,
+    "table_floor_1p2V": 29.51621291868251
+   },
+   "recharge_w": {
+    "fig8_25C": 0.3427212806767648,
+    "fig8_125C": 0.328582070137377,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.9842659468999989,
+   "exposure_a": 0.13355236308696114,
+   "source_minus_load_coarse_w": 32.08847869483483,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.404217644415093
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.495843350892391
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.3957823555820778
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.004156649108705323
+   ],
+   "high_residual_v": [
+    1.2811970905581305,
+    1.2637428681548997,
+    1.2675518553688718,
+    0.0
+   ],
+   "low_residual_v": [
+    3.385541362766988,
+    3.07200540745189,
+    3.0750817692340324,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f0.600",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.08485451251811,
+   "load_power_w": 249.93993270986465,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.1651172880165,
+   "probe_peak_a": 217.89454586547686,
+   "within_screen": true,
+   "p_a_w": 28.58973333877904,
+   "p_b_w": {
+    "fig8_25C": 29.139677082231955,
+    "fig8_125C": 29.139696334493955,
+    "table_floor_1p2V": 28.85682367865396
+   },
+   "recharge_w": {
+    "fig8_25C": 0.3754652527308026,
+    "fig8_125C": 0.37818838505068586,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.3403838717956117,
+   "exposure_a": 0.2377171543689777,
+   "source_minus_load_coarse_w": 31.324342927457394,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.402865826905978
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4965544885400476
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.3971341730911926
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10344551146126806
+   ],
+   "high_residual_v": [
+    1.2844917957637705,
+    1.265683358951911,
+    1.269506291939802,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7244007685781113,
+    1.4200259994304607,
+    1.4236748371939112,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f0.700",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 0.7,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.130556563407527,
+   "load_power_w": 249.93598820114377,
+   "h_zvs": "FFFT",
+   "l_zvs": "FTTT",
+   "peak_a": 217.0875548756127,
+   "probe_peak_a": 217.91539532410155,
+   "within_screen": true,
+   "p_a_w": 28.357106462372116,
+   "p_b_w": {
+    "fig8_25C": 29.20838180391097,
+    "fig8_125C": 29.21554449049849,
+    "table_floor_1p2V": 28.762022247917844
+   },
+   "recharge_w": {
+    "fig8_25C": 0.73860198380915,
+    "fig8_125C": 0.737287213111889,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 0.12604604337352196,
+   "exposure_a": 0.3636137318415114,
+   "source_minus_load_coarse_w": 31.103434066249434,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4024773642166348
+   ],
+   "low_transition_ns": [
+    null,
+    0.6856550079832884,
+    0.6859042000856524,
+    0.4967614702733683
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.3975226357805358
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.01434499201824653,
+    0.01409579991588244,
+    0.2032385297281666
+   ],
+   "high_residual_v": [
+    1.286046225175788,
+    1.2659439435201634,
+    1.2697825890008048,
+    0.0
+   ],
+   "low_residual_v": [
+    0.05733226215526038,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f0.800",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 0.8,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.180666054375834,
+   "load_power_w": 249.93936681317348,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.08883214849433,
+   "probe_peak_a": 217.84707108076532,
+   "within_screen": true,
+   "p_a_w": 28.35725840923055,
+   "p_b_w": {
+    "fig8_25C": 30.20699361540425,
+    "fig8_125C": 30.239900272767777,
+    "table_floor_1p2V": 29.215859461527003
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9856585435725769,
+    "fig8_125C": 1.016799221924174,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.12512900503905258,
+   "exposure_a": 0.779500735520366,
+   "source_minus_load_coarse_w": 31.103773086810975,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4024667615935258
+   ],
+   "low_transition_ns": [
+    0.7034288880818519,
+    0.6856504697467755,
+    0.6858996591759036,
+    0.4967584163807803
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.39753323840364474
+   ],
+   "low_residual_reverse_ns": [
+    0.09657111191990232,
+    0.11434953025497874,
+    0.11410034082585062,
+    0.3032415836209739
+   ],
+   "high_residual_v": [
+    1.2859717978449652,
+    1.2658678009872304,
+    1.2697065219068158,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f0.900",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.225183041096905,
+   "load_power_w": 249.77236020406067,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.0204283423642,
+   "probe_peak_a": 219.58710337663584,
+   "within_screen": true,
+   "p_a_w": 28.338341003476724,
+   "p_b_w": {
+    "fig8_25C": 31.225303727177213,
+    "fig8_125C": 31.28812862156967,
+    "table_floor_1p2V": 29.665082346009086
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9923465394225516,
+    "fig8_125C": 1.0274392491408821,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.1256909668440174,
+   "exposure_a": 1.2095461367788591,
+   "source_minus_load_coarse_w": 31.083485011964257,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4028914684906453
+   ],
+   "low_transition_ns": [
+    0.7036661594863616,
+    0.6858936118553274,
+    0.6861428930282881,
+    0.49692273800783204
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.39710853150652536
+   ],
+   "low_residual_reverse_ns": [
+    0.1963338405156119,
+    0.21410638814664604,
+    0.21385710697368535,
+    0.4030772619941414
+   ],
+   "high_residual_v": [
+    1.2889442463287324,
+    1.2689235275044766,
+    1.2727609051808706,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f1.200",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.382620223728196,
+   "load_power_w": 249.99899989630717,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.1128144548505,
+   "probe_peak_a": 224.981350526481,
+   "within_screen": true,
+   "p_a_w": 28.3640268790045,
+   "p_b_w": {
+    "fig8_25C": 34.37401229471516,
+    "fig8_125C": 34.52711770878329,
+    "table_floor_1p2V": 31.100181114971004
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9967419035302324,
+    "fig8_125C": 1.0344385357116266,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.12491758364541194,
+   "exposure_a": 2.5041751220555795,
+   "source_minus_load_coarse_w": 31.108979332226625,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4023099083034039
+   ],
+   "low_transition_ns": [
+    0.7033456382854996,
+    0.6855651495884477,
+    0.6858143057901673,
+    0.49670043520015966
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.39769009169376673
+   ],
+   "low_residual_reverse_ns": [
+    0.49665436171713173,
+    0.5144348504141836,
+    0.5141856942124639,
+    0.7032995648024716
+   ],
+   "high_residual_v": [
+    1.2848511935801525,
+    1.2647163775273427,
+    1.2685556503019733,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.800_f2.150",
+   "design": "zvs",
+   "rise_ns": 1.8,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.861195316282142,
+   "load_power_w": 250.10832594603409,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.15663087357655,
+   "probe_peak_a": 218.00480184012432,
+   "within_screen": true,
+   "p_a_w": 28.376422258151184,
+   "p_b_w": {
+    "fig8_25C": 44.20945712883794,
+    "fig8_125C": 44.64248509994229,
+    "table_floor_1p2V": 35.55040142490827
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9979857399032306,
+    "fig8_125C": 1.0364227863714308,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.12452694588764017,
+   "exposure_a": 6.578458821717735,
+   "source_minus_load_coarse_w": 31.118180453298265,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4020128798052793
+   ],
+   "low_transition_ns": [
+    0.7031938385599593,
+    0.6854095894703025,
+    0.6856587022022913,
+    0.49659557108133356
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.3979871201918912
+   ],
+   "low_residual_reverse_ns": [
+    1.446806161441367,
+    1.4645904105310237,
+    1.4643412977990349,
+    1.6534044289199927
+   ],
+   "high_residual_v": [
+    1.2827794413789846,
+    1.2625867066196363,
+    1.2664258909584873,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.500",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.5,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.00559827489939,
+   "load_power_w": 249.9505225004393,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.25866394172436,
+   "probe_peak_a": 217.77932919326204,
+   "within_screen": true,
+   "p_a_w": 29.25996412528002,
+   "p_b_w": {
+    "fig8_25C": 29.633002352236367,
+    "fig8_125C": 29.6251761843386,
+    "table_floor_1p2V": 29.450690692103347
+   },
+   "recharge_w": {
+    "fig8_25C": 0.34275585228210115,
+    "fig8_125C": 0.3286273721835486,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.9060768398256944,
+   "exposure_a": 0.16605606226112457,
+   "source_minus_load_coarse_w": 31.975941283590828,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.402769205939
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4957706907392147
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49723079405839
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.004229309261881637
+   ],
+   "high_residual_v": [
+    0.7599459455758222,
+    0.7366290592802471,
+    0.7406461322918361,
+    0.0
+   ],
+   "low_residual_v": [
+    3.386714216989726,
+    3.0730308812758573,
+    3.0761225507677903,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.600",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.040843133895894,
+   "load_power_w": 249.93841936683225,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.18535256129724,
+   "probe_peak_a": 217.91484111779718,
+   "within_screen": true,
+   "p_a_w": 28.486127859536644,
+   "p_b_w": {
+    "fig8_25C": 29.109048552453807,
+    "fig8_125C": 29.107441850061686,
+    "table_floor_1p2V": 28.790660907930427
+   },
+   "recharge_w": {
+    "fig8_25C": 0.3752065558250106,
+    "fig8_125C": 0.37781771086353744,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.2617373905811803,
+   "exposure_a": 0.2702669452532053,
+   "source_minus_load_coarse_w": 31.210098005946918,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4014204277128488
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4964815495232962
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49857957228454103
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.1035184504780194
+   ],
+   "high_residual_v": [
+    0.7636445563811023,
+    0.738825135677466,
+    0.7428579117182323,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7254375168927922,
+    1.420927136048366,
+    1.4245889663666171,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.600_step1p25ps",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 15.625,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.040843133895894,
+   "load_power_w": 250.00107305379512,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.20995920578312,
+   "probe_peak_a": 217.23154249448427,
+   "within_screen": true,
+   "p_a_w": 28.46341683349417,
+   "p_b_w": {
+    "fig8_25C": 29.087428544992246,
+    "fig8_125C": 29.08581341003822,
+    "table_floor_1p2V": 28.768447883664823
+   },
+   "recharge_w": {
+    "fig8_25C": 0.375255552583398,
+    "fig8_125C": 0.3778879738693691,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.16358956723495077,
+   "exposure_a": 0.27077399239856587,
+   "source_minus_load_coarse_w": 29.432435708909907,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4003450183996535
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4965658895052618
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49965498159773647
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10343411049605383
+   ],
+   "high_residual_v": [
+    0.7565529505893878,
+    0.7310245754478402,
+    0.7350604628129851,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7274874500376913,
+    1.422916541290123,
+    1.4265787292827392,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.600_step2p5ps",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 31.25,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.040843133895894,
+   "load_power_w": 249.98023533806457,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.20177669123925,
+   "probe_peak_a": 217.24245653742352,
+   "within_screen": true,
+   "p_a_w": 28.470982182882086,
+   "p_b_w": {
+    "fig8_25C": 29.094635046450897,
+    "fig8_125C": 29.09302271938583,
+    "table_floor_1p2V": 28.775851906506393
+   },
+   "recharge_w": {
+    "fig8_25C": 0.37523922072978644,
+    "fig8_125C": 0.37786455416920417,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.21727267872415548,
+   "exposure_a": 0.2706051136558997,
+   "source_minus_load_coarse_w": 30.02527244698061,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4007032451874593
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.49653759695819144
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.4992967548099307
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10346240304312418
+   ],
+   "high_residual_v": [
+    0.7589149686190311,
+    0.7336214931551552,
+    0.7376563574950517,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7268016239739539,
+    1.422249983880633,
+    1.4259120504640521,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.700",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.7,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.086540563526484,
+   "load_power_w": 249.934364389589,
+   "h_zvs": "FFFT",
+   "l_zvs": "FTTT",
+   "peak_a": 217.1077831196891,
+   "probe_peak_a": 217.93590130051916,
+   "within_screen": true,
+   "p_a_w": 28.253122009756257,
+   "p_b_w": {
+    "fig8_25C": 29.177128320115088,
+    "fig8_125C": 29.182655554194305,
+    "table_floor_1p2V": 28.695372482293873
+   },
+   "recharge_w": {
+    "fig8_25C": 0.738237623249975,
+    "fig8_125C": 0.7367600467427406,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 0.04711622429356352,
+   "exposure_a": 0.39606251746088844,
+   "source_minus_load_coarse_w": 30.98781256831282,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.401031442966607
+   ],
+   "low_transition_ns": [
+    null,
+    0.6857025633741745,
+    0.685952410341427,
+    0.4966887937724561
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49896855703078286
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.01429743662736049,
+    0.014047589660107955,
+    0.2033112062290788
+   ],
+   "high_residual_v": [
+    0.7653866850120963,
+    0.7391270212141521,
+    0.7431774666892821,
+    0.0
+   ],
+   "low_residual_v": [
+    0.058224733384978064,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.800",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.8,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.13666071940355,
+   "load_power_w": 249.93807887596583,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.10920587138284,
+   "probe_peak_a": 217.86604915430544,
+   "within_screen": true,
+   "p_a_w": 28.25331910908844,
+   "p_b_w": {
+    "fig8_25C": 30.17559756084673,
+    "fig8_125C": 30.206858044360047,
+    "table_floor_1p2V": 29.14917588983877
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9854062262019166,
+    "fig8_125C": 1.0164388172019183,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.046195201203756656,
+   "exposure_a": 0.8118749971672462,
+   "source_minus_load_coarse_w": 30.988186526373966,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4010202771750084
+   ],
+   "low_transition_ns": [
+    0.7034814948180933,
+    0.6856975012003498,
+    0.6859473467344226,
+    0.4966853966587297
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49897972282238146
+   ],
+   "low_residual_reverse_ns": [
+    0.09651850518366083,
+    0.11430249880140442,
+    0.11405265326733163,
+    0.30331460334302446
+   ],
+   "high_residual_v": [
+    0.765303176394319,
+    0.7390413283492379,
+    0.7430917846402316,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f0.900",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.181070382515074,
+   "load_power_w": 249.76726767255008,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.03932108950832,
+   "probe_peak_a": 219.6083424171519,
+   "within_screen": true,
+   "p_a_w": 28.23364339068611,
+   "p_b_w": {
+    "fig8_25C": 31.19303942460649,
+    "fig8_125C": 31.25421320031682,
+    "table_floor_1p2V": 29.597592857067646
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9920973127530778,
+    "fig8_125C": 1.0270836536988839,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.046564203913497165,
+   "exposure_a": 1.2418758884872263,
+   "source_minus_load_coarse_w": 30.96637669065626,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4014476581178728
+   ],
+   "low_transition_ns": [
+    0.7037243861743997,
+    0.6859463981422249,
+    0.6861963384965539,
+    0.4968533709629006
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.4985523418795171
+   ],
+   "low_residual_reverse_ns": [
+    0.19627561382757372,
+    0.21405360185974853,
+    0.2138036615054195,
+    0.40314662903907283
+   ],
+   "high_residual_v": [
+    0.7685161215916949,
+    0.7423459246822119,
+    0.7463948903619944,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f1.200",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.338650922518855,
+   "load_power_w": 249.99906060614293,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.1337219926294,
+   "probe_peak_a": 225.00422041143676,
+   "within_screen": true,
+   "p_a_w": 28.260356067767486,
+   "p_b_w": {
+    "fig8_25C": 34.342910289452846,
+    "fig8_125C": 34.494369581693405,
+    "table_floor_1p2V": 31.0337780474105
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9964968462303587,
+    "fig8_125C": 1.034089746696619,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.04605701482885546,
+   "exposure_a": 2.5365602561520735,
+   "source_minus_load_coarse_w": 30.99376497945613,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4008608605395714
+   ],
+   "low_transition_ns": [
+    0.7033962962089936,
+    0.6856101814886129,
+    0.6858599930363357,
+    0.4966263957791896
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.49913913945781857
+   ],
+   "low_residual_reverse_ns": [
+    0.4966037037936377,
+    0.5143898185140183,
+    0.5141400069662956,
+    0.7033736042234416
+   ],
+   "high_residual_v": [
+    0.7640959553087612,
+    0.7378007654232945,
+    0.7418518065578468,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r1.900_f2.150",
+   "design": "zvs",
+   "rise_ns": 1.9,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.817269467630872,
+   "load_power_w": 250.11003436996597,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.17813901059955,
+   "probe_peak_a": 218.0553807557488,
+   "within_screen": true,
+   "p_a_w": 28.273169364681006,
+   "p_b_w": {
+    "fig8_25C": 44.178849809517196,
+    "fig8_125C": 44.61023709972929,
+    "table_floor_1p2V": 35.48444720315693
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9977416292623681,
+    "fig8_125C": 1.0360756692352677,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.045802881657869304,
+   "exposure_a": 6.610873959128578,
+   "source_minus_load_coarse_w": 31.004103170103832,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.400566049350086
+   ],
+   "low_transition_ns": [
+    0.7032419976007337,
+    0.6854520649166127,
+    0.6857018347462688,
+    0.49651972448168924
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.4994339506473038
+   ],
+   "low_residual_reverse_ns": [
+    1.4467580024005926,
+    1.4645479350847135,
+    1.4642981652550575,
+    1.653480275519637
+   ],
+   "high_residual_v": [
+    0.7618725998129676,
+    0.7355140476108062,
+    0.7395648026240593,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f0.500",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 0.5,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 16.958448457732384,
+   "load_power_w": 249.9493881512965,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.26891791972463,
+   "probe_peak_a": 217.78951799893397,
+   "within_screen": true,
+   "p_a_w": 29.211044047748295,
+   "p_b_w": {
+    "fig8_25C": 29.65408797997368,
+    "fig8_125C": 29.644605631933615,
+    "table_floor_1p2V": 29.43781815691556
+   },
+   "recharge_w": {
+    "fig8_25C": 0.3425786980371331,
+    "fig8_125C": 0.3283743131576018,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.866727421537332,
+   "exposure_a": 0.19735204851463722,
+   "source_minus_load_coarse_w": 31.915402600792362,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4020843157790066
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4957356044966283
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5979156842186026
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.004264395504468069
+   ],
+   "high_residual_v": [
+    0.2491105920088046,
+    0.2201062637777298,
+    0.22433008031566004,
+    0.0
+   ],
+   "low_residual_v": [
+    3.387334729921147,
+    3.0735135427973046,
+    3.076621706038779,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f0.600",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 16.993697164556476,
+   "load_power_w": 249.93688363718803,
+   "h_zvs": "FFFT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.1955764336119,
+   "probe_peak_a": 217.92512429713776,
+   "within_screen": true,
+   "p_a_w": 28.436803942100024,
+   "p_b_w": {
+    "fig8_25C": 29.129846386195478,
+    "fig8_125C": 29.126584357939553,
+    "table_floor_1p2V": 28.77743895063618
+   },
+   "recharge_w": {
+    "fig8_25C": 0.37488967892107855,
+    "fig8_125C": 0.3773659974452398,
+    "table_floor_1p2V": 0.0936
+   },
+   "missed_capacitive_w": 0.22205248658926915,
+   "exposure_a": 0.3016118783715973,
+   "source_minus_load_coarse_w": 31.151154330823147,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4007334129875477
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4964466516337322
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5992665870100614
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10355334836758341
+   ],
+   "high_residual_v": [
+    0.25321005038360767,
+    0.22255587591047998,
+    0.22679736129591888,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7259964647092214,
+    1.4213610238716214,
+    1.425036820758029,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f0.700",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 0.7,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.039392683112883,
+   "load_power_w": 249.9326715413413,
+   "h_zvs": "FFFT",
+   "l_zvs": "FTTT",
+   "peak_a": 217.11800310601907,
+   "probe_peak_a": 217.9463515818369,
+   "within_screen": true,
+   "p_a_w": 28.20358629979458,
+   "p_b_w": {
+    "fig8_25C": 29.197610904301992,
+    "fig8_125C": 29.20147826691591,
+    "table_floor_1p2V": 28.68189369007494
+   },
+   "recharge_w": {
+    "fig8_25C": 0.7378679046623471,
+    "fig8_125C": 0.7362299080218749,
+    "table_floor_1p2V": 0.1872
+   },
+   "missed_capacitive_w": 0.007255357687368872,
+   "exposure_a": 0.4273651047567758,
+   "source_minus_load_coarse_w": 30.92891818460984,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4003436624489827
+   ],
+   "low_transition_ns": [
+    null,
+    0.6857259343074555,
+    0.6859764939512892,
+    0.4966540828433923
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5996563375486265
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0142740656940794,
+    0.014023506050245705,
+    0.20334591715814257
+   ],
+   "high_residual_v": [
+    0.2551379404565637,
+    0.22289749351057964,
+    0.2271583543554243,
+    0.0
+   ],
+   "low_residual_v": [
+    0.058714861778018615,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f0.800",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 0.8,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.089522871136403,
+   "load_power_w": 249.9367088725851,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.11955905344814,
+   "probe_peak_a": 217.87488460905274,
+   "within_screen": true,
+   "p_a_w": 28.203827507394003,
+   "p_b_w": {
+    "fig8_25C": 30.1960253573239,
+    "fig8_125C": 30.225620377295062,
+    "table_floor_1p2V": 29.1356995480671
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9850919036019439,
+    "fig8_125C": 1.0159910723242822,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.006335316061079625,
+   "exposure_a": 0.8431382754842204,
+   "source_minus_load_coarse_w": 30.929472690194956,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4003319091926012
+   ],
+   "low_transition_ns": [
+    0.7035102053013843,
+    0.6857203865940167,
+    0.6859709442117475,
+    0.4966503668251494
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5996680908050078
+   ],
+   "low_residual_reverse_ns": [
+    0.09648979470036992,
+    0.11427961340773748,
+    0.11402905579000659,
+    0.30334963317660474
+   ],
+   "high_residual_v": [
+    0.2550441598739823,
+    0.2228011970837187,
+    0.22706209731356353,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f0.900",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.133816641843477,
+   "load_power_w": 249.76173198419673,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.04804030595534,
+   "probe_peak_a": 219.61956599353215,
+   "within_screen": true,
+   "p_a_w": 28.183334904189742,
+   "p_b_w": {
+    "fig8_25C": 31.212533258056133,
+    "fig8_125C": 31.27203671271439,
+    "table_floor_1p2V": 29.58324866982019
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9917832797742129,
+    "fig8_125C": 1.0266364490860853,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.006480881949690336,
+   "exposure_a": 1.2730915985601863,
+   "source_minus_load_coarse_w": 30.906842992236733,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.400763619598686
+   ],
+   "low_transition_ns": [
+    0.7037592065096271,
+    0.6859755457521148,
+    0.6862262014223797,
+    0.49682223588506763
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5992363803989232
+   ],
+   "low_residual_reverse_ns": [
+    0.19624079349234635,
+    0.21402445424985858,
+    0.21377379857959372,
+    0.4031777641169058
+   ],
+   "high_residual_v": [
+    0.2585091642372319,
+    0.22636658002681287,
+    0.23062584445893108,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f1.200",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.291548588073383,
+   "load_power_w": 249.9990419374884,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.14461370937244,
+   "probe_peak_a": 225.05538126611162,
+   "within_screen": true,
+   "p_a_w": 28.211128918950735,
+   "p_b_w": {
+    "fig8_25C": 34.36363360897129,
+    "fig8_125C": 34.51342808799728,
+    "table_floor_1p2V": 31.02058025090405
+   },
+   "recharge_w": {
+    "fig8_25C": 0.996186584203,
+    "fig8_125C": 1.0336484478354573,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.0062813606985133155,
+   "exposure_a": 2.567836467577326,
+   "source_minus_load_coarse_w": 30.935407520267432,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.4001705754607183
+   ],
+   "low_transition_ns": [
+    0.7034230377845273,
+    0.6856310482231955,
+    0.6858815716648411,
+    0.49659024558868253
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5998294245368907
+   ],
+   "low_residual_reverse_ns": [
+    0.4965769622181039,
+    0.5143689517794358,
+    0.5141184283377902,
+    0.7034097544139487
+   ],
+   "high_residual_v": [
+    0.2537485770495138,
+    0.2214690619980999,
+    0.22573056194946872,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.000_f2.150",
+   "design": "zvs",
+   "rise_ns": 2.0,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.773324262376995,
+   "load_power_w": 250.20743020558717,
+   "h_zvs": "FFFT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.22871790177248,
+   "probe_peak_a": 218.38522828102793,
+   "within_screen": true,
+   "p_a_w": 28.23552852393017,
+   "p_b_w": {
+    "fig8_25C": 44.21592877974682,
+    "fig8_125C": 44.64602104120932,
+    "table_floor_1p2V": 35.484724755995856
+   },
+   "recharge_w": {
+    "fig8_25C": 0.9974847618418357,
+    "fig8_125C": 1.0357184102793586,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.006104990763848836,
+   "exposure_a": 6.643998393265298,
+   "source_minus_load_coarse_w": 30.956846807471152,
+   "high_transition_ns": [
+    null,
+    null,
+    null,
+    1.3996383301313655
+   ],
+   "low_transition_ns": [
+    0.7031305729034111,
+    0.6853313112897884,
+    0.685581720663201,
+    0.49638851705544484
+   ],
+   "high_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.6003616698662436
+   ],
+   "low_residual_reverse_ns": [
+    1.4468694270979152,
+    1.4646686887115379,
+    1.4644182793381253,
+    1.6536114829458815
+   ],
+   "high_residual_v": [
+    0.24947360084087222,
+    0.2170724084696758,
+    0.22133585647199894,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f0.500",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 0.5,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 16.88380942815887,
+   "load_power_w": 249.95207354638947,
+   "h_zvs": "TTTT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.271816053828,
+   "probe_peak_a": 217.79297005419946,
+   "within_screen": true,
+   "p_a_w": 29.20608479287367,
+   "p_b_w": {
+    "fig8_25C": 29.94619167388848,
+    "fig8_125C": 29.928850138811303,
+    "table_floor_1p2V": 29.586980532658643
+   },
+   "recharge_w": {
+    "fig8_25C": 0.8432396158591392,
+    "fig8_125C": 0.8026442473613081,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.8605547892288951,
+   "exposure_a": 0.33089873902515654,
+   "source_minus_load_coarse_w": 31.89430178756072,
+   "high_transition_ns": [
+    2.049534631324624,
+    2.0432593747210763,
+    2.0441116350440733,
+    1.402011730510319
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4957293320855167
+   ],
+   "high_residual_reverse_ns": [
+    0.10046536867670211,
+    0.1067406252802498,
+    0.10588836495725296,
+    0.7479882694910072
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0042706679155796266
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    3.38738256361562,
+    3.073500501142117,
+    3.076615692838152,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f0.600",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 0.6,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 16.919096831544273,
+   "load_power_w": 249.94061087284152,
+   "h_zvs": "TTTT",
+   "l_zvs": "FFFT",
+   "peak_a": 217.19902842984345,
+   "probe_peak_a": 217.92879807156854,
+   "within_screen": true,
+   "p_a_w": 28.431714263684274,
+   "p_b_w": {
+    "fig8_25C": 29.420530335891403,
+    "fig8_125C": 29.409441025634884,
+    "table_floor_1p2V": 28.925806118500613
+   },
+   "recharge_w": {
+    "fig8_25C": 0.8754014964357895,
+    "fig8_125C": 0.8514325566303552,
+    "table_floor_1p2V": 0.234
+   },
+   "missed_capacitive_w": 0.21574448883731617,
+   "exposure_a": 0.43458161486593055,
+   "source_minus_load_coarse_w": 31.1275802813,
+   "high_transition_ns": [
+    2.0503906131275325,
+    2.043760999172417,
+    2.044617625987527,
+    1.4006554926445725
+   ],
+   "low_transition_ns": [
+    null,
+    null,
+    null,
+    0.4964394455517554
+   ],
+   "high_residual_reverse_ns": [
+    0.09960938687379392,
+    0.10623900082890893,
+    0.10538237401379953,
+    0.7493445073567537
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.10356055444956021
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    1.7260054687629989,
+    1.4213121721034396,
+    1.424994054568645,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f0.700",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 0.7,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 16.964808929207322,
+   "load_power_w": 249.93684902146552,
+   "h_zvs": "TTTT",
+   "l_zvs": "FTTT",
+   "peak_a": 217.1217112776087,
+   "probe_peak_a": 217.94958374852578,
+   "within_screen": true,
+   "p_a_w": 28.19848587944092,
+   "p_b_w": {
+    "fig8_25C": 29.487926528225813,
+    "fig8_125C": 29.48397583894909,
+    "table_floor_1p2V": 28.830065144066012
+   },
+   "recharge_w": {
+    "fig8_25C": 1.2383550183283951,
+    "fig8_125C": 1.2102640866520296,
+    "table_floor_1p2V": 0.3276
+   },
+   "missed_capacitive_w": 0.0009159006105583727,
+   "exposure_a": 0.5601745488901032,
+   "source_minus_load_coarse_w": 30.905132822706832,
+   "high_transition_ns": [
+    2.0507932588448643,
+    2.0438299593975886,
+    2.044690718225762,
+    1.4002637787107408
+   ],
+   "low_transition_ns": [
+    null,
+    0.6857213711275163,
+    0.6859722390913429,
+    0.4966464453234898
+   ],
+   "high_residual_reverse_ns": [
+    0.09920674115646184,
+    0.10617004060373765,
+    0.1053092817755643,
+    0.7497362212905855
+   ],
+   "low_residual_reverse_ns": [
+    0.0,
+    0.014278628874018562,
+    0.014027760910192066,
+    0.2033535546780451
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    0.05868858777483766,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f0.800",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 0.8,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.01490375196145,
+   "load_power_w": 249.939808529557,
+   "h_zvs": "TTTT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.1228250251608,
+   "probe_peak_a": 217.88270333283447,
+   "within_screen": true,
+   "p_a_w": 28.198605012863553,
+   "p_b_w": {
+    "fig8_25C": 30.48625060683067,
+    "fig8_125C": 30.508027701673203,
+    "table_floor_1p2V": 29.28376423574236
+   },
+   "recharge_w": {
+    "fig8_25C": 1.4855725197155505,
+    "fig8_125C": 1.4900155543280613,
+    "table_floor_1p2V": 0.3744
+   },
+   "missed_capacitive_w": 0.0,
+   "exposure_a": 0.9759613632847127,
+   "source_minus_load_coarse_w": 30.905124805568704,
+   "high_transition_ns": [
+    2.0507783805146342,
+    2.0438149460232014,
+    2.044675695605163,
+    1.4002547954113391
+   ],
+   "low_transition_ns": [
+    0.7035101050939985,
+    0.6857173955716022,
+    0.6859682619430066,
+    0.4966437846303721
+   ],
+   "high_residual_reverse_ns": [
+    0.099221619486692,
+    0.10618505397812467,
+    0.10532430439616296,
+    0.7497452045899871
+   ],
+   "low_residual_reverse_ns": [
+    0.09648989490775571,
+    0.11428260443015203,
+    0.11403173805874747,
+    0.303356215371382
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f0.900",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 0.9,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.0595710315895,
+   "load_power_w": 249.77601401139344,
+   "h_zvs": "TTTT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.05591245462548,
+   "probe_peak_a": 219.62185821204514,
+   "within_screen": true,
+   "p_a_w": 28.17926994028683,
+   "p_b_w": {
+    "fig8_25C": 31.50260346532093,
+    "fig8_125C": 31.55433246272865,
+    "table_floor_1p2V": 29.731782048358102
+   },
+   "recharge_w": {
+    "fig8_25C": 1.492159352302207,
+    "fig8_125C": 1.5005209627438414,
+    "table_floor_1p2V": 0.3744
+   },
+   "missed_capacitive_w": 0.0,
+   "exposure_a": 1.4053214252895132,
+   "source_minus_load_coarse_w": 30.88393459975171,
+   "high_transition_ns": [
+    2.051444110135451,
+    2.0444890026622926,
+    2.04535009046451,
+    1.4006565657709422
+   ],
+   "low_transition_ns": [
+    0.7037433219042556,
+    0.6859563352210539,
+    0.6862073017422461,
+    0.49680457572584397
+   ],
+   "high_residual_reverse_ns": [
+    0.09855588986587495,
+    0.10551099733903348,
+    0.10464990953681594,
+    0.7493434342303841
+   ],
+   "low_residual_reverse_ns": [
+    0.19625667809771785,
+    0.21404366478091946,
+    0.21379269825972735,
+    0.4031954242761295
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f1.200",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 1.2,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.216856430875048,
+   "load_power_w": 250.00000561067114,
+   "h_zvs": "TTTT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.14698297145893,
+   "probe_peak_a": 224.97348846269998,
+   "within_screen": true,
+   "p_a_w": 28.205726499080004,
+   "p_b_w": {
+    "fig8_25C": 34.65425644965147,
+    "fig8_125C": 34.79622073931101,
+    "table_floor_1p2V": 31.168760174138555
+   },
+   "recharge_w": {
+    "fig8_25C": 1.4967085122861166,
+    "fig8_125C": 1.5077285921649524,
+    "table_floor_1p2V": 0.3744
+   },
+   "missed_capacitive_w": 0.0,
+   "exposure_a": 2.700916605413528,
+   "source_minus_load_coarse_w": 30.911166123772972,
+   "high_transition_ns": [
+    2.0505211031947974,
+    2.0435546822583164,
+    2.0444152743361954,
+    1.40009949783275
+   ],
+   "low_transition_ns": [
+    0.7034259475121077,
+    0.6856311615257107,
+    0.6858819935583995,
+    0.4965858198584738
+   ],
+   "high_residual_reverse_ns": [
+    0.09947889680652884,
+    0.10644531774301,
+    0.10558472566513077,
+    0.7499005021685762
+   ],
+   "low_residual_reverse_ns": [
+    0.4965740524905235,
+    0.5143688384769206,
+    0.5141180064442317,
+    0.7034141801441575
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "zvs_r2.150_f2.150",
+   "design": "zvs",
+   "rise_ns": 2.15,
+   "fall_ns": 2.15,
+   "status": "REGULATED_TO_250W",
+   "step_ps": 62.5,
+   "stop_reason": null,
+   "ton_cmd_ns": 17.6918702024393,
+   "load_power_w": 250.00088089490805,
+   "h_zvs": "TTTT",
+   "l_zvs": "TTTT",
+   "peak_a": 217.1464229879798,
+   "probe_peak_a": 217.1464229879798,
+   "within_screen": true,
+   "p_a_w": 28.205857916357264,
+   "p_b_w": {
+    "fig8_25C": 44.47223669736637,
+    "fig8_125C": 44.89371208507606,
+    "table_floor_1p2V": 35.6046657763459
+   },
+   "recharge_w": {
+    "fig8_25C": 1.4978979323035415,
+    "fig8_125C": 1.5096262912428378,
+    "table_floor_1p2V": 0.3744
+   },
+   "missed_capacitive_w": 0.0,
+   "exposure_a": 6.773189475920862,
+   "source_minus_load_coarse_w": 30.907471096974234,
+   "high_transition_ns": [
+    2.0504899633363105,
+    2.0435237141374536,
+    2.0443842865404513,
+    1.4000806701605812
+   ],
+   "low_transition_ns": [
+    0.7034279236636907,
+    0.6856331635693967,
+    0.685883996205173,
+    0.49658731254397914
+   ],
+   "high_residual_reverse_ns": [
+    0.09951003666501577,
+    0.10647628586387281,
+    0.1056157134608749,
+    0.7499193298407449
+   ],
+   "low_residual_reverse_ns": [
+    1.4465720763376355,
+    1.4643668364319296,
+    1.4641160037961531,
+    1.6534126874573472
+   ],
+   "high_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "low_residual_v": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "best": {
+  "zvs": {
+   "fig8_25C": "zvs_r1.900_f0.600",
+   "fig8_125C": "zvs_r1.900_f0.600",
+   "table_floor_1p2V": "zvs_r2.000_f0.700",
+   "adaptive_p_a": "zvs_r2.150_f0.900"
+  },
+  "baseline": {
+   "fig8_25C": "baseline_r2.150_f1.100",
+   "fig8_125C": "baseline_r2.150_f1.100",
+   "table_floor_1p2V": "baseline_r2.150_f1.100",
+   "adaptive_p_a": "baseline_r2.150_f1.400"
+  }
+ },
+ "tuned_comparison": {
+  "fig8_25C": {
+   "best_zvs": "zvs_r1.900_f0.600",
+   "best_baseline": "baseline_r2.150_f1.100",
+   "zvs_p_b_w": 29.109048552453807,
+   "baseline_p_b_w": 31.81134074218076,
+   "zvs_minus_baseline_w": -2.702292189726954,
+   "with_recharge_w": -2.5069867920423476
+  },
+  "fig8_125C": {
+   "best_zvs": "zvs_r1.900_f0.600",
+   "best_baseline": "baseline_r2.150_f1.100",
+   "zvs_p_b_w": 29.107441850061686,
+   "baseline_p_b_w": 31.80833479502849,
+   "zvs_minus_baseline_w": -2.700892944966803,
+   "with_recharge_w": -2.500025735161689
+  },
+  "table_floor_1p2V": {
+   "best_zvs": "zvs_r2.000_f0.700",
+   "best_baseline": "baseline_r2.150_f1.100",
+   "zvs_p_b_w": 28.68189369007494,
+   "baseline_p_b_w": 31.63248883601358,
+   "zvs_minus_baseline_w": -2.950595145938639,
+   "with_recharge_w": -2.810195145938639
+  }
+ },
+ "equal_fall_timing_error": [
+  {
+   "delta_fall_ns": -0.1,
+   "zvs_p_b_w": 29.633002352236367,
+   "baseline_p_b_w": 31.925521215774584,
+   "zvs_minus_baseline_w": -2.2925188635382163
+  },
+  {
+   "delta_fall_ns": 0.0,
+   "zvs_p_b_w": 29.109048552453807,
+   "baseline_p_b_w": 31.81134074218076,
+   "zvs_minus_baseline_w": -2.702292189726954
+  },
+  {
+   "delta_fall_ns": 0.1,
+   "zvs_p_b_w": 29.177128320115088,
+   "baseline_p_b_w": 31.915359835442526,
+   "zvs_minus_baseline_w": -2.7382315153274384
+  },
+  {
+   "delta_fall_ns": 0.2,
+   "zvs_p_b_w": 30.17559756084673,
+   "baseline_p_b_w": 32.47700192350488,
+   "zvs_minus_baseline_w": -2.3014043626581504
+  },
+  {
+   "delta_fall_ns": 0.3,
+   "zvs_p_b_w": 31.19303942460649,
+   "baseline_p_b_w": 33.053856054949335,
+   "zvs_minus_baseline_w": -1.8608166303428462
+  },
+  {
+   "delta_fall_ns": 0.4,
+   "zvs_p_b_w": 32.24299637955527,
+   "baseline_p_b_w": 33.63903527790854,
+   "zvs_minus_baseline_w": -1.396038898353268
+  },
+  {
+   "delta_fall_ns": 0.5,
+   "zvs_p_b_w": 33.29295333450406,
+   "baseline_p_b_w": 34.224214500867745,
+   "zvs_minus_baseline_w": -0.931261166363683
+  }
+ ]
+}

@@ -237,3 +237,20 @@ advantage survives only if every edge's residual reverse conduction stays
 below ~0.44 ns. This is first-order post-processing (orbits not re-solved with
 the clamp), and 8 tests tie it to A56's accounting. See
 `A57_datasheet_reverse_conduction_pricing/RESULTS.md`.
+
+`A58_asymmetric_fixed_deadtime_tuning` splits the single dead time into two
+fixed values, `d_rise` (high-side edge) and `d_fall` (low-side edge), common
+to all phases. It does not edit the scheduler files: the four schedule
+functions are swapped by object identity. Tests prove bit-identity with A56
+when the two values are equal, and that no path reads the old scalar. A
+67-point grid was regulated to 250 W (no failures, inside the 250 A
+screen). The tuned large-ripple design (0.6274 nH, 1.9/0.6 ns) reaches a
+29.11 W fixed-dead-time proxy with the datasheet VSD, against 31.81 W for
+the tuned baseline (1.4667 nH, 2.15/1.1 ns). The -2.70 W difference is 85%
+of A56's adaptive -3.18 W and reverses A57's symmetric +7.06 W. It is
+step-converged (62.5/31.25/15.625 ps) and confirmed by an extrapolated
+source-side balance to 0.01 W. The optimum is near-ZVS: it turns on at
+0.7-1.7 V residual on six of eight edges, trading 0.26 W of capacitive loss
+for most of the reverse conduction. The advantage holds for falling-edge
+errors from -0.1 to about +0.35 ns. Magnetic loss, nonlinear Coss and other
+loads remain open. See `A58_asymmetric_fixed_deadtime_tuning/RESULTS.md`.
