@@ -1,0 +1,77 @@
+{
+  "classification": "DYNAMICS_GATE_NOMINAL_SMOKE_ONLY",
+  "not_an_optimization": true,
+  "source_seed": "A54 key_states.json nominal",
+  "boundary": {
+    "module_power_w": 250.0,
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 2.15e-09,
+    "high_side_on_resistance_ohm": 0.000775,
+    "low_side_on_resistance_ohm": 0.0005166666666666667
+  },
+  "solve": {
+    "converged": true,
+    "relative_residual": 1.9168367273111696e-12,
+    "natural_zvs_flags": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "average_output_v": 0.8768761002371659,
+    "average_load_power_w": 192.22792379178503,
+    "maximum_abs_phase_current_a": 113.8882911570751,
+    "within_current_limit": true,
+    "z_star": [
+      47.99999999999885,
+      47.95428789215207,
+      47.95958138184328,
+      36.0,
+      24.0,
+      12.0,
+      36.14835472442346,
+      23.936103759680876,
+      11.966781103033647,
+      0.24593858670808813,
+      -0.014037295118657324,
+      -0.030168152748063455,
+      -0.0475236780958223,
+      0.8768449552774138,
+      4.571210784678021,
+      -2.0142047873540836,
+      27.739370163889078,
+      58.38913442825782,
+      91.97947381086023,
+      -4.571210784678025
+    ]
+  },
+  "path_check": {
+    "natural_zvs_flags": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "high_side_i2dt_a2s": [
+      5.5225196843352925e-05,
+      5.5440765506295124e-05,
+      5.543522863071957e-05,
+      5.987150809326022e-05
+    ],
+    "low_side_i2dt_a2s": [
+      0.0007372284738416494,
+      0.0007331809335011833,
+      0.0007331445693485453,
+      0.000783326261401219
+    ],
+    "dead_time_i2dt_a2s": [
+      1.6756970977786913e-05,
+      1.649385303159214e-05,
+      1.6498891385563473e-05,
+      1.2423614548446683e-05
+    ],
+    "partial_channel_conduction_loss_w": 8.591751490649518,
+    "unmodelled_dead_time_current_present": true,
+    "complete_total_loss": false
+  }
+}

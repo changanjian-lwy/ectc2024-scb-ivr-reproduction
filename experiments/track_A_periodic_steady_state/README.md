@@ -109,9 +109,10 @@ derived programmatically from the solver's own code (no hand arithmetic).
 at crossing times agreeing with the Python solver's own predictions to
 within `0.107%-0.242%` (against a pre-declared `20%` tolerance) -- the
 first SPICE-confirmed four-phase joint ZVS periodic state in this
-project's history. This remains `SENSITIVITY_ONLY` (a `76%`-of-rated-load
-finding, not a P24 operating point) and does not by itself constitute a
-P24/P25 reproduction claim. See
+project's history. This remains `SENSITIVITY_ONLY`: the SPICE-confirmed
+uniform-`7 mOhm` corrected state delivers `89.92 W`, not A51's nominal
+`190 W` (`76%`) load-setting value, and is not a P24 operating point. It does
+not by itself constitute a P24/P25 reproduction claim. See
 `A52_spice_crosscheck_reduced_load_zvs/RESULTS.md`.
 
 `A53_lphase_zvs_load_tradeoff` asks the complementary question: instead of
@@ -173,3 +174,34 @@ violated by any accepted candidate) but with much less margin than A53's own
 search: maximum observed `232.54 A`, `93%` of the limit, only `7%` headroom
 -- a direct, quantified cost of the much deeper `LPHASE` cut this device
 requires. See `A54_epc2067_lphase_joint_tradeoff/RESULTS.md`.
+
+`A55_joint_lphase_deadtime_total_loss_optimization` corrects two limitations
+that prevent A54's numbers from serving as a rigorous next-stage baseline.
+It applies P24 Table 3's EPC2067 population to resistance as well as
+capacitance (`RHS=1.55mOhm/2`, `RLS=1.55mOhm/3`), resolves each periodic state
+with those unequal resistances in the dynamics, and integrates high-side,
+low-side and dead-time current exposure separately. Re-solving A54's three
+saved comparison points gives channel-loss proxies of `8.592/21.404/25.259 W`
+at nominal/old-critical/old-margin. More importantly, the old critical point
+is no longer all-phase ZVS (`F/F/F/T`); the deeper margin remains `T/T/T/T`.
+This is a baseline correction, not an optimization result. A55's eventual
+objective is explicitly a partial electrical-loss proxy, not total system
+loss, because third-quadrant dead-time loss and magnetic loss remain
+unmodelled. See `A55_joint_lphase_deadtime_total_loss_optimization/BOUNDARY.md`.
+
+2026-09-26 continuation: the corrected four-phase transition is locally
+bracketed at 0.621524–0.622014 nH with dead time fixed at 2.15 ns; halving
+both time steps retains the ZVS classifications. The passing point delivers
+219.97 W, not 250 W, and has negative valleys around 39% of positive peaks.
+Independent actual-branch metering exposes a further loss-accounting issue:
+phase inductor current is not always channel current in this flying-capacitor
+network. At the passing point actual model channel dissipation is 24.955 W
+versus the old proxy's 21.718 W. Joint ranking must use the corrected metering.
+See A55 `RESULTS_2026-09-26.md`; this remains a sensitivity result.
+
+2026-09-27: A55's 3x3 local L/dead-time grid is complete. Only those two
+boundary fields vary; each power-metering replay is checked against its solve.
+All nine points converge, but none meets both rated output and the paper's
+small-negative-current condition. Full matrix and refinement evidence are in
+`A55_joint_lphase_deadtime_total_loss_optimization/JOINT_GRID_RESULTS.md`.
+This is not an equal-output-power loss optimization or a native P24 controller.

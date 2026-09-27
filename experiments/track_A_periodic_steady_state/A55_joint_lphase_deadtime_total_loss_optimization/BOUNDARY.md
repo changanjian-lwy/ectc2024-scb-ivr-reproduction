@@ -1,177 +1,257 @@
-# A55 - joint LPHASE + dead-time total-loss optimization at P24's rated load, with EPC2067 (BOUNDARY)
+# A55 - joint LPHASE + dead-time partial-loss optimization (BOUNDARY)
 
-Track: A (periodic steady-state reproduction). Main-line continuation
-per explicit user direction 2026-09-19 ("对 你全部都考虑进来 系统级优化
-再不行就没辙了" -- yes, take everything into account, do a system-level
-optimization; if that still doesn't work, this path is exhausted).
+Track: A (periodic steady-state reproduction).
+
+Status: `LOCAL_JOINT_GRID_AND_STEP_REFINEMENT_COMPLETED` (2026-09-27).
+The asymmetric-Ron baseline and local ZVS-boundary refinement have run. A
+3x3 L/dead-time grid has completed, under `JOINT_GRID_BOUNDARY.md`; see
+`JOINT_GRID_RESULTS.md`. No global or rated-power optimization is claimed.
+The selected 0.621524 nH / 4.3 ns point retains all-eight-ZVS after two
+successive step halvings (5 -> 2.5 -> 1.25 ps commutation steps). The finest
+run delivers approximately 219.99 W with approximately 39% negative entry
+current, so it still fails the combined rated-output/small-negative-current
+paper target. See `joint_refinement.json` for each phase and actual branch power.
+
+### 2026-09-26 correction: phase current is not switch-branch current
+
+The earlier path gate separates time intervals correctly, but substitutes the
+phase inductor current for the enabled switch's channel current. In the SCB
+network, flying-capacitor currents can make these different. Therefore the
+historical 8.592/21.404/25.259 W numbers below must be read as **phase-current
+loss proxies**, not validated switch-channel losses.
+
+`audit_accepted_orbit.py` now meters each actual enabled resistive branch as
+`P = integral(v_branch^2/R_branch dt)/T`, using accepted trajectory samples
+with provisional/backtracked samples removed. At the old margin point this
+gives 28.9099 W, versus the earlier proxy's 25.2590 W. At the old critical
+point it gives 24.6144 W versus 21.4043 W. Dynamics and ZVS verdicts are not
+changed by this measurement correction. Revalidate this branch accounting
+before publishing a joint-loss optimum. The prior path-gate PASS below is
+historical, not acceptance of the proxy as the final objective.
+
+The current local boundary search varies only L between the re-solved
+0.564665 and 0.627406 nH endpoints at 2.15 ns dead time. It uses seven
+bisections, then independently re-solves both bracket endpoints at
+31.25 ps/2.5 ps instead of 62.5 ps/5 ps. Failed convergence or a current-screen
+violation stops the bracket update; step-sensitive ZVS classifications are
+reported as unresolved. Bisection identifies a local transition, not global
+monotonicity or an optimum.
+
+This inherits A51's fixed 5 MHz command windows and early zero-voltage
+admission/ideal-clamp surrogate; failed admission produces recorded hard
+switching at the window end. It does not implement the complete native
+P24 negative-current-threshold controller. The +/-250 A limit is a project
+screen, not a sourced EPC2067 safe-operating-area limit. Three isolated
+divider coordinates stay pinned for the fast periodic solve; flying-capacitor
+voltages are solved rather than forced to 36/24/12 V.
 
 ## 0. Scope statement
 
-This does not claim a P24/P25 reproduction. `A53` (GS61008T, `LPHASE`
-alone) and `A54` (EPC2067, `LPHASE` alone) both held `dead_time_s` fixed
-at `A48`'s own single-phase-optimized `2.15 ns`, inherited unchanged
-from `A51`. This experiment adds `dead_time_s` as a SECOND free variable,
-jointly optimized alongside `LPHASE`, using EPC2067 (`A54`'s own
-better-performing device) at P24's rated `250 W`, and changes the
-objective from "find where ZVS first turns on" to **"find the (`LPHASE`,
-`dead_time_s`) pair that minimizes TOTAL loss (conduction + switching),
-whether or not every phase individually achieves full natural ZVS"** --
-a strictly more general and more correct optimization target than either
-prior experiment used.
+This is a `SENSITIVITY_ONLY` continuation of A53/A54, not a P24/P25
+reproduction. It asks whether jointly varying `LPHASE` and dead time at the
+P24 rated `250 W/module` boundary can improve the electrical-loss trade-off
+found by A54 for the EPC2067 candidate.
 
-## 1. Why dead-time is a genuinely new, previously-untested lever here
+The objective is deliberately called a **partial electrical-loss proxy**, not
+"total loss" or "system-level loss". Gate-drive loss, third-quadrant
+conduction, magnetic loss, temperature rise, package loss and control power
+are not all available. Several of those omitted terms vary with the search
+variables and therefore cannot be dismissed as harmless constants.
 
-`A48` found the single-phase `7.77%`-branch optimal dead time (`2.1516
-ns`) is tied to that SPECIFIC resonant tank's own quarter-period
-(`quarter-period ~ pi/2 * sqrt(L*C)`). `A53`/`A54` both changed `L`
-and/or `C` substantially (`A54`'s own critical point: `L` down `57%`,
-`C` up `~9x` relative to `A48`'s own tank) without ever re-deriving what
-dead time THAT tank's own resonance actually needs. Estimated
-quarter-period scaling: `sqrt((0.627/1.467)*(9300/1155)) ~= sqrt(0.427*8.05)
-~= 1.85x` longer than `A48`'s own tank -- i.e. the `2.15 ns` dead time
-inherited into `A54` may be too SHORT for its own new resonance, forcing
-premature hard-switching timeouts before a natural crossing that a
-longer window would have allowed. **This is a concrete, quantified
-reason to expect dead-time re-optimization can reduce how far `LPHASE`
-needs to be cut** -- not a speculative addition.
+## 1. Why dead time is a new lever
 
-## 2. What is explicitly included in, and excluded from, "system-level"
+A53/A54 held dead time at A48/A51's `2.15 ns` while changing the resonant
+capacitance and/or phase inductance. Since the commutation time scales roughly
+with `sqrt(L*C)`, the inherited dead time need not remain appropriate after
+those changes. A55 therefore treats dead time as a search variable rather
+than carrying `2.15 ns` forward as a claimed optimum.
 
-Per explicit investigation before writing this boundary (not assumed):
+The earlier `2.15 ns` value is a **seed/reference point only**. It is not a
+physically justified lower bound for the joint search. Because no sourced
+driver limit is available, A55 adopts `[0.5, 10] ns` strictly as a
+`SENSITIVITY_ONLY` range: `0.5 ns` is A48's lowest previously exercised value,
+and `10 ns` is below the `16.67 ns` high-side on-time so the commanded states
+do not overlap. This range is not a hardware capability claim.
 
-**Included** (real data, already in this project):
-- Conduction loss: `I_rms^2 * Ron`, EPC2067's own `1.55 mOhm`
-  (`A54`'s own convention, unchanged).
-- Capacitive switching loss: `0.5*C*V^2*f_sw`, computed PER PHASE based
-  on whether that specific phase achieves natural ZVS or not at the
-  candidate `(LPHASE, dead_time_s)` -- generalizing `A53`/`A54`'s own
-  all-or-nothing measurement into a proper per-phase, continuous
-  objective term (Section 3).
-- `LPHASE` and `dead_time_s`, jointly optimized (Section 3).
+## 2. Device and population contract
 
-**Explicitly excluded, with reasons checked, not assumed**:
-- **Gate-drive loss**: no `Qg` (gate charge) data exists anywhere in
-  this repository's own component libraries for ANY cataloged device
-  (checked directly: `grep`-confirmed absent from every `.lib` file in
-  `paper_locked/04_component_models/`). Cannot be estimated without
-  inventing a number, which this project's own discipline forbids.
-  **However, gate-drive loss depends only on gate charge, supply voltage
-  and switching frequency -- NOT on drain-side ZVS/hard-switch
-  behavior** -- so it is the SAME additive constant at every candidate
-  point in this experiment's own search space, and therefore cannot
-  change WHICH point is optimal or whether the net comparison against
-  the nominal baseline is positive or negative. Its omission does not
-  compromise this experiment's own conclusion, only the absolute
-  (not relative) efficiency number.
-- **Reverse-conduction ("third-quadrant") loss during dead time**:
-  `GaN_reverse_conduction_ideal.lib` (already in this repository)
-  confirms this is currently modeled as lossless. Unlike gate-drive
-  loss, this term is NOT constant across candidates: a hard-switched
-  phase spends its full dead-time window in reverse conduction, while a
-  natural-ZVS phase spends less time in it (ending early at the
-  crossing). **Its omission means this experiment's own switching-loss-
-  eliminated numbers are more likely an UNDERCOUNT than an overcount** --
-  i.e. achieving ZVS is probably being credited with LESS benefit here
-  than it actually has, not more. Cannot be quantified without a real
-  GaN third-quadrant voltage-drop value, which is not in this project's
-  component libraries -- flagged as a genuine, concrete addition to a
-  future `MINIMUM_INFORMATION_REQUEST.md`-style ask, not fabricated here.
-- **Magnetic core loss**: requires real inductor/core material data
-  (Steinmetz-type parameters) that does not exist anywhere in this
-  project. Not estimated. A caveat, not a silent gap -- stated plainly
-  in every result this experiment produces.
-- **Population sweep** (`NHS`/`NLS` beyond EPC2067's own paper-specified
-  `2`/`3` row): a legitimate further design axis, but explicitly OUT OF
-  SCOPE here to keep this experiment tractable -- if the two-dimensional
-  `(LPHASE, dead_time_s)` optimization already settles the question
-  either way, a further population axis is not needed to answer it; if
-  it does not settle the question, this is named as the natural next
-  step, not silently left for later without saying so.
+The candidate device and population are fixed by the selected P24 Table-3
+`nP=4, nM=4` row:
 
-## 3. Method
+| Quantity | Value | Provenance |
+|---|---:|---|
+| EPC2067 per-device typical `Rds(on)` at 25 C | `1.55 mOhm` | locked external-device library |
+| high-side parallel count | `NHS=2` | P24 Table 3 |
+| low-side parallel count | `NLS=3` | P24 Table 3 |
+| effective high-side typical resistance | `0.775 mOhm` | `1.55/2` |
+| effective low-side typical resistance | `0.5167 mOhm` | `1.55/3` |
+| high-side commutation capacitance | `3720 pF` | `2*1860 pF` |
+| low-side commutation capacitance | `5580 pF` | `3*1860 pF` |
 
-1. Reuse `A51`'s own `a51_period_map.py` and `A54`'s own EPC2067 device
-   parameters (`Ron=1.55 mOhm` uniform, `CH=3720 pF`, `CL=5580 pF`)
-   read-only; do not modify `A51`/`A53`/`A54`'s own files.
-2. **Define a proper scalar objective**: `total_loss(LPHASE, dead_time_s)
-   = conduction_loss + sum over phases of (0 if that phase achieves
-   natural ZVS else 0.5*C_phase*Vds_residual^2*f_sw)` -- evaluated at the
-   Newton-converged fixed point for that `(LPHASE, dead_time_s)` pair
-   (using continuation from a nearby already-solved point for numerical
-   safety, per `A53`/`A54`'s own established practice).
-3. **Search jointly** over `LPHASE` in `[A54's own critical 0.627 nH,
-   nominal 1.4667 nH]` and `dead_time_s` in `[2.15 ns, 10 ns]` (the
-   upper bound matching this project's own prior exploration range in
-   `A48`/`A51`'s own robustness sweeps) for the minimum of
-   `total_loss`. The exact search algorithm (coarse grid plus local
-   refinement, coordinate descent, or another reasonable method) is an
-   engineering choice, not a boundary constraint -- but report the
-   search's own coverage/history plainly, and do not stop at a point
-   that has not been checked against nearby alternatives (i.e. do not
-   report a single lucky evaluation as "the optimum" without at least a
-   local neighborhood check).
-4. **At the found optimum**, run the full per-phase step-size-converged
-   ZVS verification (`A50`/`A51`/`A53`/`A54`'s own established
-   discipline) and report every phase's own verdict individually.
-5. **Report the final total-loss comparison against the nominal-`L`/
-   nominal-dead-time EPC2067 baseline** (already established in `A54`:
-   conduction `26.94 W`, switching `17.98 W`, total `44.92 W`) and
-   against `A54`'s own already-found `LPHASE`-only critical/margin
-   points -- three-way comparison: nominal, `A54`'s `LPHASE`-only
-   optimum, this experiment's joint `(LPHASE, dead_time_s)` optimum.
+The parallel counts are not an optional population sweep: they are part of
+the chosen paper row and must be applied. A future experiment may vary
+population, but A55 does not.
 
-## 4. Provenance of every value
+Conduction loss must be path-resolved:
 
-| Value | Source | Category |
+```text
+Pcond = sum_phases [
+    RHS_eff/T * integral_HS(i_phase^2 dt)
+  + RLS_eff/T * integral_LS(i_phase^2 dt)
+]
+```
+
+It is invalid to multiply whole-period phase-current RMS by the raw
+single-device `1.55 mOhm`, because the high- and low-side paths have different
+parallel counts and different conduction intervals. The reusable contract is
+implemented in `src/scb_ivr/conduction_loss.py`.
+
+## 3. Pre-execution implementation gates
+
+A55 must not run until all of these gates pass:
+
+1. **Path gate** - the period evaluator separately accumulates
+   `integral_HS(i^2 dt)`, `integral_LS(i^2 dt)` and dead-time
+   `integral(i^2 dt)` for every phase.
+2. **Dynamics gate** - the periodic state is re-solved with distinct
+   population-corrected high- and low-side on-resistances. A state solved
+   with the old uniform `1 uOhm` switch boundary followed by a post-hoc real
+   loss calculation is not self-consistent enough for A55's comparison.
+3. **Dead-time-bound gate** - the search interval is explicitly sourced or
+   labelled as sensitivity-only. A48's `2.15 ns` may be an initial sample but
+   not an assumed lower bound.
+4. **Baseline gate** - nominal, A54-critical and A54-margin points are all
+   re-solved under the same new resistance/path-loss contract. A54's legacy
+   `44.92 W` proxy may be quoted only as historical context, not used as the
+   new optimization baseline.
+5. **Regression gate** - automated tests confirm population scaling, path
+   separation, dead-time exposure and preservation of the prior 247-test
+   baseline. Eighteen new contract/path/dynamics checks raise the local total
+   to 265 and the portable CI total to 246.
+
+Current gate status:
+
+| Gate | Status | Evidence |
 |---|---|---|
-| EPC2067 device parameters | `A54`'s own already-verified values | `EXTERNAL_DEVICE_DATA`, unchanged |
-| `dead_time_s` search range `[2.15, 10] ns` | Lower bound: `A48`'s own single-phase optimum (no longer assumed correct for this tank, Section 1). Upper bound: this project's own prior exploration range (`A51`'s robustness sweeps already tested `10 ns`) | `SENSITIVITY_ONLY` |
-| `LPHASE` search range `[0.627, 1.4667] nH` | Lower bound: `A54`'s own found critical point (further reduction cannot help, since switching loss is already ~0 there). Upper bound: P24's own nominal value | Bounds inherited from `A53`/`A54`'s own already-published results |
-| `module_power_w=250 W` | P24's own rated load | `P24_EXPLICIT` |
-| Everything else | See `A50`/`A51`/`A53`/`A54` `BOUNDARY.md` for original provenance | unchanged |
+| path gate | `PASS` | `path_resolved_period.py`, `run_path_gate_smoke.py`, `path_gate_smoke.json` |
+| dynamics gate | `PASS` | asymmetric matrix extension plus nominal/critical/margin re-solves converge safely |
+| dead-time-bound gate | `PASS (SENSITIVITY ONLY)` | `[0.5,10] ns`; inherited numerical coverage, not driver data |
+| baseline gate | `PASS` | all three historical comparison points re-solved under the new contract |
+| regression gate | `PASS` | 265 local / 246 portable tests |
 
-## 5. Success/failure conditions
+## 4. Included objective terms
 
-- **A joint optimum is found with total loss BELOW the nominal
-  baseline's `44.92 W`** (i.e. achieving full or partial ZVS this way
-  is a genuine net win once dead-time is also optimized, unlike `A53`/
-  `A54`'s own `LPHASE`-only results): a positive, actionable finding --
-  report the specific `(LPHASE, dead_time_s)` pair and by how much it
-  beats nominal, and note this would be the first net-positive ZVS
-  balance found in this whole `A53-A55` chain.
-- **The joint optimum is still above nominal, but meaningfully better
-  than `A54`'s own `LPHASE`-only critical point**: report the
-  improvement plainly -- still not a full "yes," but a genuinely
-  informative narrowing of the gap, consistent with `A54`'s own already-
-  observed pattern (each added degree of freedom has made the deficit
-  smaller, not larger).
-- **The joint optimum is no better than `A54`'s own `LPHASE`-only
-  result** (dead-time re-optimization turns out not to matter as much as
-  Section 1's estimate suggested): report this plainly -- per the user's
-  own framing, if THIS system-level attempt still does not find a net
-  win, that is treated as this specific investigative path (parameter
-  retuning within the existing topology/device catalog) being exhausted,
-  not as a reason to keep expanding the search further without a fresh,
-  separately-justified boundary decision.
-- Every phase current must stay within `+/-250 A` throughout the ENTIRE
-  search (not just the reported optimum) -- `A54`'s own search already
-  came within `7%` of this bound at its own most aggressive point;
-  report explicitly if this search approaches or exceeds that margin
-  anywhere.
+After Section 3 passes, define:
 
-## 6. What this experiment cannot prove
+```text
+partial_loss_proxy(LPHASE, dead_time)
+    = path_resolved_channel_conduction_loss
+    + residual_capacitive_turn_on_loss
+```
 
-- Does not include gate-drive, reverse-conduction, or core loss (Section
-  2) -- explicitly flagged, not fabricated.
-- Does not sweep device population (`NHS`/`NLS`) beyond EPC2067's own
-  paper-specified row -- named as the natural next axis if this
-  experiment's own two-dimensional result does not settle the question.
-- A positive result would still not constitute a P24/P25 reproduction
-  claim, nor a hardware-validated efficiency number -- it would be a
-  theoretical best-case bound given this project's own partial loss
-  model and the two devices already cataloged.
-- Does not modify `src/scb_ivr/`, or A37/A42/A45/A48/A50/A51/A52/A53/
-  A54's own committed files.
-- Does not include a SPICE cross-check of the found optimum -- the same
-  standing follow-up `A53`/`A54` already deferred, now applying to
-  whichever `(LPHASE, dead_time_s)` point this experiment recommends.
+- Channel conduction uses Section 2's path-resolved expression.
+- Residual capacitive turn-on loss is evaluated per phase from that phase's
+  residual switch voltage. A natural-ZVS phase contributes zero to this
+  particular term; a hard-switched phase contributes the stated capacitance
+  approximation.
+- Every candidate must be evaluated at its own converged four-phase periodic
+  state. Continuation from a nearby converged point is allowed and must be
+  logged.
+
+The constant-capacitance approximation remains a caveat. EPC2067's `Co(tr)`
+is specified for a 0-to-20 V transition, while this model's switch swing is
+approximately 12 V. An `Eoss(V)`/`Qoss(V)` model would be preferable if
+traceable data are added later.
+
+### Nominal-point dynamics smoke result
+
+`asymmetric_nominal_smoke.json` records the first re-solve at P24's rated
+`250 W/module` load setting and nominal `LPHASE=1.4666667 nH`, using
+`RHS=0.775 mOhm` and `RLS=0.5167 mOhm` in the descriptor dynamics:
+
+- Newton-converged relative residual: `1.91684e-12`;
+- natural-ZVS flags: `[False, False, False, False]`;
+- average output: `0.876876 V`;
+- actual resistive-load power: `192.228 W`;
+- maximum absolute phase current: `113.888 A` (`+/-250 A` gate passes);
+- path-resolved channel-conduction loss: `8.59175 W`;
+- dead-time current is present and remains unmodelled.
+
+This is a dynamics/interface smoke result, not an optimization result. Its
+large difference from A54's legacy `26.94 W` nominal conduction estimate
+demonstrates why A54's raw-single-device/whole-period-RMS value cannot be used
+as A55's baseline. Critical and margin points must be re-solved before any
+trade-off conclusion is revisited.
+
+The subsequent `asymmetric_baseline_points.json` recalculation closes the
+three-point baseline gate:
+
+| historical point | `LPHASE` | ZVS flags after asymmetric-Ron re-solve | actual load power | max `abs(iL)` | partial channel loss |
+|---|---:|---|---:|---:|---:|
+| nominal | `1.46667 nH` | `F/F/F/F` | `192.228 W` | `113.888 A` | `8.592 W` |
+| A54 critical | `0.627406 nH` | `F/F/F/T` | `219.476 W` | `204.243 A` | `21.404 W` |
+| A54 margin | `0.564665 nH` | `T/T/T/T` | `224.007 W` | `222.997 A` | `25.259 W` |
+
+Thus A54's old critical point is no longer the all-phase-ZVS boundary once
+the paper-specified parallel population is included in the dynamics. The
+margin point remains all-phase ZVS, leaving only about `10.8%` current
+headroom. A55 must locate a new critical boundary; it may not inherit A54's
+old one.
+
+## 5. Explicitly unmodelled terms
+
+- **Gate-drive loss:** no locked `Qg` value is currently available. With
+  device population, gate voltage and frequency fixed it is an additive
+  constant across this two-variable search, so omitting it does not change
+  the mathematical argmin, but it prevents an absolute total-loss claim.
+- **Third-quadrant/reverse-conduction loss:** varies with dead time and may
+  move the optimum. Its omission has no pre-declared favorable or unfavorable
+  direction. Dead-time `i^2` exposure must still be exported so a sourced
+  model can be inserted later.
+- **Magnetic loss:** varies with the physical inductor used to realize a new
+  `LPHASE`; it is not constant and may move the optimum. No material/geometry
+  model is currently locked.
+- **Thermal feedback:** the `1.55 mOhm` value is a 25 C typical value. A55
+  does not yet solve junction temperature and temperature-dependent Ron.
+
+## 6. Search and verification rules
+
+- `module_power_w=250 W`, `Vin=48 V`, target `Vout=1 V`, `f_sw=5 MHz`, four
+  phases and the existing flying-capacitor boundary remain fixed.
+- Start the `LPHASE` exploration from `[0.62741, 1.4666667] nH`, inherited
+  from A54, but do not assume A54's critical point remains critical after the
+  dynamics model changes.
+- Sweep dead time over `[0.5,10] ns` as a sensitivity range, always including
+  the inherited `2.15 ns` reference point.
+- Use a documented coarse search plus local refinement. Do not report a
+  single evaluation as an optimum without a neighborhood check.
+- At the selected point, repeat the established sub-step convergence ladder
+  and report every phase separately.
+- Every accepted candidate must remain inside `+/-250 A`; rejected/unsafe
+  continuation probes remain logged but cannot become optimization points.
+
+## 7. Permitted conclusions
+
+A55 may compare its **partial loss proxy** against re-solved baselines under
+the identical contract. It may identify a promising or unfavorable region
+for a later complete device/magnetic model.
+
+A55 may not claim:
+
+- complete system-level or hardware loss;
+- P24/P25 reproduction;
+- hardware efficiency or thermal feasibility;
+- that parameter retuning in this topology is "exhausted";
+- a validated EPC2067 Section-II-B device choice (Table 3 belongs to the
+  package-design section and does not identify the ZVS-mechanism device with
+  certainty);
+- SPICE confirmation until the selected point receives its own separately
+  bounded cross-check.
+
+## 8. Historical results retained, not silently rewritten
+
+A53 and A54 remain valid as explicitly labelled sensitivity experiments under
+their own uniform-Ron/post-hoc loss convention. Their files and numerical
+results are not overwritten. A55 introduces a stricter contract; comparisons
+must display both contracts rather than presenting recalculated A54 numbers as
+if they were A54's original output.

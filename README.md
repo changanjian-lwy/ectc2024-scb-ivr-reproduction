@@ -17,8 +17,8 @@ silently tuned away.
 - **Current validated scope:** one four-phase, 250 W module plus a native
   three-phase calibration of the 2025 follow-up method.
 - **Tools:** Python/SciPy for equations and event solvers; LTspice for circuit
-  inspection and transient experiments; 247 local regression checks for
-  boundary and branch integrity, with 228 portable checks run by GitHub CI.
+  inspection and transient experiments; 267 local regression checks for
+  boundary and branch integrity, with 248 checks in the portable CI suite.
 - **Design principle:** 2024 is the primary source. The 2025 paper fills only
   explicitly missing details, and disagreements remain separate branches.
 - **Status:** active research reproduction. Periodic-state and commutation
@@ -72,6 +72,24 @@ and full four-module hardware reproduction remain separate later questions.
   budget, charge-transfer ceiling and the two explicitly different
   peak-current conventions. Unknown Qoss/dead-time inputs leave the ZVS verdict
   `undetermined` rather than producing a false pass.
+- Separated two often-confused reduced-power findings: A51's near-ideal
+  `190 W` nominal load setting delivers `179.37 W`, whereas A52's independently
+  SPICE-confirmed, uniform-`7 mOhm` re-solve delivers `89.92 W`. A52 confirms
+  commutation physics for its corrected state, not the headline A51 state.
+- Rated-load A53/A54 sensitivity searches found ZVS-capable inductance points
+  but not a favorable partial loss balance. Their historical results retain
+  a documented uniform, post-hoc Ron convention. A55 now includes P24's
+  `2`-high-side/`3`-low-side EPC2067 population and asymmetric-Ron periodic
+  re-solves. A local ZVS transition is bracketed at 0.621524–0.622014 nH
+  (2.15 ns dead time), retained after step refinement; the passing point
+  delivers 219.97 W with approximately 39% negative current valleys.
+  An actual switch-branch power audit corrects the earlier phase-current loss
+  proxy. See [A55 results](experiments/track_A_periodic_steady_state/A55_joint_lphase_deadtime_total_loss_optimization/RESULTS_2026-09-26.md).
+  A subsequent 3x3 L/dead-time grid found no simultaneous rated-output and
+  paper-small-negative-current solution among its sampled points; see
+  [joint-grid report](experiments/track_A_periodic_steady_state/A55_joint_lphase_deadtime_total_loss_optimization/JOINT_GRID_RESULTS.md).
+  This remains a local sensitivity study, not a global optimization; physical
+  reverse-conduction and magnetic losses remain unmodelled.
 
 These are periodic-state and local commutation results. They are not claims of
 zero-start operation, closed-loop output regulation or complete 1 kW hardware
@@ -137,7 +155,7 @@ python3 tests/run_portable_suite.py
 LTspice netlists are supplied for inspection and reproduction. Generated raw
 waveforms, optimizer traces and database files are intentionally excluded from
 version control; the scripts and concise result reports needed to regenerate
-or audit them remain tracked. The complete 247-test local suite additionally
+or audit them remain tracked. The complete 267-test local suite additionally
 checks recorded LTspice `.log` files after those files have been generated:
 
 ```bash

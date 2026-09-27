@@ -1,5 +1,10 @@
 # P25原生：三相六模态方程草案
 
+2026-09-27物理事件核对与定义接口：
+[D02_PHYSICAL_EVENT_CONTRACT.md](D02_PHYSICAL_EVENT_CONTRACT.md)。
+该文单列时刻编号冲突、Eq. (12)量纲及Eq. (15)与节点KVL的差别；
+不以旧时标表推断驱动延迟，也不把本页历史数值结果视为已经通过新事件检测器。
+
 依据：P25 Fig.2/3与六模态文字；项目转录见src/scb_ivr/p25_operating_supplement.py。nP=3，nM保留；不是四相外延。
 
 ## 开关与事件

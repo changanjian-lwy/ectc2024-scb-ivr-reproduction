@@ -1,0 +1,70 @@
+{
+  "classification": "ACTUAL_SWITCH_BRANCH_METERING_AUDIT",
+  "integration": "right-endpoint backward-Euler; accepted samples only",
+  "points": [
+    {
+      "label": "endpoint_margin",
+      "phase_inductance_h": 5.646653755508038e-10,
+      "coarse_step_s": 6.25e-11,
+      "sub_step_s": 5e-12,
+      "integrated_duration_s": 2.0000000000000147e-07,
+      "period_s": 2e-07,
+      "relative_closure": 5.577981558616129e-13,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "average_output_v": 0.9465887235899184,
+      "actual_load_power_w": 224.0075560471286,
+      "high_side_channel_loss_w": [
+        0.7110637171424878,
+        0.7103601117918517,
+        0.7103242949774516,
+        0.7362141860296398
+      ],
+      "low_side_channel_loss_w": [
+        6.857273097957955,
+        6.793841362889026,
+        6.813333507633993,
+        5.577453246866304
+      ],
+      "actual_branch_channel_loss_w": 28.909863525288706,
+      "legacy_phase_current_loss_proxy_w": 25.258956425040125,
+      "complete_total_loss": false
+    },
+    {
+      "label": "endpoint_critical",
+      "phase_inductance_h": 6.274059728342265e-10,
+      "coarse_step_s": 6.25e-11,
+      "sub_step_s": 5e-12,
+      "integrated_duration_s": 2.0000000000000147e-07,
+      "period_s": 2e-07,
+      "relative_closure": 3.3169944650334533e-09,
+      "natural_zvs_flags": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "average_output_v": 0.9369648877733028,
+      "actual_load_power_w": 219.47580273583682,
+      "high_side_channel_loss_w": [
+        0.5914050444081147,
+        0.5906179904912661,
+        0.5905876726339293,
+        0.6140651752298629
+      ],
+      "low_side_channel_loss_w": [
+        5.862233079621497,
+        5.811364267439349,
+        5.82900237509091,
+        4.725131545430178
+      ],
+      "actual_branch_channel_loss_w": 24.61440715034511,
+      "legacy_phase_current_loss_proxy_w": 21.404336575821834,
+      "complete_total_loss": false
+    }
+  ]
+}

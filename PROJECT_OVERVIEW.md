@@ -30,7 +30,7 @@ localized instead of hidden by retuning unrelated parameters:
 Python/SciPy implements the analytical and event-driven models. LTspice
 provides inspectable circuit netlists and transient experiments. Automated
 tests protect the source hierarchy, branch separation and numerical contracts.
-The complete local suite contains 247 passing checks. GitHub CI runs 228
+The complete local suite contains 267 passing checks. The portable CI suite contains 248
 portable checks because LTspice-generated log fixtures are intentionally not
 published.
 
@@ -64,15 +64,42 @@ merged.
   phase-specific timing, period, power and capacitor charge balance nearly
   close, but the fixed per-phase peak-current gate still fails. The repository
   reports this as a negative result rather than relaxing the tolerance.
-- A fast, validated real-device solver (`A50`) found a four-phase joint
-  periodic state at which all four phases achieve zero-voltage switching --
-  the first in this project's history -- and a subsequent LTspice build
-  (`A52`) independently confirmed it, with the two methods' own predicted
-  switching-transition times agreeing to within `0.11%-0.24%`. This holds at
-  a reduced load (`76%` of the paper's rated power per module), not yet at
-  the rated operating point, and remains an engineering finding pending
-  device/timing data from the author, not a P24/P25 reproduction claim. See
+- A fast, validated event solver (`A50/A51`) found the first four-phase joint
+  periodic state in this project at which all four phases achieve
+  zero-voltage switching. The headline A51 load setting is nominally
+  `190 W` (`76%` of the paper's rated `250 W/module`) under a near-ideal
+  uniform `1 uOhm` switch boundary; its actual delivered load power is
+  `179.37 W`. A subsequent LTspice build (`A52`) did not reuse that state:
+  it first re-solved the same load resistance with a uniform `7 mOhm` switch
+  model, whose actual delivered power is `89.92 W`, and then independently
+  confirmed that corrected state's commutation timing to within
+  `0.11%-0.24%`. These are two explicitly different reduced-power
+  boundaries, neither is the rated operating point, and neither is a P24/P25
+  reproduction claim. See
   `experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A49_A52_2026-09-19.md`.
+- At rated `250 W/module`, A53 and A54 found ZVS-enabling phase-inductance
+  reductions for GS61008T and the P24 Table-3 EPC2067 candidate, respectively,
+  but their partial post-hoc loss comparisons remained net-negative. A54's
+  narrower loss gap was not robust because its solver dynamics retained a
+  near-ideal uniform resistance and its conduction estimate did not apply
+  P24's different high-/low-side parallel counts. A55 has now corrected those
+  two contracts and re-solved the three historical comparison points. The old
+  A54 critical point changes from all-phase ZVS to `F/F/F/T`; only its deeper
+  margin point remains `T/T/T/T`. The 2026-09-26 local refinement brackets the
+  new transition at 0.621524–0.622014 nH at 2.15 ns; a halved-step re-solve
+  retains the bracket. The passing point delivers about 219.97 W, with
+  negative valleys around 39% of positive peaks, not the paper's 1–2% rule.
+  An independent branch-power audit also found the prior phase-current loss
+  proxy misses flying-capacitor path currents; actual model channel power at
+  this point is 24.955 W versus the proxy's 21.718 W. See A55's
+  `RESULTS_2026-09-26.md`. A subsequent 3x3 local L/dead-time grid completed
+  with all nine points converged; none supplies simultaneous rated output
+  and the paper's small-negative-current condition. Halving dead time loses
+  high-side ZVS at the small-L anchors, while doubling it does not restore
+  rated power. At nominal L, longer dead time reduces modeled conduction
+  duration and output power. See A55 `JOINT_GRID_RESULTS.md`. This is not a
+  global optimization; realistic reverse conduction and magnetic loss remain
+  outside the model.
 
 ## What is deliberately not claimed
 

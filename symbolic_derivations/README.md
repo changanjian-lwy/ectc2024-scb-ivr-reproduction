@@ -6,6 +6,30 @@ rule from another branch.
 
 ## Reading order
 
+First isolated definition module:
+[`D01_TIMING_DEFINITION_CONTRACT.md`](D01_TIMING_DEFINITION_CONTRACT.md)
+— typed command/gate/nominal/event timing, 9 synthetic unit tests passed.
+Not yet connected to the solver; paper-label adapters remain to be audited.
+
+P25 native physical-event specification:
+[`02_P25_native/D02_PHYSICAL_EVENT_CONTRACT.md`](02_P25_native/D02_PHYSICAL_EVENT_CONTRACT.md)
+— first three-phase handoff, source-checked gate states, unresolved printed
+time-label conflicts, 16 synthetic tests. No four-phase extension or new circuit run.
+
+P25 shared-node derivation:
+[`02_P25_native/D03_SHARED_NODE_EQUATIONS.md`](02_P25_native/D03_SHARED_NODE_EQUATIONS.md)
+— full capacitor network, M2/M5 Schur reductions, dynamic output port,
+power identity and no-impulse state continuity. Constant-capacitance/ideal-gate
+derivation only; reverse clamp and event integration remain unimplemented.
+
+Current definition audit (2026-09-27):
+[`MATHEMATICAL_DEFINITION_AUDIT_2026-09-27.md`](MATHEMATICAL_DEFINITION_AUDIT_2026-09-27.md)
+distinguishes command/gate/clamp timing, threshold versus observed negative
+current, dimensionally consistent periodic residuals, rank of `I-M` versus
+`M`, and conditional energy bounds. It records unresolved implementation
+gates; historical solver passes are not automatically passes of this stricter
+contract. No new simulation or controller change accompanies that audit.
+
 1. [`00_Common_Symbols_and_Boundaries.md`](00_Common_Symbols_and_Boundaries.md)
    — shared notation and non-negotiable boundaries.
 2. [`01_P24_native/DERIVATION.md`](01_P24_native/DERIVATION.md) — 2024-native

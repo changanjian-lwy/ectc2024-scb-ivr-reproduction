@@ -1,0 +1,262 @@
+{
+  "classification": "ACTUAL_SWITCH_BRANCH_METERING_AUDIT",
+  "integration": "right-endpoint backward-Euler; accepted samples only",
+  "points": [
+    {
+      "label": "fine_bisect_5",
+      "phase_inductance_h": 6.215240418389056e-10,
+      "full_boundary": {
+        "vin_target_v": 48.0,
+        "vout_target_v": 1.0,
+        "module_power_w": 250.0,
+        "phases": 4,
+        "switching_frequency_hz": 5000000.0,
+        "input_ramp_s": 2.287e-05,
+        "phase_inductance_h": 6.215240418389056e-10,
+        "phase_inductor_resistance_ohm": 1e-06,
+        "flying_capacitances_f": [
+          3e-06,
+          3e-06,
+          3e-06
+        ],
+        "output_capacitance_f": 0.004672,
+        "divider_enabled": true,
+        "divider_capacitance_f": 0.0003,
+        "divider_leakage_ohm": 1000000000.0,
+        "source_inductance_h": 5e-09,
+        "source_resistance_ohm": 0.01,
+        "switch_on_resistance_ohm": 0.000775,
+        "switch_off_resistance_ohm": 1000000000000.0,
+        "diode_on_resistance_ohm": 0.001,
+        "diode_off_resistance_ohm": 1000000000000.0,
+        "dead_time_s": 2.15e-09,
+        "switch_capacitance": {
+          "high_device_f": 3.72e-09,
+          "low_device_f": 5.58e-09,
+          "high_snubber_f": 0.0,
+          "low_snubber_f": 0.0,
+          "device_evidence": "EXTERNAL_DEVICE_DATA",
+          "snubber_evidence": "EXPLORATORY_ASSUMPTION"
+        },
+        "evidence": "CROSS_PAPER_EXTENSION",
+        "high_side_on_resistance_ohm": 0.000775,
+        "low_side_on_resistance_ohm": 0.0005166666666666667
+      },
+      "simulated_modules": 1,
+      "coarse_step_s": 3.125e-11,
+      "sub_step_s": 2.5e-12,
+      "integrated_duration_s": 2.0000000000000147e-07,
+      "period_s": 2e-07,
+      "relative_closure": 7.861573677967026e-08,
+      "natural_zvs_flags": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "low_side_turn_on_verdicts": [
+        {
+          "phase_index": 0,
+          "window_start_s": 2.3015591666666665e-05,
+          "window_end_s": 2.3017741666666667e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.709370626309664,
+          "minimum_signed_switch_node_v": -0.10626070402680858,
+          "switch_node_at_window_end_v": -0.10512819203026018,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3016336935095724e-05,
+          "switch_on_time_s": 2.3016336935095724e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 1,
+          "window_start_s": 2.3065591666666667e-05,
+          "window_end_s": 2.3067741666666668e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.384552979366612,
+          "minimum_signed_switch_node_v": -0.10577808868954276,
+          "switch_node_at_window_end_v": -0.10463798551144178,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3066320247561873e-05,
+          "switch_on_time_s": 2.3066320247561873e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 2,
+          "window_start_s": 2.3115591666666664e-05,
+          "window_end_s": 2.3117741666666666e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.38480452454877,
+          "minimum_signed_switch_node_v": -0.10578056593890452,
+          "switch_node_at_window_end_v": -0.10463888008185047,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3116320515613833e-05,
+          "switch_on_time_s": 2.3116320515613833e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 3,
+          "window_start_s": 2.3165591666666666e-05,
+          "window_end_s": 2.3167741666666667e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.45501644200145,
+          "minimum_signed_switch_node_v": -0.10548239241618561,
+          "switch_node_at_window_end_v": -0.10415277653255775,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.316611705747311e-05,
+          "switch_on_time_s": 2.316611705747311e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        }
+      ],
+      "average_output_v": 0.9380145103574844,
+      "actual_load_power_w": 219.9678079676617,
+      "high_side_channel_loss_w": [
+        0.599042208601208,
+        0.598314064563437,
+        0.5982804699475542,
+        0.621734043226155
+      ],
+      "low_side_channel_loss_w": [
+        5.94194352682153,
+        5.890344362518741,
+        5.9080489335746655,
+        4.797132576071732
+      ],
+      "actual_branch_channel_loss_w": 24.954840185325025,
+      "legacy_phase_current_loss_proxy_w": 21.718418235679618,
+      "complete_total_loss": false
+    },
+    {
+      "label": "fine_bisect_7",
+      "phase_inductance_h": 6.220142027551824e-10,
+      "full_boundary": {
+        "vin_target_v": 48.0,
+        "vout_target_v": 1.0,
+        "module_power_w": 250.0,
+        "phases": 4,
+        "switching_frequency_hz": 5000000.0,
+        "input_ramp_s": 2.287e-05,
+        "phase_inductance_h": 6.220142027551824e-10,
+        "phase_inductor_resistance_ohm": 1e-06,
+        "flying_capacitances_f": [
+          3e-06,
+          3e-06,
+          3e-06
+        ],
+        "output_capacitance_f": 0.004672,
+        "divider_enabled": true,
+        "divider_capacitance_f": 0.0003,
+        "divider_leakage_ohm": 1000000000.0,
+        "source_inductance_h": 5e-09,
+        "source_resistance_ohm": 0.01,
+        "switch_on_resistance_ohm": 0.000775,
+        "switch_off_resistance_ohm": 1000000000000.0,
+        "diode_on_resistance_ohm": 0.001,
+        "diode_off_resistance_ohm": 1000000000000.0,
+        "dead_time_s": 2.15e-09,
+        "switch_capacitance": {
+          "high_device_f": 3.72e-09,
+          "low_device_f": 5.58e-09,
+          "high_snubber_f": 0.0,
+          "low_snubber_f": 0.0,
+          "device_evidence": "EXTERNAL_DEVICE_DATA",
+          "snubber_evidence": "EXPLORATORY_ASSUMPTION"
+        },
+        "evidence": "CROSS_PAPER_EXTENSION",
+        "high_side_on_resistance_ohm": 0.000775,
+        "low_side_on_resistance_ohm": 0.0005166666666666667
+      },
+      "simulated_modules": 1,
+      "coarse_step_s": 3.125e-11,
+      "sub_step_s": 2.5e-12,
+      "integrated_duration_s": 2.0000000000000147e-07,
+      "period_s": 2e-07,
+      "relative_closure": 3.8435958882146443e-10,
+      "natural_zvs_flags": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "low_side_turn_on_verdicts": [
+        {
+          "phase_index": 0,
+          "window_start_s": 2.3015591666666665e-05,
+          "window_end_s": 2.3017741666666667e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.709593407691669,
+          "minimum_signed_switch_node_v": -0.10619083812235058,
+          "switch_node_at_window_end_v": -0.10505982472003868,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3016337444161407e-05,
+          "switch_on_time_s": 2.3016337444161407e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 1,
+          "window_start_s": 2.3065591666666667e-05,
+          "window_end_s": 2.3067741666666668e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.38500073773928,
+          "minimum_signed_switch_node_v": -0.10570894914525097,
+          "switch_node_at_window_end_v": -0.10457035100214727,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3066320756282e-05,
+          "switch_on_time_s": 2.3066320756282e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 2,
+          "window_start_s": 2.3115591666666664e-05,
+          "window_end_s": 2.3117741666666666e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.385253425791117,
+          "minimum_signed_switch_node_v": -0.10571142972111791,
+          "switch_node_at_window_end_v": -0.10457125006158145,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3116321024552366e-05,
+          "switch_on_time_s": 2.3116321024552366e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        },
+        {
+          "phase_index": 3,
+          "window_start_s": 2.3165591666666666e-05,
+          "window_end_s": 2.3167741666666667e-05,
+          "sub_step_s": 2.5e-12,
+          "initial_switch_node_v": 11.454915320968068,
+          "minimum_signed_switch_node_v": -0.10541190713200178,
+          "switch_node_at_window_end_v": -0.10408383456966042,
+          "crossed_zero": true,
+          "sign_change_time_s": 2.3166117405277406e-05,
+          "switch_on_time_s": 2.3166117405277406e-05,
+          "natural": true,
+          "hard_switch_residual_v": 0.0
+        }
+      ],
+      "average_output_v": 0.9379338146510225,
+      "actual_load_power_w": 219.92996271947183,
+      "high_side_channel_loss_w": [
+        0.5981998101872695,
+        0.597483382082799,
+        0.597449450930076,
+        0.6208907365772817
+      ],
+      "low_side_channel_loss_w": [
+        5.935042818867587,
+        5.883528320917718,
+        5.901223504022938,
+        4.7912177870408135
+      ],
+      "actual_branch_channel_loss_w": 24.925035810626483,
+      "legacy_phase_current_loss_proxy_w": 21.691770571066076,
+      "complete_total_loss": false
+    }
+  ]
+}

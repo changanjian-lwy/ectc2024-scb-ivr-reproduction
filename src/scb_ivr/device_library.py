@@ -63,7 +63,31 @@ GS61008T = GaNDevice(
 
 
 @dataclass(frozen=True)
-class P25SwitchPopulation:
+class SwitchPopulation:
+    """Topology-owned parallel-device count for one switch position.
+
+    Device data stay per-device in :class:`GaNDevice`.  This separate object
+    prevents capacitance (which adds in parallel) and on-resistance (which
+    divides in parallel) from being accidentally given the same scaling law.
+    """
+
+    high_side_parallel: int
+    low_side_parallel: int
+    evidence: Evidence
+    source_location: str
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.high_side_parallel, int)
+            or not isinstance(self.low_side_parallel, int)
+            or self.high_side_parallel <= 0
+            or self.low_side_parallel <= 0
+        ):
+            raise ValueError("parallel-device counts must be positive integers")
+
+
+@dataclass(frozen=True)
+class P25SwitchPopulation(SwitchPopulation):
     high_side_parallel: int = 1
     low_side_parallel: int = 2
     evidence: Evidence = Evidence.P25_SUPPLEMENT
@@ -71,3 +95,25 @@ class P25SwitchPopulation:
 
 
 P25_GS61008T_POPULATION = P25SwitchPopulation()
+
+
+EPC2067 = GaNDevice(
+    part_number="EPC2067",
+    rated_v=40.0,
+    rds_on_typ_ohm=1.55e-3,
+    coss_typ_f=1607e-12,
+    co_er_f=1597e-12,
+    co_tr_f=1860e-12,
+    qoss_c=56e-9,
+    qoss_voltage_v=20.0,
+    source="EPC EPC2067 datasheet",
+    source_revision="2021-10-21",
+)
+
+
+P24_EPC2067_POPULATION = SwitchPopulation(
+    high_side_parallel=2,
+    low_side_parallel=3,
+    evidence=Evidence.P24_EXPLICIT,
+    source_location="P24 Table 3, nP=4/nM=4 row",
+)

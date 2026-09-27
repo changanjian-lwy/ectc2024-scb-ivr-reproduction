@@ -11,7 +11,8 @@ equation, values transferred from the 2025 prototype, and provisional values.
 | Inductor | 2.68 nH | Reported | ECTC 2024 Table 1; differs from printed Eq. (4) |
 | GaN device | EPC2067 | Reported | ECTC 2024 Table 3 |
 | Devices per switch position | HS 2, LS 3 | Reported | ECTC 2024 Table 3, four-module row |
-| Equivalent typical Ron | HS 0.65 mOhm, LS 0.433 mOhm | Calculated | EPC2067 typical 1.3 mOhm divided by parallel count |
+| Equivalent typical Ron at 25 C | HS 0.775 mOhm, LS 0.517 mOhm | Calculated | Locked EPC2067 library value 1.55 mOhm divided by the Table-3 parallel counts; not a hot-device design value |
+| Legacy exploratory-netlist Ron | HS 0.65 mOhm, LS 0.433 mOhm | Historical, not active A55 input | `circuit/experiment_E1*`, `experiment_E2*` and `ectc2024_4phase_4module_sourced_params.net` retain an earlier 1.3 mOhm assumption so their recorded results remain reproducible; they are not silently relabelled as 1.55 mOhm runs |
 | Equivalent energy Coss | HS 3.194 nF, LS 4.791 nF | Calculated approximation | EPC2067 Coss(ER)=1597 pF times parallel count |
 | Gate level | 5 V | Datasheet value | EPC2067 recommended/characterization condition |
 | Flying capacitance | 27.34 uF | Calculated design input | APEC 2025 Eq. (23), allowing 0.12 V ripple |
@@ -28,6 +29,11 @@ and partial Murata family strings GRM32EC72 and GRM219R60. Those values are
 not copied directly into the 48 V target because the prototype is 12 V,
 200 W and 0.5 MHz. The incomplete capacitor strings do not uniquely identify
 capacitance, voltage rating, ESR or ESL.
+
+The current locked EPC2067 scalar library uses `1.55 mOhm` at 25 C. Earlier
+exploratory circuit netlists used `1.3 mOhm`; their old results are retained as
+historical evidence and must be rerun under a new experiment number before
+being compared with A55.
 
 The netlist deliberately contains no capacitor-voltage initial conditions.
 Failure to establish the 36/24/12 V ladder therefore indicates a missing

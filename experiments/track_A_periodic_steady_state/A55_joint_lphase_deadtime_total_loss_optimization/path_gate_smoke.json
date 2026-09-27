@@ -1,0 +1,58 @@
+{
+  "classification": "IMPLEMENTATION_GATE_SMOKE_ONLY",
+  "source_state": "A54 key_states.json nominal",
+  "not_an_optimization": true,
+  "dynamics_caveat": "A54 state and this smoke evaluation retain the old uniform 1 uOhm solver resistance; do not cite the watts as an A55 result",
+  "period_s": 2e-07,
+  "natural_zvs_flags": [
+    false,
+    false,
+    false,
+    false
+  ],
+  "high_side_i2dt_a2s": [
+    5.7548421156535155e-05,
+    5.7749934870713156e-05,
+    5.7744212921766455e-05,
+    6.240068096962245e-05
+  ],
+  "low_side_i2dt_a2s": [
+    0.0007835767057529041,
+    0.0007796923367990286,
+    0.0007796359703286474,
+    0.0008325323782396309
+  ],
+  "dead_time_i2dt_a2s": [
+    1.7210823315320823e-05,
+    1.6955650128953998e-05,
+    1.6960852348973797e-05,
+    1.281678436140616e-05
+  ],
+  "effective_resistance_ohm": {
+    "high_side": 0.000775,
+    "low_side": 0.0005166666666666667
+  },
+  "channel_loss_w_per_phase": {
+    "high_side": [
+      0.22300013198157373,
+      0.2237809976240135,
+      0.22375882507184502,
+      0.24180263875728697
+    ],
+    "low_side": [
+      2.0242398231950025,
+      2.014205203397491,
+      2.014059590015673,
+      2.1507086437857135
+    ]
+  },
+  "partial_channel_conduction_loss_w": 9.1155558538286,
+  "dead_time_i2_average_a2_per_phase": [
+    86.05411657660412,
+    84.77825064477,
+    84.804261744869,
+    64.0839218070308
+  ],
+  "unmodelled_dead_time_current_present": true,
+  "complete_total_loss": false
+}
