@@ -1,0 +1,5210 @@
+{
+ "experiment": "A56",
+ "classification": "SENSITIVITY_ONLY",
+ "boundary": "BOUNDARY.md (commit f0e0041)",
+ "objective": "partial electrical-loss proxy = A55 actual enabled-branch channel dissipation + hard-switch capacitive discharge energy the A55 meter misses (BOUNDARY S3.4); not total loss",
+ "regulation": {
+  "variable": "Ton_cmd (D01 command on-interval), same for all phases",
+  "load_resistance_ohm": 0.004,
+  "target_power_w": 250.0,
+  "tolerance_relative": 0.001,
+  "nominal_ton_s": 1.6666666666666664e-08
+ },
+ "regulation_variable_proof": {
+  "tests": {
+   "file": "test_regulated_boundary.py",
+   "tests_run": 11,
+   "failures": 0,
+   "errors": 0,
+   "passed": true,
+   "tests": [
+    "RegulatedBoundaryFieldTests.test_descriptor_load_conductance_is_1_over_4_mohm",
+    "RegulatedBoundaryFieldTests.test_only_on_time_changes_and_load_is_exactly_4_mohm",
+    "RegulatedBoundaryFieldTests.test_ton_cmd_must_be_explicit",
+    "SchedulerPathTests.test_commanded_pwm_mode_uses_ton_cmd",
+    "SchedulerPathTests.test_next_pwm_edge_uses_ton_cmd",
+    "SchedulerPathTests.test_period_intervals_center_turn_off_windows_on_ton_cmd",
+    "SolveAndMeteringPathTests.test_full_period_and_a55_metering_never_read_duty_and_follow_ton_cmd",
+    "SolveAndMeteringPathTests.test_nominal_ton_cmd_reproduces_a55_boundary_bitwise",
+    "SolveAndMeteringPathTests.test_solve_fixed_point_passes_the_regulated_boundary_through",
+    "SolveAndMeteringPathTests.test_solver_and_meter_share_one_period_map_module",
+    "SolveAndMeteringPathTests.test_unscoped_a55_metering_would_drop_ton_cmd_scoped_metering_keeps_it"
+   ]
+  },
+  "findings": [
+   "commanded_pwm_mode, next_pwm_edge_s, A51 period_intervals/_window_mode and resolve_deadtime_window all read boundary.on_time_s; none reads duty",
+   "a duty-poisoned boundary completes a full period map and A55 metering",
+   "A53 solve_fixed_point passes the boundary object through unchanged",
+   "A55 metered_orbit rebuilds its boundary from (L, dead time) and would silently meter at the nominal 16.6667 ns schedule; A56 uses a scoped, documented rebinding (regulated_boundary.regulated_metering) so A55's unchanged code meters the regulated boundary; the test proves both the defect and the fix",
+   "load resistance is exactly 0.004 Ohm in every regulated boundary and 1/0.004 S in the assembled descriptor"
+  ]
+ },
+ "candidates": [
+  {
+   "label": "new_passing_dt_x1",
+   "phase_inductance_h": 6.215240418389056e-10,
+   "dead_time_s": 2.15e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 219.9282961671925,
+    "actual_branch_channel_loss_w": 24.967660310904858,
+    "natural_zvs_flags": [
+     true,
+     true,
+     true,
+     true
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 224.31089452990906,
+   "max_accepted_orbit_abs_current_all_trials_a": 219.81920144428398,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe new_passing_dt_x1 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 2.3257904425862034e-07,
+     "newton_iterations": 1,
+     "load_power_w": 219.9282961671925,
+     "power_relative_error": -0.12028681533122998,
+     "channel_loss_w": 24.967660310904858,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 205.85432230380312,
+     "probe_max_abs_current_a": 205.85432230380312,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 5.040374040603638
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.7769622394490188e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 8.708197049201805e-08,
+     "newton_iterations": 3,
+     "load_power_w": 252.87169170293998,
+     "power_relative_error": 0.011486766811759974,
+     "channel_loss_w": 28.889068231606203,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 219.81920144428398,
+     "probe_max_abs_current_a": 224.31089452990906,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 131.45347213745117
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.7676452544009515e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.7769622394490188e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 8.852965788649886e-11,
+     "newton_iterations": 3,
+     "load_power_w": 250.0009820745574,
+     "power_relative_error": 3.928298229594063e-06,
+     "channel_loss_w": 28.546207978485054,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.64445990612884,
+     "probe_max_abs_current_a": 218.6452069696487,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 115.09237766265869
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.7676452544009515e-08,
+    "ton_cmd_deviation_from_nominal_s": 1.0097858773428514e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.06058715264057102,
+    "load_power_w": 250.0009820745574,
+    "power_relative_error": 3.928298229594063e-06,
+    "average_output_v": 1.0000019586240398,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 8.852965788649886e-11,
+    "metered_relative_closure": 8.852965788649886e-11,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": true,
+    "high_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -84.26654939087182,
+     -85.25392066451762,
+     -85.2525700408581,
+     -85.00774847731266
+    ],
+    "phase_maximum_a": [
+     218.64445990612884,
+     217.52452416418097,
+     217.52574216516857,
+     217.08544062361514
+    ],
+    "maximum_abs_phase_current_a": 218.64445990612884,
+    "current_at_high_side_deadtime_entry_a": [
+     -84.1575945653731,
+     -85.14725628173751,
+     -85.14587941545794,
+     -84.93221332609862
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.38490613757835296,
+     0.39143750162841834,
+     0.39142898016551153,
+     0.3912386435594956
+    ],
+    "max_negative_entry_ratio": 0.39143750162841834,
+    "negative_valley_to_positive_peak_ratio": [
+     0.3854044572044047,
+     0.39192785729378504,
+     0.39191945372665515,
+     0.3915865948131451
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.5663417789171574e-08,
+     1.567034063488433e-08,
+     1.56695007162244e-08,
+     1.6299830188425628e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.8162508874069774e-07,
+     1.8164285925952901e-07,
+     1.816426104472972e-07,
+     1.8183037341941224e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.7355797055924017,
+     0.7348830570443813,
+     0.7348490571232625,
+     0.7591432519919281
+    ],
+    "low_side_channel_loss_w": [
+     6.7707107668222,
+     6.702518947595196,
+     6.720860315057023,
+     5.387662877258659
+    ],
+    "a55_meter_channel_loss_w": 28.546207978485054,
+    "legacy_phase_current_loss_proxy_w": 24.615769819935835,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.546207978485054,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 0,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "capacitive_captured_by_a55_meter_w": 0.0,
+    "energy_balance": {
+     "source_w": 281.2710015420672,
+     "dissipation_w": 278.9371153179578,
+     "channel_w": 28.546207978485036,
+     "load_w": 250.00098207455653,
+     "numerical_w": 2.333886176409634,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.3899252649162577,
+     "stored_energy_change_per_period_w": 1.1630973961729296e-06,
+     "identity_residual_w": -1.1153976382516362e-06,
+     "numerical_outside_event_windows_w": 2.333886176409634
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 6.887875782732612,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.7439256490933228,
+    "surrogate_admissions": [
+     {
+      "side": "high",
+      "phase_index": 0,
+      "admitted_duration_s": 1.3696524516220061e-10,
+      "abs_charge_c": 8.25858409793206e-09,
+      "i2_dt_a2s": 5.117936903925521e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 1,
+      "admitted_duration_s": 1.438880908749573e-10,
+      "abs_charge_c": 8.57150757157735e-09,
+      "i2_dt_a2s": 5.274863131425976e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 2,
+      "admitted_duration_s": 1.4304817221502523e-10,
+      "abs_charge_c": 8.515328279263633e-09,
+      "i2_dt_a2s": 5.238451940999884e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 3,
+      "admitted_duration_s": 7.733776444162547e-10,
+      "abs_charge_c": 5.068216862100813e-08,
+      "i2_dt_a2s": 3.3419286418528505e-06
+     },
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 1.4515412847082956e-09,
+      "abs_charge_c": 3.1383127018718475e-07,
+      "i2_dt_a2s": 6.797213396607283e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 1.469311803539567e-09,
+      "abs_charge_c": 3.1591032850497113e-07,
+      "i2_dt_a2s": 6.804947384609669e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 1.4690629913077628e-09,
+      "abs_charge_c": 3.1585760970394074e-07,
+      "i2_dt_a2s": 6.803935524817412e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 1.6568259634227916e-09,
+      "abs_charge_c": 3.559483595806446e-07,
+      "i2_dt_a2s": 7.655267518429124e-05
+     }
+    ],
+    "z_star": [
+     48.00000000011492,
+     47.94174121211558,
+     47.94890291945229,
+     36.0,
+     24.0,
+     12.0,
+     47.998717377378426,
+     23.768764407621326,
+     11.722325774624899,
+     12.293825547657033,
+     0.005154288194515983,
+     -0.037021922073936786,
+     -0.08116183164755948,
+     0.9999118582012624,
+     5.8258787999846025,
+     -64.22140807312036,
+     -10.03037746420951,
+     71.6496565612643,
+     157.08247991911836,
+     -5.825878799984685
+    ],
+    "probe_max_abs_current_a": 218.6452069696487
+   }
+  },
+  {
+   "label": "new_passing_dt_x0.5",
+   "phase_inductance_h": 6.215240418389056e-10,
+   "dead_time_s": 1.075e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 225.08400179013745,
+    "actual_branch_channel_loss_w": 26.424224525700364,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 224.29300861250877,
+   "max_accepted_orbit_abs_current_all_trials_a": 218.76507321342228,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe new_passing_dt_x0.5 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 2.1116823568539354e-11,
+     "newton_iterations": 1,
+     "load_power_w": 225.08400179013745,
+     "power_relative_error": -0.09966399283945016,
+     "channel_loss_w": 26.424224525700364,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 207.95639655370053,
+     "probe_max_abs_current_a": 207.95639655370053,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 3.7272329330444336
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.756493067220015e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 4.721817102630676e-12,
+     "newton_iterations": 3,
+     "load_power_w": 251.12382975389244,
+     "power_relative_error": 0.004495319015569654,
+     "channel_loss_w": 29.42524482284716,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.76507321342228,
+     "probe_max_abs_current_a": 224.29300861250877,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 91.97521686553955
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.752715345870316e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.756493067220015e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.4332360807387641e-07,
+     "newton_iterations": 2,
+     "load_power_w": 249.99701362344373,
+     "power_relative_error": -1.1945506225075064e-05,
+     "channel_loss_w": 29.294723945452684,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.31079504971137,
+     "probe_max_abs_current_a": 218.31079504971137,
+     "probe_evaluations": 22,
+     "error": null,
+     "wall_time_s": 50.84994101524353
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.752715345870316e-08,
+    "ton_cmd_deviation_from_nominal_s": 8.604867920364961e-10,
+    "ton_cmd_relative_deviation_from_nominal": 0.0516292075221898,
+    "load_power_w": 249.99701362344373,
+    "power_relative_error": -1.1945506225075064e-05,
+    "average_output_v": 0.9999940217036236,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 1.4332360807387641e-07,
+    "metered_relative_closure": 1.4332360807387641e-07,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": false,
+    "high_side_hard_switch_residual_v": [
+     5.238383348622243,
+     5.266035882655739,
+     5.268349227695978,
+     2.6483744981151425
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -84.85352360087042,
+     -85.82658566680121,
+     -85.82742717689007,
+     -84.180804304574
+    ],
+    "phase_maximum_a": [
+     218.2373100706797,
+     217.13376740683498,
+     217.1324700869756,
+     218.31079504971137
+    ],
+    "maximum_abs_phase_current_a": 218.31079504971137,
+    "current_at_high_side_deadtime_entry_a": [
+     -84.74543958851109,
+     -85.72072173586334,
+     -85.72153962006021,
+     -84.1044393882495
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.388317834201058,
+     0.3947830075423128,
+     0.3947891330381089,
+     0.3852509417552996
+    ],
+    "max_negative_entry_ratio": 0.3947891330381089,
+    "negative_valley_to_positive_peak_ratio": [
+     0.3888130932945848,
+     0.39527055921242926,
+     0.3952767964298966,
+     0.3856007408401644
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.6452153458701527e-08,
+     1.6452153458701527e-08,
+     1.6452153458701527e-08,
+     1.6452153458701527e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.8177532106338713e-07,
+     1.8179303790207118e-07,
+     1.8179279388887056e-07,
+     1.819784146394929e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.9282562752798379,
+     0.9148282390283596,
+     0.9149982522758483,
+     0.7856132421124872
+    ],
+    "low_side_channel_loss_w": [
+     6.807256567071627,
+     6.749865046180421,
+     6.7236295836115225,
+     5.47027673989258
+    ],
+    "a55_meter_channel_loss_w": 29.294723945452684,
+    "legacy_phase_current_loss_proxy_w": 24.681900110920623,
+    "missing_hard_switch_capacitive_w": 2.1183372331476558,
+    "partial_loss_proxy_w": 31.41306117860034,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 4,
+    "half_c_meas_v2_fsw_total_w": 2.9011803432419443,
+    "capacitive_captured_by_a55_meter_w": 0.733958540061005,
+    "energy_balance": {
+     "source_w": 284.2432967333441,
+     "dissipation_w": 279.6889652047235,
+     "channel_w": 29.294723945452674,
+     "load_w": 249.99701362344322,
+     "numerical_w": 4.554366874219581,
+     "numerical_in_event_windows_w": 2.184911450246112,
+     "other_resistive_w": 0.3972276358275906,
+     "stored_energy_change_per_period_w": -3.439318274622849e-05,
+     "identity_residual_w": -9.524162409846326e-07,
+     "numerical_outside_event_windows_w": 2.369455423973469
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 1.8685698006343523,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.2075469138070148,
+    "surrogate_admissions": [
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 3.7747452208850636e-10,
+      "abs_charge_c": 8.064990357833183e-08,
+      "i2_dt_a2s": 1.7348327563291535e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 3.9519136077256355e-10,
+      "abs_charge_c": 8.395621322275695e-08,
+      "i2_dt_a2s": 1.795966019513034e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 3.949473475719405e-10,
+      "abs_charge_c": 8.390188143252063e-08,
+      "i2_dt_a2s": 1.794862240067745e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 5.805680981942713e-10,
+      "abs_charge_c": 1.2520596189326102e-07,
+      "i2_dt_a2s": 2.708413066942253e-05
+     }
+    ],
+    "z_star": [
+     48.00000000275449,
+     47.941114845360474,
+     47.9479218774661,
+     36.0,
+     24.0,
+     12.0,
+     42.709538610855674,
+     23.83685467171721,
+     11.816408606999422,
+     6.956324438817137,
+     0.016437649253254527,
+     -0.03761292994196015,
+     -0.08261168322631339,
+     0.9999214867270622,
+     5.888515739298266,
+     -80.33712819797432,
+     -8.92374391454217,
+     72.81754868628187,
+     159.88843075163288,
+     -5.888515739298634
+    ],
+    "probe_max_abs_current_a": 218.31079504971137
+   }
+  },
+  {
+   "label": "new_passing_dt_x2",
+   "phase_inductance_h": 6.215240418389056e-10,
+   "dead_time_s": 4.3e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 219.93629890824693,
+    "actual_branch_channel_loss_w": 24.969984036790855,
+    "natural_zvs_flags": [
+     true,
+     true,
+     true,
+     true
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 224.31280514341,
+   "max_accepted_orbit_abs_current_all_trials_a": 219.82048547668555,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe new_passing_dt_x2 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.2751573170557118e-11,
+     "newton_iterations": 1,
+     "load_power_w": 219.93629890824693,
+     "power_relative_error": -0.1202548043670123,
+     "channel_loss_w": 24.969984036790855,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 205.85982153027797,
+     "probe_max_abs_current_a": 205.85982153027797,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 8.888185024261475
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.776929910319861e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 9.621870222208319e-11,
+     "newton_iterations": 4,
+     "load_power_w": 252.8708954313231,
+     "power_relative_error": 0.011483581725292513,
+     "channel_loss_w": 28.890308537597882,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 219.82048547668555,
+     "probe_max_abs_current_a": 224.31280514341,
+     "probe_evaluations": 64,
+     "error": null,
+     "wall_time_s": 285.21903705596924
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.7676156695877842e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.776929910319861e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 2.62135491238031e-11,
+     "newton_iterations": 3,
+     "load_power_w": 250.00089848861165,
+     "power_relative_error": 3.5939544467122886e-06,
+     "channel_loss_w": 28.54765562290696,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.64607850269005,
+     "probe_max_abs_current_a": 218.646511662773,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 137.33172798156738
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.7676156695877842e-08,
+    "ton_cmd_deviation_from_nominal_s": 1.0094900292111786e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.06056940175267078,
+    "load_power_w": 250.00089848861165,
+    "power_relative_error": 3.5939544467122886e-06,
+    "average_output_v": 1.0000017914495598,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 2.62135491238031e-11,
+    "metered_relative_closure": 2.62135491238031e-11,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": true,
+    "high_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -84.2652802816738,
+     -85.25122490420408,
+     -85.24987333834655,
+     -85.00801614564121
+    ],
+    "phase_maximum_a": [
+     218.64607850269005,
+     217.527806902374,
+     217.52902631193638,
+     217.0862358953276
+    ],
+    "maximum_abs_phase_current_a": 218.64607850269005,
+    "current_at_high_side_deadtime_entry_a": [
+     -84.15632360135282,
+     -85.14455678658423,
+     -85.14317897898272,
+     -84.9324812802539
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.38489747530650287,
+     0.39141918451279617,
+     0.39141065641919204,
+     0.39123844462071633
+    ],
+    "max_negative_entry_ratio": 0.39141918451279617,
+    "negative_valley_to_positive_peak_ratio": [
+     0.385395799726804,
+     0.3919095499476287,
+     0.3919011397407642,
+     0.3915863932830338
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.5663110664176244e-08,
+     1.567005014580582e-08,
+     1.56692101993937e-08,
+     1.6299555635452092e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.816253737757311e-07,
+     1.8164314517815666e-07,
+     1.81642896365315e-07,
+     1.8183066054353717e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.7359757578668354,
+     0.7352977378317592,
+     0.7352637997633936,
+     0.7594903351520529
+    ],
+    "low_side_channel_loss_w": [
+     6.770494391899283,
+     6.702408409523487,
+     6.720708710567612,
+     5.388016480302536
+    ],
+    "a55_meter_channel_loss_w": 28.54765562290696,
+    "legacy_phase_current_loss_proxy_w": 24.619164448609194,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.54765562290696,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 0,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "capacitive_captured_by_a55_meter_w": 0.0,
+    "energy_balance": {
+     "source_w": 281.0014595465833,
+     "dissipation_w": 278.93782713651825,
+     "channel_w": 28.5476556229068,
+     "load_w": 250.00089848861163,
+     "numerical_w": 2.0636321782814027,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38927302499982375,
+     "stored_energy_change_per_period_w": 1.7352785874891197e-06,
+     "identity_residual_w": -1.5034949361059091e-06,
+     "numerical_outside_event_windows_w": 2.0636321782814027
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 17.930886179158037,
+    "channel_loss_metered_inside_surrogate_intervals_w": 1.8204579479658496,
+    "surrogate_admissions": [
+     {
+      "side": "high",
+      "phase_index": 0,
+      "admitted_duration_s": 2.286953968302192e-09,
+      "abs_charge_c": 1.0443084128715984e-07,
+      "i2_dt_a2s": 5.086309440299572e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 1,
+      "admitted_duration_s": 2.293893449931768e-09,
+      "abs_charge_c": 1.0560029971150497e-07,
+      "i2_dt_a2s": 5.184415742471756e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 2,
+      "admitted_duration_s": 2.2930535035196485e-09,
+      "abs_charge_c": 1.0555619569585381e-07,
+      "i2_dt_a2s": 5.1818712810636806e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 3,
+      "admitted_duration_s": 2.92339893957804e-09,
+      "abs_charge_c": 1.3700994916441045e-07,
+      "i2_dt_a2s": 7.074681212858108e-06
+     },
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 3.60153047160899e-09,
+      "abs_charge_c": 7.741029502486936e-07,
+      "i2_dt_a2s": 0.00016651017946854363
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 3.6193018740345387e-09,
+      "abs_charge_c": 7.737103754877775e-07,
+      "i2_dt_a2s": 0.0001655320709223129
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 3.6190530611928708e-09,
+      "abs_charge_c": 7.736611827731312e-07,
+      "i2_dt_a2s": 0.0001655234540197454
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 3.806817239415054e-09,
+      "abs_charge_c": 8.121054414630758e-07,
+      "i2_dt_a2s": 0.00017333677828694532
+     }
+    ],
+    "z_star": [
+     48.00000000001884,
+     47.94183114362789,
+     47.9503996673986,
+     36.0,
+     24.0,
+     12.0,
+     47.96998685023634,
+     23.770708197743406,
+     11.724420784222504,
+     12.296904505147355,
+     0.006927039374634666,
+     -0.03517146286542023,
+     -0.07923135096168646,
+     0.9998743590957365,
+     5.816885639145142,
+     -25.13839686623858,
+     -13.465340290162413,
+     68.0689356866801,
+     153.3458590126887,
+     -5.816885639144964
+    ],
+    "probe_max_abs_current_a": 218.646511662773
+   }
+  },
+  {
+   "label": "old_critical_dt_x1",
+   "phase_inductance_h": 6.274059728342265e-10,
+   "dead_time_s": 2.15e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 219.47580273583682,
+    "actual_branch_channel_loss_w": 24.61440715034511,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     true
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 222.8515017589674,
+   "max_accepted_orbit_abs_current_all_trials_a": 218.34984720088553,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe old_critical_dt_x1 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 3.3169944650334533e-09,
+     "newton_iterations": 1,
+     "load_power_w": 219.47580273583682,
+     "power_relative_error": -0.12209678905665267,
+     "channel_loss_w": 24.61440715034511,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 204.24330863486327,
+     "probe_max_abs_current_a": 204.24330863486327,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 5.013174057006836
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.7787930784824387e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 3.11870826336407e-08,
+     "newton_iterations": 3,
+     "load_power_w": 252.961885534937,
+     "power_relative_error": 0.011847542139748146,
+     "channel_loss_w": 28.55546878616144,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.34984720088553,
+     "probe_max_abs_current_a": 222.8515017589674,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 130.19365906715393
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.76918702024393e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.7787930784824387e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.3743647177235472e-08,
+     "newton_iterations": 3,
+     "load_power_w": 250.00088089490805,
+     "power_relative_error": 3.5235796322918844e-06,
+     "channel_loss_w": 28.20585791635716,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 217.1464229879798,
+     "probe_max_abs_current_a": 217.14679289937905,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 114.25260996818542
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.76918702024393e-08,
+    "ton_cmd_deviation_from_nominal_s": 1.0252035357726378e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.06151221214635827,
+    "load_power_w": 250.00088089490805,
+    "power_relative_error": 3.5235796322918844e-06,
+    "average_output_v": 1.0000017563694774,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 1.3743647177235472e-08,
+    "metered_relative_closure": 1.3743647177235472e-08,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": true,
+    "high_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -82.89411935370262,
+     -83.86860767989103,
+     -83.86724135725446,
+     -83.65503420451796
+    ],
+    "phase_maximum_a": [
+     217.1464229879798,
+     216.04283655468504,
+     216.04407637997653,
+     215.57578109363345
+    ],
+    "maximum_abs_phase_current_a": 217.1464229879798,
+    "current_at_high_side_deadtime_entry_a": [
+     -82.78417690975459,
+     -83.76092113918234,
+     -83.75952652784107,
+     -83.57881991070379
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.3812366594421734,
+     0.38770515363966107,
+     0.3876964734757435,
+     0.3877004155415865
+    ],
+    "max_negative_entry_ratio": 0.38770515363966107,
+    "negative_valley_to_positive_peak_ratio": [
+     0.38174296501440064,
+     0.3882036035879491,
+     0.3881950515030528,
+     0.3880539538353018
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.5641380239103084e-08,
+     1.564834648830194e-08,
+     1.5647485915898943e-08,
+     1.6291789532278813e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.816047018738984e-07,
+     1.8162249663399268e-07,
+     1.816222458013569e-07,
+     1.818115424850181e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.7260557653360782,
+     0.7253489515957275,
+     0.7253152210937645,
+     0.7493897432111126
+    ],
+    "low_side_channel_loss_w": [
+     6.692157295148028,
+     6.62498490575458,
+     6.643164830592804,
+     5.319441203625067
+    ],
+    "a55_meter_channel_loss_w": 28.20585791635716,
+    "legacy_phase_current_loss_proxy_w": 24.30806048163181,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.20585791635716,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 0,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "capacitive_captured_by_a55_meter_w": 0.0,
+    "energy_balance": {
+     "source_w": 280.9083519918823,
+     "dissipation_w": 278.5952004789646,
+     "channel_w": 28.205857916357264,
+     "load_w": 250.00088089490805,
+     "numerical_w": 2.3131484417126065,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38846166769928914,
+     "stored_energy_change_per_period_w": 4.196504255205014e-06,
+     "identity_residual_w": -1.1252991911625543e-06,
+     "numerical_outside_event_windows_w": 2.3131484417126065
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 6.773189475920862,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.7290195111164012,
+    "surrogate_admissions": [
+     {
+      "side": "high",
+      "phase_index": 0,
+      "admitted_duration_s": 9.951003666501578e-11,
+      "abs_charge_c": 5.7034469909708125e-09,
+      "i2_dt_a2s": 3.391782804140608e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 1,
+      "admitted_duration_s": 1.0647628586387282e-10,
+      "abs_charge_c": 5.992750485986633e-09,
+      "i2_dt_a2s": 3.519039476502105e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 2,
+      "admitted_duration_s": 1.0561571346087489e-10,
+      "abs_charge_c": 5.936389783945313e-09,
+      "i2_dt_a2s": 3.4832488270985274e-07
+     },
+     {
+      "side": "high",
+      "phase_index": 3,
+      "admitted_duration_s": 7.499193298407449e-10,
+      "abs_charge_c": 4.826434540980759e-08,
+      "i2_dt_a2s": 3.12534320112672e-06
+     },
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 1.4465720763376356e-09,
+      "abs_charge_c": 3.1062070937207965e-07,
+      "i2_dt_a2s": 6.681765883368393e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 1.4643668364319295e-09,
+      "abs_charge_c": 3.1270921886692824e-07,
+      "i2_dt_a2s": 6.690295943313273e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 1.4641160037961532e-09,
+      "abs_charge_c": 3.126564582214811e-07,
+      "i2_dt_a2s": 6.689289915907402e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 1.653412687457347e-09,
+      "abs_charge_c": 3.52754576052973e-07,
+      "i2_dt_a2s": 7.534045818357465e-05
+     }
+    ],
+    "z_star": [
+     47.99999999984201,
+     47.94181676339466,
+     47.948938211288365,
+     36.0,
+     24.0,
+     12.0,
+     47.99806220752034,
+     23.76665309888525,
+     11.719069129326506,
+     12.292567745398356,
+     0.004793847910492504,
+     -0.03701305435959571,
+     -0.08070532098195984,
+     0.9999129462949428,
+     5.81832364479836,
+     -63.36750507841203,
+     -9.306425874172284,
+     71.62248228997028,
+     156.20138593036836,
+     -5.8183236447983315
+    ],
+    "probe_max_abs_current_a": 217.14679289937905
+   }
+  },
+  {
+   "label": "old_critical_dt_x0.5",
+   "phase_inductance_h": 6.274059728342265e-10,
+   "dead_time_s": 1.075e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 224.94512732511512,
+    "actual_branch_channel_loss_w": 26.138719918101465,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 222.7733509351091,
+   "max_accepted_orbit_abs_current_all_trials_a": 217.29053325644568,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe old_critical_dt_x0.5 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.9179126214852737e-11,
+     "newton_iterations": 1,
+     "load_power_w": 224.94512732511512,
+     "power_relative_error": -0.1002194906995395,
+     "channel_loss_w": 26.138719918101465,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 206.49767677615574,
+     "probe_max_abs_current_a": 206.49767677615574,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 3.7662436962127686
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.757035186981483e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 8.111465699460544e-12,
+     "newton_iterations": 3,
+     "load_power_w": 251.11556511047078,
+     "power_relative_error": 0.004462260441883137,
+     "channel_loss_w": 29.118706169526135,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 217.29053325644568,
+     "probe_max_abs_current_a": 222.7733509351091,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 93.3519217967987
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.7532820073615175e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.757035186981483e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 2.2053355613834437e-07,
+     "newton_iterations": 2,
+     "load_power_w": 249.99707591736978,
+     "power_relative_error": -1.1696330520893916e-05,
+     "channel_loss_w": 28.990656906502572,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 216.84244629310558,
+     "probe_max_abs_current_a": 216.84244629310558,
+     "probe_evaluations": 22,
+     "error": null,
+     "wall_time_s": 51.24381995201111
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.7532820073615175e-08,
+    "ton_cmd_deviation_from_nominal_s": 8.661534069485109e-10,
+    "ton_cmd_relative_deviation_from_nominal": 0.051969204416910664,
+    "load_power_w": 249.99707591736978,
+    "power_relative_error": -1.1696330520893916e-05,
+    "average_output_v": 0.9999941463962692,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 2.2053355613834437e-07,
+    "metered_relative_closure": 2.2053355613834437e-07,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": false,
+    "high_side_hard_switch_residual_v": [
+     5.3456512261093465,
+     5.375464827460249,
+     5.377737235210521,
+     2.8016313972711426
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -83.505987005491,
+     -84.46619397485651,
+     -84.46706346330834,
+     -82.80380769604879
+    ],
+    "phase_maximum_a": [
+     216.7264470660389,
+     215.63919154957506,
+     215.6378450769503,
+     216.84244629310558
+    ],
+    "maximum_abs_phase_current_a": 216.84244629310558,
+    "current_at_high_side_deadtime_entry_a": [
+     -83.39694363659444,
+     -84.35939097352446,
+     -84.36023499013864,
+     -82.72666644698795
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.38480279986864036,
+     0.39120621055625865,
+     0.3912125673489026,
+     0.38150587148037635
+    ],
+    "max_negative_entry_ratio": 0.3912125673489026,
+    "negative_valley_to_positive_peak_ratio": [
+     0.38530593813520975,
+     0.39170149622564265,
+     0.3917079742341438,
+     0.38186161939956637
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.6457820073614425e-08,
+     1.6457820073614425e-08,
+     1.6457820073614425e-08,
+     1.6457820073614425e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.8176473878114087e-07,
+     1.8178247751373942e-07,
+     1.817822317182595e-07,
+     1.81969260753036e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.9273703445534953,
+     0.9134871790349272,
+     0.9136600605168023,
+     0.7791475820426959
+    ],
+    "low_side_channel_loss_w": [
+     6.73067961380918,
+     6.674721889033161,
+     6.646657618662002,
+     5.404932618850308
+    ],
+    "a55_meter_channel_loss_w": 28.990656906502572,
+    "legacy_phase_current_loss_proxy_w": 24.37481489790651,
+    "missing_hard_switch_capacitive_w": 2.2146188335990824,
+    "partial_loss_proxy_w": 31.205275740101655,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 4,
+    "half_c_meas_v2_fsw_total_w": 3.0334727519648514,
+    "capacitive_captured_by_a55_meter_w": 0.7703091487960854,
+    "energy_balance": {
+     "source_w": 284.01077825309386,
+     "dissipation_w": 279.38380883867586,
+     "channel_w": 28.99065690650264,
+     "load_w": 249.99707591736947,
+     "numerical_w": 4.62693421135161,
+     "numerical_in_event_windows_w": 2.2805383487872914,
+     "other_resistive_w": 0.39607601480375365,
+     "stored_energy_change_per_period_w": 3.618591537524196e-05,
+     "identity_residual_w": -9.828489861973821e-07,
+     "numerical_outside_event_windows_w": 2.346395862564319
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 1.83621047858777,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.20254028076629765,
+    "surrogate_admissions": [
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 3.725588547551456e-10,
+      "abs_charge_c": 7.903001511940384e-08,
+      "i2_dt_a2s": 1.6879710629010557e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 3.902975873536999e-10,
+      "abs_charge_c": 8.232703221681888e-08,
+      "i2_dt_a2s": 1.748742995722454e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 3.900517918737831e-10,
+      "abs_charge_c": 8.2272678081004e-08,
+      "i2_dt_a2s": 1.747645564324593e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 5.770808266502821e-10,
+      "abs_charge_c": 1.2361237030032723e-07,
+      "i2_dt_a2s": 2.655909309940839e-05
+     }
+    ],
+    "z_star": [
+     48.00000000191671,
+     47.94116369880466,
+     47.94796331051965,
+     36.0,
+     24.0,
+     12.0,
+     42.60231192356503,
+     23.837225221039308,
+     11.81735876058717,
+     6.847681296515463,
+     0.015906559985368964,
+     -0.037576546686067,
+     -0.0821606923405284,
+     0.9999224407122049,
+     5.883630312941486,
+     -79.12574750534057,
+     -8.241240032162429,
+     72.74689391130613,
+     159.01559793207724,
+     -5.88363031293888
+    ],
+    "probe_max_abs_current_a": 216.84244629310558
+   }
+  },
+  {
+   "label": "old_critical_dt_x2",
+   "phase_inductance_h": 6.274059728342265e-10,
+   "dead_time_s": 4.3e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 219.47855053045285,
+    "actual_branch_channel_loss_w": 24.616629713882908,
+    "natural_zvs_flags": [
+     true,
+     true,
+     true,
+     true
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 222.85131509069086,
+   "max_accepted_orbit_abs_current_all_trials_a": 218.35372607885148,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe old_critical_dt_x2 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 9.020188005806422e-12,
+     "newton_iterations": 1,
+     "load_power_w": 219.47855053045285,
+     "power_relative_error": -0.12208579787818863,
+     "channel_loss_w": 24.616629713882908,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 204.2474527169541,
+     "probe_max_abs_current_a": 204.2474527169541,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 8.40891981124878
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.778781943514282e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 7.729545824842803e-11,
+     "newton_iterations": 4,
+     "load_power_w": 252.9675619611022,
+     "power_relative_error": 0.011870247844408821,
+     "channel_loss_w": 28.557494278444004,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 218.35372607885148,
+     "probe_max_abs_current_a": 222.85131509069086,
+     "probe_evaluations": 64,
+     "error": null,
+     "wall_time_s": 284.13663601875305
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.769159241909019e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.778781943514282e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.3631909560404717e-08,
+     "newton_iterations": 3,
+     "load_power_w": 250.0013453739435,
+     "power_relative_error": 5.381495774114953e-06,
+     "channel_loss_w": 28.207267151447905,
+     "high_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 217.14829868150974,
+     "probe_max_abs_current_a": 217.14836262150055,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 137.47134804725647
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.769159241909019e-08,
+    "ton_cmd_deviation_from_nominal_s": 1.0249257524235263e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.061495545145411556,
+    "load_power_w": 250.0013453739435,
+    "power_relative_error": 5.381495774114953e-06,
+    "average_output_v": 1.0000026853226138,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 1.3631909560404717e-08,
+    "metered_relative_closure": 1.3631909560404717e-08,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": true,
+    "high_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -82.89289383143155,
+     -83.865977017896,
+     -83.86460970039708,
+     -83.65535851049192
+    ],
+    "phase_maximum_a": [
+     217.14829868150974,
+     216.04634937019765,
+     216.04759064998285,
+     215.57680360238075
+    ],
+    "maximum_abs_phase_current_a": 217.14829868150974,
+    "current_at_high_side_deadtime_entry_a": [
+     -82.78294936041345,
+     -83.75828636736574,
+     -83.75689076195934,
+     -83.5791444043313
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.3812277133325864,
+     0.3876866543291831,
+     0.38767796720146386,
+     0.38770008186264937
+    ],
+    "max_negative_entry_ratio": 0.38770008186264937,
+    "negative_valley_to_positive_peak_ratio": [
+     0.3817340238663814,
+     0.3881851151957712,
+     0.3881765561378814,
+     0.3880536176090147
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.56410913453908e-08,
+     1.5648074486764436e-08,
+     1.564721388412575e-08,
+     1.6291534485728663e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.8160496972078672e-07,
+     1.816227654178587e-07,
+     1.816225145851145e-07,
+     1.818118120990611e-07
+    ],
+    "high_side_channel_loss_w": [
+     0.7264339449705534,
+     0.7257455522881798,
+     0.7257118942445695,
+     0.7497190412619991
+    ],
+    "low_side_channel_loss_w": [
+     6.69195089180422,
+     6.624882519435353,
+     6.643021561631042,
+     5.319801745811987
+    ],
+    "a55_meter_channel_loss_w": 28.207267151447905,
+    "legacy_phase_current_loss_proxy_w": 24.311412521261456,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.207267151447905,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 0,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "capacitive_captured_by_a55_meter_w": 0.0,
+    "energy_balance": {
+     "source_w": 280.64047374658657,
+     "dissipation_w": 278.5964268196997,
+     "channel_w": 28.207267151447926,
+     "load_w": 250.0013453739444,
+     "numerical_w": 2.044048803798591,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38781429430736125,
+     "stored_energy_change_per_period_w": -4.1071313017226885e-07,
+     "identity_residual_w": -1.4661985683339651e-06,
+     "numerical_outside_event_windows_w": 2.044048803798591
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 17.72521966719802,
+    "channel_loss_metered_inside_surrogate_intervals_w": 1.7899448397342401,
+    "surrogate_admissions": [
+     {
+      "side": "high",
+      "phase_index": 0,
+      "admitted_duration_s": 2.2494989263045794e-09,
+      "abs_charge_c": 1.0043825930561529e-07,
+      "i2_dt_a2s": 4.7808934981294785e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 1,
+      "admitted_duration_s": 2.2564820676782157e-09,
+      "abs_charge_c": 1.0157433823572095e-07,
+      "i2_dt_a2s": 4.873812525107456e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 2,
+      "admitted_duration_s": 2.2556214650395296e-09,
+      "abs_charge_c": 1.0153004716378812e-07,
+      "i2_dt_a2s": 4.871312289973493e-06
+     },
+     {
+      "side": "high",
+      "phase_index": 3,
+      "admitted_duration_s": 2.899942066642442e-09,
+      "abs_charge_c": 1.3309144055604316e-07,
+      "i2_dt_a2s": 6.733412431138597e-06
+     },
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 3.5965621398767727e-09,
+      "abs_charge_c": 7.677894856053535e-07,
+      "i2_dt_a2s": 0.00016403154657042285
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 3.6143578369487485e-09,
+      "abs_charge_c": 7.674420268801351e-07,
+      "i2_dt_a2s": 0.0001630836171979878
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 3.614107004204552e-09,
+      "abs_charge_c": 7.673928331285919e-07,
+      "i2_dt_a2s": 0.0001630750657975595
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 3.803404518151158e-09,
+      "abs_charge_c": 8.057855025643552e-07,
+      "i2_dt_a2s": 0.00017080249776301866
+     }
+    ],
+    "z_star": [
+     47.99999999973542,
+     47.941906132372814,
+     47.95041528727398,
+     36.0,
+     24.0,
+     12.0,
+     47.96962766423995,
+     23.76856645534134,
+     11.721150597174548,
+     12.295466147846799,
+     0.00653729747043353,
+     -0.03517481588285046,
+     -0.07879508320761658,
+     0.9998767887112838,
+     5.809386736270649,
+     -24.655583418907554,
+     -12.710462688931171,
+     68.07547083833579,
+     152.50152136210093,
+     -5.8093867362706355
+    ],
+    "probe_max_abs_current_a": 217.14836262150055
+   }
+  },
+  {
+   "label": "nominal_dt_x1",
+   "phase_inductance_h": 1.4666667e-09,
+   "dead_time_s": 2.15e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 3,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 192.22792421032145,
+    "actual_branch_channel_loss_w": 14.904607235280604,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 131.67788689543903,
+   "max_accepted_orbit_abs_current_all_trials_a": 129.65104736762194,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe nominal_dt_x1 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.9168367273111696e-12,
+     "newton_iterations": 1,
+     "load_power_w": 192.22792421032145,
+     "power_relative_error": -0.2310883031587142,
+     "channel_loss_w": 14.904607235280604,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 113.88712627921497,
+     "probe_max_abs_current_a": 113.88712627921497,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 4.8348708152771
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.9006866128538318e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.4722879204933564e-12,
+     "newton_iterations": 3,
+     "load_power_w": 253.5567676667114,
+     "power_relative_error": 0.014227070666845698,
+     "channel_loss_w": 18.628770617459722,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 129.65104736762194,
+     "probe_max_abs_current_a": 131.67788689543903,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 123.06712698936462
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 1.8879471882680588e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.9006866128538318e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 4.610412039642663e-09,
+     "newton_iterations": 2,
+     "load_power_w": 249.98215492413627,
+     "power_relative_error": -7.138030345488211e-05,
+     "channel_loss_w": 18.4082699219605,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 128.79257649927374,
+     "probe_max_abs_current_a": 128.79257649927374,
+     "probe_evaluations": 22,
+     "error": null,
+     "wall_time_s": 59.793530225753784
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.8879471882680588e-08,
+    "ton_cmd_deviation_from_nominal_s": 2.2128052160139243e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.13276831296083547,
+    "load_power_w": 249.98215492413627,
+    "power_relative_error": -7.138030345488211e-05,
+    "average_output_v": 0.9999643082297599,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 4.610412039642663e-09,
+    "metered_relative_closure": 4.610412039642663e-09,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": false,
+    "high_side_hard_switch_residual_v": [
+     11.965126267892735,
+     12.10130021676536,
+     12.100873567839649,
+     12.480691549366856
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -1.5443566008527867,
+     -1.8230241544002752,
+     -1.824853895011237,
+     0.07854483661105796
+    ],
+    "phase_maximum_a": [
+     126.93518164977897,
+     126.61214710094545,
+     126.60969892595958,
+     128.79257649927374
+    ],
+    "maximum_abs_phase_current_a": 128.79257649927374,
+    "current_at_high_side_deadtime_entry_a": [
+     -0.15643443695541467,
+     -0.47332082950887855,
+     -0.4753531803276831,
+     1.7529813190639694
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.0012323962113752337,
+     0.0037383524436364617,
+     0.003754476824130718,
+     0.0
+    ],
+    "max_negative_entry_ratio": 0.003754476824130718,
+    "negative_valley_to_positive_peak_ratio": [
+     0.012166497741451619,
+     0.014398493321077739,
+     0.014413223556264818,
+     0.0
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.6729471882680387e-08,
+     1.6729471882680387e-08,
+     1.6729471882680387e-08,
+     1.6729471882680387e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.7991807066413765e-07,
+     1.7993868608466826e-07,
+     1.7993826017543836e-07,
+     1.802671132630048e-07
+    ],
+    "high_side_channel_loss_w": [
+     1.4460262873059928,
+     1.386792025729285,
+     1.3869342939413227,
+     0.9978267899802463
+    ],
+    "low_side_channel_loss_w": [
+     3.5564826140624177,
+     3.589569825822488,
+     3.425958395296805,
+     2.6186796898219415
+    ],
+    "a55_meter_channel_loss_w": 18.4082699219605,
+    "legacy_phase_current_loss_proxy_w": 11.20087818542285,
+    "missing_hard_switch_capacitive_w": 12.97398943585106,
+    "partial_loss_proxy_w": 31.38225935781156,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 4,
+    "half_c_meas_v2_fsw_total_w": 17.777063251473574,
+    "capacitive_captured_by_a55_meter_w": 4.9303218549518375,
+    "energy_balance": {
+     "source_w": 282.7661712745904,
+     "dissipation_w": 268.75863394474476,
+     "channel_w": 18.40826992196055,
+     "load_w": 249.98215492413598,
+     "numerical_w": 14.00734686071293,
+     "numerical_in_event_windows_w": 13.001636424085076,
+     "other_resistive_w": 0.3682090986482365,
+     "stored_energy_change_per_period_w": 0.0001915550357223239,
+     "identity_residual_w": -1.085902991526666e-06,
+     "numerical_outside_event_windows_w": 1.0057104366278544
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 2.6350191640895826,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.17206215252956553,
+    "surrogate_admissions": [
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 9.475425468192145e-10,
+      "abs_charge_c": 1.1899607526940117e-07,
+      "i2_dt_a2s": 1.4984654981945526e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 9.681579673498212e-10,
+      "abs_charge_c": 1.2121767619706344e-07,
+      "i2_dt_a2s": 1.5220221759081489e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 9.677320581199264e-10,
+      "abs_charge_c": 1.2116111468694838e-07,
+      "i2_dt_a2s": 1.5213088067083465e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 1.2965851456863764e-09,
+      "abs_charge_c": 1.6562896666450358e-07,
+      "i2_dt_a2s": 2.1186739396882612e-05
+     }
+    ],
+    "z_star": [
+     48.00000000209957,
+     47.94146973771859,
+     47.94813842114873,
+     36.0,
+     24.0,
+     12.0,
+     35.98301259359306,
+     23.865264099011686,
+     11.889620848546093,
+     0.14428710046358378,
+     -0.016524568831319544,
+     -0.03481663791148,
+     -0.054419168247495604,
+     0.9999375219568329,
+     5.853026445854231,
+     -1.5443561152596215,
+     32.41902909679303,
+     67.38588249263556,
+     105.32532907217184,
+     -5.853026445847409
+    ],
+    "probe_max_abs_current_a": 128.79257649927374
+   }
+  },
+  {
+   "label": "nominal_dt_x0.5",
+   "phase_inductance_h": 1.4666667e-09,
+   "dead_time_s": 1.075e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 2,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 218.84754842282942,
+    "actual_branch_channel_loss_w": 16.596593481946158,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 129.74367635612944,
+   "max_accepted_orbit_abs_current_all_trials_a": 128.84700293374536,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe nominal_dt_x0.5 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 3.2579600672621564e-07,
+     "newton_iterations": 1,
+     "load_power_w": 218.84754842282942,
+     "power_relative_error": -0.12460980630868235,
+     "channel_loss_w": 16.596593481946158,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      false,
+      false,
+      false,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 121.0788606275184,
+     "probe_max_abs_current_a": 121.0788606275184,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 3.640903949737549
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.781344474518501e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 7.693744011783954e-07,
+     "newton_iterations": 2,
+     "load_power_w": 250.1134624739511,
+     "power_relative_error": 0.0004538498958044368,
+     "channel_loss_w": 18.450745000249732,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      false,
+      false,
+      false,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 128.84700293374536,
+     "probe_max_abs_current_a": 129.74367635612944,
+     "probe_evaluations": 22,
+     "error": null,
+     "wall_time_s": 45.38448524475098
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 1.781344474518501e-08,
+    "ton_cmd_deviation_from_nominal_s": 1.1467780785183452e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.06880668471110063,
+    "load_power_w": 250.1134624739511,
+    "power_relative_error": 0.0004538498958044368,
+    "average_output_v": 1.0002268982246745,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 7.693744011783954e-07,
+    "metered_relative_closure": 7.693744011783954e-07,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "all_eight_zvs": false,
+    "high_side_hard_switch_residual_v": [
+     12.010266941762545,
+     12.172311615495712,
+     12.172039909444312,
+     12.322630618833802
+    ],
+    "low_side_hard_switch_residual_v": [
+     1.243491205122592,
+     1.0418906915792077,
+     1.0456832644948018,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -1.5939214072286085,
+     -1.898480517631994,
+     -1.9006465028617567,
+     0.27695155960920503
+    ],
+    "phase_maximum_a": [
+     127.00571493414641,
+     126.67114637499094,
+     126.66878954198742,
+     128.84700293374536
+    ],
+    "maximum_abs_phase_current_a": 128.84700293374536,
+    "current_at_high_side_deadtime_entry_a": [
+     -0.8958673033960549,
+     -1.210172503356686,
+     -1.2123906853475446,
+     1.0441107513014143
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.007053755839731858,
+     0.009553655571839159,
+     0.00957134499927994,
+     0.0
+    ],
+    "max_negative_entry_ratio": 0.00957134499927994,
+    "negative_valley_to_positive_peak_ratio": [
+     0.012549997518261843,
+     0.014987474037787794,
+     0.015004852495505545,
+     0.0
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.673844474518602e-08,
+     1.673844474518602e-08,
+     1.673844474518602e-08,
+     1.673844474518602e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.8111155525481413e-07,
+     1.8111155525481413e-07,
+     1.8111155525481413e-07,
+     1.8133481509207083e-07
+    ],
+    "high_side_channel_loss_w": [
+     1.4548736292435474,
+     1.3995039570658991,
+     1.3996751341182694,
+     0.9827069353115931
+    ],
+    "low_side_channel_loss_w": [
+     3.5660557820286796,
+     3.598048512888133,
+     3.427919922851924,
+     2.621961126741685
+    ],
+    "a55_meter_channel_loss_w": 18.450745000249732,
+    "legacy_phase_current_loss_proxy_w": 11.221370132818018,
+    "missing_hard_switch_capacitive_w": 13.118469540129704,
+    "partial_loss_proxy_w": 31.569214540379434,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 7,
+    "half_c_meas_v2_fsw_total_w": 17.962271731738213,
+    "capacitive_captured_by_a55_meter_w": 4.954925616108189,
+    "energy_balance": {
+     "source_w": 283.08070326191296,
+     "dissipation_w": 268.93320009192394,
+     "channel_w": 18.450745000249697,
+     "load_w": 250.11346247395102,
+     "numerical_w": 14.1507652310248,
+     "numerical_in_event_windows_w": 13.146755603546149,
+     "other_resistive_w": 0.36899261772322234,
+     "stored_energy_change_per_period_w": -0.0032610850825287585,
+     "identity_residual_w": -9.759532497710666e-07,
+     "numerical_outside_event_windows_w": 1.004009627478652
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 0.14012597011293196,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.009158938972598145,
+    "surrogate_admissions": [
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 2.2325983725670598e-10,
+      "abs_charge_c": 2.802519402258639e-08,
+      "i2_dt_a2s": 3.5453957313283136e-06
+     }
+    ],
+    "z_star": [
+     47.99999976730102,
+     47.94140437775772,
+     47.94807852624777,
+     36.0,
+     24.0,
+     12.0,
+     35.93781246919748,
+     23.853767659183905,
+     11.871975837630423,
+     0.10429080329695592,
+     -0.016519629994303595,
+     -0.034823526551177326,
+     -0.05444666366993862,
+     1.000200244142503,
+     5.859538959230885,
+     -1.5939214072286085,
+     32.42347460835418,
+     67.39928283287657,
+     105.37855643720306,
+     -5.859538959516125
+    ],
+    "probe_max_abs_current_a": 129.74367635612944
+   }
+  },
+  {
+   "label": "nominal_dt_x2",
+   "phase_inductance_h": 1.4666667e-09,
+   "dead_time_s": 4.3e-09,
+   "status": "REGULATED_TO_250W",
+   "stop_reason": null,
+   "outer_trials": 4,
+   "a55_reference_metrics": {
+    "actual_load_power_w": 144.09427951197748,
+    "actual_branch_channel_loss_w": 12.014083230975306,
+    "natural_zvs_flags": [
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "replay_matches_a55": true,
+   "max_probe_abs_current_all_trials_a": 130.4977086249563,
+   "max_accepted_orbit_abs_current_all_trials_a": 129.1173390942301,
+   "trials": [
+    {
+     "iteration": 0,
+     "ton_cmd_s": 1.6666666666666664e-08,
+     "choice_reason": "replay of the seed point",
+     "seed": "A55 joint_local_grid.json probe nominal_dt_x2 (Ton_cmd = nominal)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 2.1631835458399165e-11,
+     "newton_iterations": 1,
+     "load_power_w": 144.09427951197748,
+     "power_relative_error": -0.4236228819520901,
+     "channel_loss_w": 12.014083230975306,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 99.62422712015656,
+     "probe_max_abs_current_a": 99.62422712015656,
+     "probe_evaluations": 1,
+     "error": null,
+     "wall_time_s": 7.038293838500977
+    },
+    {
+     "iteration": 1,
+     "ton_cmd_s": 1.9666666666666664e-08,
+     "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+     "seed": "trial 0 of this run (continuation)",
+     "seed_ton_cmd_s": 1.6666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 9.878723766795121e-12,
+     "newton_iterations": 3,
+     "load_power_w": 212.71117160749012,
+     "power_relative_error": -0.14915531357003953,
+     "channel_loss_w": 16.1500191827743,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 119.61313286620596,
+     "probe_max_abs_current_a": 122.61881438666883,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 177.91937375068665
+    },
+    {
+     "iteration": 2,
+     "ton_cmd_s": 2.1092756924154262e-08,
+     "choice_reason": "secant on last two successful trials",
+     "seed": "trial 1 of this run (continuation)",
+     "seed_ton_cmd_s": 1.9666666666666664e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 1.0113293577140203e-12,
+     "newton_iterations": 3,
+     "load_power_w": 250.32863809950837,
+     "power_relative_error": 0.001314552398033575,
+     "channel_loss_w": 18.49755784332318,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 129.1173390942301,
+     "probe_max_abs_current_a": 130.4977086249563,
+     "probe_evaluations": 43,
+     "error": null,
+     "wall_time_s": 129.47377586364746
+    },
+    {
+     "iteration": 3,
+     "ton_cmd_s": 2.1080781312430493e-08,
+     "choice_reason": "regula falsi (Illinois) inside successful bracket",
+     "seed": "trial 2 of this run (continuation)",
+     "seed_ton_cmd_s": 2.1092756924154262e-08,
+     "outcome": "success",
+     "converged": true,
+     "relative_residual": 5.454159629004953e-10,
+     "newton_iterations": 2,
+     "load_power_w": 249.9993854257221,
+     "power_relative_error": -2.458297111651575e-06,
+     "channel_loss_w": 18.476787676400846,
+     "high_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "accepted_orbit_max_abs_current_a": 129.03759169911743,
+     "probe_max_abs_current_a": 129.03759169911743,
+     "probe_evaluations": 22,
+     "error": null,
+     "wall_time_s": 65.07358503341675
+    }
+   ],
+   "regulated": {
+    "ton_cmd_s": 2.1080781312430493e-08,
+    "ton_cmd_deviation_from_nominal_s": 4.4141146457638294e-09,
+    "ton_cmd_relative_deviation_from_nominal": 0.2648468787458298,
+    "load_power_w": 249.9993854257221,
+    "power_relative_error": -2.458297111651575e-06,
+    "average_output_v": 0.999998769866986,
+    "load_resistance_ohm": 0.004,
+    "solver_relative_residual": 5.454159629004953e-10,
+    "metered_relative_closure": 5.454159629004953e-10,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "all_eight_zvs": false,
+    "high_side_hard_switch_residual_v": [
+     12.003197859870333,
+     12.085862489614897,
+     12.08509752670583,
+     13.00109711598682
+    ],
+    "low_side_hard_switch_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "phase_minimum_a": [
+     -1.7702296370549335,
+     -1.9555588558073338,
+     -1.9567619221473098,
+     -0.9386334892027173
+    ],
+    "phase_maximum_a": [
+     126.87619693916288,
+     126.53240211823123,
+     126.52983336882748,
+     129.03759169911743
+    ],
+    "maximum_abs_phase_current_a": 129.03759169911743,
+    "current_at_high_side_deadtime_entry_a": [
+     1.2838766410917886,
+     0.9466572101327944,
+     0.9445074659791829,
+     3.484299099375288
+    ],
+    "negative_entry_to_positive_peak_ratio": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "max_negative_entry_ratio": 0.0,
+    "negative_valley_to_positive_peak_ratio": [
+     0.013952417236337548,
+     0.015455004592263013,
+     0.015464826516000039,
+     0.0072741088611710135
+    ],
+    "modeled_high_channel_active_duration_s": [
+     1.6780781312428152e-08,
+     1.6780781312428152e-08,
+     1.6780781312428152e-08,
+     1.6780781312428152e-08
+    ],
+    "modeled_low_channel_active_duration_s": [
+     1.777181145992744e-07,
+     1.7773959843515373e-07,
+     1.7773917862725462e-07,
+     1.7806206833449848e-07
+    ],
+    "high_side_channel_loss_w": [
+     1.453101478866542,
+     1.384302210600956,
+     1.38438643285736,
+     1.0518269803697744
+    ],
+    "low_side_channel_loss_w": [
+     3.552874492107874,
+     3.584998097849988,
+     3.4323210171131455,
+     2.6329769666352068
+    ],
+    "a55_meter_channel_loss_w": 18.476787676400846,
+    "legacy_phase_current_loss_proxy_w": 11.203282663541337,
+    "missing_hard_switch_capacitive_w": 13.220902553234456,
+    "partial_loss_proxy_w": 31.697690229635302,
+    "complete_total_loss": false,
+    "hard_switched_event_count": 4,
+    "half_c_meas_v2_fsw_total_w": 18.09068704467749,
+    "capacitive_captured_by_a55_meter_w": 4.996731677357036,
+    "energy_balance": {
+     "source_w": 283.09500803811716,
+     "dissipation_w": 268.84519416027814,
+     "channel_w": 18.476787676400853,
+     "load_w": 249.99938542572227,
+     "numerical_w": 14.249833458051945,
+     "numerical_in_event_windows_w": 13.2485523094065,
+     "other_resistive_w": 0.3690210581550275,
+     "stored_energy_change_per_period_w": -1.8296753001578736e-05,
+     "identity_residual_w": -1.2834599267819158e-06,
+     "numerical_outside_event_windows_w": 1.001281148645445
+    },
+    "surrogate_dead_time_abs_current_time_per_second_a": 8.040645046607047,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.5231085921299865,
+    "surrogate_admissions": [
+     {
+      "side": "low",
+      "phase_index": 0,
+      "admitted_duration_s": 3.098895911706384e-09,
+      "abs_charge_c": 3.8865978044783356e-07,
+      "i2_dt_a2s": 4.878632024616953e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 1,
+      "admitted_duration_s": 3.12037974758571e-09,
+      "abs_charge_c": 3.901943722311014e-07,
+      "i2_dt_a2s": 4.8836288430401976e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 2,
+      "admitted_duration_s": 3.1199599396866e-09,
+      "abs_charge_c": 3.9013356277869366e-07,
+      "i2_dt_a2s": 4.882799727186734e-05
+     },
+     {
+      "side": "low",
+      "phase_index": 3,
+      "admitted_duration_s": 3.442849646930461e-09,
+      "abs_charge_c": 4.3914129386378046e-07,
+      "i2_dt_a2s": 5.604304261800754e-05
+     }
+    ],
+    "z_star": [
+     47.999999996841275,
+     47.94140117792946,
+     47.94807279373528,
+     36.0,
+     24.0,
+     12.0,
+     35.944874936270296,
+     23.910605817257753,
+     11.962772738532093,
+     0.08835985525970164,
+     -0.016467705169429497,
+     -0.03479311385968954,
+     -0.0545644093375765,
+     0.9999715762555128,
+     5.859881891453375,
+     -1.7702296370549335,
+     32.37322556394055,
+     67.34043932623908,
+     105.6064366457956,
+     -5.859881891454978
+    ],
+    "probe_max_abs_current_a": 129.03759169911743
+   }
+  }
+ ],
+ "step_refinement": {
+  "runs": [
+   {
+    "name": "nominal_dt_x1_step1p25ps",
+    "label": "nominal_dt_x1",
+    "coarse_step_s": 1.5625e-11,
+    "sub_step_s": 1.25e-12,
+    "status": "REGULATED_TO_250W",
+    "stop_reason": null,
+    "seed": "nominal_dt_x1_step2p5ps.json regulated state (step continuation)",
+    "outer_trials": 1,
+    "max_probe_abs_current_all_trials_a": 128.81652938362453,
+    "regulated": {
+     "ton_cmd_s": 1.8879471882680588e-08,
+     "ton_cmd_deviation_from_nominal_s": 2.2128052160139243e-09,
+     "ton_cmd_relative_deviation_from_nominal": 0.13276831296083547,
+     "load_power_w": 250.07231291382936,
+     "power_relative_error": 0.00028925165531745733,
+     "average_output_v": 1.0001446143889965,
+     "load_resistance_ohm": 0.004,
+     "solver_relative_residual": 1.706707690559817e-11,
+     "metered_relative_closure": 1.706707690559817e-11,
+     "high_side_natural_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "all_eight_zvs": false,
+     "high_side_hard_switch_residual_v": [
+      11.965101350956765,
+      12.100612238971163,
+      12.100185154494232,
+      12.481087673810976
+     ],
+     "low_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "phase_minimum_a": [
+      -1.5447002153241487,
+      -1.821804401030997,
+      -1.8236365391257146,
+      0.07935042931815292
+     ],
+     "phase_maximum_a": [
+      126.95704186992822,
+      126.63597970710211,
+      126.63353571981708,
+      128.81652935534177
+     ],
+     "maximum_abs_phase_current_a": 128.81652935534177,
+     "current_at_high_side_deadtime_entry_a": [
+      -0.15616399385459742,
+      -0.4712070249827686,
+      -0.4732419150917696,
+      1.7542205160263773
+     ],
+     "negative_entry_to_positive_peak_ratio": [
+      0.0012300538162711189,
+      0.003720956919768213,
+      0.003737097858017963,
+      0.0
+     ],
+     "max_negative_entry_ratio": 0.003737097858017963,
+     "negative_valley_to_positive_peak_ratio": [
+      0.01216710938261106,
+      0.014386151591709327,
+      0.01440089727227233,
+      0.0
+     ],
+     "modeled_high_channel_active_duration_s": [
+      1.6729471882680387e-08,
+      1.6729471882680387e-08,
+      1.6729471882680387e-08,
+      1.6729471882680387e-08
+     ],
+     "modeled_low_channel_active_duration_s": [
+      1.799180819591526e-07,
+      1.7993872064018033e-07,
+      1.7993829471781126e-07,
+      1.8026713586796959e-07
+     ],
+     "high_side_channel_loss_w": [
+      2.881672757633425,
+      2.5899238332597916,
+      2.586905037432039,
+      1.934333593128511
+     ],
+     "low_side_channel_loss_w": [
+      3.795488121161486,
+      3.873897552652984,
+      3.5897066505797675,
+      2.6612217244618037
+     ],
+     "a55_meter_channel_loss_w": 23.91314927030981,
+     "legacy_phase_current_loss_proxy_w": 11.20305892822782,
+     "missing_hard_switch_capacitive_w": 7.464349225495935,
+     "partial_loss_proxy_w": 31.377498495805746,
+     "complete_total_loss": false,
+     "hard_switched_event_count": 4,
+     "half_c_meas_v2_fsw_total_w": 17.776191579865024,
+     "capacitive_captured_by_a55_meter_w": 10.439114581156065,
+     "energy_balance": {
+      "source_w": 282.0749332000228,
+      "dissipation_w": 274.35198441188214,
+      "channel_w": 23.913149270309695,
+      "load_w": 250.0723129138286,
+      "numerical_w": 7.722948798226721,
+      "numerical_in_event_windows_w": 7.471329430501198,
+      "other_resistive_w": 0.36652222774384313,
+      "stored_energy_change_per_period_w": 6.234596172660645e-07,
+      "identity_residual_w": -6.335456541606277e-07,
+      "numerical_outside_event_windows_w": 0.25161936772552274
+     },
+     "surrogate_dead_time_abs_current_time_per_second_a": 2.635623665275902,
+     "channel_loss_metered_inside_surrogate_intervals_w": 0.17223553793659094,
+     "surrogate_admissions": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "admitted_duration_s": 9.475538418341595e-10,
+       "abs_charge_c": 1.190204641744225e-07,
+       "i2_dt_a2s": 1.5000509796157075e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "admitted_duration_s": 9.681925228618917e-10,
+       "abs_charge_c": 1.2124738413917227e-07,
+       "i2_dt_a2s": 1.5236857501099564e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "admitted_duration_s": 9.677666004928218e-10,
+       "abs_charge_c": 1.2119080708804251e-07,
+       "i2_dt_a2s": 1.5229789863399012e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "admitted_duration_s": 1.2966077506511514e-09,
+       "abs_charge_c": 1.656660776535431e-07,
+       "i2_dt_a2s": 2.1204663976089224e-05
+      }
+     ]
+    },
+    "trials": [
+     {
+      "iteration": 0,
+      "ton_cmd_s": 1.8879471882680588e-08,
+      "choice_reason": "replay of the seed point",
+      "seed": "nominal_dt_x1_step2p5ps.json regulated state (step continuation)",
+      "seed_ton_cmd_s": 1.8879471882680588e-08,
+      "outcome": "success",
+      "converged": true,
+      "relative_residual": 1.706707690559817e-11,
+      "newton_iterations": 3,
+      "load_power_w": 250.07231291382936,
+      "power_relative_error": 0.00028925165531745733,
+      "channel_loss_w": 23.91314927030981,
+      "high_zvs": [
+       false,
+       false,
+       false,
+       false
+      ],
+      "low_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "accepted_orbit_max_abs_current_a": 128.81652935534177,
+      "probe_max_abs_current_a": 128.81652938362453,
+      "probe_evaluations": 23,
+      "error": null,
+      "wall_time_s": 134.14393091201782
+     }
+    ]
+   },
+   {
+    "name": "nominal_dt_x1_step2p5ps",
+    "label": "nominal_dt_x1",
+    "coarse_step_s": 3.125e-11,
+    "sub_step_s": 2.5e-12,
+    "status": "REGULATED_TO_250W",
+    "stop_reason": null,
+    "seed": "nominal_dt_x1.json regulated state (step continuation)",
+    "outer_trials": 1,
+    "max_probe_abs_current_all_trials_a": 128.80854960999076,
+    "regulated": {
+     "ton_cmd_s": 1.8879471882680588e-08,
+     "ton_cmd_deviation_from_nominal_s": 2.2128052160139243e-09,
+     "ton_cmd_relative_deviation_from_nominal": 0.13276831296083547,
+     "load_power_w": 250.0422585347256,
+     "power_relative_error": 0.00016903413890245744,
+     "average_output_v": 1.000084512516413,
+     "load_resistance_ohm": 0.004,
+     "solver_relative_residual": 9.148891741570614e-11,
+     "metered_relative_closure": 9.148891741570614e-11,
+     "high_side_natural_zvs": [
+      false,
+      false,
+      false,
+      false
+     ],
+     "low_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "all_eight_zvs": false,
+     "high_side_hard_switch_residual_v": [
+      11.96511005415556,
+      12.100841554987646,
+      12.10041465295052,
+      12.480956109026717
+     ],
+     "low_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "phase_minimum_a": [
+      -1.544585609360652,
+      -1.8222103566795622,
+      -1.8240425278337413,
+      0.07908325133692826
+     ],
+     "phase_maximum_a": [
+      126.94976202634302,
+      126.62803975222197,
+      126.62559577221789,
+      128.80854960999076
+     ],
+     "maximum_abs_phase_current_a": 128.80854960999076,
+     "current_at_high_side_deadtime_entry_a": [
+      -0.15625399497154255,
+      -0.47191076338131865,
+      -0.47394575269430533,
+      1.7538092984349407
+     ],
+     "negative_entry_to_positive_peak_ratio": [
+      0.0012308333034851903,
+      0.0037267477590644605,
+      0.003742890604415152,
+      0.0
+     ],
+     "max_negative_entry_ratio": 0.003742890604415152,
+     "negative_valley_to_positive_peak_ratio": [
+      0.012166904330550371,
+      0.014390259536869973,
+      0.014405006481588004,
+      0.0
+     ],
+     "modeled_high_channel_active_duration_s": [
+      1.6729471882680387e-08,
+      1.6729471882680387e-08,
+      1.6729471882680387e-08,
+      1.6729471882680387e-08
+     ],
+     "modeled_low_channel_active_duration_s": [
+      1.7991807830042427e-07,
+      1.7993870927371985e-07,
+      1.7993828334775258e-07,
+      1.8026712843457107e-07
+     ],
+     "high_side_channel_loss_w": [
+      2.1153689790770422,
+      1.9632866505435862,
+      1.9626093754883471,
+      1.4169945934869526
+     ],
+     "low_side_channel_loss_w": [
+      3.683577625315612,
+      3.740458109030843,
+      3.5103169829253154,
+      2.6414282638022613
+     ],
+     "a55_meter_channel_loss_w": 21.03404057966996,
+     "legacy_phase_current_loss_proxy_w": 11.202331785108317,
+     "missing_hard_switch_capacitive_w": 10.345038485716913,
+     "partial_loss_proxy_w": 31.379079065386872,
+     "complete_total_loss": false,
+     "hard_switched_event_count": 4,
+     "half_c_meas_v2_fsw_total_w": 17.776482783266797,
+     "capacitive_captured_by_a55_meter_w": 7.558708519182109,
+     "energy_balance": {
+      "source_w": 282.30540793473676,
+      "dissipation_w": 271.44338332279483,
+      "channel_w": 21.03404057967006,
+      "load_w": 250.04225853472542,
+      "numerical_w": 10.862021115611489,
+      "numerical_in_event_windows_w": 10.358907260149136,
+      "other_resistive_w": 0.36708420839934774,
+      "stored_energy_change_per_period_w": 5.2005622031003895e-06,
+      "identity_residual_w": -1.7042317583815247e-06,
+      "numerical_outside_event_windows_w": 0.5031138554623524
+     },
+     "surrogate_dead_time_abs_current_time_per_second_a": 2.635422486900338,
+     "channel_loss_metered_inside_surrogate_intervals_w": 0.17217271344001922,
+     "surrogate_admissions": [
+      {
+       "side": "low",
+       "phase_index": 0,
+       "admitted_duration_s": 9.47550183105837e-10,
+       "abs_charge_c": 1.1901234731223513e-07,
+       "i2_dt_a2s": 1.4994735241491468e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "admitted_duration_s": 9.681811564014116e-10,
+       "abs_charge_c": 1.2123750091700849e-07,
+       "i2_dt_a2s": 1.5230858663329514e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "admitted_duration_s": 9.677552304341458e-10,
+       "abs_charge_c": 1.2118092686964132e-07,
+       "i2_dt_a2s": 1.5223769437506065e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "admitted_duration_s": 1.2966003172526367e-09,
+       "abs_charge_c": 1.6565372228118268e-07,
+       "i2_dt_a2s": 2.1198138634454586e-05
+      }
+     ]
+    },
+    "trials": [
+     {
+      "iteration": 0,
+      "ton_cmd_s": 1.8879471882680588e-08,
+      "choice_reason": "replay of the seed point",
+      "seed": "nominal_dt_x1.json regulated state (step continuation)",
+      "seed_ton_cmd_s": 1.8879471882680588e-08,
+      "outcome": "success",
+      "converged": true,
+      "relative_residual": 9.148891741570614e-11,
+      "newton_iterations": 2,
+      "load_power_w": 250.0422585347256,
+      "power_relative_error": 0.00016903413890245744,
+      "channel_loss_w": 21.03404057966996,
+      "high_zvs": [
+       false,
+       false,
+       false,
+       false
+      ],
+      "low_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "accepted_orbit_max_abs_current_a": 128.80854960999076,
+      "probe_max_abs_current_a": 128.80854960999076,
+      "probe_evaluations": 22,
+      "error": null,
+      "wall_time_s": 85.4720311164856
+     }
+    ]
+   },
+   {
+    "name": "old_critical_dt_x1_step1p25ps",
+    "label": "old_critical_dt_x1",
+    "coarse_step_s": 1.5625e-11,
+    "sub_step_s": 1.25e-12,
+    "status": "REGULATED_TO_250W",
+    "stop_reason": null,
+    "seed": "old_critical_dt_x1_step2p5ps.json regulated state (step continuation)",
+    "outer_trials": 1,
+    "max_probe_abs_current_all_trials_a": 217.1934135368155,
+    "regulated": {
+     "ton_cmd_s": 1.76918702024393e-08,
+     "ton_cmd_deviation_from_nominal_s": 1.0252035357726378e-09,
+     "ton_cmd_relative_deviation_from_nominal": 0.06151221214635827,
+     "load_power_w": 250.06758466996044,
+     "power_relative_error": 0.00027033867984171955,
+     "average_output_v": 1.0001351547875579,
+     "load_resistance_ohm": 0.004,
+     "solver_relative_residual": 6.249680384040732e-09,
+     "metered_relative_closure": 6.249680384040732e-09,
+     "high_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "all_eight_zvs": true,
+     "high_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "low_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "phase_minimum_a": [
+      -82.9082054477239,
+      -83.87464792270728,
+      -83.87327745026688,
+      -83.67674530078578
+     ],
+     "phase_maximum_a": [
+      217.17164875629197,
+      216.0774060453994,
+      216.07865376407827,
+      215.59818697219515
+     ],
+     "maximum_abs_phase_current_a": 217.17164875629197,
+     "current_at_high_side_deadtime_entry_a": [
+      -82.79540505771685,
+      -83.7641258082703,
+      -83.76272740625485,
+      -83.5977043765761
+     ],
+     "negative_entry_to_positive_peak_ratio": [
+      0.3812440782757472,
+      0.3876579571242671,
+      0.38764924691593894,
+      0.38774771509260125
+     ],
+     "max_negative_entry_ratio": 0.38774771509260125,
+     "negative_valley_to_positive_peak_ratio": [
+      0.3817634848863846,
+      0.38816945028063055,
+      0.38816086637527125,
+      0.3881143272859583
+     ],
+     "modeled_high_channel_active_duration_s": [
+      1.5642937723709728e-08,
+      1.5650011970903626e-08,
+      1.5649152398219734e-08,
+      1.6292876112032124e-08
+     ],
+     "modeled_low_channel_active_duration_s": [
+      1.8160459146191027e-07,
+      1.8162239073978354e-07,
+      1.8162213988100155e-07,
+      1.8181145614430027e-07
+     ],
+     "high_side_channel_loss_w": [
+      0.7221962512115241,
+      0.7215593202022097,
+      0.7215259021321913,
+      0.7454565531013365
+     ],
+     "low_side_channel_loss_w": [
+      6.688574750032783,
+      6.6219997797386005,
+      6.640087914853308,
+      5.322881898872228
+     ],
+     "a55_meter_channel_loss_w": 28.18428237014418,
+     "legacy_phase_current_loss_proxy_w": 24.307950093509792,
+     "missing_hard_switch_capacitive_w": 0.0,
+     "partial_loss_proxy_w": 28.18428237014418,
+     "complete_total_loss": false,
+     "hard_switched_event_count": 0,
+     "half_c_meas_v2_fsw_total_w": 0.0,
+     "capacitive_captured_by_a55_meter_w": 0.0,
+     "energy_balance": {
+      "source_w": 279.21497648826005,
+      "dissipation_w": 278.6362219287119,
+      "channel_w": 28.184282370144267,
+      "load_w": 250.06758466996104,
+      "numerical_w": 0.5787718719237295,
+      "numerical_in_event_windows_w": 0.0,
+      "other_resistive_w": 0.3843548886065946,
+      "stored_energy_change_per_period_w": -1.6674647773662343e-05,
+      "identity_residual_w": -6.377278111147078e-07,
+      "numerical_outside_event_windows_w": 0.5787718719237295
+     },
+     "surrogate_dead_time_abs_current_time_per_second_a": 6.776187139760758,
+     "channel_loss_metered_inside_surrogate_intervals_w": 0.7296756101656218,
+     "surrogate_admissions": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "admitted_duration_s": 1.0106752127165956e-10,
+       "abs_charge_c": 5.8113089934684925e-09,
+       "i2_dt_a2s": 3.494392105118221e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "admitted_duration_s": 1.0814176846555786e-10,
+       "abs_charge_c": 6.107356437499366e-09,
+       "i2_dt_a2s": 3.6246026676170707e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "admitted_duration_s": 1.0728219578166626e-10,
+       "abs_charge_c": 6.050952360410691e-09,
+       "i2_dt_a2s": 3.588874739575532e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "admitted_duration_s": 7.510059095940558e-10,
+       "abs_charge_c": 4.840337679919015e-08,
+       "i2_dt_a2s": 3.1419458991706688e-06
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "admitted_duration_s": 1.4464616643495166e-09,
+       "abs_charge_c": 3.106421734741608e-07,
+       "i2_dt_a2s": 6.686094574933756e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "admitted_duration_s": 1.4642609422227837e-09,
+       "abs_charge_c": 3.1274590358484846e-07,
+       "i2_dt_a2s": 6.695180293809007e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "admitted_duration_s": 1.4640100834407944e-09,
+       "abs_charge_c": 3.126931359668919e-07,
+       "i2_dt_a2s": 6.694194590601651e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "admitted_duration_s": 1.6533263467395144e-09,
+       "abs_charge_c": 3.527832203356817e-07,
+       "i2_dt_a2s": 7.538128103377457e-05
+      }
+     ]
+    },
+    "trials": [
+     {
+      "iteration": 0,
+      "ton_cmd_s": 1.76918702024393e-08,
+      "choice_reason": "replay of the seed point",
+      "seed": "old_critical_dt_x1_step2p5ps.json regulated state (step continuation)",
+      "seed_ton_cmd_s": 1.76918702024393e-08,
+      "outcome": "success",
+      "converged": true,
+      "relative_residual": 6.249680384040732e-09,
+      "newton_iterations": 2,
+      "load_power_w": 250.06758466996044,
+      "power_relative_error": 0.00027033867984171955,
+      "channel_loss_w": 28.18428237014418,
+      "high_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "low_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "accepted_orbit_max_abs_current_a": 217.17164875629197,
+      "probe_max_abs_current_a": 217.1934135368155,
+      "probe_evaluations": 22,
+      "error": null,
+      "wall_time_s": 129.43373799324036
+     }
+    ]
+   },
+   {
+    "name": "old_critical_dt_x1_step2p5ps",
+    "label": "old_critical_dt_x1",
+    "coarse_step_s": 3.125e-11,
+    "sub_step_s": 2.5e-12,
+    "status": "REGULATED_TO_250W",
+    "stop_reason": null,
+    "seed": "old_critical_dt_x1.json regulated state (step continuation)",
+    "outer_trials": 1,
+    "max_probe_abs_current_all_trials_a": 217.204319219438,
+    "regulated": {
+     "ton_cmd_s": 1.76918702024393e-08,
+     "ton_cmd_deviation_from_nominal_s": 1.0252035357726378e-09,
+     "ton_cmd_relative_deviation_from_nominal": 0.06151221214635827,
+     "load_power_w": 250.0454016828914,
+     "power_relative_error": 0.00018160673156564222,
+     "average_output_v": 1.0000907938251185,
+     "load_resistance_ohm": 0.004,
+     "solver_relative_residual": 7.004482292421092e-08,
+     "metered_relative_closure": 7.004482292421092e-08,
+     "high_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "low_side_natural_zvs": [
+      true,
+      true,
+      true,
+      true
+     ],
+     "all_eight_zvs": true,
+     "high_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "low_side_hard_switch_residual_v": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "phase_minimum_a": [
+      -82.90351965470377,
+      -83.87263708955719,
+      -83.87126343421376,
+      -83.66951393745073
+     ],
+     "phase_maximum_a": [
+      217.16326513682063,
+      216.06590544902696,
+      216.06715384750808,
+      215.5907474576449
+     ],
+     "maximum_abs_phase_current_a": 217.16326513682063,
+     "current_at_high_side_deadtime_entry_a": [
+      -82.79167199698804,
+      -83.76306801674733,
+      -83.7616667553649,
+      -83.5914153658711
+     ],
+     "negative_entry_to_positive_peak_ratio": [
+      0.3812416061474593,
+      0.38767369540636865,
+      0.38766497019015056,
+      0.38773192426680336
+     ],
+     "max_negative_entry_ratio": 0.38773192426680336,
+     "negative_valley_to_positive_peak_ratio": [
+      0.38175664563926864,
+      0.388180804904196,
+      0.3881722045240013,
+      0.38809417808567365
+     ],
+     "modeled_high_channel_active_duration_s": [
+      1.5642419427576448e-08,
+      1.564945759336908e-08,
+      1.564859779467308e-08,
+      1.6292514463769924e-08
+     ],
+     "modeled_low_channel_active_duration_s": [
+      1.816046284578869e-07,
+      1.816224262811742e-07,
+      1.8162217542160616e-07,
+      1.8181148506690094e-07
+     ],
+     "high_side_channel_loss_w": [
+      0.723482403998899,
+      0.722822349134139,
+      0.7227888508102618,
+      0.7467671921866271
+     ],
+     "low_side_channel_loss_w": [
+      6.689764686964257,
+      6.622990254474319,
+      6.641109350578167,
+      5.321730998006631
+     ],
+     "a55_meter_channel_loss_w": 28.191456086153302,
+     "legacy_phase_current_loss_proxy_w": 24.307989895516695,
+     "missing_hard_switch_capacitive_w": 0.0,
+     "partial_loss_proxy_w": 28.191456086153302,
+     "complete_total_loss": false,
+     "hard_switched_event_count": 0,
+     "half_c_meas_v2_fsw_total_w": 0.0,
+     "capacitive_captured_by_a55_meter_w": 0.0,
+     "energy_balance": {
+      "source_w": 279.7797631367034,
+      "dissipation_w": 278.6225796209228,
+      "channel_w": 28.191456086153185,
+      "load_w": 250.04540168289137,
+      "numerical_w": 1.157204318867438,
+      "numerical_in_event_windows_w": 0.0,
+      "other_resistive_w": 0.3857218518782588,
+      "stored_energy_change_per_period_w": -1.9131571327157815e-05,
+      "identity_residual_w": -1.6715154944613175e-06,
+      "numerical_outside_event_windows_w": 1.157204318867438
+     },
+     "surrogate_dead_time_abs_current_time_per_second_a": 6.775189150260804,
+     "channel_loss_metered_inside_surrogate_intervals_w": 0.7294409452295858,
+     "surrogate_admissions": [
+      {
+       "side": "high",
+       "phase_index": 0,
+       "admitted_duration_s": 1.0054922513838007e-10,
+       "abs_charge_c": 5.775356129235744e-09,
+       "i2_dt_a2s": 3.459091312845464e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 1,
+       "admitted_duration_s": 1.07587390931011e-10,
+       "abs_charge_c": 6.0690947007902876e-09,
+       "i2_dt_a2s": 3.588488598997095e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 2,
+       "admitted_duration_s": 1.0672759223501215e-10,
+       "abs_charge_c": 6.012722435600308e-09,
+       "i2_dt_a2s": 3.552756463715044e-07
+      },
+      {
+       "side": "high",
+       "phase_index": 3,
+       "admitted_duration_s": 7.506442613318561e-10,
+       "abs_charge_c": 4.8357063041929115e-08,
+       "i2_dt_a2s": 3.136277194316384e-06
+      },
+      {
+       "side": "low",
+       "phase_index": 0,
+       "admitted_duration_s": 1.4464986603261384e-09,
+       "abs_charge_c": 3.1063509163982753e-07,
+       "i2_dt_a2s": 6.684510255790518e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 1,
+       "admitted_duration_s": 1.4642964836134422e-09,
+       "abs_charge_c": 3.127337606599308e-07,
+       "i2_dt_a2s": 6.693421934131671e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 2,
+       "admitted_duration_s": 1.4640456240454063e-09,
+       "abs_charge_c": 3.1268099815411943e-07,
+       "i2_dt_a2s": 6.69242986034358e-05
+      },
+      {
+       "side": "low",
+       "phase_index": 3,
+       "admitted_duration_s": 1.653355269340184e-09,
+       "abs_charge_c": 3.5277374329072757e-07,
+       "i2_dt_a2s": 7.536615011259954e-05
+      }
+     ]
+    },
+    "trials": [
+     {
+      "iteration": 0,
+      "ton_cmd_s": 1.76918702024393e-08,
+      "choice_reason": "replay of the seed point",
+      "seed": "old_critical_dt_x1.json regulated state (step continuation)",
+      "seed_ton_cmd_s": 1.76918702024393e-08,
+      "outcome": "success",
+      "converged": true,
+      "relative_residual": 7.004482292421092e-08,
+      "newton_iterations": 2,
+      "load_power_w": 250.0454016828914,
+      "power_relative_error": 0.00018160673156564222,
+      "channel_loss_w": 28.191456086153302,
+      "high_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "low_zvs": [
+       true,
+       true,
+       true,
+       true
+      ],
+      "accepted_orbit_max_abs_current_a": 217.16326513682063,
+      "probe_max_abs_current_a": 217.204319219438,
+      "probe_evaluations": 22,
+      "error": null,
+      "wall_time_s": 68.33434295654297
+     }
+    ]
+   }
+  ],
+  "ladder": {
+   "nominal_dt_x1": {
+    "label": "nominal_dt_x1",
+    "levels": [
+     {
+      "name": "nominal_dt_x1",
+      "coarse_step_s": 6.25e-11,
+      "sub_step_s": 5e-12,
+      "ton_cmd_s": 1.8879471882680588e-08,
+      "load_power_w": 249.98215492413627,
+      "a55_meter_channel_loss_w": 18.4082699219605,
+      "missing_hard_switch_capacitive_w": 12.97398943585106,
+      "partial_loss_proxy_w": 31.38225935781156,
+      "source_minus_load_w": 32.784016350454436,
+      "integrator_removed_w": 14.00734686071293,
+      "integrator_removed_in_event_windows_w": 13.001636424085076,
+      "other_resistive_w": 0.3682090986482365
+     },
+     {
+      "name": "nominal_dt_x1_step2p5ps",
+      "coarse_step_s": 3.125e-11,
+      "sub_step_s": 2.5e-12,
+      "ton_cmd_s": 1.8879471882680588e-08,
+      "load_power_w": 250.0422585347256,
+      "a55_meter_channel_loss_w": 21.03404057966996,
+      "missing_hard_switch_capacitive_w": 10.345038485716913,
+      "partial_loss_proxy_w": 31.379079065386872,
+      "source_minus_load_w": 32.26314940001134,
+      "integrator_removed_w": 10.862021115611489,
+      "integrator_removed_in_event_windows_w": 10.358907260149136,
+      "other_resistive_w": 0.36708420839934774
+     },
+     {
+      "name": "nominal_dt_x1_step1p25ps",
+      "coarse_step_s": 1.5625e-11,
+      "sub_step_s": 1.25e-12,
+      "ton_cmd_s": 1.8879471882680588e-08,
+      "load_power_w": 250.07231291382936,
+      "a55_meter_channel_loss_w": 23.91314927030981,
+      "missing_hard_switch_capacitive_w": 7.464349225495935,
+      "partial_loss_proxy_w": 31.377498495805746,
+      "source_minus_load_w": 32.00262028619423,
+      "integrator_removed_w": 7.722948798226721,
+      "integrator_removed_in_event_windows_w": 7.471329430501198,
+      "other_resistive_w": 0.36652222774384313
+     }
+    ],
+    "source_minus_load_richardson_h0_w": 31.742091172377116,
+    "source_minus_load_successive_differences_w": [
+     0.520866950443093,
+     0.26052911381711397
+    ],
+    "partial_loss_proxy_spread_w": 0.004760862005813493,
+    "a55_meter_spread_w": 5.504879348349309
+   },
+   "old_critical_dt_x1": {
+    "label": "old_critical_dt_x1",
+    "levels": [
+     {
+      "name": "old_critical_dt_x1",
+      "coarse_step_s": 6.25e-11,
+      "sub_step_s": 5e-12,
+      "ton_cmd_s": 1.76918702024393e-08,
+      "load_power_w": 250.00088089490805,
+      "a55_meter_channel_loss_w": 28.20585791635716,
+      "missing_hard_switch_capacitive_w": 0.0,
+      "partial_loss_proxy_w": 28.20585791635716,
+      "source_minus_load_w": 30.907471096974234,
+      "integrator_removed_w": 2.3131484417126065,
+      "integrator_removed_in_event_windows_w": 0.0,
+      "other_resistive_w": 0.38846166769928914
+     },
+     {
+      "name": "old_critical_dt_x1_step2p5ps",
+      "coarse_step_s": 3.125e-11,
+      "sub_step_s": 2.5e-12,
+      "ton_cmd_s": 1.76918702024393e-08,
+      "load_power_w": 250.0454016828914,
+      "a55_meter_channel_loss_w": 28.191456086153302,
+      "missing_hard_switch_capacitive_w": 0.0,
+      "partial_loss_proxy_w": 28.191456086153302,
+      "source_minus_load_w": 29.734361453812056,
+      "integrator_removed_w": 1.157204318867438,
+      "integrator_removed_in_event_windows_w": 0.0,
+      "other_resistive_w": 0.3857218518782588
+     },
+     {
+      "name": "old_critical_dt_x1_step1p25ps",
+      "coarse_step_s": 1.5625e-11,
+      "sub_step_s": 1.25e-12,
+      "ton_cmd_s": 1.76918702024393e-08,
+      "load_power_w": 250.06758466996044,
+      "a55_meter_channel_loss_w": 28.18428237014418,
+      "missing_hard_switch_capacitive_w": 0.0,
+      "partial_loss_proxy_w": 28.18428237014418,
+      "source_minus_load_w": 29.147391818299013,
+      "integrator_removed_w": 0.5787718719237295,
+      "integrator_removed_in_event_windows_w": 0.0,
+      "other_resistive_w": 0.3843548886065946
+     }
+    ],
+    "source_minus_load_richardson_h0_w": 28.56042218278597,
+    "source_minus_load_successive_differences_w": [
+     1.173109643162178,
+     0.5869696355130429
+    ],
+    "partial_loss_proxy_spread_w": 0.02157554621297919,
+    "a55_meter_spread_w": 0.02157554621297919
+   }
+  }
+ },
+ "capacitive_accounting": {
+  "source": "capacitive_accounting.json",
+  "orbits": [
+   {
+    "name": "A55_context_nominal_dt_x1_unregulated_192W",
+    "role": "context",
+    "label": null,
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.6666666666666664e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 192.22792421032145,
+    "a55_meter_channel_loss_w": 14.904607235280604,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 12.65309008972649,
+    "channel_loss_plus_missing_capacitive_w": 27.557697325007094,
+    "half_c_meas_v2_fsw_total_w": 17.334199139851332,
+    "half_c_struct_v2_fsw_total_w": 17.370181888820493,
+    "orbit_captured_capacitive_w": 4.788021016750492,
+    "energy_balance": {
+     "source_w": 220.91606501694457,
+     "dissipation_w": 207.36073291715718,
+     "channel_w": 14.904607235280546,
+     "load_w": 192.227924210322,
+     "numerical_w": 13.555333187702361,
+     "numerical_in_event_windows_w": 12.680888122750005,
+     "other_resistive_w": 0.2282014715546552,
+     "stored_energy_change_per_period_w": 2.2343238370581275e-08,
+     "identity_residual_w": -1.1102582071487177e-06,
+     "numerical_outside_event_windows_w": 0.8744450649523561
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.3001075e-05,
+      "residual_v": 11.811226657318066,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.3038663563614888e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.088220262555191e-07,
+      "conduction_baseline_energy_j": 3.2512650708632066e-09,
+      "conduction_fit_rms_w": 0.00021096535799935284,
+      "physical_capacitive_excess_j": 9.055707611846559e-07,
+      "discharged_charge_c": 1.5361573770497982e-07,
+      "c_measured_from_charge_f": 1.300590888329128e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715025392535e-08,
+      "half_c_meas_v2_j": 9.071951480823188e-07,
+      "half_c_struct_v2_j": 9.081780392300213e-07,
+      "half_c_a51_v2_j": 8.322674006461118e-07,
+      "tau_estimate_s": 1.0079579384550741e-11,
+      "orbit_captured_excess_j": 2.2713537056528567e-07,
+      "orbit_captured_fraction": 0.2508201239493975,
+      "missing_from_orbit_meter_j": 6.784353906193702e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.3051075000000002e-05,
+      "residual_v": 11.934800865010057,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.8795161887857537e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.359975053281947e-07,
+      "conduction_baseline_energy_j": 3.2110864065616983e-09,
+      "conduction_fit_rms_w": 0.0003507532585232772,
+      "physical_capacitive_excess_j": 9.32786418921633e-07,
+      "discharged_charge_c": 1.5490704171851877e-07,
+      "c_measured_from_charge_f": 1.297944083614069e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681988891e-08,
+      "half_c_meas_v2_j": 9.243923477491634e-07,
+      "half_c_struct_v2_j": 9.272809606852657e-07,
+      "half_c_a51_v2_j": 7.780093570896655e-07,
+      "tau_estimate_s": 1.0059066648009034e-11,
+      "orbit_captured_excess_j": 2.847405324720137e-07,
+      "orbit_captured_fraction": 0.3052580169436792,
+      "missing_from_orbit_meter_j": 6.480458864496194e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.3101075e-05,
+      "residual_v": 11.9343112698454,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.8840084559257134e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.360883493662783e-07,
+      "conduction_baseline_energy_j": 3.17009156754735e-09,
+      "conduction_fit_rms_w": 0.0003473414228352711,
+      "physical_capacitive_excess_j": 9.329182577987309e-07,
+      "discharged_charge_c": 1.5495531809972952e-07,
+      "c_measured_from_charge_f": 1.29840184821773e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864701832e-08,
+      "half_c_meas_v2_j": 9.246424995600405e-07,
+      "half_c_struct_v2_j": 9.272048835109886e-07,
+      "half_c_a51_v2_j": 7.547221907388361e-07,
+      "tau_estimate_s": 1.0062614323687408e-11,
+      "orbit_captured_excess_j": 2.85230754025024e-07,
+      "orbit_captured_fraction": 0.305740349318536,
+      "missing_from_orbit_meter_j": 6.47687503773707e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.3151075e-05,
+      "residual_v": 12.368643099211042,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.6372567487780775e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.201749119804091e-07,
+      "conduction_baseline_energy_j": 3.228128590032713e-09,
+      "conduction_fit_rms_w": 0.00033614218805890693,
+      "physical_capacitive_excess_j": 7.169467833903765e-07,
+      "discharged_charge_c": 1.1490505900749466e-07,
+      "c_measured_from_charge_f": 9.290029479048038e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.227888201312684e-09,
+      "half_c_meas_v2_j": 7.106098325787432e-07,
+      "half_c_struct_v2_j": 7.113724943378233e-07,
+      "half_c_a51_v2_j": 6.293648766559731e-07,
+      "tau_estimate_s": 7.199772846262229e-12,
+      "orbit_captured_excess_j": 1.6049754628777503e-07,
+      "orbit_captured_fraction": 0.22386256554328435,
+      "missing_from_orbit_meter_j": 5.564492371026014e-07
+     }
+    ]
+   },
+   {
+    "name": "new_passing_dt_x0.5",
+    "role": "regulated",
+    "label": "new_passing_dt_x0.5",
+    "phase_inductance_h": 6.215240418389056e-10,
+    "dead_time_s": 1.075e-09,
+    "ton_cmd_s": 1.752715345870316e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 249.99701362344373,
+    "a55_meter_channel_loss_w": 29.294723945452684,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 2.1183372331476558,
+    "channel_loss_plus_missing_capacitive_w": 31.41306117860034,
+    "half_c_meas_v2_fsw_total_w": 2.9011803432419443,
+    "half_c_struct_v2_fsw_total_w": 2.8623564211521,
+    "orbit_captured_capacitive_w": 0.733958540061005,
+    "energy_balance": {
+     "source_w": 284.2432967333441,
+     "dissipation_w": 279.6889652047235,
+     "channel_w": 29.294723945452674,
+     "load_w": 249.99701362344322,
+     "numerical_w": 4.554366874219581,
+     "numerical_in_event_windows_w": 2.184911450246112,
+     "other_resistive_w": 0.3972276358275906,
+     "stored_energy_change_per_period_w": -3.439318274622849e-05,
+     "identity_residual_w": -9.524162409846326e-07,
+     "numerical_outside_event_windows_w": 2.369455423973469
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.30005375e-05,
+      "residual_v": 5.238383348622243,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 4.8020770271184e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.8471091986473918e-07,
+      "conduction_baseline_energy_j": 1.0177934472831366e-08,
+      "conduction_fit_rms_w": 0.0011946723176265704,
+      "physical_capacitive_excess_j": 1.7453298539190782e-07,
+      "discharged_charge_c": 6.897519872173868e-08,
+      "c_measured_from_charge_f": 1.3167268245055028e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715283768833e-08,
+      "half_c_meas_v2_j": 1.8065926622593306e-07,
+      "half_c_struct_v2_j": 1.7863869729736931e-07,
+      "half_c_a51_v2_j": 1.637070717984313e-07,
+      "tau_estimate_s": 1.0204632889917647e-11,
+      "orbit_captured_excess_j": 3.7842835798352634e-08,
+      "orbit_captured_fraction": 0.21682340282771104,
+      "missing_from_orbit_meter_j": 1.366901495935552e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.30505375e-05,
+      "residual_v": 5.266035882655739,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.702687227433793e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.8704595101365393e-07,
+      "conduction_baseline_energy_j": 5.503642207052746e-09,
+      "conduction_fit_rms_w": 0.0018636604121568365,
+      "physical_capacitive_excess_j": 1.8154230880660118e-07,
+      "discharged_charge_c": 6.947497063835303e-08,
+      "c_measured_from_charge_f": 1.3193030238775316e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069957727064e-08,
+      "half_c_meas_v2_j": 1.8292884416401049e-07,
+      "half_c_struct_v2_j": 1.8052968180238994e-07,
+      "half_c_a51_v2_j": 1.5146842346048495e-07,
+      "tau_estimate_s": 1.022459843505087e-11,
+      "orbit_captured_excess_j": 5.152323006728518e-08,
+      "orbit_captured_fraction": 0.28380838828139715,
+      "missing_from_orbit_meter_j": 1.3001907873931602e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.31005375e-05,
+      "residual_v": 5.268349227695978,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.700994859823095e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.87089895447737e-07,
+      "conduction_baseline_energy_j": 5.420441213078394e-09,
+      "conduction_fit_rms_w": 0.001861219599843063,
+      "physical_capacitive_excess_j": 1.816694542346586e-07,
+      "discharged_charge_c": 6.952978543459448e-08,
+      "c_measured_from_charge_f": 1.3197641695632644e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597963151938899e-08,
+      "half_c_meas_v2_j": 1.8315359569810644e-07,
+      "half_c_struct_v2_j": 1.8068832833812092e-07,
+      "half_c_a51_v2_j": 1.4707590212848254e-07,
+      "tau_estimate_s": 1.0228172314115299e-11,
+      "orbit_captured_excess_j": 5.158950738515256e-08,
+      "orbit_captured_fraction": 0.28397458231209016,
+      "missing_from_orbit_meter_j": 1.3007994684950605e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.31505375e-05,
+      "residual_v": 2.6483744981151425,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.1166248222538837e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 3.804451966969271e-08,
+      "conduction_baseline_energy_j": 5.330113461128193e-09,
+      "conduction_fit_rms_w": 0.001841108722265087,
+      "physical_capacitive_excess_j": 3.271440620856452e-08,
+      "discharged_charge_c": 2.5294279630148127e-08,
+      "c_measured_from_charge_f": 9.550869655386788e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.227888457764307e-09,
+      "half_c_meas_v2_j": 3.349436256033881e-08,
+      "half_c_struct_v2_j": 3.2614576792539845e-08,
+      "half_c_a51_v2_j": 2.885474192969959e-08,
+      "tau_estimate_s": 7.40192398292476e-12,
+      "orbit_captured_excess_j": 5.836134761410644e-09,
+      "orbit_captured_fraction": 0.17839647536939746,
+      "missing_from_orbit_meter_j": 2.6878271447153876e-08
+     }
+    ]
+   },
+   {
+    "name": "new_passing_dt_x1",
+    "role": "regulated",
+    "label": "new_passing_dt_x1",
+    "phase_inductance_h": 6.215240418389056e-10,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.7676452544009515e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 250.0009820745574,
+    "a55_meter_channel_loss_w": 28.546207978485054,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.546207978485054,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 281.2710015420672,
+     "dissipation_w": 278.9371153179578,
+     "channel_w": 28.546207978485036,
+     "load_w": 250.00098207455653,
+     "numerical_w": 2.333886176409634,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.3899252649162577,
+     "stored_energy_change_per_period_w": 1.1630973961729296e-06,
+     "identity_residual_w": -1.1153976382516362e-06,
+     "numerical_outside_event_windows_w": 2.333886176409634
+    },
+    "events": []
+   },
+   {
+    "name": "new_passing_dt_x2",
+    "role": "regulated",
+    "label": "new_passing_dt_x2",
+    "phase_inductance_h": 6.215240418389056e-10,
+    "dead_time_s": 4.3e-09,
+    "ton_cmd_s": 1.7676156695877842e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 250.00089848861165,
+    "a55_meter_channel_loss_w": 28.54765562290696,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.54765562290696,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 281.0014595465833,
+     "dissipation_w": 278.93782713651825,
+     "channel_w": 28.5476556229068,
+     "load_w": 250.00089848861163,
+     "numerical_w": 2.0636321782814027,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38927302499982375,
+     "stored_energy_change_per_period_w": 1.7352785874891197e-06,
+     "identity_residual_w": -1.5034949361059091e-06,
+     "numerical_outside_event_windows_w": 2.0636321782814027
+    },
+    "events": []
+   },
+   {
+    "name": "nominal_dt_x0.5",
+    "role": "regulated",
+    "label": "nominal_dt_x0.5",
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 1.075e-09,
+    "ton_cmd_s": 1.781344474518501e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 250.1134624739511,
+    "a55_meter_channel_loss_w": 18.450745000249732,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 7,
+    "missing_capacitive_power_w": 13.118469540129704,
+    "channel_loss_plus_missing_capacitive_w": 31.569214540379434,
+    "half_c_meas_v2_fsw_total_w": 17.962271731738213,
+    "half_c_struct_v2_fsw_total_w": 17.99226644041134,
+    "orbit_captured_capacitive_w": 4.954925616108189,
+    "energy_balance": {
+     "source_w": 283.08070326191296,
+     "dissipation_w": 268.93320009192394,
+     "channel_w": 18.450745000249697,
+     "load_w": 250.11346247395102,
+     "numerical_w": 14.1507652310248,
+     "numerical_in_event_windows_w": 13.146755603546149,
+     "other_resistive_w": 0.36899261772322234,
+     "stored_energy_change_per_period_w": -0.0032610850825287585,
+     "identity_residual_w": -9.759532497710666e-07,
+     "numerical_outside_event_windows_w": 1.004009627478652
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.30005375e-05,
+      "residual_v": 12.010266941762545,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.390480642803576e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.405014706455281e-07,
+      "conduction_baseline_energy_j": 4.29562312860489e-09,
+      "conduction_fit_rms_w": 0.00020934246397523942,
+      "physical_capacitive_excess_j": 9.362058475169232e-07,
+      "discharged_charge_c": 1.561995901000531e-07,
+      "c_measured_from_charge_f": 1.3005505277897705e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715025392364e-08,
+      "half_c_meas_v2_j": 9.379993866477641e-07,
+      "half_c_struct_v2_j": 9.390447932006866e-07,
+      "half_c_a51_v2_j": 8.605541373693623e-07,
+      "tau_estimate_s": 1.007926659037072e-11,
+      "orbit_captured_excess_j": 2.3475244115175272e-07,
+      "orbit_captured_fraction": 0.25074874481331333,
+      "missing_from_orbit_meter_j": 7.014534063651705e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.30505375e-05,
+      "residual_v": 12.172311615495712,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 3.01744095916671e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.758044368850571e-07,
+      "conduction_baseline_energy_j": 4.2761946395003505e-09,
+      "conduction_fit_rms_w": 0.00034980504772907375,
+      "physical_capacitive_excess_j": 9.715282422455569e-07,
+      "discharged_charge_c": 1.5798501177146097e-07,
+      "c_measured_from_charge_f": 1.297904759276302e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681988943e-08,
+      "half_c_meas_v2_j": 9.615213969299906e-07,
+      "half_c_struct_v2_j": 9.645552571214042e-07,
+      "half_c_a51_v2_j": 8.092833211154363e-07,
+      "tau_estimate_s": 1.005876188439134e-11,
+      "orbit_captured_excess_j": 2.9746790127717066e-07,
+      "orbit_captured_fraction": 0.30618554185271407,
+      "missing_from_orbit_meter_j": 6.740603409683861e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.31005375e-05,
+      "residual_v": 12.172039909444312,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 3.0220798511171015e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.759206814057737e-07,
+      "conduction_baseline_energy_j": 4.227426825149528e-09,
+      "conduction_fit_rms_w": 0.0003457916265578063,
+      "physical_capacitive_excess_j": 9.716932545806242e-07,
+      "discharged_charge_c": 1.5803720212858086e-07,
+      "c_measured_from_charge_f": 1.2983625037735824e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864701564e-08,
+      "half_c_meas_v2_j": 9.618175657430018e-07,
+      "half_c_struct_v2_j": 9.645121966767541e-07,
+      "half_c_a51_v2_j": 7.850894349410116e-07,
+      "tau_estimate_s": 1.0062309404245263e-11,
+      "orbit_captured_excess_j": 2.979805582865606e-07,
+      "orbit_captured_fraction": 0.3066611370222662,
+      "missing_from_orbit_meter_j": 6.737126962940635e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.31505375e-05,
+      "residual_v": 12.322630618833802,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.647024649450094e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.169770455231391e-07,
+      "conduction_baseline_energy_j": 4.303757196704405e-09,
+      "conduction_fit_rms_w": 0.000325205555284141,
+      "physical_capacitive_excess_j": 7.126732883264347e-07,
+      "discharged_charge_c": 1.1447306123291719e-07,
+      "c_measured_from_charge_f": 9.289661012637801e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.227888201312684e-09,
+      "half_c_meas_v2_j": 7.053046246901911e-07,
+      "half_c_struct_v2_j": 7.060895979622246e-07,
+      "half_c_a51_v2_j": 6.246909970046241e-07,
+      "tau_estimate_s": 7.1994872847942955e-12,
+      "orbit_captured_excess_j": 1.60398707748305e-07,
+      "orbit_captured_fraction": 0.225066254587664,
+      "missing_from_orbit_meter_j": 5.522745805781297e-07
+     },
+     {
+      "side": "low",
+      "phase": 1,
+      "window_end_s": 2.3018350944745187e-05,
+      "residual_v": 1.243491205122592,
+      "switching_branch": [
+       "x1",
+       null
+      ],
+      "branch_resistance_ohm": 0.0005166666666666667,
+      "orbit_metered_window_energy_j": 7.203581589060063e-09,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.6328066328620425e-08,
+      "conduction_baseline_energy_j": 7.238355988740564e-09,
+      "conduction_fit_rms_w": 5.000854399428692e-06,
+      "physical_capacitive_excess_j": 9.08971033987986e-09,
+      "discharged_charge_c": 1.708358294674654e-08,
+      "c_measured_from_charge_f": 1.3738402713561874e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715024767388e-08,
+      "half_c_meas_v2_j": 1.0621642573130809e-08,
+      "half_c_struct_v2_j": 1.0066220155684205e-08,
+      "half_c_a51_v2_j": 9.224828746097816e-09,
+      "tau_estimate_s": 7.098174735340302e-12,
+      "orbit_captured_excess_j": -3.4774399680500694e-11,
+      "orbit_captured_fraction": -0.003825688430128821,
+      "missing_from_orbit_meter_j": 9.124484739560361e-09
+     },
+     {
+      "side": "low",
+      "phase": 2,
+      "window_end_s": 2.3068350944745188e-05,
+      "residual_v": 1.0418906915792077,
+      "switching_branch": [
+       "x2",
+       null
+      ],
+      "branch_resistance_ohm": 0.0005166666666666667,
+      "orbit_metered_window_energy_j": 7.3898143100987154e-09,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.3901935386743136e-08,
+      "conduction_baseline_energy_j": 7.187450575161356e-09,
+      "conduction_fit_rms_w": 5.000198547196023e-06,
+      "physical_capacitive_excess_j": 6.71448481158178e-09,
+      "discharged_charge_c": 1.452515033966765e-08,
+      "c_measured_from_charge_f": 1.3941146088609052e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681858887e-08,
+      "half_c_meas_v2_j": 7.566809466344145e-09,
+      "half_c_struct_v2_j": 7.066840747928091e-09,
+      "half_c_a51_v2_j": 5.929236617585732e-09,
+      "tau_estimate_s": 7.202925479114677e-12,
+      "orbit_captured_excess_j": 2.0236373493735958e-10,
+      "orbit_captured_fraction": 0.030138385984328005,
+      "missing_from_orbit_meter_j": 6.51212107664442e-09
+     },
+     {
+      "side": "low",
+      "phase": 3,
+      "window_end_s": 2.3118350944745186e-05,
+      "residual_v": 1.0456832644948018,
+      "switching_branch": [
+       "x3",
+       null
+      ],
+      "branch_resistance_ohm": 0.0005166666666666667,
+      "orbit_metered_window_energy_j": 7.356918069524561e-09,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.3913196073510836e-08,
+      "conduction_baseline_energy_j": 7.138992646932662e-09,
+      "conduction_fit_rms_w": 4.9985908467781615e-06,
+      "physical_capacitive_excess_j": 6.7742034265781745e-09,
+      "discharged_charge_c": 1.4579788270595934e-08,
+      "c_measured_from_charge_f": 1.3942834092921847e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864174721e-08,
+      "half_c_meas_v2_j": 7.62292029721989e-09,
+      "half_c_struct_v2_j": 7.1183822175857315e-09,
+      "half_c_a51_v2_j": 5.794189738477365e-09,
+      "tau_estimate_s": 7.2037976146762874e-12,
+      "orbit_captured_excess_j": 2.1792542259189906e-10,
+      "orbit_captured_fraction": 0.03216989642455701,
+      "missing_from_orbit_meter_j": 6.556278003986275e-09
+     }
+    ]
+   },
+   {
+    "name": "nominal_dt_x1",
+    "role": "regulated",
+    "label": "nominal_dt_x1",
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.8879471882680588e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 249.98215492413627,
+    "a55_meter_channel_loss_w": 18.4082699219605,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 12.97398943585106,
+    "channel_loss_plus_missing_capacitive_w": 31.38225935781156,
+    "half_c_meas_v2_fsw_total_w": 17.777063251473574,
+    "half_c_struct_v2_fsw_total_w": 17.81459774983168,
+    "orbit_captured_capacitive_w": 4.9303218549518375,
+    "energy_balance": {
+     "source_w": 282.7661712745904,
+     "dissipation_w": 268.75863394474476,
+     "channel_w": 18.40826992196055,
+     "load_w": 249.98215492413598,
+     "numerical_w": 14.00734686071293,
+     "numerical_in_event_windows_w": 13.001636424085076,
+     "other_resistive_w": 0.3682090986482365,
+     "stored_energy_change_per_period_w": 0.0001915550357223239,
+     "identity_residual_w": -1.085902991526666e-06,
+     "numerical_outside_event_windows_w": 1.0057104366278544
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.3001075e-05,
+      "residual_v": 11.965126267892735,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.3728739682126687e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.334734755736556e-07,
+      "conduction_baseline_energy_j": 4.292201418174533e-09,
+      "conduction_fit_rms_w": 0.00020916028611708685,
+      "physical_capacitive_excess_j": 9.29181274155481e-07,
+      "discharged_charge_c": 1.556120592187089e-07,
+      "c_measured_from_charge_f": 1.3005467366966186e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715025392081e-08,
+      "half_c_meas_v2_j": 9.309589686793268e-07,
+      "half_c_struct_v2_j": 9.319992454090749e-07,
+      "half_c_a51_v2_j": 8.540974961675531e-07,
+      "tau_estimate_s": 1.0079237209398794e-11,
+      "orbit_captured_excess_j": 2.3299519540309233e-07,
+      "orbit_captured_fraction": 0.2507532188644871,
+      "missing_from_orbit_meter_j": 6.961860787523887e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.3051075000000002e-05,
+      "residual_v": 12.10130021676536,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.9836411780357003e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.645744766656076e-07,
+      "conduction_baseline_energy_j": 4.277460908214126e-09,
+      "conduction_fit_rms_w": 0.0003493406389356323,
+      "physical_capacitive_excess_j": 9.602970157573934e-07,
+      "discharged_charge_c": 1.570624630064933e-07,
+      "c_measured_from_charge_f": 1.2978974175758082e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681988911e-08,
+      "half_c_meas_v2_j": 9.503300088130892e-07,
+      "half_c_struct_v2_j": 9.533339497552176e-07,
+      "half_c_a51_v2_j": 7.998683945723281e-07,
+      "tau_estimate_s": 1.0058704986212514e-11,
+      "orbit_captured_excess_j": 2.940866568953559e-07,
+      "orbit_captured_fraction": 0.3062455178655404,
+      "missing_from_orbit_meter_j": 6.662103588620376e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.3101075e-05,
+      "residual_v": 12.100873567839649,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.9881549693417844e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.64664980245383e-07,
+      "conduction_baseline_energy_j": 4.229208849068036e-09,
+      "conduction_fit_rms_w": 0.00034535267941692354,
+      "physical_capacitive_excess_j": 9.604357713963149e-07,
+      "discharged_charge_c": 1.5711231187346511e-07,
+      "c_measured_from_charge_f": 1.2983551228154361e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.059796286470131e-08,
+      "half_c_meas_v2_j": 9.505981109658966e-07,
+      "half_c_struct_v2_j": 9.532667285925101e-07,
+      "half_c_a51_v2_j": 7.759358978324673e-07,
+      "tau_estimate_s": 1.006225220181963e-11,
+      "orbit_captured_excess_j": 2.9458628808511043e-07,
+      "orbit_captured_fraction": 0.3067214871191549,
+      "missing_from_orbit_meter_j": 6.658494833112045e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.3151075e-05,
+      "residual_v": 12.480691549366856,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.6868725350331005e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.352392197478913e-07,
+      "conduction_baseline_energy_j": 4.291022896501239e-09,
+      "conduction_fit_rms_w": 0.00032627203835082036,
+      "physical_capacitive_excess_j": 7.309481968513901e-07,
+      "discharged_charge_c": 1.1594318455424153e-07,
+      "c_measured_from_charge_f": 9.289804502870141e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.22788820131261e-09,
+      "half_c_meas_v2_j": 7.235255618364021e-07,
+      "half_c_struct_v2_j": 7.243196262095332e-07,
+      "half_c_a51_v2_j": 6.408194523084493e-07,
+      "tau_estimate_s": 7.1995984897243594e-12,
+      "orbit_captured_excess_j": 1.6439623060680882e-07,
+      "orbit_captured_fraction": 0.22490818270700572,
+      "missing_from_orbit_meter_j": 5.665519662445812e-07
+     }
+    ]
+   },
+   {
+    "name": "nominal_dt_x1_step1p25ps",
+    "role": "regulated",
+    "label": "nominal_dt_x1",
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.8879471882680588e-08,
+    "coarse_step_s": 1.5625e-11,
+    "sub_step_s": 1.25e-12,
+    "load_power_w": 250.07231291382936,
+    "a55_meter_channel_loss_w": 23.91314927030981,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 7.464349225495935,
+    "channel_loss_plus_missing_capacitive_w": 31.377498495805746,
+    "half_c_meas_v2_fsw_total_w": 17.776191579865024,
+    "half_c_struct_v2_fsw_total_w": 17.813723973018597,
+    "orbit_captured_capacitive_w": 10.439114581156065,
+    "energy_balance": {
+     "source_w": 282.0749332000228,
+     "dissipation_w": 274.35198441188214,
+     "channel_w": 23.913149270309695,
+     "load_w": 250.0723129138286,
+     "numerical_w": 7.722948798226721,
+     "numerical_in_event_windows_w": 7.471329430501198,
+     "other_resistive_w": 0.36652222774384313,
+     "stored_energy_change_per_period_w": 6.234596172660645e-07,
+     "identity_residual_w": -6.335456541606277e-07,
+     "numerical_outside_event_windows_w": 0.25161936772552274
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.3001075e-05,
+      "residual_v": 11.965101350956765,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.338832082464114e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.334710314983353e-07,
+      "conduction_baseline_energy_j": 4.2939861645209886e-09,
+      "conduction_fit_rms_w": 0.00020914691113547423,
+      "physical_capacitive_excess_j": 9.291770453338143e-07,
+      "discharged_charge_c": 1.5561174456531016e-07,
+      "c_measured_from_charge_f": 1.300546815283491e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715025392392e-08,
+      "half_c_meas_v2_j": 9.309551475615658e-07,
+      "half_c_struct_v2_j": 9.319953637047248e-07,
+      "half_c_a51_v2_j": 8.540939389179502e-07,
+      "tau_estimate_s": 1.0079237818447055e-11,
+      "orbit_captured_excess_j": 5.295892220818904e-07,
+      "orbit_captured_fraction": 0.5699551282948786,
+      "missing_from_orbit_meter_j": 3.9958782325192394e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.3051075000000002e-05,
+      "residual_v": 12.100612238971163,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.937385415152482e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.644695721140394e-07,
+      "conduction_baseline_energy_j": 4.27915700621604e-09,
+      "conduction_fit_rms_w": 0.0003492575562719231,
+      "physical_capacitive_excess_j": 9.601904151078235e-07,
+      "discharged_charge_c": 1.5705351809520134e-07,
+      "c_measured_from_charge_f": 1.2978972881173374e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.092406968198893e-08,
+      "half_c_meas_v2_j": 9.502218616181362e-07,
+      "half_c_struct_v2_j": 9.532255557921809e-07,
+      "half_c_a51_v2_j": 7.997774496256844e-07,
+      "tau_estimate_s": 1.0058703982909365e-11,
+      "orbit_captured_excess_j": 5.894593845090322e-07,
+      "orbit_captured_fraction": 0.6138984260146353,
+      "missing_from_orbit_meter_j": 3.707310305987912e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.3101075e-05,
+      "residual_v": 12.100185154494232,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.951046599408354e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.645602926663125e-07,
+      "conduction_baseline_energy_j": 4.230949362071383e-09,
+      "conduction_fit_rms_w": 0.0003452716040175738,
+      "physical_capacitive_excess_j": 9.60329343304241e-07,
+      "discharged_charge_c": 1.571033581896449e-07,
+      "c_measured_from_charge_f": 1.2983549936117615e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864701846e-08,
+      "half_c_meas_v2_j": 9.504898612437656e-07,
+      "half_c_struct_v2_j": 9.531582698325075e-07,
+      "half_c_a51_v2_j": 7.758476150436539e-07,
+      "tau_estimate_s": 1.006225120049115e-11,
+      "orbit_captured_excess_j": 5.90873710578764e-07,
+      "orbit_captured_fraction": 0.615282366095076,
+      "missing_from_orbit_meter_j": 3.6945563272547717e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.3151075e-05,
+      "residual_v": 12.481087673810976,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 3.8219341102749574e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.352887695504905e-07,
+      "conduction_baseline_energy_j": 4.292811965969229e-09,
+      "conduction_fit_rms_w": 0.0003262450231569028,
+      "physical_capacitive_excess_j": 7.309959575845213e-07,
+      "discharged_charge_c": 1.1594685727074967e-07,
+      "c_measured_from_charge_f": 9.289803925826158e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.22788820131261e-09,
+      "half_c_meas_v2_j": 7.235714455495371e-07,
+      "half_c_struct_v2_j": 7.243656052743067e-07,
+      "half_c_a51_v2_j": 6.40860130868079e-07,
+      "tau_estimate_s": 7.199598042515272e-12,
+      "orbit_captured_excess_j": 3.7790059906152653e-07,
+      "orbit_captured_fraction": 0.516966742620915,
+      "missing_from_orbit_meter_j": 3.530953585229948e-07
+     }
+    ]
+   },
+   {
+    "name": "nominal_dt_x1_step2p5ps",
+    "role": "regulated",
+    "label": "nominal_dt_x1",
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.8879471882680588e-08,
+    "coarse_step_s": 3.125e-11,
+    "sub_step_s": 2.5e-12,
+    "load_power_w": 250.0422585347256,
+    "a55_meter_channel_loss_w": 21.03404057966996,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 10.345038485716913,
+    "channel_loss_plus_missing_capacitive_w": 31.379079065386872,
+    "half_c_meas_v2_fsw_total_w": 17.776482783266797,
+    "half_c_struct_v2_fsw_total_w": 17.814015824340334,
+    "orbit_captured_capacitive_w": 7.558708519182109,
+    "energy_balance": {
+     "source_w": 282.30540793473676,
+     "dissipation_w": 271.44338332279483,
+     "channel_w": 21.03404057967006,
+     "load_w": 250.04225853472542,
+     "numerical_w": 10.862021115611489,
+     "numerical_in_event_windows_w": 10.358907260149136,
+     "other_resistive_w": 0.36708420839934774,
+     "stored_energy_change_per_period_w": 5.2005622031003895e-06,
+     "identity_residual_w": -1.7042317583815247e-06,
+     "numerical_outside_event_windows_w": 0.5031138554623524
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.3001075e-05,
+      "residual_v": 11.96511005415556,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 3.7610747114623826e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.334719298361141e-07,
+      "conduction_baseline_energy_j": 4.293391311450953e-09,
+      "conduction_fit_rms_w": 0.0002091510091271197,
+      "physical_capacitive_excess_j": 9.291785385246632e-07,
+      "discharged_charge_c": 1.5561185645040975e-07,
+      "c_measured_from_charge_f": 1.3005468043845092e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.19317150253927e-08,
+      "half_c_meas_v2_j": 9.309564940803047e-07,
+      "half_c_struct_v2_j": 9.319967195384345e-07,
+      "half_c_a51_v2_j": 8.540951814234597e-07,
+      "tau_estimate_s": 1.0079237733979946e-11,
+      "orbit_captured_excess_j": 3.718140798347873e-07,
+      "orbit_captured_fraction": 0.4001535382265162,
+      "missing_from_orbit_meter_j": 5.573644586898759e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.3051075000000002e-05,
+      "residual_v": 12.100841554987646,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 4.4295443850213806e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.645045382848796e-07,
+      "conduction_baseline_energy_j": 4.278591705921338e-09,
+      "conduction_fit_rms_w": 0.0003492857632219448,
+      "physical_capacitive_excess_j": 9.602259465789583e-07,
+      "discharged_charge_c": 1.5705649959856283e-07,
+      "c_measured_from_charge_f": 1.2978973312300607e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681989163e-08,
+      "half_c_meas_v2_j": 9.502579084115948e-07,
+      "half_c_struct_v2_j": 9.532616848663421e-07,
+      "half_c_a51_v2_j": 7.998077627227584e-07,
+      "tau_estimate_s": 1.005870431703297e-11,
+      "orbit_captured_excess_j": 4.386758467962167e-07,
+      "orbit_captured_fraction": 0.45684648322523214,
+      "missing_from_orbit_meter_j": 5.215500997827416e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.3101075e-05,
+      "residual_v": 12.10041465295052,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 4.4391893119674564e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.645951921922438e-07,
+      "conduction_baseline_energy_j": 4.2303692197688655e-09,
+      "conduction_fit_rms_w": 0.00034529871736398095,
+      "physical_capacitive_excess_j": 9.60364822972475e-07,
+      "discharged_charge_c": 1.5710634311482813e-07,
+      "c_measured_from_charge_f": 1.2983550367550414e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864701578e-08,
+      "half_c_meas_v2_j": 9.505259481490692e-07,
+      "half_c_struct_v2_j": 9.53194426374441e-07,
+      "half_c_a51_v2_j": 7.758770455880836e-07,
+      "tau_estimate_s": 1.0062251534851571e-11,
+      "orbit_captured_excess_j": 4.3968856197697676e-07,
+      "orbit_captured_fraction": 0.4578349304965939,
+      "missing_from_orbit_meter_j": 5.206762609954981e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.3151075e-05,
+      "residual_v": 12.480956109026717,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.658554308952488e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.352723085705157e-07,
+      "conduction_baseline_energy_j": 4.292215666807722e-09,
+      "conduction_fit_rms_w": 0.00032625382041257455,
+      "physical_capacitive_excess_j": 7.309800929037079e-07,
+      "discharged_charge_c": 1.1594563744825392e-07,
+      "c_measured_from_charge_f": 9.289804117202005e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.227888201312582e-09,
+      "half_c_meas_v2_j": 7.235562060123907e-07,
+      "half_c_struct_v2_j": 7.243503340888487e-07,
+      "half_c_a51_v2_j": 6.408466201576844e-07,
+      "tau_estimate_s": 7.1995981908315534e-12,
+      "orbit_captured_excess_j": 2.6156321522844106e-07,
+      "orbit_captured_fraction": 0.3578253604546476,
+      "missing_from_orbit_meter_j": 4.6941687767526687e-07
+     }
+    ]
+   },
+   {
+    "name": "nominal_dt_x2",
+    "role": "regulated",
+    "label": "nominal_dt_x2",
+    "phase_inductance_h": 1.4666667e-09,
+    "dead_time_s": 4.3e-09,
+    "ton_cmd_s": 2.1080781312430493e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 249.9993854257221,
+    "a55_meter_channel_loss_w": 18.476787676400846,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 13.220902553234456,
+    "channel_loss_plus_missing_capacitive_w": 31.697690229635302,
+    "half_c_meas_v2_fsw_total_w": 18.09068704467749,
+    "half_c_struct_v2_fsw_total_w": 18.128041384619458,
+    "orbit_captured_capacitive_w": 4.996731677357036,
+    "energy_balance": {
+     "source_w": 283.09500803811716,
+     "dissipation_w": 268.84519416027814,
+     "channel_w": 18.476787676400853,
+     "load_w": 249.99938542572227,
+     "numerical_w": 14.249833458051945,
+     "numerical_in_event_windows_w": 13.2485523094065,
+     "other_resistive_w": 0.3690210581550275,
+     "stored_energy_change_per_period_w": -1.8296753001578736e-05,
+     "identity_residual_w": -1.2834599267819158e-06,
+     "numerical_outside_event_windows_w": 1.001281148645445
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.300215e-05,
+      "residual_v": 12.003197859870333,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.38745582501801e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.393905255673033e-07,
+      "conduction_baseline_energy_j": 4.305138655933244e-09,
+      "conduction_fit_rms_w": 0.0002085068801453503,
+      "physical_capacitive_excess_j": 9.350853869113701e-07,
+      "discharged_charge_c": 1.5610954339480523e-07,
+      "c_measured_from_charge_f": 1.3005662758981765e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715025392086e-08,
+      "half_c_meas_v2_j": 9.369068685909304e-07,
+      "half_c_struct_v2_j": 9.379397001994043e-07,
+      "half_c_a51_v2_j": 8.595414142688926e-07,
+      "tau_estimate_s": 1.0079388638210868e-11,
+      "orbit_captured_excess_j": 2.3444044384586777e-07,
+      "orbit_captured_fraction": 0.2507155465451506,
+      "missing_from_orbit_meter_j": 7.006449430655023e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.3052150000000003e-05,
+      "residual_v": 12.085862489614897,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.9758709357239564e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.621141372386486e-07,
+      "conduction_baseline_energy_j": 4.2781246971952435e-09,
+      "conduction_fit_rms_w": 0.0003476461033865309,
+      "physical_capacitive_excess_j": 9.578360125414533e-07,
+      "discharged_charge_c": 1.5686397505039818e-07,
+      "c_measured_from_charge_f": 1.2979129556139479e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069681989047e-08,
+      "half_c_meas_v2_j": 9.479182160167471e-07,
+      "half_c_struct_v2_j": 9.509031494874012e-07,
+      "half_c_a51_v2_j": 7.978288990647633e-07,
+      "tau_estimate_s": 1.0058825406008096e-11,
+      "orbit_captured_excess_j": 2.933089688752004e-07,
+      "orbit_captured_fraction": 0.30622044382832864,
+      "missing_from_orbit_meter_j": 6.645270436662529e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.310215e-05,
+      "residual_v": 12.08509752670583,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 2.979977181037913e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 9.62127524781367e-07,
+      "conduction_baseline_energy_j": 4.223634398231558e-09,
+      "conduction_fit_rms_w": 0.00034361539014462914,
+      "physical_capacitive_excess_j": 9.579038903831353e-07,
+      "discharged_charge_c": 1.5690935390286446e-07,
+      "c_measured_from_charge_f": 1.2983706052526577e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597962864701321e-08,
+      "half_c_meas_v2_j": 9.481324223842586e-07,
+      "half_c_struct_v2_j": 9.50782780317244e-07,
+      "half_c_a51_v2_j": 7.739140244392954e-07,
+      "tau_estimate_s": 1.0062372190708097e-11,
+      "orbit_captured_excess_j": 2.9377408370555976e-07,
+      "orbit_captured_fraction": 0.30668429959926163,
+      "missing_from_orbit_meter_j": 6.641298066775756e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.315215e-05,
+      "residual_v": 13.00109711598682,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.8205400274735724e-07,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 7.969327199849175e-07,
+      "conduction_baseline_energy_j": 4.231163702577928e-09,
+      "conduction_fit_rms_w": 0.00033081742851662606,
+      "physical_capacitive_excess_j": 7.927015562823396e-07,
+      "discharged_charge_c": 1.2078671437321466e-07,
+      "c_measured_from_charge_f": 9.290501662716532e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.22788820131261e-09,
+      "half_c_meas_v2_j": 7.851799019435624e-07,
+      "half_c_struct_v2_j": 7.859826469198418e-07,
+      "half_c_a51_v2_j": 6.953739082826044e-07,
+      "tau_estimate_s": 7.200138788605312e-12,
+      "orbit_captured_excess_j": 1.778228390447793e-07,
+      "orbit_captured_fraction": 0.22432507875819468,
+      "missing_from_orbit_meter_j": 6.148787172375603e-07
+     }
+    ]
+   },
+   {
+    "name": "old_critical_dt_x0.5",
+    "role": "regulated",
+    "label": "old_critical_dt_x0.5",
+    "phase_inductance_h": 6.274059728342265e-10,
+    "dead_time_s": 1.075e-09,
+    "ton_cmd_s": 1.7532820073615175e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 249.99707591736978,
+    "a55_meter_channel_loss_w": 28.990656906502572,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 4,
+    "missing_capacitive_power_w": 2.2146188335990824,
+    "channel_loss_plus_missing_capacitive_w": 31.205275740101655,
+    "half_c_meas_v2_fsw_total_w": 3.0334727519648514,
+    "half_c_struct_v2_fsw_total_w": 2.994541227835931,
+    "orbit_captured_capacitive_w": 0.7703091487960854,
+    "energy_balance": {
+     "source_w": 284.01077825309386,
+     "dissipation_w": 279.38380883867586,
+     "channel_w": 28.99065690650264,
+     "load_w": 249.99707591736947,
+     "numerical_w": 4.62693421135161,
+     "numerical_in_event_windows_w": 2.2805383487872914,
+     "other_resistive_w": 0.39607601480375365,
+     "stored_energy_change_per_period_w": 3.618591537524196e-05,
+     "identity_residual_w": -9.828489861973821e-07,
+     "numerical_outside_event_windows_w": 2.346395862564319
+    },
+    "events": [
+     {
+      "side": "high",
+      "phase": 1,
+      "window_end_s": 2.30005375e-05,
+      "residual_v": 5.3456512261093465,
+      "switching_branch": [
+       "vin",
+       "a1"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 4.9693821785092135e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.9191880051197319e-07,
+      "conduction_baseline_energy_j": 1.003281918434424e-08,
+      "conduction_fit_rms_w": 0.0011719751954107438,
+      "physical_capacitive_excess_j": 1.8188598132762893e-07,
+      "discharged_charge_c": 7.035725049894823e-08,
+      "c_measured_from_charge_f": 1.3161586404161165e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.1931715279564494e-08,
+      "half_c_meas_v2_j": 1.8805266119769252e-07,
+      "half_c_struct_v2_j": 1.860296755731404e-07,
+      "half_c_a51_v2_j": 1.7048027054442895e-07,
+      "tau_estimate_s": 1.0200229463224902e-11,
+      "orbit_captured_excess_j": 3.9661002600747895e-08,
+      "orbit_captured_fraction": 0.21805420248032767,
+      "missing_from_orbit_meter_j": 1.4222497872688105e-07
+     },
+     {
+      "side": "high",
+      "phase": 2,
+      "window_end_s": 2.30505375e-05,
+      "residual_v": 5.375464827460249,
+      "switching_branch": [
+       "a1",
+       "a2"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.9278628526311014e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.9461322984471807e-07,
+      "conduction_baseline_energy_j": 5.440545462249295e-09,
+      "conduction_fit_rms_w": 0.0018284222957016477,
+      "physical_capacitive_excess_j": 1.8917268438246877e-07,
+      "discharged_charge_c": 7.087792302911806e-08,
+      "c_measured_from_charge_f": 1.3185450059507845e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0924069953239007e-08,
+      "half_c_meas_v2_j": 1.9050089114322945e-07,
+      "half_c_struct_v2_j": 1.881104999443172e-07,
+      "half_c_a51_v2_j": 1.5782889864289425e-07,
+      "tau_estimate_s": 1.0218723796118579e-11,
+      "orbit_captured_excess_j": 5.3838083064061716e-08,
+      "orbit_captured_fraction": 0.2845975529702377,
+      "missing_from_orbit_meter_j": 1.3533460131840704e-07
+     },
+     {
+      "side": "high",
+      "phase": 3,
+      "window_end_s": 2.31005375e-05,
+      "residual_v": 5.377737235210521,
+      "switching_branch": [
+       "a2",
+       "a3"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 5.926599155930699e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 1.9465924371170716e-07,
+      "conduction_baseline_energy_j": 5.357280521778148e-09,
+      "conduction_fit_rms_w": 0.001825949778956334,
+      "physical_capacitive_excess_j": 1.8930196318992901e-07,
+      "discharged_charge_c": 7.093269672202883e-08,
+      "c_measured_from_charge_f": 1.3190063705158336e-08,
+      "c_structural_sum_f": 1.302e-08,
+      "c_a51_measure_node_capacitance_f": 1.0597963147269008e-08,
+      "half_c_meas_v2_j": 1.9072870217797485e-07,
+      "half_c_struct_v2_j": 1.8826957608901274e-07,
+      "half_c_a51_v2_j": 1.5324685323681378e-07,
+      "tau_estimate_s": 1.022229937149771e-11,
+      "orbit_captured_excess_j": 5.390871103752884e-08,
+      "orbit_captured_fraction": 0.2847762914293792,
+      "missing_from_orbit_meter_j": 1.3539325215240017e-07
+     },
+     {
+      "side": "high",
+      "phase": 4,
+      "window_end_s": 2.31505375e-05,
+      "residual_v": 2.8016313972711426,
+      "switching_branch": [
+       "a3",
+       "x4"
+      ],
+      "branch_resistance_ohm": 0.000775,
+      "orbit_metered_window_energy_j": 1.1925818956762127e-08,
+      "ladder_rung_at_orbit_step_reproduces_orbit": true,
+      "h_to_zero_limit_energy_j": 4.189675347889036e-08,
+      "conduction_baseline_energy_j": 5.27178589988351e-09,
+      "conduction_fit_rms_w": 0.0018064226498426515,
+      "physical_capacitive_excess_j": 3.6624967579006846e-08,
+      "discharged_charge_c": 2.6707507568992812e-08,
+      "c_measured_from_charge_f": 9.532841327737324e-09,
+      "c_structural_sum_f": 9.3e-09,
+      "c_a51_measure_node_capacitance_f": 8.227888453591045e-09,
+      "half_c_meas_v2_j": 3.741229587407348e-08,
+      "half_c_struct_v2_j": 3.649849396071587e-08,
+      "half_c_a51_v2_j": 3.229091796052006e-08,
+      "tau_estimate_s": 7.387952028996426e-12,
+      "orbit_captured_excess_j": 6.654033056878617e-09,
+      "orbit_captured_fraction": 0.18168024429030916,
+      "missing_from_orbit_meter_j": 2.997093452212823e-08
+     }
+    ]
+   },
+   {
+    "name": "old_critical_dt_x1",
+    "role": "regulated",
+    "label": "old_critical_dt_x1",
+    "phase_inductance_h": 6.274059728342265e-10,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.76918702024393e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 250.00088089490805,
+    "a55_meter_channel_loss_w": 28.20585791635716,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.20585791635716,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 280.9083519918823,
+     "dissipation_w": 278.5952004789646,
+     "channel_w": 28.205857916357264,
+     "load_w": 250.00088089490805,
+     "numerical_w": 2.3131484417126065,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38846166769928914,
+     "stored_energy_change_per_period_w": 4.196504255205014e-06,
+     "identity_residual_w": -1.1252991911625543e-06,
+     "numerical_outside_event_windows_w": 2.3131484417126065
+    },
+    "events": []
+   },
+   {
+    "name": "old_critical_dt_x1_step1p25ps",
+    "role": "regulated",
+    "label": "old_critical_dt_x1",
+    "phase_inductance_h": 6.274059728342265e-10,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.76918702024393e-08,
+    "coarse_step_s": 1.5625e-11,
+    "sub_step_s": 1.25e-12,
+    "load_power_w": 250.06758466996044,
+    "a55_meter_channel_loss_w": 28.18428237014418,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.18428237014418,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 279.21497648826005,
+     "dissipation_w": 278.6362219287119,
+     "channel_w": 28.184282370144267,
+     "load_w": 250.06758466996104,
+     "numerical_w": 0.5787718719237295,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.3843548886065946,
+     "stored_energy_change_per_period_w": -1.6674647773662343e-05,
+     "identity_residual_w": -6.377278111147078e-07,
+     "numerical_outside_event_windows_w": 0.5787718719237295
+    },
+    "events": []
+   },
+   {
+    "name": "old_critical_dt_x1_step2p5ps",
+    "role": "regulated",
+    "label": "old_critical_dt_x1",
+    "phase_inductance_h": 6.274059728342265e-10,
+    "dead_time_s": 2.15e-09,
+    "ton_cmd_s": 1.76918702024393e-08,
+    "coarse_step_s": 3.125e-11,
+    "sub_step_s": 2.5e-12,
+    "load_power_w": 250.0454016828914,
+    "a55_meter_channel_loss_w": 28.191456086153302,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.191456086153302,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 279.7797631367034,
+     "dissipation_w": 278.6225796209228,
+     "channel_w": 28.191456086153185,
+     "load_w": 250.04540168289137,
+     "numerical_w": 1.157204318867438,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.3857218518782588,
+     "stored_energy_change_per_period_w": -1.9131571327157815e-05,
+     "identity_residual_w": -1.6715154944613175e-06,
+     "numerical_outside_event_windows_w": 1.157204318867438
+    },
+    "events": []
+   },
+   {
+    "name": "old_critical_dt_x2",
+    "role": "regulated",
+    "label": "old_critical_dt_x2",
+    "phase_inductance_h": 6.274059728342265e-10,
+    "dead_time_s": 4.3e-09,
+    "ton_cmd_s": 1.769159241909019e-08,
+    "coarse_step_s": 6.25e-11,
+    "sub_step_s": 5e-12,
+    "load_power_w": 250.0013453739435,
+    "a55_meter_channel_loss_w": 28.207267151447905,
+    "diagnostic_meter_reproduces_a55_meter": true,
+    "hard_switched_event_count": 0,
+    "missing_capacitive_power_w": 0.0,
+    "channel_loss_plus_missing_capacitive_w": 28.207267151447905,
+    "half_c_meas_v2_fsw_total_w": 0.0,
+    "half_c_struct_v2_fsw_total_w": 0.0,
+    "orbit_captured_capacitive_w": 0.0,
+    "energy_balance": {
+     "source_w": 280.64047374658657,
+     "dissipation_w": 278.5964268196997,
+     "channel_w": 28.207267151447926,
+     "load_w": 250.0013453739444,
+     "numerical_w": 2.044048803798591,
+     "numerical_in_event_windows_w": 0.0,
+     "other_resistive_w": 0.38781429430736125,
+     "stored_energy_change_per_period_w": -4.1071313017226885e-07,
+     "identity_residual_w": -1.4661985683339651e-06,
+     "numerical_outside_event_windows_w": 2.044048803798591
+    },
+    "events": []
+   }
+  ]
+ },
+ "comparison_at_250w": {
+  "baseline": "nominal_dt_x1",
+  "ranked_by_partial_loss_proxy": [
+   {
+    "label": "old_critical_dt_x1",
+    "all_eight_zvs": true,
+    "ton_cmd_s": 1.76918702024393e-08,
+    "load_power_w": 250.00088089490805,
+    "a55_meter_channel_loss_w": 28.20585791635716,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.20585791635716,
+    "delta_partial_loss_vs_baseline_w": -3.1764014414543986,
+    "delta_a55_meter_vs_baseline_w": 9.797587994396661,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 28.20585791635716,
+    "surrogate_dead_time_abs_current_time_per_second_a": 6.773189475920862,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.7290195111164012
+   },
+   {
+    "label": "old_critical_dt_x2",
+    "all_eight_zvs": true,
+    "ton_cmd_s": 1.769159241909019e-08,
+    "load_power_w": 250.0013453739435,
+    "a55_meter_channel_loss_w": 28.207267151447905,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.207267151447905,
+    "delta_partial_loss_vs_baseline_w": -3.1749922063636546,
+    "delta_a55_meter_vs_baseline_w": 9.798997229487405,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 28.207267151447905,
+    "surrogate_dead_time_abs_current_time_per_second_a": 17.72521966719802,
+    "channel_loss_metered_inside_surrogate_intervals_w": 1.7899448397342401
+   },
+   {
+    "label": "new_passing_dt_x1",
+    "all_eight_zvs": true,
+    "ton_cmd_s": 1.7676452544009515e-08,
+    "load_power_w": 250.0009820745574,
+    "a55_meter_channel_loss_w": 28.546207978485054,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.546207978485054,
+    "delta_partial_loss_vs_baseline_w": -2.8360513793265056,
+    "delta_a55_meter_vs_baseline_w": 10.137938056524554,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 28.546207978485054,
+    "surrogate_dead_time_abs_current_time_per_second_a": 6.887875782732612,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.7439256490933228
+   },
+   {
+    "label": "new_passing_dt_x2",
+    "all_eight_zvs": true,
+    "ton_cmd_s": 1.7676156695877842e-08,
+    "load_power_w": 250.00089848861165,
+    "a55_meter_channel_loss_w": 28.54765562290696,
+    "missing_hard_switch_capacitive_w": 0.0,
+    "partial_loss_proxy_w": 28.54765562290696,
+    "delta_partial_loss_vs_baseline_w": -2.8346037349046007,
+    "delta_a55_meter_vs_baseline_w": 10.139385700946459,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 28.54765562290696,
+    "surrogate_dead_time_abs_current_time_per_second_a": 17.930886179158037,
+    "channel_loss_metered_inside_surrogate_intervals_w": 1.8204579479658496
+   },
+   {
+    "label": "old_critical_dt_x0.5",
+    "all_eight_zvs": false,
+    "ton_cmd_s": 1.7532820073615175e-08,
+    "load_power_w": 249.99707591736978,
+    "a55_meter_channel_loss_w": 28.990656906502572,
+    "missing_hard_switch_capacitive_w": 2.2146188335990824,
+    "partial_loss_proxy_w": 31.205275740101655,
+    "delta_partial_loss_vs_baseline_w": -0.17698361770990445,
+    "delta_a55_meter_vs_baseline_w": 10.582386984542072,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 30.78321334259094,
+    "surrogate_dead_time_abs_current_time_per_second_a": 1.83621047858777,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.20254028076629765
+   },
+   {
+    "label": "nominal_dt_x1",
+    "all_eight_zvs": false,
+    "ton_cmd_s": 1.8879471882680588e-08,
+    "load_power_w": 249.98215492413627,
+    "a55_meter_channel_loss_w": 18.4082699219605,
+    "missing_hard_switch_capacitive_w": 12.97398943585106,
+    "partial_loss_proxy_w": 31.38225935781156,
+    "delta_partial_loss_vs_baseline_w": 0.0,
+    "delta_a55_meter_vs_baseline_w": 0.0,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 28.85062824518728,
+    "surrogate_dead_time_abs_current_time_per_second_a": 2.6350191640895826,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.17206215252956553
+   },
+   {
+    "label": "new_passing_dt_x0.5",
+    "all_eight_zvs": false,
+    "ton_cmd_s": 1.752715345870316e-08,
+    "load_power_w": 249.99701362344373,
+    "a55_meter_channel_loss_w": 29.294723945452684,
+    "missing_hard_switch_capacitive_w": 2.1183372331476558,
+    "partial_loss_proxy_w": 31.41306117860034,
+    "delta_partial_loss_vs_baseline_w": 0.030801820788781242,
+    "delta_a55_meter_vs_baseline_w": 10.886454023492185,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 31.00975269023804,
+    "surrogate_dead_time_abs_current_time_per_second_a": 1.8685698006343523,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.2075469138070148
+   },
+   {
+    "label": "nominal_dt_x0.5",
+    "all_eight_zvs": false,
+    "ton_cmd_s": 1.781344474518501e-08,
+    "load_power_w": 250.1134624739511,
+    "a55_meter_channel_loss_w": 18.450745000249732,
+    "missing_hard_switch_capacitive_w": 13.118469540129704,
+    "partial_loss_proxy_w": 31.569214540379434,
+    "delta_partial_loss_vs_baseline_w": 0.1869551825678748,
+    "delta_a55_meter_vs_baseline_w": 0.04247507828923247,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 29.013675332803864,
+    "surrogate_dead_time_abs_current_time_per_second_a": 0.14012597011293196,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.009158938972598145
+   },
+   {
+    "label": "nominal_dt_x2",
+    "all_eight_zvs": false,
+    "ton_cmd_s": 2.1080781312430493e-08,
+    "load_power_w": 249.9993854257221,
+    "a55_meter_channel_loss_w": 18.476787676400846,
+    "missing_hard_switch_capacitive_w": 13.220902553234456,
+    "partial_loss_proxy_w": 31.697690229635302,
+    "delta_partial_loss_vs_baseline_w": 0.3154308718237431,
+    "delta_a55_meter_vs_baseline_w": 0.06851775444034658,
+    "partial_loss_with_capacitive_scaled_by_coer_over_cotr_w": 29.12175592713769,
+    "surrogate_dead_time_abs_current_time_per_second_a": 8.040645046607047,
+    "channel_loss_metered_inside_surrogate_intervals_w": 0.5231085921299865
+   }
+  ],
+  "illustrative_reverse_conduction_break_even": [
+   {
+    "label": "old_critical_dt_x1",
+    "delta_abs_current_time_a": 4.13817031183128,
+    "illustrative_break_even_reverse_drop_v": 0.9021762080133182
+   },
+   {
+    "label": "old_critical_dt_x2",
+    "delta_abs_current_time_a": 15.090200503108436,
+    "illustrative_break_even_reverse_drop_v": 0.31761505704188914
+   },
+   {
+    "label": "new_passing_dt_x1",
+    "delta_abs_current_time_a": 4.25285661864303,
+    "illustrative_break_even_reverse_drop_v": 0.8013237175575498
+   },
+   {
+    "label": "new_passing_dt_x2",
+    "delta_abs_current_time_a": 15.295867015068454,
+    "illustrative_break_even_reverse_drop_v": 0.29308567640687105
+   }
+  ],
+  "co_er_over_co_tr": 0.8586021505376344
+ },
+ "safety": {
+  "screen_a": 250.0,
+  "note": "project screen, not EPC2067 SOA",
+  "max_accepted_orbit_abs_current_regulated_states_a": 218.64607850269005,
+  "max_probe_abs_current_regulated_trials_a": 218.646511662773,
+  "max_probe_abs_current_any_trial_a": 224.31280514341,
+  "max_accepted_orbit_abs_current_any_trial_a": 219.82048547668555,
+  "max_probe_abs_current_refinement_runs_a": 217.204319219438,
+  "trials_failing_probe_screen": [],
+  "trials_failing_accepted_orbit_screen": []
+ }
+}

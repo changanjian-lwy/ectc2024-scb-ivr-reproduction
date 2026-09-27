@@ -205,3 +205,22 @@ All nine points converge, but none meets both rated output and the paper's
 small-negative-current condition. Full matrix and refinement evidence are in
 `A55_joint_lphase_deadtime_total_loss_optimization/JOINT_GRID_RESULTS.md`.
 This is not an equal-output-power loss optimization or a native P24 controller.
+
+`A56_equal_power_regulated_loss_comparison` re-compares A55's nine L/dead-time
+points at EQUAL delivered power. Each is regulated to mean(Vout^2/R)=250 W by
+an openly declared command on-interval `Ton_cmd`; the 4 mOhm load is never
+retuned, and a test proves every scheduler path reads the override. A55's
+`metered_orbit` rebuilds its own boundary and so is used through a documented
+scoped rebinding. The required capacitive-accounting check found that A55's
+branch meter captures only 18-31% of each hard-switch node-capacitance
+discharge at the 62.5 ps step. The rest is backward-Euler numerical damping,
+confirmed by the exact energy identity. The measured missing energy is
+therefore added. At 250 W, the regulated nominal baseline (`Ton_cmd` +13.3%)
+has a partial-loss proxy of 31.38 W (18.41 W metered + 12.97 W missed). The
+best all-eight-ZVS point (0.627406 nH, 2.15 ns, `Ton_cmd` +6.2%) has 28.21 W,
+a 3.18 W advantage. The proxy is step-converged, and a source-side energy
+balance confirms it. The margin is narrow: a constant reverse-conduction drop
+of only ~0.9 V under the fixed symmetric dead time would erase it. Coss
+nonlinearity and magnetic loss are unresolved, and negative currents remain
+~39% of peak. This is a partial electrical-loss proxy result, not a hardware
+efficiency or native-P24 claim. See `A56_equal_power_regulated_loss_comparison/RESULTS.md`.
