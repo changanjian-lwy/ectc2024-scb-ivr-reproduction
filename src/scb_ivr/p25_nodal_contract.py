@@ -10,7 +10,8 @@ from math import isfinite
 
 import numpy as np
 
-from .p25_native_events import MODES, NativeBoundary
+from .p25_native_events import NativeBoundary
+from .p25_cycle_modes import cycle_mode
 
 
 NODES = ("vin", "a1", "a2", "x1", "x2", "x3", "out")
@@ -107,9 +108,7 @@ def instantaneous_rates(boundary: NativeBoundary, parts: Components, mode: str, 
         raise ValueError("requires declared dynamic_Co_current_ports output boundary")
     if reverse_path_regime != "off_reverse_channels_excluded_until_admission":
         raise ValueError("reverse-conduction model is not implemented in D03")
-    modes = {m.name: m for m in MODES if "OPTIONAL" not in m.name}
-    if mode not in modes:
-        raise ValueError("only M1-M6 unclamped modes are supported")
+    gates = cycle_mode(mode).gates
     if not all(isfinite(x) for x in (vin_v, dvin_v_s, load_current_a,
                                     other_modules_current_a, constraint_tolerance_v)):
         raise ValueError("finite port inputs/tolerance required")
@@ -125,7 +124,7 @@ def instantaneous_rates(boundary: NativeBoundary, parts: Components, mode: str, 
     cvalues = parts.capacitances()
     cfull = (af * cvalues) @ af.T
     c = cfull[1:, 1:]
-    active = np.array((*modes[mode].gates.high, *modes[mode].gates.low))
+    active = np.array((*gates.high, *gates.low))
     s = a[:, :6][:, active]
     sin = af[0, :6][active]
     constraint = s.T @ v + sin * vin_v

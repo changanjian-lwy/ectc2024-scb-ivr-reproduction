@@ -1,175 +1,98 @@
-# Evidence-Bounded SCB-IVR Reproduction
+# SCB-IVR · From Paper to Reproducible Model
 
 [![Python regression checks](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction/actions/workflows/tests.yml/badge.svg)](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction/actions/workflows/tests.yml)
 
-Modular analytical, numerical and LTspice reproduction of the 2024 ECTC paper
-*Package Power Delivery Architecture for High Performance Computing Systems
-With a 1 kW IVR Operated in CCM-DCM Boundary Mode Condition*.
+**Power electronics · Mathematical modeling · Python/SciPy · LTspice**
 
-This repository turns a research paper into an auditable engineering workflow:
-source claims are separated from assumptions, switching events are encoded as
-testable modules, and unsuccessful cases are retained as evidence rather than
-silently tuned away.
+An evidence-bounded investigation of series-capacitor buck integrated voltage
+regulators for high-performance computing. The system target comes from the
+2024 ECTC paper: **48 V → 1 V, 1 kW**, using four four-phase modules.
+The 2025 APEC follow-up supplies a separate native three-phase reference.
 
-## Project at a glance
+The engineering question: **can the published topology, switching sequence and
+device assumptions coexist in one physically consistent operating cycle?**
 
-- **System target:** 48 V to 1 V, 1 kW package power delivery.
-- **Current validated scope:** one four-phase, 250 W module plus a native
-  three-phase calibration of the 2025 follow-up method.
-- **Tools:** Python/SciPy for equations and event solvers; LTspice for circuit
-  inspection and transient experiments; 267 local regression checks for
-  boundary and branch integrity, with 248 checks in the portable CI suite.
-- **Design principle:** 2024 is the primary source. The 2025 paper fills only
-  explicitly missing details, and disagreements remain separate branches.
-- **Status:** active research reproduction. Periodic-state and commutation
-  behavior are under test; this is not yet a complete hardware validation.
+[Project overview](PROJECT_OVERVIEW.md) · [Current status](reports/CURRENT_STATUS.md) ·
+[Derivations](symbolic_derivations/README.md) · [Experiments](experiments/README.md)
 
-For a concise portfolio-level explanation, see
-[`PROJECT_OVERVIEW.md`](PROJECT_OVERVIEW.md).
+> Research in progress—not a completed 1 kW reproduction or hardware validation.
+> A local ZVS event, a passing unit test and a full periodic solution are different evidence levels.
 
-## Current research question
+## Three workstreams, explicit boundaries
 
-The project first asks whether the paper-derived four-phase topology and
-switching events admit a self-consistent periodic trajectory and passive
-flying-capacitor restoration. Zero-start, closed-loop regulation, efficiency
-and full four-module hardware reproduction remain separate later questions.
+| Workstream | Model and purpose | Current evidence |
+|---|---|---|
+| **Mathematical core** | Native P25, **3 phases / 1 module**; shared-node equations, physical events and control memory | All 15 main modes assembled algebraically; first handoff tested; full-cycle event orchestration still incomplete |
+| **Periodic-state engineering** | P24-derived **4-phase module**; separately declared device and timing variants | Conditional periodic/ZVS solutions, independent LTspice cross-check and loss-sensitivity studies; not a paper operating-point match |
+| **Zero-start** | Separate four-phase startup models and boundary audits | Startup trajectories and convergence diagnostics; no demonstrated paper-consistent zero-start-to-ZVS handoff |
 
-## Evidence policy
+Output boundaries differ **between named experiments**, never implicitly:
+older isolation studies use an ideal 1 V source; the new P25 core retains a
+dynamic output capacitor. Check the case boundary before transferring results.
 
-- The 2024 ECTC paper is the primary source for the target topology, equations
-  and operating sequence.
-- The 2025 APEC paper supplements only details that the 2024 paper leaves open.
-- A disagreement between the papers creates separate branches; values and time
-  labels are never silently merged.
-- Unreported quantities remain explicit assumptions or blockers. Parameters
-  are not tuned merely to obtain a preferred waveform.
-- Every active experiment has a `BOUNDARY.md` and `RESULTS.md` stating what
-  changed, what was observed and what the result cannot support.
+## Selected evidence
 
-## Main results so far
+- **Equations before tuning.** The P24 5 MHz inductance calculation gives
+  1.4667 nH, versus 2.68 nH in Table I. The discrepancy is recorded, not hidden.
+  [Source and formula records](paper_locked/README.md)
+- **A failure localized to its physical event.** A synthetic P25 trajectory
+  reaches M5, but phase 3 current reaches zero before SH2 achieves ZVS.
+  Volt-second and output-charge accounting explains the failed continuation;
+  this is not a paper-parameter experiment.
+  [D13](symbolic_derivations/02_P25_native/D13_NEGATIVE_TARGET_AND_HIGH_HANDOFF.md) ·
+  [D14](symbolic_derivations/02_P25_native/D14_FREEWHEEL_MARGIN_AND_SEED_SCOPE.md)
+- **Independent cross-check.** A52 compares a corrected four-phase periodic
+  state against LTspice at **89.92 W delivered power**, under a uniform 7 mΩ
+  switch model—not the 250 W/module target.
+  [A52 results](experiments/track_A_periodic_steady_state/A52_spice_crosscheck_reduced_load_zvs/RESULTS.md)
+- **ZVS is not automatically an efficiency win.** Separate sensitivity studies
+  examine nonlinear capacitance, dead time, temperature, winding-loss budget
+  and load. Conclusions remain attached to their modeled boundaries.
+  [A59: capacitance](experiments/track_A_periodic_steady_state/A59_nonlinear_coss_epc2067/RESULTS.md) ·
+  [A60: temperature](experiments/track_A_periodic_steady_state/A60_temperature_ron_sensitivity/RESULTS.md) ·
+  [A62: load](experiments/track_A_periodic_steady_state/A62_load_sweep_fixed_deadtime/RESULTS.md)
 
-- Reproduced the reported duty, on-time and peak-current relationships.
-- Found an unresolved 5 MHz inductance discrepancy: the printed equation gives
-  1.4667 nH while Table I reports 2.68 nH.
-- Built a physical-event mapping that prevents the 2024 and 2025 `t1/t2/t3`
-  labels from being incorrectly treated as identical events.
-- Reduced the maximum four-phase periodic current residual from 80.468 A for an
-  all-zero seed to 0.105 A through documented periodic-state iterations.
-- Under an explicit ideal 1 V output-isolation boundary, symmetric C1
-  perturbations both moved toward the control trajectory over 20 periods,
-  providing early evidence of a passive restoring tendency.
-- Calibrated the event method on the native 2025 three-phase topology. A
-  locally periodic trajectory exists near 563 kHz, but the frozen public
-  parameters do not simultaneously reproduce 0.5 MHz, equal phase spacing,
-  peak current and flying-capacitor charge balance.
-- A strict joint optimization repeatedly places the consistent inductance near
-  31–32 nH rather than the prototype table's 22 nH. Even after a labelled
-  negative-valley correction, the best tested branch misses the fixed
-  per-phase peak-current gate; it remains a diagnostic, not a reproduction
-  claim.
-- Added a parameter-only feasibility envelope. Before any unknown device value
-  is fitted, it reports the available negative current, local inductor-energy
-  budget, charge-transfer ceiling and the two explicitly different
-  peak-current conventions. Unknown Qoss/dead-time inputs leave the ZVS verdict
-  `undetermined` rather than producing a false pass.
-- Separated two often-confused reduced-power findings: A51's near-ideal
-  `190 W` nominal load setting delivers `179.37 W`, whereas A52's independently
-  SPICE-confirmed, uniform-`7 mOhm` re-solve delivers `89.92 W`. A52 confirms
-  commutation physics for its corrected state, not the headline A51 state.
-- Rated-load A53/A54 sensitivity searches found ZVS-capable inductance points
-  but not a favorable partial loss balance. Their historical results retain
-  a documented uniform, post-hoc Ron convention. A55 now includes P24's
-  `2`-high-side/`3`-low-side EPC2067 population and asymmetric-Ron periodic
-  re-solves. A local ZVS transition is bracketed at 0.621524–0.622014 nH
-  (2.15 ns dead time), retained after step refinement; the passing point
-  delivers 219.97 W with approximately 39% negative current valleys.
-  An actual switch-branch power audit corrects the earlier phase-current loss
-  proxy. See [A55 results](experiments/track_A_periodic_steady_state/A55_joint_lphase_deadtime_total_loss_optimization/RESULTS_2026-09-26.md).
-  A subsequent 3x3 L/dead-time grid found no simultaneous rated-output and
-  paper-small-negative-current solution among its sampled points; see
-  [joint-grid report](experiments/track_A_periodic_steady_state/A55_joint_lphase_deadtime_total_loss_optimization/JOINT_GRID_RESULTS.md).
-  This remains a local sensitivity study, not a global optimization; physical
-  reverse-conduction and magnetic losses remain unmodelled.
+## How the project is built
 
-These are periodic-state and local commutation results. They are not claims of
-zero-start operation, closed-loop output regulation or complete 1 kW hardware
-validation.
+| Layer | Responsibility | Entry point |
+|---|---|---|
+| Sources & assumptions | Paper claims, extensions and unknowns | [paper_locked](paper_locked/README.md) |
+| Equations & state | KCL/KVL, charge, flux and energy | [derivations](symbolic_derivations/README.md) |
+| Events & control | Zero crossings, ZVS admission, latched targets and gate transitions | [reusable modules](src/scb_ivr/README.md) |
+| Devices & experiments | Explicit models and controlled comparisons | [experiments](experiments/README.md) |
+| Verification | Tests, first-failure diagnostics and circuit cross-checks | [tests](tests/README.md) · [validation](validation/README.md) |
 
-## Repository map
-
-```text
-src/scb_ivr/      Reusable equations, topology, event and controller modules
-scripts/          Human-run analytical and startup workflows
-validation/       LTspice log readers and accepted-result regressions
-paper_locked/     Source hierarchy, formula audit and P24/P25 branch records
-symbolic_derivations/ Equation-first P24, P25 and combined evidence branches
-experiments/      One-change-at-a-time simulation cases and negative evidence
-results/          Parameter provenance and consolidated records
-tests/            Automated boundary and regression checks
-tools/            Local LTspice execution helpers
-reports/          Shareable technical progress summaries
-circuit/          Earlier exploratory netlists retained for traceability
-```
-
-## Recommended reading order
-
-1. [`PROJECT_OVERVIEW.md`](PROJECT_OVERVIEW.md) — scope, architecture and
-   selected outcomes.
-2. [`paper_locked/00_boundaries/PAPER_LOCKED_REPRODUCTION_BASELINE.md`](paper_locked/00_boundaries/PAPER_LOCKED_REPRODUCTION_BASELINE.md)
-   — frozen evidence hierarchy.
-3. [`paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md`](paper_locked/00_boundaries/SEQUENCE_SOURCE_MATRIX.md)
-   — exact ownership of switching-sequence claims.
-4. [`symbolic_derivations/README.md`](symbolic_derivations/README.md) — ordered
-   analytical branches and strict joint audit.
-5. [`paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md`](paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md)
-   — traceable experiment history.
-6. [`experiments/README.md`](experiments/README.md) — simulation layout and
-   boundaries.
-7. [`results/PARAMETRIC_FEASIBILITY_ENVELOPE.md`](results/PARAMETRIC_FEASIBILITY_ENVELOPE.md)
-   — what can and cannot be proved before missing device data arrive.
-8. [`results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md`](results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md)
-   — Track-B boundary audit and the hybrid descriptor-model definition.
-9. [`results/ZERO_START_ONE_PERIOD_CONVERGENCE.md`](results/ZERO_START_ONE_PERIOD_CONVERGENCE.md)
-   — first-period step-size and diode-event convergence gate.
-10. [`results/ZERO_START_TEN_PERIOD_CONVERGENCE.md`](results/ZERO_START_TEN_PERIOD_CONVERGENCE.md)
-    — multi-period convergence and passive-divider current law.
-11. [`results/ZERO_START_FULL_RAMP_REFERENCE.md`](results/ZERO_START_FULL_RAMP_REFERENCE.md)
-    — complete input-ramp reference solve and handoff-state audit.
-12. [`results/ZERO_START_POST_RAMP_POINCARE_AUDIT.md`](results/ZERO_START_POST_RAMP_POINCARE_AUDIT.md)
-    — restartable fixed-event sampling, long-envelope audit and three-level
-    time-step check.
-13. [`results/ZERO_START_AFFINE_PERIOD_FIXED_POINT.md`](results/ZERO_START_AFFINE_PERIOD_FIXED_POINT.md)
-    — direct affine-period solution, rank audit and Table-1 boundary
-    consistency metrics.
-14. [`results/model_interface/`](results/model_interface/)
-    — canonical synchronized four-phase JSON/CSV data for downstream model
-    construction, including all raw variables and event-boundary states.
+P24/P25 conflicts create separate branches. A three-phase result is never
+silently relabeled as four-phase. Capacitor/current states are not reset to
+force a successful event, and unsuccessful cases remain part of the record.
 
 ## Run the checks
+
+Python 3.11+:
 
 ```bash
 python3 -m pip install -r requirements.txt
 python3 tests/run_portable_suite.py
 ```
 
-LTspice netlists are supplied for inspection and reproduction. Generated raw
-waveforms, optimizer traces and database files are intentionally excluded from
-version control; the scripts and concise result reports needed to regenerate
-or audit them remain tracked. The complete 267-test local suite additionally
-checks recorded LTspice `.log` files after those files have been generated:
+Verified locally on **2026-09-28: 416 portable tests passed**. GitHub Actions
+runs this suite. The full suite also checks locally generated LTspice logs:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-## Current boundaries
+**435 full-suite tests passed** on the same date. These are software and model
+contract checks, not 435 reproduced paper operating points. Local log fixtures
+are not published.
 
-- Active mainline: one four-phase, 250 W module of the 2024 architecture.
-- Target operating point: 48 V to 1 V, 5 MHz.
-- Active source branch: P24-derived 2% negative-current control.
-- Periodic balance studies presently use an explicitly labelled ideal 1 V
-  output clamp.
-- The 36/24/12 V capacitor values are periodic-state coordinates, not
-  demonstrated zero-start outcomes.
-- Full nonlinear device, gate-driver delay, package parasitic, thermal, EMI and
-  reliability models are not yet included.
+## Where to go next
+
+- **Technical reviewer:** [overview](PROJECT_OVERVIEW.md) → [status and limitations](reports/CURRENT_STATUS.md).
+- **Model developer:** [module guide](src/scb_ivr/README.md) → [15-mode assembly](symbolic_derivations/02_P25_native/D15_THREE_PHASE_MODE_ASSEMBLY.md).
+- **Experiment reviewer:** [experiment index](experiments/README.md) → the selected case's boundary and results.
+- **Historical context:** [experiment registry](paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md). Older reports are dated snapshots, not the current baseline.
+
+Source papers, private meeting notes, raw waveforms and temporary solver outputs
+are excluded from publication. Existing paths are retained to preserve scripts
+and evidence references.

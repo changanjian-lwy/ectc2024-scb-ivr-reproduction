@@ -2,121 +2,56 @@
 
 ## Objective
 
-This project reproduces and audits a high-step-down integrated voltage
-regulator for high-performance computing. The target architecture converts
-48 V to 1 V at 1 kW using four interleaved 250 W modules, each containing four
-phases. The immediate goal is not to produce attractive waveforms; it is to
-determine which paper-reported equations, switching events and component
-values can coexist in one reproducible model.
+Turn the 2024 ECTC SCB-IVR paper into an auditable computational model, using
+the 2025 APEC paper as an explicitly separated reference where appropriate.
+The target is 48 V to 1 V, 1 kW across four four-phase modules. This is the
+research target, **not an achieved simulation or hardware rating**.
 
-## Why the workflow is modular
+## Approach: vertical layers, horizontal switching events
 
-The reproduction is separated into six layers so that a failed result can be
-localized instead of hidden by retuning unrelated parameters:
+Vertically, the project separates sources, equations, event/control logic,
+device models, experiments and verification. Horizontally, a switching cycle
+is broken into physical events: high-side conduction, turn-off commutation,
+low-side ZVS admission, freewheeling, negative-current preparation and the
+next high-side admission.
 
-1. **Evidence layer** — records whether each claim comes from the 2024 paper,
-   the 2025 follow-up, another cited source or an explicit assumption.
-2. **Equation layer** — evaluates duty ratio, on-time, current ramps, charge
-   balance and commutation energy before circuit simulation.
-3. **Event layer** — maps paper time labels to physical events such as current
-   zero crossing, negative-current threshold and zero-voltage admission.
-4. **Device layer** — inserts switch resistance, output capacitance and other
-   parasitics without rewriting the controller or topology.
-5. **Experiment layer** — changes one boundary at a time and records both
-   successful and unsuccessful cases.
-6. **Verification layer** — rejects a candidate unless every predeclared
-   timing, state-return, current, power and charge-balance gate passes.
+These directions interact. Device capacitance affects commutation time;
+a late commutation changes the other phases' currents; a locally valid
+transition may fail in the complete circuit. The model must retain
+simultaneous phase and capacitor states rather than concatenate isolated
+single-phase successes.
 
-Python/SciPy implements the analytical and event-driven models. LTspice
-provides inspectable circuit netlists and transient experiments. Automated
-tests protect the source hierarchy, branch separation and numerical contracts.
-The complete local suite contains 267 passing checks. The portable CI suite contains 248
-portable checks because LTspice-generated log fixtures are intentionally not
-published.
+## Implementation
 
-The Python source is organized by responsibility: reusable models live in
-`src/scb_ivr`, human-run workflows in `scripts`, LTspice result readers in
-`validation`, and behavioral contracts in `tests`.
+- **Python/SciPy:** reusable node equations, constrained derivatives, affine
+  propagation, event guards, control memory and diagnostics.
+- **LTspice:** inspectable netlists and independent transient checks.
+- **Automated tests:** identities, branch separation, invalid-state rejection,
+  event ordering and historical regressions.
+- **Evidence records:** source, changed variables, assumptions and limitations.
 
-## Two evidence branches
+## What the work demonstrates
 
-- **P24 native:** the 2024 four-phase topology and its explicitly reported
-  switching rules.
-- **P24 primary + P25 supplement:** the same four-phase target, with only the
-  missing switching details extended from the 2025 three-phase paper.
+| Engineering capability | Concrete evidence |
+|---|---|
+| Translate literature into executable models | Native P25 15-mode mapping on one shared topology |
+| Design modular scientific software | Separate equations, controller memory, event guards and device contracts |
+| Diagnose rather than retune blindly | First failed event and integrated volt-second/charge accounting |
+| Verify independently | Python-to-LTspice comparison in A52, under its reduced-power boundary |
+| Question assumptions | Separate capacitance, timing, temperature and load sensitivity studies |
+| Report negative results honestly | Partial handoffs are not promoted to complete reproduction |
 
-A third, native P25 model is used to calibrate the method before transferring
-it to the P24 topology. Conflicting rules are never averaged or silently
-merged.
+## Current limits
 
-## Selected engineering outcomes
+The strict P25-native core is **three-phase, single-module**; its all-mode
+algebra is tested, but its full-cycle event orchestration is incomplete.
+Four-phase engineering experiments form a separate model family with their
+own device, timing and output assumptions. They are not automatic validation
+of the new mathematical core.
 
-- The published duty, on-time and peak-current relationships were reproduced.
-- A 5 MHz inductance inconsistency was isolated: the printed 2024 equation
-  gives 1.4667 nH while its Table I reports 2.68 nH.
-- The four-phase periodic-current residual was reduced from 80.468 A for an
-  all-zero seed to 0.105 A through documented state iterations.
-- A native P25 event solve finds a locally periodic trajectory near 563 kHz,
-  showing local causal feasibility while also demonstrating that it is not a
-  0.5 MHz paper match.
-- A strict P25 joint audit repeatedly moves the consistent inductance toward
-  31–32 nH instead of the listed 22 nH. With negative-valley correction and
-  phase-specific timing, period, power and capacitor charge balance nearly
-  close, but the fixed per-phase peak-current gate still fails. The repository
-  reports this as a negative result rather than relaxing the tolerance.
-- A fast, validated event solver (`A50/A51`) found the first four-phase joint
-  periodic state in this project at which all four phases achieve
-  zero-voltage switching. The headline A51 load setting is nominally
-  `190 W` (`76%` of the paper's rated `250 W/module`) under a near-ideal
-  uniform `1 uOhm` switch boundary; its actual delivered load power is
-  `179.37 W`. A subsequent LTspice build (`A52`) did not reuse that state:
-  it first re-solved the same load resistance with a uniform `7 mOhm` switch
-  model, whose actual delivered power is `89.92 W`, and then independently
-  confirmed that corrected state's commutation timing to within
-  `0.11%-0.24%`. These are two explicitly different reduced-power
-  boundaries, neither is the rated operating point, and neither is a P24/P25
-  reproduction claim. See
-  `experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A49_A52_2026-09-19.md`.
-- At rated `250 W/module`, A53 and A54 found ZVS-enabling phase-inductance
-  reductions for GS61008T and the P24 Table-3 EPC2067 candidate, respectively,
-  but their partial post-hoc loss comparisons remained net-negative. A54's
-  narrower loss gap was not robust because its solver dynamics retained a
-  near-ideal uniform resistance and its conduction estimate did not apply
-  P24's different high-/low-side parallel counts. A55 has now corrected those
-  two contracts and re-solved the three historical comparison points. The old
-  A54 critical point changes from all-phase ZVS to `F/F/F/T`; only its deeper
-  margin point remains `T/T/T/T`. The 2026-09-26 local refinement brackets the
-  new transition at 0.621524–0.622014 nH at 2.15 ns; a halved-step re-solve
-  retains the bracket. The passing point delivers about 219.97 W, with
-  negative valleys around 39% of positive peaks, not the paper's 1–2% rule.
-  An independent branch-power audit also found the prior phase-current loss
-  proxy misses flying-capacitor path currents; actual model channel power at
-  this point is 24.955 W versus the proxy's 21.718 W. See A55's
-  `RESULTS_2026-09-26.md`. A subsequent 3x3 local L/dead-time grid completed
-  with all nine points converged; none supplies simultaneous rated output
-  and the paper's small-negative-current condition. Halving dead time loses
-  high-side ZVS at the small-L anchors, while doubling it does not restore
-  rated power. At nominal L, longer dead time reduces modeled conduction
-  duration and output power. See A55 `JOINT_GRID_RESULTS.md`. This is not a
-  global optimization; realistic reverse conduction and magnetic loss remain
-  outside the model.
+Neither a paper-consistent zero-start handoff nor complete 1 kW hardware
+performance has been established. Earlier ideal-output-clamp results remain
+isolation experiments, not output-regulation demonstrations.
 
-## What is deliberately not claimed
-
-- The steady-state 36/24/12 V ladder is not evidence of successful zero-start.
-- An ideal 1 V output clamp is a declared isolation boundary, not a completed
-  output regulator.
-- A local ZVS event is not proof of a periodic, equal-spaced, full-power system.
-- The present models do not yet establish hardware efficiency, thermal, EMI or
-  reliability performance.
-
-## Reproduce the automated checks
-
-```bash
-python3 -m pip install -r requirements.txt
-python3 tests/run_portable_suite.py
-```
-
-Begin the technical audit with
-[`symbolic_derivations/README.md`](symbolic_derivations/README.md) and the
-[`experiment registry`](paper_locked/00_boundaries/EXPERIMENT_REGISTRY.md).
+See [current status](reports/CURRENT_STATUS.md) for progress and unresolved
+steps, or [README](README.md) to run the tests.
