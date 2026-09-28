@@ -1,0 +1,501 @@
+{
+ "experiment": "A60",
+ "classification": "SENSITIVITY_ONLY",
+ "points": [
+  {
+   "name": "baseline_r2.150_f1.050_T125C",
+   "design": "baseline",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.05e-09,
+   "ton_cmd_s": 1.8545530280878787e-08,
+   "p_a_w": 37.69088209521317,
+   "p_b_temperature_interpolated_w": 37.7404221495441,
+   "channel_loss_w": 24.702357367241113,
+   "missed_capacitive_w": 12.988524727972056,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 129.11285266234395
+  },
+  {
+   "name": "baseline_r2.150_f1.050_T25C",
+   "design": "baseline",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.05e-09,
+   "ton_cmd_s": 1.8203045122735152e-08,
+   "p_a_w": 31.206129151588936,
+   "p_b_temperature_interpolated_w": 31.235936309107537,
+   "channel_loss_w": 16.122959004909216,
+   "missed_capacitive_w": 15.08317014667972,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 127.91690950279481
+  },
+  {
+   "name": "baseline_r2.150_f1.150_R1.55mohm",
+   "design": "baseline",
+   "tj_c": null,
+   "rds_on_device_ohm": 0.0015500000000000002,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.15e-09,
+   "ton_cmd_s": 1.8356602738769073e-08,
+   "p_a_w": 33.07286882976342,
+   "p_b_temperature_interpolated_w": 33.25495505048852,
+   "channel_loss_w": 18.93695229744961,
+   "missed_capacitive_w": 14.135916532313809,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 128.27874020298714
+  },
+  {
+   "name": "baseline_r2.150_f1.150_T100C",
+   "design": "baseline",
+   "tj_c": 100.0,
+   "rds_on_device_ohm": 0.0018573288334545455,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.15e-09,
+   "ton_cmd_s": 1.8499927169986913e-08,
+   "p_a_w": 35.713545636353885,
+   "p_b_temperature_interpolated_w": 35.902684173494855,
+   "channel_loss_w": 22.39685417509902,
+   "missed_capacitive_w": 13.316691461254864,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 128.79409599269923
+  },
+  {
+   "name": "baseline_r2.150_f1.150_T125C",
+   "design": "baseline",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.15e-09,
+   "ton_cmd_s": 1.8590881956119947e-08,
+   "p_a_w": 37.4813537726924,
+   "p_b_temperature_interpolated_w": 37.67510740686872,
+   "channel_loss_w": 24.66357859537568,
+   "missed_capacitive_w": 12.817775177316724,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 129.10465595215672
+  },
+  {
+   "name": "baseline_r2.150_f1.150_T25C",
+   "design": "baseline",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.15e-09,
+   "ton_cmd_s": 1.8242855794958738e-08,
+   "p_a_w": 30.956821215018024,
+   "p_b_temperature_interpolated_w": 31.13210530860749,
+   "channel_loss_w": 16.08311837335244,
+   "missed_capacitive_w": 14.873702841665585,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 127.87534604536265
+  },
+  {
+   "name": "baseline_r2.150_f1.150_T60C",
+   "design": "baseline",
+   "tj_c": 60.0,
+   "rds_on_device_ohm": 0.0015519880020366597,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.15e-09,
+   "ton_cmd_s": 1.8356602738769073e-08,
+   "p_a_w": 33.08817712776541,
+   "p_b_temperature_interpolated_w": 33.26957257394311,
+   "channel_loss_w": 18.957937435242616,
+   "missed_capacitive_w": 14.130239692522796,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 128.27581093593597
+  },
+  {
+   "name": "baseline_r2.150_f1.250_T125C",
+   "design": "baseline",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.25e-09,
+   "ton_cmd_s": 1.864579551033698e-08,
+   "p_a_w": 37.44726800255425,
+   "p_b_temperature_interpolated_w": 37.85269337813107,
+   "channel_loss_w": 24.675716495504474,
+   "missed_capacitive_w": 12.771551507049782,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "peak_a": 129.1424686071634
+  },
+  {
+   "name": "baseline_r2.150_f1.250_T25C",
+   "design": "baseline",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 2.1500000000000002e-09,
+   "dead_time_fall_s": 1.25e-09,
+   "ton_cmd_s": 1.8295108603238e-08,
+   "p_a_w": 30.884399070914643,
+   "p_b_temperature_interpolated_w": 31.217503071477783,
+   "channel_loss_w": 16.083991724259416,
+   "missed_capacitive_w": 14.800407346655227,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "low_side_natural_zvs": [
+    false,
+    true,
+    true,
+    true
+   ],
+   "peak_a": 127.89925819183783
+  },
+  {
+   "name": "zvs_r1.950_f0.550_T125C",
+   "design": "zvs",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 5.500000000000001e-10,
+   "ton_cmd_s": 1.730234379254741e-08,
+   "p_a_w": 38.85189189528131,
+   "p_b_temperature_interpolated_w": 39.03823818516751,
+   "channel_loss_w": 38.26584564807136,
+   "missed_capacitive_w": 0.5860462472099468,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "peak_a": 220.02237553532368
+  },
+  {
+   "name": "zvs_r1.950_f0.550_T25C",
+   "design": "zvs",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 5.500000000000001e-10,
+   "ton_cmd_s": 1.6953706080115403e-08,
+   "p_a_w": 24.304428350672076,
+   "p_b_temperature_interpolated_w": 24.490759574006862,
+   "channel_loss_w": 23.526314207026193,
+   "missed_capacitive_w": 0.7781141436458847,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "peak_a": 215.82003250314756
+  },
+  {
+   "name": "zvs_r1.950_f0.650_R1.55mohm",
+   "design": "zvs",
+   "tj_c": null,
+   "rds_on_device_ohm": 0.0015500000000000002,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 6.5e-10,
+   "ton_cmd_s": 1.710440905428607e-08,
+   "p_a_w": 28.357780131263258,
+   "p_b_temperature_interpolated_w": 28.670537244169573,
+   "channel_loss_w": 28.169625391616112,
+   "missed_capacitive_w": 0.1881547396471451,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 217.08498815871738
+  },
+  {
+   "name": "zvs_r1.950_f0.650_T100C",
+   "design": "zvs",
+   "tj_c": 100.0,
+   "rds_on_device_ohm": 0.0018573288334545455,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 6.5e-10,
+   "ton_cmd_s": 1.7254787867435466e-08,
+   "p_a_w": 34.311445610159495,
+   "p_b_temperature_interpolated_w": 34.6414200097556,
+   "channel_loss_w": 34.156081059126436,
+   "missed_capacitive_w": 0.15536455103305877,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 218.8888435558335
+  },
+  {
+   "name": "zvs_r1.950_f0.650_T125C",
+   "design": "zvs",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 6.5e-10,
+   "ton_cmd_s": 1.734648753831232e-08,
+   "p_a_w": 38.317806279926714,
+   "p_b_temperature_interpolated_w": 38.65784482046243,
+   "channel_loss_w": 38.180065729323395,
+   "missed_capacitive_w": 0.13774055060331597,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 219.979951093491
+  },
+  {
+   "name": "zvs_r1.950_f0.650_T25C",
+   "design": "zvs",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 6.5e-10,
+   "ton_cmd_s": 1.6987350402163254e-08,
+   "p_a_w": 23.639478353597447,
+   "p_b_temperature_interpolated_w": 23.93770565485915,
+   "channel_loss_w": 23.42177241332058,
+   "missed_capacitive_w": 0.21770594027686702,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 215.67721015598252
+  },
+  {
+   "name": "zvs_r1.950_f0.650_T60C",
+   "design": "zvs",
+   "tj_c": 60.0,
+   "rds_on_device_ohm": 0.0015519880020366597,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 6.5e-10,
+   "ton_cmd_s": 1.710440905428607e-08,
+   "p_a_w": 28.392562046830836,
+   "p_b_temperature_interpolated_w": 28.704609326981,
+   "channel_loss_w": 28.2044324880116,
+   "missed_capacitive_w": 0.18812955881923432,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "peak_a": 217.08451183691236
+  },
+  {
+   "name": "zvs_r1.950_f0.750_T125C",
+   "design": "zvs",
+   "tj_c": 125.0,
+   "rds_on_device_ohm": 0.0020622062418952617,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 7.500000000000001e-10,
+   "ton_cmd_s": 1.7390797401758194e-08,
+   "p_a_w": 38.21388068924642,
+   "p_b_temperature_interpolated_w": 39.067249974342246,
+   "channel_loss_w": 38.16120859033869,
+   "missed_capacitive_w": 0.05267209890773806,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "peak_a": 219.89220684708928
+  },
+  {
+   "name": "zvs_r1.950_f0.750_T25C",
+   "design": "zvs",
+   "tj_c": 25.0,
+   "rds_on_device_ohm": 0.00130044063831692,
+   "dead_time_rise_s": 1.95e-09,
+   "dead_time_fall_s": 7.500000000000001e-10,
+   "ton_cmd_s": 1.704332108640818e-08,
+   "p_a_w": 23.50962570340014,
+   "p_b_temperature_interpolated_w": 24.17824134903866,
+   "channel_loss_w": 23.44046565320031,
+   "missed_capacitive_w": 0.06916005019983136,
+   "high_side_natural_zvs": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "low_side_natural_zvs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "peak_a": 215.72667239983844
+  }
+ ],
+ "tuned_difference_vs_tj": [
+  {
+   "tj_c": 25.0,
+   "zvs_p_b_w": 23.93770565485915,
+   "baseline_p_b_w": 31.13210530860749,
+   "zvs_minus_baseline_w": -7.194399653748338
+  },
+  {
+   "tj_c": 60.0,
+   "zvs_p_b_w": 28.704609326981,
+   "baseline_p_b_w": 33.26957257394311,
+   "zvs_minus_baseline_w": -4.564963246962108
+  },
+  {
+   "tj_c": 100.0,
+   "zvs_p_b_w": 34.6414200097556,
+   "baseline_p_b_w": 35.902684173494855,
+   "zvs_minus_baseline_w": -1.2612641637392557
+  },
+  {
+   "tj_c": 125.0,
+   "zvs_p_b_w": 38.65784482046243,
+   "baseline_p_b_w": 37.67510740686872,
+   "zvs_minus_baseline_w": 0.9827374135937106
+  }
+ ],
+ "break_even_tj_c_linear": 114.05150709874154
+}

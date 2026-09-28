@@ -271,3 +271,27 @@ showed that the project's EPC2067 "typical" RDS(on) (1.55 mOhm), Coss (1607
 pF) and Qoss (56 nC) are the MAX column; typical values are 1.3 mOhm,
 1071 pF and 37 nC. Only RDS(on) is used, and 1.55 mOhm equals the typical
 device at Tj ~ 60 C (A60). See `A59_nonlinear_coss_epc2067/RESULTS.md`.
+
+A60-A63 stress-test A59's tuned comparison with public data only, before
+any request to the advisor:
+
+- `A60_temperature_ron_sensitivity`: typical RDS(on)(Tj) = 1.3 mOhm times the
+  EPC2067 Fig. 9 factor. The advantage is -7.19 / -4.56 / -1.26 / +0.98 W
+  at Tj 25 / 60 / 100 / 125 C, reversing at ~114 C, because the
+  large-ripple design's loss is almost all conduction. The optima do not
+  move with temperature.
+- `A61_inductor_loss_break_even`: all solves have ~zero inductor
+  resistance. The advantage is erased by an equal winding DCR of 293 / 185
+  / 50 uOhm (skin-scaled 5 MHz ACR 263 / 166 / 45 uOhm) at Tj 25 / 60 /
+  100 C.
+- `A62_load_sweep_fixed_deadtime`: with 250 W-tuned fixed dead times, the
+  large-ripple design wins only above ~211 W (84% load). Its ~22 W
+  circulating-current floor stays at light load: 22.1 vs 11.8 W at 100 W
+  out. With ideal adaptive turn-on the crossover is still between 200 and
+  225 W.
+- `A63_flying_capacitor_sensitivity`: the advantage is -6.13 / -4.97 /
+  -4.58 / -4.17 W for Cfly = 1 / 2 / 3 / 6 uF, so the exact Cfly is not
+  blocking for this comparison.
+
+Together these say that A56-A59's rated-load advantage is a narrow,
+warm-device, full-load, low-inductor-loss result, not a design win.

@@ -1,0 +1,560 @@
+{
+ "experiment": "A62",
+ "classification": "SENSITIVITY_ONLY",
+ "points": {
+  "baseline": [
+   {
+    "power_w": 250.0,
+    "name": "baseline_r2.150_f1.150_P250W",
+    "ton_cmd_s": 1.8356602738769073e-08,
+    "load_power_w": 249.9625551428907,
+    "p_a_w": 33.07286882976342,
+    "p_b_w": 33.25495505048852,
+    "channel_loss_w": 18.936952297449615,
+    "missed_capacitive_w": 14.135916532313809,
+    "reverse_loss_w": 0.18719625390770678,
+    "efficiency_proxy": 0.8825970933339505,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     12.019009606131952,
+     12.156648243160006,
+     12.15544751745324,
+     12.332345242433217
+    ],
+    "low_residual_v": [
+     0.8874860678887114,
+     0.7321710601282835,
+     0.7426812731231517,
+     0.0
+    ],
+    "peak_a": 128.27874020298714
+   },
+   {
+    "power_w": 225.0,
+    "name": "baseline_r2.150_f1.150_P225W",
+    "ton_cmd_s": 1.8163302899221902e-08,
+    "load_power_w": 224.86011556840097,
+    "p_a_w": 28.145557950778816,
+    "p_b_w": 28.237677096982726,
+    "channel_loss_w": 16.06132648112754,
+    "missed_capacitive_w": 12.084231469651275,
+    "reverse_loss_w": 0.09451717869993317,
+    "efficiency_proxy": 0.8884933813139957,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     11.134341144493952,
+     11.251486468468421,
+     11.251858051789634,
+     11.146097763384144
+    ],
+    "low_residual_v": [
+     1.4500946113906197,
+     1.3041060425500866,
+     1.3130218195542758,
+     0.0
+    ],
+    "peak_a": 121.71641111233241
+   },
+   {
+    "power_w": 200.0,
+    "name": "baseline_r2.150_f1.150_P200W",
+    "ton_cmd_s": 1.7979022417795264e-08,
+    "load_power_w": 199.99992127649523,
+    "p_a_w": 23.76405578905335,
+    "p_b_w": 23.770956352450085,
+    "channel_loss_w": 13.504729133321145,
+    "missed_capacitive_w": 10.259326655732206,
+    "reverse_loss_w": 0.007011840598346418,
+    "efficiency_proxy": 0.8937710382977062,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     10.241881814239754,
+     10.339363823734121,
+     10.341376180090469,
+     9.973376892134526
+    ],
+    "low_residual_v": [
+     2.0116830508172394,
+     1.8748970028715037,
+     1.8824520432116507,
+     0.0
+    ],
+    "peak_a": 115.22729018537395
+   },
+   {
+    "power_w": 150.0,
+    "name": "baseline_r2.150_f1.150_P150W",
+    "ton_cmd_s": 1.759829696026226e-08,
+    "load_power_w": 149.99996110183832,
+    "p_a_w": 16.636858876238843,
+    "p_b_w": 16.636858876238843,
+    "channel_loss_w": 9.28965945480421,
+    "missed_capacitive_w": 7.347199421434634,
+    "reverse_loss_w": 0.0,
+    "efficiency_proxy": 0.9001609908610013,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     8.420237720330839,
+     8.48084351107882,
+     8.48596718673097,
+     7.655929841279115
+    ],
+    "low_residual_v": [
+     3.1554578504772763,
+     3.0375670749509904,
+     3.042820834740627,
+     1.311288192017955
+    ],
+    "peak_a": 102.25077219585921
+   },
+   {
+    "power_w": 100.0,
+    "name": "baseline_r2.150_f1.150_P100W",
+    "ton_cmd_s": 1.7216964701741154e-08,
+    "load_power_w": 99.99995424314751,
+    "p_a_w": 11.760884652550667,
+    "p_b_w": 11.760884652550667,
+    "channel_loss_w": 6.2898590875803135,
+    "missed_capacitive_w": 5.471025564970353,
+    "reverse_loss_w": 0.0,
+    "efficiency_proxy": 0.8947674341598704,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     6.547348528392661,
+     6.574790501651005,
+     6.581328901637637,
+     5.3476754299120195
+    ],
+    "low_residual_v": [
+     4.317868142311523,
+     4.2198800972645545,
+     4.223409418158144,
+     2.708552925973335
+    ],
+    "peak_a": 89.33110737174738
+   },
+   {
+    "power_w": 50.0,
+    "name": "baseline_r2.150_f1.150_P50W",
+    "ton_cmd_s": 1.6834828264069456e-08,
+    "load_power_w": 49.9999678816102,
+    "p_a_w": 9.14227850367811,
+    "p_b_w": 9.14227850367811,
+    "channel_loss_w": 4.487171864546128,
+    "missed_capacitive_w": 4.655106639131983,
+    "reverse_loss_w": 0.0,
+    "efficiency_proxy": 0.8454188993900608,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     4.638102292971851,
+     4.635089280175993,
+     4.641807463697024,
+     3.0144214752961176
+    ],
+    "low_residual_v": [
+     5.496092596926593,
+     5.418914567299887,
+     5.4214101619826955,
+     4.0960306514960685
+    ],
+    "peak_a": 76.42264773597879
+   },
+   {
+    "power_w": 25.0,
+    "name": "baseline_r2.150_f1.150_P25W",
+    "ton_cmd_s": 1.6635678013176042e-08,
+    "load_power_w": 24.97581414978531,
+    "p_a_w": 8.686055475969292,
+    "p_b_w": 8.686055475969292,
+    "channel_loss_w": 4.028732892653947,
+    "missed_capacitive_w": 4.657322583315345,
+    "reverse_loss_w": 0.0,
+    "efficiency_proxy": 0.7421468511750898,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     3.67445686984194,
+     3.657031627347749,
+     3.663747352214191,
+     1.8290339290558197
+    ],
+    "low_residual_v": [
+     6.09287182785125,
+     6.026294918515419,
+     6.028465711198608,
+     4.791286768309942
+    ],
+    "peak_a": 69.94131180595876
+   }
+  ],
+  "zvs": [
+   {
+    "power_w": 250.0,
+    "name": "zvs_r1.950_f0.650_P250W",
+    "ton_cmd_s": 1.710440905428607e-08,
+    "load_power_w": 249.92798743609794,
+    "p_a_w": 28.357780131263258,
+    "p_b_w": 28.670537244169573,
+    "channel_loss_w": 28.169625391616112,
+    "missed_capacitive_w": 0.18815473964714513,
+    "reverse_loss_w": 0.32231096007800053,
+    "efficiency_proxy": 0.8971167259815177,
+    "high_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     0.9241634336617679,
+     0.8733028160805105,
+     0.9008870166626295,
+     0.0
+    ],
+    "low_residual_v": [
+     1.2222984328580029,
+     0.9911083317448505,
+     1.0116137082312646,
+     0.0
+    ],
+    "peak_a": 217.08498815871738
+   },
+   {
+    "power_w": 225.0,
+    "name": "zvs_r1.950_f0.650_P225W",
+    "ton_cmd_s": 1.69556599265069e-08,
+    "load_power_w": 224.79982150221488,
+    "p_a_w": 26.175720218265063,
+    "p_b_w": 26.552623443917245,
+    "channel_loss_w": 25.969767322926383,
+    "missed_capacitive_w": 0.20595289533867903,
+    "reverse_loss_w": 0.38712272799145947,
+    "efficiency_proxy": 0.8944450545560021,
+    "high_side_natural_zvs": [
+     false,
+     true,
+     false,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     0.04288291940139999,
+     0.0,
+     0.007844948954826236,
+     0.0
+    ],
+    "low_residual_v": [
+     1.564842279231785,
+     1.3426932372923146,
+     1.359372152962442,
+     0.0
+    ],
+    "peak_a": 210.24700729486455
+   },
+   {
+    "power_w": 200.0,
+    "name": "zvs_r1.950_f0.650_P200W",
+    "ton_cmd_s": 1.6824272312197517e-08,
+    "load_power_w": 200.00009013486564,
+    "p_a_w": 24.33793377471593,
+    "p_b_w": 25.127352063538083,
+    "channel_loss_w": 24.034019276199583,
+    "missed_capacitive_w": 0.30391449851634583,
+    "reverse_loss_w": 0.8100201499502245,
+    "efficiency_proxy": 0.8883860542345546,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "high_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_residual_v": [
+     1.9012810871578154,
+     1.6881252222722922,
+     1.7010055348675661,
+     0.0
+    ],
+    "peak_a": 203.542658735237
+   },
+   {
+    "power_w": 150.0,
+    "name": "zvs_r1.950_f0.650_P150W",
+    "ton_cmd_s": 1.6569133535514257e-08,
+    "load_power_w": 150.00002867491972,
+    "p_a_w": 21.323038132998008,
+    "p_b_w": 23.105769895257215,
+    "channel_loss_w": 20.74616813894065,
+    "missed_capacitive_w": 0.5768699940573575,
+    "reverse_loss_w": 1.8362638536521296,
+    "efficiency_proxy": 0.8665222429660314,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_residual_v": [
+     2.5874245932416398,
+     2.3925209332600517,
+     2.3993492981253897,
+     0.6471435933443492
+    ],
+    "peak_a": 189.9717211292095
+   },
+   {
+    "power_w": 100.0,
+    "name": "zvs_r1.950_f0.650_P100W",
+    "ton_cmd_s": 1.6329569920237038e-08,
+    "load_power_w": 99.92205612959937,
+    "p_a_w": 19.257590464623174,
+    "p_b_w": 22.071498038739694,
+    "channel_loss_w": 18.291942819548417,
+    "missed_capacitive_w": 0.9656476450747582,
+    "reverse_loss_w": 2.9086545471134992,
+    "efficiency_proxy": 0.8191920440614627,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_residual_v": [
+     3.282889145495672,
+     3.106641898076574,
+     3.109211288683166,
+     1.5019005750215302
+    ],
+    "peak_a": 176.35178158506776
+   },
+   {
+    "power_w": 50.0,
+    "name": "zvs_r1.950_f0.650_P50W",
+    "ton_cmd_s": 1.611355004295318e-08,
+    "load_power_w": 49.97204523489294,
+    "p_a_w": 18.166852781639207,
+    "p_b_w": 22.043596796490466,
+    "channel_loss_w": 16.700214848012866,
+    "missed_capacitive_w": 1.4666379336263404,
+    "reverse_loss_w": 4.0209304294110195,
+    "efficiency_proxy": 0.6940242051106991,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_residual_v": [
+     3.9803856917428426,
+     3.8232561920768093,
+     3.8230911550166353,
+     2.347139843764271
+    ],
+    "peak_a": 162.82707244038366
+   },
+   {
+    "power_w": 25.0,
+    "name": "zvs_r1.950_f0.650_P25W",
+    "ton_cmd_s": 1.601173683072897e-08,
+    "load_power_w": 24.994121000802245,
+    "p_a_w": 17.981359042418763,
+    "p_b_w": 22.399119220361257,
+    "channel_loss_w": 16.221851493693098,
+    "missed_capacitive_w": 1.7595075487256646,
+    "reverse_loss_w": 4.5897744817305135,
+    "efficiency_proxy": 0.5274359610728957,
+    "high_side_natural_zvs": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "low_side_natural_zvs": [
+     false,
+     false,
+     false,
+     false
+    ],
+    "high_residual_v": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "low_residual_v": [
+     4.330626973781545,
+     4.183277084875594,
+     4.182193393175399,
+     2.767612304351602
+    ],
+    "peak_a": 156.0817930184536
+   }
+  ]
+ },
+ "difference": [
+  {
+   "power_w": 250.0,
+   "zvs_minus_baseline_w": -4.584417806318946
+  },
+  {
+   "power_w": 225.0,
+   "zvs_minus_baseline_w": -1.6850536530654807
+  },
+  {
+   "power_w": 200.0,
+   "zvs_minus_baseline_w": 1.3563957110879983
+  },
+  {
+   "power_w": 150.0,
+   "zvs_minus_baseline_w": 6.468911019018371
+  },
+  {
+   "power_w": 100.0,
+   "zvs_minus_baseline_w": 10.310613386189027
+  },
+  {
+   "power_w": 50.0,
+   "zvs_minus_baseline_w": 12.901318292812356
+  },
+  {
+   "power_w": 25.0,
+   "zvs_minus_baseline_w": 13.713063744391965
+  }
+ ],
+ "crossover_power_w_linear": 211.1492544235199,
+ "note": "225 W points were added after the declared grid to locate the crossover"
+}

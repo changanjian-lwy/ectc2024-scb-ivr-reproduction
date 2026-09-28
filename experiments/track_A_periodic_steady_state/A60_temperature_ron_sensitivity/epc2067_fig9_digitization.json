@@ -1,0 +1,17 @@
+{
+ "source": "EPC EPC2067 datasheet Fig. 9, typical normalized RDS(on) vs TJ, ID = 37 A, VGS = 5 V",
+ "category": "EXTERNAL_DEVICE_DATA",
+ "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/epc2067_datasheet.pdf",
+ "revision": "Revised October 21, 2021",
+ "sha256": "8271d9eb71a3f78285c4c024ccfd06c33af129583c1bdef484d7dde01ae2324f",
+ "tick_fit_max_residual": {
+  "x_pt": 1.1523383004325751,
+  "y_pt": 0.5267987932479627
+ },
+ "normalized_at_25c": 1.0003357207538777,
+ "printed_rds_on_25c": {
+  "typ_mohm": 1.3,
+  "max_mohm": 1.55,
+  "note": "1.55 mOhm is the MAX column; typical is 1.3 mOhm"
+ }
+}
