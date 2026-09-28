@@ -254,3 +254,20 @@ source-side balance to 0.01 W. The optimum is near-ZVS: it turns on at
 for most of the reverse conduction. The advantage holds for falling-edge
 errors from -0.1 to about +0.35 ns. Magnetic loss, nonlinear Coss and other
 loads remain open. See `A58_asymmetric_fixed_deadtime_tuning/RESULTS.md`.
+
+`A59_nonlinear_coss_epc2067` replaces the constant Co(tr) with EPC2067's
+datasheet Coss(V), digitized from Fig. 5a. The digitized curve reproduces
+the printed Q(20 V), Co(tr), Co(er) and Coss(20 V) within 1%. The stepper is
+charge-based backward Euler with a per-step Newton solve. It is installed by
+object identity without editing the solver files, and it reproduces the
+linear solver to 5.8e-12 when given a linear charge model. The dead times
+were re-tuned on a 52-point grid centered on the new transition times. The
+tuned large-ripple design (1.95/0.65 ns) reaches 28.67 W and the tuned
+baseline (2.15/1.15 ns) 33.26 W, a -4.58 W difference (A58: -2.70 W). The
+real curve makes the baseline's 12 V hard turn-on 28% costlier per device
+(Qoss*V - Eoss vs 1/2 CV^2). The result is step-converged and confirmed by
+an extrapolated source-side balance to 0.01 W. Reading the datasheet also
+showed that the project's EPC2067 "typical" RDS(on) (1.55 mOhm), Coss (1607
+pF) and Qoss (56 nC) are the MAX column; typical values are 1.3 mOhm,
+1071 pF and 37 nC. Only RDS(on) is used, and 1.55 mOhm equals the typical
+device at Tj ~ 60 C (A60). See `A59_nonlinear_coss_epc2067/RESULTS.md`.

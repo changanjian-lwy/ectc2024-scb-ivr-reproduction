@@ -1,0 +1,389 @@
+{
+ "experiment": "A59",
+ "classification": "SENSITIVITY_ONLY",
+ "design": "zvs",
+ "coss_model_id": "fig5a_pchip",
+ "phase_inductance_h": 6.274059728342265e-10,
+ "dead_time_rise_s": 2.2500000000000003e-09,
+ "dead_time_fall_s": 5.500000000000001e-10,
+ "coarse_step_s": 6.25e-11,
+ "sub_step_s": 5e-12,
+ "seed": "zvs_r2.250_f0.650.json",
+ "seed_ton_cmd_s": 1.6958877145713222e-08,
+ "status": "REGULATED_TO_250W",
+ "trials": [
+  {
+   "iteration": 0,
+   "ton_cmd_s": 1.6958877145713222e-08,
+   "choice_reason": "replay of the seed",
+   "seed_ton_cmd_s": 1.6958877145713222e-08,
+   "outcome": "success",
+   "converged": true,
+   "stalled_reason": null,
+   "relative_residual": 7.034077981341672e-12,
+   "iterations_used": 3,
+   "solver_probe_safety": {
+    "limit_a": 250.0,
+    "evaluations": 43,
+    "maximum_abs_phase_current_a": 217.7872832890563,
+    "within_limit": true
+   },
+   "z_star": [
+    48.0,
+    47.941412397609355,
+    47.948711728196244,
+    36.0,
+    24.0,
+    12.0,
+    47.99750832118072,
+    23.768830186031995,
+    11.7328533230775,
+    12.29209868657951,
+    0.0048681979414907485,
+    -0.03703586964803523,
+    -0.08106656466189274,
+    1.002163133271209,
+    5.858760239060135,
+    -62.911082746426494,
+    -9.455002610569212,
+    71.67547111000756,
+    156.89648103665772,
+    -5.858760239060158
+   ],
+   "power_relative_error": 0.004512891954190579,
+   "h": 0.00225390593112218,
+   "accepted_orbit_current_screen_pass": true,
+   "wall_time_s": 119.74651384353638,
+   "power_w": 251.12822298854766
+  },
+  {
+   "iteration": 1,
+   "ton_cmd_s": 1.692073939084123e-08,
+   "choice_reason": "first step: Ton/(1+h) (Vout proportional to Ton model)",
+   "seed_ton_cmd_s": 1.6958877145713222e-08,
+   "outcome": "success",
+   "converged": true,
+   "stalled_reason": null,
+   "relative_residual": 2.970302629545574e-11,
+   "iterations_used": 3,
+   "solver_probe_safety": {
+    "limit_a": 250.0,
+    "evaluations": 43,
+    "maximum_abs_phase_current_a": 217.2030079258487,
+    "within_limit": true
+   },
+   "z_star": [
+    48.0,
+    47.94168714463192,
+    47.94895360071673,
+    36.0,
+    24.0,
+    12.0,
+    47.997648397531286,
+    23.769429861923257,
+    11.73304761235402,
+    12.291040168957696,
+    0.004869239063562583,
+    -0.03693546010293493,
+    -0.0808577737198836,
+    0.9997922331016215,
+    5.831285536812184,
+    -62.780104266149614,
+    -9.456636724248758,
+    71.48091824769875,
+    156.49245557783928,
+    -5.8312855368121985
+   ],
+   "power_relative_error": -0.000233716249036231,
+   "h": -0.00011686495322671409,
+   "accepted_orbit_current_screen_pass": true,
+   "wall_time_s": 131.6942799091339,
+   "power_w": 249.94157093774095
+  }
+ ],
+ "full_boundary": {
+  "vin_target_v": 48.0,
+  "vout_target_v": 1.0,
+  "module_power_w": 250.0,
+  "phases": 4,
+  "switching_frequency_hz": 5000000.0,
+  "input_ramp_s": 2.287e-05,
+  "phase_inductance_h": 6.274059728342265e-10,
+  "phase_inductor_resistance_ohm": 1e-06,
+  "flying_capacitances_f": [
+   3e-06,
+   3e-06,
+   3e-06
+  ],
+  "output_capacitance_f": 0.004672,
+  "divider_enabled": true,
+  "divider_capacitance_f": 0.0003,
+  "divider_leakage_ohm": 1000000000.0,
+  "source_inductance_h": 5e-09,
+  "source_resistance_ohm": 0.01,
+  "switch_on_resistance_ohm": 0.000775,
+  "switch_off_resistance_ohm": 1000000000000.0,
+  "diode_on_resistance_ohm": 0.001,
+  "diode_off_resistance_ohm": 1000000000000.0,
+  "dead_time_s": 1.4000000000000001e-09,
+  "switch_capacitance": {
+   "high_device_f": 3.72e-09,
+   "low_device_f": 5.58e-09,
+   "high_snubber_f": 0.0,
+   "low_snubber_f": 0.0,
+   "device_evidence": "EXTERNAL_DEVICE_DATA",
+   "snubber_evidence": "EXPLORATORY_ASSUMPTION"
+  },
+  "evidence": "CROSS_PAPER_EXTENSION",
+  "high_side_on_resistance_ohm": 0.000775,
+  "low_side_on_resistance_ohm": 0.0005166666666666667,
+  "ton_cmd_s": 1.692073939084123e-08,
+  "dead_time_rise_s": 2.2500000000000003e-09,
+  "dead_time_fall_s": 5.500000000000001e-10,
+  "coss_model_id": "fig5a_pchip",
+  "on_time_s_effective_property": 1.692073939084123e-08,
+  "load_resistance_ohm": 0.004,
+  "duty_property_unused": 0.08333333333333333
+ },
+ "regulated": {
+  "ton_cmd_s": 1.692073939084123e-08,
+  "z_star": [
+   48.0,
+   47.94168714463192,
+   47.94895360071673,
+   36.0,
+   24.0,
+   12.0,
+   47.997648397531286,
+   23.769429861923257,
+   11.73304761235402,
+   12.291040168957696,
+   0.004869239063562583,
+   -0.03693546010293493,
+   -0.0808577737198836,
+   0.9997922331016215,
+   5.831285536812184,
+   -62.780104266149614,
+   -9.456636724248758,
+   71.48091824769875,
+   156.49245557783928,
+   -5.8312855368121985
+  ],
+  "load_power_w": 249.94157093774095,
+  "power_relative_error": -0.000233716249036231,
+  "relative_residual": 2.970302629545574e-11,
+  "high_side_natural_zvs": [
+   true,
+   true,
+   true,
+   true
+  ],
+  "low_side_natural_zvs": [
+   false,
+   false,
+   false,
+   false
+  ],
+  "maximum_abs_phase_current_a": 217.2010359266231,
+  "max_probe_abs_current_a": 217.7872832890563
+ },
+ "accounting": {
+  "channel_loss_w": 28.25857110536617,
+  "missed_capacitive_w": 0.6469230008194865,
+  "hard_events": [
+   {
+    "side": "low",
+    "phase_index": 0,
+    "residual_v": 2.743279345601046,
+    "orbit_window_energy_j": 1.927924883382551e-08,
+    "coarse_rung_reproduces_orbit": true,
+    "h_to_zero_energy_j": 6.596862425116274e-08,
+    "missed_j": 4.668937541733723e-08,
+    "half_c_struct_v2_j": 4.8991536007688476e-08
+   },
+   {
+    "side": "low",
+    "phase_index": 1,
+    "residual_v": 2.4915235808085145,
+    "orbit_window_energy_j": 2.0160892785302824e-08,
+    "coarse_rung_reproduces_orbit": true,
+    "h_to_zero_energy_j": 5.8933264536963336e-08,
+    "missed_j": 3.877237175166051e-08,
+    "half_c_struct_v2_j": 4.0412060296748984e-08
+   },
+   {
+    "side": "low",
+    "phase_index": 2,
+    "residual_v": 2.5071289917243935,
+    "orbit_window_energy_j": 2.0214775630864604e-08,
+    "coarse_rung_reproduces_orbit": true,
+    "h_to_zero_energy_j": 5.957337277921483e-08,
+    "missed_j": 3.9358597148350226e-08,
+    "half_c_struct_v2_j": 4.091987953525378e-08
+   },
+   {
+    "side": "low",
+    "phase_index": 3,
+    "residual_v": 0.8687729872435349,
+    "orbit_window_energy_j": 1.605354174256023e-08,
+    "coarse_rung_reproduces_orbit": true,
+    "h_to_zero_energy_j": 2.0617797589109553e-08,
+    "missed_j": 4.5642558465493235e-09,
+    "half_c_struct_v2_j": 3.509664240642857e-09
+   }
+  ],
+  "p_a_w": 28.905494106185657,
+  "p_b_w": {
+   "fig8_25C": 29.564431875062272,
+   "fig8_125C": 29.54862234060292,
+   "table_floor_1p2V": 29.245117861246182
+  },
+  "recharge_estimate_w": {
+   "fig8_25C": 0.6747270401070192,
+   "fig8_125C": 0.64222048121079,
+   "table_floor_1p2V": 0.1872
+  },
+  "ron_credit_in_remainders_w": 0.014228806206838682,
+  "reverse_loss_w": {
+   "fig8_25C": 0.6731665750834543,
+   "fig8_125C": 0.6573570406240985,
+   "table_floor_1p2V": 0.35385256126736375
+  },
+  "reverse_events": [
+   {
+    "side": "high",
+    "phase_index": 0,
+    "duration_ns": 0.12738828998346627,
+    "branch_mean_current_a": 58.991706610269055,
+    "per_device_current_a": 29.495853305134528,
+    "vsd_v": 2.275080083847182,
+    "reverse_loss_w": 0.08548445773832929,
+    "ron_loss_replaced_w": 0.0017642290472384798
+   },
+   {
+    "side": "high",
+    "phase_index": 1,
+    "duration_ns": 0.13932080105062045,
+    "branch_mean_current_a": 59.0072148636348,
+    "per_device_current_a": 29.5036074318174,
+    "vsd_v": 2.2751325329746295,
+    "reverse_loss_w": 0.09351855425736154,
+    "ron_loss_replaced_w": 0.0019337528690023063
+   },
+   {
+    "side": "high",
+    "phase_index": 2,
+    "duration_ns": 0.13369479205695686,
+    "branch_mean_current_a": 58.774912341349335,
+    "per_device_current_a": 29.387456170674668,
+    "vsd_v": 2.274352916616528,
+    "reverse_loss_w": 0.08935818531986284,
+    "ron_loss_replaced_w": 0.0018433152255550196
+   },
+   {
+    "side": "high",
+    "phase_index": 3,
+    "duration_ns": 0.5620186351998683,
+    "branch_mean_current_a": 62.954749019687846,
+    "per_device_current_a": 31.477374509843923,
+    "vsd_v": 2.2882162012041474,
+    "reverse_loss_w": 0.4048053777679007,
+    "ron_loss_replaced_w": 0.008687509065042875
+   }
+  ],
+  "transitions": [
+   {
+    "side": "high",
+    "phase_index": 0,
+    "natural": true,
+    "window_s": 2.2500000000015455e-09,
+    "transition_s": 2.1226117100180792e-09,
+    "residual_reverse_s": 1.2738828998346626e-10,
+    "residual_v": 0.0
+   },
+   {
+    "side": "high",
+    "phase_index": 1,
+    "natural": true,
+    "window_s": 2.2500000000015455e-09,
+    "transition_s": 2.110679198950925e-09,
+    "residual_reverse_s": 1.3932080105062044e-10,
+    "residual_v": 0.0
+   },
+   {
+    "side": "high",
+    "phase_index": 2,
+    "natural": true,
+    "window_s": 2.2500000000015455e-09,
+    "transition_s": 2.1163052079445886e-09,
+    "residual_reverse_s": 1.3369479205695687e-10,
+    "residual_v": 0.0
+   },
+   {
+    "side": "high",
+    "phase_index": 3,
+    "natural": true,
+    "window_s": 2.2500000000015455e-09,
+    "transition_s": 1.6879813648016772e-09,
+    "residual_reverse_s": 5.620186351998682e-10,
+    "residual_v": 0.0
+   },
+   {
+    "side": "low",
+    "phase_index": 0,
+    "natural": false,
+    "window_s": 5.499999999978179e-10,
+    "transition_s": null,
+    "residual_reverse_s": 0.0,
+    "residual_v": 2.743279345601046
+   },
+   {
+    "side": "low",
+    "phase_index": 1,
+    "natural": false,
+    "window_s": 5.499999999978179e-10,
+    "transition_s": null,
+    "residual_reverse_s": 0.0,
+    "residual_v": 2.4915235808085145
+   },
+   {
+    "side": "low",
+    "phase_index": 2,
+    "natural": false,
+    "window_s": 5.499999999978179e-10,
+    "transition_s": null,
+    "residual_reverse_s": 0.0,
+    "residual_v": 2.5071289917243935
+   },
+   {
+    "side": "low",
+    "phase_index": 3,
+    "natural": false,
+    "window_s": 5.499999999978179e-10,
+    "transition_s": null,
+    "residual_reverse_s": 0.0,
+    "residual_v": 0.8687729872435349
+   }
+  ],
+  "exposure_a": 0.2948771343894699,
+  "source_minus_load_coarse_w": 31.58794682886105,
+  "energy_balance": {
+   "source_w": 281.52951776660115,
+   "dissipation_w": 278.5901087510827,
+   "channel_w": 28.25857110536617,
+   "load_w": 249.9415709377401,
+   "numerical_w": 2.8681830275839,
+   "numerical_in_event_windows_w": 0.0,
+   "other_resistive_w": 0.3899667079764413,
+   "stored_energy_change_per_period_w": 6.039613253960852e-07,
+   "identity_residual_w": 0.07122538397321021,
+   "numerical_outside_event_windows_w": 2.8681830275839
+  }
+ },
+ "newton_stats": {
+  "steps": 625535,
+  "iterations": 1474460,
+  "max_iterations": 3
+ },
+ "wall_time_s": 320.33580207824707
+}

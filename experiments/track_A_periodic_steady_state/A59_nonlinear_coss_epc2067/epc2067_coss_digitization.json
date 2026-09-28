@@ -1,0 +1,26 @@
+{
+ "source": "EPC EPC2067 datasheet, Fig. 5a (Coss, linear) and Fig. 6 (Qoss, Eoss), VGS = 0 V, typical, per device",
+ "category": "EXTERNAL_DEVICE_DATA",
+ "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/epc2067_datasheet.pdf",
+ "revision": "Revised October 21, 2021",
+ "sha256": "8271d9eb71a3f78285c4c024ccfd06c33af129583c1bdef484d7dde01ae2324f",
+ "method": "PDF vector Bezier paths; axis maps least-squares on tick labels",
+ "tick_fit_max_residual_pt": {
+  "fig5a_x": 0.7103614807129048,
+  "fig5a_y": 8.526512829121202e-14,
+  "fig6_x": 1.0162845187717124,
+  "fig6_left": 3.410605131648481e-13,
+  "fig6_right": 1.1368683772161603e-13
+ },
+ "fig6_right_axis_labels_excluded": [
+  0.34
+ ],
+ "fig6_right_axis_note": "label printed '0.34' on an evenly spaced 0.18 uJ axis (0.36 intended); excluded from the fit",
+ "printed_typical_values": {
+  "coss_20v_pf": 1071,
+  "co_tr_0_20v_pf": 1860,
+  "co_er_0_20v_pf": 1597,
+  "qoss_20v_nc": 37
+ },
+ "printed_note": "Coss 1607 pF and Qoss 56 nC are the MAX column, not typical"
+}
