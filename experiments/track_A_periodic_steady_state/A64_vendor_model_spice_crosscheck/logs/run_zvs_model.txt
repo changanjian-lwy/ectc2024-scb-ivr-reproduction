@@ -1,0 +1,84 @@
+18:59:01 === zvs R1.0_T60 stages=modelcheck,coss,static
+18:59:04   qcap C=2n step 2p: Q(2,5,8 V) = [4.000000003999372, 9.9995, 9.9995] nC (expected 4/10/16)
+18:59:05   qcap C=2n step 0.2p: Q(2,5,8 V) = [4.000000003992775, 9.9995, 9.9995] nC (expected 4/10/16)
+18:59:06   qcap Q=2n*x step 2p: Q(2,5,8 V) = [4.000000003998962, 9.9995, 9.9995] nC (expected 4/10/16)
+18:59:08   qcap Q=2n*x step 0.2p: Q(2,5,8 V) = [4.000000003997658, 9.9995, 9.9995] nC (expected 4/10/16)
+18:59:09   qcap Q=2n*v(d) step 2p: Q(2,5,8 V) = [3.195038780806004, 5.183467502844038, 6.347991353137257] nC (expected 4/10/16)
+18:59:10   qcap Q=2n*v(d) step 0.2p: Q(2,5,8 V) = [0.8632436465878636, 1.088039795134163, 1.1916915474818763] nC (expected 4/10/16)
+18:59:12   output ramp EPC2067 0.1 A step 20p: Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+18:59:13   output ramp EPC2067 1.0 A step 2p: Q(1,6,12,20 V) = 2.09, 10.24, 19.08, 28.74 nC
+18:59:16   output ramp EPC2067 1.0 A step 0.2p: Q(1,6,12,20 V) = 1.00, 5.29, 9.88, 15.34 nC
+18:59:18   gate ramp EPC2067 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 0 pF
+18:59:19   gate ramp EPC2067 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 0 pF
+18:59:21   output ramp EPC2067X 0.1 A step 20p: Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+18:59:22   output ramp EPC2067X 1.0 A step 2p: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+18:59:25   output ramp EPC2067X 1.0 A step 0.2p: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+18:59:26   gate ramp EPC2067X 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 0 pF
+18:59:27   gate ramp EPC2067X 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 0 pF
+18:59:31   coss: C(0)=2440 pF C(12)=1808 pF C(20)=1071 pF Q(12)=26.44 nC E(12)=151.3 nJ Q(20)=37.22 nC; 25 C vs 60 C max rel diff 1.9e-04
+18:59:36   static T=25 Vgs=5.0 I=10 -> Vds=0.0126338656217 R=1.2634 mOhm
+18:59:36   static T=25 Vgs=5.0 I=25 -> Vds=0.0318051010239 R=1.2722 mOhm
+18:59:36   static T=25 Vgs=5.0 I=50 -> Vds=0.0643878370052 R=1.2878 mOhm
+18:59:36   static T=25 Vgs=5.0 I=75 -> Vds=0.0978352487892 R=1.3045 mOhm
+18:59:36   static T=25 Vgs=5.0 I=100 -> Vds=0.13224766793 R=1.3225 mOhm
+18:59:36   static T=25 Vgs=0.0 I=-10 -> Vds=-2.09969306381
+18:59:36   static T=25 Vgs=0.0 I=-25 -> Vds=-2.23372286631
+18:59:36   static T=25 Vgs=0.0 I=-50 -> Vds=-2.39137989077
+18:59:36   static T=25 Vgs=0.0 I=-75 -> Vds=-2.53085398907
+18:59:36   static T=25 Vgs=0.0 I=-100 -> Vds=-2.664094126
+18:59:36   static T=60 Vgs=5.0 I=10 -> Vds=0.0150477819791 R=1.5048 mOhm
+18:59:36   static T=60 Vgs=5.0 I=25 -> Vds=0.0379013594258 R=1.5161 mOhm
+18:59:36   static T=60 Vgs=5.0 I=50 -> Vds=0.0768063960159 R=1.5361 mOhm
+18:59:36   static T=60 Vgs=5.0 I=75 -> Vds=0.116847623543 R=1.5580 mOhm
+18:59:36   static T=60 Vgs=5.0 I=100 -> Vds=0.158181721512 R=1.5818 mOhm
+18:59:36   static T=60 Vgs=0.0 I=-10 -> Vds=-2.06025151789
+18:59:36   static T=60 Vgs=0.0 I=-25 -> Vds=-2.20467484561
+18:59:36   static T=60 Vgs=0.0 I=-50 -> Vds=-2.38205272712
+18:59:36   static T=60 Vgs=0.0 I=-75 -> Vds=-2.54251529978
+18:59:36   static T=60 Vgs=0.0 I=-100 -> Vds=-2.69676674246
+19:00:37 === zvs R1.0_T60 stages=modelcheck
+19:00:40   qcap C=2n step 2p: Q(2,5,8 V) = [4.000000003999372, 9.9995, 9.9995] nC (expected 4/10/16)
+19:00:41   qcap C=2n step 0.2p: Q(2,5,8 V) = [4.000000003992775, 9.9995, 9.9995] nC (expected 4/10/16)
+19:00:43   qcap Q=2n*x step 2p: Q(2,5,8 V) = [4.000000003998962, 9.9995, 9.9995] nC (expected 4/10/16)
+19:00:44   qcap Q=2n*x step 0.2p: Q(2,5,8 V) = [4.000000003997658, 9.9995, 9.9995] nC (expected 4/10/16)
+19:00:45   qcap Q=2n*v(d) step 2p: Q(2,5,8 V) = [3.195038780806004, 5.183467502844038, 6.347991353137257] nC (expected 4/10/16)
+19:00:47   qcap Q=2n*v(d) step 0.2p: Q(2,5,8 V) = [0.8632436465878636, 1.088039795134163, 1.1916915474818763] nC (expected 4/10/16)
+19:00:49   output ramp EPC2067 0.1 A step 20p: Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+19:00:51   output ramp EPC2067 1.0 A step 2p: Q(1,6,12,20 V) = 2.09, 10.24, 19.08, 28.74 nC
+19:00:54   output ramp EPC2067 1.0 A step 0.2p: Q(1,6,12,20 V) = 1.00, 5.29, 9.88, 15.34 nC
+19:00:56   gate ramp EPC2067 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 2050 pF
+19:00:57   gate ramp EPC2067 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 870 pF
+19:00:59   output ramp EPC2067X 0.1 A step 20p: Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+19:01:01   output ramp EPC2067X 1.0 A step 2p: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:01:04   output ramp EPC2067X 1.0 A step 0.2p: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:01:05   gate ramp EPC2067X 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 2050 pF
+19:01:07   gate ramp EPC2067X 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 870 pF
+19:05:45 === zvs R1.0_T60 stages=modelcheck
+19:05:48   qcap C=2n step 2p: Q(2,5,8 V) = [4.000000003999372, 9.9995, 9.9995] nC (expected 4/10/16)
+19:05:49   qcap C=2n step 0.2p: Q(2,5,8 V) = [4.000000003992775, 9.9995, 9.9995] nC (expected 4/10/16)
+19:05:50   qcap Q=2n*x step 2p: Q(2,5,8 V) = [4.000000003998962, 9.9995, 9.9995] nC (expected 4/10/16)
+19:05:51   qcap Q=2n*x step 0.2p: Q(2,5,8 V) = [4.000000003997658, 9.9995, 9.9995] nC (expected 4/10/16)
+19:05:53   qcap Q=2n*v(d) step 2p: Q(2,5,8 V) = [3.195038780806004, 5.183467502844038, 6.347991353137257] nC (expected 4/10/16)
+19:05:54   qcap Q=2n*v(d) step 0.2p: Q(2,5,8 V) = [0.8632436465878636, 1.088039795134163, 1.1916915474818763] nC (expected 4/10/16)
+19:05:56   output ramp EPC2067 0.1 A step 20p : Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+19:05:58   output ramp EPC2067 1.0 A step 2p : Q(1,6,12,20 V) = 2.09, 10.24, 19.08, 28.74 nC
+19:06:01   output ramp EPC2067 1.0 A step 0.2p : Q(1,6,12,20 V) = 1.00, 5.29, 9.88, 15.34 nC
+19:06:03   output ramp EPC2067 1.0 A step 2p reltol=1e-4: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:06   output ramp EPC2067 1.0 A step 0.2p reltol=1e-4: Q(1,6,12,20 V) = 2.08, 10.24, 19.09, 28.76 nC
+19:06:08   output ramp EPC2067 1.0 A step 2p reltol=1e-5: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:10   gate ramp EPC2067 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 2182 pF
+19:06:11   gate ramp EPC2067 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 2182 pF
+19:06:13   gate ramp EPC2067 0.1 A step 20p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.14 nC
+19:06:15   gate ramp EPC2067 1.0 A step 2p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.13 nC
+19:06:18   gate ramp EPC2067 1.0 A step 0.2p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.13 nC
+19:06:20   output ramp EPC2067X 0.1 A step 20p : Q(1,6,12,20 V) = 2.44, 14.11, 26.44, 37.22 nC
+19:06:22   output ramp EPC2067X 1.0 A step 2p : Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:24   output ramp EPC2067X 1.0 A step 0.2p : Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:26   output ramp EPC2067X 1.0 A step 2p reltol=1e-4: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:29   output ramp EPC2067X 1.0 A step 0.2p reltol=1e-4: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:30   output ramp EPC2067X 1.0 A step 2p reltol=1e-5: Q(1,6,12,20 V) = 2.43, 14.10, 26.43, 37.22 nC
+19:06:32   gate ramp EPC2067X 0.1 A step 20p: Ciss(0-0.5 V, Vds 20 V) = 2182 pF
+19:06:33   gate ramp EPC2067X 1.0 A step 2p: Ciss(0-0.5 V, Vds 20 V) = 2182 pF
+19:06:35   gate ramp EPC2067X 0.1 A step 20p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.14 nC
+19:06:37   gate ramp EPC2067X 1.0 A step 2p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.13 nC
+19:06:40   gate ramp EPC2067X 1.0 A step 0.2p (Vds 0): Qg(1, 2.5, 5 V) = 2.45, 6.87, 15.13 nC

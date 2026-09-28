@@ -1,0 +1,9 @@
+19:00:37 === baseline R1.0_T60 stages=center,sweep,repair,extend_fall,step,decomp,literal,brute
+19:00:37 centre search baseline_R1.0_T60_r4.300_f3.500_centre_search
+19:01:11   [bcs c0] Ton=18.3566 dr=4.300 df=3.500 n=20 Pout=227.513 Pcorr=33.531 dPc=+0.606 dE/T=-39.69 rel=2.46e-01(i_l2) cdt r/f=2.147/1.348 wall=33s
+19:01:42   [bcs c1] Ton=18.7566 dr=4.302 df=3.401 n=16 Pout=228.929 Pcorr=47.527 dPc=-0.530 dE/T=28.53 rel=3.49e-02(i_l2) cdt r/f=2.124/1.116 wall=31s
+19:02:14   [bcs c2] Ton=19.1566 dr=4.315 df=3.416 n=16 Pout=240.070 Pcorr=47.781 dPc=-0.404 dE/T=22.60 rel=2.59e-02(i_l2) cdt r/f=2.137/1.101 wall=32s
+19:02:44   [bcs c3] Ton=19.4849 dr=4.327 df=3.440 n=16 Pout=248.574 Pcorr=49.013 dPc=-0.419 dE/T=23.35 rel=2.46e-02(i_l2) cdt r/f=2.149/1.094 wall=30s
+19:03:15   [bcs c4] Ton=19.5113 dr=4.328 df=3.469 n=16 Pout=251.320 Pcorr=45.800 dPc=-0.094 dE/T=5.19 rel=7.06e-03(i_l2) cdt r/f=2.154/1.135 wall=31s
+19:03:15   centre search CHANNEL_MATCHED: dr=4.3276 df=3.4685 ns
+19:03:15 solve baseline_R1.0_T60_r4.350_f3.450 (center) from Ton=19.5113 ns origin=35.0 ns

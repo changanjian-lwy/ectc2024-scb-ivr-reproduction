@@ -1,0 +1,50 @@
+{
+ "source_record": "baseline_R1.0_T60_r4.050_f2.950.json",
+ "design": "baseline",
+ "case": "R1.0_T60",
+ "vth_knee_v": 2.05578,
+ "edges": [
+  {
+   "edge": "rise",
+   "csv": "baseline_R1.0_T60_phase1_rise.csv",
+   "outgoing": "low",
+   "incoming": "high",
+   "inductor_current_at_cmd_off_a": 3.204181830620185,
+   "outgoing_vds_0p5V_after_cmd_ns": 5.874110440237664,
+   "outgoing_vds_90pct_after_cmd_ns": 7.120723127495931,
+   "outgoing_excess_before_vds_0p5V_j": 8.832722195757124e-10,
+   "outgoing_excess_vds_0p5V_to_90pct_j": 3.859217587069402e-07,
+   "outgoing_excess_after_90pct_j": 8.021103766037733e-08,
+   "outgoing_group_current_at_vds_0p5V_a": 25.631665748807773,
+   "channel_timing": {
+    "channel_off_s": 3.647932856972208e-07,
+    "channel_on_s": 3.6667125062495205e-07,
+    "channel_dead_time_s": 1.8779649277312457e-09,
+    "turn_off_delay_s": 3.843285697220789e-09,
+    "turn_on_delay_s": 1.6712506249520481e-09,
+    "vds_in_at_channel_on_v": 12.037720893427398
+   }
+  },
+  {
+   "edge": "fall",
+   "csv": "baseline_R1.0_T60_phase1_fall.csv",
+   "outgoing": "high",
+   "incoming": "low",
+   "inductor_current_at_cmd_off_a": 96.08578088743042,
+   "outgoing_vds_0p5V_after_cmd_ns": 3.006974020161614,
+   "outgoing_vds_90pct_after_cmd_ns": 5.155322371336437,
+   "outgoing_excess_before_vds_0p5V_j": 2.217160918962466e-08,
+   "outgoing_excess_vds_0p5V_to_90pct_j": 6.081018238675825e-07,
+   "outgoing_excess_after_90pct_j": 6.799152756396053e-08,
+   "outgoing_group_current_at_vds_0p5V_a": 110.77905551488925,
+   "channel_timing": {
+    "channel_off_s": 3.853810729018326e-07,
+    "channel_on_s": 3.86174625514972e-07,
+    "channel_dead_time_s": 7.935526131394266e-10,
+    "turn_off_delay_s": 4.875566544252111e-09,
+    "turn_on_delay_s": 2.7191191573915273e-09,
+    "vds_in_at_channel_on_v": -0.43517615744145793
+   }
+  }
+ ]
+}

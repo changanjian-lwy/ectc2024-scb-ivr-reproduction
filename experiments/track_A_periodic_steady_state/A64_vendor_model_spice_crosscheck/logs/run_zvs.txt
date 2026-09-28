@@ -1,0 +1,272 @@
+13:34:51 === zvs R1.0_T60 stages=center,sweep,literal,step,brute
+13:34:51 centre search zvs_R1.0_T60_r3.650_f2.950_centre_search
+13:35:39   [zcs c0] Ton=17.1044 dr=3.650 df=2.950 n=20 Pout=224.389 Pcorr=54.238 dPc=+0.260 dE/T=-35.47 rel=3.96e-02(i_l3) cdt r/f=2.096/0.644 wall=48s
+13:36:17   [zcs c1] Ton=17.5044 dr=3.577 df=2.953 n=16 Pout=229.638 Pcorr=60.837 dPc=-0.213 dE/T=23.30 rel=1.96e-02(i_l3) cdt r/f=1.712/0.646 wall=38s
+13:36:59   [zcs c2] Ton=17.9044 dr=3.696 df=2.960 n=16 Pout=242.029 Pcorr=64.211 dPc=-0.227 dE/T=26.75 rel=2.03e-02(i_l3) cdt r/f=1.933/0.647 wall=42s
+13:37:42   [zcs c3] Ton=18.1996 dr=3.696 df=2.960 n=16 Pout=251.406 Pcorr=66.193 dPc=-0.189 dE/T=22.20 rel=1.68e-02(i_l3) cdt r/f=2.177/0.643 wall=43s
+13:38:26   [zcs c4] Ton=18.1554 dr=3.638 df=2.964 n=16 Pout=251.700 Pcorr=64.187 dPc=+0.007 dE/T=-1.30 rel=1.18e-03(i_l3) cdt r/f=2.097/0.642 wall=44s
+13:39:10   [zcs c5] Ton=18.1018 dr=3.532 df=2.968 n=16 Pout=249.266 Pcorr=63.334 dPc=+0.053 dE/T=-5.99 rel=5.99e-03(i_l3) cdt r/f=1.736/0.644 wall=44s
+13:39:56   [zcs c6] Ton=18.1249 dr=3.595 df=2.984 n=16 Pout=249.677 Pcorr=64.067 dPc=-0.012 dE/T=1.49 rel=1.52e-03(i_l3) cdt r/f=2.068/0.657 wall=46s
+13:40:39   [zcs c7] Ton=18.1351 dr=3.536 df=2.975 n=16 Pout=249.645 Pcorr=63.982 dPc=+0.001 dE/T=-0.07 rel=1.75e-04(i_l3) cdt r/f=1.725/0.650 wall=43s
+13:41:20   [zcs c8] Ton=18.1463 dr=3.648 df=2.976 n=16 Pout=250.927 Pcorr=64.417 dPc=-0.026 dE/T=3.08 rel=2.94e-03(i_l3) cdt r/f=2.113/0.652 wall=41s
+13:42:01   [zcs c9] Ton=18.1171 dr=3.601 df=2.975 n=16 Pout=250.056 Pcorr=63.751 dPc=+0.020 dE/T=-2.48 rel=2.37e-03(i_l3) cdt r/f=2.067/0.650 wall=41s
+13:42:44   [zcs c10] Ton=18.1171 dr=3.480 df=2.975 n=16 Pout=248.773 Pcorr=63.654 dPc=+0.028 dE/T=-2.79 rel=2.93e-03(i_l3) cdt r/f=1.615/0.648 wall=42s
+13:43:32   [zcs c11] Ton=18.1557 dr=3.570 df=2.975 n=16 Pout=250.250 Pcorr=64.432 dPc=-0.034 dE/T=3.91 rel=3.64e-03(i_l3) cdt r/f=1.788/0.650 wall=49s
+13:43:32   centre search NOT_CONVERGED: dr=3.5698 df=2.9755 ns
+13:43:32 solve zvs_R1.0_T60_r3.550_f3.000 (center) from Ton=18.1557 ns origin=35.0 ns
+13:44:48   [zce c0] Ton=18.1557 dr=3.550 df=3.000 n=16 Pout=250.038 Pcorr=64.132 dPc=+0.007 dE/T=-0.88 rel=8.41e-04(i_l3) cdt r/f=1.760/0.667 wall=76s
+13:45:53   [zce c1] Ton=18.1557 dr=3.550 df=3.000 n=16 Pout=249.969 Pcorr=64.182 dPc=+0.001 dE/T=-0.08 rel=6.95e-05(i_l3) cdt r/f=1.757/0.667 wall=65s
+13:45:53   -> REGULATED_TO_250W P_loss=64.1815 W (raw 64.1063) Pout=249.969 gate=8.294 periods=32 file=zvs_R1.0_T60_r3.550_f3.000.json
+13:45:53 solve zvs_R1.0_T60_r3.550_f3.100 (sweep) from Ton=18.1557 ns origin=35.0 ns
+13:46:40   [zsw c0] Ton=18.1557 dr=3.550 df=3.100 n=16 Pout=248.511 Pcorr=64.079 dPc=+0.032 dE/T=-3.79 rel=3.61e-03(i_l3) cdt r/f=1.769/0.739 wall=47s
+13:47:31   [zsw c1] Ton=18.2126 dr=3.550 df=3.100 n=16 Pout=249.555 Pcorr=65.000 dPc=-0.031 dE/T=3.62 rel=3.21e-03(i_l3) cdt r/f=1.743/0.740 wall=51s
+13:48:14   [zsw c2] Ton=18.2152 dr=3.550 df=3.100 n=16 Pout=249.956 Pcorr=64.785 dPc=-0.000 dE/T=0.05 rel=6.81e-05(i_l3) cdt r/f=1.756/0.739 wall=43s
+13:48:14   -> REGULATED_TO_250W P_loss=64.7847 W (raw 64.8350) Pout=249.956 gate=8.294 periods=48 file=zvs_R1.0_T60_r3.550_f3.100.json
+13:48:14 solve zvs_R1.0_T60_r3.550_f3.200 (sweep) from Ton=18.2152 ns origin=35.0 ns
+13:48:58   [zsw c0] Ton=18.2152 dr=3.550 df=3.200 n=16 Pout=248.491 Pcorr=64.701 dPc=+0.033 dE/T=-3.82 rel=3.62e-03(i_l3) cdt r/f=1.769/0.811 wall=44s
+13:49:40   [zsw c1] Ton=18.2744 dr=3.550 df=3.200 n=16 Pout=249.592 Pcorr=65.655 dPc=-0.032 dE/T=3.63 rel=3.30e-03(i_l3) cdt r/f=1.743/0.812 wall=43s
+13:50:23   [zsw c2] Ton=18.2798 dr=3.550 df=3.200 n=16 Pout=250.047 Pcorr=65.483 dPc=-0.004 dE/T=0.41 rel=4.54e-04(i_l3) cdt r/f=1.755/0.811 wall=43s
+13:50:23   -> REGULATED_TO_250W P_loss=65.4829 W (raw 65.8922) Pout=250.047 gate=8.293 periods=48 file=zvs_R1.0_T60_r3.550_f3.200.json
+13:50:23 solve zvs_R1.0_T60_r3.550_f3.300 (sweep) from Ton=18.2798 ns origin=35.0 ns
+13:51:15   [zsw c0] Ton=18.2798 dr=3.550 df=3.300 n=16 Pout=248.601 Pcorr=65.401 dPc=+0.033 dE/T=-3.81 rel=3.62e-03(i_l3) cdt r/f=1.769/0.883 wall=52s
+13:51:58   [zsw c1] Ton=18.3412 dr=3.550 df=3.300 n=16 Pout=249.751 Pcorr=66.393 dPc=-0.034 dE/T=3.88 rel=3.45e-03(i_l3) cdt r/f=1.743/0.884 wall=42s
+13:52:43   [zsw c2] Ton=18.3379 dr=3.550 df=3.300 n=16 Pout=250.024 Pcorr=66.091 dPc=+0.002 dE/T=-0.21 rel=2.03e-04(i_l3) cdt r/f=1.758/0.883 wall=46s
+13:52:43   -> REGULATED_TO_250W P_loss=66.0906 W (raw 65.8810) Pout=250.024 gate=8.291 periods=48 file=zvs_R1.0_T60_r3.550_f3.300.json
+13:52:43 solve zvs_R1.0_T60_r3.550_f2.900 (sweep) from Ton=18.1557 ns origin=35.0 ns
+13:53:30   [zsw c0] Ton=18.1557 dr=3.550 df=2.900 n=16 Pout=251.405 Pcorr=64.318 dPc=-0.032 dE/T=3.75 rel=3.34e-03(i_l3) cdt r/f=1.749/0.596 wall=46s
+13:54:19   [zsw c1] Ton=18.0997 dr=3.550 df=2.900 n=16 Pout=250.378 Pcorr=63.416 dPc=+0.031 dE/T=-3.71 rel=3.46e-03(i_l3) cdt r/f=1.783/0.596 wall=49s
+13:55:11   [zsw c2] Ton=18.0997 dr=3.550 df=2.900 n=16 Pout=250.032 Pcorr=63.663 dPc=-0.002 dE/T=0.12 rel=2.10e-04(i_l3) cdt r/f=1.756/0.596 wall=52s
+13:55:11   -> REGULATED_TO_250W P_loss=63.6631 W (raw 63.7809) Pout=250.032 gate=8.295 periods=48 file=zvs_R1.0_T60_r3.550_f2.900.json
+13:55:11 solve zvs_R1.0_T60_r3.550_f2.800 (sweep) from Ton=18.0997 ns origin=35.0 ns
+13:55:57   [zsw c0] Ton=18.0997 dr=3.550 df=2.800 n=16 Pout=251.476 Pcorr=63.808 dPc=-0.032 dE/T=3.75 rel=3.32e-03(i_l3) cdt r/f=1.749/0.524 wall=46s
+13:56:41   [zsw c1] Ton=18.0473 dr=3.550 df=2.800 n=16 Pout=250.505 Pcorr=62.978 dPc=+0.026 dE/T=-3.15 rel=2.92e-03(i_l3) cdt r/f=1.780/0.524 wall=45s
+13:57:26   [zsw c2] Ton=18.0366 dr=3.550 df=2.800 n=16 Pout=249.973 Pcorr=63.045 dPc=+0.006 dE/T=-0.80 rel=6.86e-04(i_l3) cdt r/f=1.760/0.525 wall=45s
+13:58:11   [zsw c3] Ton=18.0366 dr=3.550 df=2.800 n=16 Pout=249.914 Pcorr=63.087 dPc=+0.001 dE/T=-0.08 rel=8.44e-05(i_l3) cdt r/f=1.757/0.525 wall=45s
+13:58:11   -> REGULATED_TO_250W P_loss=63.0869 W (raw 63.0040) Pout=249.914 gate=8.295 periods=64 file=zvs_R1.0_T60_r3.550_f2.800.json
+13:58:11 solve zvs_R1.0_T60_r3.550_f2.700 (sweep) from Ton=18.0366 ns origin=35.0 ns
+13:58:56   [zsw c0] Ton=18.0366 dr=3.550 df=2.700 n=16 Pout=251.321 Pcorr=63.274 dPc=-0.031 dE/T=3.67 rel=3.23e-03(i_l3) cdt r/f=1.749/0.453 wall=45s
+13:59:41   [zsw c1] Ton=17.9792 dr=3.550 df=2.700 n=16 Pout=250.246 Pcorr=62.378 dPc=+0.031 dE/T=-3.77 rel=3.47e-03(i_l3) cdt r/f=1.783/0.453 wall=45s
+14:00:26   [zsw c2] Ton=17.9792 dr=3.550 df=2.700 n=16 Pout=249.917 Pcorr=62.610 dPc=+0.000 dE/T=-0.08 rel=6.02e-05(i_l3) cdt r/f=1.757/0.453 wall=44s
+14:00:26   -> REGULATED_TO_250W P_loss=62.6097 W (raw 62.5248) Pout=249.917 gate=8.295 periods=48 file=zvs_R1.0_T60_r3.550_f2.700.json
+14:00:26 solve zvs_R1.0_T60_r3.550_f2.600 (sweep) from Ton=17.9792 ns origin=35.0 ns
+14:01:10   [zsw c0] Ton=17.9792 dr=3.550 df=2.600 n=16 Pout=251.314 Pcorr=62.824 dPc=-0.031 dE/T=3.64 rel=3.27e-03(i_l3) cdt r/f=1.749/0.382 wall=44s
+14:01:55   [zsw c1] Ton=17.9255 dr=3.550 df=2.600 n=16 Pout=250.314 Pcorr=61.985 dPc=+0.028 dE/T=-3.45 rel=3.23e-03(i_l3) cdt r/f=1.781/0.382 wall=45s
+14:02:39   [zsw c2] Ton=17.9145 dr=3.550 df=2.600 n=16 Pout=249.789 Pcorr=62.039 dPc=+0.010 dE/T=-1.20 rel=1.21e-03(i_l3) cdt r/f=1.761/0.382 wall=44s
+14:03:23   [zsw c3] Ton=17.9193 dr=3.550 df=2.600 n=16 Pout=249.813 Pcorr=62.159 dPc=-0.001 dE/T=0.18 rel=1.73e-04(i_l3) cdt r/f=1.756/0.382 wall=44s
+14:03:23   -> REGULATED_TO_250W P_loss=62.1591 W (raw 62.3349) Pout=249.813 gate=8.295 periods=64 file=zvs_R1.0_T60_r3.550_f2.600.json
+14:03:23   extension step (edge optimum) d_fall -0.1 ns
+14:03:23 solve zvs_R1.0_T60_r3.550_f2.500 (sweep) from Ton=17.9193 ns origin=35.0 ns
+14:04:08   [zsw c0] Ton=17.9193 dr=3.550 df=2.500 n=16 Pout=251.207 Pcorr=62.403 dPc=-0.030 dE/T=3.62 rel=3.26e-03(i_l3) cdt r/f=1.749/0.310 wall=45s
+14:04:52   [zsw c1] Ton=17.8734 dr=3.550 df=2.500 n=16 Pout=250.492 Pcorr=61.597 dPc=+0.033 dE/T=-3.81 rel=3.78e-03(i_l3) cdt r/f=1.860/0.310 wall=44s
+14:05:38   [zsw c2] Ton=17.8686 dr=3.550 df=2.500 n=16 Pout=250.027 Pcorr=61.783 dPc=+0.003 dE/T=-0.38 rel=3.52e-04(i_l3) cdt r/f=1.759/0.310 wall=46s
+14:05:38   -> REGULATED_TO_250W P_loss=61.7830 W (raw 61.4000) Pout=250.027 gate=8.296 periods=48 file=zvs_R1.0_T60_r3.550_f2.500.json
+14:05:38   extension step (edge optimum) d_fall -0.1 ns
+14:05:38 solve zvs_R1.0_T60_r3.550_f2.400 (sweep) from Ton=17.8686 ns origin=35.0 ns
+14:06:23   [zsw c0] Ton=17.8686 dr=3.550 df=2.400 n=16 Pout=251.357 Pcorr=62.123 dPc=-0.029 dE/T=3.49 rel=3.15e-03(i_l3) cdt r/f=1.750/0.238 wall=45s
+14:07:08   [zsw c1] Ton=17.8226 dr=3.550 df=2.400 n=16 Pout=250.564 Pcorr=61.375 dPc=+0.027 dE/T=-3.28 rel=3.20e-03(i_l3) cdt r/f=1.781/0.238 wall=45s
+14:07:53   [zsw c2] Ton=17.8182 dr=3.550 df=2.400 n=16 Pout=250.139 Pcorr=61.542 dPc=+0.000 dE/T=-0.05 rel=2.01e-05(i_lsrc) cdt r/f=1.758/0.238 wall=46s
+14:07:53   -> REGULATED_TO_250W P_loss=61.5425 W (raw 61.4956) Pout=250.139 gate=8.295 periods=48 file=zvs_R1.0_T60_r3.550_f2.400.json
+14:07:53   extension step (edge optimum) d_fall -0.1 ns
+14:07:53   best d_fall at d_rise=3.550: 2.400 ns
+14:07:53 solve zvs_R1.0_T60_r3.650_f2.400 (sweep) from Ton=17.8182 ns origin=35.0 ns
+14:08:38   [zsw c0] Ton=17.8182 dr=3.650 df=2.400 n=16 Pout=251.073 Pcorr=61.789 dPc=-0.018 dE/T=2.17 rel=2.16e-03(i_l3) cdt r/f=2.112/0.240 wall=45s
+14:09:28   [zsw c1] Ton=17.7743 dr=3.650 df=2.400 n=16 Pout=250.292 Pcorr=61.125 dPc=+0.025 dE/T=-3.26 rel=3.19e-03(i_l3) cdt r/f=2.105/0.240 wall=50s
+14:10:15   [zsw c2] Ton=17.7722 dr=3.650 df=2.400 n=16 Pout=249.933 Pcorr=61.289 dPc=+0.002 dE/T=-0.32 rel=2.87e-04(i_l3) cdt r/f=2.110/0.240 wall=48s
+14:10:15   -> REGULATED_TO_250W P_loss=61.2891 W (raw 60.9717) Pout=249.933 gate=8.293 periods=48 file=zvs_R1.0_T60_r3.650_f2.400.json
+14:10:15 solve zvs_R1.0_T60_r3.750_f2.400 (sweep) from Ton=17.7722 ns origin=35.0 ns
+14:11:01   [zsw c0] Ton=17.7722 dr=3.750 df=2.400 n=16 Pout=250.912 Pcorr=61.662 dPc=-0.018 dE/T=2.34 rel=2.26e-03(i_l3) cdt r/f=2.193/0.242 wall=46s
+14:11:48   [zsw c1] Ton=17.7391 dr=3.750 df=2.400 n=16 Pout=250.372 Pcorr=61.153 dPc=+0.014 dE/T=-2.03 rel=1.88e-03(i_l3) cdt r/f=2.187/0.242 wall=46s
+14:12:34   [zsw c2] Ton=17.7330 dr=3.750 df=2.400 n=16 Pout=250.016 Pcorr=61.201 dPc=+0.003 dE/T=-0.40 rel=3.51e-04(i_l3) cdt r/f=2.190/0.242 wall=46s
+14:12:34   -> REGULATED_TO_250W P_loss=61.2009 W (raw 60.8001) Pout=250.016 gate=8.292 periods=48 file=zvs_R1.0_T60_r3.750_f2.400.json
+14:12:34 solve zvs_R1.0_T60_r3.850_f2.400 (sweep) from Ton=17.7330 ns origin=35.0 ns
+14:13:22   [zsw c0] Ton=17.7330 dr=3.850 df=2.400 n=16 Pout=251.044 Pcorr=61.665 dPc=-0.017 dE/T=2.51 rel=2.33e-03(i_l3) cdt r/f=2.271/0.244 wall=49s
+14:14:08   [zsw c1] Ton=17.6871 dr=3.850 df=2.400 n=16 Pout=250.241 Pcorr=61.008 dPc=+0.019 dE/T=-2.87 rel=2.71e-03(i_l3) cdt r/f=2.263/0.244 wall=46s
+14:14:54   [zsw c2] Ton=17.6898 dr=3.850 df=2.400 n=16 Pout=249.988 Pcorr=61.202 dPc=-0.002 dE/T=0.27 rel=2.00e-04(i_l3) cdt r/f=2.269/0.244 wall=45s
+14:14:54   -> REGULATED_TO_250W P_loss=61.2020 W (raw 61.4699) Pout=249.988 gate=8.290 periods=48 file=zvs_R1.0_T60_r3.850_f2.400.json
+14:14:54 solve zvs_R1.0_T60_r3.450_f2.400 (sweep) from Ton=17.8182 ns origin=35.0 ns
+14:15:39   [zsw c0] Ton=17.8182 dr=3.450 df=2.400 n=16 Pout=249.277 Pcorr=61.434 dPc=+0.019 dE/T=-1.97 rel=2.13e-03(i_l3) cdt r/f=1.558/0.237 wall=45s
+14:16:19   [zsw c1] Ton=17.8437 dr=3.450 df=2.400 n=16 Pout=249.732 Pcorr=61.858 dPc=-0.015 dE/T=1.72 rel=1.63e-03(i_l3) cdt r/f=1.552/0.237 wall=40s
+14:17:02   [zsw c2] Ton=17.8481 dr=3.450 df=2.400 n=16 Pout=249.982 Pcorr=61.799 dPc=-0.003 dE/T=0.29 rel=2.83e-04(i_l3) cdt r/f=1.555/0.237 wall=42s
+14:17:02   -> REGULATED_TO_250W P_loss=61.7992 W (raw 62.0922) Pout=249.982 gate=8.297 periods=48 file=zvs_R1.0_T60_r3.450_f2.400.json
+14:17:02 solve zvs_R1.0_T60_r3.350_f2.400 (sweep) from Ton=17.8481 ns origin=35.0 ns
+14:17:48   [zsw c0] Ton=17.8481 dr=3.350 df=2.400 n=16 Pout=249.232 Pcorr=61.838 dPc=+0.018 dE/T=-1.72 rel=1.89e-03(i_l3) cdt r/f=1.378/0.235 wall=46s
+14:18:36   [zsw c1] Ton=17.8756 dr=3.350 df=2.400 n=16 Pout=249.794 Pcorr=62.256 dPc=-0.016 dE/T=1.72 rel=1.60e-03(i_l3) cdt r/f=1.376/0.235 wall=48s
+14:19:20   [zsw c2] Ton=17.8696 dr=3.350 df=2.400 n=16 Pout=249.815 Pcorr=62.039 dPc=+0.010 dE/T=-1.11 rel=1.25e-03(i_l3) cdt r/f=1.378/0.235 wall=44s
+14:20:07   [zsw c3] Ton=17.8722 dr=3.350 df=2.400 n=16 Pout=249.809 Pcorr=62.131 dPc=-0.000 dE/T=0.09 rel=7.28e-05(i_l3) cdt r/f=1.377/0.235 wall=46s
+14:20:07   -> REGULATED_TO_250W P_loss=62.1306 W (raw 62.2203) Pout=249.809 gate=8.299 periods=64 file=zvs_R1.0_T60_r3.350_f2.400.json
+14:20:07 solve zvs_R1.0_T60_r3.250_f2.400 (sweep) from Ton=17.8722 ns origin=35.0 ns
+14:20:52   [zsw c0] Ton=17.8722 dr=3.250 df=2.400 n=16 Pout=249.139 Pcorr=62.368 dPc=+0.017 dE/T=-1.50 rel=1.71e-03(i_l3) cdt r/f=1.216/0.234 wall=45s
+14:21:36   [zsw c1] Ton=17.8875 dr=3.250 df=2.400 n=16 Pout=249.407 Pcorr=62.661 dPc=-0.013 dE/T=1.28 rel=1.28e-03(i_l3) cdt r/f=1.215/0.234 wall=44s
+14:22:20   [zsw c2] Ton=17.9046 dr=3.250 df=2.400 n=16 Pout=249.919 Pcorr=62.778 dPc=-0.012 dE/T=1.26 rel=1.29e-03(i_l3) cdt r/f=1.215/0.234 wall=44s
+14:23:07   [zsw c3] Ton=17.9074 dr=3.250 df=2.400 n=16 Pout=250.065 Pcorr=62.738 dPc=-0.003 dE/T=0.26 rel=2.65e-04(i_l3) cdt r/f=1.215/0.234 wall=47s
+14:23:07   -> REGULATED_TO_250W P_loss=62.7382 W (raw 63.0027) Pout=250.065 gate=8.301 periods=64 file=zvs_R1.0_T60_r3.250_f2.400.json
+14:23:07   optimum: d_rise=3.750 d_fall=2.400 ns P_loss=61.2009 W (zvs_R1.0_T60_r3.750_f2.400.json)
+14:23:07 solve zvs_R1.0_T60_r1.950_f0.650_literal (literal) from Ton=17.1044 ns origin=0.0 ns
+14:24:12   [zli c0] Ton=17.1044 dr=1.950 df=0.650 n=20 Pout=231.491 Pcorr=161.023 dPc=+0.179 dE/T=-24.17 rel=2.70e-02(i_l3) cdt r/f=-1.629/-2.388 wall=65s
+14:25:01   [zli c1] Ton=17.5044 dr=1.950 df=0.650 n=16 Pout=244.692 Pcorr=163.459 dPc=-0.318 dE/T=30.34 rel=4.40e-02(i_l3) cdt r/f=-1.629/-2.390 wall=50s
+14:25:47   [zli c2] Ton=17.6599 dr=1.950 df=0.650 n=16 Pout=248.982 Pcorr=163.780 dPc=-0.097 dE/T=9.07 rel=1.40e-02(i_l3) cdt r/f=-1.627/-2.392 wall=46s
+14:26:37   [zli c3] Ton=17.7012 dr=1.950 df=0.650 n=16 Pout=250.121 Pcorr=163.826 dPc=-0.026 dE/T=2.27 rel=3.80e-03(i_l3) cdt r/f=-1.626/-2.392 wall=50s
+14:27:27   [zli c4] Ton=17.6968 dr=1.950 df=0.650 n=16 Pout=249.932 Pcorr=163.752 dPc=+0.005 dE/T=-0.58 rel=8.28e-04(i_l3) cdt r/f=-1.626/-2.393 wall=50s
+14:27:27   -> REGULATED_TO_250W P_loss=163.7515 W (raw 163.1757) Pout=249.932 gate=8.324 periods=84 file=zvs_R1.0_T60_r1.950_f0.650_literal.json
+14:27:27 solve zvs_R1.0_T60_r3.750_f2.400_step25ps (step) from Ton=17.7330 ns origin=35.0 ns
+14:28:54   [zst c0] Ton=17.7330 dr=3.750 df=2.400 n=16 Pout=249.984 Pcorr=61.210 dPc=+0.000 dE/T=-0.05 rel=3.90e-05(i_l3) cdt r/f=2.191/0.242 wall=86s
+14:29:08   -> REGULATED_TO_250W P_loss=61.2096 W (raw 61.1632) Pout=249.984 gate=8.291 periods=16 file=zvs_R1.0_T60_r3.750_f2.400_step25ps.json
+14:30:04   brute 20 periods: rel last=5.25e-03 Pout=250.125 Pcorr=64.0526
+14:31:00   brute 40 periods: rel last=1.27e-04 Pout=249.973 Pcorr=64.1784
+14:31:00   brute: first period below 1e-3 = 27; accelerated centre P_loss 64.1815 vs brute 64.1784 W
+18:10:51 === zvs R1.0_T60 stages=decomp,static,extend_fall,decomp
+18:11:02   decomp zvs_R1.0_T60_r3.550_f3.000.json: P_loss 64.183 (accepted 64.182); conduction=22.49 turn_on_overlap=-1.10 turn_on_underdriven=5.76 turn_off_overlap=39.65 turn_off_underdriven=3.80 third_quadrant=3.70 off_state=-10.65 a59_style_cond=26.27
+18:11:11   decomp zvs_R1.0_T60_r3.750_f2.400.json: P_loss 61.208 (accepted 61.201); conduction=22.60 turn_on_overlap=-0.67 turn_on_underdriven=5.85 turn_off_overlap=38.47 turn_off_underdriven=3.75 third_quadrant=1.38 off_state=-10.72 a59_style_cond=26.23
+18:11:22   decomp zvs_R1.0_T60_r1.950_f0.650_literal.json: P_loss 163.762 (accepted 163.752); conduction=25.26 turn_on_overlap=33.43 turn_on_underdriven=4.43 turn_off_overlap=97.34 turn_off_underdriven=3.22 third_quadrant=0.00 off_state=-0.78 a59_style_cond=28.49
+18:11:29   static T=25 Vgs=5.0 I=10 -> Vds=0.0126338656217 R=1.2634 mOhm
+18:11:29   static T=25 Vgs=5.0 I=25 -> Vds=0.0318051010239 R=1.2722 mOhm
+18:11:29   static T=25 Vgs=5.0 I=50 -> Vds=0.0643878370052 R=1.2878 mOhm
+18:11:29   static T=25 Vgs=5.0 I=75 -> Vds=0.0978352487892 R=1.3045 mOhm
+18:11:29   static T=25 Vgs=5.0 I=100 -> Vds=0.13224766793 R=1.3225 mOhm
+18:11:29   static T=25 Vgs=0.0 I=-10 -> Vds=-2.09969306381
+18:11:29   static T=25 Vgs=0.0 I=-25 -> Vds=-2.23372286631
+18:11:29   static T=25 Vgs=0.0 I=-50 -> Vds=-2.39137989077
+18:11:29   static T=25 Vgs=0.0 I=-75 -> Vds=-2.53085398907
+18:11:29   static T=25 Vgs=0.0 I=-100 -> Vds=-2.664094126
+18:11:29   static T=60 Vgs=5.0 I=10 -> Vds=0.0150477819791 R=1.5048 mOhm
+18:11:29   static T=60 Vgs=5.0 I=25 -> Vds=0.0379013594258 R=1.5161 mOhm
+18:11:29   static T=60 Vgs=5.0 I=50 -> Vds=0.0768063960159 R=1.5361 mOhm
+18:11:29   static T=60 Vgs=5.0 I=75 -> Vds=0.116847623543 R=1.5580 mOhm
+18:11:29   static T=60 Vgs=5.0 I=100 -> Vds=0.158181721512 R=1.5818 mOhm
+18:11:29   static T=60 Vgs=0.0 I=-10 -> Vds=-2.06025151789
+18:11:29   static T=60 Vgs=0.0 I=-25 -> Vds=-2.20467484561
+18:11:29   static T=60 Vgs=0.0 I=-50 -> Vds=-2.38205272712
+18:11:29   static T=60 Vgs=0.0 I=-75 -> Vds=-2.54251529978
+18:11:29   static T=60 Vgs=0.0 I=-100 -> Vds=-2.69676674246
+18:11:29   second-pass extension d_fall -> 2.300 ns at d_rise 3.750
+18:11:29 solve zvs_R1.0_T60_r3.750_f2.300 (sweep) from Ton=17.7330 ns origin=35.0 ns
+18:12:06   [zsw c0] Ton=17.7330 dr=3.750 df=2.300 n=16 Pout=251.273 Pcorr=61.651 dPc=-0.023 dE/T=3.28 rel=2.93e-03(i_l3) cdt r/f=2.194/0.169 wall=37s
+18:12:43   [zsw c1] Ton=17.6738 dr=3.750 df=2.300 n=16 Pout=250.178 Pcorr=60.821 dPc=+0.025 dE/T=-3.72 rel=3.52e-03(i_l3) cdt r/f=2.184/0.169 wall=37s
+18:13:22   [zsw c2] Ton=17.6793 dr=3.750 df=2.300 n=16 Pout=249.939 Pcorr=61.086 dPc=-0.002 dE/T=0.30 rel=3.13e-04(i_l3) cdt r/f=2.191/0.169 wall=39s
+18:13:22   -> REGULATED_TO_250W P_loss=61.0861 W (raw 61.3836) Pout=249.939 gate=8.292 periods=48 file=zvs_R1.0_T60_r3.750_f2.300.json
+18:13:22   second-pass extension d_fall -> 2.200 ns at d_rise 3.750
+18:13:22 solve zvs_R1.0_T60_r3.750_f2.200 (sweep) from Ton=17.6793 ns origin=35.0 ns
+18:13:59   [zsw c0] Ton=17.6793 dr=3.750 df=2.200 n=16 Pout=251.197 Pcorr=61.716 dPc=-0.022 dE/T=3.21 rel=2.89e-03(i_l3) cdt r/f=2.194/0.095 wall=38s
+18:14:39   [zsw c1] Ton=17.6222 dr=3.750 df=2.200 n=16 Pout=250.141 Pcorr=60.932 dPc=+0.024 dE/T=-3.65 rel=3.50e-03(i_l3) cdt r/f=2.185/0.095 wall=39s
+18:15:19   [zsw c2] Ton=17.6289 dr=3.750 df=2.200 n=16 Pout=249.939 Pcorr=61.198 dPc=-0.003 dE/T=0.41 rel=3.59e-04(i_l3) cdt r/f=2.191/0.095 wall=40s
+18:15:19   -> REGULATED_TO_250W P_loss=61.1982 W (raw 61.6062) Pout=249.939 gate=8.292 periods=48 file=zvs_R1.0_T60_r3.750_f2.200.json
+18:15:19   d_fall optimum interior on the r=3.750 line
+18:15:19 decomp exists: zvs_R1.0_T60_r3.550_f3.000_decomp
+18:15:29   decomp zvs_R1.0_T60_r3.750_f2.300.json: P_loss 61.081 (accepted 61.086); conduction=22.65 turn_on_overlap=-1.91 turn_on_underdriven=5.76 turn_off_overlap=38.52 turn_off_underdriven=3.71 third_quadrant=1.16 off_state=-9.33 a59_style_cond=26.24
+18:15:29 decomp exists: zvs_R1.0_T60_r1.950_f0.650_literal_decomp
+18:15:30 === zvs R0.3_T60 stages=center,transfer,decomp
+18:15:30 centre search zvs_R0.3_T60_r2.735_f1.712_centre_search
+18:16:15   [zcs c0] Ton=18.1557 dr=2.735 df=1.712 n=16 Pout=267.521 Pcorr=44.642 dPc=-0.337 dE/T=42.87 rel=3.12e-02(i_l3) cdt r/f=1.919/0.595 wall=45s
+18:17:01   [zcs c1] Ton=17.7557 dr=2.750 df=1.739 n=16 Pout=261.452 Pcorr=38.819 dPc=+0.168 dE/T=-27.58 rel=3.44e-02(i_l3) cdt r/f=2.012/0.640 wall=45s
+18:17:44   [zcs c2] Ton=17.4342 dr=2.719 df=1.745 n=16 Pout=250.486 Pcorr=37.312 dPc=+0.128 dE/T=-19.86 rel=2.58e-02(i_l3) cdt r/f=1.980/0.653 wall=43s
+18:18:26   [zcs c3] Ton=17.4252 dr=2.719 df=1.745 n=16 Pout=248.717 Pcorr=38.071 dPc=+0.021 dE/T=-2.81 rel=2.99e-03(i_l3) cdt r/f=1.929/0.649 wall=42s
+18:18:26   centre search CHANNEL_MATCHED: dr=2.7193 df=1.7450 ns
+18:18:26 solve zvs_R0.3_T60_r2.700_f1.750 (center) from Ton=17.4252 ns origin=35.0 ns
+18:19:05   [zce c0] Ton=17.4252 dr=2.700 df=1.750 n=16 Pout=248.170 Pcorr=38.129 dPc=+0.008 dE/T=-1.09 rel=1.23e-03(i_l3) cdt r/f=1.899/0.653 wall=39s
+18:19:47   [zce c1] Ton=17.4969 dr=2.700 df=1.750 n=16 Pout=249.822 Pcorr=38.796 dPc=-0.031 dE/T=4.54 rel=4.73e-03(i_l3) cdt r/f=1.894/0.649 wall=42s
+18:20:28   [zce c2] Ton=17.4935 dr=2.700 df=1.750 n=16 Pout=250.129 Pcorr=38.547 dPc=-0.000 dE/T=-0.12 rel=3.10e-05(i_lsrc) cdt r/f=1.900/0.651 wall=41s
+18:20:28   -> REGULATED_TO_250W P_loss=38.5468 W (raw 38.4240) Pout=250.129 gate=8.292 periods=48 file=zvs_R0.3_T60_r2.700_f1.750.json
+18:20:28 solve zvs_R0.3_T60_r2.900_f1.050 (transfer) from Ton=17.4935 ns origin=35.0 ns
+18:21:13   [ztr c0] Ton=17.4935 dr=2.900 df=1.050 n=16 Pout=261.448 Pcorr=42.731 dPc=-0.162 dE/T=28.53 rel=2.39e-02(i_l3) cdt r/f=2.152/-0.369 wall=45s
+18:21:57   [ztr c1] Ton=17.0935 dr=2.900 df=1.050 n=16 Pout=253.972 Pcorr=38.811 dPc=+0.120 dE/T=-25.66 rel=3.48e-02(i_l3) cdt r/f=2.143/-0.395 wall=44s
+18:22:48   [ztr c2] Ton=17.0173 dr=2.900 df=1.050 n=16 Pout=249.962 Pcorr=39.152 dPc=+0.027 dE/T=-5.48 rel=6.36e-03(i_l3) cdt r/f=2.155/-0.392 wall=50s
+18:26:52   [ztr c3] Ton=17.0173 dr=2.900 df=1.050 n=16 Pout=249.524 Pcorr=39.328 dPc=+0.003 dE/T=-0.65 rel=6.83e-04(i_l3) cdt r/f=2.157/-0.391 wall=245s
+18:27:43   [ztr c4] Ton=17.0331 dr=2.900 df=1.050 n=16 Pout=249.861 Pcorr=39.459 dPc=-0.004 dE/T=0.92 rel=1.01e-03(i_l3) cdt r/f=2.157/-0.390 wall=51s
+18:28:32   [ztr c5] Ton=17.0397 dr=2.900 df=1.050 n=16 Pout=250.099 Pcorr=39.474 dPc=-0.002 dE/T=0.53 rel=5.69e-04(i_l3) cdt r/f=2.157/-0.390 wall=48s
+18:28:32   -> REGULATED_TO_250W P_loss=39.4738 W (raw 40.0005) Pout=250.099 gate=8.291 periods=96 file=zvs_R0.3_T60_r2.900_f1.050.json
+18:28:43   decomp zvs_R0.3_T60_r2.700_f1.750.json: P_loss 38.547 (accepted 38.547); conduction=25.16 turn_on_overlap=-0.11 turn_on_underdriven=2.78 turn_off_overlap=13.47 turn_off_underdriven=1.96 third_quadrant=2.00 off_state=-7.19 a59_style_cond=27.16
+19:06:40 === zvs R1.0_T60 stages=step,decomp,xcheck
+19:06:40 solve zvs_R1.0_T60_r3.750_f2.300_step25ps (step) from Ton=17.6793 ns origin=35.0 ns
+19:07:48   [zst c0] Ton=17.6793 dr=3.750 df=2.300 n=16 Pout=249.970 Pcorr=61.060 dPc=-0.000 dE/T=0.05 rel=4.45e-05(i_l3) cdt r/f=2.191/0.169 wall=67s
+19:07:59   -> REGULATED_TO_250W P_loss=61.0600 W (raw 61.1104) Pout=249.970 gate=8.291 periods=16 file=zvs_R1.0_T60_r3.750_f2.300_step25ps.json
+19:08:08   decomp zvs_R1.0_T60_r3.550_f3.000.json: P_loss 64.183 (accepted 64.182); conduction=22.49 turn_on_overlap=-1.10 turn_on_underdriven=5.76 turn_off_overlap=39.65 turn_off_underdriven=3.80 third_quadrant=3.70 off_state=-10.65 a59_style_cond=26.27
+19:08:18   decomp zvs_R1.0_T60_r3.750_f2.300.json: P_loss 61.081 (accepted 61.086); conduction=22.65 turn_on_overlap=-1.91 turn_on_underdriven=5.76 turn_off_overlap=38.52 turn_off_underdriven=3.71 third_quadrant=1.16 off_state=-9.33 a59_style_cond=26.24
+19:08:28   decomp zvs_R1.0_T60_r1.950_f0.650_literal.json: P_loss 163.762 (accepted 163.752); conduction=25.26 turn_on_overlap=33.43 turn_on_underdriven=4.43 turn_off_overlap=97.34 turn_off_underdriven=3.22 third_quadrant=0.00 off_state=-0.78 a59_style_cond=28.49
+19:08:40   xcheck zvs_R1.0_T60_r3.750_f2.300.json: EPC2067X P_loss 61.077 W (Pout 249.96) vs as-distributed 61.086 W (Pout 249.94)
+19:08:56   xcheck zvs_R1.0_T60_r3.550_f3.000.json: EPC2067X P_loss 64.184 W (Pout 249.97) vs as-distributed 64.182 W (Pout 249.97)
+19:08:57 === zvs R0.3_T60 stages=sweep,decomp,xcheck
+19:08:57 solve zvs_R0.3_T60_r2.700_f1.850 (sweep) from Ton=17.4935 ns origin=35.0 ns
+19:09:42   [zsw c0] Ton=17.4935 dr=2.700 df=1.850 n=16 Pout=248.646 Pcorr=38.608 dPc=+0.025 dE/T=-3.77 rel=4.29e-03(i_l3) cdt r/f=1.903/0.729 wall=45s
+19:10:27   [zsw c1] Ton=17.5544 dr=2.700 df=1.850 n=16 Pout=249.786 Pcorr=39.331 dPc=-0.027 dE/T=3.95 rel=4.13e-03(i_l3) cdt r/f=1.895/0.726 wall=45s
+19:11:11   [zsw c2] Ton=17.5510 dr=2.700 df=1.850 n=16 Pout=250.056 Pcorr=39.099 dPc=+0.001 dE/T=-0.18 rel=2.25e-04(i_l3) cdt r/f=1.900/0.726 wall=44s
+19:11:11   -> REGULATED_TO_250W P_loss=39.0987 W (raw 38.9218) Pout=250.056 gate=8.286 periods=48 file=zvs_R0.3_T60_r2.700_f1.850.json
+19:11:11 solve zvs_R0.3_T60_r2.700_f1.950 (sweep) from Ton=17.5510 ns origin=35.0 ns
+19:11:56   [zsw c0] Ton=17.5510 dr=2.700 df=1.950 n=16 Pout=248.525 Pcorr=39.224 dPc=+0.027 dE/T=-3.88 rel=4.43e-03(i_l3) cdt r/f=1.903/0.806 wall=46s
+19:12:39   [zsw c1] Ton=17.6158 dr=2.700 df=1.950 n=16 Pout=249.729 Pcorr=40.007 dPc=-0.031 dE/T=4.26 rel=4.57e-03(i_l3) cdt r/f=1.894/0.802 wall=42s
+19:13:21   [zsw c2] Ton=17.6122 dr=2.700 df=1.950 n=16 Pout=250.040 Pcorr=39.745 dPc=+0.002 dE/T=-0.21 rel=2.61e-04(i_l3) cdt r/f=1.900/0.803 wall=42s
+19:13:21   -> REGULATED_TO_250W P_loss=39.7448 W (raw 39.5355) Pout=250.040 gate=8.277 periods=48 file=zvs_R0.3_T60_r2.700_f1.950.json
+19:13:21 solve zvs_R0.3_T60_r2.700_f2.050 (sweep) from Ton=17.6122 ns origin=35.0 ns
+19:14:04   [zsw c0] Ton=17.6122 dr=2.700 df=2.050 n=16 Pout=248.466 Pcorr=39.933 dPc=+0.028 dE/T=-3.97 rel=4.51e-03(i_l3) cdt r/f=1.903/0.883 wall=43s
+19:14:49   [zsw c1] Ton=17.6720 dr=2.700 df=2.050 n=16 Pout=249.554 Pcorr=40.676 dPc=-0.027 dE/T=3.80 rel=3.88e-03(i_l3) cdt r/f=1.895/0.880 wall=45s
+19:15:32   [zsw c2] Ton=17.6758 dr=2.700 df=2.050 n=16 Pout=249.997 Pcorr=40.506 dPc=-0.001 dE/T=0.23 rel=2.37e-04(i_l3) cdt r/f=1.899/0.880 wall=43s
+19:15:32   -> REGULATED_TO_250W P_loss=40.5065 W (raw 40.7384) Pout=249.997 gate=8.265 periods=48 file=zvs_R0.3_T60_r2.700_f2.050.json
+19:15:32 solve zvs_R0.3_T60_r2.700_f1.650 (sweep) from Ton=17.4935 ns origin=35.0 ns
+19:16:18   [zsw c0] Ton=17.4935 dr=2.700 df=1.650 n=16 Pout=251.588 Pcorr=38.539 dPc=-0.025 dE/T=3.73 rel=3.90e-03(i_l3) cdt r/f=1.897/0.573 wall=46s
+19:17:00   [zsw c1] Ton=17.4261 dr=2.700 df=1.650 n=16 Pout=250.258 Pcorr=37.788 dPc=+0.028 dE/T=-4.27 rel=4.79e-03(i_l3) cdt r/f=1.906/0.577 wall=42s
+19:17:45   [zsw c2] Ton=17.4299 dr=2.700 df=1.650 n=16 Pout=249.968 Pcorr=38.031 dPc=-0.002 dE/T=0.26 rel=3.25e-04(i_l3) cdt r/f=1.899/0.575 wall=45s
+19:17:45   -> REGULATED_TO_250W P_loss=38.0313 W (raw 38.2900) Pout=249.968 gate=8.296 periods=48 file=zvs_R0.3_T60_r2.700_f1.650.json
+19:17:45 solve zvs_R0.3_T60_r2.700_f1.550 (sweep) from Ton=17.4299 ns origin=35.0 ns
+19:18:28   [zsw c0] Ton=17.4299 dr=2.700 df=1.550 n=16 Pout=251.417 Pcorr=38.062 dPc=-0.025 dE/T=3.68 rel=3.87e-03(i_l3) cdt r/f=1.897/0.498 wall=43s
+19:19:15   [zsw c1] Ton=17.3713 dr=2.700 df=1.550 n=16 Pout=250.301 Pcorr=37.392 dPc=+0.024 dE/T=-3.77 rel=4.28e-03(i_l3) cdt r/f=1.906/0.502 wall=47s
+19:20:05   [zsw c2] Ton=17.3779 dr=2.700 df=1.550 n=16 Pout=250.092 Pcorr=37.653 dPc=-0.006 dE/T=0.86 rel=9.42e-04(i_l3) cdt r/f=1.899/0.500 wall=51s
+19:20:45   [zsw c3] Ton=17.3760 dr=2.700 df=1.550 n=16 Pout=250.112 Pcorr=37.600 dPc=-0.000 dE/T=-0.03 rel=1.46e-05(i_lsrc) cdt r/f=1.900/0.501 wall=40s
+19:20:45   -> REGULATED_TO_250W P_loss=37.5997 W (raw 37.5739) Pout=250.112 gate=8.299 periods=64 file=zvs_R0.3_T60_r2.700_f1.550.json
+19:20:45 solve zvs_R0.3_T60_r2.700_f1.450 (sweep) from Ton=17.3760 ns origin=35.0 ns
+19:21:32   [zsw c0] Ton=17.3760 dr=2.700 df=1.450 n=16 Pout=251.510 Pcorr=37.699 dPc=-0.024 dE/T=3.57 rel=3.76e-03(i_l3) cdt r/f=1.897/0.424 wall=47s
+19:22:18   [zsw c1] Ton=17.3404 dr=2.700 df=1.450 n=16 Pout=250.925 Pcorr=37.243 dPc=+0.013 dE/T=-2.04 rel=2.24e-03(i_l3) cdt r/f=1.904/0.426 wall=46s
+19:23:03   [zsw c2] Ton=17.3176 dr=2.700 df=1.450 n=16 Pout=250.165 Pcorr=37.165 dPc=+0.008 dE/T=-1.28 rel=1.41e-03(i_l3) cdt r/f=1.902/0.426 wall=45s
+19:23:48   [zsw c3] Ton=17.3101 dr=2.700 df=1.450 n=16 Pout=249.882 Pcorr=37.157 dPc=+0.004 dE/T=-0.61 rel=7.09e-04(i_l3) cdt r/f=1.900/0.426 wall=45s
+19:23:48   -> REGULATED_TO_250W P_loss=37.1568 W (raw 36.5444) Pout=249.882 gate=8.302 periods=64 file=zvs_R0.3_T60_r2.700_f1.450.json
+19:23:48 solve zvs_R0.3_T60_r2.700_f1.350 (sweep) from Ton=17.3101 ns origin=35.0 ns
+19:24:32   [zsw c0] Ton=17.3101 dr=2.700 df=1.350 n=16 Pout=251.183 Pcorr=37.383 dPc=-0.022 dE/T=3.36 rel=3.57e-03(i_l3) cdt r/f=1.897/0.347 wall=44s
+19:25:18   [zsw c1] Ton=17.2435 dr=2.700 df=1.350 n=16 Pout=249.823 Pcorr=36.690 dPc=+0.027 dE/T=-4.17 rel=4.86e-03(i_l3) cdt r/f=1.906/0.351 wall=46s
+19:26:05   [zsw c2] Ton=17.2655 dr=2.700 df=1.350 n=16 Pout=249.965 Pcorr=37.085 dPc=-0.012 dE/T=1.70 rel=1.94e-03(i_l3) cdt r/f=1.898/0.349 wall=47s
+19:26:49   [zsw c3] Ton=17.2655 dr=2.700 df=1.350 n=16 Pout=250.106 Pcorr=37.009 dPc=-0.002 dE/T=0.20 rel=2.12e-04(i_l3) cdt r/f=1.900/0.349 wall=44s
+19:26:49   -> REGULATED_TO_250W P_loss=37.0089 W (raw 37.2101) Pout=250.106 gate=8.303 periods=64 file=zvs_R0.3_T60_r2.700_f1.350.json
+19:26:49   extension step (edge optimum) d_fall -0.1 ns
+19:26:49 solve zvs_R0.3_T60_r2.700_f1.250 (sweep) from Ton=17.2655 ns origin=35.0 ns
+19:27:35   [zsw c0] Ton=17.2655 dr=2.700 df=1.250 n=16 Pout=251.367 Pcorr=37.463 dPc=-0.021 dE/T=3.15 rel=3.44e-03(i_l3) cdt r/f=1.898/0.259 wall=46s
+19:28:18   [zsw c1] Ton=17.2161 dr=2.700 df=1.250 n=16 Pout=250.390 Pcorr=36.943 dPc=+0.019 dE/T=-2.97 rel=3.32e-03(i_l3) cdt r/f=1.905/0.260 wall=43s
+19:29:04   [zsw c2] Ton=17.2005 dr=2.700 df=1.250 n=16 Pout=249.785 Pcorr=36.936 dPc=+0.009 dE/T=-1.44 rel=1.58e-03(i_l3) cdt r/f=1.902/0.260 wall=46s
+19:29:49   [zsw c3] Ton=17.2062 dr=2.700 df=1.250 n=16 Pout=249.819 Pcorr=37.039 dPc=-0.001 dE/T=0.22 rel=2.49e-04(i_l3) cdt r/f=1.899/0.260 wall=45s
+19:29:49   -> REGULATED_TO_250W P_loss=37.0392 W (raw 37.2564) Pout=249.819 gate=8.304 periods=64 file=zvs_R0.3_T60_r2.700_f1.250.json
+19:29:49   extension step (edge optimum) d_fall -0.1 ns
+19:29:49   best d_fall at d_rise=2.700: 1.350 ns
+19:29:49 solve zvs_R0.3_T60_r2.800_f1.350 (sweep) from Ton=17.2655 ns origin=35.0 ns
+19:30:33   [zsw c0] Ton=17.2655 dr=2.800 df=1.350 n=16 Pout=251.362 Pcorr=37.405 dPc=-0.019 dE/T=3.00 rel=3.32e-03(i_l3) cdt r/f=2.049/0.347 wall=43s
+19:31:16   [zsw c1] Ton=17.2157 dr=2.800 df=1.350 n=16 Pout=250.416 Pcorr=36.871 dPc=+0.017 dE/T=-2.96 rel=3.31e-03(i_l3) cdt r/f=2.058/0.350 wall=43s
+19:31:57   [zsw c2] Ton=17.2090 dr=2.800 df=1.350 n=16 Pout=249.980 Pcorr=36.950 dPc=+0.003 dE/T=-0.50 rel=5.82e-04(i_l3) cdt r/f=2.054/0.349 wall=41s
+19:31:57   -> REGULATED_TO_250W P_loss=36.9498 W (raw 36.4504) Pout=249.980 gate=8.297 periods=48 file=zvs_R0.3_T60_r2.800_f1.350.json
+19:31:57 solve zvs_R0.3_T60_r2.900_f1.350 (sweep) from Ton=17.2090 ns origin=35.0 ns
+19:32:40   [zsw c0] Ton=17.2090 dr=2.900 df=1.350 n=16 Pout=251.220 Pcorr=37.422 dPc=-0.018 dE/T=3.04 rel=3.32e-03(i_l3) cdt r/f=2.157/0.347 wall=43s
+19:33:22   [zsw c1] Ton=17.1557 dr=2.900 df=1.350 n=16 Pout=250.225 Pcorr=36.864 dPc=+0.018 dE/T=-3.17 rel=3.61e-03(i_l3) cdt r/f=2.156/0.350 wall=42s
+19:39:15   [zsw c2] Ton=17.1585 dr=2.900 df=1.350 n=16 Pout=249.973 Pcorr=37.029 dPc=-0.001 dE/T=0.15 rel=2.27e-04(i_l3) cdt r/f=2.157/0.349 wall=352s
+19:39:15   -> REGULATED_TO_250W P_loss=37.0286 W (raw 37.1781) Pout=249.973 gate=8.289 periods=48 file=zvs_R0.3_T60_r2.900_f1.350.json
+19:39:15 solve zvs_R0.3_T60_r3.000_f1.350 (sweep) from Ton=17.1585 ns origin=35.0 ns
+21:04:25   [zsw c0] Ton=17.1585 dr=3.000 df=1.350 n=16 Pout=251.296 Pcorr=37.509 dPc=-0.018 dE/T=3.21 rel=3.47e-03(i_l3) cdt r/f=2.244/0.347 wall=5110s
+22:29:47   [zsw c1] Ton=17.1019 dr=3.000 df=1.350 n=16 Pout=250.273 Pcorr=36.916 dPc=+0.019 dE/T=-3.52 rel=3.90e-03(i_l3) cdt r/f=2.241/0.350 wall=5122s
+22:30:22   [zsw c2] Ton=17.1053 dr=3.000 df=1.350 n=16 Pout=249.984 Pcorr=37.099 dPc=-0.002 dE/T=0.25 rel=3.40e-04(i_l3) cdt r/f=2.243/0.349 wall=35s
+22:30:22   -> REGULATED_TO_250W P_loss=37.0992 W (raw 37.3472) Pout=249.984 gate=8.281 periods=48 file=zvs_R0.3_T60_r3.000_f1.350.json
+22:30:22 solve zvs_R0.3_T60_r2.600_f1.350 (sweep) from Ton=17.2655 ns origin=35.0 ns
+22:30:59   [zsw c0] Ton=17.2655 dr=2.600 df=1.350 n=16 Pout=248.918 Pcorr=36.656 dPc=+0.020 dE/T=-2.82 rel=3.38e-03(i_l3) cdt r/f=1.783/0.351 wall=36s
+22:31:37   [zsw c1] Ton=17.3028 dr=2.600 df=1.350 n=16 Pout=249.638 Pcorr=37.085 dPc=-0.015 dE/T=2.22 rel=2.31e-03(i_l3) cdt r/f=1.781/0.349 wall=38s
+22:32:15   [zsw c2] Ton=17.3097 dr=2.600 df=1.350 n=16 Pout=249.984 Pcorr=37.036 dPc=-0.003 dE/T=0.40 rel=4.31e-04(i_l3) cdt r/f=1.782/0.349 wall=39s
+22:32:15   -> REGULATED_TO_250W P_loss=37.0359 W (raw 37.4351) Pout=249.984 gate=8.309 periods=48 file=zvs_R0.3_T60_r2.600_f1.350.json
+22:32:15 solve zvs_R0.3_T60_r2.500_f1.350 (sweep) from Ton=17.3097 ns origin=35.0 ns
+22:32:52   [zsw c0] Ton=17.3097 dr=2.500 df=1.350 n=16 Pout=248.864 Pcorr=36.744 dPc=+0.021 dE/T=-2.62 rel=3.24e-03(i_l3) cdt r/f=1.671/0.351 wall=37s
+22:33:32   [zsw c1] Ton=17.3609 dr=2.500 df=1.350 n=16 Pout=249.954 Pcorr=37.297 dPc=-0.026 dE/T=3.40 rel=3.74e-03(i_l3) cdt r/f=1.669/0.348 wall=39s
+22:34:11   [zsw c2] Ton=17.3527 dr=2.500 df=1.350 n=16 Pout=250.002 Pcorr=37.055 dPc=+0.005 dE/T=-0.66 rel=7.21e-04(i_l3) cdt r/f=1.670/0.349 wall=39s
+22:34:51   [zsw c3] Ton=17.3527 dr=2.500 df=1.350 n=16 Pout=249.956 Pcorr=37.087 dPc=+0.000 dE/T=-0.05 rel=9.60e-05(i_l3) cdt r/f=1.670/0.349 wall=41s
+22:34:51   -> REGULATED_TO_250W P_loss=37.0868 W (raw 37.0326) Pout=249.956 gate=8.314 periods=64 file=zvs_R0.3_T60_r2.500_f1.350.json
+22:34:51 solve zvs_R0.3_T60_r2.400_f1.350 (sweep) from Ton=17.3527 ns origin=35.0 ns
+22:35:32   [zsw c0] Ton=17.3527 dr=2.400 df=1.350 n=16 Pout=248.867 Pcorr=36.896 dPc=+0.022 dE/T=-2.47 rel=3.17e-03(i_l3) cdt r/f=1.556/0.351 wall=41s
+22:36:13   [zsw c1] Ton=17.3982 dr=2.400 df=1.350 n=16 Pout=249.847 Pcorr=37.411 dPc=-0.027 dE/T=3.25 rel=3.65e-03(i_l3) cdt r/f=1.553/0.348 wall=40s
+22:36:55   [zsw c2] Ton=17.3956 dr=2.400 df=1.350 n=16 Pout=249.998 Pcorr=37.221 dPc=+0.002 dE/T=-0.24 rel=2.43e-04(i_l3) cdt r/f=1.555/0.349 wall=42s
+22:36:55   -> REGULATED_TO_250W P_loss=37.2213 W (raw 36.9822) Pout=249.998 gate=8.317 periods=48 file=zvs_R0.3_T60_r2.400_f1.350.json
+22:36:55   optimum: d_rise=2.800 d_fall=1.350 ns P_loss=36.9498 W (zvs_R0.3_T60_r2.800_f1.350.json)
+22:37:05   decomp zvs_R0.3_T60_r2.700_f1.750.json: P_loss 38.547 (accepted 38.547); conduction=25.16 turn_on_overlap=-0.11 turn_on_underdriven=2.78 turn_off_overlap=13.47 turn_off_underdriven=1.96 third_quadrant=2.00 off_state=-7.19 a59_style_cond=27.16
+22:37:15   decomp zvs_R0.3_T60_r2.800_f1.350.json: P_loss 36.957 (accepted 36.950); conduction=25.23 turn_on_overlap=-0.83 turn_on_underdriven=2.74 turn_off_overlap=12.83 turn_off_underdriven=1.96 third_quadrant=0.49 off_state=-5.93 a59_style_cond=27.08
+22:37:28   xcheck zvs_R0.3_T60_r2.800_f1.350.json: EPC2067X P_loss 36.961 W (Pout 249.96) vs as-distributed 36.950 W (Pout 249.98)
+22:37:42   xcheck zvs_R0.3_T60_r2.700_f1.750.json: EPC2067X P_loss 38.546 W (Pout 250.13) vs as-distributed 38.547 W (Pout 250.13)
+22:37:42 === zvs R1.0_T60 stages=wave
+22:37:49   waveforms written: zvs_R1.0_T60_phase1_summary.json

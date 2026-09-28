@@ -1,0 +1,41 @@
+wrote results.json: 74 points, 10 decompositions, 2 brute
+
+== R0.3_T60
+  zvs      opt [2.8, 1.3499999999999999] P_loss=36.950 device=36.548 +gate=45.247 centre=38.54681985249361 n=16 failed=0
+  baseline opt [3.05, 1.8] P_loss=35.747 device=35.372 +gate=44.095 centre=35.94798542807369 n=13 failed=0
+  zvs_minus_baseline_w: +1.203 W
+  zvs_minus_baseline_device_w: +1.176 W
+  zvs_minus_baseline_with_gate_w: +1.152 W
+  zvs_minus_baseline_centre_w: +2.599 W
+  change_vs_a59_w: +5.761 W
+
+== R1.0_T60
+  zvs      opt [3.7499999999999996, 2.3] P_loss=61.086 device=60.619 +gate=69.378 centre=64.18151037407402 n=18 failed=0
+  baseline opt [4.05, 2.9499999999999997] P_loss=43.740 device=43.345 +gate=52.063 centre=44.569962124633925 n=17 failed=5
+  zvs_minus_baseline_w: +17.346 W
+  zvs_minus_baseline_device_w: +17.274 W
+  zvs_minus_baseline_with_gate_w: +17.315 W
+  zvs_minus_baseline_centre_w: +19.612 W
+  change_vs_a59_w: +21.858 W
+
+== decompositions (dissipative, Coss-corrected; W)
+  baseline_R0.3_T60_r3.050_f1.800.json: conduction=12.58 turn_on_overlap=19.65 turn_on_underdriven=1.10 turn_off_overlap=1.05 turn_off_underdriven=0.74 third_quadrant=0.04 off_state=0.21 | a59_style_cond=13.57 Rfull={'h1': 1.5350136128182328, 'l1': 1.5232062583976924, 'h2': 1.5351920318428678, 'l2': 1.5232054451830628, 'h3': 1.5351738604912812, 'l3': 1.523038630113616, 'h4': 1.535630337230254, 'l4': 1.5176538376082482}
+  baseline_R0.3_T60_r3.150_f2.000.json: conduction=12.55 turn_on_overlap=19.65 turn_on_underdriven=1.14 turn_off_overlap=1.08 turn_off_underdriven=0.74 third_quadrant=0.20 off_state=0.02 | a59_style_cond=13.56 Rfull={'h1': 1.5350797516085268, 'l1': 1.5232208464639494, 'h2': 1.535349544511681, 'l2': 1.5231531887671679, 'h3': 1.535073192743542, 'l3': 1.5230098165778478, 'h4': 1.535967787719238, 'l4': 1.5175930398299111}
+  baseline_R1.0_T60_r2.150_f1.150_literal.json: conduction=12.69 turn_on_overlap=53.00 turn_on_underdriven=1.96 turn_off_overlap=44.26 turn_off_underdriven=1.36 third_quadrant=0.00 off_state=0.18 | a59_style_cond=14.40 Rfull={'h1': 1.5791001279571064, 'l1': 1.5296073391163243, 'h2': 1.579580350572186, 'l2': 1.529597264134361, 'h3': 1.5793394865477226, 'l3': 1.5298678024638819, 'h4': 1.5798496675441425, 'l4': 1.5210018336545643}
+  baseline_R1.0_T60_r4.050_f2.950.json: conduction=11.48 turn_on_overlap=19.68 turn_on_underdriven=2.35 turn_off_overlap=7.70 turn_off_underdriven=1.47 third_quadrant=0.40 off_state=0.31 | a59_style_cond=13.12 Rfull={'h1': 1.5825575169805215, 'l1': 1.5257885697957827, 'h2': 1.5828022438288762, 'l2': 1.5257571541377524, 'h3': 1.582973048809401, 'l3': 1.5257889508569107, 'h4': 1.5833628906044537, 'l4': 1.5210078980617139}
+  baseline_R1.0_T60_r4.350_f3.450.json: conduction=11.43 turn_on_overlap=19.71 turn_on_underdriven=2.34 turn_off_overlap=7.72 turn_off_underdriven=1.49 third_quadrant=1.25 off_state=0.27 | a59_style_cond=13.13 Rfull={'h1': 1.5826258460333584, 'l1': 1.5258094712218042, 'h2': 1.58263879113134, 'l2': 1.525804249011392, 'h3': 1.5827521603577608, 'l3': 1.5258006211865154, 'h4': 1.5830012267858886, 'l4': 1.520898026234822}
+  zvs_R0.3_T60_r2.700_f1.750.json: conduction=25.16 turn_on_overlap=0.02 turn_on_underdriven=2.85 turn_off_overlap=5.97 turn_off_underdriven=1.85 third_quadrant=1.98 off_state=0.20 | a59_style_cond=27.16 Rfull={'h1': 1.5574244908871324, 'l1': 1.537480279525107, 'h2': 1.5579919571930205, 'l2': 1.537337355105892, 'h3': 1.5573433276836182, 'l3': 1.5374182974346144, 'h4': 1.557981008673457, 'l4': 1.5300156410767471}
+  zvs_R0.3_T60_r2.800_f1.350.json: conduction=25.23 turn_on_overlap=0.02 turn_on_underdriven=2.87 turn_off_overlap=5.86 turn_off_underdriven=1.84 third_quadrant=0.47 off_state=0.22 | a59_style_cond=27.08 Rfull={'h1': 1.5581315787378434, 'l1': 1.5374134298167073, 'h2': 1.557667646878006, 'l2': 1.5372438337868417, 'h3': 1.5576772883224477, 'l3': 1.5373804196756116, 'h4': 1.5568885642307753, 'l4': 1.5300425688056583}
+  zvs_R1.0_T60_r1.950_f0.650_literal.json: conduction=25.26 turn_on_overlap=47.75 turn_on_underdriven=4.55 turn_off_overlap=82.02 turn_off_underdriven=3.11 third_quadrant=0.00 off_state=0.30 | a59_style_cond=28.49 Rfull={'h1': 1.5953351642947478, 'l1': 1.5471886250757356, 'h2': 1.5968332395849738, 'l2': 1.5470983856935243, 'h3': 1.5967740171015359, 'l3': 1.547621892851199, 'h4': 1.5965880249703253, 'l4': 1.5348239167058944}
+  zvs_R1.0_T60_r3.550_f3.000.json: conduction=22.49 turn_on_overlap=0.36 turn_on_underdriven=5.83 turn_off_overlap=27.34 turn_off_underdriven=3.67 third_quadrant=3.68 off_state=0.23 | a59_style_cond=26.27 Rfull={'h1': 1.605169530637014, 'l1': 1.5420516693104769, 'h2': 1.6053469946809995, 'l2': 1.5419319868359775, 'h3': 1.6057448502090195, 'l3': 1.5421357325091278, 'h4': 1.6046543124494024, 'l4': 1.5343924084675793}
+  zvs_R1.0_T60_r3.750_f2.300.json: conduction=22.65 turn_on_overlap=0.16 turn_on_underdriven=5.89 turn_off_overlap=26.86 turn_off_underdriven=3.59 third_quadrant=1.15 off_state=0.33 | a59_style_cond=26.24 Rfull={'h1': 1.6072476948727874, 'l1': 1.5420082257674108, 'h2': 1.6074471472651475, 'l2': 1.5419190055824912, 'h3': 1.6074303837216743, 'l3': 1.5420084568829273, 'h4': 1.60660879821567, 'l4': 1.5345446238837277}
+
+== x-form checks
+  baseline_R0.3_T60_r3.050_f1.800.json: 35.747 -> 35.752 W (delta +0.005)
+  baseline_R0.3_T60_r3.150_f2.000.json: 35.948 -> 35.945 W (delta -0.003)
+  baseline_R1.0_T60_r4.050_f2.950.json: 43.740 -> 43.749 W (delta +0.009)
+  baseline_R1.0_T60_r4.350_f3.450.json: 44.570 -> 44.574 W (delta +0.004)
+  zvs_R0.3_T60_r2.700_f1.750.json: 38.547 -> 38.546 W (delta -0.001)
+  zvs_R0.3_T60_r2.800_f1.350.json: 36.950 -> 36.961 W (delta +0.011)
+  zvs_R1.0_T60_r3.550_f3.000.json: 64.182 -> 64.184 W (delta +0.003)
+  zvs_R1.0_T60_r3.750_f2.300.json: 61.086 -> 61.077 W (delta -0.009)

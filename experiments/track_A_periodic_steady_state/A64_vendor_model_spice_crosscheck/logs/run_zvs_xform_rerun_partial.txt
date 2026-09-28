@@ -1,0 +1,7 @@
+19:01:07 === zvs R1.0_T60 stages=center,sweep,repair,extend_fall,step,decomp,literal,brute
+19:01:07 centre search zvs_R1.0_T60_r3.650_f2.950_centre_search
+19:01:41   [zcs c0] Ton=17.1044 dr=3.650 df=2.950 n=20 Pout=224.389 Pcorr=54.237 dPc=+0.259 dE/T=-35.47 rel=3.96e-02(i_l3) cdt r/f=2.096/0.644 wall=34s
+19:02:11   [zcs c1] Ton=17.5044 dr=3.577 df=2.953 n=16 Pout=229.521 Pcorr=60.927 dPc=-0.225 dE/T=24.51 rel=2.05e-02(i_l3) cdt r/f=1.710/0.646 wall=29s
+19:02:38   [zcs c2] Ton=17.9044 dr=3.697 df=2.959 n=16 Pout=242.010 Pcorr=64.238 dPc=-0.230 dE/T=27.40 rel=2.06e-02(i_l3) cdt r/f=1.934/0.647 wall=28s
+19:03:07   [zcs c3] Ton=18.0524 dr=3.697 df=2.959 n=16 Pout=247.917 Pcorr=64.429 dPc=-0.109 dE/T=12.92 rel=1.07e-02(i_l3) cdt r/f=2.170/0.643 wall=29s
+19:03:37   [zcs c4] Ton=18.0785 dr=3.639 df=2.963 n=16 Pout=249.113 Pcorr=63.789 dPc=-0.018 dE/T=1.99 rel=1.72e-03(i_l3) cdt r/f=2.106/0.643 wall=29s

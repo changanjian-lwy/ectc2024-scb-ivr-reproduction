@@ -1,0 +1,6 @@
+# EPC's vendor library is copyrighted and is NOT redistributed by this public
+# repository. `fetch_epc2067_model.py` downloads it and writes it here.
+vendor/
+# LTspice scratch copies (the runner normally uses a short temp dir outside
+# the repository; this entry only guards against accidental local copies)
+work/
