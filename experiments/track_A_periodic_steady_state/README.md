@@ -295,3 +295,16 @@ any request to the advisor:
 
 Together these say that A56-A59's rated-load advantage is a narrow,
 warm-device, full-load, low-inductor-loss result, not a design win.
+
+`A64_vendor_model_spice_crosscheck` (verification line) repeats the tuned
+comparison in LTspice with EPC's own EPC2067 subcircuit. The model was
+hash-checked from public mirrors and is not redistributed. The run uses
+floating 5 V gate drives and SPICE-retuned timing, at 250 W and 60 C. The
+ranking reverses: the large-ripple design loses by +17.35 W at R_drv =
+1 Ohm and +1.20 W at 0.3 Ohm. The cause is turn-off V*I overlap at ~189 A
+per high-side switch, which an ideal switch cannot have: 26.9 vs 7.7 W at
+1 Ohm. Where the two models should agree, they do: Rds(on), Coss, the
+baseline's hard turn-on and the conduction loss. The parent session
+independently replayed all four optima to within 0.04 W. See
+`CONSOLIDATED_FINDINGS_A53_A64_2026-09-28.md` for the whole A53-A64 chain
+and the remaining advisor questions.
