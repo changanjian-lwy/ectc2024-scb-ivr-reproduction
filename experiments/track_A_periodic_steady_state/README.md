@@ -463,3 +463,16 @@ to the controller.
   structural cause.
 - **A confound remains.** The latency also deepens phase 1's effective
   negative current (-0.66 A/ns).
+
+`A76_p24_single_module_control_rules` settles the control rules for the
+Verilog controller.
+- **Comparator self-trim (Schaef 2019): adopted.** It absorbs 10-18 ns of
+  latency completely: the state equals the zero-latency one.
+- **Reactive ZVS: dropped.** It is unused once the trim is on.
+- **A per-phase current condition on the timed turn-offs: rejected.**
+  Phase 4 skips cycles, the ladder drifts, and Vds reaches 40-44 V.
+- **Phase 4 is still restart-driven at -2.5 A.** A75's improvement came
+  from the deeper effective negative current. The untrimmed 10 ns run, at
+  -8.8 A (7% of peak, inside P25's 5-10%; P24 states 1-2%), passes: every
+  phase soft, no restart.
+- **Next.** A negative-current target sweep (A78).

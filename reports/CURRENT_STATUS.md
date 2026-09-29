@@ -325,13 +325,19 @@ each question:
        own zero-cross-detection reference.
      - In those predictive runs phase 4 also rings.
      - P25 tolerates 45 ns (edges at 0.8-1.7 V).
-   - **Next, physical model (single-module level first).**
-     1. Compensate the phase-1 comparator for the latency, to separate
-        the deeper effective negative current from the prediction.
-     2. Test phase 4 with per-phase current sensing, and test for two
-        coexisting steady states at identical parameters.
-     3. Make the ZVS path predictive.
-     4. Write the predictive controller in Verilog and co-simulate it
+   - **Done ([A76](../experiments/track_A_periodic_steady_state/A76_p24_single_module_control_rules/RESULTS.md), 2026-09-30): control rules.**
+     - **Adopted:** comparator self-trim (Schaef). It absorbs 10-18 ns of
+       latency.
+     - **Dropped:** reactive ZVS.
+     - **Rejected:** per-phase current conditions (cycle skipping, ladder
+       drift, Vds up to 44 V).
+     - **Phase 4 depends on the negative-current target.** At P24's -2.5 A
+       (2%) it stays restart-driven. At -8.8 A (7%, inside P25's 5-10%)
+       every phase is soft.
+   - **Next (single-module level first).**
+     1. Physical model, A78: a negative-current target sweep across P24's
+        1-2% and P25's 5-10%, with conduction loss accounted.
+     2. A77: the Verilog controller with the adopted rules, co-simulated
         with the plant.
 
      After that, the four-phase mathematical model with the valley
