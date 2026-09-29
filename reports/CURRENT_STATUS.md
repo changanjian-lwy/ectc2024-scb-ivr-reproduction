@@ -351,11 +351,17 @@ each question:
      - An integral Ton loop regulates the module to 1.0000 V.
      - At 5%, phase 4 is bistable: the soft and restart states coexist.
      - At 7.5% (-9.375 A), both gains settle soft, for +2% conduction loss.
+   - **Done ([A80](../experiments/track_A_periodic_steady_state/A80_verilog_full_module_controller/RESULTS.md), 2026-09-30): the full Verilog module controller.**
+     - Co-simulated from zero at 7.5%, it regulates to 1.0002 V with every
+       phase soft, matching Python within quantisation.
+     - It reproduces the 5% bistability.
+     - Its dither is 2.3-4.0 A, from clock quantisation.
    - **Next (single-module level first).**
-     1. A80 (running): the full Verilog module controller from zero (mode S
-        start-up, handover, mode P, voltage loop), co-simulated at 7.5%.
-     2. Mathematical model: whether two P24 orbits coexist at 5%, and
-        where the restart orbit ends.
+     1. A81: an asynchronous comparator/delay-line fast path for phase 1
+        (Chiang 2009-style), to remove the quantisation dither.
+     2. Mathematical model: the four-phase extension (the current code is
+        nP = 3). Then: do two P24 orbits coexist at 5%, and where does the
+        restart orbit end?
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

@@ -517,3 +517,20 @@ Ton.
   7.5% is the robust target.
 - **Dither.** The predictive dither is 1.0-1.25 A, just above the project's
   1 A threshold.
+
+`A80_verilog_full_module_controller` extends the A77 RTL into the full
+module controller:
+- mode S start-up with chained edges across the 2.15 ns dead time;
+- the handover;
+- mode P;
+- a 12-bit-ADC integral voltage loop.
+
+Co-simulated from the all-zero plant at 7.5%, it:
+- hands over at 88.80 us, the same instant as Python;
+- regulates to 1.0002 V within 65 us;
+- keeps every phase predictive and soft at 7.8-7.9 V;
+- stays at or below 25.4 V peak Vds.
+
+At 5% it reproduces A79's phase-4 restart state. The one shortfall is a
+2.3-4.0 A dither from the 4 ns synchroniser quantisation and Ton LSB
+toggling. Checks: unit tests 15/15; synthesis clean at 22.3k cells.
