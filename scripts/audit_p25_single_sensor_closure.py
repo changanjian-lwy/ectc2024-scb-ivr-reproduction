@@ -44,10 +44,10 @@ NAMES = ("a2_v", "x1_v", "out_v", "iL1_a", "iL2_a", "iL3_a")
 SCALE = np.array([1, 1, .1, 1, 1, 1.])
 
 
-def context(phase_shift_s, intervals=4000):
+def context(phase_shift_s, intervals=4000, winding_ohm=(0.,) * 3):
     sc = P25_SCALE
     label = "D41 P25-scale " + ("single-sensor" if phase_shift_s else "per-phase") + " control"
-    parts = Components(sc["coss_f"], (0.,) * 6, sc["series_f"], sc["output_f"], sc["inductance_h"], (0.,) * 3, label)
+    parts = Components(sc["coss_f"], (0.,) * 6, sc["series_f"], sc["output_f"], sc["inductance_h"], tuple(winding_ohm), label)
     policy = Policy((sc["on_time_s"],) * 3, 1e-8, 1e-8, 1e-15, True, label, phase_shift_s)
     ports = ConstantPorts(sc["load_a"], 0., label)
     reverse = ReverseModel("ideal_zero_drop", (0.,) * 6, "declared ideal mathematical branch")
