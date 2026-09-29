@@ -270,11 +270,18 @@ each question:
 2. **Closed-loop Ton (mathematical model).** Open loop, Vo sags to 0.844 V
    at 4.9 mΩ. P25 regulates to 1 V. The question is whether a slow Ton loop
    keeps the orbit stable.
-3. **Start-up and timeout fallback (both models).** A69's deadlock shows
-   that fixed-shift control needs a forced turn-on. The rule belongs in the
-   mathematical model's control memory. Whether it recovers from the A69
-   start state is then checked in the physical model. This connects to
-   Track B.
+3. **Start-up (both models).**
+   - **Done ([A70](../experiments/track_A_periodic_steady_state/A70_valley_fallback_turn_on/RESULTS.md)).**
+     A69's deadlock is removed by a published valley-switching fallback
+     (Chiang and Chen, TPEL 2009). The A69 deadlock start settles on
+     D42's 4.9 mΩ section (within 0.6 mA). Runs near the orbit are
+     unchanged.
+   - **Next, mathematical model.** Add the valley trigger to the control
+     memory and re-check the D41/D42 orbit and its stability.
+   - **Next, physical model.** Test the start-up sequence of Stillwell and
+     Pilawa-Podgurski (TPEL 2019): load disconnected, switching running,
+     input ramped, load connected afterwards. First on P25 (three phases),
+     then on P24 via Track B's precharge.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

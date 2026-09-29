@@ -353,3 +353,17 @@ model in `symbolic_derivations/02_P25_native`; older files call it the
     cycle (D42: 0.926).
   - The fixed-shift control has no timeout: started far from the damped
     orbit it deadlocks, so hardware needs a fallback.
+
+`A70_valley_fallback_turn_on` answers A69's deadlock from the literature,
+with no new mechanism invented. Chiang and Chen (TPEL 2009) turn the switch
+on at the resonant valley of Vds whenever ZVS cannot be reached. With that
+fallback on the three high sides:
+- the A69 deadlock start fires the valley path once, then settles on
+  D42's 4.9 mOhm section, to within 0.6 mA;
+- a run near the orbit is bit-identical to A69, with zero firings.
+
+The deadlock had been a near miss: SH2's Vds bottomed at 4 mV. A start
+with empty inductors into the full constant-current load still stalls,
+because Vo is pulled negative. That is why Stillwell and Pilawa-Podgurski
+(TPEL 2019) start with the load disconnected, which is the next test.
+Track B's R04E21-R04E26 stall is the same missing turn-on path.
