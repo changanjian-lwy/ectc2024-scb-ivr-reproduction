@@ -284,14 +284,15 @@ def edge_timing(d: dict, meta: dict, a59: dict) -> list[dict]:
                 t_out_cmd += T
             while t_out_cmd >= t_hi:
                 t_out_cmd -= T
-            t_in_cmd = t_out_cmd + ((t_in_cmd_tau - t_out_cmd_tau) % T)
+            # A65: signed command offset, wrapped to (-T/2, T/2] (negative = command overlap)
+            t_in_cmd = t_out_cmd + command_offset(t_in_cmd_tau, t_out_cmd_tau, T)
             vgs_out = gate_vgs(d, outgoing, p)
             vgs_in = gate_vgs(d, incoming, p)
             vds_in = branch_v(d, incoming, p)
             vds_out = branch_v(d, outgoing, p)
-            span_end = t_in_cmd + 8e-9
+            span_end = max(t_in_cmd, t_out_cmd) + 8e-9
             off = crossings(t, vgs_out, vth, t_out_cmd, span_end, -1)
-            on = crossings(t, vgs_in, vth, t_out_cmd, span_end, +1)
+            on = crossings(t, vgs_in, vth, min(t_in_cmd, t_out_cmd), span_end, +1)
             t_off = off[0] if off else None
             t_on = on[0] if on else None
             zero = crossings(t, vds_in, VDS_ZERO_V, t_out_cmd, span_end, -1)
@@ -325,13 +326,22 @@ def edge_timing(d: dict, meta: dict, a59: dict) -> list[dict]:
                 rec["hard_window_s"] = end_hard - t_on
                 rec["hard_energy_incoming_j"] = integrate(t, vds_in * idr_in, t_on, end_hard) if end_hard > t_on else 0.0
             # full edge window: outgoing command-off to incoming command-on + 5 ns
-            w1, w2 = t_out_cmd, t_in_cmd + 5e-9
+            w1, w2 = t_out_cmd, max(t_in_cmd, t_out_cmd) + 5e-9
             rec["edge_window_energy_incoming_j"] = integrate(t, vds_in * idr_in, w1, w2)
             rec["edge_window_energy_outgoing_j"] = integrate(t, vds_out * idr_out, w1, w2)
             rec["inductor_current_at_cmd_off_a"] = interp(t, d[f"I(LIND{p})"], t_out_cmd)
             out.append(rec)
     return out
 
+
+
+def command_offset(t_in_tau: float, t_out_tau: float, period: float) -> float:
+    """Incoming command-on minus outgoing command-off, wrapped to (-T/2, T/2].
+
+    A64 used `(t_in - t_out) % T`, which is the same for positive dead times
+    but maps a negative one (command overlap, A65) to almost a period later.
+    """
+    return ((t_in_tau - t_out_tau + period / 2) % period) - period / 2
 
 _COSS = {}
 
@@ -484,5 +494,5 @@ def channel_summary(edges: list[dict]) -> dict:
     return out
 
 
-__all__ = ["analyze", "state_at", "derived", "stored_energy", "relative_change", "vth_knee",
+__all__ = ["analyze", "command_offset", "state_at", "derived", "stored_energy", "relative_change", "vth_knee",
            "integrate", "interp", "edge_timing", "channel_summary"]

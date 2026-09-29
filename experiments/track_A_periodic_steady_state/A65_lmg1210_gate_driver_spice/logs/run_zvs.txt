@@ -1,0 +1,8 @@
+16:34:31 === zvs LMG1210_DEV_T60 stages=center,sweep
+16:34:31   seed: zvs_R1.0_T60_r3.750_f2.300.json (A64, read only)
+16:34:31 centre search zvs_LMG1210_DEV_T60_r3.140_f2.260_centre_search
+16:34:55   [zcs c0] Ton=17.6793 dr=3.140 df=2.260 n=16 Pout=241.120 Pcorr=67.525 dPc=+0.128 dE/T=-23.83 rel=2.46e-02(i_l3) cdt r/f=4.490/3.287 wall=24s
+16:35:15   [zcs c1] Ton=18.0793 dr=2.140 df=1.260 n=16 Pout=250.280 Pcorr=64.167 dPc=-0.218 dE/T=34.51 rel=2.05e-02(i_l3) cdt r/f=3.568/2.279 wall=20s
+16:35:34   [zcs c2] Ton=17.7941 dr=1.140 df=0.260 n=16 Pout=251.939 Pcorr=52.072 dPc=+0.109 dE/T=-13.73 rel=1.25e-02(i_l3) cdt r/f=2.595/1.277 wall=19s
+16:35:52   [zcs c3] Ton=17.7582 dr=0.477 df=0.050 n=16 Pout=248.260 Pcorr=55.132 dPc=+0.092 dE/T=-6.10 rel=7.09e-03(i_l3) cdt r/f=0.784/1.062 wall=18s
+16:36:35   [zcs c4] Ton=17.7904 dr=0.904 df=0.050 n=16 Pout=250.956 Pcorr=53.638 dPc=-0.065 dE/T=6.30 rel=5.91e-03(i_l3) cdt r/f=2.378/1.071 wall=43s

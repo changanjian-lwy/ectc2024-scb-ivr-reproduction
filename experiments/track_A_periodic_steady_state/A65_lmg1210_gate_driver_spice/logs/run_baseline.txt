@@ -1,0 +1,6 @@
+16:34:31 === baseline LMG1210_DEV_T60 stages=center,sweep
+16:34:31   seed: baseline_R1.0_T60_r4.050_f2.950.json (A64, read only)
+16:34:31 centre search baseline_LMG1210_DEV_T60_r3.655_f2.795_centre_search
+16:35:05   [bcs c0] Ton=19.0055 dr=3.655 df=2.795 n=16 Pout=220.318 Pcorr=22.081 dPc=+0.595 dE/T=-91.87 rel=8.45e-02(i_l2) cdt r/f=3.938/4.220 wall=34s
+16:35:54   [bcs c1] Ton=19.4055 dr=2.761 df=1.795 n=16 Pout=214.290 Pcorr=60.647 dPc=-2.225 dE/T=101.84 rel=7.68e-02(i_l2) cdt r/f=2.607/2.974 wall=49s
+16:36:34   [bcs c2] Ton=19.8055 dr=2.454 df=0.795 n=16 Pout=248.188 Pcorr=58.263 dPc=-1.906 dE/T=92.55 rel=6.57e-02(i_l2) cdt r/f=2.304/1.930 wall=39s

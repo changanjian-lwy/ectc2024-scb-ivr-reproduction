@@ -218,7 +218,7 @@ def stage_sweep(a59, case, log):
     def line(fixed, centre_val, vary_fall):
         up = [centre_val + k * GRID_S for k in range(1, HALF_WIDTH_STEPS + 1)]
         down = [centre_val - k * GRID_S for k in range(1, HALF_WIDTH_STEPS + 1)]
-        down = [v for v in down if v > 0.05e-9]
+        down = [v for v in down if v > S.DT_FLOOR_S]
         walk(fixed, up, vary_fall)
         walk(fixed, down, vary_fall)
         # declared outward extension while the best value sits on the edge
@@ -230,7 +230,7 @@ def stage_sweep(a59, case, log):
             if best_v == vals[-1]:
                 walk(fixed, [vals[-1] * 1e-12 + GRID_S], vary_fall)
                 log(f"  extension step (edge optimum) {'d_fall' if vary_fall else 'd_rise'} +0.1 ns")
-            elif best_v == vals[0] and vals[0] * 1e-12 - GRID_S > 0.05e-9:
+            elif best_v == vals[0] and vals[0] * 1e-12 - GRID_S > S.DT_FLOOR_S:
                 walk(fixed, [vals[0] * 1e-12 - GRID_S], vary_fall)
                 log(f"  extension step (edge optimum) {'d_fall' if vary_fall else 'd_rise'} -0.1 ns")
             else:
@@ -673,7 +673,7 @@ def stage_extend_fall(a59, case, log, steps=4):
             log(f"  d_fall optimum interior on the r={dr * 1e9:.3f} line")
             return
         nxt = round((f_min - GRID_S) * 1e12) * 1e-12
-        if nxt <= 0.05e-9:
+        if nxt <= S.DT_FLOOR_S:
             return
         failed = [r for r in records(a59["design"], case)
                   if abs(r.get("dead_time_rise_s", 0) - dr) < 1e-13 and abs(r.get("dead_time_fall_s", 0) - nxt) < 1e-13

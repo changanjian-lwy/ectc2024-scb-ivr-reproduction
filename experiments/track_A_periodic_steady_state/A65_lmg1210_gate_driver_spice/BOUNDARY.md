@@ -80,6 +80,27 @@ Changes:
    emit A64's netlist line for line; only the two header comment lines may
    differ. This was checked before this BOUNDARY: 116/116 lines, 2 header
    differences.
+4. **Negative command dead times allowed (amendment, before any record).**
+   A64's code floored command dead times at +0.05 ns. That floor never
+   bound in A64, where command dead times were >= 1.35 ns.
+
+   With LMG1210's ~1.5 A pull-up, the incoming channel turns on about 1 ns
+   later than the outgoing one turns off, even at zero command dead time.
+   The first centre-search chunks of the large-ripple design drove `d_fall`
+   to the floor, with the channel fall dead time still ~1 ns (target
+   0.65 ns). A floored optimum would have overstated the large-ripple loss.
+
+   The runs were stopped before any record was written. Then:
+   - the floor is `-2.5 ns` (command overlap; the channels themselves still
+     must not overlap, and the loss shows it if they do);
+   - A64's edge analysis computed the incoming command time as
+     `(t_in - t_out) mod T`. That maps a negative offset to almost a period
+     later. It now wraps the signed offset to (-T/2, T/2]. Its search
+     window starts at the earlier of the two commands and ends 8 ns after
+     the later one.
+
+   Both are identical to A64 for positive dead times; unit tests cover this
+   (13 tests).
 
 ## 4. Decides / does not decide
 

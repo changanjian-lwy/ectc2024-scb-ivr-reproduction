@@ -187,5 +187,27 @@ class DriverTests(unittest.TestCase):
             self.assertLess(fig["y_resid_max"], 1e-3)
 
 
+
+class NegativeDeadTimeTests(unittest.TestCase):
+    def test_command_offset_matches_a64_for_positive_and_signs_negative(self):
+        import a65_analysis as Y
+        T = A.PERIOD_S
+        for out_tau in (17e-9, 190e-9, 0.0):
+            for dt in (0.05e-9, 1.35e-9, 4.05e-9):
+                old = ((out_tau + dt) - out_tau) % T
+                self.assertAlmostEqual(Y.command_offset(out_tau + dt, out_tau, T), old, delta=1e-21)
+            for dt in (-0.3e-9, -2.5e-9):
+                self.assertAlmostEqual(Y.command_offset((out_tau + dt) % T, out_tau, T), dt, delta=1e-21)
+
+    def test_negative_fall_dead_time_overlaps_commands(self):
+        a = A.load_a59("zvs")
+        ton, dr, df = a["ton_cmd_s"], 0.5e-9, -0.4e-9
+        w = A.gate_windows(ton, dr, df)
+        for p in range(1, 5):
+            self.assertAlmostEqual(w[("high", p)][1] - w[("low", p)][0], -df, delta=1e-18)
+            for side in ("high", "low"):
+                A.pulse_for(*w[(side, p)], A.PERIOD_S)   # must not raise
+
+
 if __name__ == "__main__":
     unittest.main()

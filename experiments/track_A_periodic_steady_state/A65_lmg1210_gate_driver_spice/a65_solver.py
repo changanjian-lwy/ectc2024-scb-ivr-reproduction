@@ -157,6 +157,12 @@ def rre(samples, skip=0):
     return dict(zip(STATE_KEYS, x.tolist())), float(step), float(last_step)
 
 
+#: Lowest command dead time (A65 BOUNDARY Section 3, change 4). A64's floor
+#: was +0.05 ns and never bound; with LMG1210's 1.5 A pull-up the optimum
+#: needs command overlap (negative command dead time, channels still apart).
+DT_FLOOR_S = -2.5e-9
+
+
 def comp_update(hist, i_cmd, i_meas, target, max_step=1.0e-9):
     """Next command dead time so the measured channel dead time hits target."""
     cmd, meas = hist[-1][i_cmd], hist[-1][i_meas]
@@ -168,7 +174,7 @@ def comp_update(hist, i_cmd, i_meas, target, max_step=1.0e-9):
             if 0.3 < slope < 5.0:
                 gain = 1.0 / slope
     step = max(-max_step, min(max_step, gain * (target - meas)))
-    return max(0.05e-9, cmd + step)
+    return max(DT_FLOOR_S, cmd + step)
 
 
 def power_estimate(ch, state):

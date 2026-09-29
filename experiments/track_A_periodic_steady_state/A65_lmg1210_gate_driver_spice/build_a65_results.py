@@ -1,4 +1,4 @@
-"""A64 - collect every run record into results.json (never overwrites; writes results_vN.json then).
+"""A65 (copy of A64) - collect every run record into results.json (never overwrites; writes results_vN.json then).
 
 Also prints the tables RESULTS.md is written from.
 """
@@ -22,7 +22,20 @@ A59 = {"zvs_p_b_w": 28.670537244169573, "baseline_p_b_w": 33.25495505048852,
 
 
 def case_tag(case):
+    driver = case.get("driver", "R")
+    if driver != "R":
+        return f"{driver}_T{case['temp_c']:.0f}"
     return f"R{case['r_drv_ohm']:.1f}_T{case['temp_c']:.0f}"
+
+
+def a64_reference():
+    """A64's comparison block (read only): the resistor-driver cases."""
+    path = HERE.parent / "A64_vendor_model_spice_crosscheck" / "results.json"
+    comp = json.loads(path.read_text())["comparison"]
+    return {case: {"zvs_p_loss_w": e["zvs"]["optimum_p_loss_w"], "baseline_p_loss_w": e["baseline"]["optimum_p_loss_w"],
+                   "zvs_minus_baseline_w": e["zvs_minus_baseline_w"],
+                   "zvs_timing_ns": e["zvs"]["optimum_timing_ns"], "baseline_timing_ns": e["baseline"]["optimum_timing_ns"]}
+            for case, e in comp.items()}
 
 
 def _ns(v):
@@ -181,7 +194,8 @@ def collect(run_dir):
 
 def write(dry, points, decomps, brutes, others, comparison, model_check, xchecks):
     out = {
-        "experiment": "A64",
+        "experiment": "A65",
+        "driver": "TI LMG1210 typical output I-V (datasheet Figs. 1-2), lmg1210_output_iv.csv",
         "classification": "SENSITIVITY_ONLY",
         "vendor_model": {"subckt": "EPC2067 (EPCGaNLibrary.lib, (C) Efficient Power Conversion Corp.)",
                          "block_sha256_prefix": "b1d201cc7ab403f7", "block_chars": 2734,
@@ -194,6 +208,7 @@ def write(dry, points, decomps, brutes, others, comparison, model_check, xchecks
                                           "the accepted points (xchecks)",
                          "ltspice": "LTspice 26.0.2 for MacOS (Wine)"},
         "a59_reference": A59,
+        "a64_reference": a64_reference(),
         "model_check": model_check,
         "xchecks": xchecks,
         "comparison": comparison,
@@ -224,6 +239,9 @@ def write(dry, points, decomps, brutes, others, comparison, model_check, xchecks
                     "zvs_minus_baseline_centre_w", "change_vs_a59_w"):
             if key in entry:
                 print(f"  {key}: {entry[key]:+.3f} W")
+    for case, e in a64_reference().items():
+        print(f"\n== A64 {case}: zvs {e['zvs_p_loss_w']:.3f} baseline {e['baseline_p_loss_w']:.3f} "
+              f"diff {e['zvs_minus_baseline_w']:+.3f} W")
     print("\n== decompositions (dissipative, Coss-corrected; W)")
     for dr in decomps:
         tot = dr["dissipative_totals_w"] or {}
