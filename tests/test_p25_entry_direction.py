@@ -65,9 +65,38 @@ class EntryDirectionTests(unittest.TestCase):
         self.assertEqual(next(i.status for i in report.items if i.name=="reverse.SH1"),"TANGENT_OR_RATE_UNRESOLVED")
 
     def test_near_zero_not_projected(self):
+        # D40: +1 nV gap moving outward is released under its own status, value kept
         s=replace(self.s,voltage_v=(12.-1e-9,4.,2.,0.,0.,1.))
         report=classify_entry(self.flow(s),self.reverse,self.tol)
+        item=next(i for i in report.items if i.name=="reverse.SH1")
+        self.assertEqual(item.status,"LEAVING_REVERSE_BOUNDARY_WITHIN_TOLERANCE")
+        self.assertAlmostEqual(item.value,1e-9,delta=1e-15)
+        self.assertIn("reverse.SH1",report.release_names)
+
+    def test_d40_negative_residual_moving_outward_is_released_not_projected(self):
+        s=replace(self.s,voltage_v=(12.+6e-9,4.,2.,0.,0.,1.))
+        report=classify_entry(self.flow(s),self.reverse,self.tol)
+        item=next(i for i in report.items if i.name=="reverse.SH1")
+        self.assertEqual(item.status,"LEAVING_REVERSE_BOUNDARY_WITHIN_TOLERANCE")
+        self.assertAlmostEqual(item.value,-6e-9,delta=1e-15)
+        self.assertGreater(item.rate,self.tol.voltage_rate_v_s)
+        self.assertEqual(report.blockers,())
+
+    def test_d40_negative_residual_moving_inward_stays_outside_domain(self):
+        s=replace(self.s,voltage_v=(12.+6e-9,4.,2.,0.,0.,1.),current_a=(-20.,2.,3.))
+        report=classify_entry(self.flow(s),self.reverse,self.tol)
+        self.assertEqual(next(i.status for i in report.items if i.name=="reverse.SH1"),"OUTSIDE_DOMAIN")
+        self.assertIn("reverse.SH1",report.blockers)
+
+    def test_d40_small_positive_tangent_stays_unresolved(self):
+        s=replace(self.s,voltage_v=(12.-1e-9,4.,2.,0.,0.,1.),current_a=(0.,2.,3.))
+        report=classify_entry(self.flow(s),self.reverse,self.tol)
         self.assertEqual(next(i.status for i in report.items if i.name=="reverse.SH1"),"NEAR_BOUNDARY_UNRESOLVED")
+
+    def test_d40_beyond_tolerance_stays_outside_domain(self):
+        s=replace(self.s,voltage_v=(12.+2e-8,4.,2.,0.,0.,1.))
+        report=classify_entry(self.flow(s),self.reverse,self.tol)
+        self.assertEqual(next(i.status for i in report.items if i.name=="reverse.SH1"),"OUTSIDE_DOMAIN")
 
     def test_target_at_entry_is_not_treated_as_release(self):
         s=replace(self.s,voltage_v=(8.,4.,0.,0.,0.,1.))

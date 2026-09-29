@@ -1,7 +1,14 @@
-"""D11: P25 nP=3/nM=1 fixed-mode entry directions, without epsilon steps.
+"""D11/D40: P25 nP=3/nM=1 fixed-mode entry directions, without epsilon steps.
 
-Only exact zero with strictly positive resolved first derivative can leave
-a reverse boundary here. Near-zero, tangent and outward cases are blocked.
+D11: exact zero with a strictly positive resolved first derivative can leave
+a reverse boundary. D40 adds one explicit case: a reverse gap whose value lies
+within the declared voltage tolerance (0 < |g| <= tol, either sign) AND whose
+resolved rate is strictly outward (> rate tolerance) is released with its own
+status, LEAVING_REVERSE_BOUNDARY_WITHIN_TOLERANCE. Such gaps are what a root
+located to that same tolerance leaves behind (e.g. an ON switch preserving a
+-6 nV ZVS-root residual into its next turn-off). The value is kept as is,
+never projected to zero. Tangent, inward, target and current-domain cases
+within the band remain blocked; values below -tol remain OUTSIDE_DOMAIN.
 This classifier does not implement a reverse clamp or activate any gate.
 """
 from dataclasses import dataclass
@@ -64,7 +71,10 @@ def classify_entry(flow, reverse: ReverseModel, tolerance: DirectionTolerance) -
         rt=tolerance.voltage_rate_v_s if unit=="V" else tolerance.current_rate_a_s
         if not isfinite(value) or not isfinite(rate):
             raise ValueError("nonfinite entry value/rate")
-        if value<0:
+        if value!=0 and abs(value)<=tol and role=="reverse" and rate>rt:
+            # D40: tolerance-band gap moving strictly outward; value retained, not projected
+            status="LEAVING_REVERSE_BOUNDARY_WITHIN_TOLERANCE"
+        elif value<0:
             status="OUTSIDE_DOMAIN"  # no projection even inside numerical tolerance
         elif value>tol:
             status="INTERIOR"
@@ -81,6 +91,7 @@ def classify_entry(flow, reverse: ReverseModel, tolerance: DirectionTolerance) -
         else:
             status="TANGENT_OR_RATE_UNRESOLVED"
         items.append(EntryItem(name,float(value),float(rate),unit,status))
-    release=tuple(i.name for i in items if i.status=="LEAVING_REVERSE_BOUNDARY")
-    blockers=tuple(i.name for i in items if i.status not in {"INTERIOR","LEAVING_REVERSE_BOUNDARY"})
+    leaving={"LEAVING_REVERSE_BOUNDARY","LEAVING_REVERSE_BOUNDARY_WITHIN_TOLERANCE"}
+    release=tuple(i.name for i in items if i.status in leaving)
+    blockers=tuple(i.name for i in items if i.status not in {"INTERIOR",*leaving})
     return EntryReport(tuple(items),release,blockers)
