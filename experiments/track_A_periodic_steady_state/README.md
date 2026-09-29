@@ -491,3 +491,16 @@ and Icarus Verilog.
   39 mV low, and one 8 ns Ton step moves Vo by ~0.43 V.
 - **Checks.** Unit tests 10/10; Yosys synthesis with no latches, 13.3k
   generic cells.
+
+`A78_p24_negative_current_target` sweeps the phase-1 negative-current
+target with A76's adopted controller.
+- **P24's stated 1-2% of peak (-1.25 / -2.5 A) is not enough.** Phase 4,
+  and at 1% also phases 2-3, is restart-driven.
+- **The threshold lies between 4% and 5%.** Phase 4's turn-off current
+  goes from +0.42 to -4.94 A.
+- **5% (-6.25 A, P25's lower bound) is the smallest target that meets the
+  single-module criterion:** every phase predictive and soft, no restart,
+  Vds ≤ 25.4 V.
+- **The price.** Relative to the output power, conduction loss rises only
+  4.8% to 5.2% up to 10%, while the turn-on proxy falls 5.3% to 2.3%. This
+  is open loop, at unequal Vo.

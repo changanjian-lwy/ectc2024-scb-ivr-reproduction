@@ -342,10 +342,15 @@ each question:
      - **Synchroniser effect:** a 4 ns edge jitter on phase 1's
        comparator-decided turn-off.
      - **Counter-only 125 MHz is inadequate at P24.**
+   - **Done ([A78](../experiments/track_A_periodic_steady_state/A78_p24_negative_current_target/RESULTS.md), 2026-09-30): negative-current target.**
+     - **P24's 1-2% is not enough.** Phase 4 is restart-driven up to 4%.
+     - **5% (P25's lower bound, -6.25 A) is the smallest target that
+       meets the single-module criterion.**
+     - Conduction loss barely changes; the turn-on proxy falls.
    - **Next (single-module level first).**
-     1. Physical model, A78 (running): a negative-current target sweep
-        across P24's 1-2% and P25's 5-10%, with conduction loss accounted.
-     2. A79: the output-voltage loop (physical model, then the RTL).
+     1. A79 at -6.25 A: the output-voltage loop (physical model).
+     2. A80: the full Verilog module controller from zero (mode S start-up,
+        handover, mode P, voltage loop), co-simulated.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
