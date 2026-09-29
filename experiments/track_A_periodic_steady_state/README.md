@@ -308,3 +308,48 @@ baseline's hard turn-on and the conduction loss. The parent session
 independently replayed all four optima to within 0.04 W. See
 `CONSOLIDATED_FINDINGS_A53_A64_2026-09-28.md` for the whole A53-A64 chain
 and the remaining advisor questions.
+
+A65-A66 close the two questions A64 left to the advisor, from public data:
+
+- `A65_lmg1210_gate_driver_spice`: A64 with a real driver in place of the
+  free resistor: TI LMG1210's digitized output I-V, one output per device.
+  - P25's own driver (Infineon 1EDBx275F) cannot pass P24's 16.7 ns
+    high-side pulse.
+  - One LMG1210 per 2-device switch cannot charge the high-side gate within
+    the on-time.
+  - The large-ripple design loses by +11.68 W (52.23 vs 40.55 W), between
+    A64's 0.3 Ohm and 1.0 Ohm cases.
+  - The asymmetric driver (1.68 A pull-up, 3.64 A pull-down) adds ~1.1 ns
+    of reverse conduction at ~160 A: +3.3 W that a resistor does not have.
+  - Both designs need timing accurate to a few tenths of a ns. The part
+    spreads by up to 3.4 ns, so only adaptive timing works.
+- `A66_p24_embedded_inductor_sizing`: P24 names its inductor (embedded
+  units on ref. [10]'s HBS1 core). By ref. [10]'s own loss model, the
+  large-ripple design's AC inductor loss is 2.33 times the baseline's for
+  any material. That is +219 W per module with HBS1, and +26 to +38 W even
+  with ref. [10]'s future material.
+
+`A67_zvs_negative_current_scaling` explains why the papers can report ZVS
+with a small negative current. The fraction needed is about
+`sqrt(L*C_node)/Ton`: 1.5-2.0% at P25's built 12 V, 0.5 MHz point (P25
+specifies 5-10%), but 22-26% at P24's 48 V, 5 MHz point (P24 states 1-2%).
+The claim is point-specific, not contradictory.
+
+A68-A69 connect Track A to the mathematical model (the P25-native event
+model in `symbolic_derivations/02_P25_native`; older files call it the
+"main line"):
+
+- `A68_mainline_machinery_at_p25_scale`: run read-only, the mathematical
+  model's repeated failures (D23-D38) came from its synthetic fixture's
+  scale. At P25-scale values it passes the SH2 ZVS step on the first try.
+  This led to D40-D42, in which the model closes a periodic orbit under
+  P25's single-sensor control.
+- `A69_three_phase_p25_transient_crosscheck`: an independent time-domain
+  simulation of the same three-phase circuit and control, sharing only the
+  start state.
+  - It reproduces D41's period to 3.5 ps.
+  - Its drift growth without damping is 1.059 (D41: |lambda| 1.060).
+  - With P25-scale 4.9 mOhm per phase, a 0.2 A kick decays at 0.929 per
+    cycle (D42: 0.926).
+  - The fixed-shift control has no timeout: started far from the damped
+    orbit it deadlocks, so hardware needs a fallback.

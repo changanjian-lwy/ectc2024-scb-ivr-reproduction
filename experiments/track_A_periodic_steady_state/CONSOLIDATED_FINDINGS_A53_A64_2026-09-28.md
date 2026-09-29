@@ -1,4 +1,6 @@
-# Consolidated findings A53-A64: does rated-load ZVS pay for itself? (2026-09-28)
+# Consolidated findings A53-A66: does rated-load ZVS pay for itself? (2026-09-28, extended 2026-09-29)
+
+(The file name keeps "A53_A64" so existing links still work.)
 
 Scope: Track A, `SENSITIVITY_ONLY` throughout. The subject is one
 four-phase EPC2067 module (48 V -> 1 V, 5 MHz, 250 W). Two designs are
@@ -27,6 +29,8 @@ leaves efficiency on the table.
 | A62 | load sweep at fixed tuned timing | wins only above **~211 W (84%)**; +10.3 W at 100 W out |
 | A63 | Cfly 1-6 uF | -6.13 ... -4.17 W (robust) |
 | A64 | EPC's own EPC2067 SPICE model, finite gate drive, re-tuned timing | **+17.35 W** (R_drv 1 Ohm) / **+1.20 W** (0.3 Ohm) |
+| A65 | A64 with a real driver: TI LMG1210's digitized output stage, one per device | **+11.68 W** (52.23 vs 40.55 W; between A64's two resistor cases) |
+| A66 | phase-inductor loss with P24's own inductor (HBS1, P24 ref. [10]) | **+219 W** in the inductors (HBS1); +26 to +38 W with ref. [10]'s target material |
 
 A53/A54's "net negative" conclusion was not reproduced for the reasons
 they gave (unequal power, biased meter). It was wrong in its argument, not
@@ -45,8 +49,11 @@ module.** The ideal-switch model (A56-A59) found an advantage of up to
 - dead times held within a few tenths of a nanosecond of the natural
   transitions.
 
-EPC's own device model (A64) then removes the advantage even at the most
-favourable point (250 W, 60 C, zero inductor loss). With a finite gate
+EPC's own device model (A64) then removes the advantage at the reference
+point (250 W, 60 C, zero inductor loss). (It is not the most favourable
+point: at Tj 25 C the ideal-switch advantage is 2.6 W larger (A60). With
+a 0.3 Ohm drive, where A64's gap is only +1.20 W, that could flip the
+sign. A65 and A66 make that corner moot.) With a finite gate
 drive, the large-ripple design must turn off ~189 A per high-side switch,
 and the resulting V*I overlap costs 26.9 W vs the baseline's 7.7 W at
 1 Ohm drive. The large-ripple design then loses by 17.35 W (1 Ohm) or
@@ -54,8 +61,34 @@ and the resulting V*I overlap costs 26.9 W vs the baseline's 7.7 W at
 the large-ripple design has a ~22 W circulating-current floor that does
 not fall with load (A62).
 
+The phase inductor settles it independently of the switches (A66). P24
+names its inductor technology: embedded units of at most 5 A peak, on the
+HBS1 composite core of its ref. [10].
+- By ref. [10]'s own measured loss model, the large-ripple design's AC
+  inductor loss is 2.33 times the baseline's, for any core material.
+- With HBS1 at P24's 5 MHz, D = 1/12 point, that is +219 W per module.
+- Even ref. [10]'s proposed future material leaves +26 to +38 W.
+- The large-ripple design also needs 1.69 times as many embedded
+  inductors.
+
 This is consistent with P24's own choice: a larger inductor and a small
 (1-2%) negative current, rather than full rated-load ZVS.
+
+**Why the papers can report ZVS with a small negative current (A67).**
+There is no contradiction; the requirement depends on the operating point.
+The negative current needed, as a fraction of the ripple, is about
+`sqrt(L*C_node)/Ton`, i.e. the switch node's flip time over the on-time.
+- **P25 (built, 12 V, 0.5 MHz).** The flip time is 7-9 ns against a
+  500 ns on-time, so 1.5-2.0% suffices. P25 specifies 5-10%. Its measured
+  ZVS is physically consistent.
+- **P24 (48 V, 5 MHz, never built).** The flip time is ~4 ns against a
+  16.7 ns on-time, so 22-26% is needed. P24's stated 1-2% lifts the node
+  only to ~2 V of 12 V. The high side then hard-switches at ~10-12 V,
+  which is what A56-A65 find.
+
+The mathematical model now reproduces P25's control and orbit at P25
+scale (D41/D42), and an independent circuit simulation confirms it (A69).
+This is the regime where the papers' claim holds.
 
 ## 3. Robust intermediate results
 
@@ -132,25 +165,81 @@ at 60 C. Full results: `A64_vendor_model_spice_crosscheck/RESULTS.md`.
 - Limits: no layout loop inductance; a symmetric driver (a stronger
   pull-down than pull-up would narrow the gap); 60 C only.
 
-## 6. What still needs the advisor
+## 5a. Boundary audit (2026-09-29): scope limits common to A53-A66
 
-After A57-A64, these items remain that public data and modeling cannot
-settle. Each names the conclusion it unblocks.
+None of these can reverse the answer. They mark where the numbers apply.
 
-1. **Gate driver (pull-up/pull-down strength or turn-off speed) and
-   dead-time implementation (fixed or adaptive, timing accuracy).** A64:
-   the answer swings by 16 W between 1 Ohm and 0.3 Ohm drive. A57/A58: it
-   swings by ~10 W between one symmetric window and tuned timing.
-2. **Phase-inductor DCR, AC resistance at 5-20 MHz and core loss at
-   ~300 A p-p (or the part/structure).** The A61 break-even is
-   ~50-190 uOhm. After A64 this matters only if a very strong driver is
-   used.
-3. **Typical full-load junction temperature or the board's thermal path.**
-   The ideal-switch ranking reverses at ~114 C (A60).
-4. **P24's load profile or efficiency weighting.** Below ~84% load the
-   baseline wins outright (A62).
+1. **Module row.** The chain uses P24's 4-module row: 250 W per module,
+   2 high / 3 low EPC2067 per switch (P24 Table 3; Table I's analytical
+   case). P24's featured design (Fig. 5) is the 8-module row: 1 high /
+   2 low per switch.
+   - A66's per-module inductor losses scale with module power, so its
+     ratio (2.33) and its inductor efficiencies carry over.
+   - A64/A65's switch-level watts are specific to the 4-module row.
+   - Side finding: Table 3's 4-module row lists 25 parallel 36.7 nH units
+     per phase, i.e. 1.468 nH. That independently supports the project's
+     Eq. (4) value (1.4667 nH) over Table I's printed 2.68 nH.
+2. **Device count held fixed.** P24 sizes the switch count from the peak
+   current: 62.5 A per high-side device in this row. By that rule, the
+   large-ripple design's 217 A high-side peak would need ~4 devices, not 2.
+   This is not modelled. More devices cut conduction but add gate charge,
+   Coss and area. They cannot close A66's inductor gap.
+3. **Gate-drive supplies.** The sources of high sides 1-3 sit on the
+   flying-capacitor nodes (36-48 V, 24-36 V, 12-24 V) and never return to
+   ground. They need isolated or cascaded-bootstrap supplies. A64/A65 use
+   ideal floating 5 V supplies.
+4. **Not modelled, all against the large-ripple design:**
+   - power-loop and common-source inductance (turn-off at 1.7x the
+     current);
+   - the output ripple and output-capacitor cost of 300 A p-p phase
+     ripple;
+   - the 1.69x embedded-inductor area (A66).
+5. **Operating point.** The SPICE lines (A64/A65) cover 250 W at 60 C
+   only. A60 (temperature) and A62 (load) exist only for the ideal-switch
+   model.
 
-No longer needed for this question:
+## 6. What still needs the advisor: nothing blocks the answer
+
+The 48 V / 1 kW converter was never built (Mihai, 2026-09-15). Questions
+of the form "what did P24 use" therefore have no hardware answer. Public
+sources settled every item that A57-A64 had left open:
+
+1. **Gate driver and timing: public datasheets (A65).**
+   - P25's own driver (Infineon 1EDBx275F) suppresses input pulses shorter
+     than 15/19/23 ns (min/typ/max). P24's high-side on-time at 5 MHz is
+     16.7 ns.
+   - One TI LMG1210 per 2-device switch cannot charge the high-side gate
+     within the on-time: Vgs reaches 3.2 V.
+   - With one LMG1210 output per device, the strongest commercial
+     arrangement, the large-ripple design still loses by **+11.68 W**
+     (52.23 vs 40.55 W). That lies between A64's 0.3 Ohm (+1.20 W) and
+     1.0 Ohm (+17.35 W) cases, closer to the 1 Ohm end.
+     - The turn-off overlap penalty is +11.3 W.
+     - The driver's weak pull-up adds ~1.1 ns of reverse conduction at
+       ~160 A: +3.3 W that a resistor driver does not have.
+     - A60's 2.6 W cold-device margin cannot close that gap.
+   - Timing: LMG1210's minimum dead time spreads -0.55 to 3.1 ns part to
+     part, and its high-/low-side mismatch is up to 3.4 ns. The tuned
+     optima need ~0.1-0.3 ns. Only closed-loop adaptive timing reaches
+     that.
+2. **Phase inductor: P24 names it (A66).** Ref. [10]'s measured loss model
+   puts the large-ripple design +219 W per module behind with HBS1, and
+   +26 to +38 W behind with ref. [10]'s future target material.
+3. **Junction temperature and load profile** mattered only for the
+   ideal-switch margin of at most 4.6 W. A66's inductor term alone
+   exceeds that margin 5-50 times, so neither can change the answer.
+
+Findings to report to the advisor (not questions):
+
+- **P24's 5 MHz point with its named inductor.** With HBS1 inductors, even
+  the baseline's inductors would lose ~185 W per 250 W module, an inductor
+  efficiency of ~58% (A66 Section 5). This agrees with ref. [10]'s own
+  conclusion that 12-1 V at 5 MHz needs a new material.
+- **Gate drive at P24's 5 MHz point.** The point needs at least one
+  fast-GaN driver output per device. The group's own P25 driver cannot
+  pass the pulse.
+
+Also no longer needed for this question:
 - the exact Cfly (A63, robust over 1-6 uF);
 - nonlinear Coss (A59, public);
 - the reverse-conduction drop (A57, public);

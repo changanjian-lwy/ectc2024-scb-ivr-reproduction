@@ -12,7 +12,7 @@ session's work was committed unchanged as the baseline (`0f50511`).
 
 ## 1. Mathematical model — native P25, three phases / one module
 
-**Latest (2026-09-29, D39–D41):**
+**Latest (2026-09-29, D39–D42, cross-checked by A69):**
 
 - **Why D23–D38 kept failing.** The synthetic F/H/s fixture's switch-node
   flip time `sqrt(L*C)` is 122–150× its on-time. P25's built point has
@@ -39,7 +39,27 @@ session's work was committed unchanged as the baseline (`0f50511`).
   - The per-phase control of D06 leaves the phase spacing nearly neutral
     (`J−I` singular values ~3e-4) and does not converge.
   - The returned orbit is weakly unstable in the lossless open-loop model.
-    Damping (Ron, DCR, feedback) is the next step.
+- **[D42](../symbolic_derivations/02_P25_native/D42_DAMPING_CONTINUATION.md):**
+  per-phase series resistance, continued 0 → 4.9 mΩ from the D41 orbit.
+  - The unstable pair falls monotonically: 1.060 → 1.026 (1 mΩ) → 0.991
+    (2 mΩ). It crosses the unit circle at ~1.75 mΩ.
+  - At P25's estimated 4.9 mΩ (duty-weighted GS61008T Ron + Coilcraft DCR),
+    the largest |λ| is 0.926.
+  - The weak instability is an artefact of the lossless idealisation, not
+    of the control structure.
+  - Open loop, Vo sags to 0.844 V: Ton and the load are held.
+- **Physical-model cross-check
+  ([A69](../experiments/track_A_periodic_steady_state/A69_three_phase_p25_transient_crosscheck/RESULTS.md)).**
+  An independent fixed-step circuit simulation, sharing only the start state,
+  reproduces:
+  - the period to 3.5 ps;
+  - the lossless drift growth, 1.059 vs 1.060;
+  - the 0.5 mΩ growth, 1.039 vs 1.043;
+  - the 4.9 mΩ decay of a 0.2 A kick, 0.929 vs 0.926.
+
+  Started far from the damped orbit, the fixed-shift control deadlocks: the
+  timed low sides turn off without enough negative current, and nothing
+  forces a turn-on. Hardware needs a timeout fallback.
 
 The historical record follows.
 
@@ -213,8 +233,8 @@ boundaries differ from the strict native P25 core and from one another.
 | A53–A56 | How do inductance, actual switch currents and equal delivered power change the comparison? | [A56](../experiments/track_A_periodic_steady_state/A56_equal_power_regulated_loss_comparison/RESULTS.md) |
 | A57–A59 | What changes with reverse conduction, separate dead times and nonlinear capacitance? | [A59](../experiments/track_A_periodic_steady_state/A59_nonlinear_coss_epc2067/RESULTS.md) |
 | A60–A63 | How conditional is the result on temperature, winding loss, load and flying capacitance? | [A60](../experiments/track_A_periodic_steady_state/A60_temperature_ron_sensitivity/RESULTS.md), [A61](../experiments/track_A_periodic_steady_state/A61_inductor_loss_break_even/RESULTS.md), [A62](../experiments/track_A_periodic_steady_state/A62_load_sweep_fixed_deadtime/RESULTS.md), [A63](../experiments/track_A_periodic_steady_state/A63_flying_capacitor_sensitivity/RESULTS.md) |
-| A64–A66 | Does the conclusion survive EPC's vendor model, a real gate driver and P24's own inductor? | [consolidated](../experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A53_A64_2026-09-28.md), [A64](../experiments/track_A_periodic_steady_state/A64_vendor_model_spice_crosscheck/RESULTS.md), [A66](../experiments/track_A_periodic_steady_state/A66_p24_embedded_inductor_sizing/RESULTS.md) |
-| A67–A68 | How much negative current does SCB ZVS need, and does that explain the mathematical model's failures? | [A67](../experiments/track_A_periodic_steady_state/A67_zvs_negative_current_scaling/RESULTS.md), [A68](../experiments/track_A_periodic_steady_state/A68_mainline_machinery_at_p25_scale/RESULTS.md) |
+| A64–A66 | Does the conclusion survive EPC's vendor model, a real gate driver and P24's own inductor? | [consolidated](../experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A53_A64_2026-09-28.md), [A64](../experiments/track_A_periodic_steady_state/A64_vendor_model_spice_crosscheck/RESULTS.md), [A65](../experiments/track_A_periodic_steady_state/A65_lmg1210_gate_driver_spice/RESULTS.md), [A66](../experiments/track_A_periodic_steady_state/A66_p24_embedded_inductor_sizing/RESULTS.md) |
+| A67–A69 | How much negative current does SCB ZVS need? Does that explain the mathematical model's failures? Does a circuit simulation confirm its P25 orbit? | [A67](../experiments/track_A_periodic_steady_state/A67_zvs_negative_current_scaling/RESULTS.md), [A68](../experiments/track_A_periodic_steady_state/A68_mainline_machinery_at_p25_scale/RESULTS.md), [A69](../experiments/track_A_periodic_steady_state/A69_three_phase_p25_transient_crosscheck/RESULTS.md) |
 
 These are **conditional engineering studies**, not proof that the paper's
 small negative-current rule, rated power and timing hold simultaneously.
@@ -238,17 +258,26 @@ The extra local checks use generated LTspice logs; all are software/model
 regressions, not independent physical experiments.
 
 Full-cycle reachability is established at P25 scale (D40). A returned
-periodic section exists under D41 single-sensor control. The next
-mathematical questions:
+periodic section exists under D41 single-sensor control. With P25-scale
+damping it is stable (D42), and an independent circuit simulation confirms
+the orbit and its stability (A69). Next, with the model that should carry
+each question:
 
-1. **Damping.** Add P25's switch Ron and inductor DCR (declared, P25-scale).
-   The question is whether the weakly unstable pair becomes stable, i.e.
-   whether the orbit is one the hardware could sit on.
-2. **Adaptive phase shift.** P25's circuit is unpublished. A phase shift
-   that follows the measured period is the other plausible reading, and it
-   should be compared with D41's fixed shift.
-3. **Cross-check against the physical model.** Compare the D41 orbit with a
-   three-phase circuit simulation of the same values.
+1. **Adaptive phase shift (mathematical model).** P25's circuit is
+   unpublished. A phase shift that follows the measured period is the other
+   plausible reading, and it should be compared with D41's fixed shift for
+   existence and stability.
+2. **Closed-loop Ton (mathematical model).** Open loop, Vo sags to 0.844 V
+   at 4.9 mΩ. P25 regulates to 1 V. The question is whether a slow Ton loop
+   keeps the orbit stable.
+3. **Start-up and timeout fallback (both models).** A69's deadlock shows
+   that fixed-shift control needs a forced turn-on. The rule belongs in the
+   mathematical model's control memory. Whether it recovers from the A69
+   start state is then checked in the physical model. This connects to
+   Track B.
+4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
+   Coss (datasheet) and, if a public vendor model exists, with it. The
+   question is whether ZVS margin and stability survive.
 
 The synthetic F/H/s fixture stays a regression fixture only. Its failures
 are scale effects (A67/A68), so it is not a candidate operating point. Fixed design-peak references are an explicit
@@ -261,4 +290,4 @@ P24 transfer remains a separately declared topology/sequence branch.
 1. **先讲拆分方法：**纵向分成来源、方程、事件控制、器件、实验和验证；横向按一相的物理事件拆周期。
 2. **再讲做出的东西：**共享节点模型、可复用控制与事件模块、15模态代数组装、独立SPICE交叉验证，以及器件/损耗敏感性实验。
 3. **讲一个有价值的失败：**局部SH2换流还没完成，另一相电流已先过零；用同一条轨迹的伏秒与电荷积分解释，而不是任意改初始电流。
-4. **最后讲边界和缺口：**P25三相数学模型与P24四相实验分开；完整事件周期和零启动衔接尚未验证，不能说已经完整复现论文。
+4. **最后讲边界和缺口：**P25三相数学模型与P24四相实验分开。P25量级下的周期解已经闭合（D41），加阻尼后稳定（D42），并经独立电路仿真验证（A69）；但它仍是开环、理想器件的结果，零启动衔接和闭环调节尚未验证，不能说已经完整复现论文。
