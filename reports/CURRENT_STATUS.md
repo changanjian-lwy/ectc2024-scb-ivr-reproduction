@@ -291,10 +291,19 @@ each question:
      unchanged.
    - **Next, mathematical model.** Add the valley trigger to the control
      memory and re-check the D41/D42 orbit and its stability.
-   - **Next, physical model.** Test the start-up sequence of Stillwell and
-     Pilawa-Podgurski (TPEL 2019): load disconnected, switching running,
-     input ramped, load connected afterwards. First on P25 (three phases),
-     then on P24 via Track B's precharge.
+   - **Done ([A71](../experiments/track_A_periodic_steady_state/A71_p25_soft_start_sequence/RESULTS.md)).**
+     A zero start of the P25-scale SCB reaches D42's 4.9 mΩ section. The
+     sequence has three parts:
+     - fixed timing with the input ramped at Roberts' 30x rate and no
+       load (Stillwell and Pilawa-Podgurski 2019);
+     - the load and the P25 control switched on together;
+     - the valley fallback for the high-side turn-on.
+
+     Fixed timing under load falls into a sustained oscillation, so a later
+     handover is unreliable.
+   - **Next, physical model.** Test the same sequence on P24's four-phase
+     circuit, with Track B's precharge and the valley path as the
+     steady-state turn-on.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

@@ -369,3 +369,20 @@ with empty inductors into the full constant-current load still stalls,
 because Vo is pulled negative. That is why Stillwell and Pilawa-Podgurski
 (TPEL 2019) start with the load disconnected, which is the next test.
 Track B's R04E21-R04E26 stall is the same missing turn-on path.
+
+`A71_p25_soft_start_sequence` takes the P25-scale SCB from all-zero state
+to D42's 4.9 mOhm section. It follows the published sequence: fixed-timing
+switching from t = 0, the input ramped with the load off (Stillwell and
+Pilawa-Podgurski 2019), and Roberts' 30x-margin ramp time (457 us).
+- **The ramp.** The series capacitors track the ramp: within 1.6% over
+  8-12 V, and 1.5% at full input.
+- **The handover must coincide with the load connection.** P25's
+  open-loop control delivers ~22.5 A per phase, matching the 67.5 A load.
+  - Handed over together with the load, both ramp speeds reach D42's
+    section 100-150 us later.
+  - A handover 100 us after the load can stall (run 1).
+- **Why a later handover fails.** Fixed timing under load never settles.
+  It falls into a sustained oscillation (`VCs2/Vin` peak-to-peak 0.19),
+  so a later handover lands at an arbitrary phase.
+- **Fixed timing is needed at the start.** Starting with P25's rule
+  instead stalls within the first cycle.

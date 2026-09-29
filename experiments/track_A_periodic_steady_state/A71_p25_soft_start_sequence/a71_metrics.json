@@ -1,0 +1,189 @@
+{
+ "main_ramp457": {
+  "status": "STALLED",
+  "t_end_us": 618.866,
+  "sections": 309,
+  "valley": 3,
+  "handover_us": 608.0,
+  "ramp_max_dev_cs1": 0.1694,
+  "ramp_max_dev_cs2": 0.1684,
+  "ramp_ipk_a": 32.7,
+  "noload_full_vin_cs2_ratio": [
+   0.3284,
+   0.3357
+  ],
+  "noload_full_vin_Vo": [
+   1.0467,
+   1.0487
+  ],
+  "end_Vo": -0.227,
+  "end_i": [
+   7.56,
+   47.1,
+   5.71
+  ],
+  "end_states": [
+   "LOW",
+   "LOW",
+   "LOW"
+  ]
+ },
+ "fast_ramp46": {
+  "status": "COMPLETED",
+  "t_end_us": 796.0,
+  "sections": 368,
+  "valley": 12,
+  "handover_us": 196.0,
+  "ramp_max_dev_cs1": 0.4855,
+  "ramp_max_dev_cs2": 0.3218,
+  "ramp_ipk_a": 65.6,
+  "noload_full_vin_cs2_ratio": [
+   0.3066,
+   0.3562
+  ],
+  "noload_full_vin_Vo": [
+   0.9035,
+   1.1347
+  ],
+  "final_dI_a": 0.0006,
+  "final_dV_v": 1.12e-05,
+  "converged_at_us": 399.58,
+  "converge_after_handover_us": 203.6,
+  "Vo_min_max_after_handover": [
+   0.244,
+   1.02
+  ],
+  "ipk_after_handover_a": 85.7,
+  "valley_last_after_handover_us": 38.86,
+  "valley_vds_max_v": 3.06,
+  "period_last_ns": 2172.366
+ },
+ "control_p25_from_t0": {
+  "status": "STALLED",
+  "t_end_us": 6.0,
+  "sections": 0,
+  "valley": 0,
+  "handover_us": 0.0,
+  "end_Vo": -0.0,
+  "end_i": [
+   -0.02,
+   0.01,
+   -0.02
+  ],
+  "end_states": [
+   "LOW",
+   "DOWN",
+   "LOW"
+  ]
+ },
+ "s_mode_loaded_400us": {
+  "status": "COMPLETED",
+  "t_end_us": 496.0,
+  "sections": 248,
+  "valley": 0,
+  "handover_us": null,
+  "ramp_max_dev_cs1": 0.4855,
+  "ramp_max_dev_cs2": 0.3218,
+  "ramp_ipk_a": 65.6,
+  "noload_full_vin_cs2_ratio": [
+   0.3066,
+   0.3562
+  ],
+  "noload_full_vin_Vo": [
+   0.9035,
+   1.1347
+  ],
+  "cs2_ratio_pp_by_100us": [
+   0.205,
+   0.194,
+   0.194,
+   0.194
+  ],
+  "i_pp_by_100us": [
+   [
+    35.3,
+    64.4,
+    41.8
+   ],
+   [
+    17.5,
+    49.5,
+    40.0
+   ],
+   [
+    17.5,
+    49.5,
+    40.0
+   ],
+   [
+    17.5,
+    49.5,
+    40.0
+   ]
+  ],
+  "Vo_range_loaded": [
+   0.379,
+   1.047
+  ]
+ },
+ "handover_with_load_ramp457": {
+  "status": "COMPLETED",
+  "t_end_us": 1107.0,
+  "sections": 529,
+  "valley": 11,
+  "handover_us": 508.0,
+  "ramp_max_dev_cs1": 0.1694,
+  "ramp_max_dev_cs2": 0.1684,
+  "ramp_ipk_a": 32.7,
+  "noload_full_vin_cs2_ratio": [
+   0.3284,
+   0.3357
+  ],
+  "noload_full_vin_Vo": [
+   1.0467,
+   1.0487
+  ],
+  "final_dI_a": 0.0006,
+  "final_dV_v": 1.12e-05,
+  "converged_at_us": 660.8,
+  "converge_after_handover_us": 152.8,
+  "Vo_min_max_after_handover": [
+   0.475,
+   0.897
+  ],
+  "ipk_after_handover_a": 57.1,
+  "valley_last_after_handover_us": 27.17,
+  "valley_vds_max_v": 3.17,
+  "period_last_ns": 2172.366
+ },
+ "handover_with_load_ramp46": {
+  "status": "COMPLETED",
+  "t_end_us": 696.0,
+  "sections": 323,
+  "valley": 5,
+  "handover_us": 96.0,
+  "ramp_max_dev_cs1": 0.4855,
+  "ramp_max_dev_cs2": 0.3218,
+  "ramp_ipk_a": 65.6,
+  "noload_full_vin_cs2_ratio": [
+   0.3066,
+   0.3562
+  ],
+  "noload_full_vin_Vo": [
+   0.9035,
+   1.1347
+  ],
+  "final_dI_a": 0.0006,
+  "final_dV_v": 1.12e-05,
+  "converged_at_us": 197.1,
+  "converge_after_handover_us": 101.1,
+  "Vo_min_max_after_handover": [
+   0.319,
+   1.047
+  ],
+  "ipk_after_handover_a": 58.2,
+  "valley_last_after_handover_us": 9.53,
+  "valley_vds_max_v": 3.4,
+  "period_last_ns": 2172.366
+ }
+}
