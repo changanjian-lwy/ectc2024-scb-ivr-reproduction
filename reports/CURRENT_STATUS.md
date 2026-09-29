@@ -357,8 +357,10 @@ each question:
      - It reproduces the 5% bistability.
      - Its dither is 2.3-4.0 A, from clock quantisation.
    - **Next (single-module level first).**
-     1. A81: an asynchronous comparator/delay-line fast path for phase 1
-        (Chiang 2009-style), to remove the quantisation dither.
+     1. Done ([A81](../experiments/track_A_periodic_steady_state/A81_verilog_async_fast_path/RESULTS.md)):
+        an asynchronous fast path for phase 1 removes its 4 ns edge
+        jitter, and the dither halves (4.0 to 1.9 A). The remainder is
+        probably Ton LSB toggling (not yet shown).
      2. Mathematical model: the four-phase extension (the current code is
         nP = 3). Then: do two P24 orbits coexist at 5%, and where does the
         restart orbit end?

@@ -534,3 +534,16 @@ Co-simulated from the all-zero plant at 7.5%, it:
 At 5% it reproduces A79's phase-4 restart state. The one shortfall is a
 2.3-4.0 A dither from the 4 ns synchroniser quantisation and Ton LSB
 toggling. Checks: unit tests 15/15; synthesis clean at 22.3k cells.
+
+`A81_verilog_async_fast_path` gives phase 1's comparator-decided turn-off,
+and the predictive turn-on after it, an asynchronous front-end path:
+comparator and latch, then a programmable delay line. This is the
+Chiang 2009 / Schaef 2019 partition: the clocked logic arms the path and
+sets the codes; a TDC reports the edges back.
+- **Phase-1 edge jitter:** its turn-off current spread falls from 3.0 to
+  0.26 A.
+- **Module dither:** halves, from 4.0 to 1.9 A.
+- **Everything else unchanged:** Vo 1.000 V, every phase soft, 25.65 V
+  peak.
+- **Checks:** gate (async off) equals A80 f2 bit for bit; unit tests
+  18/18; synthesis clean.
