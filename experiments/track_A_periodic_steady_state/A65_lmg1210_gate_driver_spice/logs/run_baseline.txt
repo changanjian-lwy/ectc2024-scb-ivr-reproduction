@@ -4,3 +4,236 @@
 16:35:05   [bcs c0] Ton=19.0055 dr=3.655 df=2.795 n=16 Pout=220.318 Pcorr=22.081 dPc=+0.595 dE/T=-91.87 rel=8.45e-02(i_l2) cdt r/f=3.938/4.220 wall=34s
 16:35:54   [bcs c1] Ton=19.4055 dr=2.761 df=1.795 n=16 Pout=214.290 Pcorr=60.647 dPc=-2.225 dE/T=101.84 rel=7.68e-02(i_l2) cdt r/f=2.607/2.974 wall=49s
 16:36:34   [bcs c2] Ton=19.8055 dr=2.454 df=0.795 n=16 Pout=248.188 Pcorr=58.263 dPc=-1.906 dE/T=92.55 rel=6.57e-02(i_l2) cdt r/f=2.304/1.930 wall=39s
+=== restart Tue Sep 29 16:38:54 +08 2026
+16:38:54 === baseline LMG1210_DEV_T60 stages=center,sweep
+16:38:54   seed: baseline_R1.0_T60_r4.050_f2.950.json (A64, read only)
+16:38:54 centre search baseline_LMG1210_DEV_T60_r3.655_f2.795_centre_search
+16:39:25   [bcs c0] Ton=19.0055 dr=3.655 df=2.795 n=16 Pout=220.318 Pcorr=22.081 dPc=+0.595 dE/T=-91.87 rel=8.45e-02(i_l2) cdt r/f=3.938/4.220 wall=31s
+16:39:53   [bcs c1] Ton=19.4055 dr=2.761 df=1.795 n=16 Pout=214.290 Pcorr=60.647 dPc=-2.225 dE/T=101.84 rel=7.68e-02(i_l2) cdt r/f=2.607/2.974 wall=28s
+16:40:19   [bcs c2] Ton=19.8055 dr=2.454 df=0.795 n=16 Pout=248.188 Pcorr=58.263 dPc=-1.906 dE/T=92.55 rel=6.57e-02(i_l2) cdt r/f=2.304/1.930 wall=26s
+16:40:52   [bcs c3] Ton=19.8391 dr=2.299 df=0.048 n=16 Pout=266.896 Pcorr=52.902 dPc=-0.959 dE/T=46.50 rel=4.30e-02(i_l2) cdt r/f=2.162/1.106 wall=32s
+16:41:25   [bcs c4] Ton=19.5262 dr=2.285 df=0.088 n=16 Pout=264.637 Pcorr=42.041 dPc=+0.168 dE/T=-13.62 rel=1.76e-02(i_l2) cdt r/f=2.200/1.190 wall=33s
+16:42:31   [bcs c5] Ton=19.2551 dr=2.260 df=0.069 n=16 Pout=258.140 Pcorr=40.700 dPc=+0.263 dE/T=-18.76 rel=3.02e-02(i_l2) cdt r/f=2.183/1.178 wall=66s
+16:46:26   [bcs c6] Ton=19.1044 dr=2.212 df=0.024 n=16 Pout=253.628 Pcorr=42.379 dPc=+0.173 dE/T=-11.25 rel=1.74e-02(i_l2) cdt r/f=2.126/1.117 wall=235s
+16:47:05   [bcs c7] Ton=19.0372 dr=2.233 df=0.048 n=16 Pout=250.645 Pcorr=42.351 dPc=+0.115 dE/T=-7.62 rel=1.12e-02(i_l2) cdt r/f=2.142/1.155 wall=39s
+16:47:47   [bcs c8] Ton=19.0252 dr=2.233 df=0.048 n=16 Pout=249.465 Pcorr=43.225 dPc=+0.043 dE/T=-2.40 rel=3.73e-03(i_l2) cdt r/f=2.136/1.154 wall=42s
+16:47:47   centre search CHANNEL_MATCHED: dr=2.2329 df=0.0478 ns
+16:47:47 solve baseline_LMG1210_DEV_T60_r2.250_f0.050 (center) from Ton=19.0252 ns origin=35.0 ns
+16:48:26   [bce c0] Ton=19.0252 dr=2.250 df=0.050 n=16 Pout=248.982 Pcorr=43.408 dPc=+0.018 dE/T=-1.12 rel=1.55e-03(i_l2) cdt r/f=2.151/1.158 wall=38s
+16:49:02   [bce c1] Ton=19.0687 dr=2.250 df=0.050 n=16 Pout=249.621 Pcorr=44.189 dPc=-0.041 dE/T=2.64 rel=3.07e-03(i_l2) cdt r/f=2.146/1.154 wall=36s
+16:49:41   [bce c2] Ton=19.0648 dr=2.250 df=0.050 n=16 Pout=249.997 Pcorr=43.641 dPc=+0.008 dE/T=-0.42 rel=3.11e-04(i_l2) cdt r/f=2.150/1.155 wall=39s
+16:50:21   [bce c3] Ton=19.0648 dr=2.250 df=0.050 n=16 Pout=249.941 Pcorr=43.698 dPc=+0.002 dE/T=-0.10 rel=1.34e-04(i_l2) cdt r/f=2.150/1.155 wall=40s
+16:50:21   -> REGULATED_TO_250W P_loss=43.6980 W (raw 43.6030) Pout=249.941 gate=8.444 periods=64 file=baseline_LMG1210_DEV_T60_r2.250_f0.050.json
+16:50:21 solve baseline_LMG1210_DEV_T60_r2.250_f0.150 (sweep) from Ton=19.0648 ns origin=35.0 ns
+16:51:03   [bsw c0] Ton=19.0648 dr=2.250 df=0.150 n=16 Pout=249.338 Pcorr=41.916 dPc=+0.031 dE/T=-1.89 rel=2.71e-03(i_l2) cdt r/f=2.152/1.298 wall=42s
+16:51:41   [bsw c1] Ton=19.1333 dr=2.250 df=0.150 n=16 Pout=249.918 Pcorr=43.622 dPc=-0.101 dE/T=6.41 rel=7.04e-03(i_l2) cdt r/f=2.142/1.290 wall=38s
+16:52:23   [bsw c2] Ton=19.1064 dr=2.250 df=0.150 n=16 Pout=250.616 Pcorr=41.928 dPc=+0.036 dE/T=-2.39 rel=2.58e-03(i_l2) cdt r/f=2.152/1.296 wall=42s
+16:53:07   [bsw c3] Ton=19.0836 dr=2.250 df=0.150 n=16 Pout=249.875 Pcorr=41.958 dPc=+0.030 dE/T=-1.96 rel=2.53e-03(i_l2) cdt r/f=2.152/1.297 wall=44s
+16:53:47   [bsw c4] Ton=19.0875 dr=2.250 df=0.150 n=16 Pout=249.700 Pcorr=42.281 dPc=+0.005 dE/T=-0.19 rel=3.31e-04(i_l2) cdt r/f=2.150/1.296 wall=40s
+16:56:03   [bsw c5] Ton=19.0967 dr=2.250 df=0.150 n=16 Pout=249.843 Pcorr=42.439 dPc=-0.008 dE/T=0.52 rel=5.33e-04(i_l2) cdt r/f=2.149/1.295 wall=136s
+16:57:07   [bsw c6] Ton=19.1068 dr=2.250 df=0.150 n=16 Pout=250.094 Pcorr=42.510 dPc=-0.011 dE/T=0.73 rel=9.04e-04(i_l2) cdt r/f=2.149/1.294 wall=64s
+16:57:43   [bsw c7] Ton=19.1030 dr=2.250 df=0.150 n=16 Pout=250.114 Pcorr=42.358 dPc=-0.000 dE/T=-0.07 rel=5.90e-05(i_l2) cdt r/f=2.150/1.295 wall=36s
+16:57:43   -> REGULATED_TO_250W P_loss=42.3576 W (raw 42.2827) Pout=250.114 gate=8.443 periods=128 file=baseline_LMG1210_DEV_T60_r2.250_f0.150.json
+16:57:43 solve baseline_LMG1210_DEV_T60_r2.250_f0.250 (sweep) from Ton=19.1030 ns origin=35.0 ns
+16:58:20   [bsw c0] Ton=19.1030 dr=2.250 df=0.250 n=16 Pout=249.429 Pcorr=40.933 dPc=+0.033 dE/T=-2.17 rel=2.72e-03(i_l2) cdt r/f=2.152/1.432 wall=37s
+16:59:20   [bsw c1] Ton=19.1267 dr=2.250 df=0.250 n=16 Pout=249.613 Pcorr=41.528 dPc=-0.010 dE/T=0.70 rel=6.46e-04(i_l2) cdt r/f=2.149/1.429 wall=60s
+16:59:56   [bsw c2] Ton=19.1825 dr=2.250 df=0.250 n=16 Pout=250.666 Pcorr=42.273 dPc=-0.059 dE/T=4.08 rel=4.57e-03(i_l2) cdt r/f=2.145/1.423 wall=36s
+17:00:37   [bsw c3] Ton=19.0002 dr=2.250 df=0.250 n=16 Pout=251.374 Pcorr=35.711 dPc=+0.406 dE/T=-31.63 rel=6.81e-02(i_l2) cdt r/f=2.191/1.457 wall=41s
+17:01:21   [bsw c4] Ton=18.9871 dr=2.250 df=0.250 n=16 Pout=247.197 Pcorr=39.458 dPc=+0.139 dE/T=-7.74 rel=1.30e-02(i_l2) cdt r/f=2.160/1.444 wall=44s
+17:01:58   [bsw c5] Ton=19.0105 dr=2.250 df=0.250 n=16 Pout=246.551 Pcorr=40.945 dPc=+0.014 dE/T=-0.50 rel=1.04e-03(i_l2) cdt r/f=2.151/1.438 wall=37s
+17:02:41   [bsw c6] Ton=19.0680 dr=2.250 df=0.250 n=16 Pout=247.527 Pcorr=41.830 dPc=-0.050 dE/T=3.35 rel=3.86e-03(i_l2) cdt r/f=2.146/1.431 wall=43s
+17:03:22   [bsw c7] Ton=19.2136 dr=2.250 df=0.250 n=16 Pout=250.650 Pcorr=43.396 dPc=-0.152 dE/T=9.68 rel=1.04e-02(i_l2) cdt r/f=2.139/1.418 wall=41s
+17:04:03   [bsw c8] Ton=19.1985 dr=2.250 df=0.250 n=16 Pout=251.556 Pcorr=41.852 dPc=-0.026 dE/T=1.19 rel=2.04e-03(i_l2) cdt r/f=2.148/1.424 wall=42s
+=== restart after session end Tue Sep 29 17:07:09 +08 2026
+17:07:09 === baseline LMG1210_DEV_T60 stages=center,sweep
+17:07:09 centre exists: baseline_LMG1210_DEV_T60_r2.250_f0.050.json
+17:07:09 solve baseline_LMG1210_DEV_T60_r2.250_f0.250 (sweep) from Ton=19.1030 ns origin=35.0 ns
+17:07:41   [bsw c0] Ton=19.1030 dr=2.250 df=0.250 n=16 Pout=249.429 Pcorr=40.933 dPc=+0.033 dE/T=-2.17 rel=2.72e-03(i_l2) cdt r/f=2.152/1.432 wall=32s
+17:08:13   [bsw c1] Ton=19.1267 dr=2.250 df=0.250 n=16 Pout=249.613 Pcorr=41.528 dPc=-0.010 dE/T=0.70 rel=6.46e-04(i_l2) cdt r/f=2.149/1.429 wall=32s
+17:09:12   [bsw c2] Ton=19.1825 dr=2.250 df=0.250 n=16 Pout=250.666 Pcorr=42.273 dPc=-0.059 dE/T=4.08 rel=4.57e-03(i_l2) cdt r/f=2.145/1.423 wall=59s
+17:09:50   [bsw c3] Ton=19.0002 dr=2.250 df=0.250 n=16 Pout=251.374 Pcorr=35.711 dPc=+0.406 dE/T=-31.63 rel=6.81e-02(i_l2) cdt r/f=2.191/1.457 wall=38s
+17:10:38   [bsw c4] Ton=18.9871 dr=2.250 df=0.250 n=16 Pout=247.197 Pcorr=39.458 dPc=+0.139 dE/T=-7.74 rel=1.30e-02(i_l2) cdt r/f=2.160/1.444 wall=48s
+17:11:24   [bsw c5] Ton=19.0105 dr=2.250 df=0.250 n=16 Pout=246.551 Pcorr=40.945 dPc=+0.014 dE/T=-0.50 rel=1.04e-03(i_l2) cdt r/f=2.151/1.438 wall=45s
+17:12:10   [bsw c6] Ton=19.0680 dr=2.250 df=0.250 n=16 Pout=247.527 Pcorr=41.830 dPc=-0.050 dE/T=3.35 rel=3.86e-03(i_l2) cdt r/f=2.146/1.431 wall=46s
+17:12:57   [bsw c7] Ton=19.2136 dr=2.250 df=0.250 n=16 Pout=250.650 Pcorr=43.396 dPc=-0.152 dE/T=9.68 rel=1.04e-02(i_l2) cdt r/f=2.139/1.418 wall=47s
+17:13:43   [bsw c8] Ton=19.1985 dr=2.250 df=0.250 n=16 Pout=251.556 Pcorr=41.852 dPc=-0.026 dE/T=1.19 rel=2.04e-03(i_l2) cdt r/f=2.148/1.424 wall=46s
+17:14:18   [bsw c9] Ton=19.1259 dr=2.250 df=0.250 n=16 Pout=250.380 Pcorr=40.671 dPc=+0.058 dE/T=-4.13 rel=5.22e-03(i_l2) cdt r/f=2.154/1.432 wall=35s
+17:15:01   [bsw c10] Ton=19.1142 dr=2.250 df=0.250 n=16 Pout=249.653 Pcorr=41.056 dPc=+0.028 dE/T=-1.62 rel=2.21e-03(i_l2) cdt r/f=2.152/1.431 wall=43s
+17:16:33   [bsw c11] Ton=19.1199 dr=2.250 df=0.250 n=16 Pout=249.548 Pcorr=41.371 dPc=-0.000 dE/T=-0.02 rel=1.87e-04(i_l2) cdt r/f=2.150/1.430 wall=92s
+17:17:27   [bsw c12] Ton=19.1275 dr=2.250 df=0.250 n=16 Pout=249.681 Pcorr=41.483 dPc=-0.006 dE/T=0.45 rel=3.64e-04(i_l2) cdt r/f=2.149/1.429 wall=53s
+17:18:05   [bsw c13] Ton=19.1455 dr=2.250 df=0.250 n=16 Pout=250.068 Pcorr=41.669 dPc=-0.019 dE/T=1.19 rel=1.60e-03(i_l2) cdt r/f=2.148/1.427 wall=38s
+17:18:05   -> NOT_CONVERGED P_loss=41.6695 W (raw 42.8556) Pout=250.068 gate=8.443 periods=224 file=baseline_LMG1210_DEV_T60_r2.250_f0.250.json
+17:18:05 solve baseline_LMG1210_DEV_T60_r2.250_f0.350 (sweep) from Ton=19.1455 ns origin=35.0 ns
+17:22:33   [bsw c0] Ton=19.1455 dr=2.250 df=0.350 n=16 Pout=249.442 Pcorr=40.363 dPc=+0.032 dE/T=-2.20 rel=2.80e-03(i_l2) cdt r/f=2.152/1.556 wall=268s
+17:23:23   [bsw c1] Ton=19.1933 dr=2.250 df=0.350 n=16 Pout=249.905 Pcorr=41.471 dPc=-0.048 dE/T=3.01 rel=3.73e-03(i_l2) cdt r/f=2.146/1.549 wall=50s
+17:23:58   [bsw c2] Ton=19.1815 dr=2.250 df=0.350 n=16 Pout=250.181 Pcorr=40.764 dPc=+0.011 dE/T=-0.52 rel=5.11e-04(i_l2) cdt r/f=2.150/1.552 wall=35s
+17:24:35   [bsw c3] Ton=19.1678 dr=2.250 df=0.350 n=16 Pout=249.856 Pcorr=40.657 dPc=+0.014 dE/T=-0.94 rel=1.18e-03(i_l2) cdt r/f=2.151/1.554 wall=37s
+17:25:37   [bsw c4] Ton=19.1738 dr=2.250 df=0.350 n=16 Pout=249.843 Pcorr=40.871 dPc=-0.002 dE/T=0.14 rel=1.12e-04(i_l2) cdt r/f=2.149/1.552 wall=63s
+17:25:37   -> REGULATED_TO_250W P_loss=40.8712 W (raw 41.0092) Pout=249.843 gate=8.442 periods=80 file=baseline_LMG1210_DEV_T60_r2.250_f0.350.json
+17:25:37 solve baseline_LMG1210_DEV_T60_r2.250_f-0.050 (sweep) from Ton=19.0648 ns origin=35.0 ns
+17:26:24   [bsw c0] Ton=19.0648 dr=2.250 df=-0.050 n=16 Pout=250.440 Pcorr=45.924 dPc=-0.024 dE/T=1.60 rel=1.97e-03(i_l2) cdt r/f=2.147/-0.135 wall=46s
+17:27:16   [bsw c1] Ton=19.0468 dr=2.250 df=-0.050 n=16 Pout=250.312 Pcorr=45.449 dPc=+0.012 dE/T=-0.82 rel=9.74e-04(i_l2) cdt r/f=2.150/-0.137 wall=52s
+17:27:58   [bsw c2] Ton=19.0342 dr=2.250 df=-0.050 n=16 Pout=249.959 Pcorr=45.406 dPc=+0.013 dE/T=-0.87 rel=1.04e-03(i_l2) cdt r/f=2.150/-0.137 wall=42s
+17:28:44   [bsw c3] Ton=19.0342 dr=2.250 df=-0.050 n=16 Pout=249.856 Pcorr=45.518 dPc=+0.003 dE/T=-0.18 rel=2.68e-04(i_l2) cdt r/f=2.150/-0.137 wall=46s
+17:28:44   -> REGULATED_TO_250W P_loss=45.5183 W (raw 45.3388) Pout=249.856 gate=8.445 periods=64 file=baseline_LMG1210_DEV_T60_r2.250_f-0.050.json
+17:28:44 solve baseline_LMG1210_DEV_T60_r2.250_f-0.150 (sweep) from Ton=19.0342 ns origin=35.0 ns
+17:29:33   [bsw c0] Ton=19.0342 dr=2.250 df=-0.150 n=16 Pout=250.260 Pcorr=48.164 dPc=-0.012 dE/T=1.32 rel=1.57e-03(i_l2) cdt r/f=2.148/-0.779 wall=49s
+17:30:16   [bsw c1] Ton=18.9984 dr=2.250 df=-0.150 n=16 Pout=249.891 Pcorr=47.336 dPc=+0.035 dE/T=-2.77 rel=3.14e-03(i_l2) cdt r/f=2.153/-0.778 wall=42s
+17:30:58   [bsw c2] Ton=18.9515 dr=2.250 df=-0.150 n=16 Pout=249.079 Pcorr=46.651 dPc=+0.092 dE/T=-6.19 rel=7.79e-03(i_l2) cdt r/f=2.157/-0.778 wall=43s
+17:31:48   [bsw c3] Ton=18.9629 dr=2.250 df=-0.150 n=16 Pout=248.537 Pcorr=47.599 dPc=+0.015 dE/T=-0.60 rel=1.21e-03(i_l2) cdt r/f=2.150/-0.776 wall=50s
+17:32:24   [bsw c4] Ton=18.9988 dr=2.250 df=-0.150 n=16 Pout=249.136 Pcorr=48.179 dPc=-0.032 dE/T=2.12 rel=2.53e-03(i_l2) cdt r/f=2.147/-0.776 wall=36s
+17:32:54   [bsw c5] Ton=19.0506 dr=2.250 df=-0.150 n=16 Pout=250.377 Pcorr=48.609 dPc=-0.055 dE/T=3.70 rel=4.43e-03(i_l2) cdt r/f=2.145/-0.778 wall=30s
+17:33:24   [bsw c6] Ton=19.0349 dr=2.250 df=-0.150 n=16 Pout=250.519 Pcorr=47.900 dPc=-0.002 dE/T=-0.23 rel=2.99e-05(i_l2) cdt r/f=2.149/-0.779 wall=29s
+17:33:53   [bsw c7] Ton=19.0132 dr=2.250 df=-0.150 n=16 Pout=250.084 Pcorr=47.627 dPc=+0.020 dE/T=-1.41 rel=1.99e-03(i_l2) cdt r/f=2.151/-0.778 wall=29s
+17:34:23   [bsw c8] Ton=19.0090 dr=2.250 df=-0.150 n=16 Pout=249.836 Pcorr=47.758 dPc=+0.011 dE/T=-0.56 rel=9.88e-04(i_l2) cdt r/f=2.150/-0.778 wall=30s
+17:34:53   [bsw c9] Ton=19.0118 dr=2.250 df=-0.150 n=16 Pout=249.821 Pcorr=47.873 dPc=+0.004 dE/T=0.06 rel=1.60e-04(i_l2) cdt r/f=2.149/-0.778 wall=30s
+17:34:53   -> REGULATED_TO_250W P_loss=47.8726 W (raw 47.9311) Pout=249.821 gate=8.445 periods=160 file=baseline_LMG1210_DEV_T60_r2.250_f-0.150.json
+17:34:53 solve baseline_LMG1210_DEV_T60_r2.250_f-0.250 (sweep) from Ton=19.0118 ns origin=35.0 ns
+17:35:23   [bsw c0] Ton=19.0118 dr=2.250 df=-0.250 n=16 Pout=250.203 Pcorr=50.930 dPc=-0.021 dE/T=1.25 rel=1.53e-03(i_l2) cdt r/f=2.148/-0.966 wall=31s
+17:35:55   [bsw c1] Ton=19.0046 dr=2.250 df=-0.250 n=16 Pout=250.270 Pcorr=50.609 dPc=+0.007 dE/T=-0.51 rel=5.80e-04(i_l2) cdt r/f=2.150/-0.966 wall=31s
+17:36:31   [bsw c2] Ton=18.9932 dr=2.250 df=-0.250 n=16 Pout=249.993 Pcorr=50.524 dPc=+0.015 dE/T=-0.84 rel=1.15e-03(i_l2) cdt r/f=2.150/-0.966 wall=37s
+17:37:04   [bsw c3] Ton=18.9932 dr=2.250 df=-0.250 n=16 Pout=249.889 Pcorr=50.637 dPc=+0.006 dE/T=-0.18 rel=2.70e-04(i_l2) cdt r/f=2.150/-0.966 wall=33s
+17:37:43   [bsw c4] Ton=18.9979 dr=2.250 df=-0.250 n=16 Pout=249.957 Pcorr=50.723 dPc=-0.004 dE/T=0.26 rel=3.03e-04(i_l2) cdt r/f=2.149/-0.966 wall=38s
+17:37:43   -> REGULATED_TO_250W P_loss=50.7226 W (raw 50.9826) Pout=249.957 gate=8.445 periods=80 file=baseline_LMG1210_DEV_T60_r2.250_f-0.250.json
+17:37:43 solve baseline_LMG1210_DEV_T60_r2.250_f0.450 (sweep) from Ton=19.1738 ns origin=35.0 ns
+17:38:20   [bsw c0] Ton=19.1738 dr=2.250 df=0.450 n=16 Pout=249.000 Pcorr=39.931 dPc=+0.042 dE/T=-2.73 rel=3.41e-03(i_l2) cdt r/f=2.153/1.672 wall=37s
+17:38:53   [bsw c1] Ton=19.2114 dr=2.250 df=0.450 n=16 Pout=249.408 Pcorr=40.746 dPc=-0.018 dE/T=1.08 rel=1.23e-03(i_l2) cdt r/f=2.148/1.666 wall=33s
+17:39:24   [bsw c2] Ton=19.2442 dr=2.250 df=0.450 n=16 Pout=250.187 Pcorr=41.001 dPc=-0.029 dE/T=1.97 rel=2.36e-03(i_l2) cdt r/f=2.147/1.663 wall=31s
+17:39:55   [bsw c3] Ton=19.2228 dr=2.250 df=0.450 n=16 Pout=250.226 Pcorr=40.240 dPc=+0.028 dE/T=-1.81 rel=1.97e-03(i_l2) cdt r/f=2.152/1.668 wall=31s
+17:40:26   [bsw c4] Ton=19.2141 dr=2.250 df=0.450 n=16 Pout=249.830 Pcorr=40.373 dPc=+0.017 dE/T=-0.95 rel=1.18e-03(i_l2) cdt r/f=2.151/1.667 wall=31s
+17:40:57   [bsw c5] Ton=19.2179 dr=2.250 df=0.450 n=16 Pout=249.774 Pcorr=40.561 dPc=+0.001 dE/T=-0.00 rel=7.46e-05(i_l2) cdt r/f=2.150/1.666 wall=31s
+17:40:57   -> REGULATED_TO_250W P_loss=40.5607 W (raw 40.5596) Pout=249.774 gate=8.442 periods=96 file=baseline_LMG1210_DEV_T60_r2.250_f0.450.json
+17:40:57   extension step (edge optimum) d_fall +0.1 ns
+17:40:57 solve baseline_LMG1210_DEV_T60_r2.250_f0.550 (sweep) from Ton=19.2179 ns origin=35.0 ns
+17:41:25   [bsw c0] Ton=19.2179 dr=2.250 df=0.550 n=16 Pout=248.846 Pcorr=39.790 dPc=+0.046 dE/T=-2.99 rel=3.70e-03(i_l2) cdt r/f=2.153/1.779 wall=28s
+17:41:54   [bsw c1] Ton=19.2139 dr=2.250 df=0.550 n=16 Pout=248.916 Pcorr=39.582 dPc=+0.059 dE/T=-3.92 rel=5.29e-03(i_l2) cdt r/f=2.155/1.780 wall=29s
+17:42:21   [bsw c2] Ton=19.2501 dr=2.250 df=0.550 n=16 Pout=248.722 Pcorr=41.006 dPc=-0.045 dE/T=2.87 rel=3.20e-03(i_l2) cdt r/f=2.146/1.772 wall=27s
+17:42:50   [bsw c3] Ton=19.3018 dr=2.250 df=0.550 n=16 Pout=250.047 Pcorr=41.310 dPc=-0.061 dE/T=3.80 rel=4.42e-03(i_l2) cdt r/f=2.145/1.768 wall=29s
+17:43:18   [bsw c4] Ton=19.3018 dr=2.250 df=0.550 n=16 Pout=250.532 Pcorr=40.775 dPc=-0.017 dE/T=0.88 rel=1.21e-03(i_l2) cdt r/f=2.148/1.770 wall=28s
+17:43:49   [bsw c5] Ton=19.2810 dr=2.250 df=0.550 n=16 Pout=250.276 Pcorr=40.350 dPc=+0.014 dE/T=-1.02 rel=1.18e-03(i_l2) cdt r/f=2.151/1.773 wall=30s
+17:44:20   [bsw c6] Ton=19.2587 dr=2.250 df=0.550 n=16 Pout=249.745 Pcorr=40.177 dPc=+0.024 dE/T=-1.56 rel=1.85e-03(i_l2) cdt r/f=2.151/1.775 wall=31s
+17:44:52   [bsw c7] Ton=19.2694 dr=2.250 df=0.550 n=16 Pout=249.740 Pcorr=40.541 dPc=-0.003 dE/T=0.27 rel=3.32e-04(i_l2) cdt r/f=2.149/1.773 wall=32s
+17:45:21   [bsw c8] Ton=19.2804 dr=2.250 df=0.550 n=16 Pout=249.968 Pcorr=40.663 dPc=-0.011 dE/T=0.70 rel=8.14e-04(i_l2) cdt r/f=2.149/1.772 wall=30s
+17:45:50   [bsw c9] Ton=19.2804 dr=2.250 df=0.550 n=16 Pout=250.058 Pcorr=40.565 dPc=-0.004 dE/T=0.17 rel=3.62e-04(i_l2) cdt r/f=2.149/1.772 wall=28s
+17:45:50   -> REGULATED_TO_250W P_loss=40.5649 W (raw 40.7302) Pout=250.058 gate=8.442 periods=160 file=baseline_LMG1210_DEV_T60_r2.250_f0.550.json
+17:45:50   extension step (edge optimum) d_fall +0.1 ns
+17:45:50   best d_fall at d_rise=2.250: 0.450 ns
+17:45:50 solve baseline_LMG1210_DEV_T60_r2.350_f0.450 (sweep) from Ton=19.2179 ns origin=35.0 ns
+17:46:20   [bsw c0] Ton=19.2179 dr=2.350 df=0.450 n=16 Pout=248.843 Pcorr=39.862 dPc=+0.044 dE/T=-3.03 rel=3.58e-03(i_l2) cdt r/f=2.253/1.672 wall=30s
+17:46:50   [bsw c1] Ton=19.2083 dr=2.350 df=0.450 n=16 Pout=248.909 Pcorr=39.484 dPc=+0.070 dE/T=-5.09 rel=6.09e-03(i_l2) cdt r/f=2.255/1.674 wall=30s
+17:47:20   [bsw c2] Ton=19.2497 dr=2.350 df=0.450 n=16 Pout=248.563 Pcorr=41.187 dPc=-0.052 dE/T=3.42 rel=3.94e-03(i_l2) cdt r/f=2.245/1.665 wall=30s
+17:47:49   [bsw c3] Ton=19.3064 dr=2.350 df=0.450 n=16 Pout=250.042 Pcorr=41.489 dPc=-0.067 dE/T=4.20 rel=4.70e-03(i_l2) cdt r/f=2.244/1.661 wall=29s
+17:48:16   [bsw c4] Ton=19.3064 dr=2.350 df=0.450 n=16 Pout=250.596 Pcorr=40.899 dPc=-0.020 dE/T=1.02 rel=1.32e-03(i_l2) cdt r/f=2.248/1.663 wall=27s
+17:48:45   [bsw c5] Ton=19.2836 dr=2.350 df=0.450 n=16 Pout=250.335 Pcorr=40.426 dPc=+0.015 dE/T=-1.06 rel=1.26e-03(i_l2) cdt r/f=2.250/1.666 wall=28s
+17:49:13   [bsw c6] Ton=19.2543 dr=2.350 df=0.450 n=16 Pout=249.677 Pcorr=40.163 dPc=+0.028 dE/T=-1.96 rel=2.41e-03(i_l2) cdt r/f=2.252/1.669 wall=28s
+17:49:40   [bsw c7] Ton=19.2687 dr=2.350 df=0.450 n=16 Pout=249.674 Pcorr=40.630 dPc=-0.004 dE/T=0.36 rel=2.75e-04(i_l2) cdt r/f=2.249/1.666 wall=27s
+17:50:08   [bsw c8] Ton=19.2832 dr=2.350 df=0.450 n=16 Pout=249.974 Pcorr=40.793 dPc=-0.015 dE/T=0.93 rel=1.06e-03(i_l2) cdt r/f=2.248/1.665 wall=28s
+17:50:36   [bsw c9] Ton=19.2832 dr=2.350 df=0.450 n=16 Pout=250.095 Pcorr=40.665 dPc=-0.005 dE/T=0.24 rel=2.42e-04(i_l2) cdt r/f=2.249/1.665 wall=28s
+17:50:36   -> REGULATED_TO_250W P_loss=40.6654 W (raw 40.9012) Pout=250.095 gate=8.442 periods=160 file=baseline_LMG1210_DEV_T60_r2.350_f0.450.json
+17:50:36 solve baseline_LMG1210_DEV_T60_r2.450_f0.450 (sweep) from Ton=19.2832 ns origin=35.0 ns
+17:51:06   [bsw c0] Ton=19.2832 dr=2.450 df=0.450 n=16 Pout=249.212 Pcorr=39.923 dPc=+0.041 dE/T=-2.91 rel=3.37e-03(i_l2) cdt r/f=2.353/1.671 wall=30s
+17:51:36   [bsw c1] Ton=19.3481 dr=2.450 df=0.450 n=16 Pout=249.787 Pcorr=41.383 dPc=-0.055 dE/T=3.78 rel=3.98e-03(i_l2) cdt r/f=2.344/1.662 wall=30s
+17:52:08   [bsw c2] Ton=19.3191 dr=2.450 df=0.450 n=16 Pout=250.219 Pcorr=40.036 dPc=+0.042 dE/T=-2.84 rel=3.47e-03(i_l2) cdt r/f=2.353/1.668 wall=31s
+17:52:37   [bsw c3] Ton=19.3118 dr=2.450 df=0.450 n=16 Pout=249.699 Pcorr=40.322 dPc=+0.020 dE/T=-1.14 rel=1.48e-03(i_l2) cdt r/f=2.351/1.668 wall=30s
+17:53:09   [bsw c4] Ton=19.3168 dr=2.450 df=0.450 n=16 Pout=249.617 Pcorr=40.562 dPc=+0.003 dE/T=-0.04 rel=1.30e-04(i_l3) cdt r/f=2.349/1.667 wall=32s
+17:53:51   [bsw c5] Ton=19.3232 dr=2.450 df=0.450 n=16 Pout=249.719 Pcorr=40.662 dPc=-0.005 dE/T=0.35 rel=3.38e-04(i_l2) cdt r/f=2.348/1.666 wall=42s
+17:54:22   [bsw c6] Ton=19.3407 dr=2.450 df=0.450 n=16 Pout=250.073 Pcorr=40.856 dPc=-0.017 dE/T=1.09 rel=1.25e-03(i_l2) cdt r/f=2.348/1.664 wall=31s
+17:54:55   [bsw c7] Ton=19.3407 dr=2.450 df=0.450 n=16 Pout=250.220 Pcorr=40.708 dPc=-0.004 dE/T=0.27 rel=3.46e-04(i_l2) cdt r/f=2.348/1.665 wall=32s
+17:54:55   -> REGULATED_TO_250W P_loss=40.7076 W (raw 40.9798) Pout=250.220 gate=8.443 periods=128 file=baseline_LMG1210_DEV_T60_r2.450_f0.450.json
+17:54:55 solve baseline_LMG1210_DEV_T60_r2.550_f0.450 (sweep) from Ton=19.3407 ns origin=35.0 ns
+17:55:28   [bsw c0] Ton=19.3407 dr=2.550 df=0.450 n=16 Pout=249.363 Pcorr=39.958 dPc=+0.039 dE/T=-2.83 rel=3.19e-03(i_l2) cdt r/f=2.452/1.671 wall=33s
+17:56:00   [bsw c1] Ton=19.4000 dr=2.550 df=0.450 n=16 Pout=249.805 Pcorr=41.331 dPc=-0.048 dE/T=3.32 rel=3.40e-03(i_l2) cdt r/f=2.444/1.662 wall=32s
+17:56:32   [bsw c2] Ton=19.3747 dr=2.550 df=0.450 n=16 Pout=250.211 Pcorr=40.164 dPc=+0.031 dE/T=-2.20 rel=2.36e-03(i_l2) cdt r/f=2.452/1.668 wall=32s
+17:57:01   [bsw c3] Ton=19.3668 dr=2.550 df=0.450 n=16 Pout=249.758 Pcorr=40.363 dPc=+0.017 dE/T=-1.05 rel=1.29e-03(i_l2) cdt r/f=2.450/1.668 wall=29s
+17:57:33   [bsw c4] Ton=19.3710 dr=2.550 df=0.450 n=16 Pout=249.671 Pcorr=40.575 dPc=+0.002 dE/T=-0.07 rel=1.25e-04(i_l2) cdt r/f=2.449/1.666 wall=32s
+17:58:07   [bsw c5] Ton=19.3768 dr=2.550 df=0.450 n=16 Pout=249.754 Pcorr=40.669 dPc=-0.005 dE/T=0.29 rel=3.78e-04(i_l2) cdt r/f=2.448/1.666 wall=34s
+17:58:07   -> REGULATED_TO_250W P_loss=40.6691 W (raw 40.9557) Pout=249.754 gate=8.442 periods=96 file=baseline_LMG1210_DEV_T60_r2.550_f0.450.json
+17:58:07 solve baseline_LMG1210_DEV_T60_r2.150_f0.450 (sweep) from Ton=19.2179 ns origin=35.0 ns
+17:58:40   [bsw c0] Ton=19.2179 dr=2.150 df=0.450 n=16 Pout=250.744 Pcorr=41.279 dPc=-0.049 dE/T=3.17 rel=3.77e-03(i_l2) cdt r/f=2.046/1.660 wall=33s
+17:59:14   [bsw c1] Ton=19.1946 dr=2.150 df=0.450 n=16 Pout=250.757 Pcorr=40.449 dPc=+0.016 dE/T=-1.01 rel=1.19e-03(i_l2) cdt r/f=2.051/1.665 wall=34s
+17:59:47   [bsw c2] Ton=19.1858 dr=2.150 df=0.450 n=16 Pout=250.319 Pcorr=40.634 dPc=-0.002 dE/T=0.06 rel=5.27e-05(i_l3) cdt r/f=2.050/1.665 wall=33s
+18:00:22   [bsw c3] Ton=19.1728 dr=2.150 df=0.450 n=16 Pout=250.128 Pcorr=40.397 dPc=+0.014 dE/T=-0.98 rel=1.04e-03(i_l2) cdt r/f=2.051/1.667 wall=35s
+18:00:57   [bsw c4] Ton=19.1672 dr=2.150 df=0.450 n=16 Pout=249.904 Pcorr=40.455 dPc=+0.009 dE/T=-0.55 rel=6.55e-04(i_l2) cdt r/f=2.051/1.667 wall=35s
+18:01:31   [bsw c5] Ton=19.1696 dr=2.150 df=0.450 n=16 Pout=249.878 Pcorr=40.567 dPc=+0.000 dE/T=0.01 rel=1.78e-05(i_l2) cdt r/f=2.050/1.666 wall=35s
+18:01:31   -> REGULATED_TO_250W P_loss=40.5668 W (raw 40.5793) Pout=249.878 gate=8.442 periods=96 file=baseline_LMG1210_DEV_T60_r2.150_f0.450.json
+18:01:31 solve baseline_LMG1210_DEV_T60_r2.050_f0.450 (sweep) from Ton=19.1696 ns origin=35.0 ns
+18:02:08   [bsw c0] Ton=19.1696 dr=2.050 df=0.450 n=16 Pout=250.872 Pcorr=41.282 dPc=-0.050 dE/T=3.25 rel=4.14e-03(i_l2) cdt r/f=1.947/1.660 wall=36s
+18:02:40   [bsw c1] Ton=19.1404 dr=2.050 df=0.450 n=16 Pout=250.749 Pcorr=40.358 dPc=+0.023 dE/T=-1.46 rel=1.78e-03(i_l2) cdt r/f=1.952/1.666 wall=33s
+18:03:16   [bsw c2] Ton=19.0905 dr=2.050 df=0.450 n=16 Pout=249.651 Pcorr=39.849 dPc=+0.054 dE/T=-3.54 rel=4.52e-03(i_l2) cdt r/f=1.954/1.671 wall=35s
+18:03:51   [bsw c3] Ton=19.1065 dr=2.050 df=0.450 n=16 Pout=249.529 Pcorr=40.559 dPc=-0.001 dE/T=0.26 rel=1.28e-04(i_l2) cdt r/f=1.950/1.667 wall=35s
+18:04:25   [bsw c4] Ton=19.1279 dr=2.050 df=0.450 n=16 Pout=249.967 Pcorr=40.831 dPc=-0.023 dE/T=1.41 rel=1.75e-03(i_l2) cdt r/f=1.949/1.664 wall=34s
+18:04:56   [bsw c5] Ton=19.1279 dr=2.050 df=0.450 n=16 Pout=250.132 Pcorr=40.637 dPc=-0.006 dE/T=0.29 rel=7.47e-04(i_l2) cdt r/f=1.950/1.665 wall=32s
+18:05:26   [bsw c6] Ton=19.1215 dr=2.050 df=0.450 n=16 Pout=250.043 Pcorr=40.506 dPc=+0.006 dE/T=-0.35 rel=4.17e-04(i_l2) cdt r/f=1.951/1.666 wall=29s
+18:05:57   [bsw c7] Ton=19.1215 dr=2.050 df=0.450 n=16 Pout=250.002 Pcorr=40.551 dPc=+0.001 dE/T=-0.07 rel=1.17e-04(i_l2) cdt r/f=1.950/1.666 wall=32s
+18:05:57   -> REGULATED_TO_250W P_loss=40.5510 W (raw 40.4828) Pout=250.002 gate=8.442 periods=128 file=baseline_LMG1210_DEV_T60_r2.050_f0.450.json
+18:05:57 solve baseline_LMG1210_DEV_T60_r1.950_f0.450 (sweep) from Ton=19.1215 ns origin=35.0 ns
+18:06:25   [bsw c0] Ton=19.1215 dr=1.950 df=0.450 n=16 Pout=251.002 Pcorr=41.275 dPc=-0.052 dE/T=3.28 rel=4.16e-03(i_l2) cdt r/f=1.847/1.660 wall=28s
+18:06:59   [bsw c1] Ton=19.0388 dr=1.950 df=0.450 n=16 Pout=249.765 Pcorr=39.680 dPc=+0.072 dE/T=-4.54 rel=6.28e-03(i_l2) cdt r/f=1.855/1.672 wall=34s
+18:07:34   [bsw c2] Ton=19.0878 dr=1.950 df=0.450 n=16 Pout=249.824 Pcorr=41.461 dPc=-0.078 dE/T=5.01 rel=5.32e-03(i_l2) cdt r/f=1.846/1.661 wall=35s
+18:08:06   [bsw c3] Ton=19.0907 dr=1.950 df=0.450 n=16 Pout=250.440 Pcorr=40.814 dPc=-0.022 dE/T=1.13 rel=1.61e-03(i_l2) cdt r/f=1.849/1.664 wall=32s
+18:08:37   [bsw c4] Ton=19.0834 dr=1.950 df=0.450 n=16 Pout=250.422 Pcorr=40.549 dPc=+0.003 dE/T=-0.28 rel=2.44e-04(i_l2) cdt r/f=1.851/1.665 wall=31s
+18:09:10   [bsw c5] Ton=19.0412 dr=1.950 df=0.450 n=16 Pout=249.574 Pcorr=40.001 dPc=+0.042 dE/T=-2.76 rel=3.76e-03(i_l2) cdt r/f=1.853/1.670 wall=34s
+18:09:46   [bsw c6] Ton=19.0624 dr=1.950 df=0.450 n=16 Pout=249.670 Pcorr=40.673 dPc=-0.011 dE/T=0.82 rel=8.97e-04(i_l2) cdt r/f=1.850/1.666 wall=36s
+18:10:20   [bsw c7] Ton=19.0955 dr=1.950 df=0.450 n=16 Pout=250.408 Pcorr=41.025 dPc=-0.036 dE/T=2.30 rel=2.57e-03(i_l2) cdt r/f=1.848/1.662 wall=34s
+18:10:55   [bsw c8] Ton=19.0772 dr=1.950 df=0.450 n=16 Pout=250.314 Pcorr=40.452 dPc=+0.008 dE/T=-0.72 rel=7.83e-04(i_l2) cdt r/f=1.851/1.666 wall=36s
+18:11:28   [bsw c9] Ton=19.0458 dr=1.950 df=0.450 n=16 Pout=249.620 Pcorr=40.115 dPc=+0.034 dE/T=-2.16 rel=2.94e-03(i_l2) cdt r/f=1.853/1.669 wall=32s
+18:12:01   [bsw c10] Ton=19.0630 dr=1.950 df=0.450 n=16 Pout=249.707 Pcorr=40.652 dPc=-0.009 dE/T=0.68 rel=7.66e-04(i_l2) cdt r/f=1.850/1.666 wall=33s
+18:12:31   [bsw c11] Ton=19.0924 dr=1.950 df=0.450 n=16 Pout=250.357 Pcorr=40.968 dPc=-0.032 dE/T=2.03 rel=2.58e-03(i_l2) cdt r/f=1.849/1.663 wall=31s
+18:13:02   [bsw c12] Ton=19.0762 dr=1.950 df=0.450 n=16 Pout=250.273 Pcorr=40.465 dPc=+0.009 dE/T=-0.66 rel=8.15e-04(i_l2) cdt r/f=1.851/1.666 wall=31s
+18:13:33   [bsw c13] Ton=19.0489 dr=1.950 df=0.450 n=16 Pout=249.668 Pcorr=40.171 dPc=+0.029 dE/T=-1.88 rel=2.54e-03(i_l2) cdt r/f=1.852/1.669 wall=30s
+18:13:33   -> NOT_CONVERGED P_loss=40.1712 W (raw 38.2919) Pout=249.668 gate=8.442 periods=224 file=baseline_LMG1210_DEV_T60_r1.950_f0.450.json
+18:13:33 solve baseline_LMG1210_DEV_T60_r1.950_f0.450 (sweep) from Ton=19.1215 ns origin=35.0 ns
+18:14:03   [bsw c0] Ton=19.1215 dr=1.950 df=0.450 n=16 Pout=251.002 Pcorr=41.275 dPc=-0.052 dE/T=3.28 rel=4.16e-03(i_l2) cdt r/f=1.847/1.660 wall=30s
+18:14:32   [bsw c1] Ton=19.0388 dr=1.950 df=0.450 n=16 Pout=249.765 Pcorr=39.680 dPc=+0.072 dE/T=-4.54 rel=6.28e-03(i_l2) cdt r/f=1.855/1.672 wall=29s
+18:15:00   [bsw c2] Ton=19.0878 dr=1.950 df=0.450 n=16 Pout=249.824 Pcorr=41.461 dPc=-0.078 dE/T=5.01 rel=5.32e-03(i_l2) cdt r/f=1.846/1.661 wall=28s
+18:15:29   [bsw c3] Ton=19.0907 dr=1.950 df=0.450 n=16 Pout=250.440 Pcorr=40.814 dPc=-0.022 dE/T=1.13 rel=1.61e-03(i_l2) cdt r/f=1.849/1.664 wall=28s
+18:15:58   [bsw c4] Ton=19.0834 dr=1.950 df=0.450 n=16 Pout=250.422 Pcorr=40.549 dPc=+0.003 dE/T=-0.28 rel=2.44e-04(i_l2) cdt r/f=1.851/1.665 wall=29s
+18:16:31   [bsw c5] Ton=19.0412 dr=1.950 df=0.450 n=16 Pout=249.574 Pcorr=40.001 dPc=+0.042 dE/T=-2.76 rel=3.76e-03(i_l2) cdt r/f=1.853/1.670 wall=33s
+18:17:05   [bsw c6] Ton=19.0624 dr=1.950 df=0.450 n=16 Pout=249.670 Pcorr=40.673 dPc=-0.011 dE/T=0.82 rel=8.97e-04(i_l2) cdt r/f=1.850/1.666 wall=34s
+18:17:34   [bsw c7] Ton=19.0955 dr=1.950 df=0.450 n=16 Pout=250.408 Pcorr=41.025 dPc=-0.036 dE/T=2.30 rel=2.57e-03(i_l2) cdt r/f=1.848/1.662 wall=29s
+18:18:14   [bsw c8] Ton=19.0772 dr=1.950 df=0.450 n=16 Pout=250.314 Pcorr=40.452 dPc=+0.008 dE/T=-0.72 rel=7.83e-04(i_l2) cdt r/f=1.851/1.666 wall=40s
+18:18:52   [bsw c9] Ton=19.0458 dr=1.950 df=0.450 n=16 Pout=249.620 Pcorr=40.115 dPc=+0.034 dE/T=-2.16 rel=2.94e-03(i_l2) cdt r/f=1.853/1.669 wall=38s
+18:19:25   [bsw c10] Ton=19.0630 dr=1.950 df=0.450 n=16 Pout=249.707 Pcorr=40.652 dPc=-0.009 dE/T=0.68 rel=7.66e-04(i_l2) cdt r/f=1.850/1.666 wall=33s
+18:20:01   [bsw c11] Ton=19.0924 dr=1.950 df=0.450 n=16 Pout=250.357 Pcorr=40.968 dPc=-0.032 dE/T=2.03 rel=2.58e-03(i_l2) cdt r/f=1.849/1.663 wall=36s
+18:20:35   [bsw c12] Ton=19.0762 dr=1.950 df=0.450 n=16 Pout=250.273 Pcorr=40.465 dPc=+0.009 dE/T=-0.66 rel=8.15e-04(i_l2) cdt r/f=1.851/1.666 wall=33s
+18:21:12   [bsw c13] Ton=19.0489 dr=1.950 df=0.450 n=16 Pout=249.668 Pcorr=40.171 dPc=+0.029 dE/T=-1.88 rel=2.54e-03(i_l2) cdt r/f=1.852/1.669 wall=37s
+18:21:12   -> NOT_CONVERGED P_loss=40.1712 W (raw 38.2919) Pout=249.668 gate=8.442 periods=224 file=baseline_LMG1210_DEV_T60_r1.950_f0.450_v2.json
+18:21:12   extension step (edge optimum) d_rise -0.1 ns
+18:21:12 solve baseline_LMG1210_DEV_T60_r1.950_f0.450 (sweep) from Ton=19.1215 ns origin=35.0 ns
+18:21:47   [bsw c0] Ton=19.1215 dr=1.950 df=0.450 n=16 Pout=251.002 Pcorr=41.275 dPc=-0.052 dE/T=3.28 rel=4.16e-03(i_l2) cdt r/f=1.847/1.660 wall=34s
+18:22:19   [bsw c1] Ton=19.0388 dr=1.950 df=0.450 n=16 Pout=249.765 Pcorr=39.680 dPc=+0.072 dE/T=-4.54 rel=6.28e-03(i_l2) cdt r/f=1.855/1.672 wall=32s
+18:22:51   [bsw c2] Ton=19.0878 dr=1.950 df=0.450 n=16 Pout=249.824 Pcorr=41.461 dPc=-0.078 dE/T=5.01 rel=5.32e-03(i_l2) cdt r/f=1.846/1.661 wall=32s
+18:23:23   [bsw c3] Ton=19.0907 dr=1.950 df=0.450 n=16 Pout=250.440 Pcorr=40.814 dPc=-0.022 dE/T=1.13 rel=1.61e-03(i_l2) cdt r/f=1.849/1.664 wall=31s
+18:23:56   [bsw c4] Ton=19.0834 dr=1.950 df=0.450 n=16 Pout=250.422 Pcorr=40.549 dPc=+0.003 dE/T=-0.28 rel=2.44e-04(i_l2) cdt r/f=1.851/1.665 wall=34s
+18:24:29   [bsw c5] Ton=19.0412 dr=1.950 df=0.450 n=16 Pout=249.574 Pcorr=40.001 dPc=+0.042 dE/T=-2.76 rel=3.76e-03(i_l2) cdt r/f=1.853/1.670 wall=32s
+18:25:04   [bsw c6] Ton=19.0624 dr=1.950 df=0.450 n=16 Pout=249.670 Pcorr=40.673 dPc=-0.011 dE/T=0.82 rel=8.97e-04(i_l2) cdt r/f=1.850/1.666 wall=35s
+18:25:36   [bsw c7] Ton=19.0955 dr=1.950 df=0.450 n=16 Pout=250.408 Pcorr=41.025 dPc=-0.036 dE/T=2.30 rel=2.57e-03(i_l2) cdt r/f=1.848/1.662 wall=33s
+18:26:10   [bsw c8] Ton=19.0772 dr=1.950 df=0.450 n=16 Pout=250.314 Pcorr=40.452 dPc=+0.008 dE/T=-0.72 rel=7.83e-04(i_l2) cdt r/f=1.851/1.666 wall=34s
+18:26:45   [bsw c9] Ton=19.0458 dr=1.950 df=0.450 n=16 Pout=249.620 Pcorr=40.115 dPc=+0.034 dE/T=-2.16 rel=2.94e-03(i_l2) cdt r/f=1.853/1.669 wall=35s
+18:27:20   [bsw c10] Ton=19.0630 dr=1.950 df=0.450 n=16 Pout=249.707 Pcorr=40.652 dPc=-0.009 dE/T=0.68 rel=7.66e-04(i_l2) cdt r/f=1.850/1.666 wall=35s
+18:27:58   [bsw c11] Ton=19.0924 dr=1.950 df=0.450 n=16 Pout=250.357 Pcorr=40.968 dPc=-0.032 dE/T=2.03 rel=2.58e-03(i_l2) cdt r/f=1.849/1.663 wall=37s
+18:28:35   [bsw c12] Ton=19.0762 dr=1.950 df=0.450 n=16 Pout=250.273 Pcorr=40.465 dPc=+0.009 dE/T=-0.66 rel=8.15e-04(i_l2) cdt r/f=1.851/1.666 wall=37s
+18:29:14   [bsw c13] Ton=19.0489 dr=1.950 df=0.450 n=16 Pout=249.668 Pcorr=40.171 dPc=+0.029 dE/T=-1.88 rel=2.54e-03(i_l2) cdt r/f=1.852/1.669 wall=40s
+18:29:14   -> NOT_CONVERGED P_loss=40.1712 W (raw 38.2919) Pout=249.668 gate=8.442 periods=224 file=baseline_LMG1210_DEV_T60_r1.950_f0.450_v3.json
+18:29:14   extension step (edge optimum) d_rise -0.1 ns
+18:29:14 solve baseline_LMG1210_DEV_T60_r1.950_f0.450 (sweep) from Ton=19.1215 ns origin=35.0 ns
+18:29:56   [bsw c0] Ton=19.1215 dr=1.950 df=0.450 n=16 Pout=251.002 Pcorr=41.275 dPc=-0.052 dE/T=3.28 rel=4.16e-03(i_l2) cdt r/f=1.847/1.660 wall=42s
+18:30:34   [bsw c1] Ton=19.0388 dr=1.950 df=0.450 n=16 Pout=249.765 Pcorr=39.680 dPc=+0.072 dE/T=-4.54 rel=6.28e-03(i_l2) cdt r/f=1.855/1.672 wall=37s
+18:31:15   [bsw c2] Ton=19.0878 dr=1.950 df=0.450 n=16 Pout=249.824 Pcorr=41.461 dPc=-0.078 dE/T=5.01 rel=5.32e-03(i_l2) cdt r/f=1.846/1.661 wall=42s
+18:31:56   [bsw c3] Ton=19.0907 dr=1.950 df=0.450 n=16 Pout=250.440 Pcorr=40.814 dPc=-0.022 dE/T=1.13 rel=1.61e-03(i_l2) cdt r/f=1.849/1.664 wall=40s
+18:32:36   [bsw c4] Ton=19.0834 dr=1.950 df=0.450 n=16 Pout=250.422 Pcorr=40.549 dPc=+0.003 dE/T=-0.28 rel=2.44e-04(i_l2) cdt r/f=1.851/1.665 wall=40s
+18:33:16   [bsw c5] Ton=19.0412 dr=1.950 df=0.450 n=16 Pout=249.574 Pcorr=40.001 dPc=+0.042 dE/T=-2.76 rel=3.76e-03(i_l2) cdt r/f=1.853/1.670 wall=41s
+18:33:56   [bsw c6] Ton=19.0624 dr=1.950 df=0.450 n=16 Pout=249.670 Pcorr=40.673 dPc=-0.011 dE/T=0.82 rel=8.97e-04(i_l2) cdt r/f=1.850/1.666 wall=40s
+18:34:37   [bsw c7] Ton=19.0955 dr=1.950 df=0.450 n=16 Pout=250.408 Pcorr=41.025 dPc=-0.036 dE/T=2.30 rel=2.57e-03(i_l2) cdt r/f=1.848/1.662 wall=41s
+18:35:19   [bsw c8] Ton=19.0772 dr=1.950 df=0.450 n=16 Pout=250.314 Pcorr=40.452 dPc=+0.008 dE/T=-0.72 rel=7.83e-04(i_l2) cdt r/f=1.851/1.666 wall=41s
+18:36:01   [bsw c9] Ton=19.0458 dr=1.950 df=0.450 n=16 Pout=249.620 Pcorr=40.115 dPc=+0.034 dE/T=-2.16 rel=2.94e-03(i_l2) cdt r/f=1.853/1.669 wall=42s
+18:36:39   [bsw c10] Ton=19.0630 dr=1.950 df=0.450 n=16 Pout=249.707 Pcorr=40.652 dPc=-0.009 dE/T=0.68 rel=7.66e-04(i_l2) cdt r/f=1.850/1.666 wall=38s
+18:37:15   [bsw c11] Ton=19.0924 dr=1.950 df=0.450 n=16 Pout=250.357 Pcorr=40.968 dPc=-0.032 dE/T=2.03 rel=2.58e-03(i_l2) cdt r/f=1.849/1.663 wall=36s
+18:37:47   [bsw c12] Ton=19.0762 dr=1.950 df=0.450 n=16 Pout=250.273 Pcorr=40.465 dPc=+0.009 dE/T=-0.66 rel=8.15e-04(i_l2) cdt r/f=1.851/1.666 wall=32s
+18:38:20   [bsw c13] Ton=19.0489 dr=1.950 df=0.450 n=16 Pout=249.668 Pcorr=40.171 dPc=+0.029 dE/T=-1.88 rel=2.54e-03(i_l2) cdt r/f=1.852/1.669 wall=33s
+18:38:20   -> NOT_CONVERGED P_loss=40.1712 W (raw 38.2919) Pout=249.668 gate=8.442 periods=224 file=baseline_LMG1210_DEV_T60_r1.950_f0.450_v4.json
+18:38:20   extension step (edge optimum) d_rise -0.1 ns
+18:38:20   optimum: d_rise=2.050 d_fall=0.450 ns P_loss=40.5510 W (baseline_LMG1210_DEV_T60_r2.050_f0.450.json)
+19:13:04 === baseline LMG1210_DEV_T60 stages=decomp
+19:13:19   decomp baseline_LMG1210_DEV_T60_r2.250_f0.050.json: P_loss 43.703 (accepted 43.698); conduction=11.56 turn_on_overlap=8.68 turn_on_underdriven=2.53 turn_off_overlap=10.30 turn_off_underdriven=1.25 third_quadrant=0.71 off_state=8.25 a59_style_cond=13.22
+19:13:34   decomp baseline_LMG1210_DEV_T60_r2.050_f0.450.json: P_loss 40.556 (accepted 40.551); conduction=11.47 turn_on_overlap=8.94 turn_on_underdriven=2.57 turn_off_overlap=8.66 turn_off_underdriven=1.25 third_quadrant=1.32 off_state=5.93 a59_style_cond=13.18

@@ -30,17 +30,31 @@ regulated high-side gate windows are 14.6-16.3 ns.
   1.68 A source and 3.64 A sink, above the table's typical 1.58 A and
   3.1 A. The curves are therefore the stronger, optimistic driver. That
   favours the large-ripple design, which needs a fast turn-off.
-- **One driver per switch cannot drive P24's high side** (pre-boundary
-  feasibility check, disclosed here). Two EPC2067 need
-  2 x 15.1 nC = 30 nC to reach 5 V. At <= 1.68 A that takes >= 18 ns,
-  more than the 14.6-16.7 ns on-time. A 3-period LTspice smoke run confirmed
-  it: from A64's R1.0 large-ripple optimum, with one LMG1210 output per
-  switch, the high-side internal Vgs peaked at 3.18 V. That arrangement
-  (`LMG1210_SW`) is therefore reported as infeasible and is not swept.
+- **One driver per 2-device switch cannot drive the high side of the
+  4-module row this project uses** (pre-boundary feasibility check,
+  disclosed here). Two EPC2067 need 2 x 15.1 nC = 30 nC to reach 5 V. At
+  <= 1.68 A that takes >= 18 ns, more than the 14.6-16.7 ns on-time.
+  A 3-period LTspice smoke run confirmed it: from A64's R1.0 large-ripple
+  optimum, with one LMG1210 output per switch, the high-side internal Vgs
+  peaked at 3.18 V. That arrangement (`LMG1210_SW`) is therefore reported
+  as infeasible here and is not swept.
+
+  *Scope correction (2026-09-29 boundary audit, wording only):* this
+  holds for P24 Table 3's 4-module row (2 high / 3 low EPC2067 per switch),
+  which is this project's configuration. P24's featured 8-module design
+  (Fig. 5) uses one EPC2067 per high side. There, one driver per switch
+  *is* one driver per device on the high side (~9 ns to 5 V), i.e. the
+  `LMG1210_DEV` high side.
 - **Primary case: one LMG1210 output per device (`LMG1210_DEV`).** This is
-  the strongest arrangement commercial parts allow. It is optimistic: it
-  ignores the 20 drivers' placement, their supplies and their
-  propagation-delay spread.
+  the strongest arrangement commercial driver output stages allow. It is
+  optimistic: it ignores the 20 drivers' placement, their supplies and
+  their propagation-delay spread.
+
+  In the SCB, the sources of high sides 1-3 never return to ground: they
+  sit on the flying-capacitor nodes (36-48 V, 24-36 V, 12-24 V). Their gate
+  supplies therefore need isolation or a cascaded bootstrap. P25's
+  prototype uses an isolated driver. Each device's 5 V supply is ideal
+  here.
 
 Plateau-equivalent resistance, used only as the initial timing guess: at
 the A64 turn-off plateau (internal Vgs 2.3-2.6 V, A64 waveforms), the

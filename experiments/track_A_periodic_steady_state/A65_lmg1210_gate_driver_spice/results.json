@@ -1,0 +1,3759 @@
+{
+ "experiment": "A65",
+ "driver": "TI LMG1210 typical output I-V (datasheet Figs. 1-2), lmg1210_output_iv.csv",
+ "classification": "SENSITIVITY_ONLY",
+ "vendor_model": {
+  "subckt": "EPC2067 (EPCGaNLibrary.lib, (C) Efficient Power Conversion Corp.)",
+  "block_sha256_prefix": "b1d201cc7ab403f7",
+  "block_chars": 2734,
+  "mirrors": [
+   "vgreff/LTSpiceLibraries",
+   "hadibadri/GaN-Power-Converter",
+   "adml-upm/ESA_parallel_GaN",
+   "Blade87/LTspice"
+  ],
+  "committed": false,
+  "evidence": "EXTERNAL_DEVICE_DATA",
+  "simulated": "EPC2067 block as distributed (all sweeps)",
+  "check_variant": "EPC2067X: the same block with C_CGS1/C_CGD1/C_CSD1 charge expressions written in x (fetch_epc2067_model.x_form), re-run at the accepted points (xchecks)",
+  "ltspice": "LTspice 26.0.2 for MacOS (Wine)"
+ },
+ "a59_reference": {
+  "zvs_p_b_w": 28.670537244169573,
+  "baseline_p_b_w": 33.25495505048852,
+  "zvs_minus_baseline_w": -4.584417806318946,
+  "zvs_p_a_w": 28.357780131263258,
+  "baseline_p_a_w": 33.07286882976342,
+  "zvs_channel_w": 28.169625391616112,
+  "baseline_channel_w": 18.936952297449615,
+  "zvs_missed_capacitive_w": 0.18815473964714513,
+  "baseline_missed_capacitive_w": 14.135916532313809,
+  "zvs_reverse_fig8_25C_w": 0.32231096007800053,
+  "baseline_reverse_fig8_25C_w": 0.18719625390770678,
+  "zvs_other_resistive_w": 0.3887039527514844,
+  "baseline_other_resistive_w": 0.37232000094348905,
+  "source": "A59 results.json tuned_comparison fig8_25C and runs/{zvs_r1.950_f0.650,baseline_r2.150_f1.150}.json"
+ },
+ "a64_reference": {
+  "R0.3_T60": {
+   "zvs_p_loss_w": 36.94983443775053,
+   "baseline_p_loss_w": 35.74713852261052,
+   "zvs_minus_baseline_w": 1.202695915140012,
+   "zvs_timing_ns": [
+    2.8,
+    1.3499999999999999
+   ],
+   "baseline_timing_ns": [
+    3.05,
+    1.8
+   ]
+  },
+  "R1.0_T60": {
+   "zvs_p_loss_w": 61.08609910405007,
+   "baseline_p_loss_w": 43.740477662093966,
+   "zvs_minus_baseline_w": 17.345621441956105,
+   "zvs_timing_ns": [
+    3.7499999999999996,
+    2.3
+   ],
+   "baseline_timing_ns": [
+    4.05,
+    2.9499999999999997
+   ]
+  }
+ },
+ "model_check": null,
+ "xchecks": [],
+ "comparison": {
+  "LMG1210_DEV_T60": {
+   "zvs": {
+    "optimum": "zvs_LMG1210_DEV_T60_r1.400_f0.050.json",
+    "optimum_p_loss_w": 52.23231509546194,
+    "optimum_p_device_w": 51.78941626154489,
+    "optimum_p_total_with_gate_w": 60.63763916508619,
+    "optimum_timing_ns": [
+     1.4,
+     0.05
+    ],
+    "centre": "zvs_LMG1210_DEV_T60_r0.500_f-0.250.json",
+    "centre_p_loss_w": 57.98589050213969,
+    "points_regulated": 23,
+    "points_failed": 0
+   },
+   "baseline": {
+    "optimum": "baseline_LMG1210_DEV_T60_r2.050_f0.450.json",
+    "optimum_p_loss_w": 40.55101298629876,
+    "optimum_p_device_w": 40.16361365930829,
+    "optimum_p_total_with_gate_w": 48.99305657289453,
+    "optimum_timing_ns": [
+     2.0500000000000003,
+     0.45
+    ],
+    "centre": "baseline_LMG1210_DEV_T60_r2.250_f0.050.json",
+    "centre_p_loss_w": 43.69803425687455,
+    "points_regulated": 13,
+    "points_failed": 5
+   },
+   "zvs_minus_baseline_w": 11.681302109163184,
+   "zvs_minus_baseline_device_w": 11.625802602236604,
+   "zvs_minus_baseline_with_gate_w": 11.64458259219166,
+   "zvs_minus_baseline_centre_w": 14.28785624526514,
+   "a59_zvs_minus_baseline_w": -4.584417806318946,
+   "change_vs_a59_w": 16.21022040855555
+  }
+ },
+ "decompositions": [
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.050_f0.450_decompc.json",
+   "source_record": "baseline_LMG1210_DEV_T60_r2.050_f0.450.json",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "dead_time_rise_ns": 2.0500000000000003,
+   "dead_time_fall_ns": 0.45,
+   "p_loss_corr_w": 40.5561663712116,
+   "source_p_loss_corr_w": 40.55101298629876,
+   "p_passive_resistive_w": 0.3874500382016744,
+   "p_switch_sum_w": 40.13865574478067,
+   "p_gate_total_w": 8.442216960601272,
+   "coss_corrected": true,
+   "dissipative_totals_w": {
+    "conduction": 11.468266184117233,
+    "turn_on_overlap": 20.15554884316582,
+    "turn_on_underdriven": 2.634411135178801,
+    "turn_off_overlap": 3.103332164251161,
+    "turn_off_underdriven": 1.1993688200594912,
+    "third_quadrant": 1.3213036788193917,
+    "off_state": 0.2708512527601765
+   },
+   "dissipative_by_side_w": {
+    "high": {
+     "conduction": 0.6329745315169254,
+     "turn_on_overlap": 19.88725918258316,
+     "turn_on_underdriven": 0.30305250135244893,
+     "turn_off_overlap": 3.103332164251161,
+     "turn_off_underdriven": 1.1990880558691999,
+     "third_quadrant": 0.0,
+     "off_state": 0.13941770337428233
+    },
+    "low": {
+     "conduction": 10.835291652600308,
+     "turn_on_overlap": 0.2682896605826607,
+     "turn_on_underdriven": 2.331358633826352,
+     "turn_off_overlap": 0.0,
+     "turn_off_underdriven": 0.00028076419029132233,
+     "third_quadrant": 1.3213036788193917,
+     "off_state": 0.1314335493858942
+    }
+   },
+   "dissipative_sum_w": 40.15308207835208,
+   "terminal_totals_w": {
+    "conduction": 11.468173797106077,
+    "turn_on_overlap": 8.93813514460773,
+    "turn_on_underdriven": 2.574360640156051,
+    "turn_off_overlap": 8.66498089331969,
+    "turn_off_underdriven": 1.2462918460342407,
+    "third_quadrant": 1.3205792950744542,
+    "off_state": 5.9261341284824285
+   },
+   "terminal_sum_w": 40.13865574478067,
+   "a59_style_conduction_w": 13.184649800000937,
+   "vendor_conduction_like_w": 15.28882628329637,
+   "r_full_gate_per_device_mohm": {
+    "h1": 1.5745464295925744,
+    "l1": 1.52450735585828,
+    "h2": 1.5748492618917738,
+    "l2": 1.524414609464169,
+    "h3": 1.5746658678288907,
+    "l3": 1.5245157356197392,
+    "h4": 1.575343401254015,
+    "l4": 1.519537434000325
+   },
+   "thresholds": {
+    "v_full_gate_v": 4.5,
+    "v_channel_start_v": 1.78578,
+    "k2_v": 2.05578,
+    "overlap_v": 1.0,
+    "reverse_v": -0.5
+   },
+   "third_quadrant_time_ns": {
+    "h1": 0.0,
+    "l1": 0.7290185418919934,
+    "h2": 0.0,
+    "l2": 0.7256650907153809,
+    "h3": 0.0,
+    "l3": 0.7241361902687371,
+    "h4": 0.0,
+    "l4": 0.913004374622573
+   }
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.050_decompc.json",
+   "source_record": "baseline_LMG1210_DEV_T60_r2.250_f0.050.json",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.05,
+   "p_loss_corr_w": 43.70278310873917,
+   "source_p_loss_corr_w": 43.69803425687455,
+   "p_passive_resistive_w": 0.39519505129930776,
+   "p_switch_sum_w": 43.27743373839182,
+   "p_gate_total_w": 8.44370457376593,
+   "coss_corrected": true,
+   "dissipative_totals_w": {
+    "conduction": 11.55694942917338,
+    "turn_on_overlap": 22.744627619476574,
+    "turn_on_underdriven": 2.672740907381111,
+    "turn_off_overlap": 4.173598089432337,
+    "turn_off_underdriven": 1.2014290159702774,
+    "third_quadrant": 0.703837510597165,
+    "off_state": 0.2386149586238835
+   },
+   "dissipative_by_side_w": {
+    "high": {
+     "conduction": 0.6407410078852379,
+     "turn_on_overlap": 19.902527581506746,
+     "turn_on_underdriven": 0.32662741094549197,
+     "turn_off_overlap": 4.173598089432337,
+     "turn_off_underdriven": 1.201104067524815,
+     "third_quadrant": 0.0,
+     "off_state": 0.11177939195143152
+    },
+    "low": {
+     "conduction": 10.916208421288143,
+     "turn_on_overlap": 2.8421000379698285,
+     "turn_on_underdriven": 2.3461134964356187,
+     "turn_off_overlap": 0.0,
+     "turn_off_underdriven": 0.00032494844546250345,
+     "third_quadrant": 0.703837510597165,
+     "off_state": 0.12683556667245194
+    }
+   },
+   "dissipative_sum_w": 43.291797530654726,
+   "terminal_totals_w": {
+    "conduction": 11.5568566732438,
+    "turn_on_overlap": 8.680784754569297,
+    "turn_on_underdriven": 2.531593022260549,
+    "turn_off_overlap": 10.301714938740028,
+    "turn_off_underdriven": 1.2491269011027126,
+    "third_quadrant": 0.7050214219986637,
+    "off_state": 8.252336026476772
+   },
+   "terminal_sum_w": 43.27743373839182,
+   "a59_style_conduction_w": 13.215918008727654,
+   "vendor_conduction_like_w": 15.337576596607061,
+   "r_full_gate_per_device_mohm": {
+    "h1": 1.5744522251053932,
+    "l1": 1.5245415425725206,
+    "h2": 1.5745032272929287,
+    "l2": 1.524517304986843,
+    "h3": 1.5745021611145222,
+    "l3": 1.5245904855175167,
+    "h4": 1.5751722524852358,
+    "l4": 1.5195341618714642
+   },
+   "thresholds": {
+    "v_full_gate_v": 4.5,
+    "v_channel_start_v": 1.78578,
+    "k2_v": 2.05578,
+    "overlap_v": 1.0,
+    "reverse_v": -0.5
+   },
+   "third_quadrant_time_ns": {
+    "h1": 0.0,
+    "l1": 0.42688754769869836,
+    "h2": 0.0,
+    "l2": 0.4590940995313885,
+    "h3": 0.0,
+    "l3": 0.4392532325250621,
+    "h4": 0.0,
+    "l4": 0.5550808714944048
+   }
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.250_decompc.json",
+   "source_record": "zvs_LMG1210_DEV_T60_r0.500_f-0.250.json",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.25,
+   "p_loss_corr_w": 57.97954311941654,
+   "source_p_loss_corr_w": 57.98589050213969,
+   "p_passive_resistive_w": 0.45777933510271457,
+   "p_switch_sum_w": 57.450575255796686,
+   "p_gate_total_w": 8.421327017834352,
+   "coss_corrected": true,
+   "dissipative_totals_w": {
+    "conduction": 22.78028095866464,
+    "turn_on_overlap": 5.4924131645594585,
+    "turn_on_underdriven": 6.588784635747128,
+    "turn_off_overlap": 16.222970247730895,
+    "turn_off_underdriven": 3.064531677538689,
+    "third_quadrant": 2.9092040333181797,
+    "off_state": 0.39556603075441843
+   },
+   "dissipative_by_side_w": {
+    "high": {
+     "conduction": 1.3485378552056178,
+     "turn_on_overlap": 3.259667268150721,
+     "turn_on_underdriven": 0.5718882467481816,
+     "turn_off_overlap": 15.469021023471333,
+     "turn_off_underdriven": 2.5185510071761943,
+     "third_quadrant": 0.0040685743968670255,
+     "off_state": 0.11799112206483887
+    },
+    "low": {
+     "conduction": 21.431743103459024,
+     "turn_on_overlap": 2.2327458964087383,
+     "turn_on_underdriven": 6.016896388998948,
+     "turn_off_overlap": 0.7539492242595645,
+     "turn_off_underdriven": 0.5459806703624946,
+     "third_quadrant": 2.9051354589213125,
+     "off_state": 0.27757490868957957
+    }
+   },
+   "dissipative_sum_w": 57.45375074831341,
+   "terminal_totals_w": {
+    "conduction": 22.780286651361997,
+    "turn_on_overlap": -7.691782728510265,
+    "turn_on_underdriven": 6.4492351856598225,
+    "turn_off_overlap": 26.09489310754003,
+    "turn_off_underdriven": 3.184863016700999,
+    "third_quadrant": 2.9208747722266493,
+    "off_state": 3.7122052508174463
+   },
+   "terminal_sum_w": 57.45057525579668,
+   "a59_style_conduction_w": 26.55511326852925,
+   "vendor_conduction_like_w": 32.41438485372282,
+   "r_full_gate_per_device_mohm": {
+    "h1": 1.5961642235955633,
+    "l1": 1.5404841992719474,
+    "h2": 1.5969703479883812,
+    "l2": 1.5403397683921654,
+    "h3": 1.5962536356154782,
+    "l3": 1.5405170631698746,
+    "h4": 1.5964276742199406,
+    "l4": 1.5326309097435242
+   },
+   "thresholds": {
+    "v_full_gate_v": 4.5,
+    "v_channel_start_v": 1.78578,
+    "k2_v": 2.05578,
+    "overlap_v": 1.0,
+    "reverse_v": -0.5
+   },
+   "third_quadrant_time_ns": {
+    "h1": 0.0,
+    "l1": 0.830669396695314,
+    "h2": 0.0,
+    "l2": 0.8857994656433504,
+    "h3": 0.0,
+    "l3": 0.8566223620806951,
+    "h4": 0.024776785410172024,
+    "l4": 0.916662782408197
+   }
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.400_f0.050_decompc.json",
+   "source_record": "zvs_LMG1210_DEV_T60_r1.400_f0.050.json",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "dead_time_rise_ns": 1.4,
+   "dead_time_fall_ns": 0.05,
+   "p_loss_corr_w": 52.22755756283373,
+   "source_p_loss_corr_w": 52.23231509546194,
+   "p_passive_resistive_w": 0.4426284808244765,
+   "p_switch_sum_w": 51.71382542500042,
+   "p_gate_total_w": 8.405360564874627,
+   "coss_corrected": true,
+   "dissipative_totals_w": {
+    "conduction": 22.496025450931107,
+    "turn_on_overlap": 0.2868940046695139,
+    "turn_on_underdriven": 6.5051172908091415,
+    "turn_off_overlap": 14.418870496927473,
+    "turn_off_underdriven": 3.0515119210742676,
+    "third_quadrant": 4.626842400689468,
+    "off_state": 0.32714906237695823
+   },
+   "dissipative_by_side_w": {
+    "high": {
+     "conduction": 1.2765096063444656,
+     "turn_on_overlap": 0.0,
+     "turn_on_underdriven": 0.5267428599663047,
+     "turn_off_overlap": 13.903893180544939,
+     "turn_off_underdriven": 2.5139286428796317,
+     "third_quadrant": 0.30553546261131126,
+     "off_state": 0.061415319893752235
+    },
+    "low": {
+     "conduction": 21.21951584458664,
+     "turn_on_overlap": 0.286894004669514,
+     "turn_on_underdriven": 5.978374430842837,
+     "turn_off_overlap": 0.5149773163825354,
+     "turn_off_underdriven": 0.5375832781946357,
+     "third_quadrant": 4.321306938078157,
+     "off_state": 0.26573374248320597
+    }
+   },
+   "dissipative_sum_w": 51.71241062747793,
+   "terminal_totals_w": {
+    "conduction": 22.495961767844378,
+    "turn_on_overlap": -4.706995274240277,
+    "turn_on_underdriven": 6.464742002273971,
+    "turn_off_overlap": 22.851515268776215,
+    "turn_off_underdriven": 3.1672590860808367,
+    "third_quadrant": 4.639558185856517,
+    "off_state": -3.1982156115912184
+   },
+   "terminal_sum_w": 51.71382542500042,
+   "a59_style_conduction_w": 26.488553642218154,
+   "vendor_conduction_like_w": 32.12796285619919,
+   "r_full_gate_per_device_mohm": {
+    "h1": 1.6053950651431856,
+    "l1": 1.5403985966998752,
+    "h2": 1.60515778953562,
+    "l2": 1.540209871615392,
+    "h3": 1.6049791263835032,
+    "l3": 1.5404519725106651,
+    "h4": 1.6049534679307604,
+    "l4": 1.5324492417886748
+   },
+   "thresholds": {
+    "v_full_gate_v": 4.5,
+    "v_channel_start_v": 1.78578,
+    "k2_v": 2.05578,
+    "overlap_v": 1.0,
+    "reverse_v": -0.5
+   },
+   "third_quadrant_time_ns": {
+    "h1": 0.33961217670672683,
+    "l1": 1.1263334566879746,
+    "h2": 0.31023287958694,
+    "l2": 1.1460464985976433,
+    "h3": 0.3132025117983526,
+    "l3": 1.1669014206187587,
+    "h4": 0.7201660324882555,
+    "l4": 1.2102550268358243
+   }
+  }
+ ],
+ "brute_force": [],
+ "static_checks": {
+  "centre_search": [
+   {
+    "file": "baseline_LMG1210_DEV_T60_r3.655_f2.795_centre_search.json",
+    "design": "baseline",
+    "case": "LMG1210_DEV_T60",
+    "status": "CHANNEL_MATCHED",
+    "dead_time_rise_ns": 2.232934956903398,
+    "dead_time_fall_ns": 0.04784991240847313,
+    "periods_total": 144
+   },
+   {
+    "file": "zvs_LMG1210_DEV_T60_r3.140_f2.260_centre_search.json",
+    "design": "zvs",
+    "case": "LMG1210_DEV_T60",
+    "status": "NOT_CONVERGED",
+    "dead_time_rise_ns": 0.4917694929588735,
+    "dead_time_fall_ns": -0.2490637163881384,
+    "periods_total": 192
+   }
+  ],
+  "static_coss": {
+   "experiment": "A65",
+   "kind": "static_coss",
+   "status": "MEASURED",
+   "model": "EPC2067",
+   "method": "single EPC2067, gate held at source (VG=0), 0.1 A into the drain, Q = 0.1 A * t",
+   "temp_c": 60,
+   "check_25c_max_rel_diff": 0.0001872843660344741,
+   "q_12v_c": 2.643610015014671e-08,
+   "e_12v_j": 1.5133723073310224e-07,
+   "q_20v_c": 3.721853587326889e-08,
+   "c_0v_f": 2.4402503298820107e-09,
+   "c_12v_f": 1.8080731504399986e-09,
+   "c_20v_f": 1.0710114723277104e-09
+  }
+ },
+ "points": [
+  {
+   "file": "baseline_LMG1210_DEV_T60_r1.950_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "NOT_CONVERGED",
+   "dead_time_rise_ns": 1.9500000000000002,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.04891375892273,
+   "max_step_ps": 50.0,
+   "p_in_w": 287.95952715937796,
+   "p_out_w": 249.6676113537921,
+   "power_relative_error": -0.0013295545848316381,
+   "p_loss_w": 38.29191580558587,
+   "p_loss_corr_w": 40.171246500400926,
+   "stored_energy_rate_w": -1.8793306948150512,
+   "p_loss_tail_estimate_w": 1.4439294257986277,
+   "ltspice_meas_p_loss_w": 38.29191580550002,
+   "p_passive_resistive_w": 0.38088274357222,
+   "p_device_w": 39.790363756828704,
+   "p_switch_sum_w": 39.760228381342685,
+   "closure_w": 0.030135375486018745,
+   "p_gate_total_w": 8.4417680200345,
+   "p_total_with_gate_w": 48.61301452043543,
+   "p_conduction_reff_w": 25.00198488182394,
+   "p_edge_excess_w": 18.074032835152778,
+   "rel_change": 0.002539284245003592,
+   "periods_total": 224,
+   "chunks": 14,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 127.87625447577467,
+   "channel_dead_time_rise_mean_ns": 1.8524150595984084,
+   "channel_dead_time_fall_mean_ns": 1.6689261158648523,
+   "channel_dead_time_rise_min_max_ns": [
+    1.8517796747744257,
+    1.8532565012137328
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5789419850822328,
+    1.7000058490707368
+   ],
+   "turn_off_delay_rise_ns": 3.332624099447816,
+   "turn_on_delay_rise_ns": 3.2350391590461833,
+   "turn_off_delay_fall_ns": 3.8224959826806564,
+   "turn_on_delay_fall_ns": 5.041422098545369,
+   "vds_in_at_channel_on_rise_v": [
+    11.924851541187225,
+    12.05739636078843,
+    12.05736819045634,
+    11.953646846007144
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.42966352334376157,
+    -0.42880873084985893,
+    -0.42884244693308626,
+    -0.42699357443803276
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.752658531909649,
+    0.7337990083247959,
+    0.7720614544973768,
+    0.8997896697686882
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.03029700709615,
+    100.20157323163457,
+    100.18596644232402,
+    101.17975344248198
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    2.6405974365229,
+    2.284445671618182,
+    2.276196570575861,
+    3.3882166035758394
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r1.950_f0.450_v2.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "NOT_CONVERGED",
+   "dead_time_rise_ns": 1.9500000000000002,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.04891375892273,
+   "max_step_ps": 50.0,
+   "p_in_w": 287.95952715937796,
+   "p_out_w": 249.6676113537921,
+   "power_relative_error": -0.0013295545848316381,
+   "p_loss_w": 38.29191580558587,
+   "p_loss_corr_w": 40.171246500400926,
+   "stored_energy_rate_w": -1.8793306948150512,
+   "p_loss_tail_estimate_w": 1.4439294257986277,
+   "ltspice_meas_p_loss_w": 38.29191580550002,
+   "p_passive_resistive_w": 0.38088274357222,
+   "p_device_w": 39.790363756828704,
+   "p_switch_sum_w": 39.760228381342685,
+   "closure_w": 0.030135375486018745,
+   "p_gate_total_w": 8.4417680200345,
+   "p_total_with_gate_w": 48.61301452043543,
+   "p_conduction_reff_w": 25.00198488182394,
+   "p_edge_excess_w": 18.074032835152778,
+   "rel_change": 0.002539284245003592,
+   "periods_total": 224,
+   "chunks": 14,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 127.87625447577467,
+   "channel_dead_time_rise_mean_ns": 1.8524150595984084,
+   "channel_dead_time_fall_mean_ns": 1.6689261158648523,
+   "channel_dead_time_rise_min_max_ns": [
+    1.8517796747744257,
+    1.8532565012137328
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5789419850822328,
+    1.7000058490707368
+   ],
+   "turn_off_delay_rise_ns": 3.332624099447816,
+   "turn_on_delay_rise_ns": 3.2350391590461833,
+   "turn_off_delay_fall_ns": 3.8224959826806564,
+   "turn_on_delay_fall_ns": 5.041422098545369,
+   "vds_in_at_channel_on_rise_v": [
+    11.924851541187225,
+    12.05739636078843,
+    12.05736819045634,
+    11.953646846007144
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.42966352334376157,
+    -0.42880873084985893,
+    -0.42884244693308626,
+    -0.42699357443803276
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.752658531909649,
+    0.7337990083247959,
+    0.7720614544973768,
+    0.8997896697686882
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.03029700709615,
+    100.20157323163457,
+    100.18596644232402,
+    101.17975344248198
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    2.6405974365229,
+    2.284445671618182,
+    2.276196570575861,
+    3.3882166035758394
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r1.950_f0.450_v3.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "NOT_CONVERGED",
+   "dead_time_rise_ns": 1.9500000000000002,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.04891375892273,
+   "max_step_ps": 50.0,
+   "p_in_w": 287.95952715937796,
+   "p_out_w": 249.6676113537921,
+   "power_relative_error": -0.0013295545848316381,
+   "p_loss_w": 38.29191580558587,
+   "p_loss_corr_w": 40.171246500400926,
+   "stored_energy_rate_w": -1.8793306948150512,
+   "p_loss_tail_estimate_w": 1.4439294257986277,
+   "ltspice_meas_p_loss_w": 38.29191580550002,
+   "p_passive_resistive_w": 0.38088274357222,
+   "p_device_w": 39.790363756828704,
+   "p_switch_sum_w": 39.760228381342685,
+   "closure_w": 0.030135375486018745,
+   "p_gate_total_w": 8.4417680200345,
+   "p_total_with_gate_w": 48.61301452043543,
+   "p_conduction_reff_w": 25.00198488182394,
+   "p_edge_excess_w": 18.074032835152778,
+   "rel_change": 0.002539284245003592,
+   "periods_total": 224,
+   "chunks": 14,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 127.87625447577467,
+   "channel_dead_time_rise_mean_ns": 1.8524150595984084,
+   "channel_dead_time_fall_mean_ns": 1.6689261158648523,
+   "channel_dead_time_rise_min_max_ns": [
+    1.8517796747744257,
+    1.8532565012137328
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5789419850822328,
+    1.7000058490707368
+   ],
+   "turn_off_delay_rise_ns": 3.332624099447816,
+   "turn_on_delay_rise_ns": 3.2350391590461833,
+   "turn_off_delay_fall_ns": 3.8224959826806564,
+   "turn_on_delay_fall_ns": 5.041422098545369,
+   "vds_in_at_channel_on_rise_v": [
+    11.924851541187225,
+    12.05739636078843,
+    12.05736819045634,
+    11.953646846007144
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.42966352334376157,
+    -0.42880873084985893,
+    -0.42884244693308626,
+    -0.42699357443803276
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.752658531909649,
+    0.7337990083247959,
+    0.7720614544973768,
+    0.8997896697686882
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.03029700709615,
+    100.20157323163457,
+    100.18596644232402,
+    101.17975344248198
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    2.6405974365229,
+    2.284445671618182,
+    2.276196570575861,
+    3.3882166035758394
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r1.950_f0.450_v4.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "NOT_CONVERGED",
+   "dead_time_rise_ns": 1.9500000000000002,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.04891375892273,
+   "max_step_ps": 50.0,
+   "p_in_w": 287.95952715937796,
+   "p_out_w": 249.6676113537921,
+   "power_relative_error": -0.0013295545848316381,
+   "p_loss_w": 38.29191580558587,
+   "p_loss_corr_w": 40.171246500400926,
+   "stored_energy_rate_w": -1.8793306948150512,
+   "p_loss_tail_estimate_w": 1.4439294257986277,
+   "ltspice_meas_p_loss_w": 38.29191580550002,
+   "p_passive_resistive_w": 0.38088274357222,
+   "p_device_w": 39.790363756828704,
+   "p_switch_sum_w": 39.760228381342685,
+   "closure_w": 0.030135375486018745,
+   "p_gate_total_w": 8.4417680200345,
+   "p_total_with_gate_w": 48.61301452043543,
+   "p_conduction_reff_w": 25.00198488182394,
+   "p_edge_excess_w": 18.074032835152778,
+   "rel_change": 0.002539284245003592,
+   "periods_total": 224,
+   "chunks": 14,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 127.87625447577467,
+   "channel_dead_time_rise_mean_ns": 1.8524150595984084,
+   "channel_dead_time_fall_mean_ns": 1.6689261158648523,
+   "channel_dead_time_rise_min_max_ns": [
+    1.8517796747744257,
+    1.8532565012137328
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5789419850822328,
+    1.7000058490707368
+   ],
+   "turn_off_delay_rise_ns": 3.332624099447816,
+   "turn_on_delay_rise_ns": 3.2350391590461833,
+   "turn_off_delay_fall_ns": 3.8224959826806564,
+   "turn_on_delay_fall_ns": 5.041422098545369,
+   "vds_in_at_channel_on_rise_v": [
+    11.924851541187225,
+    12.05739636078843,
+    12.05736819045634,
+    11.953646846007144
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.42966352334376157,
+    -0.42880873084985893,
+    -0.42884244693308626,
+    -0.42699357443803276
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.752658531909649,
+    0.7337990083247959,
+    0.7720614544973768,
+    0.8997896697686882
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.03029700709615,
+    100.20157323163457,
+    100.18596644232402,
+    101.17975344248198
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    2.6405974365229,
+    2.284445671618182,
+    2.276196570575861,
+    3.3882166035758394
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.050_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.0500000000000003,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.12145580999581,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.48504117771466,
+   "p_out_w": 250.0022407299502,
+   "power_relative_error": 8.962919800792335e-06,
+   "p_loss_w": 40.482800447764475,
+   "p_loss_corr_w": 40.55101298629876,
+   "stored_energy_rate_w": -0.06821253853428466,
+   "p_loss_tail_estimate_w": 0.0338266797975556,
+   "ltspice_meas_p_loss_w": 40.4828004475,
+   "p_passive_resistive_w": 0.38739932699046814,
+   "p_device_w": 40.16361365930829,
+   "p_switch_sum_w": 40.13345001422059,
+   "closure_w": 0.030163645087696977,
+   "p_gate_total_w": 8.442043586595775,
+   "p_total_with_gate_w": 48.99305657289453,
+   "p_conduction_reff_w": 25.01202528276097,
+   "p_edge_excess_w": 18.37309741020511,
+   "rel_change": 0.00011711244636573211,
+   "periods_total": 128,
+   "chunks": 8,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.24985432475123,
+   "channel_dead_time_rise_mean_ns": 1.9503852593848425,
+   "channel_dead_time_fall_mean_ns": 1.6660291215109353,
+   "channel_dead_time_rise_min_max_ns": [
+    1.949990096070693,
+    1.9513509826997406
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5761957740266015,
+    1.6970574778440422
+   ],
+   "turn_off_delay_rise_ns": 3.3321394546050653,
+   "turn_on_delay_rise_ns": 3.2325247139900717,
+   "turn_off_delay_fall_ns": 3.825677103024131,
+   "turn_on_delay_fall_ns": 5.041706224534927,
+   "vds_in_at_channel_on_rise_v": [
+    11.96603009980216,
+    12.101662536303255,
+    12.101795721529133,
+    12.012721898657237
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.43056333066558417,
+    -0.4297204164800562,
+    -0.42976995868078216,
+    -0.42785355437363704
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7459893956441253,
+    0.7426279470582133,
+    0.7385064391979905,
+    0.9071374135598298
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.41499202461041,
+    100.61452920285632,
+    100.59953487188577,
+    101.56675798823453
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.003262663584251,
+    2.676752337241057,
+    2.6682155482051986,
+    3.7637097089308202
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.150_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.15,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.169590871053487,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.45726482240315,
+   "p_out_w": 249.8779916876144,
+   "power_relative_error": -0.0004880332495423856,
+   "p_loss_w": 40.57927313478876,
+   "p_loss_corr_w": 40.56678875563329,
+   "stored_energy_rate_w": 0.012484379155464076,
+   "p_loss_tail_estimate_w": 6.488910608265779e-05,
+   "ltspice_meas_p_loss_w": 40.579273135,
+   "p_passive_resistive_w": 0.38732629712492295,
+   "p_device_w": 40.17946245850837,
+   "p_switch_sum_w": 40.14923433514078,
+   "closure_w": 0.030228123367585624,
+   "p_gate_total_w": 8.442231325424789,
+   "p_total_with_gate_w": 49.00902008105808,
+   "p_conduction_reff_w": 25.029002401895788,
+   "p_edge_excess_w": 18.381701503638602,
+   "rel_change": 1.7786516327093408e-05,
+   "periods_total": 96,
+   "chunks": 6,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.23911659157207,
+   "channel_dead_time_rise_mean_ns": 2.049804146806876,
+   "channel_dead_time_fall_mean_ns": 1.6661536509952803,
+   "channel_dead_time_rise_min_max_ns": [
+    2.0491881493347286,
+    2.0509831877174443
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5760971591351716,
+    1.6971726690457358
+   ],
+   "turn_off_delay_rise_ns": 3.3322154773763395,
+   "turn_on_delay_rise_ns": 3.2320196241831596,
+   "turn_off_delay_fall_ns": 3.825555215351163,
+   "turn_on_delay_fall_ns": 5.041708866346304,
+   "vds_in_at_channel_on_rise_v": [
+    11.97335667169962,
+    12.108596621389978,
+    12.107799073027783,
+    12.030545058421502
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4305203896494105,
+    -0.42967868675237414,
+    -0.42971044797865227,
+    -0.42787647146008845
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7572588338834169,
+    0.7426153642664678,
+    0.7386279624609735,
+    0.9436964527831236
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.39641655950598,
+    100.59718015721329,
+    100.58417438178401,
+    101.55226671367379
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.0817726428564236,
+    2.757554529260074,
+    2.751096919903421,
+    3.851565956365646
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f-0.050.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": -0.05,
+   "ton_cmd_ns": 19.034181130313275,
+   "max_step_ps": 50.0,
+   "p_in_w": 295.19460694712734,
+   "p_out_w": 249.8557981822338,
+   "power_relative_error": -0.0005768072710647942,
+   "p_loss_w": 45.33880876489358,
+   "p_loss_corr_w": 45.51829688231799,
+   "stored_energy_rate_w": -0.17948811742440896,
+   "p_loss_tail_estimate_w": 0.05171580548848804,
+   "ltspice_meas_p_loss_w": 45.338808764999996,
+   "p_passive_resistive_w": 0.39934999938403015,
+   "p_device_w": 45.11894688293396,
+   "p_switch_sum_w": 45.088780053437354,
+   "closure_w": 0.03016682949660776,
+   "p_gate_total_w": 8.444599805611462,
+   "p_total_with_gate_w": 53.96289668792945,
+   "p_conduction_reff_w": 24.83255573056221,
+   "p_edge_excess_w": 23.23264631468577,
+   "rel_change": 0.0002679210422892409,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.06523848686868,
+   "channel_dead_time_rise_mean_ns": 2.1496715659880774,
+   "channel_dead_time_fall_mean_ns": -0.1365592387312184,
+   "channel_dead_time_rise_min_max_ns": [
+    2.148496258224876,
+    2.151138639534176
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -0.5509084677805625,
+    0.9579041211073384
+   ],
+   "turn_off_delay_rise_ns": 3.3321330013911714,
+   "turn_on_delay_rise_ns": 3.231804567379397,
+   "turn_off_delay_fall_ns": 3.98954667645223,
+   "turn_on_delay_fall_ns": 3.902987437721121,
+   "vds_in_at_channel_on_rise_v": [
+    11.976486269113055,
+    12.115415671438061,
+    12.11655021236806,
+    12.041455442187747
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    8.525683383683651,
+    7.876690448663206,
+    7.884347646037779,
+    -0.42855891126307855
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 1,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.5424753226821329
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.86828087423369,
+    101.10456604220553,
+    101.0911724104904,
+    101.95455071481346
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.0501722864803043,
+    2.798228520469891,
+    2.790747105246233,
+    3.9303399782016144
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f-0.150.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": -0.15,
+   "ton_cmd_ns": 19.0117667895412,
+   "max_step_ps": 50.0,
+   "p_in_w": 297.7518237591574,
+   "p_out_w": 249.82067756125647,
+   "power_relative_error": -0.0007172897549740931,
+   "p_loss_w": 47.93114619790093,
+   "p_loss_corr_w": 47.872602520425666,
+   "stored_energy_rate_w": 0.058543677475264566,
+   "p_loss_tail_estimate_w": 0.00021233023509600638,
+   "ltspice_meas_p_loss_w": 47.93114619750001,
+   "p_passive_resistive_w": 0.40594914741427257,
+   "p_device_w": 47.46665337301139,
+   "p_switch_sum_w": 47.43633628549689,
+   "closure_w": 0.030317087514497132,
+   "p_gate_total_w": 8.444662849071314,
+   "p_total_with_gate_w": 56.31726536949698,
+   "p_conduction_reff_w": 24.8178603402891,
+   "p_edge_excess_w": 25.486192522905633,
+   "rel_change": 0.00016040481014161973,
+   "periods_total": 160,
+   "chunks": 10,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.0712913596251,
+   "channel_dead_time_rise_mean_ns": 2.149376723432433,
+   "channel_dead_time_fall_mean_ns": -0.7780854367580067,
+   "channel_dead_time_rise_min_max_ns": [
+    2.1482302730671043,
+    2.150948753297423
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -0.8121443030798902,
+    -0.7521314666212965
+   ],
+   "turn_off_delay_rise_ns": 3.332080125846483,
+   "turn_on_delay_rise_ns": 3.231456849279064,
+   "turn_off_delay_fall_ns": 4.025854288348927,
+   "turn_on_delay_fall_ns": 3.3977688515908255,
+   "vds_in_at_channel_on_rise_v": [
+    11.982213889361974,
+    12.126395509927315,
+    12.125197002614662,
+    12.047912912461209
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    9.724351992248618,
+    9.358196539441812,
+    9.350107815820303,
+    9.268594921049539
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 0,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    101.11570057637259,
+    101.37398338176291,
+    101.35852086251634,
+    102.18714907575743
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.071301080365275,
+    2.8459985972298143,
+    2.837123604181109,
+    3.9722152993308777
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f-0.250.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": -0.25,
+   "ton_cmd_ns": 18.99791659755478,
+   "max_step_ps": 50.0,
+   "p_in_w": 300.9392421658377,
+   "p_out_w": 249.95665342924272,
+   "power_relative_error": -0.00017338628302909775,
+   "p_loss_w": 50.98258873659499,
+   "p_loss_corr_w": 50.72258820604524,
+   "stored_energy_rate_w": 0.26000053054975325,
+   "p_loss_tail_estimate_w": -0.17185541020116785,
+   "ltspice_meas_p_loss_w": 50.982588737000015,
+   "p_passive_resistive_w": 0.4142605475087744,
+   "p_device_w": 50.30832765853646,
+   "p_switch_sum_w": 50.27807886255049,
+   "closure_w": 0.030248795985976074,
+   "p_gate_total_w": 8.44495507052622,
+   "p_total_with_gate_w": 59.16754327657146,
+   "p_conduction_reff_w": 24.79454547412658,
+   "p_edge_excess_w": 28.2075079425766,
+   "rel_change": 0.0003029854592581037,
+   "periods_total": 80,
+   "chunks": 5,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.11132768988398,
+   "channel_dead_time_rise_mean_ns": 2.1490532872289867,
+   "channel_dead_time_fall_mean_ns": -0.9656357442872515,
+   "channel_dead_time_rise_min_max_ns": [
+    2.1479432348762066,
+    2.1507465548150595
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -1.0034556006221775,
+    -0.9420674716415911
+   ],
+   "turn_off_delay_rise_ns": 3.3320726139324606,
+   "turn_on_delay_rise_ns": 3.231125901161596,
+   "turn_off_delay_fall_ns": 4.055849550617183,
+   "turn_on_delay_fall_ns": 3.340213806330057,
+   "vds_in_at_channel_on_rise_v": [
+    11.988367839184724,
+    12.136413299606971,
+    12.135166622437287,
+    12.053998341624993
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    10.357187868051692,
+    10.05248965323509,
+    10.054096576094414,
+    10.118359016003016
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 0,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    101.42509848307517,
+    101.70309164688929,
+    101.68896119907878,
+    102.48188270160861
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.0905471480103954,
+    2.8911830260078624,
+    2.881518570033508,
+    4.006445780839424
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.050.json",
+   "kind": "center",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 19.064767594161882,
+   "max_step_ps": 50.0,
+   "p_in_w": 293.5442048347481,
+   "p_out_w": 249.94121727380397,
+   "power_relative_error": -0.0002351309047841088,
+   "p_loss_w": 43.602987560944136,
+   "p_loss_corr_w": 43.69803425687455,
+   "stored_energy_rate_w": -0.09504669593041193,
+   "p_loss_tail_estimate_w": 0.018054249321294808,
+   "ltspice_meas_p_loss_w": 43.60298756050002,
+   "p_passive_resistive_w": 0.39514647819849813,
+   "p_device_w": 43.30288777867605,
+   "p_switch_sum_w": 43.272794008028384,
+   "closure_w": 0.030093770647667384,
+   "p_gate_total_w": 8.443700991563247,
+   "p_total_with_gate_w": 52.1417352484378,
+   "p_conduction_reff_w": 24.864798216431858,
+   "p_edge_excess_w": 21.467819067974077,
+   "rel_change": 0.00013376669107154743,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.1217832473135,
+   "channel_dead_time_rise_mean_ns": 2.1495719597641205,
+   "channel_dead_time_fall_mean_ns": 1.15515623313708,
+   "channel_dead_time_rise_min_max_ns": [
+    2.148398186638166,
+    2.1509781809965447
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0876096139020845,
+    1.1814372480108097
+   ],
+   "turn_off_delay_rise_ns": 3.332141128329146,
+   "turn_on_delay_rise_ns": 3.231713088093415,
+   "turn_off_delay_fall_ns": 3.9472453667247582,
+   "turn_on_delay_fall_ns": 5.052401599861729,
+   "vds_in_at_channel_on_rise_v": [
+    11.978050464492874,
+    12.115215158271763,
+    12.115431430683971,
+    12.043926773876521
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4309305227149446,
+    -0.43024155871107356,
+    -0.4302420073066874,
+    -0.42849844521241975
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.44168948889043186,
+    0.4575801980338695,
+    0.47755140635539933,
+    0.5963438700523523
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.72413129709531,
+    100.94751787577023,
+    100.93362925281866,
+    101.82620481159682
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.0829101118880926,
+    2.8111518407176903,
+    2.8025027931275135,
+    3.9424871186545594
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.150.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.15,
+   "ton_cmd_ns": 19.10303201733751,
+   "max_step_ps": 50.0,
+   "p_in_w": 292.3971242898636,
+   "p_out_w": 250.11440959574603,
+   "power_relative_error": 0.00045763838298418236,
+   "p_loss_w": 42.282714694117566,
+   "p_loss_corr_w": 42.3576294082719,
+   "stored_energy_rate_w": -0.07491471415432827,
+   "p_loss_tail_estimate_w": -7.530402193831541e-06,
+   "ltspice_meas_p_loss_w": 42.28271469449999,
+   "p_passive_resistive_w": 0.3922480017598455,
+   "p_device_w": 41.96538140651205,
+   "p_switch_sum_w": 41.93513848870971,
+   "closure_w": 0.03024291780234023,
+   "p_gate_total_w": 8.442943903497202,
+   "p_total_with_gate_w": 50.8005733117691,
+   "p_conduction_reff_w": 24.877582834250433,
+   "p_edge_excess_w": 20.16963305942922,
+   "rel_change": 5.901341196812547e-05,
+   "periods_total": 128,
+   "chunks": 8,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.19276581512952,
+   "channel_dead_time_rise_mean_ns": 2.1495616092524275,
+   "channel_dead_time_fall_mean_ns": 1.294984151363313,
+   "channel_dead_time_rise_min_max_ns": [
+    2.1484109003723115,
+    2.150881620181188
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.2176097164136004,
+    1.324074744699267
+   ],
+   "turn_off_delay_rise_ns": 3.332048956419664,
+   "turn_on_delay_rise_ns": 3.23161056567224,
+   "turn_off_delay_fall_ns": 3.9048056388083614,
+   "turn_on_delay_fall_ns": 5.0497897901717685,
+   "vds_in_at_channel_on_rise_v": [
+    11.980151166654476,
+    12.115192005811735,
+    12.115752656494031,
+    12.044968408921063
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.43100592162305745,
+    -0.43026942468104434,
+    -0.4302766862929004,
+    -0.42850767763169095
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.533623318744777,
+    0.533998175388458,
+    0.5327528304142097,
+    0.6358190121592225
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.63754137758455,
+    100.84962751886233,
+    100.8337932151052,
+    101.74972533464982
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.1144608084084173,
+    2.8225073353336287,
+    2.813632030853726,
+    3.944151098393034
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.250.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "NOT_CONVERGED",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.25,
+   "ton_cmd_ns": 19.145536050259043,
+   "max_step_ps": 50.0,
+   "p_in_w": 292.92389593717456,
+   "p_out_w": 250.06832858709802,
+   "power_relative_error": 0.00027331434839217295,
+   "p_loss_w": 42.85556735007654,
+   "p_loss_corr_w": 41.66947716067868,
+   "stored_energy_rate_w": 1.1860901893978593,
+   "p_loss_tail_estimate_w": -0.9423712997647504,
+   "ltspice_meas_p_loss_w": 42.85556735000001,
+   "p_passive_resistive_w": 0.3936885107821355,
+   "p_device_w": 41.27578864989655,
+   "p_switch_sum_w": 41.2456833181965,
+   "closure_w": 0.030105331700049476,
+   "p_gate_total_w": 8.442746016917367,
+   "p_total_with_gate_w": 50.11222317759605,
+   "p_conduction_reff_w": 25.009480454032005,
+   "p_edge_excess_w": 19.403097843166893,
+   "rel_change": 0.001600084675544232,
+   "periods_total": 224,
+   "chunks": 14,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.41968293633084,
+   "channel_dead_time_rise_mean_ns": 2.1481178501383833,
+   "channel_dead_time_fall_mean_ns": 1.4274336405685464,
+   "channel_dead_time_rise_min_max_ns": [
+    2.14663705675844,
+    2.149567602711237
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.3431039884261096,
+    1.4580611243449877
+   ],
+   "turn_off_delay_rise_ns": 3.3318302956138486,
+   "turn_on_delay_rise_ns": 3.22994814575238,
+   "turn_off_delay_fall_ns": 3.8697984175795166,
+   "turn_on_delay_fall_ns": 5.047232058147938,
+   "vds_in_at_channel_on_rise_v": [
+    12.007579265703292,
+    12.144887683703242,
+    12.144266263623607,
+    12.082633596403987
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4313181505414802,
+    -0.43064460009604943,
+    -0.4306163187001861,
+    -0.42878439070615104
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.5901608601076738,
+    0.5755336066070041,
+    0.5973900383524877,
+    0.7332436934017562
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.73306959022074,
+    100.95626938294306,
+    100.9422670579295,
+    101.86913742618924
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.329828106670876,
+    3.0458725922168575,
+    3.0360863811530328,
+    4.150858203634805
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.350.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.35,
+   "ton_cmd_ns": 19.17384876904701,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.8523249988693,
+   "p_out_w": 249.84310708815696,
+   "power_relative_error": -0.0006275716473721493,
+   "p_loss_w": 41.00921791071233,
+   "p_loss_corr_w": 40.871186819641416,
+   "stored_energy_rate_w": 0.1380310910709115,
+   "p_loss_tail_estimate_w": -0.08265797498558662,
+   "ltspice_meas_p_loss_w": 41.009217910999986,
+   "p_passive_resistive_w": 0.38832919573528424,
+   "p_device_w": 40.482857623906135,
+   "p_switch_sum_w": 40.45262460452612,
+   "closure_w": 0.030233019380013104,
+   "p_gate_total_w": 8.44223543592731,
+   "p_total_with_gate_w": 49.313422255568724,
+   "p_conduction_reff_w": 25.024256898681553,
+   "p_edge_excess_w": 18.670383513210314,
+   "rel_change": 0.0001124544594604362,
+   "periods_total": 80,
+   "chunks": 5,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.21614961973137,
+   "channel_dead_time_rise_mean_ns": 2.1494604562713464,
+   "channel_dead_time_fall_mean_ns": 1.5523742445077529,
+   "channel_dead_time_rise_min_max_ns": [
+    2.148375614868612,
+    2.1509037083292335
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.4638203343433343,
+    1.5835906421361978
+   ],
+   "turn_off_delay_rise_ns": 3.3320059172246466,
+   "turn_on_delay_rise_ns": 3.2314663734961413,
+   "turn_off_delay_fall_ns": 3.8419998895103378,
+   "turn_on_delay_fall_ns": 5.04437413401817,
+   "vds_in_at_channel_on_rise_v": [
+    11.982435149111165,
+    12.115142236440589,
+    12.115499129680817,
+    12.049957022803094
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4306376125807444,
+    -0.42984878323005027,
+    -0.4299238552399328,
+    -0.42808587665332454
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.6482844433826436,
+    0.6807830809811258,
+    0.6788525816221561,
+    0.8095920501851347
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.42718419543502,
+    100.63444575795735,
+    100.61982825266425,
+    101.5769179179904
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.1576512582456164,
+    2.84602780188664,
+    2.8378580042835773,
+    3.9522478323332817
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.217856730553486,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.3335656084382,
+   "p_out_w": 249.77400981357926,
+   "power_relative_error": -0.0009039607456829968,
+   "p_loss_w": 40.55955579485895,
+   "p_loss_corr_w": 40.5606509605532,
+   "stored_energy_rate_w": -0.001095165694242617,
+   "p_loss_tail_estimate_w": 0.009170987456398676,
+   "ltspice_meas_p_loss_w": 40.559555795,
+   "p_passive_resistive_w": 0.3870026392061215,
+   "p_device_w": 40.17364832134707,
+   "p_switch_sum_w": 40.143540111551715,
+   "closure_w": 0.03010820979535822,
+   "p_gate_total_w": 8.442183748250645,
+   "p_total_with_gate_w": 49.002834708803846,
+   "p_conduction_reff_w": 25.03221000839799,
+   "p_edge_excess_w": 18.379675029504668,
+   "rel_change": 7.457547324503773e-05,
+   "periods_total": 96,
+   "chunks": 6,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.20910000956815,
+   "channel_dead_time_rise_mean_ns": 2.1495300208055035,
+   "channel_dead_time_fall_mean_ns": 1.6663956662565154,
+   "channel_dead_time_rise_min_max_ns": [
+    2.148466023557889,
+    2.1506784080324737
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.576485658667907,
+    1.697330039855201
+   ],
+   "turn_off_delay_rise_ns": 3.332130644928042,
+   "turn_on_delay_rise_ns": 3.2316606657336937,
+   "turn_off_delay_fall_ns": 3.8253012106151156,
+   "turn_on_delay_fall_ns": 5.041696876871492,
+   "vds_in_at_channel_on_rise_v": [
+    11.97935747903553,
+    12.110290111816017,
+    12.111642889415945,
+    12.045692499432027
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4304288030002095,
+    -0.4296304072810117,
+    -0.4296155760506383,
+    -0.4277984068629046
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7541450923651887,
+    0.7422479822336897,
+    0.7798768221550714,
+    0.9003904096274626
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.36335078813269,
+    100.56498578911494,
+    100.54931455161139,
+    101.51736679089215
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.1435346028009223,
+    2.819278340087281,
+    2.811174234913778,
+    3.912876905571325
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.250_f0.550.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.25,
+   "dead_time_fall_ns": 0.5499999999999999,
+   "ton_cmd_ns": 19.280355172449585,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.78790128302336,
+   "p_out_w": 250.0577453622643,
+   "power_relative_error": 0.00023098144905731033,
+   "p_loss_w": 40.730155920759024,
+   "p_loss_corr_w": 40.564909158860026,
+   "stored_energy_rate_w": 0.16524676189899612,
+   "p_loss_tail_estimate_w": -0.18260462077007117,
+   "ltspice_meas_p_loss_w": 40.7301559205,
+   "p_passive_resistive_w": 0.3881900156590909,
+   "p_device_w": 40.176719143200934,
+   "p_switch_sum_w": 40.14666475918464,
+   "closure_w": 0.0300543840162959,
+   "p_gate_total_w": 8.442249307044925,
+   "p_total_with_gate_w": 49.00715846590495,
+   "p_conduction_reff_w": 24.952276749268545,
+   "p_edge_excess_w": 18.41990917247577,
+   "rel_change": 0.000361936068878489,
+   "periods_total": 160,
+   "chunks": 10,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.35399501927037,
+   "channel_dead_time_rise_mean_ns": 2.14928884302766,
+   "channel_dead_time_fall_mean_ns": 1.772179304907838,
+   "channel_dead_time_rise_min_max_ns": [
+    2.1483156444150215,
+    2.150391650543212
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.6818388365012533,
+    1.8029763150868583
+   ],
+   "turn_off_delay_rise_ns": 3.3320776273765857,
+   "turn_on_delay_rise_ns": 3.2313664704043945,
+   "turn_off_delay_fall_ns": 3.817026473103796,
+   "turn_on_delay_fall_ns": 5.0392057780116986,
+   "vds_in_at_channel_on_rise_v": [
+    11.986491899772858,
+    12.116408035364204,
+    12.117173739433284,
+    12.050929871725502
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.43054009226367806,
+    -0.4296828918995748,
+    -0.42974856017269913,
+    -0.4278100924955104
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.8314213323439725,
+    0.8325957773528719,
+    0.8161895931248914,
+    1.0029574340210605
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.4838068130182,
+    100.68068320365983,
+    100.6669816345529,
+    101.63701321568016
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.19461919347246,
+    2.8613373392925405,
+    2.8526074386228966,
+    3.9439926430942784
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.350_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.35,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.283238951811263,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.9965937957591,
+   "p_out_w": 250.0953975505658,
+   "power_relative_error": 0.0003815902022632489,
+   "p_loss_w": 40.901196245193326,
+   "p_loss_corr_w": 40.66538810003021,
+   "stored_energy_rate_w": 0.23580814516310777,
+   "p_loss_tail_estimate_w": -0.20804343270563913,
+   "ltspice_meas_p_loss_w": 40.90119624550002,
+   "p_passive_resistive_w": 0.38872646123404525,
+   "p_device_w": 40.27666163879617,
+   "p_switch_sum_w": 40.246589653531906,
+   "closure_w": 0.030071985264264356,
+   "p_gate_total_w": 8.442347898505176,
+   "p_total_with_gate_w": 49.10773599853539,
+   "p_conduction_reff_w": 24.94872235608596,
+   "p_edge_excess_w": 18.50882475363948,
+   "rel_change": 0.00024196184697564864,
+   "periods_total": 160,
+   "chunks": 10,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.33600201486354,
+   "channel_dead_time_rise_mean_ns": 2.2489131383542933,
+   "channel_dead_time_fall_mean_ns": 1.6652171768729218,
+   "channel_dead_time_rise_min_max_ns": [
+    2.2473678386347626,
+    2.250067928967068
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5752609070195587,
+    1.6962026730616002
+   ],
+   "turn_off_delay_rise_ns": 3.331926151072471,
+   "turn_on_delay_rise_ns": 3.2308392894266937,
+   "turn_off_delay_fall_ns": 3.826597113177147,
+   "turn_on_delay_fall_ns": 5.0418142900499285,
+   "vds_in_at_channel_on_rise_v": [
+    11.993991652431713,
+    12.123617642796553,
+    12.122690721083856,
+    12.071394436928772
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.4307509066758788,
+    -0.4299095694501424,
+    -0.4299538475182748,
+    -0.4280592906271926
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7769423358880124,
+    0.743815531795303,
+    0.7344210246949051,
+    0.9183558517785017
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.49512524158021,
+    100.70175508250496,
+    100.6830926234837,
+    101.64633159912977
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.268421210733106,
+    2.946014153790143,
+    2.935864991086229,
+    4.039642247861076
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.450_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.45,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.34072226139445,
+   "max_step_ps": 50.0,
+   "p_in_w": 291.19972125546525,
+   "p_out_w": 250.21988450480438,
+   "power_relative_error": 0.000879538019217474,
+   "p_loss_w": 40.97983675066083,
+   "p_loss_corr_w": 40.707563554518956,
+   "stored_energy_rate_w": 0.27227319614187007,
+   "p_loss_tail_estimate_w": -0.020867320872664588,
+   "ltspice_meas_p_loss_w": 40.97983675049999,
+   "p_passive_resistive_w": 0.38925602977969975,
+   "p_device_w": 40.318307524739254,
+   "p_switch_sum_w": 40.28795791151221,
+   "closure_w": 0.030349613227045324,
+   "p_gate_total_w": 8.44256327442131,
+   "p_total_with_gate_w": 49.150126828940266,
+   "p_conduction_reff_w": 24.897578006338506,
+   "p_edge_excess_w": 18.572386618221707,
+   "rel_change": 0.0003464943494626437,
+   "periods_total": 128,
+   "chunks": 8,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.3808514505319,
+   "channel_dead_time_rise_mean_ns": 2.348321777876428,
+   "channel_dead_time_fall_mean_ns": 1.6647499152338678,
+   "channel_dead_time_rise_min_max_ns": [
+    2.346431977893544,
+    2.349615073504299
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5750351731113863,
+    1.6954575756616497
+   ],
+   "turn_off_delay_rise_ns": 3.331885544664075,
+   "turn_on_delay_rise_ns": 3.2302073225406365,
+   "turn_off_delay_fall_ns": 3.8271036559761176,
+   "turn_on_delay_fall_ns": 5.041853571209846,
+   "vds_in_at_channel_on_rise_v": [
+    12.00506040040549,
+    12.131881605803452,
+    12.12959671379593,
+    12.091277523065244
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.43085428597791,
+    -0.43000110924921603,
+    -0.4300165021239827,
+    -0.42816265288993943
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7769102709598563,
+    0.7442792488066666,
+    0.736878166436041,
+    0.919046117947344
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.53941241100785,
+    100.74415965401728,
+    100.7294203986499,
+    101.68962753630501
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.351251081166289,
+    3.0274921090658395,
+    3.018811428930521,
+    4.127975867251636
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "baseline_LMG1210_DEV_T60_r2.550_f0.450.json",
+   "kind": "sweep",
+   "design": "baseline",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 2.5500000000000003,
+   "dead_time_fall_ns": 0.45,
+   "ton_cmd_ns": 19.37677162462671,
+   "max_step_ps": 50.0,
+   "p_in_w": 290.7094650482916,
+   "p_out_w": 249.75379613597434,
+   "power_relative_error": -0.0009848154561026279,
+   "p_loss_w": 40.955668912317215,
+   "p_loss_corr_w": 40.66906078543292,
+   "stored_energy_rate_w": 0.28660812688430237,
+   "p_loss_tail_estimate_w": -0.18675121658986313,
+   "ltspice_meas_p_loss_w": 40.95566891250001,
+   "p_passive_resistive_w": 0.38797663226318385,
+   "p_device_w": 40.281084153169736,
+   "p_switch_sum_w": 40.25091820955503,
+   "closure_w": 0.030165943614704815,
+   "p_gate_total_w": 8.442150199415286,
+   "p_total_with_gate_w": 49.111210984848206,
+   "p_conduction_reff_w": 24.98829501016352,
+   "p_edge_excess_w": 18.50244739485557,
+   "rel_change": 0.00037830191156333447,
+   "periods_total": 96,
+   "chunks": 6,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 128.27061230646817,
+   "channel_dead_time_rise_mean_ns": 2.4482468061840046,
+   "channel_dead_time_fall_mean_ns": 1.6658943990857893,
+   "channel_dead_time_rise_min_max_ns": [
+    2.4459506076264943,
+    2.449582282115167
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.5758841898995886,
+    1.69689447184254
+   ],
+   "turn_off_delay_rise_ns": 3.3316378717832764,
+   "turn_on_delay_rise_ns": 3.229884677967195,
+   "turn_off_delay_fall_ns": 3.8259006514942318,
+   "turn_on_delay_fall_ns": 5.041795050579881,
+   "vds_in_at_channel_on_rise_v": [
+    12.009288679262493,
+    12.133944769432754,
+    12.132985529138708,
+    12.106503693576716
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.43056592744143596,
+    -0.4297118124882152,
+    -0.42977241373234704,
+    -0.4279548428346567
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.7746058093621646,
+    0.7430158852626381,
+    0.7421268074709778,
+    0.946601350558373
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    100.41217361308225,
+    100.61623303906428,
+    100.60402638975644,
+    101.56879777882912
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    3.4051994086681048,
+    3.0815013969856735,
+    3.0739656398980544,
+    4.191246301670884
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.200_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.2,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.84619124461799,
+   "max_step_ps": 50.0,
+   "p_in_w": 310.1676377450899,
+   "p_out_w": 249.99136043876635,
+   "power_relative_error": -3.4558244934590476e-05,
+   "p_loss_w": 60.176277306323534,
+   "p_loss_corr_w": 60.0970694380731,
+   "stored_energy_rate_w": 0.07920786825044157,
+   "p_loss_tail_estimate_w": -0.0,
+   "ltspice_meas_p_loss_w": 60.176277306500026,
+   "p_passive_resistive_w": 0.4635454443184317,
+   "p_device_w": 59.633523993754665,
+   "p_switch_sum_w": 59.562273503230465,
+   "closure_w": 0.07125049052419996,
+   "p_gate_total_w": 8.424390458222426,
+   "p_total_with_gate_w": 68.52145989629553,
+   "p_conduction_reff_w": 31.54146509455802,
+   "p_edge_excess_w": 27.082580004914103,
+   "rel_change": 7.909419214596426e-05,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.73771116957582,
+   "channel_dead_time_rise_mean_ns": -0.13233347594874717,
+   "channel_dead_time_fall_mean_ns": 1.057801441668391,
+   "channel_dead_time_rise_min_max_ns": [
+    -0.18102959236457,
+    -0.11034478266272753
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0529169638533649,
+    1.0601697008563573
+   ],
+   "turn_off_delay_rise_ns": 3.6362365166647956,
+   "turn_on_delay_rise_ns": 3.3039030407160332,
+   "turn_off_delay_fall_ns": 4.117094748759397,
+   "turn_on_delay_fall_ns": 5.124896190427679,
+   "vds_in_at_channel_on_rise_v": [
+    10.887662133226394,
+    10.978422365251783,
+    10.981660426866064,
+    10.575820574660199
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6368716504788626,
+    -0.6343699425935269,
+    -0.6343674719659879,
+    -0.6301901258565534
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.09831460405636,
+    1.097135116998292,
+    1.095183523733044,
+    1.1400502586771835
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.3552559259413,
+    161.89990744861691,
+    161.87674265167274,
+    161.5530849948845
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -78.0813388099845,
+    -79.07268815994793,
+    -79.08982036112113,
+    -78.29696776850194
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.300_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.3,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.838904748503214,
+   "max_step_ps": 50.0,
+   "p_in_w": 308.32717768782254,
+   "p_out_w": 249.98891102000417,
+   "power_relative_error": -4.435591998330768e-05,
+   "p_loss_w": 58.33826666781839,
+   "p_loss_corr_w": 58.33939078112083,
+   "stored_energy_rate_w": -0.001124113302441998,
+   "p_loss_tail_estimate_w": 0.0,
+   "ltspice_meas_p_loss_w": 58.338266668000024,
+   "p_passive_resistive_w": 0.45860184219507283,
+   "p_device_w": 57.880788938925754,
+   "p_switch_sum_w": 57.80951476581812,
+   "closure_w": 0.07127417310763207,
+   "p_gate_total_w": 8.423370625608122,
+   "p_total_with_gate_w": 66.76276140672894,
+   "p_conduction_reff_w": 31.60069757002891,
+   "p_edge_excess_w": 25.319085002055193,
+   "rel_change": 2.1302229794176763e-05,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.7428820260042,
+   "channel_dead_time_rise_mean_ns": 0.055759439101916164,
+   "channel_dead_time_fall_mean_ns": 1.059393192627633,
+   "channel_dead_time_rise_min_max_ns": [
+    0.046825232424915104,
+    0.06408259932679043
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0543900464472793,
+    1.0618314744468795
+   ],
+   "turn_off_delay_rise_ns": 3.597519554131448,
+   "turn_on_delay_rise_ns": 3.353278993233553,
+   "turn_off_delay_fall_ns": 4.115574809713892,
+   "turn_on_delay_fall_ns": 5.124968002341415,
+   "vds_in_at_channel_on_rise_v": [
+    10.28059342785978,
+    10.374107114226247,
+    10.375708502944102,
+    9.664234434827506
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6368809130368718,
+    -0.634344706906188,
+    -0.6343806655123614,
+    -0.6301323905239599
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.063111687159707,
+    1.1027071430097102,
+    1.0961154719013966,
+    1.1917911060452009
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.3655697662186,
+    161.9005630217138,
+    161.8937326627092,
+    161.56076490156556
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -78.00764270415682,
+    -79.01258757840309,
+    -79.01233209709513,
+    -78.26309498466928
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.400_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.4,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.83118331983826,
+   "max_step_ps": 50.0,
+   "p_in_w": 306.90334865544827,
+   "p_out_w": 249.99156047166795,
+   "power_relative_error": -3.375811332817502e-05,
+   "p_loss_w": 56.9117881837803,
+   "p_loss_corr_w": 56.88689964629935,
+   "stored_energy_rate_w": 0.024888537480949324,
+   "p_loss_tail_estimate_w": 0.006808565698469553,
+   "ltspice_meas_p_loss_w": 56.911788184000024,
+   "p_passive_resistive_w": 0.4548008707884276,
+   "p_device_w": 56.43209877551092,
+   "p_switch_sum_w": 56.36084893305532,
+   "closure_w": 0.07124984245560029,
+   "p_gate_total_w": 8.422504154707976,
+   "p_total_with_gate_w": 65.30940380100732,
+   "p_conduction_reff_w": 31.688712577912884,
+   "p_edge_excess_w": 23.835902203026738,
+   "rel_change": 0.00017695879786358562,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.7565308614207,
+   "channel_dead_time_rise_mean_ns": 0.26349543101404144,
+   "channel_dead_time_fall_mean_ns": 1.0608724270591072,
+   "channel_dead_time_rise_min_max_ns": [
+    0.2401506195404074,
+    0.32395948392898793
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0553348889075553,
+    1.0634596942328474
+   ],
+   "turn_off_delay_rise_ns": 3.5764604292430575,
+   "turn_on_delay_rise_ns": 3.439955860257069,
+   "turn_off_delay_fall_ns": 4.114145656135494,
+   "turn_on_delay_fall_ns": 5.125018083194491,
+   "vds_in_at_channel_on_rise_v": [
+    9.429403000702553,
+    9.523043659215183,
+    9.533089344650493,
+    8.044880491829026
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6369192326362649,
+    -0.6343737196300212,
+    -0.6344182110575334,
+    -0.6300808620888407
+   ],
+   "zvs_count_rise": 0,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0811634531937988,
+    1.0935758609140867,
+    1.0966773678761428,
+    1.1678323945711082
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.38610739443308,
+    161.9246899592186,
+    161.92395996966567,
+    161.5635546274068
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.9321721200467,
+    -78.93611318906329,
+    -78.92640740271712,
+    -78.23772636179328
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.05,
+   "ton_cmd_ns": 17.764985307596092,
+   "max_step_ps": 50.0,
+   "p_in_w": 306.00416910772844,
+   "p_out_w": 249.865664105107,
+   "power_relative_error": -0.0005373435795720249,
+   "p_loss_w": 56.13850500262145,
+   "p_loss_corr_w": 55.95237526696943,
+   "stored_energy_rate_w": 0.18612973565201862,
+   "p_loss_tail_estimate_w": -0.04488885736403093,
+   "ltspice_meas_p_loss_w": 56.138505002500025,
+   "p_passive_resistive_w": 0.45239145225923416,
+   "p_device_w": 55.4999838147102,
+   "p_switch_sum_w": 55.428737054506655,
+   "closure_w": 0.07124676020354315,
+   "p_gate_total_w": 8.421721591499962,
+   "p_total_with_gate_w": 64.3740968584694,
+   "p_conduction_reff_w": 31.788810724647874,
+   "p_edge_excess_w": 22.84099012805537,
+   "rel_change": 0.00016108850889983472,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.58720332433305,
+   "channel_dead_time_rise_mean_ns": 0.8295860320195612,
+   "channel_dead_time_fall_mean_ns": 0.9671644255079248,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4563813253431249,
+    1.9343552417111614
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    0.9623546975321542,
+    0.9696124584374816
+   ],
+   "turn_off_delay_rise_ns": 3.564754650515163,
+   "turn_on_delay_rise_ns": 3.894340682534898,
+   "turn_off_delay_fall_ns": 4.110825727768038,
+   "turn_on_delay_fall_ns": 5.127990153276072,
+   "vds_in_at_channel_on_rise_v": [
+    8.226578532660346,
+    8.32244903016402,
+    8.349709724900448,
+    -0.3412423959304661
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6371985690849791,
+    -0.6347268571890323,
+    -0.6347240062255954,
+    -0.6302617006200594
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.9813213044460616,
+    1.0016538271908133,
+    0.9820430259914696,
+    1.0832719377394433
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.33559008987783,
+    161.88393540238206,
+    161.87577752802432,
+    161.4824067551565
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.84051413816525,
+    -78.81791344028858,
+    -78.81614004665924,
+    -78.18066698532381
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.150.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.15,
+   "ton_cmd_ns": 17.72325183284821,
+   "max_step_ps": 50.0,
+   "p_in_w": 306.7555375148576,
+   "p_out_w": 250.05371310374485,
+   "power_relative_error": 0.0002148524149794273,
+   "p_loss_w": 56.70182441111275,
+   "p_loss_corr_w": 56.71245884951208,
+   "stored_energy_rate_w": -0.010634438399326207,
+   "p_loss_tail_estimate_w": -0.0,
+   "ltspice_meas_p_loss_w": 56.701824411499985,
+   "p_passive_resistive_w": 0.454412427675851,
+   "p_device_w": 56.258046421836234,
+   "p_switch_sum_w": 56.18696807707209,
+   "closure_w": 0.0710783447641461,
+   "p_gate_total_w": 8.421734544087123,
+   "p_total_with_gate_w": 65.1341933935992,
+   "p_conduction_reff_w": 31.86645500556728,
+   "p_edge_excess_w": 23.51724424811061,
+   "rel_change": 0.0001008601210085551,
+   "periods_total": 80,
+   "chunks": 5,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.4950577221146,
+   "channel_dead_time_rise_mean_ns": 0.8297375314155939,
+   "channel_dead_time_fall_mean_ns": 0.8729419198350667,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4572708912718258,
+    1.934229703385377
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    0.8684581971956216,
+    0.8752068606107984
+   ],
+   "turn_off_delay_rise_ns": 3.5650279536791976,
+   "turn_on_delay_rise_ns": 3.8947654850949656,
+   "turn_off_delay_fall_ns": 4.108151914693851,
+   "turn_on_delay_fall_ns": 5.131093834528823,
+   "vds_in_at_channel_on_rise_v": [
+    8.224765253642452,
+    8.319927487137226,
+    8.339980804900238,
+    -0.34136156505134185
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6375794232862693,
+    -0.6352166133775532,
+    -0.6352603452074079,
+    -0.6307845699433763
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.8847065866131605,
+    0.9035620009366782,
+    0.9170563002235214,
+    0.99441846707551
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.44404629210808,
+    162.0047074857869,
+    161.99567448931262,
+    161.5932569628321
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.90980298554808,
+    -78.85595498282238,
+    -78.85265399322526,
+    -78.21246337198555
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.250.json",
+   "kind": "center",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.25,
+   "ton_cmd_ns": 17.675007865742877,
+   "max_step_ps": 50.0,
+   "p_in_w": 308.1241762352728,
+   "p_out_w": 249.88775979223783,
+   "power_relative_error": -0.0004489608310487281,
+   "p_loss_w": 58.23641644303494,
+   "p_loss_corr_w": 57.98589050213969,
+   "stored_energy_rate_w": 0.25052594089525204,
+   "p_loss_tail_estimate_w": -0.13719276244169962,
+   "ltspice_meas_p_loss_w": 58.23641644350003,
+   "p_passive_resistive_w": 0.4580476197966083,
+   "p_device_w": 57.52784288234308,
+   "p_switch_sum_w": 57.456682117632994,
+   "closure_w": 0.07116076471008626,
+   "p_gate_total_w": 8.421384158972266,
+   "p_total_with_gate_w": 66.40727466111196,
+   "p_conduction_reff_w": 31.91431819274298,
+   "p_edge_excess_w": 24.725159439683658,
+   "rel_change": 0.00029617786737456557,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.31033228790253,
+   "channel_dead_time_rise_mean_ns": 0.8292817698685375,
+   "channel_dead_time_fall_mean_ns": 0.7797328589094261,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4560108469204217,
+    1.9345052279832073
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    0.7756680468869727,
+    0.7819939453360585
+   ],
+   "turn_off_delay_rise_ns": 3.5648104913239935,
+   "turn_on_delay_rise_ns": 3.8940922611927054,
+   "turn_off_delay_fall_ns": 4.104351523396585,
+   "turn_on_delay_fall_ns": 5.134084382306136,
+   "vds_in_at_channel_on_rise_v": [
+    8.229865550023897,
+    8.32698795540258,
+    8.355114260094767,
+    -0.3411658074124069
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6377386433928857,
+    -0.6354476226412099,
+    -0.635498758678819,
+    -0.631045789036845
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.8447559614195487,
+    0.8174126611546496,
+    0.8316760530477475,
+    0.8888956155387553
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.53036220842603,
+    162.11126597437993,
+    162.0992140941095,
+    161.69083446053025
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.8979082772552,
+    -78.80345903947911,
+    -78.8014267152033,
+    -78.14630033754874
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.350.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.35,
+   "ton_cmd_ns": 17.64058532849678,
+   "max_step_ps": 50.0,
+   "p_in_w": 309.94704335224094,
+   "p_out_w": 250.02339692880443,
+   "power_relative_error": 9.358771521772447e-05,
+   "p_loss_w": 59.9236464234365,
+   "p_loss_corr_w": 59.92638858243637,
+   "stored_energy_rate_w": -0.002742158999868849,
+   "p_loss_tail_estimate_w": -0.0,
+   "ltspice_meas_p_loss_w": 59.92364642300001,
+   "p_passive_resistive_w": 0.4629501229505585,
+   "p_device_w": 59.46343845948581,
+   "p_switch_sum_w": 59.39228228634246,
+   "closure_w": 0.07115617314335054,
+   "p_gate_total_w": 8.42177945892609,
+   "p_total_with_gate_w": 68.34816804136246,
+   "p_conduction_reff_w": 32.054583995800215,
+   "p_edge_excess_w": 26.519741283576487,
+   "rel_change": 1.717038854727231e-05,
+   "periods_total": 112,
+   "chunks": 7,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.2071822171348,
+   "channel_dead_time_rise_mean_ns": 0.8294697965718273,
+   "channel_dead_time_fall_mean_ns": 0.29079890751977605,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4566439830187838,
+    1.9344710908791547
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -0.8979246326996787,
+    0.6890898554791022
+   ],
+   "turn_off_delay_rise_ns": 3.564998328360619,
+   "turn_on_delay_rise_ns": 3.89446812493262,
+   "turn_off_delay_fall_ns": 4.100359691933931,
+   "turn_on_delay_fall_ns": 4.741158599453628,
+   "vds_in_at_channel_on_rise_v": [
+    8.224062895710507,
+    8.329260306076112,
+    8.348103901228189,
+    -0.3412541987049569
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    7.76320273855757,
+    -0.6357886162231193,
+    -0.6358288606446125,
+    -0.6314029257327997
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 3,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.7322984985088584,
+    0.7456877486090704,
+    0.8392742849346967
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.78250903169422,
+    162.38477798506992,
+    162.36874085748056,
+    161.95730573877034
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.9759188527409,
+    -78.83898856463894,
+    -78.84511237241335,
+    -78.16863987108322
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.450.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.45,
+   "ton_cmd_ns": 17.6053492318733,
+   "max_step_ps": 50.0,
+   "p_in_w": 312.46787560772356,
+   "p_out_w": 249.98825709857087,
+   "power_relative_error": -4.6971605716539244e-05,
+   "p_loss_w": 62.47961850915267,
+   "p_loss_corr_w": 62.492403816548794,
+   "stored_energy_rate_w": -0.012785307396123713,
+   "p_loss_tail_estimate_w": -0.17855158359135698,
+   "ltspice_meas_p_loss_w": 62.479618509000005,
+   "p_passive_resistive_w": 0.4697546720694883,
+   "p_device_w": 62.0226491444793,
+   "p_switch_sum_w": 61.95160344770148,
+   "closure_w": 0.0710456967778228,
+   "p_gate_total_w": 8.422248519126974,
+   "p_total_with_gate_w": 70.91465233567577,
+   "p_conduction_reff_w": 32.20870287622872,
+   "p_edge_excess_w": 28.91733314712982,
+   "rel_change": 0.00028609101327512724,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.06083181903193,
+   "channel_dead_time_rise_mean_ns": 0.8290618304032784,
+   "channel_dead_time_fall_mean_ns": -1.1127875808358894,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4557371345254416,
+    1.934290673395444
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -1.1547425125807471,
+    -1.0952249527705213
+   ],
+   "turn_off_delay_rise_ns": 3.5650311076937267,
+   "turn_on_delay_rise_ns": 3.894092938097179,
+   "turn_off_delay_fall_ns": 4.095272958061594,
+   "turn_on_delay_fall_ns": 3.4324853772258446,
+   "vds_in_at_channel_on_rise_v": [
+    8.22469828469622,
+    8.33554312560182,
+    8.359462330259289,
+    -0.341188049755231
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    9.5050112723529,
+    8.871211868499978,
+    8.876073002624594,
+    8.947246403345622
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 0,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    162.0702234182593,
+    162.70205140871946,
+    162.68919869887506,
+    162.2586279594533
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -78.014465357938,
+    -78.83016830918017,
+    -78.82833637697334,
+    -78.14904288449041
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f-0.550.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": -0.5499999999999999,
+   "ton_cmd_ns": 17.57186197794787,
+   "max_step_ps": 50.0,
+   "p_in_w": 315.069064700579,
+   "p_out_w": 249.8983146606369,
+   "power_relative_error": -0.00040674135745233375,
+   "p_loss_w": 65.17075003994212,
+   "p_loss_corr_w": 65.64995502903494,
+   "stored_energy_rate_w": -0.4792049890928185,
+   "p_loss_tail_estimate_w": 0.211106558683184,
+   "ltspice_meas_p_loss_w": 65.17075004000002,
+   "p_passive_resistive_w": 0.47680380188095045,
+   "p_device_w": 65.173151227154,
+   "p_switch_sum_w": 65.10210834714434,
+   "closure_w": 0.07104288000965653,
+   "p_gate_total_w": 8.422538524014469,
+   "p_total_with_gate_w": 74.07249355304941,
+   "p_conduction_reff_w": 32.395472173658796,
+   "p_edge_excess_w": 31.871894957055336,
+   "rel_change": 0.0004251077826979288,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 217.8444650206377,
+   "channel_dead_time_rise_mean_ns": 0.8290959241974776,
+   "channel_dead_time_fall_mean_ns": -1.2766421084427335,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4556157796318562,
+    1.9345063210788023
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    -1.3037820323793692,
+    -1.2620588807110833
+   ],
+   "turn_off_delay_rise_ns": 3.5651395418162917,
+   "turn_on_delay_rise_ns": 3.8942354660139435,
+   "turn_off_delay_fall_ns": 4.089390027353596,
+   "turn_on_delay_fall_ns": 3.362747918910797,
+   "vds_in_at_channel_on_rise_v": [
+    8.223676047744657,
+    8.334781090775286,
+    8.360135472288054,
+    -0.34119681446886285
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    10.201946891271719,
+    9.727255372565041,
+    9.723151844553962,
+    9.89267199746989
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 0,
+   "reverse_before_on_fall_ns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    162.35788820419725,
+    163.02408980607362,
+    163.02586535449745,
+    162.5668582881168
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -78.08833247663449,
+    -78.88118407701133,
+    -78.85417430881732,
+    -78.17801992234375
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.824958722765896,
+   "max_step_ps": 50.0,
+   "p_in_w": 305.43255347713415,
+   "p_out_w": 250.10808377357912,
+   "power_relative_error": 0.00043233509431650496,
+   "p_loss_w": 55.32446970355504,
+   "p_loss_corr_w": 55.690707663722144,
+   "stored_energy_rate_w": -0.36623796016710397,
+   "p_loss_tail_estimate_w": 0.1644441860262169,
+   "ltspice_meas_p_loss_w": 55.32446970349998,
+   "p_passive_resistive_w": 0.45089246876223943,
+   "p_device_w": 55.2398151949599,
+   "p_switch_sum_w": 55.16863749019198,
+   "closure_w": 0.07117770476791918,
+   "p_gate_total_w": 8.421384249818557,
+   "p_total_with_gate_w": 64.1120919135407,
+   "p_conduction_reff_w": 31.811751955681416,
+   "p_edge_excess_w": 22.585054392413024,
+   "rel_change": 0.000499809138659034,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.7843739816509,
+   "channel_dead_time_rise_mean_ns": 0.8301493939947807,
+   "channel_dead_time_fall_mean_ns": 1.0625398686287235,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4578245448595946,
+    1.9340420149712705
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0572214456846114,
+    1.0650066673634802
+   ],
+   "turn_off_delay_rise_ns": 3.565158335397714,
+   "turn_on_delay_rise_ns": 3.895307729392669,
+   "turn_off_delay_fall_ns": 4.1125230219150675,
+   "turn_on_delay_fall_ns": 5.125062890543681,
+   "vds_in_at_channel_on_rise_v": [
+    8.22001004024736,
+    8.309996725823668,
+    8.331869012139958,
+    -0.34161104531401154
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6369630574874674,
+    -0.6344186272447587,
+    -0.634459555928793,
+    -0.6299535682878306
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0899756708772328,
+    1.097376372650121,
+    1.1161976542750043,
+    1.1677948733214036
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.42359653540268,
+    161.96128541146425,
+    161.9652116163505,
+    161.5708233757034
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.90639984803114,
+    -78.91520416813997,
+    -78.9054149333488,
+    -78.27933186849664
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.500_f0.150.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.5,
+   "dead_time_fall_ns": 0.15,
+   "ton_cmd_ns": 17.87192134447721,
+   "max_step_ps": 50.0,
+   "p_in_w": 305.8277365137785,
+   "p_out_w": 249.82784329417908,
+   "power_relative_error": -0.0006886268232837445,
+   "p_loss_w": 55.99989321959945,
+   "p_loss_corr_w": 55.72911154695951,
+   "stored_energy_rate_w": 0.27078167263994146,
+   "p_loss_tail_estimate_w": -0.20969635512179235,
+   "ltspice_meas_p_loss_w": 55.999893220000025,
+   "p_passive_resistive_w": 0.45192178929761867,
+   "p_device_w": 55.27718975766189,
+   "p_switch_sum_w": 55.20597188872518,
+   "closure_w": 0.07121786893670645,
+   "p_gate_total_w": 8.420926102077894,
+   "p_total_with_gate_w": 64.1500376490374,
+   "p_conduction_reff_w": 31.766515240218947,
+   "p_edge_excess_w": 22.67324663184844,
+   "rel_change": 0.00020457146249477053,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.9011012441172,
+   "channel_dead_time_rise_mean_ns": 0.829519805727376,
+   "channel_dead_time_fall_mean_ns": 1.1586753769001241,
+   "channel_dead_time_rise_min_max_ns": [
+    0.4572058547273064,
+    1.9338255722771873
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.1528975436759397,
+    1.161116460065168
+   ],
+   "turn_off_delay_rise_ns": 3.5649757385832506,
+   "turn_on_delay_rise_ns": 3.8944955443108005,
+   "turn_off_delay_fall_ns": 4.113500819549209,
+   "turn_on_delay_fall_ns": 5.122176196449428,
+   "vds_in_at_channel_on_rise_v": [
+    8.233250052418857,
+    8.319740792480413,
+    8.341716649006129,
+    -0.34136378969136016
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6364826446751363,
+    -0.6338715622142927,
+    -0.6339363939270797,
+    -0.6293705048566929
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.1609945143224796,
+    1.1759707187959247,
+    1.187537496806514,
+    1.2735405097156691
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.4759523374977,
+    161.9974897780562,
+    161.98955756375372,
+    161.59412524117803
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.78971483177526,
+    -78.8197272662476,
+    -78.81632743424875,
+    -78.20068107160587
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.600_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.6,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.811293699241652,
+   "max_step_ps": 50.0,
+   "p_in_w": 304.81362732511303,
+   "p_out_w": 250.06390810112387,
+   "power_relative_error": 0.0002556324044955538,
+   "p_loss_w": 54.74971922398915,
+   "p_loss_corr_w": 54.73378932998803,
+   "stored_energy_rate_w": 0.015929894001120992,
+   "p_loss_tail_estimate_w": -0.00026774434123151607,
+   "ltspice_meas_p_loss_w": 54.749719223999996,
+   "p_passive_resistive_w": 0.4492620103505136,
+   "p_device_w": 54.28452731963751,
+   "p_switch_sum_w": 54.21334809144926,
+   "closure_w": 0.07117922818824951,
+   "p_gate_total_w": 8.420180202502037,
+   "p_total_with_gate_w": 63.153969532490066,
+   "p_conduction_reff_w": 31.939464957895154,
+   "p_edge_excess_w": 21.562302184243638,
+   "rel_change": 6.564239645197096e-05,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.83148010009936,
+   "channel_dead_time_rise_mean_ns": 1.125246538075745,
+   "channel_dead_time_fall_mean_ns": 1.0644126933866245,
+   "channel_dead_time_rise_min_max_ns": [
+    0.8097387843250016,
+    2.0381942900168784
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0589811842707937,
+    1.066870821397254
+   ],
+   "turn_off_delay_rise_ns": 3.5588375365361093,
+   "turn_on_delay_rise_ns": 4.084084074611809,
+   "turn_off_delay_fall_ns": 4.110664318434441,
+   "turn_on_delay_fall_ns": 5.125077011820956,
+   "vds_in_at_channel_on_rise_v": [
+    5.932691865186746,
+    5.983879670401528,
+    6.0932216646524795,
+    -0.33695586486278356
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6370494259384372,
+    -0.634467774913485,
+    -0.6345571450660685,
+    -0.6297929922061773
+   ],
+   "zvs_count_rise": 1,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0729480936873454,
+    1.0774732990011469,
+    1.1033835163385457,
+    1.156574151478189
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.48309986677134,
+    162.02165521986842,
+    162.01699379566458,
+    161.57858771064517
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.78610682262654,
+    -78.79090819933568,
+    -78.78766735762989,
+    -78.2486505012711
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.700_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.7,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.790602303839712,
+   "max_step_ps": 50.0,
+   "p_in_w": 304.0761193789222,
+   "p_out_w": 249.94042945074673,
+   "power_relative_error": -0.0002382821970130511,
+   "p_loss_w": 54.13568992817547,
+   "p_loss_corr_w": 53.944457363738934,
+   "stored_energy_rate_w": 0.1912325644365387,
+   "p_loss_tail_estimate_w": -0.0048579619894941264,
+   "ltspice_meas_p_loss_w": 54.13568992849999,
+   "p_passive_resistive_w": 0.4472998952021323,
+   "p_device_w": 53.4971574685368,
+   "p_switch_sum_w": 53.4260726688906,
+   "closure_w": 0.07108479964620074,
+   "p_gate_total_w": 8.418691930816546,
+   "p_total_with_gate_w": 62.363149294555484,
+   "p_conduction_reff_w": 32.08365710507868,
+   "p_edge_excess_w": 20.702610328796077,
+   "rel_change": 9.55326242987966e-05,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.8295126082131,
+   "channel_dead_time_rise_mean_ns": 2.1779765261782438,
+   "channel_dead_time_fall_mean_ns": 1.066476119914584,
+   "channel_dead_time_rise_min_max_ns": [
+    2.138205877933495,
+    2.191565510092089
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0607585823377264,
+    1.069133250274546
+   ],
+   "turn_off_delay_rise_ns": 3.5552610119397516,
+   "turn_on_delay_rise_ns": 5.033237538118154,
+   "turn_off_delay_fall_ns": 4.108562338508167,
+   "turn_on_delay_fall_ns": 5.125038458422642,
+   "vds_in_at_channel_on_rise_v": [
+    -0.3415069362066354,
+    -0.34346465376853513,
+    -0.3435383667502262,
+    -0.33201444344684394
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6370009213416965,
+    -0.6344545723210813,
+    -0.6345346783904389,
+    -0.6295169042663097
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0675623160865895,
+    1.124837920062933,
+    1.102713776069663,
+    1.1558690234772009
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.49318724246157,
+    162.03491445241926,
+    162.02581534437348,
+    161.53001340410916
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.67656604612219,
+    -78.68407706176053,
+    -78.68138958436113,
+    -78.23682627897465
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.800_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.8,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.7745579375005,
+   "max_step_ps": 50.0,
+   "p_in_w": 303.4297251366646,
+   "p_out_w": 250.13334544099536,
+   "power_relative_error": 0.0005333817639814331,
+   "p_loss_w": 53.296379695669245,
+   "p_loss_corr_w": 53.36942021187396,
+   "stored_energy_rate_w": -0.0730405162047143,
+   "p_loss_tail_estimate_w": -0.0,
+   "ltspice_meas_p_loss_w": 53.29637969550001,
+   "p_passive_resistive_w": 0.4456149473014873,
+   "p_device_w": 52.92380526457247,
+   "p_switch_sum_w": 52.852687026355845,
+   "closure_w": 0.0711182382166271,
+   "p_gate_total_w": 8.417478890414783,
+   "p_total_with_gate_w": 61.78689910228874,
+   "p_conduction_reff_w": 32.32902596297253,
+   "p_edge_excess_w": 19.98437025897628,
+   "rel_change": 0.0001163966931747738,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.9141539495481,
+   "channel_dead_time_rise_mean_ns": 2.2755175343914797,
+   "channel_dead_time_fall_mean_ns": 1.0684884578504414,
+   "channel_dead_time_rise_min_max_ns": [
+    2.2353611242372926,
+    2.289389919668044
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0626264358603188,
+    1.0710797850463272
+   ],
+   "turn_off_delay_rise_ns": 3.5536603326705927,
+   "turn_on_delay_rise_ns": 5.029177867062012,
+   "turn_off_delay_fall_ns": 4.106602220342503,
+   "turn_on_delay_fall_ns": 5.1250906781928345,
+   "vds_in_at_channel_on_rise_v": [
+    -0.337096059950701,
+    -0.3389897702299821,
+    -0.3390280668665075,
+    -0.3267920709088821
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6372084914997118,
+    -0.6346267119174656,
+    -0.6347053820215905,
+    -0.6294501950965007
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.090917918167472,
+    1.1244526890389117,
+    1.113467015299233,
+    1.181850084827493
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.59632177438482,
+    162.13954441600856,
+    162.13471573964873,
+    161.57171663087811
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.66542025728312,
+    -78.6643488701253,
+    -78.657441700664,
+    -78.33170043039625
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r0.900_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 0.9,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.73869516645973,
+   "max_step_ps": 50.0,
+   "p_in_w": 303.0540257795545,
+   "p_out_w": 249.84978532103,
+   "power_relative_error": -0.0006008587158800038,
+   "p_loss_w": 53.20424045852448,
+   "p_loss_corr_w": 52.886557789534024,
+   "stored_energy_rate_w": 0.31768266899045994,
+   "p_loss_tail_estimate_w": -0.23171919919720074,
+   "ltspice_meas_p_loss_w": 53.20424045849998,
+   "p_passive_resistive_w": 0.44459488635743893,
+   "p_device_w": 52.44196290317659,
+   "p_switch_sum_w": 52.37088769709755,
+   "closure_w": 0.07107520607903695,
+   "p_gate_total_w": 8.41575818313602,
+   "p_total_with_gate_w": 61.302315972670044,
+   "p_conduction_reff_w": 32.539457352462506,
+   "p_edge_excess_w": 19.39297107277338,
+   "rel_change": 0.0005918829406122616,
+   "periods_total": 64,
+   "chunks": 4,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.87693935895163,
+   "channel_dead_time_rise_mean_ns": 2.372153970172442,
+   "channel_dead_time_fall_mean_ns": 1.071042402511291,
+   "channel_dead_time_rise_min_max_ns": [
+    2.3309478887515325,
+    2.3862848227556896
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.064787525491761,
+    1.0738840466431427
+   ],
+   "turn_off_delay_rise_ns": 3.5525936735800134,
+   "turn_on_delay_rise_ns": 5.024747643752599,
+   "turn_off_delay_fall_ns": 4.1039152849156295,
+   "turn_on_delay_fall_ns": 5.124957687426811,
+   "vds_in_at_channel_on_rise_v": [
+    -0.3316905502630174,
+    -0.3336237713152346,
+    -0.33362633927258634,
+    -0.32090888709935395
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6370807967575733,
+    -0.6345418612870126,
+    -0.6346040635899806,
+    -0.6290186156265868
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.1124811448631098,
+    1.0951887835238905,
+    1.0834866824471399,
+    1.1945813282953794
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.57611453307575,
+    162.11270916145403,
+    162.1185819047137,
+    161.46546885295365
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.52508600627105,
+    -78.53724586499195,
+    -78.51100216661311,
+    -78.31033568085242
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.000_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.0,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.706209863870107,
+   "max_step_ps": 50.0,
+   "p_in_w": 302.3267568674206,
+   "p_out_w": 249.88803810074285,
+   "power_relative_error": -0.00044784759702864996,
+   "p_loss_w": 52.43871876667777,
+   "p_loss_corr_w": 52.55474885207862,
+   "stored_energy_rate_w": -0.11603008540084225,
+   "p_loss_tail_estimate_w": 2.560642059405965e-06,
+   "ltspice_meas_p_loss_w": 52.43871876700002,
+   "p_passive_resistive_w": 0.4426655320672606,
+   "p_device_w": 52.11208332001136,
+   "p_switch_sum_w": 52.04103453518383,
+   "closure_w": 0.07104878482752497,
+   "p_gate_total_w": 8.413960709188366,
+   "p_total_with_gate_w": 60.968709561266984,
+   "p_conduction_reff_w": 32.85041823078449,
+   "p_edge_excess_w": 18.888490614729573,
+   "rel_change": 4.249955195496868e-05,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.86769358552363,
+   "channel_dead_time_rise_mean_ns": 2.4679413387287306,
+   "channel_dead_time_fall_mean_ns": 1.0735324145705318,
+   "channel_dead_time_rise_min_max_ns": [
+    2.4263130429689443,
+    2.482206377320582
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0670852236791761,
+    1.076327139071452
+   ],
+   "turn_off_delay_rise_ns": 3.552209016090577,
+   "turn_on_delay_rise_ns": 5.020150354819233,
+   "turn_off_delay_fall_ns": 4.101363989540587,
+   "turn_on_delay_fall_ns": 5.124896404111009,
+   "vds_in_at_channel_on_rise_v": [
+    -0.32637160161269263,
+    -0.3281342966802013,
+    -0.3282100255355778,
+    -0.3148793236738865
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6370707989076503,
+    -0.6345270679456907,
+    -0.6345811816149229,
+    -0.6287551298504759
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.095546985364035,
+    1.0982250409278875,
+    1.088657244708365,
+    1.1796247047749024
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.59191445170245,
+    162.1409823593961,
+    162.13224561765665,
+    161.43360446416057
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.53529051308496,
+    -78.53655581257996,
+    -78.52653688874321,
+    -78.42463370905425
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.100_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.0999999999999999,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.673372975006497,
+   "max_step_ps": 50.0,
+   "p_in_w": 302.5375450037634,
+   "p_out_w": 250.01128403965964,
+   "power_relative_error": 4.513615863865894e-05,
+   "p_loss_w": 52.52626096410377,
+   "p_loss_corr_w": 52.40339386385976,
+   "stored_energy_rate_w": 0.12286710024400627,
+   "p_loss_tail_estimate_w": -0.00021655607025174178,
+   "ltspice_meas_p_loss_w": 52.52626096450001,
+   "p_passive_resistive_w": 0.4432578664267596,
+   "p_device_w": 51.960135997433,
+   "p_switch_sum_w": 51.88917162308329,
+   "closure_w": 0.07096437434970682,
+   "p_gate_total_w": 8.412082855813521,
+   "p_total_with_gate_w": 60.815476719673285,
+   "p_conduction_reff_w": 33.21058239529301,
+   "p_edge_excess_w": 18.513081221796423,
+   "rel_change": 0.0001065615082487406,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.99241166920038,
+   "channel_dead_time_rise_mean_ns": 2.563412699315834,
+   "channel_dead_time_fall_mean_ns": 1.0763679347936177,
+   "channel_dead_time_rise_min_max_ns": [
+    2.5212164880187364,
+    2.5780482458553102
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.069668804572412,
+    1.079378791716429
+   ],
+   "turn_off_delay_rise_ns": 3.5518792838967395,
+   "turn_on_delay_rise_ns": 5.015291983212703,
+   "turn_off_delay_fall_ns": 4.09851763550882,
+   "turn_on_delay_fall_ns": 5.124885570302328,
+   "vds_in_at_channel_on_rise_v": [
+    -0.3203511758802218,
+    -0.3220580543972604,
+    -0.32214978888276635,
+    -0.30828897190626725
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6373024430657882,
+    -0.6347562426474722,
+    -0.6348149775924431,
+    -0.6287334890336044
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.083451863513752,
+    1.105917163758627,
+    1.0861180354806403,
+    1.1975811390104918
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.75612269716595,
+    162.29391228744242,
+    162.29790708438378,
+    161.52850102842564
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.47398639744858,
+    -78.48785636981526,
+    -78.46880384448988,
+    -78.46497971715533
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.200_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.2,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.635468835999212,
+   "max_step_ps": 50.0,
+   "p_in_w": 303.21663425738,
+   "p_out_w": 250.05781517641032,
+   "power_relative_error": 0.00023126070564116752,
+   "p_loss_w": 53.158819080969714,
+   "p_loss_corr_w": 52.3649701788,
+   "stored_energy_rate_w": 0.7938489021697137,
+   "p_loss_tail_estimate_w": -0.01780995881774226,
+   "ltspice_meas_p_loss_w": 53.158819081000004,
+   "p_passive_resistive_w": 0.44510618702757804,
+   "p_device_w": 51.919863991772424,
+   "p_switch_sum_w": 51.84891538128619,
+   "closure_w": 0.07094861048623358,
+   "p_gate_total_w": 8.410224148655969,
+   "p_total_with_gate_w": 60.77519432745597,
+   "p_conduction_reff_w": 33.58571752892335,
+   "p_edge_excess_w": 18.231056024214702,
+   "rel_change": 0.00031175558524773915,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 219.1633657520579,
+   "channel_dead_time_rise_mean_ns": 2.658825688233564,
+   "channel_dead_time_fall_mean_ns": 1.0792794254569058,
+   "channel_dead_time_rise_min_max_ns": [
+    2.6162955902791687,
+    2.6734511036924316
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0725904555823558,
+    1.082259345198109
+   ],
+   "turn_off_delay_rise_ns": 3.55142144727344,
+   "turn_on_delay_rise_ns": 5.010247135506914,
+   "turn_off_delay_fall_ns": 4.0956282725107345,
+   "turn_on_delay_fall_ns": 5.124907697967531,
+   "vds_in_at_channel_on_rise_v": [
+    -0.3135824984552882,
+    -0.3153283492610197,
+    -0.315427666531316,
+    -0.3011210495976699
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.637678799965896,
+    -0.6350592878735031,
+    -0.6351689820855537,
+    -0.6288448924873233
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0967240040969441,
+    1.130371381707384,
+    1.10227522962785,
+    1.1814324860525667
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.97215260792365,
+    162.50306042611024,
+    162.5010689668408,
+    161.67923203113028
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.34465095918173,
+    -78.35814449979341,
+    -78.34592567217015,
+    -78.41906264783545
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.300_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.3,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.587252472040614,
+   "max_step_ps": 50.0,
+   "p_in_w": 301.9778318476962,
+   "p_out_w": 250.07511660576228,
+   "power_relative_error": 0.0003004664230490395,
+   "p_loss_w": 51.90271524193395,
+   "p_loss_corr_w": 52.23319433595512,
+   "stored_energy_rate_w": -0.33047909402117437,
+   "p_loss_tail_estimate_w": 0.10984235736051308,
+   "ltspice_meas_p_loss_w": 51.90271524199998,
+   "p_passive_resistive_w": 0.441771840617376,
+   "p_device_w": 51.79142249533774,
+   "p_switch_sum_w": 51.720419312759155,
+   "closure_w": 0.07100318257858618,
+   "p_gate_total_w": 8.40796162564786,
+   "p_total_with_gate_w": 60.641155961602976,
+   "p_conduction_reff_w": 33.95155083296736,
+   "p_edge_excess_w": 17.911487717891053,
+   "rel_change": 0.00017336100599053201,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 219.0079213415332,
+   "channel_dead_time_rise_mean_ns": 2.753240368243122,
+   "channel_dead_time_fall_mean_ns": 1.0825025332696334,
+   "channel_dead_time_rise_min_max_ns": [
+    2.7104998410965826,
+    2.7679630813263203
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0756004366584884,
+    1.0856454792713552
+   ],
+   "turn_off_delay_rise_ns": 3.5520813692158186,
+   "turn_on_delay_rise_ns": 5.005321737459055,
+   "turn_off_delay_fall_ns": 4.09218796842031,
+   "turn_on_delay_fall_ns": 5.124690501689834,
+   "vds_in_at_channel_on_rise_v": [
+    -0.30738741241221024,
+    -0.30893668348463427,
+    -0.3090927342856164,
+    -0.2945820741285856
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6373083020531471,
+    -0.6347454487445527,
+    -0.6347912960153291,
+    -0.628392607346812
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.1004618703964002,
+    1.1189967701000783,
+    1.0918560168915057,
+    1.1824561500344992
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.85834215672722,
+    162.39104126791204,
+    162.39447260586613,
+    161.54916798646155
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.49586068851298,
+    -78.51492723439344,
+    -78.49316320709369,
+    -78.61710214242824
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.400_f-0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.4,
+   "dead_time_fall_ns": -0.05,
+   "ton_cmd_ns": 17.48341343234984,
+   "max_step_ps": 50.0,
+   "p_in_w": 302.4823509454852,
+   "p_out_w": 249.92160895866428,
+   "power_relative_error": -0.00031356416534289444,
+   "p_loss_w": 52.56074198682096,
+   "p_loss_corr_w": 52.426086855539545,
+   "stored_energy_rate_w": 0.1346551312814137,
+   "p_loss_tail_estimate_w": -0.003229321744736753,
+   "ltspice_meas_p_loss_w": 52.56074198700002,
+   "p_passive_resistive_w": 0.4431041613352225,
+   "p_device_w": 51.982982694204324,
+   "p_switch_sum_w": 51.911951855217865,
+   "closure_w": 0.07103083898645934,
+   "p_gate_total_w": 8.405906095509412,
+   "p_total_with_gate_w": 60.83199295104896,
+   "p_conduction_reff_w": 34.300566831159045,
+   "p_edge_excess_w": 17.867067431803555,
+   "rel_change": 7.646960962392136e-05,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.88000532741393,
+   "channel_dead_time_rise_mean_ns": 2.8485957124268,
+   "channel_dead_time_fall_mean_ns": 0.9904528504150003,
+   "channel_dead_time_rise_min_max_ns": [
+    2.8060164461885915,
+    2.8633296699952986
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    0.9837973630227128,
+    0.993569209558003
+   ],
+   "turn_off_delay_rise_ns": 3.5516681817649767,
+   "turn_on_delay_rise_ns": 5.000263894191671,
+   "turn_off_delay_fall_ns": 4.08705665510708,
+   "turn_on_delay_fall_ns": 5.12750950552219,
+   "vds_in_at_channel_on_rise_v": [
+    -0.30017931608416215,
+    -0.3016185940090622,
+    -0.30177381832355926,
+    -0.286958116254252
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6376502054439646,
+    -0.6351523996417145,
+    -0.6352290629952666,
+    -0.6287369818678872
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    0.9906750161667067,
+    1.0436813245597587,
+    1.046305950496132,
+    1.1199648655154986
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.8851965199902,
+    162.42882309132517,
+    162.4276864760146,
+    161.5594161454787
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.41493926549683,
+    -78.4045644299612,
+    -78.38989573146165,
+    -78.54091328288644
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.400_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.4,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.534971479412178,
+   "max_step_ps": 50.0,
+   "p_in_w": 302.40574622658556,
+   "p_out_w": 249.8551122975399,
+   "power_relative_error": -0.0005795508098404012,
+   "p_loss_w": 52.55063392904563,
+   "p_loss_corr_w": 52.23231509546194,
+   "stored_energy_rate_w": 0.3183188335836862,
+   "p_loss_tail_estimate_w": -0.09648761878262482,
+   "ltspice_meas_p_loss_w": 52.55063392900002,
+   "p_passive_resistive_w": 0.442898833917048,
+   "p_device_w": 51.78941626154489,
+   "p_switch_sum_w": 51.7184373563444,
+   "closure_w": 0.07097890520049077,
+   "p_gate_total_w": 8.405324069624248,
+   "p_total_with_gate_w": 60.63763916508619,
+   "p_conduction_reff_w": 34.26529692035869,
+   "p_edge_excess_w": 17.720342872336573,
+   "rel_change": 0.00026399139374287163,
+   "periods_total": 128,
+   "chunks": 8,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 219.02720262783853,
+   "channel_dead_time_rise_mean_ns": 2.848657466619017,
+   "channel_dead_time_fall_mean_ns": 1.0862128874188846,
+   "channel_dead_time_rise_min_max_ns": [
+    2.8060630290226003,
+    2.8632462188206746
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.0790234770638947,
+    1.089395426541699
+   ],
+   "turn_off_delay_rise_ns": 3.55158728207763,
+   "turn_on_delay_rise_ns": 5.000244748696542,
+   "turn_off_delay_fall_ns": 4.088339153156939,
+   "turn_on_delay_fall_ns": 5.124552040575715,
+   "vds_in_at_channel_on_rise_v": [
+    -0.30005942630048654,
+    -0.30158392017504165,
+    -0.3017631608461506,
+    -0.28693804496402137
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6373213191517462,
+    -0.6347522918442757,
+    -0.6348296343599685,
+    -0.6282425749656597
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.0984096890269206,
+    1.119488387848176,
+    1.1139046468472071,
+    1.2175384182631452
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.93283465535038,
+    162.46789054397817,
+    162.46172372688883,
+    161.59023905309422
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.37462637230567,
+    -78.38483215644195,
+    -78.37216741356175,
+    -78.54332690365979
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.400_f0.150.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.4,
+   "dead_time_fall_ns": 0.15,
+   "ton_cmd_ns": 17.592245729212355,
+   "max_step_ps": 50.0,
+   "p_in_w": 301.7449619973291,
+   "p_out_w": 249.99746307799245,
+   "power_relative_error": -1.0147688030204272e-05,
+   "p_loss_w": 51.74749891933663,
+   "p_loss_corr_w": 52.309949972082954,
+   "stored_energy_rate_w": -0.5624510527463267,
+   "p_loss_tail_estimate_w": 0.1651727778008548,
+   "ltspice_meas_p_loss_w": 51.7474989195,
+   "p_passive_resistive_w": 0.44112199801424223,
+   "p_device_w": 51.868827974068715,
+   "p_switch_sum_w": 51.79783673441233,
+   "closure_w": 0.07099123965638654,
+   "p_gate_total_w": 8.40542795309071,
+   "p_total_with_gate_w": 60.71537792517366,
+   "p_conduction_reff_w": 34.26519064483618,
+   "p_edge_excess_w": 17.832852416669695,
+   "rel_change": 0.0005478362655466516,
+   "periods_total": 48,
+   "chunks": 3,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 219.10476991484887,
+   "channel_dead_time_rise_mean_ns": 2.8480435172973118,
+   "channel_dead_time_fall_mean_ns": 1.1819293266717796,
+   "channel_dead_time_rise_min_max_ns": [
+    2.8048655496243975,
+    2.86285167921373
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.1744036906322184,
+    1.1850016283919298
+   ],
+   "turn_off_delay_rise_ns": 3.5523315649507934,
+   "turn_on_delay_rise_ns": 5.0003750822479995,
+   "turn_off_delay_fall_ns": 4.089800228464527,
+   "turn_on_delay_fall_ns": 5.121729555136401,
+   "vds_in_at_channel_on_rise_v": [
+    -0.30047249872272697,
+    -0.30208868876950146,
+    -0.3021788077916696,
+    -0.28753470813583526
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6367693215425931,
+    -0.6341322452622845,
+    -0.6342240262393248,
+    -0.6276337392619002
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.1952962697515852,
+    1.2272501218254088,
+    1.1971831363097658,
+    1.2703488098552973
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.95166780683653,
+    162.47288445657585,
+    162.46645377171214,
+    161.5926557846913
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.51263306652943,
+    -78.55642932463418,
+    -78.53499778317256,
+    -78.71098414851653
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  },
+  {
+   "file": "zvs_LMG1210_DEV_T60_r1.500_f0.050.json",
+   "kind": "sweep",
+   "design": "zvs",
+   "case": "LMG1210_DEV_T60",
+   "status": "REGULATED_TO_250W",
+   "dead_time_rise_ns": 1.5,
+   "dead_time_fall_ns": 0.05,
+   "ton_cmd_ns": 17.488813765981618,
+   "max_step_ps": 50.0,
+   "p_in_w": 301.6654649638027,
+   "p_out_w": 250.04079258350004,
+   "power_relative_error": 0.00016317033400015113,
+   "p_loss_w": 51.62467238030271,
+   "p_loss_corr_w": 52.23387439843968,
+   "stored_energy_rate_w": -0.6092020181369673,
+   "p_loss_tail_estimate_w": 0.023006586083835778,
+   "ltspice_meas_p_loss_w": 51.62467238049997,
+   "p_passive_resistive_w": 0.44092318908198297,
+   "p_device_w": 51.792951209357696,
+   "p_switch_sum_w": 51.721870545990036,
+   "closure_w": 0.07108066336765972,
+   "p_gate_total_w": 8.402926978581206,
+   "p_total_with_gate_w": 60.63680137702089,
+   "p_conduction_reff_w": 34.560263552839956,
+   "p_edge_excess_w": 17.55749646843826,
+   "rel_change": 0.0005930292400933569,
+   "periods_total": 128,
+   "chunks": 8,
+   "final_chunk_plain_periods": 16,
+   "max_abs_phase_current_a": 218.97075208479444,
+   "channel_dead_time_rise_mean_ns": 2.9432261475232826,
+   "channel_dead_time_fall_mean_ns": 1.089635350304628,
+   "channel_dead_time_rise_min_max_ns": [
+    2.9004820577632606,
+    2.9580176841598154
+   ],
+   "channel_dead_time_fall_min_max_ns": [
+    1.082449687173316,
+    1.0928138913407694
+   ],
+   "turn_off_delay_rise_ns": 3.5521767575797107,
+   "turn_on_delay_rise_ns": 4.995402905103092,
+   "turn_off_delay_fall_ns": 4.084761957930928,
+   "turn_on_delay_fall_ns": 5.124397308235446,
+   "vds_in_at_channel_on_rise_v": [
+    -0.293313890655255,
+    -0.2947398574622455,
+    -0.29485012636593316,
+    -0.2798927712788707
+   ],
+   "vds_in_at_channel_on_fall_v": [
+    -0.6371520273422999,
+    -0.6345510559225256,
+    -0.6346762451027044,
+    -0.6280880011193537
+   ],
+   "zvs_count_rise": 4,
+   "zvs_count_fall": 4,
+   "reverse_before_on_fall_ns": [
+    1.090675415898291,
+    1.148447212273615,
+    1.1422491028295099,
+    1.2102922679217583
+   ],
+   "inductor_current_at_fall_cmd_a": [
+    161.93098403462693,
+    162.461532350427,
+    162.47147614368228,
+    161.58549699656598
+   ],
+   "inductor_current_at_rise_cmd_a": [
+    -77.52816154021498,
+    -78.55280815276538,
+    -78.52727443119869,
+    -78.71791636253418
+   ],
+   "symmetry": null,
+   "log_warnings": []
+  }
+ ]
+}
