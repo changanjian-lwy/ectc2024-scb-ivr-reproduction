@@ -1,0 +1,124 @@
+{
+ "experiment": "A66",
+ "classification": "SENSITIVITY_ONLY (P24_EXPLICIT inductor choice, EXTERNAL_DEVICE_DATA from ref. [10])",
+ "duty_phase": 0.08333333333333333,
+ "racx_5MHz_D1_12_mohm_per_nH": [
+  1.3901702065892418,
+  1.343614875830666,
+  1.4345871022952041
+ ],
+ "racx_5MHz_D0p19_mohm_per_nH": 1.0114336820974443,
+ "kappa_5MHz": [
+  5.069,
+  4.786,
+  5.372
+ ],
+ "designs": {
+  "zvs": {
+   "design": "zvs",
+   "L_phase_h": 6.274059728342265e-10,
+   "peak_a": 217.08498815871738,
+   "ripple_pp_a": 299.9359767075518,
+   "n_units_per_phase": 43.41699763174348,
+   "L_unit_h": 2.7240083636685322e-08,
+   "R_unit_ohm": 0.019358566873389643,
+   "R_phase_ohm": 0.00044587530067339366,
+   "unit_half_ripple_a": 3.454130790566913,
+   "P_dc_w": 6.965326692594924,
+   "sum_delta_i2_L_A2H": 5.63227135499393e-05
+  },
+  "baseline": {
+   "design": "baseline",
+   "L_phase_h": 1.4666667e-09,
+   "peak_a": 128.27874020298714,
+   "ripple_pp_a": 128.5232378381285,
+   "n_units_per_phase": 25.655748040597427,
+   "L_unit_h": 3.7628431314734493e-08,
+   "R_unit_ohm": 0.02340309832047885,
+   "R_phase_ohm": 0.0009121970750354266,
+   "unit_half_ripple_a": 2.504764967966525,
+   "P_dc_w": 14.252353519068762,
+   "sum_delta_i2_L_A2H": 2.4214327904122263e-05
+  }
+ },
+ "unit_count_ratio": 1.692291238713477,
+ "ac_loss_ratio_zvs_over_baseline": 2.326007716297213,
+ "cases": {
+  "HBS1 (P24's named material), 5 MHz, D = 1/12": {
+   "kappa_racx_mohm_per_nH": 7.046772777200867,
+   "P_ac_w": {
+    "zvs": 396.8933645817947,
+    "baseline": 170.63286669298407
+   },
+   "P_total_w": {
+    "zvs": 403.8586912743896,
+    "baseline": 184.88522021205284
+   },
+   "zvs_minus_baseline_w": 218.97347106233678,
+   "baseline_inductor_efficiency": 0.5748643282889642,
+   "zvs_inductor_efficiency": 0.3823456097413689
+  },
+  "HBS1, low end (kappa and racx minima)": {
+   "kappa_racx_mohm_per_nH": 6.430540795725567,
+   "P_ac_w": {
+    "zvs": 362.18550720884986,
+    "baseline": 155.71122342853417
+   },
+   "P_total_w": {
+    "zvs": 369.1508339014448,
+    "baseline": 169.96357694760292
+   },
+   "zvs_minus_baseline_w": 199.18725695384188,
+   "baseline_inductor_efficiency": 0.5952897196872657,
+   "zvs_inductor_efficiency": 0.40377883112048674
+  },
+  "HBS1, high end (kappa and racx maxima)": {
+   "kappa_racx_mohm_per_nH": 7.706601913529837,
+   "P_ac_w": {
+    "zvs": 434.0567320191551,
+    "baseline": 186.61018576074756
+   },
+   "P_total_w": {
+    "zvs": 441.02205871175005,
+    "baseline": 200.8625392798163
+   },
+   "zvs_minus_baseline_w": 240.15951943193375,
+   "baseline_inductor_efficiency": 0.5544927294233329,
+   "zvs_inductor_efficiency": 0.3617829515689656
+  },
+  "[10] Table VII target material, face value": {
+   "kappa_racx_mohm_per_nH": 1.028,
+   "P_ac_w": {
+    "zvs": 57.899749529337605,
+    "baseline": 24.892329085437687
+   },
+   "P_total_w": {
+    "zvs": 64.86507622193253,
+    "baseline": 39.14468260450645
+   },
+   "zvs_minus_baseline_w": 25.720393617426076,
+   "baseline_inductor_efficiency": 0.8646190472814306,
+   "zvs_inductor_efficiency": 0.7939908833324772
+  },
+  "[10] Table VII target material, scaled to D = 1/12": {
+   "kappa_racx_mohm_per_nH": 1.4129398671103952,
+   "P_ac_w": {
+    "zvs": 79.5806073985481,
+    "baseline": 34.21338925101805
+   },
+   "P_total_w": {
+    "zvs": 86.54593409114302,
+    "baseline": 48.46574277008681
+   },
+   "zvs_minus_baseline_w": 38.08019132105621,
+   "baseline_inductor_efficiency": 0.8376170668021328,
+   "zvs_inductor_efficiency": 0.7428406487070952
+  }
+ },
+ "break_even_kappa_racx_mohm_per_nH": 0.3697303490665951,
+ "measured_kappa_ripple_range_a": [
+  0.07724,
+  0.5844
+ ],
+ "a59_ideal_advantage_w": 4.584417806318946
+}
