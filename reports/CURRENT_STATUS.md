@@ -14,6 +14,13 @@ session's work was committed unchanged as the baseline (`0f50511`).
 
 **Latest (2026-09-29, D39–D42, cross-checked by A69):**
 
+**Acceptance clarification ([fresh audit](AUDIT_D41_D42_RETURN_ACCEPTANCE_2026-09-29.md)):**
+D42's saved 4 mΩ point passes the original full return criterion on replay;
+the 4.9 mΩ point completes all 15 modes but remains above the current-return
+tolerance. D41's saved lossless point also remains formally unreturned.
+Read "closed orbit" claims below as near-closure unless the formal status
+passes; linearized stability estimates do not replace that return check.
+
 - **Why D23–D38 kept failing.** The synthetic F/H/s fixture's switch-node
   flip time `sqrt(L*C)` is 122–150× its on-time. P25's built point has
   ~1.5%. In the fixture, ZVS commutation runs on the same time scale as the
@@ -102,6 +109,12 @@ derives one new initial a2 from a pre-SH2 affine offset, then reruns from M1.
 M1–M5 reach SH2 ZVS, but M6 starts with negative inductor voltage/current
 slope and its scheduled turn-off is rejected. ZVS admission does not establish
 the paper's intended rising-current mode or a complete periodic solution.
+
+[D39](../symbolic_derivations/02_P25_native/D39_ZVS_RISE_WINDOW_ENVELOPE.md)
+evaluates an analytical whole-window comparison envelope. With the other
+D38 seed coordinates frozen, X2 remains below Vo throughout that window;
+further a2-only tuning there cannot deliver positive M6 entry slope.
+Floating-point evaluation is not certified interval arithmetic or global infeasibility.
 
 | Stage | Completed work | Evidence |
 |---|---|---|
@@ -252,8 +265,8 @@ be reported as self-established startup balance.
 
 ## Verification and next step
 
-On 2026-09-29 (after D41), **520 portable checks** passed. The full local
-suite was last run by the previous session (524 checks, before D40/D41).
+On 2026-09-29, the current shared workspace passed **520 portable checks**
+and **539 full local checks** on a fresh rerun. Counts include both sessions' work.
 The extra local checks use generated LTspice logs; all are software/model
 regressions, not independent physical experiments.
 

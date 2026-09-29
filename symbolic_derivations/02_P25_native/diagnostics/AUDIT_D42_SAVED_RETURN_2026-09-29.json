@@ -1,0 +1,291 @@
+{
+  "scope": "SAVED_SEED_REPLAY_ORIGINAL_CONTRACT_NOT_NEWTON_OR_STABILITY_RECOMPUTATION",
+  "rows": [
+    {
+      "R_ohm": 0.004,
+      "archived_status": "CONDITIONAL_STATE_RETURN",
+      "replayed_status": "CONDITIONAL_STATE_RETURN",
+      "failed_mode": null,
+      "accepted_modes": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10",
+        "M11",
+        "M12",
+        "M13",
+        "M14",
+        "M15"
+      ],
+      "return_check": {
+        "period_s": 0.0000021207726109703385,
+        "residuals": [
+          {
+            "name": "V_SH1",
+            "unit": "V",
+            "delta": -4.6679122789328176e-9,
+            "allowance": 1e-8,
+            "scaled": 0.46679122789328176
+          },
+          {
+            "name": "V_SH2",
+            "unit": "V",
+            "delta": 5.496263000281942e-9,
+            "allowance": 1e-8,
+            "scaled": 0.5496263000281942
+          },
+          {
+            "name": "V_SH3",
+            "unit": "V",
+            "delta": 1.0044551856935868e-9,
+            "allowance": 1e-8,
+            "scaled": 0.10044551856935868
+          },
+          {
+            "name": "V_SL1",
+            "unit": "V",
+            "delta": -4.784759255471727e-10,
+            "allowance": 1e-8,
+            "scaled": 0.047847592554717266
+          },
+          {
+            "name": "V_SL2",
+            "unit": "V",
+            "delta": -4.581866535049932e-9,
+            "allowance": 1e-8,
+            "scaled": 0.45818665350499316
+          },
+          {
+            "name": "V_SL3",
+            "unit": "V",
+            "delta": -1.832805550936508e-9,
+            "allowance": 1e-8,
+            "scaled": 0.1832805550936508
+          },
+          {
+            "name": "V_Cs1",
+            "unit": "V",
+            "delta": 5.14638820447999e-9,
+            "allowance": 1e-8,
+            "scaled": 0.514638820447999
+          },
+          {
+            "name": "V_Cs2",
+            "unit": "V",
+            "delta": 3.753516164550774e-9,
+            "allowance": 1e-8,
+            "scaled": 0.3753516164550774
+          },
+          {
+            "name": "V_Co",
+            "unit": "V",
+            "delta": 4.5123893510634616e-10,
+            "allowance": 1e-8,
+            "scaled": 0.045123893510634616
+          },
+          {
+            "name": "iL1",
+            "unit": "A",
+            "delta": 9.95587168262091e-10,
+            "allowance": 1e-8,
+            "scaled": 0.09955871682620909
+          },
+          {
+            "name": "iL2",
+            "unit": "A",
+            "delta": -7.64688579124595e-9,
+            "allowance": 1e-8,
+            "scaled": 0.764688579124595
+          },
+          {
+            "name": "iL3",
+            "unit": "A",
+            "delta": -5.510528922059166e-9,
+            "allowance": 1e-8,
+            "scaled": 0.5510528922059166
+          },
+          {
+            "name": "Vin",
+            "unit": "V",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_1",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_2",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_3",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          }
+        ],
+        "max_scaled": 0.764688579124595,
+        "state_returns": true,
+        "scope": "STATE_RETURN_ONLY; trajectory, external forcing, feasibility and stability unverified"
+      }
+    },
+    {
+      "R_ohm": 0.0049,
+      "archived_status": "SECTION_REACHED_STATE_NOT_RETURNED",
+      "replayed_status": "SECTION_REACHED_STATE_NOT_RETURNED",
+      "failed_mode": null,
+      "accepted_modes": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10",
+        "M11",
+        "M12",
+        "M13",
+        "M14",
+        "M15"
+      ],
+      "return_check": {
+        "period_s": 0.000002172346394394835,
+        "residuals": [
+          {
+            "name": "V_SH1",
+            "unit": "V",
+            "delta": -6.666059704230065e-9,
+            "allowance": 1e-8,
+            "scaled": 0.6666059704230065
+          },
+          {
+            "name": "V_SH2",
+            "unit": "V",
+            "delta": 3.972449036382386e-9,
+            "allowance": 1e-8,
+            "scaled": 0.3972449036382386
+          },
+          {
+            "name": "V_SH3",
+            "unit": "V",
+            "delta": 7.00239066731001e-9,
+            "allowance": 1e-8,
+            "scaled": 0.700239066731001
+          },
+          {
+            "name": "V_SL1",
+            "unit": "V",
+            "delta": 5.788280077467789e-9,
+            "allowance": 1e-8,
+            "scaled": 0.5788280077467789
+          },
+          {
+            "name": "V_SL2",
+            "unit": "V",
+            "delta": -3.0289488029536523e-9,
+            "allowance": 1e-8,
+            "scaled": 0.3028948802953652
+          },
+          {
+            "name": "V_SL3",
+            "unit": "V",
+            "delta": -4.30878186811188e-9,
+            "allowance": 1e-8,
+            "scaled": 0.430878186811188
+          },
+          {
+            "name": "V_Cs1",
+            "unit": "V",
+            "delta": 8.777796267622762e-10,
+            "allowance": 1e-8,
+            "scaled": 0.08777796267622762
+          },
+          {
+            "name": "V_Cs2",
+            "unit": "V",
+            "delta": 5.722557538945239e-9,
+            "allowance": 1e-8,
+            "scaled": 0.5722557538945239
+          },
+          {
+            "name": "V_Co",
+            "unit": "V",
+            "delta": 4.834684874666095e-10,
+            "allowance": 1e-8,
+            "scaled": 0.04834684874666095
+          },
+          {
+            "name": "iL1",
+            "unit": "A",
+            "delta": -4.3965759921604786e-9,
+            "allowance": 1e-8,
+            "scaled": 0.43965759921604786
+          },
+          {
+            "name": "iL2",
+            "unit": "A",
+            "delta": 2.8180231481655937e-8,
+            "allowance": 1e-8,
+            "scaled": 2.8180231481655937
+          },
+          {
+            "name": "iL3",
+            "unit": "A",
+            "delta": -1.674891336733708e-8,
+            "allowance": 1e-8,
+            "scaled": 1.6748913367337082
+          },
+          {
+            "name": "Vin",
+            "unit": "V",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_1",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_2",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          },
+          {
+            "name": "peak_ref_3",
+            "unit": "A",
+            "delta": 0,
+            "allowance": 1e-8,
+            "scaled": 0
+          }
+        ],
+        "max_scaled": 2.8180231481655937,
+        "state_returns": false,
+        "scope": "STATE_RETURN_ONLY; trajectory, external forcing, feasibility and stability unverified"
+      }
+    }
+  ]
+}

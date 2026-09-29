@@ -97,6 +97,8 @@ Definition audit additions (not yet wired into legacy solvers):
   from the negative-current section required by M15→M1 periodic return.
 - `p25_down_commutation_charge`: D35 separates low-side node-normalized Cx
   from high-side Cn, checking three-phase charge accounting on the same flow.
+- `p25_affine_envelope`: D39 whole-window per-coordinate comparison envelope;
+  analytical theorem evaluated in floating point, not certified interval arithmetic.
 - `p25_periodic_section`: SH1-on full capacitor/current/control-memory return,
   explicit model identity and dimensionally scaled residuals. Does not establish
   an intervening trajectory, external forcing periodicity, or stability.

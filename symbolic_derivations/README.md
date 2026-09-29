@@ -179,6 +179,10 @@ reports, model source and acceptance tests are tracked and are sufficient to
 audit or regenerate the reported calculations.
 # Latest mathematical necessity check
 
+[D39: whole-window ZVS/rise comparison](02_P25_native/D39_ZVS_RISE_WINDOW_ENVELOPE.md)
+rules out positive next-phase entry slope within the stated a2-only window,
+using an analytical comparison bound evaluated in floating point.
+
 [D38: ZVS admission versus next-phase rise](02_P25_native/D38_A2_OFFSET_ZVS_VS_RISE.md)
 derives a new a2 seed without changing devices/control; a continuous first
 high-side handoff passes but the next rising-current mode does not.

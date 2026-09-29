@@ -342,8 +342,10 @@ model in `symbolic_derivations/02_P25_native`; older files call it the
 - `A68_mainline_machinery_at_p25_scale`: run read-only, the mathematical
   model's repeated failures (D23-D38) came from its synthetic fixture's
   scale. At P25-scale values it passes the SH2 ZVS step on the first try.
-  This led to D40-D42, in which the model closes a periodic orbit under
-  P25's single-sensor control.
+  This led to D40-D42. There the model reaches a near-closed periodic
+  section under P25's single-sensor control. The formal return check passes
+  at 4 mOhm; the other points are near-closures (see
+  `reports/AUDIT_D41_D42_RETURN_ACCEPTANCE_2026-09-29.md`).
 - `A69_three_phase_p25_transient_crosscheck`: an independent time-domain
   simulation of the same three-phase circuit and control, sharing only the
   start state.
