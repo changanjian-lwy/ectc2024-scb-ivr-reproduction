@@ -32,17 +32,33 @@ Two further findings, both for the main line to decide on:
    (the SL2 target is reached in 0.12 ns), so nothing physical reverses.
    M2 never meets this: SH1's gap is exactly 0.0, since SH1 sits on the
    fixed input.
-2. **No isolated period-1 orbit in the ideal open-loop model.** A
-   diagnostic override releases only reverse gaps with
-   -tol <= value < 0 and an outward rate. With it, the full M1-M15 cycle
-   closes onto the next SH1 section, with ZVS on all three high sides, at
-   an emergent **1.943 us (0.515 MHz)**; P25's hardware runs at 0.5 MHz.
+2. **Under per-phase current control, periodic closure is not reached
+   (ill-conditioned).** A diagnostic override releases only reverse gaps
+   with -tol <= value < 0 and an outward rate. With it, the full M1-M15
+   cycle closes onto the next SH1 section, with ZVS on all three high
+   sides, at an emergent **1.943 us (0.515 MHz)**; P25's hardware runs at
+   0.5 MHz.
    - Truncated-SVD Newton brings the current residual after one cycle to
      2.6e-5 A (from 2 A). The voltage residual stalls at 0.9 mV.
    - `J - I` has two near-null directions, both in the (iL2, iL3) plane:
-     the phase spacing is neutral.
+     the phase spacing is nearly neutral.
    - The largest section-map eigenvalue is ~1.14. A plain iteration leaves
      the 15-mode order after 14 cycles.
+
+   *Correction (2026-09-29, after D41):*
+   - The first version said "no isolated period-1 orbit". That is too
+     strong.
+   - The Jacobians above used a 2e-6 finite-difference step. The section
+     map carries ~1e-8 event-location noise, so that step gives ~5e-3
+     derivative error.
+   - Recomputed with a 1e-3 step, the two small singular values are
+     3.0e-4 and 2.5e-4. Both still lie in (iL2, iL3), so the phase spacing
+     is still nearly neutral.
+   - That makes any orbit very ill-conditioned, and Newton did not
+     converge. It does not prove that none exists.
+   - With the mathematical model's D41 single-sensor (phase-shift) control,
+     P25 Sec. III, Newton converges to a returned section (residual
+     ~1e-8). See `symbolic_derivations/02_P25_native/D41_*`.
 
 ## 1. Runs
 

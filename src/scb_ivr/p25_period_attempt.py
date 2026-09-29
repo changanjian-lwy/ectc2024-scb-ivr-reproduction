@@ -1,15 +1,21 @@
-"""D19: compose one conditional P25 cycle attempt without state replacement.
+"""D19/D41: compose one conditional P25 cycle attempt without state replacement.
+
+D41: with Policy.phase_shift_s set, phases 2 and 3 end their NEGATIVE stage at
+the declared phase-shift time (reach_phase_shift_due), and their ALL_LOW
+search is bounded by that time: a timer due before the phase's own current
+zero is reported (PHASE_SHIFT_DUE_BEFORE_NEXT_CURRENT_ZERO), never forced.
 
 Finite-scan event detection remains conditional. Reaching the next section is
 NOT a periodic orbit: full state/controller return is a separate D08 check.
 """
 from dataclasses import dataclass
 from math import isfinite
-from .p25_control_memory import Memory, Stage, start_at_high_on
+from .p25_control_memory import Memory, Stage, start_at_high_on, phase_shift_due
 from .p25_cycle_modes import cycle_mode
 from .p25_handoff import LowHandoff, enter_all_low, reach_next_current_zero
 from .p25_high_on import advance_high_on
-from .p25_negative_handoff import reach_negative_target, enter_next_high
+from .p25_local_flow import ScanReport
+from .p25_negative_handoff import reach_negative_target, reach_phase_shift_due, enter_next_high
 from .p25_local_flow import LocalFlow
 
 
@@ -75,9 +81,27 @@ def attempt_period(start, parts, ports, policy, reverse, *, stage_horizons_s,
             if slot==1:
                 outcome=enter_all_low(current,parts,ports,policy,reverse,direction=direction,**kwargs)
             elif slot==2:
-                outcome=reach_next_current_zero(current,parts,ports,policy,reverse,**kwargs)
+                q=current.phase%3+1
+                if policy.timed(q):
+                    due=phase_shift_due(current,policy,q)
+                    if due<=current.last_event.time_s:
+                        outcome=LowHandoff("PHASE_SHIFT_DUE_BEFORE_NEXT_CURRENT_ZERO",
+                            ScanReport("TIMER_BEFORE_STAGE_ENTRY",("control.phase_shift",),(),current.last_event.time_s),
+                            None,None,None,f"SL{q} timer already due while iL{q} is still positive")
+                    else:
+                        kwargs["end_s"]=min(kwargs["end_s"],due)
+                        outcome=reach_next_current_zero(current,parts,ports,policy,reverse,**kwargs)
+                        if outcome.memory is None and outcome.status.endswith("_NO_EVENT_OBSERVED") and kwargs["end_s"]==due:
+                            outcome=LowHandoff("PHASE_SHIFT_DUE_BEFORE_NEXT_CURRENT_ZERO",outcome.scan,None,None,None,
+                                f"iL{q} did not reach zero before its declared phase-shift time")
+                else:
+                    outcome=reach_next_current_zero(current,parts,ports,policy,reverse,**kwargs)
             elif slot==3:
-                outcome=reach_negative_target(current,parts,ports,policy,reverse,
+                q=current.phase%3+1
+                stage_fn=reach_phase_shift_due if policy.timed(q) else reach_negative_target
+                if policy.timed(q):
+                    kwargs["end_s"]=max(kwargs["end_s"],phase_shift_due(current,policy,q))
+                outcome=stage_fn(current,parts,ports,policy,reverse,
                     current_rate_tolerance_a_s=direction.current_rate_a_s,**kwargs)
             else:
                 outcome=enter_next_high(current,parts,ports,policy,reverse,direction=direction,**kwargs)

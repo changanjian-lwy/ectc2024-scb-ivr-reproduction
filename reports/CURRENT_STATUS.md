@@ -4,7 +4,45 @@ Updated: **2026-09-29**. This is the current navigation summary; dated reports
 remain historical snapshots. No experiment parameters were changed for this
 repository presentation update.
 
-## 1. Mathematical core — native P25, three phases / one module
+The project runs two models in parallel on purpose, each checking the other:
+the **mathematical model** (native P25 event model, Section 1) and the
+**physical model** (Track A circuit simulations, Section 2). Since
+2026-09-29 both are maintained by one session. The mathematical-model
+session's work was committed unchanged as the baseline (`0f50511`).
+
+## 1. Mathematical model — native P25, three phases / one module
+
+**Latest (2026-09-29, D39–D41):**
+
+- **Why D23–D38 kept failing.** The synthetic F/H/s fixture's switch-node
+  flip time `sqrt(L*C)` is 122–150× its on-time. P25's built point has
+  ~1.5%. In the fixture, ZVS commutation runs on the same time scale as the
+  other phases' currents, so "phase 3 reaches zero before SH2 ZVS" is a
+  scale effect.
+  - Physical-model A67 derives the criterion.
+  - A68 runs this machinery read-only at P25 scale. There, M5 SH2 ZVS
+    passes on the first try.
+- **[D39](../symbolic_derivations/02_P25_native/D39_ZVS_RISE_WINDOW_ENVELOPE.md):**
+  write-up of the affine-envelope bound on the D38 window.
+- **[D40](../symbolic_derivations/02_P25_native/D40_TOLERANCE_CONSISTENT_ENTRY.md):**
+  a reverse gap within the voltage tolerance that moves strictly outward is
+  released under its own status, with the value kept. This resolves the
+  conflict between tolerance-accepted roots (a −6 nV SH2 ZVS residual kept
+  by the ON switch) and D11's exact-zero entry. At P25 scale, M1–M15 now
+  completes without any override.
+- **[D41](../symbolic_derivations/02_P25_native/D41_SINGLE_SENSOR_PHASE_SHIFT_CONTROL.md):**
+  P25 Sec. III single-sensor control is an optional policy.
+  - Phase 1 is current-sensed. Phases 2 and 3 turn their low sides off at
+    fixed phase shifts after phase 1's high-on.
+  - At P25 scale, Newton converges to a returned section: ZVS on all three
+    high sides, period ~1.946 µs.
+  - The per-phase control of D06 leaves the phase spacing nearly neutral
+    (`J−I` singular values ~3e-4) and does not converge.
+  - The returned orbit is weakly unstable in the lossless open-loop model.
+    Damping (Ron, DCR, feedback) is the next step.
+
+The historical record follows.
+
 
 **Purpose:** define a coupled switching model before claiming a periodic
 solution. No P24 fourth phase or module coupling is implicit.
@@ -164,7 +202,7 @@ checks accepted M1–M4 energy accounting. Retaining 1.72e-7 J of ON-node
 residual work closes the synthetic ledger to approximately 2.1e-14 J.
 Residual work is not MOS loss, and energy balance is not periodicity.
 
-## 2. Engineering experiments — separate four-phase track
+## 2. Physical model — Track A four-phase circuit simulations
 
 These cases investigate periodic states and device/timing trade-offs. Their
 boundaries differ from the strict native P25 core and from one another.
@@ -175,6 +213,8 @@ boundaries differ from the strict native P25 core and from one another.
 | A53–A56 | How do inductance, actual switch currents and equal delivered power change the comparison? | [A56](../experiments/track_A_periodic_steady_state/A56_equal_power_regulated_loss_comparison/RESULTS.md) |
 | A57–A59 | What changes with reverse conduction, separate dead times and nonlinear capacitance? | [A59](../experiments/track_A_periodic_steady_state/A59_nonlinear_coss_epc2067/RESULTS.md) |
 | A60–A63 | How conditional is the result on temperature, winding loss, load and flying capacitance? | [A60](../experiments/track_A_periodic_steady_state/A60_temperature_ron_sensitivity/RESULTS.md), [A61](../experiments/track_A_periodic_steady_state/A61_inductor_loss_break_even/RESULTS.md), [A62](../experiments/track_A_periodic_steady_state/A62_load_sweep_fixed_deadtime/RESULTS.md), [A63](../experiments/track_A_periodic_steady_state/A63_flying_capacitor_sensitivity/RESULTS.md) |
+| A64–A66 | Does the conclusion survive EPC's vendor model, a real gate driver and P24's own inductor? | [consolidated](../experiments/track_A_periodic_steady_state/CONSOLIDATED_FINDINGS_A53_A64_2026-09-28.md), [A64](../experiments/track_A_periodic_steady_state/A64_vendor_model_spice_crosscheck/RESULTS.md), [A66](../experiments/track_A_periodic_steady_state/A66_p24_embedded_inductor_sizing/RESULTS.md) |
+| A67–A68 | How much negative current does SCB ZVS need, and does that explain the mathematical model's failures? | [A67](../experiments/track_A_periodic_steady_state/A67_zvs_negative_current_scaling/RESULTS.md), [A68](../experiments/track_A_periodic_steady_state/A68_mainline_machinery_at_p25_scale/RESULTS.md) |
 
 These are **conditional engineering studies**, not proof that the paper's
 small negative-current rule, rated power and timing hold simultaneously.
@@ -192,17 +232,26 @@ be reported as self-established startup balance.
 
 ## Verification and next step
 
-On 2026-09-29, **505 portable checks** and **524 full local checks** passed.
+On 2026-09-29 (after D41), **520 portable checks** passed. The full local
+suite was last run by the previous session (524 checks, before D40/D41).
 The extra local checks use generated LTspice logs; all are software/model
 regressions, not independent physical experiments.
 
-Three-phase event orchestration and a conditional return-check interface are
-implemented. The next mathematical question is admissible full-cycle
-reachability under a frozen parameter/control contract, before solving
-periodic closure. Candidates must first satisfy D33's negative-current return
-direction, as well as the existing voltage/current entry constraints.
-D29 does not justify endlessly tuning a synthetic fixture
-or treating it as paper hardware. Fixed design-peak references are an explicit
+Full-cycle reachability is established at P25 scale (D40). A returned
+periodic section exists under D41 single-sensor control. The next
+mathematical questions:
+
+1. **Damping.** Add P25's switch Ron and inductor DCR (declared, P25-scale).
+   The question is whether the weakly unstable pair becomes stable, i.e.
+   whether the orbit is one the hardware could sit on.
+2. **Adaptive phase shift.** P25's circuit is unpublished. A phase shift
+   that follows the measured period is the other plausible reading, and it
+   should be compared with D41's fixed shift.
+3. **Cross-check against the physical model.** Compare the D41 orbit with a
+   three-phase circuit simulation of the same values.
+
+The synthetic F/H/s fixture stays a regression fixture only. Its failures
+are scale effects (A67/A68), so it is not a candidate operating point. Fixed design-peak references are an explicit
 project policy; measured-peak feedback still needs its own observer contract.
 Finite-grid event scans are not certified interval root coverage.
 P24 transfer remains a separately declared topology/sequence branch.

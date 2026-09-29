@@ -1,4 +1,10 @@
-"""D06: ideal zero-delay P25 three-phase event controller, not a plant solver.
+"""D06/D41: ideal zero-delay P25 three-phase event controller, not a plant solver.
+
+D41 (optional, Policy.phase_shift_s): P25 Sec. III single-sensor control. Only
+phase 1's current is sensed (zero crossing -> latched negative target -> SL1
+off). Phases 2 and 3 turn their low sides off at fixed delays after the
+latest phase-1 high-on entry (Memory.reference_s): the interleaving phase
+shift. Default None keeps the D06 per-phase current-target control.
 
 Physical topology/Coss remain in D03/D05. Only gates, clocks and memory may
 change at an event. Caller must locate roots and certify electrical feasibility.
@@ -26,6 +32,7 @@ class Trigger(str, Enum):
     NEXT_CURRENT_ZERO = "next_inductor_downward_zero"
     NEGATIVE_TARGET = "next_inductor_negative_target"
     NEXT_HIGH_ZERO = "next_high_vds_zero"
+    PHASE_SHIFT_DUE = "timed_low_off_after_sensed_phase"  # D41
 
 
 @dataclass(frozen=True)
@@ -36,6 +43,7 @@ class Policy:
     time_tolerance_s: float
     ideal_zero_delay: bool
     declaration: str
+    phase_shift_s: tuple[float, float] | None = None  # D41: SL2/SL3 off after phase-1 high-on
 
     def __post_init__(self):
         if not isinstance(self.on_time_s, tuple) or len(self.on_time_s) != 3 or not all(isfinite(t) and t > 0 for t in self.on_time_s):
@@ -46,6 +54,14 @@ class Policy:
             raise ValueError("separate finite nonnegative V/A/s tolerances required")
         if self.ideal_zero_delay is not True or not self.declaration.strip():
             raise ValueError("explicit ideal zero-delay assumption required; real driver not implemented")
+        if self.phase_shift_s is not None:
+            d = self.phase_shift_s
+            if not isinstance(d, tuple) or len(d) != 2 or not all(isfinite(x) for x in d) or not 0 < d[0] < d[1]:
+                raise ValueError("D41 phase shifts: explicit tuple (phase-2, phase-3) with 0 < d2 < d3")
+
+    def timed(self, phase: int) -> bool:
+        """D41: is this phase's low-side turn-off timed rather than current-sensed?"""
+        return self.phase_shift_s is not None and phase in (2, 3)
 
 
 @dataclass(frozen=True)
@@ -66,6 +82,7 @@ class Memory:
     last_event: Snapshot
     peaks: tuple[KnownPeak | None, ...]
     latched_target_a: float | None
+    reference_s: float | None = None  # D41: latest phase-1 high-on entry time (timer origin)
 
 
 def gate_pattern(phase: int, stage: Stage) -> GateState:
@@ -110,7 +127,7 @@ def start_at_high_on(s: Snapshot, *, phase: int, peaks: tuple[KnownPeak | None, 
     for k, peak in enumerate(peaks, 1):
         if peak is not None and (peak.reference.phase != k or peak.available_at_s > s.time_s):
             raise ValueError("wrong-phase or future peak in initial memory")
-    memory = Memory(phase, Stage.RISE, s.time_s, s, tuple(peaks), None)
+    memory = Memory(phase, Stage.RISE, s.time_s, s, tuple(peaks), None, s.time_s if phase == 1 else None)
     _admit_snapshot(memory, s, policy)
     return memory
 
@@ -141,19 +158,25 @@ def transition(memory: Memory, trigger: Trigger, at: Snapshot, *, policy: Policy
     It is only a witness: trajectory continuity, first-root location and D05
     admissibility must be certified by the caller, not by this controller.
     """
+    q = memory.phase % 3 + 1
     expected = {Stage.RISE: Trigger.HIGH_OFF_DUE, Stage.DOWN_COMM: Trigger.LOW_ZERO,
-                Stage.ALL_LOW: Trigger.NEXT_CURRENT_ZERO, Stage.NEGATIVE: Trigger.NEGATIVE_TARGET,
+                Stage.ALL_LOW: Trigger.NEXT_CURRENT_ZERO,
+                Stage.NEGATIVE: Trigger.PHASE_SHIFT_DUE if policy.timed(q) else Trigger.NEGATIVE_TARGET,
                 Stage.UP_COMM: Trigger.NEXT_HIGH_ZERO}
     if trigger != expected[memory.stage]:
         raise ValueError("event out of order or duplicate event")
     _admit_snapshot(memory, at, policy)
     phase, stage, target = memory.phase, memory.stage, memory.latched_target_a
-    q = phase % 3 + 1
     if trigger == Trigger.HIGH_OFF_DUE:
         due = memory.entered_at_s+policy.on_time_s[phase-1]
         if abs(at.time_s-due) > policy.time_tolerance_s:
             raise ValueError("locate actual high-on duration endpoint; no early/late time substitution")
         next_stage = Stage.DOWN_COMM
+    elif trigger == Trigger.PHASE_SHIFT_DUE:
+        due = phase_shift_due(memory, policy, q)
+        if abs(at.time_s-due) > policy.time_tolerance_s:
+            raise ValueError("locate actual phase-shift endpoint; no early/late time substitution")
+        next_stage = Stage.UP_COMM
     else:
         if left is None:
             raise ValueError("physical event needs a left-state witness, not a timer")
@@ -186,6 +209,16 @@ def transition(memory: Memory, trigger: Trigger, at: Snapshot, *, policy: Policy
     # Identity reset for ALL electrical coordinates. Only gate/memory metadata change.
     cycle = at.cycle + (1 if trigger == Trigger.NEXT_HIGH_ZERO and phase == 1 else 0)
     after = replace(at, gates=gate_pattern(phase, next_stage), cycle=cycle)
-    result = Memory(phase, next_stage, at.time_s, after, memory.peaks, target)
+    reference = at.time_s if (trigger == Trigger.NEXT_HIGH_ZERO and phase == 1) else memory.reference_s
+    result = Memory(phase, next_stage, at.time_s, after, memory.peaks, target, reference)
     _admit_snapshot(result, after, policy)
     return result
+
+
+def phase_shift_due(memory: Memory, policy: Policy, phase: int) -> float:
+    """D41 absolute low-off time of a timed phase: phase-1 high-on entry + declared shift."""
+    if not policy.timed(phase):
+        raise ValueError("phase is current-sensed, not timed")
+    if memory.reference_s is None or not isfinite(memory.reference_s):
+        raise ValueError("D41 timer origin (phase-1 high-on entry) unknown; no substitute origin")
+    return memory.reference_s + policy.phase_shift_s[phase-2]
