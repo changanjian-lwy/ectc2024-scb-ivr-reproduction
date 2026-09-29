@@ -6,8 +6,8 @@ cross-checks; there is no new solve. Records: `results.json`
 
 ## 0. Verdict
 
-**ZVS at the CCM/DCM boundary with 1-2% negative current is real, but only
-where the switch node's flip time is short compared with the on-time.**
+**ZVS at the CCM/DCM boundary with a small negative current is real, but
+only where the switch node's flip time is short compared with the on-time.**
 The negative current needed, as a fraction of the ripple, is about
 `sqrt(L*C_node) / Ton`:
 
@@ -16,13 +16,14 @@ The negative current needed, as a fraction of the ripple, is about
 | flip time `sqrt(L*C_node)` | 6.7-9.0 ns | 3.7-4.4 ns |
 | on-time | 500 ns | 16.7 ns |
 | **negative current needed, % of peak** | **1.5-2.0%** | **22-26%** |
-| papers' rule | 1-2% (matches) | 1-2% (an order of magnitude short) |
+| what the paper specifies | P25: 5-10% ("up to 5%" in its design section): ample margin | P24: 1-2%, an order of magnitude short |
 
 This reconciles the papers with Track A:
 
-- P25's measured ZVS is physically consistent. Its point sits where the
-  rule holds.
-- P24 states the same rule for a 48 V, 5 MHz point that was never built or
+- P25's measured ZVS is physically consistent. It needs 1.5-2.0% and
+  specifies 5-10% (P25 Sec. II, Mode 4). P24's 1-2% would itself be only
+  marginal at P25's point.
+- P24 states 1-2% for a 48 V, 5 MHz point that was never built or
   simulated. P24's waveforms are conceptual (Fig. 4 is titled "Theoretical
   key waveforms"); the text never mentions simulation. There, 1-2% lifts the
   node only to ~2.1-2.3 V of 12 V, so the high side hard-switches at
@@ -30,7 +31,8 @@ This reconciles the papers with Track A:
 
 Note: the earlier Track A shorthand, "ZVS cannot be reached with a small
 negative current", was too broad. The correct statement is point-specific,
-as above.
+as above. Correction (2026-09-29): the first version of this file called 1-2%
+"the papers' rule" at both points. 1-2% is P24's; P25 specifies 5-10%.
 
 ## 1. The criterion
 
@@ -134,7 +136,7 @@ own orders of magnitude:
 - ~0.7 nF per GS61008T;
 - 12 V and a 500 ns on-time;
 - a 50 A peak;
-- alpha = 1-2%.
+- alpha = 5% (the main line enforces P25's published 5-10% range).
 
 This belongs to the main-line session and is not done here.
 
