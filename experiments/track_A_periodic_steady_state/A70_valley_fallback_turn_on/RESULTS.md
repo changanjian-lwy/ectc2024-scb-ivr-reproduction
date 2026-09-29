@@ -113,3 +113,14 @@ python3 a70_transient.py zero_currents_4p9 --cycles 250 --zero-currents --ref re
 ```
 
 Wall time is ~2 s per cycle.
+
+## Re-verification (2026-09-30, A73)
+
+A73 found that the inherited diode branch could conduct in the forbidden
+direction within a step. Run 2 (the deadlock start) was re-run with the
+fixed, unidirectional diode (A73 run 10). It needed **zero** diode
+corrections and gave the identical outcome:
+- one valley firing, phase 2, at 54 mV, t = 2.54 us;
+- convergence to D42's 4.9 mOhm section.
+
+A70's conclusions stand.

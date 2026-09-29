@@ -76,3 +76,15 @@ python3 a69_transient.py damped 150 10e-12 ref_D42_R0p5mohm.json 1e7
 python3 a69_transient.py damped4p9_perturbed 80 10e-12 ref_D42_R4p9mohm.json 1e7 start_D42_R4p9mohm_perturbed.json
 python3 a69_transient.py lossless 5 10e-12 ref_D41_lossless.json 1e5   # BOUNDARY 5a smoke (10 uOhm)
 ```
+
+## Re-verification (2026-09-30, A73)
+
+A73 found that the inherited diode branch could conduct in the forbidden
+direction within a step. The Section 2 deadlock was re-run with the fixed,
+unidirectional diode (A73 run 9). It needed 40 diode corrections during the
+transient, and the deadlock is identical: t = 7.854 us, states (LOW, UP, UP).
+
+The orbit cross-checks (Section 0) switch only at ZVS, so a
+forbidden-direction diode current cannot occur in them. The evidence
+agrees: A73 run 10, started from the same D41 section, needed zero
+corrections.

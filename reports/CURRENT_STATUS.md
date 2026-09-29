@@ -299,20 +299,24 @@ each question:
      - the load and the P25 control switched on together;
      - the valley fallback for the high-side turn-on.
 
-     Fixed timing under load falls into a sustained oscillation, so a later
-     handover is unreliable.
-   - **Done ([A72](../experiments/track_A_periodic_steady_state/A72_p24_four_phase_zero_start/RESULTS.md)):
-     the A71 sequence does not carry over to P24's four-phase module.**
-     - The ramp alone leaves the ladder unbalanced (deviation ~0.49).
-     - Vds reaches 47.6 V, above the 40 V rating.
-     - P25's control cannot rebalance the ladder.
-     - The controller also needs level-sensitive comparators and restart
-       timers (UCC28051/UCC28063A practice).
-   - **Next, physical model.** Add Track B's divider precharge (R04E17,
-     CDIV 300 uF) before the ramp, then hand over with the load.
-   - **Open, structural.** Is P24's mode-P orbit stable? Run 8 drifted
-     near balance. This needs the four-phase event model or a shooting
-     check.
+     *Withdrawn (2026-09-30, A73):* the claim that fixed timing under load
+     falls into a sustained oscillation was a simulator artefact. A later
+     handover works too.
+   - **Corrected ([A73](../experiments/track_A_periodic_steady_state/A73_p24_literature_startup_methods/RESULTS.md), 2026-09-30).**
+     A72's failure on P24 was a simulator defect: the diode branch conducted
+     both ways within a step. With it fixed:
+     - the A71 sequence works on P24, reaching a periodic state with
+       Vds ≤ 24.8 V (within the 40 V rating);
+     - the published methods reach the same state: Wei 2021 ratio precharge
+       and Xia and Stauth 2022 closed-loop balancing;
+     - A71's "hand over with the load" rule is withdrawn (fixed timing
+       under load does settle);
+     - A69's deadlock and A70's recovery are re-verified.
+   - **Next, both models: adaptive phase shift.** In the P24 steady state,
+     phase 4 is turned on by the restart timer every cycle. The T0/4 shifts
+     do not match the 222.9 ns period.
+   - **Open.** Track B's LTspice ramp-only run (R04E16) ended at ~55% of
+     the ladder level. It has no diodes, so this defect does not explain it.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

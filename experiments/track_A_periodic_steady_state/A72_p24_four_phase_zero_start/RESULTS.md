@@ -9,6 +9,39 @@ Each amendment was written before its runs. Records:
 - `a72_summary.json`;
 - `regression_gate_vs_A71.json`.
 
+## CORRECTION (2026-09-30): the verdict below is withdrawn
+
+**A72's failures were caused by a simulator defect, not by the circuit.**
+A73 found the defect (A73 `BOUNDARY.md` Section 8). The reverse-conduction
+branch inherited from A69 is a 0.1 uOhm resistor whose on/off state updates
+only at step boundaries. Within a step it conducted in both directions. When
+a switch was turned on while the opposite device's diode conducted, the
+input was shorted through that "diode" for one 10 ps step: 3.4 MA was seen
+at SL1, and a flying capacitor was charged by ~11 V. A real diode blocks
+that direction.
+
+With the defect fixed (`diode_check`, A73), the same P24 cases give:
+
+| A72 claim | corrected result (A73) |
+|---|---|
+| The ramp alone leaves the ladder unbalanced (deviation 0.46-0.49); Vds 47.6-47.9 V > 40 V | The ramp alone tracks. Ratio deviation 5.5 / 3.0 / 2.1 / 1.6% over Vin 4-12 / 12-24 / 24-36 / 36-48 V, 1.2% at the end. Vds max 24.6 V: the normal SCB peak of 2*Vin/N on SH2-SH4. Peak current 109 A (A73 run 4) |
+| P25's control cannot rebalance the P24 ladder; runs stall or never settle | The A71 sequence works on P24. The run settles on a periodic state (period 222.9 ns, Vo 0.965 V, ladder within 0.8%), with Vds max 24.8 V and peak current 161 A (A73 run 5 = A72 run 9 with the fix) |
+| Run-8 drift near balance | Not seen with the fix |
+
+Still valid from A72:
+- the regression gate against A71;
+- the two controller findings.
+  - **Level-sensitive events.**
+  - **The restart timer.** It is load-bearing in the corrected P24 steady
+    state: phase 4's high side is turned on by it every cycle (A73).
+
+Track B's R04E16 also ended unbalanced with the ramp alone. Its LTspice
+netlist has no diodes, so it cannot share this defect. That remains an
+**unexplained discrepancy**, not a confirmation.
+
+The text below is kept unchanged as the record of what was run and
+concluded at the time.
+
 ## 0. Verdict
 
 **The sequence that worked on the P25-scale three-phase SCB (A71) does not

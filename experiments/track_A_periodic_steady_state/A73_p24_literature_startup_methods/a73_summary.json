@@ -1,0 +1,235 @@
+{
+ "r1_m1_precharge_softstart": {
+  "status": "COMPLETED",
+  "diode_cuts": 1975,
+  "restarts": 1375,
+  "valley": 4050,
+  "vds_max_v": {
+   "SH1": 12.07,
+   "SH2": 24.03,
+   "SH3": 24.26,
+   "SH4": 24.78,
+   "SL1": 12.15,
+   "SL2": 12.32,
+   "SL3": 12.32,
+   "SL4": 14.2
+  },
+  "ipk_a": 161.1,
+  "dev_max_pre_handover_vin_ge_12": 0.0127,
+  "dev_at_handover": 0.0012,
+  "vds_note": "see vds_max (whole run)",
+  "dev_end": 0.0079,
+  "last20_pp_current_a": 1.1e-05,
+  "last20_pp_vo_v": 0.0,
+  "periodic": true,
+  "end_section": {
+   "vo": 0.9653,
+   "ladder": [
+    0.7487,
+    0.5034,
+    0.2579
+   ],
+   "i": [
+    1.05,
+    29.8,
+    63.56,
+    108.99
+   ],
+   "period_ns": 222.891
+  },
+  "valley_phases_last60": {
+   "1": 20,
+   "2": 20,
+   "3": 20
+  },
+  "valley_vds_last60": [
+   9.79,
+   9.87
+  ],
+  "t_converge_after_handover_us": null
+ },
+ "r2_m2_balance_kb1": {
+  "status": "COMPLETED",
+  "diode_cuts": 2210,
+  "restarts": 1370,
+  "valley": 4051,
+  "vds_max_v": {
+   "SH1": 12.38,
+   "SH2": 24.3,
+   "SH3": 24.26,
+   "SH4": 24.77,
+   "SL1": 12.4,
+   "SL2": 12.32,
+   "SL3": 12.31,
+   "SL4": 14.2
+  },
+  "ipk_a": 160.9,
+  "dev_max_pre_handover_vin_ge_12": 0.0197,
+  "dev_at_handover": 0.0013,
+  "vds_note": "see vds_max (whole run)",
+  "dev_end": 0.0079,
+  "last20_pp_current_a": 1.1e-05,
+  "last20_pp_vo_v": 0.0,
+  "periodic": true,
+  "end_section": {
+   "vo": 0.9653,
+   "ladder": [
+    0.7487,
+    0.5034,
+    0.2579
+   ],
+   "i": [
+    1.05,
+    29.8,
+    63.56,
+    108.99
+   ],
+   "period_ns": 222.891
+  },
+  "valley_phases_last60": {
+   "1": 20,
+   "2": 20,
+   "3": 20
+  },
+  "valley_vds_last60": [
+   9.79,
+   9.87
+  ],
+  "t_converge_after_handover_us": null
+ },
+ "r3_m2_balance_kb3": {
+  "status": "COMPLETED",
+  "diode_cuts": 2220,
+  "restarts": 1369,
+  "valley": 4058,
+  "vds_max_v": {
+   "SH1": 12.27,
+   "SH2": 24.17,
+   "SH3": 24.26,
+   "SH4": 24.77,
+   "SL1": 12.29,
+   "SL2": 12.32,
+   "SL3": 12.31,
+   "SL4": 14.21
+  },
+  "ipk_a": 160.2,
+  "dev_max_pre_handover_vin_ge_12": 0.0153,
+  "dev_at_handover": 0.0013,
+  "vds_note": "see vds_max (whole run)",
+  "dev_end": 0.0079,
+  "last20_pp_current_a": 1.1e-05,
+  "last20_pp_vo_v": 0.0,
+  "periodic": true,
+  "end_section": {
+   "vo": 0.9653,
+   "ladder": [
+    0.7487,
+    0.5034,
+    0.2579
+   ],
+   "i": [
+    1.05,
+    29.8,
+    63.56,
+    108.99
+   ],
+   "period_ns": 222.891
+  },
+  "valley_phases_last60": {
+   "1": 20,
+   "2": 20,
+   "3": 20
+  },
+  "valley_vds_last60": [
+   9.79,
+   9.87
+  ],
+  "t_converge_after_handover_us": null
+ },
+ "r4_recheck_a72r4_ramp_only": {
+  "status": "COMPLETED",
+  "diode_cuts": 375,
+  "restarts": 0,
+  "valley": 0,
+  "vds_max_v": {
+   "SH1": 12.6,
+   "SH2": 24.55,
+   "SH3": 24.14,
+   "SH4": 24.12,
+   "SL1": 12.61,
+   "SL2": 12.34,
+   "SL3": 12.2,
+   "SL4": 12.17
+  },
+  "ipk_a": 108.6,
+  "dev_max_pre_handover_vin_ge_12": 0.0297,
+  "dev_end": 0.0012,
+  "last20_pp_current_a": 0.00632,
+  "last20_pp_vo_v": 9.1e-06,
+  "periodic": false,
+  "end_section": {
+   "vo": 1.1403,
+   "ladder": [
+    0.7488,
+    0.5004,
+    0.2509
+   ],
+   "i": [
+    -62.24,
+    -30.92,
+    7.74,
+    46.91
+   ],
+   "period_ns": 200.0
+  }
+ },
+ "r5_recheck_a72r9": {
+  "status": "COMPLETED",
+  "diode_cuts": 2235,
+  "restarts": 1372,
+  "valley": 4046,
+  "vds_max_v": {
+   "SH1": 12.6,
+   "SH2": 24.55,
+   "SH3": 24.25,
+   "SH4": 24.77,
+   "SL1": 12.61,
+   "SL2": 12.34,
+   "SL3": 12.3,
+   "SL4": 14.2
+  },
+  "ipk_a": 161.3,
+  "dev_max_pre_handover_vin_ge_12": 0.0297,
+  "dev_at_handover": 0.0012,
+  "vds_note": "see vds_max (whole run)",
+  "dev_end": 0.0079,
+  "last20_pp_current_a": 1.1e-05,
+  "last20_pp_vo_v": 0.0,
+  "periodic": true,
+  "end_section": {
+   "vo": 0.9653,
+   "ladder": [
+    0.7487,
+    0.5034,
+    0.2579
+   ],
+   "i": [
+    1.05,
+    29.8,
+    63.56,
+    108.99
+   ],
+   "period_ns": 222.891
+  },
+  "valley_phases_last60": {
+   "1": 20,
+   "2": 20,
+   "3": 20
+  },
+  "valley_vds_last60": [
+   9.79,
+   9.87
+  ],
+  "t_converge_after_handover_us": null
+ }
+}

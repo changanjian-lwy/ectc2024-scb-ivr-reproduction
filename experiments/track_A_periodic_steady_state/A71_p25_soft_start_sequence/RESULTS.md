@@ -6,6 +6,25 @@ amendment (runs 4-6) made after runs 1-3 and before running them. Records:
   valley firings;
 - `a71_metrics.json`: the Section 6 metrics.
 
+## CORRECTION (2026-09-30): Section 2 and the handover rule are withdrawn
+
+A73 found a simulator defect: the diode branch conducted in both directions
+within a step (A73 `BOUNDARY.md` Section 8). A73 re-ran the affected A71
+cases with the fix (A73 runs 6-8):
+- **Section 2 is withdrawn.** "Fixed timing under load falls into a sustained
+  oscillation" does not hold: with the fix, mode S under the 67.5 A load
+  settles within 100 us (Vo 0.933 V).
+- **Run 1's stall was an artefact.** With the fix, the handover 100 us after
+  the load reaches D42's section 129 us later.
+- **The rule "hand over together with the load" loses its basis.** Both
+  orders work.
+- **Unchanged.** The converged result of runs 5 and 6 (D42's section from
+  all-zero state) is identical to 5 digits with the fix. The ramp tracking
+  and the control run (run 3: P25 rule from t = 0 stalls) also stand.
+
+The text below is kept unchanged as the record of what was concluded at the
+time.
+
 ## 0. Verdict
 
 **From an all-zero state, the idealised P25-scale SCB reaches D42's

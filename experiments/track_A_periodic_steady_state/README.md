@@ -404,3 +404,32 @@ reproduces A71 bit for bit at N = 3. It does not carry over.
   - A positive current at a timed low-side turn-off leaves no resonance,
     so a restart timer is needed (TI UCC28051/UCC28063A practice).
 - **Next.** Track B's divider precharge before the ramp.
+
+**Correction (2026-09-30).** A73 found a simulator defect: the diode branch,
+inherited from A69, conducted in both directions within a step, so a hard
+turn-on against a conducting diode shorted the input for one step. This
+affects the entries above:
+- **A72's verdict is withdrawn.** With the fix, the ramp alone keeps P24's
+  ladder within 1.6-3% (Vds max 24.6 V, the normal 2*Vin/N), and the A71
+  sequence works on P24.
+- **A71's "fixed timing under load never settles" is withdrawn,** and with
+  it the need to hand over together with the load.
+- **Stand, re-verified:** A69's deadlock, A70's recovery, and A71's
+  converged start-up.
+
+`A73_p24_literature_startup_methods` tests the published ladder-control
+start-up methods on P24, with the defect fixed:
+- Wei et al. 2021: ratio precharge plus soft start;
+- Xia and Stauth 2022: closed-loop balancing;
+- the plain A71 sequence.
+
+All reach the same periodic state:
+- period 222.9 ns, Vo 0.965 V;
+- ladder within 0.8%, Vds max 24.8 V, peak 161 A.
+
+In steady state:
+- phases 1-3 turn on at the valley (Vds ≈ 9.8 V, as A67 predicts);
+- phase 4 is turned on by the restart timer every cycle, because the fixed
+  T0/4 shifts do not match the stretched period.
+
+That makes an adaptive phase shift necessary at P24 scale.

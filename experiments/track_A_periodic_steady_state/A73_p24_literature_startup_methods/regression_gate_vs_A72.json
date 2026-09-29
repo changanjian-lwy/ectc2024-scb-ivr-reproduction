@@ -1,0 +1,11 @@
+{
+ "gate": "BOUNDARY Section 3",
+ "compared": "a73 defaults, first 20 us vs A72 run_s_ramp_td2p15_noload.json",
+ "sections": [
+  101,
+  101
+ ],
+ "max_abs_d": 0.0,
+ "max_abs_dt": 0.0,
+ "result": "PASS (bit-identical)"
+}
