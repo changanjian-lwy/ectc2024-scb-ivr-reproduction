@@ -42,3 +42,9 @@ reports/MEETING_NOTES_*.md
 .wine/
 .crossover/
 .claude/
+
+# HDL simulation build products (cocotb + Icarus Verilog); sources, configs and summaries stay tracked
+sim_build*/
+results.xml
+*.vcd
+*.fst

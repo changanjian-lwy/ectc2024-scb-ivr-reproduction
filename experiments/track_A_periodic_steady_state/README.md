@@ -476,3 +476,18 @@ Verilog controller.
   -8.8 A (7% of peak, inside P25's 5-10%; P24 states 1-2%), passes: every
   phase soft, no restart.
 - **Next.** A negative-current target sweep (A78).
+
+`A77_verilog_controller_cosim` implements the adopted controller as
+synthesizable Verilog and closes the loop around the A76 plant with cocotb
+and Icarus Verilog.
+- **Implementation.** 250 MHz with a 5-bit delay line (125 ps edges), 2-FF
+  synchronised comparators, and a 10 ns driver.
+- **It reproduces A76's steady state within quantisation:** period 221.45
+  against 221.41 ns, Vo 0.960 against 0.963 V, phases 1-3 at 9.8-9.9 V.
+- **A new implementation effect.** The synchroniser puts phase 1's
+  comparator-decided turn-off on the 4 ns grid: ±1.3 A edge jitter and a
+  3.65 A section dither.
+- **Counter-only 125 MHz (Roberts' FPGA setting) is inadequate.** Vo is
+  39 mV low, and one 8 ns Ton step moves Vo by ~0.43 V.
+- **Checks.** Unit tests 10/10; Yosys synthesis with no latches, 13.3k
+  generic cells.

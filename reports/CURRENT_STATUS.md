@@ -334,11 +334,21 @@ each question:
      - **Phase 4 depends on the negative-current target.** At P24's -2.5 A
        (2%) it stays restart-driven. At -8.8 A (7%, inside P25's 5-10%)
        every phase is soft.
+   - **Done ([A77](../experiments/track_A_periodic_steady_state/A77_verilog_controller_cosim/RESULTS.md), 2026-09-30): Verilog controller.**
+     - **Implementation:** synthesizable, 250 MHz with 125 ps delay-line
+       edges, 2-FF synchronised comparators.
+     - **Co-simulated with the A76 plant.** It reproduces A76's steady
+       state within quantisation.
+     - **Synchroniser effect:** a 4 ns edge jitter on phase 1's
+       comparator-decided turn-off.
+     - **Counter-only 125 MHz is inadequate at P24.**
    - **Next (single-module level first).**
-     1. Physical model, A78: a negative-current target sweep across P24's
-        1-2% and P25's 5-10%, with conduction loss accounted.
-     2. A77: the Verilog controller with the adopted rules, co-simulated
-        with the plant.
+     1. Physical model, A78 (running): a negative-current target sweep
+        across P24's 1-2% and P25's 5-10%, with conduction loss accounted.
+     2. A79: the output-voltage loop (physical model, then the RTL).
+     3. RTL:
+        - a predictive phase-1 turn-off, to remove the 4 ns jitter;
+        - start-up (mode S and the handover).
 
      After that, the four-phase mathematical model with the valley
      trigger.

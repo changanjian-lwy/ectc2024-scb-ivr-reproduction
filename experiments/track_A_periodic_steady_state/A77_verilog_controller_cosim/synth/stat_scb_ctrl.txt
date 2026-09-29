@@ -1,0 +1,132 @@
+
+7. Printing statistics.
+
+=== $paramod\sync2\W=s32'00000000000000000000000000010000 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       66 wire bits
+        6 public wires
+       66 public wire bits
+        4 ports
+       34 port bits
+       32 cells
+       32   $_SDFF_PP0_
+
+=== scb_ctrl ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      483 wires
+     1776 wire bits
+       48 public wires
+     1289 public wire bits
+       40 ports
+      958 port bits
+      642 cells
+       36   $_AND_
+      304   $_NAND_
+        1   $_NOT_
+       42   $_OR_
+       32   $_SDFFE_PP0P_
+       54   $_SDFF_PP0_
+       49   $_XNOR_
+      124   $_XOR_
+        5 submodules
+        3   $paramod$37a962f668f180a7bea4f5d02345c7654deb9ed4\scb_phase
+        1   $paramod$ee5efb1378799d86298dc5d8e521cbae9af0c529\scb_phase
+        1   $paramod\sync2\W=s32'00000000000000000000000000010000
+
+=== $paramod$37a962f668f180a7bea4f5d02345c7654deb9ed4\scb_phase ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     2274 wires
+     4312 wire bits
+       68 public wires
+      991 public wire bits
+       41 ports
+      452 port bits
+     3086 cells
+       92   $_ANDNOT_
+      733   $_AND_
+       40   $_DFFE_PP_
+      109   $_MUX_
+      748   $_NAND_
+       59   $_NOR_
+       76   $_NOT_
+       48   $_ORNOT_
+      320   $_OR_
+      126   $_SDFFE_PP0P_
+       34   $_SDFFE_PP1P_
+        4   $_SDFF_PP0_
+      214   $_XNOR_
+      483   $_XOR_
+
+=== $paramod$ee5efb1378799d86298dc5d8e521cbae9af0c529\scb_phase ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     2511 wires
+     4622 wire bits
+       69 public wires
+      996 public wire bits
+       41 ports
+      452 port bits
+     3352 cells
+       81   $_ANDNOT_
+      835   $_AND_
+       40   $_DFFE_PP_
+      123   $_MUX_
+      784   $_NAND_
+       54   $_NOR_
+       78   $_NOT_
+       59   $_ORNOT_
+      373   $_OR_
+      160   $_SDFFE_PP0P_
+        1   $_SDFFE_PP1P_
+        4   $_SDFF_PP0_
+      247   $_XNOR_
+      513   $_XOR_
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+    13284 scb_ctrl
+     3086 $paramod$37a962f668f180a7bea4f5d02345c7654deb9ed4\scb_phase
+     3352 $paramod$ee5efb1378799d86298dc5d8e521cbae9af0c529\scb_phase
+       32 $paramod\sync2\W=s32'00000000000000000000000000010000
+
+        +----------Count including submodules.
+        | 
+     9822 wires
+    19400 wire bits
+      327 public wires
+     5324 public wire bits
+      208 ports
+     2800 port bits
+        - memories
+        - memory bits
+        - processes
+    13284 cells
+      357   $_ANDNOT_
+     3070   $_AND_
+      160   $_DFFE_PP_
+      450   $_MUX_
+     3332   $_NAND_
+      231   $_NOR_
+      307   $_NOT_
+      203   $_ORNOT_
+     1375   $_OR_
+      570   $_SDFFE_PP0P_
+      103   $_SDFFE_PP1P_
+      102   $_SDFF_PP0_
+      938   $_XNOR_
+     2086   $_XOR_
+        5 submodules
+        3   $paramod$37a962f668f180a7bea4f5d02345c7654deb9ed4\scb_phase
+        1   $paramod$ee5efb1378799d86298dc5d8e521cbae9af0c529\scb_phase
+        1   $paramod\sync2\W=s32'00000000000000000000000000010000
+

@@ -1,0 +1,20 @@
+{
+ "note": "Base case: 250 MHz clock, 5-bit delay line (125 ps), LMG1210 typical 10 ns driver delay, P24 2% target, trim on; starts from A76 run 1's last section",
+ "init_run": "../../A76_p24_single_module_control_rules/run_r1_pred_td10_trim.json",
+ "t_clk_ns": 4.0,
+ "fb": 5,
+ "fine": 1,
+ "t_drv_ns": 10.0,
+ "i_target": -2.5,
+ "trim": 1,
+ "trim_lsb_a": 0.25,
+ "v_hys": 0.05,
+ "ton_ns": 16.667,
+ "t0_ns": 200.0,
+ "rs_high_ns": 20.0,
+ "rs_low_ns": 400.0,
+ "dt_step_ns": 0.2,
+ "dt_max_ns": 34.8,
+ "t_end_us": 100.0,
+ "out": "run_c1_base_250mhz_itgt2p5.json"
+}
