@@ -317,10 +317,24 @@ each question:
      every cycle. Shifts that follow the measured period do not change
      that. At its timed turn-off, phase 4 carries +7.08 A (phases 2-3:
      -3.35 A). The problem is its current level, not its timing.
-   - **Next, physical model: per-phase current sensing.** This separates
-     two candidates: phase N's structure (node capacitance 9.30 against
-     13.02 nF; on-state voltage `VCs3`), or a self-reinforcing restart
-     state. After that, the four-phase mathematical model with the valley
+   - **Done ([A75](../experiments/track_A_periodic_steady_state/A75_controller_latency_valley_timing/RESULTS.md), 2026-09-30): controller latency.**
+     - At P24, reactive valley detection loses the valley at a 10 ns
+       comparator-to-gate latency (LMG1210 typical).
+     - A predictive, self-corrected turn-on keeps it up to 10 ns. This
+       follows Chiang 2009 and Schaef et al. ISSCC 2019, which is P25's
+       own zero-cross-detection reference.
+     - In those predictive runs phase 4 also rings.
+     - P25 tolerates 45 ns (edges at 0.8-1.7 V).
+   - **Next, physical model (single-module level first).**
+     1. Compensate the phase-1 comparator for the latency, to separate
+        the deeper effective negative current from the prediction.
+     2. Test phase 4 with per-phase current sensing, and test for two
+        coexisting steady states at identical parameters.
+     3. Make the ZVS path predictive.
+     4. Write the predictive controller in Verilog and co-simulate it
+        with the plant.
+
+     After that, the four-phase mathematical model with the valley
      trigger.
    - **Open.** Track B's LTspice ramp-only run (R04E16) ended at ~55% of
      the ladder level. It has no diodes, so this defect does not explain it.

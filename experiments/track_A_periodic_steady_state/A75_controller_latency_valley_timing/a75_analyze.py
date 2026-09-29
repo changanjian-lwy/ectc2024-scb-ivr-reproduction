@@ -1,0 +1,94 @@
+"""A75 analysis: regression gate against the A74 baseline, and the latency x valley-mode table (BOUNDARY Sections 5-6).
+
+Reads run_*.json written by a75_transient.py; writes regression_gate_vs_A74.json and a75_summary.json.
+"""
+from __future__ import annotations
+
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+LAST = 50  # cycles for the turn-on statistics
+PER = 20   # sections for the periodicity test
+
+
+def load(path):
+    return json.loads(Path(path).read_text())
+
+
+def gate(ref_path, new_path):
+    ref, new = load(ref_path), load(new_path)
+    a, b = ref["sections"], new["sections"]
+    same_count = len(a) == len(b) and ref["sections_total"] == new["sections_total"]
+    dv = max(abs(x - y) for s, r in zip(a, b) for x, y in zip(s["v"] + s["i"], r["v"] + r["i"]))
+    dt = max(abs(s["t_s"] - r["t_s"]) for s, r in zip(a, b))
+    out = {"reference": str(Path(ref_path).relative_to(HERE.parent)), "candidate": Path(new_path).name,
+           "sections_ref": ref["sections_total"], "sections_new": new["sections_total"],
+           "max_abs_diff_v_i": dv, "max_abs_diff_t_s": dt,
+           "end_y_equal": ref["end"]["y"] == new["end"]["y"],
+           "pass": bool(same_count and dv == 0.0 and dt == 0.0 and ref["end"]["y"] == new["end"]["y"])}
+    return out
+
+
+def summarize(path):
+    d = load(path); e = d["end"]; secs = d["sections"]; n = len(secs[-1]["i"]); pr = d["params"]
+    tot = d["sections_total"] - 1
+    last = secs[-(PER + 1):]
+    per = np.diff([s["t_s"] for s in last])
+    di = max(abs(x - y) for s in last for x, y in zip(s["i"], last[-1]["i"]))
+    dvo = max(abs(s["vo"] - last[-1]["vo"]) for s in last)
+    s = secs[-1]
+    ton = [t for t in e["turnons_last"] if t["cycle"] >= tot - LAST and t["mode"] == "P"]
+    cyc = len({t["cycle"] for t in ton}) or 1
+    how = {k: dict(Counter(t["how"] for t in ton if t["phase"] == k)) for k in range(1, n + 1)}
+    vds = {k: [t["vds_v"] for t in ton if t["phase"] == k] for k in range(1, n + 1)}
+    lo = [t for t in e.get("lowoffs_last", []) if t["cycle"] >= tot - LAST and t["mode"] == "P"]
+    lo_i = {k: [t["i_a"] for t in lo if t["phase"] == k] for k in range(1, n + 1)}
+    c_node = pr["c_high"] + pr["c_low"]
+    f_sw = 1.0 / float(np.mean(per)) if len(per) else float("nan")
+    e_on = sum(0.5 * c_node * v ** 2 for t in ton for v in [t["vds_v"]]) / cyc   # J per cycle, all phases
+    return {
+        "case": d["case"], "t_d_ns": pr["t_d"] * 1e9, "valley_mode": pr["valley_mode"], "status": e["status"],
+        "periodic": bool(di < 1e-3 and dvo < 1e-4), "last20_max_di_a": di, "last20_max_dvo_v": dvo,
+        "period_ns": float(np.mean(per) * 1e9), "vo_v": s["vo"],
+        "ladder_ratio": [v / s["vin_v"] for v in s["vcs_v"]], "section_i_a": s["i"],
+        "turnon_how_last50": how,
+        "turnon_vds_mean_max_last50": {k: [float(np.mean(v)), float(np.max(v))] if v else None for k, v in vds.items()},
+        "delayed_edges_last50": sum(1 for t in ton if t.get("delayed")),
+        "lowoff_edge_i_mean_min_max_last50": {k: [float(np.mean(v)), float(np.min(v)), float(np.max(v))] if v else None
+                                              for k, v in lo_i.items()},
+        "restarts_last50": sum(1 for t in ton if t["how"] == "high_restart"),
+        "turnon_loss_proxy_w": e_on * f_sw, "turnon_energy_proxy_uj_per_cycle": e_on * 1e6,
+        "vds_max_v": max(e["vds_max_v"].values()), "ipk_a": max(x["ipk_a"] for x in secs),
+        "dt_pred_ns": [x * 1e9 for x in e["dt_pred_s"]], "half_res_ns": e["half_res_s"] * 1e9,
+        "pred_stats": e["pred_stats"], "latent_detections": e["latent_detections"],
+        "restart_count_total": e["restart_count"], "diode_cuts": e["diode_cuts"],
+    }
+
+
+def main():
+    runs = sorted(HERE.glob("run_*.json"))
+    rows = {p.stem[4:]: summarize(p) for p in runs}
+    gates = {}
+    for cand, ref in json.loads((HERE / "gate_pairs.json").read_text()).items():
+        if (HERE / f"run_{cand}.json").exists():
+            gates[cand] = gate(HERE.parent / ref, HERE / f"run_{cand}.json")
+            print("gate", cand, gates[cand])
+    for k, r in rows.items():
+        print(f"{k:28s} {r['status']:9s} periodic {r['periodic']} T {r['period_ns']:.3f} ns Vo {r['vo_v']:.4f} "
+              f"i {np.round(r['section_i_a'], 1)} Vdsmax {r['vds_max_v']:.1f} ipk {r['ipk_a']:.0f} "
+              f"restarts(last50) {r['restarts_last50']} proxy {r['turnon_loss_proxy_w']:.2f} W dt_pred {np.round(r['dt_pred_ns'], 2)}")
+        print(f"     last20 max di {r['last20_max_di_a']:.3g} A, max dVo {r['last20_max_dvo_v']:.3g} V")
+        for ph, h in r["turnon_how_last50"].items():
+            print(f"     phase {ph}: {h}  Vds at edge mean/max {np.round(r['turnon_vds_mean_max_last50'][ph], 2)}"
+                  f"  low-off edge i mean/min/max {np.round(r['lowoff_edge_i_mean_min_max_last50'][ph], 2)}")
+    (HERE / "a75_summary.json").write_text(json.dumps({"gates": gates, "runs": rows}, indent=1))
+    return 0 if all(g["pass"] for g in gates.values()) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

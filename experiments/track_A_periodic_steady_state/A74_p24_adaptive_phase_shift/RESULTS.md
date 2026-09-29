@@ -108,6 +108,11 @@ with their own ZCD.
 though the ring had 60 ns to reach its valley. These runs have no
 diagnostic log, and this is not yet explained.
 
+**Update (A75, 2026-09-30).** In A75's predictive runs with latency (runs
+5-7), phase 4 rings: -4.4 to -12.4 A at its timed turn-off, soft turn-on,
+no restarts. In A75 reactive run 1, at nearly the same phase-1 current, it
+does not. This favours candidate 2. It is not yet a same-parameter test.
+
 ## 4. Limits
 
 - **The circuit is A73's idealised P24 module.**

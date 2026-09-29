@@ -446,3 +446,20 @@ That makes an adaptive phase shift necessary at P24 scale.
 - **Next.** Per-phase current sensing, to separate two candidates: phase
   N's different node capacitance and on-state voltage, or a
   self-reinforcing restart state.
+
+`A75_controller_latency_valley_timing` adds a comparator-to-gate latency
+to the controller.
+- **The zero-latency controller hid a real problem at P24.** Reactive
+  valley detection loses the valley at LMG1210's typical 10 ns: the edges
+  land at 11.7-12.1 V instead of 9.8 V, and the state stops being periodic.
+- **A predictive, self-corrected turn-on keeps the valley up to 10 ns.**
+  This is Chiang 2009's delay compensation, and the method of Schaef et
+  al. ISSCC 2019, the zero-cross-detection reference P25 cites. Every
+  phase lands at 8.1-9.6 V, and no restart fires.
+- **At 18 ns** the delayed-ZVS path becomes the weak point.
+- **P25 at 45 ns** stays periodic, with ZVS edges at 0.8-1.7 V.
+- **Phase 4 rings in the predictive runs** (-4.4 A or lower at its
+  turn-off), which favours a self-reinforcing restart state over a
+  structural cause.
+- **A confound remains.** The latency also deepens phase 1's effective
+  negative current (-0.66 A/ns).
