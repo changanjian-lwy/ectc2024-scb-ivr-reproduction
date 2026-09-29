@@ -1,0 +1,262 @@
+{
+ "main_ramp68p61": {
+  "status": "STALLED",
+  "t_end_us": 106.96,
+  "handover_us": 88.8,
+  "ramp_dev_max_vin_ge_12": 0.491,
+  "ipk_a": 459.0,
+  "vds_max_v": 47.64,
+  "vds_max_switch": "SH3",
+  "valley": 88,
+  "restarts": null,
+  "sections": 489,
+  "last_section": {
+   "vo": 0.56,
+   "ladder": [
+    0.527,
+    0.52,
+    0.436
+   ],
+   "i": [
+    0.9,
+    -189.1,
+    -85.7,
+    126.3
+   ]
+  }
+ },
+ "fast_ramp6p861": {
+  "status": "STALLED",
+  "t_end_us": 68.93,
+  "handover_us": 27.0,
+  "ramp_dev_max_vin_ge_12": 0.23,
+  "ipk_a": 463.0,
+  "vds_max_v": 47.73,
+  "vds_max_switch": "SH2",
+  "valley": 422,
+  "restarts": null,
+  "sections": 263,
+  "last_section": {
+   "vo": 0.879,
+   "ladder": [
+    0.728,
+    0.225,
+    0.161
+   ],
+   "i": [
+    -2.6,
+    111.3,
+    -66.9,
+    42.4
+   ]
+  }
+ },
+ "control_mode_p_from_t0": {
+  "status": "STALLED",
+  "t_end_us": 0.6,
+  "handover_us": 0.0,
+  "ramp_dev_max_vin_ge_12": null,
+  "ipk_a": 0.0,
+  "vds_max_v": 0.42,
+  "vds_max_switch": "SH1",
+  "valley": 0,
+  "restarts": null,
+  "sections": 0,
+  "last_section": {
+   "vo": 0.0,
+   "ladder": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "i": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "s_ramp_td2p15_noload": {
+  "status": "COMPLETED",
+  "t_end_us": 88.61,
+  "handover_us": null,
+  "ramp_dev_max_vin_ge_12": 0.491,
+  "ipk_a": 427.0,
+  "vds_max_v": 47.64,
+  "vds_max_switch": "SH3",
+  "valley": 0,
+  "restarts": null,
+  "sections": 443,
+  "last_section": {
+   "vo": 0.856,
+   "ladder": [
+    0.832,
+    0.419,
+    0.415
+   ],
+   "i": [
+    -290.4,
+    -53.7,
+    116.8,
+    101.9
+   ]
+  }
+ },
+ "s_ramp_td0p05_noload": {
+  "status": "COMPLETED",
+  "t_end_us": 88.61,
+  "handover_us": null,
+  "ramp_dev_max_vin_ge_12": 0.492,
+  "ipk_a": 510.0,
+  "vds_max_v": 47.86,
+  "vds_max_switch": "SH3",
+  "valley": 0,
+  "restarts": null,
+  "sections": 443,
+  "last_section": {
+   "vo": 0.846,
+   "ladder": [
+    0.503,
+    0.502,
+    0.029
+   ],
+   "i": [
+    94.4,
+    -184.8,
+    -152.1,
+    86.9
+   ]
+  }
+ },
+ "s_ramp_td2p15_loaded": {
+  "status": "COMPLETED",
+  "t_end_us": 88.61,
+  "handover_us": null,
+  "ramp_dev_max_vin_ge_12": 0.461,
+  "ipk_a": 468.0,
+  "vds_max_v": 47.7,
+  "vds_max_switch": "SH3",
+  "valley": 0,
+  "restarts": null,
+  "sections": 443,
+  "last_section": {
+   "vo": 0.752,
+   "ladder": [
+    0.67,
+    0.663,
+    0.004
+   ],
+   "i": [
+    -127.8,
+    117.2,
+    193.5,
+    -71.6
+   ]
+  }
+ },
+ "s_ramp_td0p05_loaded": {
+  "status": "COMPLETED",
+  "t_end_us": 88.61,
+  "handover_us": null,
+  "ramp_dev_max_vin_ge_12": 0.49,
+  "ipk_a": 461.0,
+  "vds_max_v": 47.58,
+  "vds_max_switch": "SH3",
+  "valley": 0,
+  "restarts": null,
+  "sections": 443,
+  "last_section": {
+   "vo": 0.668,
+   "ladder": [
+    0.525,
+    0.523,
+    0.03
+   ],
+   "i": [
+    -33.5,
+    -44.7,
+    -45.9,
+    95.7
+   ]
+  }
+ },
+ "main_ramp68p61_stall20": {
+  "status": "STALLED",
+  "t_end_us": 190.07,
+  "handover_us": 88.8,
+  "ramp_dev_max_vin_ge_12": 0.491,
+  "ipk_a": 459.0,
+  "vds_max_v": 47.64,
+  "vds_max_switch": "SH3",
+  "valley": 1166,
+  "restarts": null,
+  "sections": 773,
+  "last_section": {
+   "vo": 0.967,
+   "ladder": [
+    0.728,
+    0.223,
+    0.158
+   ],
+   "i": [
+    -2.6,
+    121.5,
+    -62.1,
+    46.5
+   ]
+  }
+ },
+ "main_ramp68p61_fixes": {
+  "status": "COMPLETED",
+  "t_end_us": 388.61,
+  "handover_us": 88.8,
+  "ramp_dev_max_vin_ge_12": 0.491,
+  "ipk_a": 1166.0,
+  "vds_max_v": 48.24,
+  "vds_max_switch": "SL3",
+  "valley": 811,
+  "restarts": 4498,
+  "sections": 4646,
+  "last_section": {
+   "vo": 0.098,
+   "ladder": [
+    0.529,
+    0.259,
+    0.016
+   ],
+   "i": [
+    42.4,
+    2.7,
+    59.6,
+    33.9
+   ]
+  }
+ },
+ "fast_ramp6p861_fixes": {
+  "status": "COMPLETED",
+  "t_end_us": 326.86,
+  "handover_us": 27.0,
+  "ramp_dev_max_vin_ge_12": 0.23,
+  "ipk_a": 958.0,
+  "vds_max_v": 48.38,
+  "vds_max_switch": "SL3",
+  "valley": 833,
+  "restarts": 4274,
+  "sections": 4318,
+  "last_section": {
+   "vo": 0.101,
+   "ladder": [
+    0.769,
+    0.767,
+    0.029
+   ],
+   "i": [
+    87.0,
+    109.1,
+    55.1,
+    266.8
+   ]
+  }
+ }
+}

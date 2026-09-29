@@ -1,0 +1,9 @@
+{
+ "gate": "BOUNDARY Section 4",
+ "compared": "a72 N=3, P25 values, CC 67.5 A, first 30 us vs A71 run_handover_with_load_ramp46.json",
+ "sections": 16,
+ "max_abs_dV": 0.0,
+ "max_abs_dI": 0.0,
+ "max_abs_dt_s": 0.0,
+ "result": "PASS (bit-identical)"
+}

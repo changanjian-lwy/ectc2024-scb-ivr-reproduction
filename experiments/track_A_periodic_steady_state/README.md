@@ -386,3 +386,21 @@ Pilawa-Podgurski 2019), and Roberts' 30x-margin ramp time (457 us).
   so a later handover lands at an arbitrary phase.
 - **Fixed timing is needed at the start.** Starting with P25's rule
   instead stalls within the first cycle.
+
+`A72_p24_four_phase_zero_start` runs the A71 sequence on P24's four-phase
+module (48 V, 5 MHz, EPC2067), using a generalised simulator that
+reproduces A71 bit for bit at N = 3. It does not carry over.
+- **The ramp alone does not balance P24's ladder.** Under fixed timing,
+  the ladder ratios deviate by 0.46-0.49, with peaks of 430-510 A. Vds
+  reaches 47.6-47.9 V, above EPC2067's 40 V rating. This holds whether
+  the dead time is 2.15 or 0.05 ns, and whether the load is on or off.
+  Track B's R04E16 also ends unbalanced; only R04E17's divider precharge
+  balanced the ladder.
+- **P25's single-sensor control cannot rebalance a badly unbalanced P24
+  ladder.** Phase 1's cycle collapses and the timed phases starve.
+- **Two controller gaps were found.**
+  - Event detection must be level-sensitive: a comparator already
+    tripped must fire.
+  - A positive current at a timed low-side turn-off leaves no resonance,
+    so a restart timer is needed (TI UCC28051/UCC28063A practice).
+- **Next.** Track B's divider precharge before the ramp.

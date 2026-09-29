@@ -301,9 +301,18 @@ each question:
 
      Fixed timing under load falls into a sustained oscillation, so a later
      handover is unreliable.
-   - **Next, physical model.** Test the same sequence on P24's four-phase
-     circuit, with Track B's precharge and the valley path as the
-     steady-state turn-on.
+   - **Done ([A72](../experiments/track_A_periodic_steady_state/A72_p24_four_phase_zero_start/RESULTS.md)):
+     the A71 sequence does not carry over to P24's four-phase module.**
+     - The ramp alone leaves the ladder unbalanced (deviation ~0.49).
+     - Vds reaches 47.6 V, above the 40 V rating.
+     - P25's control cannot rebalance the ladder.
+     - The controller also needs level-sensitive comparators and restart
+       timers (UCC28051/UCC28063A practice).
+   - **Next, physical model.** Add Track B's divider precharge (R04E17,
+     CDIV 300 uF) before the ramp, then hand over with the load.
+   - **Open, structural.** Is P24's mode-P orbit stable? Run 8 drifted
+     near balance. This needs the four-phase event model or a shooting
+     check.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
