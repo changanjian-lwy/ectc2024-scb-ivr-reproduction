@@ -10,7 +10,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from .p25_event_guards import Snapshot
-from .p25_cycle_modes import cycle_mode
+from .p25_cycle_modes import cycle_mode, current_signs, commutation_target
 from .p25_nodal_contract import Components, SWITCHES, incidence, inductor_incidence, instantaneous_rates
 from .p25_reverse_contract import ReverseModel, paper_mode_violations
 from .p25_root_location import Quantity, RootSettings, locate_downward, EventWindow, order_windows
@@ -121,18 +121,16 @@ def scan_commutation(flow: LocalFlow, reverse: ReverseModel, *, end_s: float,
     gaps in the P25 single-module branch. Other entry roots remain unresolved.
     No external events: ConstantPorts/Vin define the entire supplied interval.
     """
-    if flow.mode not in {"M2","M5"}:
-        raise ValueError("commutation scan supports M2/M5 only")
+    target = commutation_target(flow.mode)
     if not isinstance(reverse,ReverseModel):
         raise ValueError("explicit reverse surrogate required")
     if not isfinite(end_s) or end_s <= flow.start.time_s or type(intervals) is not int or intervals<1:
         raise ValueError("explicit finite forward horizon and positive sample count required")
-    target = "SL1" if flow.mode=="M2" else "SH2"
     watches = [Quantity("target."+target,"V",lambda s:s.switch_voltage(target))]
     for name,on,drop in zip(SWITCHES,(*flow.start.gates.high,*flow.start.gates.low),reverse.drop_v):
         if not on:
             watches.append(Quantity("reverse."+name,"V",lambda s,n=name,d=drop:s.switch_voltage(n)+d))
-    signs = (1,1,1) if flow.mode=="M2" else (1,-1,1)
+    signs = current_signs(flow.mode)
     for k,sign in enumerate(signs):
         watches.append(Quantity(f"domain.iL{k+1}","A",lambda s,k=k,sign=sign:sign*s.current_a[k]))
     released=set()

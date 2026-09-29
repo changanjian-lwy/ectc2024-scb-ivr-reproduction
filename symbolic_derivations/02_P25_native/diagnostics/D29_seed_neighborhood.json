@@ -1,0 +1,719 @@
+{
+  "date": "2026-09-29",
+  "runs": [
+    {
+      "scope": "SYNTHETIC_INITIAL_STATE_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+      "intervals": 200,
+      "coordinates": [
+        [
+          "a2",
+          "V"
+        ],
+        [
+          "x1",
+          "V"
+        ],
+        [
+          "out",
+          "V"
+        ],
+        [
+          "iL1",
+          "A"
+        ],
+        [
+          "iL2",
+          "A"
+        ],
+        [
+          "iL3",
+          "A"
+        ]
+      ],
+      "cases": [
+        {
+          "case": "baseline",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "a2_x0.9",
+          "seed": [
+            3.6,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "a2_x1.1",
+          "seed": [
+            4.4,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "x1_x0.9",
+          "seed": [
+            4,
+            1.8,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.139057279080152,
+              "latest_s": 4.13905727982521
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "x1_x1.1",
+          "seed": [
+            4,
+            2.2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.134762585908174,
+              "latest_s": 4.134762586653232
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "out_x0.9",
+          "seed": [
+            4,
+            2,
+            0.9,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.219550068080426,
+              "latest_s": 4.219550068825484
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "out_x1.1",
+          "seed": [
+            4,
+            2,
+            1.1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.056029441356658,
+              "latest_s": 4.056029442101717
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL1_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            18,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.304185903370381,
+              "latest_s": 4.304185904115439
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL1_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            22,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 3.989175901859997,
+              "latest_s": 3.9891759026050546
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL2_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            1.8,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.152862447351218,
+              "latest_s": 4.1528624480962755
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL2_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2.2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.121327189654112,
+              "latest_s": 4.121327190399169
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL3_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            2.7
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 3.882018256634474,
+              "latest_s": 3.8820182573795323
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL3_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            3.3000000000000003
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.379818074703217,
+              "latest_s": 4.379818075448275
+            }
+          ],
+          "state_return": null
+        }
+      ]
+    },
+    {
+      "scope": "SYNTHETIC_INITIAL_STATE_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+      "intervals": 400,
+      "coordinates": [
+        [
+          "a2",
+          "V"
+        ],
+        [
+          "x1",
+          "V"
+        ],
+        [
+          "out",
+          "V"
+        ],
+        [
+          "iL1",
+          "A"
+        ],
+        [
+          "iL2",
+          "A"
+        ],
+        [
+          "iL3",
+          "A"
+        ]
+      ],
+      "cases": [
+        {
+          "case": "baseline",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "a2_x0.9",
+          "seed": [
+            3.6,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "a2_x1.1",
+          "seed": [
+            4.4,
+            2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.137001277506349,
+              "latest_s": 4.137001278251407
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "x1_x0.9",
+          "seed": [
+            4,
+            1.8,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.139057279080152,
+              "latest_s": 4.13905727982521
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "x1_x1.1",
+          "seed": [
+            4,
+            2.2,
+            1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.134762585908174,
+              "latest_s": 4.134762586653232
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "out_x0.9",
+          "seed": [
+            4,
+            2,
+            0.9,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.219550068080426,
+              "latest_s": 4.219550068825484
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "out_x1.1",
+          "seed": [
+            4,
+            2,
+            1.1,
+            20,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.056029441356658,
+              "latest_s": 4.056029442101717
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL1_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            18,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.304185903370381,
+              "latest_s": 4.304185904115439
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL1_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            22,
+            2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 3.989175901859997,
+              "latest_s": 3.9891759026050546
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL2_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            1.8,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.152862447351218,
+              "latest_s": 4.1528624480962755
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL2_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2.2,
+            3
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.121327189654112,
+              "latest_s": 4.121327190399169
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL3_x0.9",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            2.7
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 3.882018256634474,
+              "latest_s": 3.8820182573795323
+            }
+          ],
+          "state_return": null
+        },
+        {
+          "case": "iL3_x1.1",
+          "seed": [
+            4,
+            2,
+            1,
+            20,
+            2,
+            3.3000000000000003
+          ],
+          "status": "TRAJECTORY_UNRESOLVED_NO_RETURN_RESIDUAL",
+          "failed_mode": "M5",
+          "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+          "events": [
+            "domain.iL3"
+          ],
+          "windows": [
+            {
+              "event": "domain.iL3",
+              "earliest_s": 4.379818074703217,
+              "latest_s": 4.379818075448275
+            }
+          ],
+          "state_return": null
+        }
+      ]
+    }
+  ]
+}

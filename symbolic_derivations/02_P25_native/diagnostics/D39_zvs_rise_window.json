@@ -1,0 +1,69 @@
+{
+  "scope": "D38_FROZEN_OTHER_COORDINATES_PRE_SH2_WINDOW_ONLY",
+  "inherited_first_event_scope": "CONDITIONAL_SAMPLED_SCREEN_ONLY; no gate action or first-root certificate",
+  "envelope": {
+    "start_s": 7.052471034675838,
+    "end_s": 7.95252937719226,
+    "coordinates": [
+      "a1",
+      "a2",
+      "x1",
+      "x2",
+      "x3",
+      "out",
+      "iL1",
+      "iL2",
+      "iL3"
+    ],
+    "units": [
+      "V",
+      "V",
+      "V",
+      "V",
+      "V",
+      "V",
+      "A",
+      "A",
+      "A"
+    ],
+    "lower": [
+      8.392069219294983,
+      3.4490319547653874,
+      -6.849186773294491e-10,
+      -0.41907358785378146,
+      0.0,
+      1.7318897022894326,
+      -0.018244264295438017,
+      -1.5996005515854228,
+      0.34379840148492774
+    ],
+    "upper": [
+      8.4320812703966,
+      4.209260925696117,
+      -6.849186773294491e-10,
+      0.41907358785378146,
+      0.0,
+      1.837564489231728,
+      1.6065621295257366,
+      -0.4003994489849668,
+      1.1562015980872815
+    ],
+    "change_bound": [
+      0.020006025550808663,
+      0.3801144854653646,
+      0.0,
+      0.41907358785378146,
+      0.0,
+      0.052837393471147694,
+      0.8124031969105873,
+      0.5996005513002279,
+      0.4062015983011769
+    ],
+    "scope": "ANALYTICAL_COMPARISON_NUMERICALLY_EVALUATED; not rigorous floating-point enclosure or event certification"
+  },
+  "x2_upper_v": 0.41907358785378146,
+  "output_lower_v": 1.7318897022894326,
+  "inductor_voltage_upper_v": -1.3128161144356512,
+  "current_derivative_upper_a_s": -0.4376053714785504,
+  "rise_status": "POSITIVE_ENTRY_RISE_EXCLUDED_ON_DECLARED_WINDOW"
+}

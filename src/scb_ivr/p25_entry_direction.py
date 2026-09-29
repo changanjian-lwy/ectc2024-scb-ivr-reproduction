@@ -9,6 +9,7 @@ from math import isfinite
 import numpy as np
 from .p25_nodal_contract import SWITCHES, incidence
 from .p25_reverse_contract import ReverseModel
+from .p25_cycle_modes import current_signs, commutation_target
 
 
 @dataclass(frozen=True)
@@ -45,16 +46,16 @@ def classify_entry(flow, reverse: ReverseModel, tolerance: DirectionTolerance) -
     s=flow.start
     if s.boundary.branch!="P25" or s.boundary.nP!=3 or s.boundary.nM!=1 or s.boundary.module!=1:
         raise ValueError("D11 currently requires P25 native three-phase SINGLE module")
-    if flow.mode not in {"M2","M5"} or not isinstance(reverse,ReverseModel):
-        raise ValueError("M2/M5 and explicit reverse surrogate required")
+    target=commutation_target(flow.mode)
+    if not isinstance(reverse,ReverseModel):
+        raise ValueError("explicit reverse surrogate required")
     dz=flow.generator@np.r_[s.voltage_v,s.current_a,1.]
     rates=incidence().T@np.r_[0.,dz[:6]]
-    target="SL1" if flow.mode=="M2" else "SH2"
     rows=[("target."+target,s.switch_voltage(target),rates[SWITCHES.index(target)],"V","target")]
     for k,(name,on) in enumerate(zip(SWITCHES,(*s.gates.high,*s.gates.low))):
         if not on:
             rows.append(("reverse."+name,s.switch_voltage(name)+reverse.drop_v[k],rates[k],"V","reverse"))
-    signs=(1,1,1) if flow.mode=="M2" else (1,-1,1)
+    signs=current_signs(flow.mode)
     for k,sign in enumerate(signs):
         rows.append((f"domain.iL{k+1}",sign*s.current_a[k],sign*dz[6+k],"A","domain"))
     items=[]

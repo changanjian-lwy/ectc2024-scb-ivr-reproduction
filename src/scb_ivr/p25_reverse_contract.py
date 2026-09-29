@@ -11,7 +11,7 @@ from math import isfinite
 import numpy as np
 
 from .p25_event_guards import Snapshot
-from .p25_native_events import MODES
+from .p25_cycle_modes import cycle_mode, current_signs
 from .p25_nodal_contract import Components, SWITCHES, incidence, inductor_incidence
 
 
@@ -73,20 +73,19 @@ class LocalResolution:
 def paper_mode_violations(state: Snapshot, mode: str, *, tolerance_a: float) -> tuple[str, ...]:
     """Closed current-sign domains, not event timing or a full feasibility test.
 
-    M1/M6 rising phase entry current is not forcibly zeroed. Equality is a
+    Rising phase entry current is not forcibly zeroed. Equality is a
     boundary requiring directional event checks, not proof of strict interior.
     """
     if not isfinite(tolerance_a) or tolerance_a < 0:
         raise ValueError("explicit finite nonnegative current tolerance required")
-    modes = {m.name: m for m in MODES}
-    if mode not in modes:
-        raise ValueError("unknown P25 first-handoff mode")
+    # Preserve the two original optional reverse-submode aliases. Additional
+    # prime intervals are not invented by the main-mode cyclic extension.
+    main = {"M2_PRIME_OPTIONAL": "M2", "M5_PRIME_OPTIONAL": "M5"}.get(mode, mode)
+    spec = cycle_mode(main)
     failures = []
-    if state.gates != modes[mode].gates:
+    if state.gates != spec.gates:
         failures.append("GATE_PATTERN")
-    signs = {"M1": (0, 1, 1), "M2": (1, 1, 1), "M2_PRIME_OPTIONAL": (1, 1, 1),
-             "M3": (1, 1, 1), "M4": (1, -1, 1), "M5": (1, -1, 1),
-             "M5_PRIME_OPTIONAL": (1, -1, 1), "M6": (1, 0, 1)}[mode]
+    signs = current_signs(main)
     for k, (sign, current) in enumerate(zip(signs, state.current_a), 1):
         if sign and sign*current < -tolerance_a:
             failures.append(f"iL{k}_SIGN")

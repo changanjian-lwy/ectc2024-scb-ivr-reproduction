@@ -1,0 +1,1016 @@
+[
+  {
+    "scope": "SYNTHETIC_ONE_INITIAL_COORDINATE_DERIVATION_NOT_PAPER_RESULT",
+    "intervals": 200,
+    "baseline_a2_v": 4.0,
+    "pre_SH2_null_column_max": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "conditional_open_a2_window_v": [
+      8.234110174641032,
+      8.58292880461504
+    ],
+    "candidate_a2_v": 8.408519489628036,
+    "failed_mode": "M6",
+    "state_return": null,
+    "stages": [
+      {
+        "mode": "M1",
+        "status": "CONDITIONAL_M2_ENTRY",
+        "events": [
+          "control.high_off"
+        ],
+        "before": {
+          "time_s": 0.0,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            4.0,
+            0.0,
+            0.0,
+            0.5
+          ],
+          "inductor_current_a": [
+            -0.0025,
+            2.0,
+            3.0
+          ],
+          "gates": {
+            "high": [
+              true,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "actual on-time preserved; electrical state and peak records unchanged",
+        "accepted_after": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            3.9999833397951234,
+            0.0,
+            0.0,
+            0.5034887571707317
+          ],
+          "inductor_current_a": [
+            0.03248252641224571,
+            1.9966550515480213,
+            2.997491288661016
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M2",
+        "status": "CONDITIONAL_M3_ENTRY",
+        "events": [
+          "reverse.SL1",
+          "target.SL1"
+        ],
+        "before": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            3.9999833397951234,
+            0.0,
+            0.0,
+            0.5034887571707317
+          ],
+          "inductor_current_a": [
+            0.03248252641224571,
+            1.9966550515480213,
+            2.997491288661016
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "electrical state unchanged; pre/post complementarity checked; sampled coverage only",
+        "accepted_after": {
+          "time_s": 4.348853832185268,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.5367705249241723
+          ],
+          "inductor_current_a": [
+            3.105882508820498,
+            0.5411490499011189,
+            1.90586178742584
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M3",
+        "status": "CONDITIONAL_M4_ENTRY",
+        "events": [
+          "domain.iL2"
+        ],
+        "before": {
+          "time_s": 4.348853832185268,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.5367705249241723
+          ],
+          "inductor_current_a": [
+            3.105882508820498,
+            0.5411490499011189,
+            1.90586178742584
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "current zero located; gates unchanged; causal negative target latched",
+        "accepted_after": {
+          "time_s": 5.348927018493415,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.6971307621889529
+          ],
+          "inductor_current_a": [
+            2.29415893321363,
+            -2.7513719080829446e-10,
+            1.499999999793648
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M4",
+        "status": "CONDITIONAL_M5_ENTRY",
+        "events": [
+          "target.iL2_negative"
+        ],
+        "before": {
+          "time_s": 5.348927018493415,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.6971307621889529
+          ],
+          "inductor_current_a": [
+            2.29415893321363,
+            -2.7513719080829446e-10,
+            1.499999999793648
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "SL2 off at latched negative target; electrical state unchanged",
+        "accepted_after": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M5",
+        "status": "CONDITIONAL_M6_ENTRY",
+        "events": [
+          "reverse.SH2",
+          "target.SH2"
+        ],
+        "before": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "reason": "SH2 ZVS gate admission; negative entry current retained",
+        "accepted_after": {
+          "time_s": 7.544654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.42176465123405,
+            8.421764651235684,
+            -6.849186773294491e-10,
+            0.20296756539613436,
+            0.0,
+            1.7649301844978222
+          ],
+          "inductor_current_a": [
+            0.3569791544729914,
+            -1.275474169373515,
+            0.5314101107993021
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M6",
+        "status": "HIGH_OFF_EVENT_REJECTED",
+        "events": [
+          "control.high_off"
+        ],
+        "before": {
+          "time_s": 7.544654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.42176465123405,
+            8.421764651235684,
+            -6.849186773294491e-10,
+            0.20296756539613436,
+            0.0,
+            1.7649301844978222
+          ],
+          "inductor_current_a": [
+            0.3569791544729914,
+            -1.275474169373515,
+            0.5314101107993021
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "reason": "iL2 outside current-sign domain of high_off_to_low_zero",
+        "accepted_after": null,
+        "entry_inductor_voltage_v": -1.561962619101688,
+        "entry_current_derivative_a_s": -0.5206542063672294,
+        "entry_rise_direction": "NONPOSITIVE",
+        "unaccepted_high_off_continuation": {
+          "time_s": 7.564654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.422984343288743,
+            8.422984343290375,
+            -6.849186773294491e-10,
+            0.20540694950551994,
+            0.0,
+            1.7637079920342589
+          ],
+          "inductor_current_a": [
+            0.33933593686917213,
+            -1.285875077061414,
+            0.5225885020008171
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "scope": "SYNTHETIC_ONE_INITIAL_COORDINATE_DERIVATION_NOT_PAPER_RESULT",
+    "intervals": 400,
+    "baseline_a2_v": 4.0,
+    "pre_SH2_null_column_max": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "conditional_open_a2_window_v": [
+      8.234110174641032,
+      8.58292880461504
+    ],
+    "candidate_a2_v": 8.408519489628036,
+    "failed_mode": "M6",
+    "state_return": null,
+    "stages": [
+      {
+        "mode": "M1",
+        "status": "CONDITIONAL_M2_ENTRY",
+        "events": [
+          "control.high_off"
+        ],
+        "before": {
+          "time_s": 0.0,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            4.0,
+            0.0,
+            0.0,
+            0.5
+          ],
+          "inductor_current_a": [
+            -0.0025,
+            2.0,
+            3.0
+          ],
+          "gates": {
+            "high": [
+              true,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "actual on-time preserved; electrical state and peak records unchanged",
+        "accepted_after": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            3.9999833397951234,
+            0.0,
+            0.0,
+            0.5034887571707317
+          ],
+          "inductor_current_a": [
+            0.03248252641224571,
+            1.9966550515480213,
+            2.997491288661016
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M2",
+        "status": "CONDITIONAL_M3_ENTRY",
+        "events": [
+          "reverse.SL1",
+          "target.SL1"
+        ],
+        "before": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12.0,
+            8.408519489628036,
+            3.9999833397951234,
+            0.0,
+            0.0,
+            0.5034887571707317
+          ],
+          "inductor_current_a": [
+            0.03248252641224571,
+            1.9966550515480213,
+            2.997491288661016
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "electrical state unchanged; pre/post complementarity checked; sampled coverage only",
+        "accepted_after": {
+          "time_s": 4.348853832185268,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.5367705249241723
+          ],
+          "inductor_current_a": [
+            3.105882508820498,
+            0.5411490499011189,
+            1.90586178742584
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M3",
+        "status": "CONDITIONAL_M4_ENTRY",
+        "events": [
+          "domain.iL2"
+        ],
+        "before": {
+          "time_s": 4.348853832185268,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.5367705249241723
+          ],
+          "inductor_current_a": [
+            3.105882508820498,
+            0.5411490499011189,
+            1.90586178742584
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "current zero located; gates unchanged; causal negative target latched",
+        "accepted_after": {
+          "time_s": 5.348927018493415,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.6971307621889529
+          ],
+          "inductor_current_a": [
+            2.29415893321363,
+            -2.7513719080829446e-10,
+            1.499999999793648
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M4",
+        "status": "CONDITIONAL_M5_ENTRY",
+        "events": [
+          "target.iL2_negative"
+        ],
+        "before": {
+          "time_s": 5.348927018493415,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.6971307621889529
+          ],
+          "inductor_current_a": [
+            2.29415893321363,
+            -2.7513719080829446e-10,
+            1.499999999793648
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "reason": "SL2 off at latched negative target; electrical state unchanged",
+        "accepted_after": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M5",
+        "status": "CONDITIONAL_M6_ENTRY",
+        "events": [
+          "reverse.SH2",
+          "target.SH2"
+        ],
+        "before": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            8.237665929858787,
+            -6.849186773294491e-10,
+            0.0,
+            0.0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "reason": "SH2 ZVS gate admission; negative entry current retained",
+        "accepted_after": {
+          "time_s": 7.544654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.42176465123405,
+            8.421764651235684,
+            -6.849186773294491e-10,
+            0.20296756539613436,
+            0.0,
+            1.7649301844978222
+          ],
+          "inductor_current_a": [
+            0.3569791544729914,
+            -1.275474169373515,
+            0.5314101107993021
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "mode": "M6",
+        "status": "HIGH_OFF_EVENT_REJECTED",
+        "events": [
+          "control.high_off"
+        ],
+        "before": {
+          "time_s": 7.544654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.42176465123405,
+            8.421764651235684,
+            -6.849186773294491e-10,
+            0.20296756539613436,
+            0.0,
+            1.7649301844978222
+          ],
+          "inductor_current_a": [
+            0.3569791544729914,
+            -1.275474169373515,
+            0.5314101107993021
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "reason": "iL2 outside current-sign domain of high_off_to_low_zero",
+        "accepted_after": null,
+        "entry_inductor_voltage_v": -1.561962619101688,
+        "entry_current_derivative_a_s": -0.5206542063672294,
+        "entry_rise_direction": "NONPOSITIVE",
+        "unaccepted_high_off_continuation": {
+          "time_s": 7.564654849618675,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.422984343288743,
+            8.422984343290375,
+            -6.849186773294491e-10,
+            0.20540694950551994,
+            0.0,
+            1.7637079920342589
+          ],
+          "inductor_current_a": [
+            0.33933593686917213,
+            -1.285875077061414,
+            0.5225885020008171
+          ],
+          "gates": {
+            "high": [
+              false,
+              true,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

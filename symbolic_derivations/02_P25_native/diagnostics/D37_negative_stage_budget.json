@@ -1,0 +1,302 @@
+{
+  "scope": "UNCHANGED_D36_SYNTHETIC_SEEDS_SAME_PATH_BUDGET",
+  "cases": [
+    {
+      "initial_x1_v": 3.0,
+      "failed_mode": "M4",
+      "stages": [
+        {
+          "mode": "M4",
+          "coverage": "UNACCEPTED_DIAGNOSTIC_TO_ROOT",
+          "start": {
+            "time_s": 5.608248968124389,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              9.309055186578668,
+              3.87185977078946,
+              -2.9347968499848776e-10,
+              0.0,
+              0.0,
+              1.543507952456879
+            ],
+            "inductor_current_a": [
+              1.1654931657252066,
+              -1.6794166751710193e-11,
+              1.4999999999874045
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          "end": {
+            "time_s": 7.092737372666598,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              9.309055186578668,
+              3.87185977078946,
+              -2.9347968499848776e-10,
+              0.0,
+              0.0,
+              1.5697380185010246
+            ],
+            "inductor_current_a": [
+              -2.563822487644529e-10,
+              -0.7769954438592972,
+              0.9172534171055271
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          "negative_target_a": -1.0,
+          "initial_L1i1_vs": 2.330986331450413,
+          "integral_Vo_vs": 2.33098633152751,
+          "integral_x1_vs": -4.3566718934895494e-10,
+          "integral_R1i1_vs": 0.0,
+          "final_L1i1_vs": -5.127644975289058e-10,
+          "flux_balance_residual_vs": -4.440892098500626e-16,
+          "required_output_flux_for_negative_target_vs": 2.9999999999496176
+        }
+      ]
+    },
+    {
+      "initial_x1_v": 4.0,
+      "failed_mode": "M5",
+      "stages": [
+        {
+          "mode": "M4",
+          "coverage": "ACCEPTED_SEGMENT",
+          "start": {
+            "time_s": 5.348927018493415,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              8.412075244845791,
+              3.829146440230752,
+              -6.849186773294491e-10,
+              0.0,
+              0.0,
+              1.6971307621889529
+            ],
+            "inductor_current_a": [
+              2.29415893321363,
+              -2.7513719080829446e-10,
+              1.499999999793648
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          "end": {
+            "time_s": 7.052471034675838,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              8.412075244845791,
+              3.829146440230752,
+              -6.849186773294491e-10,
+              0.0,
+              0.0,
+              1.7847270957605803
+            ],
+            "inductor_current_a": [
+              0.7941589326151492,
+              -1.0000000002851948,
+              0.7499999997861047
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          "negative_target_a": -1.0,
+          "initial_L1i1_vs": 4.58831786642726,
+          "integral_Vo_vs": 3.000000000030173,
+          "integral_x1_vs": -1.1667891143361629e-09,
+          "integral_R1i1_vs": 0.0,
+          "final_L1i1_vs": 1.5883178652302985,
+          "flux_balance_residual_vs": 1.3322676295501878e-15,
+          "required_output_flux_for_negative_target_vs": 2.9999999991745883
+        },
+        {
+          "mode": "M5",
+          "coverage": "UNACCEPTED_DIAGNOSTIC_TO_ROOT",
+          "start": {
+            "time_s": 7.052471034675838,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              8.412075244845791,
+              3.829146440230752,
+              -6.849186773294491e-10,
+              0.0,
+              0.0,
+              1.7847270957605803
+            ],
+            "inductor_current_a": [
+              0.7941589326151492,
+              -1.0000000002851948,
+              0.7499999997861047
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                false,
+                true
+              ]
+            }
+          },
+          "end": {
+            "time_s": 7.95252937719226,
+            "node_order": [
+              "a1",
+              "a2",
+              "x1",
+              "x2",
+              "x3",
+              "out"
+            ],
+            "node_voltage_v": [
+              8.431454057622126,
+              4.197343882981094,
+              -6.849186773294491e-10,
+              0.4059351307884651,
+              0.0,
+              1.7337769300726666
+            ],
+            "inductor_current_a": [
+              -1.3163248269165706e-10,
+              -1.4723967406960552,
+              0.3529205335668306
+            ],
+            "gates": {
+              "high": [
+                false,
+                false,
+                false
+              ],
+              "low": [
+                true,
+                false,
+                true
+              ]
+            }
+          },
+          "negative_target_a": -1.0,
+          "initial_L1i1_vs": 1.5883178652302985,
+          "integral_Vo_vs": 1.5883178648770968,
+          "integral_x1_vs": -6.164667694756839e-10,
+          "integral_R1i1_vs": 0.0,
+          "final_L1i1_vs": -2.632649653833141e-10,
+          "flux_balance_residual_vs": 2.220446049250313e-16,
+          "charge": {
+            "target": "SH2",
+            "phase": 2,
+            "start_vds_v": 4.582928804615039,
+            "end_vds_v": 4.234110174641033,
+            "normalized_capacitance_f": 3.2192982456140338,
+            "required_normalized_charge_c": 14.753814660471217,
+            "negative_phase_charge_c": 1.1229512035128137,
+            "other_normalized_charge_c": -4.444599757419878e-19,
+            "remaining_normalized_charge_c": 13.630863456958407,
+            "voltage_balance_residual_v": 8.880403585632462e-16,
+            "rate_coefficients": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              3.881707933700729e-19,
+              0.31062670299727535,
+              0.0,
+              0.0
+            ],
+            "scope": "AFFINE_ENDPOINT_ACCOUNTING; not device Qoss, first-root or ZVS feasibility proof"
+          },
+          "conditional_bound": {
+            "status": "NOT_APPLICABLE",
+            "reason": "monotone output voltage not established by this bound",
+            "required_charge_c": null,
+            "maximum_charge_c": null,
+            "maximum_duration_s": null,
+            "minimum_output_current_margin_a": -2.176518755521536
+          },
+          "entry_output_derivative_v_s": -0.01981917686451917
+        }
+      ]
+    }
+  ]
+}

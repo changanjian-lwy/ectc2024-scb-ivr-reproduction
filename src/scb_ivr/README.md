@@ -49,19 +49,54 @@ Definition audit additions (not yet wired into legacy solvers):
   and an explicit ideal gate/reverse-boundary batch with pre/post D05 checks.
   Does not certify trajectory continuity or completeness of supplied events.
 - `p25_local_flow`: constant-port full-network affine continuation and sampled
-  M2/M5 event screening; not certified first-event detection or gate control.
+  all six commutation-mode event screening; not certified first-event detection or gate control.
 - `p25_entry_direction`: P25 nP=3/nM=1 exact-zero reverse-gap direction;
   no epsilon steps, gate actions or four-phase schedule reuse.
-- `p25_handoff`: conditional P25 nP=3/nM=1 M2-to-M3 joint event and M3-to-M4
-  entry; electrical state identity, explicit causal peak requirement, no defaults.
-- `p25_negative_handoff`: same first-handoff branch, M4 latched target and
-  M5-to-M6 joint high-side admission; competing boundaries stop the chain.
+- `p25_seed_evaluation`: runs a fixed-boundary candidate; failed trajectories
+  have no invented periodic residual. Only completed section returns reach D08.
+- `p25_shooting_contract`: six-coordinate SH1 section with frozen device,
+  timing, ports and design-peak references; not a periodic solver or observer.
+- `p25_period_attempt`: one M1–M15 attempt, full per-step records and
+  first-failure return; independently rejects state resets. Section reachability
+  is explicitly separate from periodic-state closure.
+- `p25_trace_balance`: accepted-segment charge/volt-second ledger; excludes
+  failed trial endpoints and distinguishes prefixes from full-cycle coverage.
+- `p25_high_on`: sampled competing-event screening through the original
+  common on-time; no peak estimation, resumed-history skip or forced handoff.
+- `p25_handoff`: conditional P25 nP=3/nM=1 low admission and next-phase
+  zero crossing for all three handoffs; state identity and causal peak requirement.
+- `p25_negative_handoff`: latched negative target and next-high admission
+  for all three handoffs, including M15-to-M1 cycle increment; competing
+  boundaries stop the chain. Legacy “second” APIs remain phase-1-only.
 - `p25_freewheel_margin`: P25 nP=3/nM=1 endpoint volt-second accounting,
   keeping winding and node-residual terms; no fixed-output or periodic claim.
+- `p25_all_low_necessity`: conditional common-volt-second current-order bound;
+  rejects or explicitly excludes nonzero winding/node-residual pairs.
+- `p25_commutation_charge`: full-network affine target-voltage accounting
+  normalized by the active current coefficient; not isolated-device Qoss.
+- `p25_commutation_closed_form`: independent P25 M5/M10/M15 capacitor
+  elimination formulas; phase positions are not assumed interchangeable.
+- `p25_commutation_dynamics`: checks the forced second-order target-Vds
+  equation with actual dynamic Vo and winding R; distinguishes Cn from Cx.
+- `p25_reduced_commutation`: independently assembled five-state local flow,
+  retaining all phase currents and dynamic output; D27 reconstructs all nodes
+  from entry constants, but does not replace the main guard scanner.
 - `p25_cycle_modes`: P25 M1–M15 main-mode indexing on the same physical
-  topology; later modes labelled cyclic mapping, not four-phase extension.
+  topology, shared current-sign domains and six physical commutation targets;
+  later modes labelled cyclic mapping, not four-phase extension.
 - `p25_watch_contract`: model-specific required event names/quantities and
   independent algebraic checks; checks installation coverage, not callbacks.
+- `p25_commutation_necessity`: D30 conservative charge/flux obstruction under
+  exact zero-R/zero-ON-node assumptions; rejects residual-bearing old seeds,
+  and never labels a necessary-condition pass as ZVS success.
+- `p25_residual_charge_bound`: D31 retains constant ON-node offsets in the
+  affine-continuation charge bound; not an ideal-state/error certificate.
+- `p25_energy_ledger`: D32 accepted-prefix input/load/winding/stored-energy
+  audit; ON-residual work is explicit and is not physical MOS loss.
+- `p25_section_necessity`: D33 distinguishes a general SH1-on debug entry
+  from the negative-current section required by M15→M1 periodic return.
+- `p25_down_commutation_charge`: D35 separates low-side node-normalized Cx
+  from high-side Cn, checking three-phase charge accounting on the same flow.
 - `p25_periodic_section`: SH1-on full capacitor/current/control-memory return,
   explicit model identity and dimensionally scaled residuals. Does not establish
   an intervening trajectory, external forcing periodicity, or stability.

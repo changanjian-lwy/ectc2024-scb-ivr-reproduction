@@ -42,3 +42,28 @@ def cycle_mode(name: str) -> CycleMode:
     if name in original and result.gates!=original[name]:
         raise ValueError("cycle mapping contradicts locked first-six source table")
     return result
+
+
+def current_signs(name: str) -> tuple[int, int, int]:
+    """Closed paper-mode signs; zero means unrestricted, not zero current.
+
+    Extends D02 first-handoff signs using the D15 repeated-phase mapping.
+    These are domain checks, not proof that a trajectory reaches that mode.
+    """
+    mode = cycle_mode(name)
+    signs = [1, 1, 1]
+    if mode.slot == "high_on":
+        signs[mode.phase-1] = 0
+    elif mode.slot in {"negative", "up_comm"}:
+        signs[mode.next_phase-1] = -1
+    return tuple(signs)
+
+
+def commutation_target(name: str) -> str:
+    """Return the physical target switch without rotating any node state."""
+    mode = cycle_mode(name)
+    if mode.slot == "down_comm":
+        return f"SL{mode.phase}"
+    if mode.slot == "up_comm":
+        return f"SH{mode.next_phase}"
+    raise ValueError("commutation requires M2/M5/M7/M10/M12/M15")

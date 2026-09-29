@@ -1,0 +1,1848 @@
+[
+  {
+    "scope": "SYNTHETIC_INITIAL_VOLTAGE_GRID_NOT_PAPER_REPRODUCTION",
+    "intervals": 200,
+    "frozen_model": {
+      "components": {
+        "coss_f": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snubber_f": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "series_f": [
+          17,
+          19
+        ],
+        "output_f": 23,
+        "inductance_h": [
+          2,
+          3,
+          4
+        ],
+        "winding_ohm": [
+          0,
+          0,
+          0
+        ],
+        "source": "D12 synthetic F/H/s"
+      },
+      "reverse_model": {
+        "kind": "ideal_zero_drop",
+        "drop_v": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "declaration": "declared ideal mathematical branch"
+      },
+      "control": {
+        "on_time_s": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "voltage_tolerance_v": 1e-8,
+        "current_tolerance_a": 1e-8,
+        "time_tolerance_s": 1e-9,
+        "ideal_zero_delay": true,
+        "declaration": "D12 ideal synthetic control"
+      },
+      "port_model_id": "constant synthetic current"
+    },
+    "frozen_ports": {
+      "load_current_a": 1,
+      "other_modules_current_a": 0,
+      "declaration": "D12 synthetic constant current"
+    },
+    "cases": [
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 2,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.484350268244743,
+            "latest_s": 4.484350268989801,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            1.9999972286587395,
+            0,
+            0,
+            1.0034753514047425
+          ],
+          "inductor_current_a": [
+            0.007482617394419572,
+            1.993321748005307,
+            2.99499131100398
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.484350268989801,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            11.12725048147484,
+            3.958440499117849,
+            1.0270159727119212,
+            0,
+            0,
+            1.580503644954928
+          ],
+          "inductor_current_a": [
+            0.5698578173531563,
+            -9.084033525397217e-11,
+            1.4999999999318696
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 1.9999972286587395,
+          "end_vds_v": 1.0270159727119212,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 5.502504938144021,
+          "phase_charge_c": 2.67692079211499,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.8255841460290303,
+          "voltage_balance_residual_v": -2.220446049250313e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 3,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.333937859237192,
+            "latest_s": 4.3339378599822505,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            2.999991673112354,
+            0,
+            0,
+            1.0034796992199773
+          ],
+          "inductor_current_a": [
+            0.017482584383187477,
+            1.9933217383434856,
+            2.994991303757614
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.3339378599822505,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            10.054067595402174,
+            3.9073365521620085,
+            0.830576835493489,
+            0,
+            0,
+            1.7128807928112613
+          ],
+          "inductor_current_a": [
+            1.6405808447058834,
+            -1.4659273794848104e-10,
+            1.4999999998900548
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 2.999991673112354,
+          "end_vds_v": 0.830576835493489,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 8.253745934819168,
+          "phase_charge_c": 5.96861619897653,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.28512973584264,
+          "voltage_balance_residual_v": 1.3322676295501878e-15,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 4,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.205330848395823,
+            "latest_s": 4.205330849140881,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            3.9999861175659683,
+            0,
+            0,
+            1.0034840470352122
+          ],
+          "inductor_current_a": [
+            0.027482551371955377,
+            1.9933217286816642,
+            2.994991296511248
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.205330849140881,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.065565168595382,
+            3.8602650080283514,
+            0.7285433643473765,
+            0,
+            0,
+            1.8352781115966712
+          ],
+          "inductor_current_a": [
+            2.7469851740742994,
+            -3.591853481310636e-10,
+            1.4999999997306102
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 3.9999861175659683,
+          "end_vds_v": 0.7285433643473765,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 11.004986931494313,
+          "phase_charge_c": 9.000577424056178,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.0044095074381345,
+          "voltage_balance_residual_v": 0,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 2,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 5.930753610730172,
+            "latest_s": 5.930753611475231,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            1.999994450887895,
+            0,
+            0,
+            0.5034800615402619
+          ],
+          "inductor_current_a": [
+            0.012482592434709904,
+            1.996655070871664,
+            2.997491303153748
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 5.930753611475231,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            10.289821116334267,
+            3.9185629103016315,
+            0.09340846853786344,
+            0,
+            0,
+            1.3777780266434396
+          ],
+          "inductor_current_a": [
+            0.18855808851351463,
+            -7.62780949514763e-11,
+            1.4999999999427915
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 1.999994450887895,
+          "end_vds_v": 0.09340846853786344,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 5.502497295784537,
+          "phase_charge_c": 5.24550665998313,
+          "other_charge_c": 0,
+          "remaining_charge_c": 0.2569906358014083,
+          "voltage_balance_residual_v": 4.440892098500626e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 3,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1",
+          "M2",
+          "M3"
+        ],
+        "failed_mode": "M4",
+        "last_action": "OTHER_M4_BOUNDARY_FIRST_OR_OVERLAP",
+        "events": [
+          "domain.iL1"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL1",
+            "earliest_s": 7.092737371921539,
+            "latest_s": 7.092737372666598,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  true,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 5.608248968124389,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.309055186578668,
+            3.87185977078946,
+            -2.9347968499848776e-10,
+            0,
+            0,
+            1.543507952456879
+          ],
+          "inductor_current_a": [
+            1.1654931657252066,
+            -1.6794166751710193e-11,
+            1.4999999999874045
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 7.092737372666598,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.309055186578668,
+            3.87185977078946,
+            -2.9347968499848776e-10,
+            0,
+            0,
+            1.5697380185010246
+          ],
+          "inductor_current_a": [
+            -2.563822487644529e-10,
+            -0.7769954438592972,
+            0.9172534171055271
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 2.999988895341509,
+          "end_vds_v": -2.9347968499848776e-10,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 8.253738292459682,
+          "phase_charge_c": 8.253738293267117,
+          "other_charge_c": 0,
+          "remaining_charge_c": -8.074378268174477e-10,
+          "voltage_balance_residual_v": -4.440892098500626e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 4,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1",
+          "M2",
+          "M3",
+          "M4"
+        ],
+        "failed_mode": "M5",
+        "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+        "events": [
+          "domain.iL1"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL1",
+            "earliest_s": 7.952529376447202,
+            "latest_s": 7.95252937719226,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  true,
+                  false,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            3.829146440230752,
+            -6.849186773294491e-10,
+            0,
+            0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 7.95252937719226,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.431454057622126,
+            4.197343882981094,
+            -6.849186773294491e-10,
+            0.4059351307884651,
+            0,
+            1.7337769300726666
+          ],
+          "inductor_current_a": [
+            -1.3163248269165706e-10,
+            -1.4723967406960552,
+            0.3529205335668306
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 3.9999833397951234,
+          "end_vds_v": -6.849186773294491e-10,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 11.004979289134829,
+          "phase_charge_c": 11.004979291019211,
+          "other_charge_c": 0,
+          "remaining_charge_c": -1.8843868132556456e-9,
+          "voltage_balance_residual_v": -1.3322676295501878e-15,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      }
+    ]
+  },
+  {
+    "scope": "SYNTHETIC_INITIAL_VOLTAGE_GRID_NOT_PAPER_REPRODUCTION",
+    "intervals": 400,
+    "frozen_model": {
+      "components": {
+        "coss_f": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snubber_f": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "series_f": [
+          17,
+          19
+        ],
+        "output_f": 23,
+        "inductance_h": [
+          2,
+          3,
+          4
+        ],
+        "winding_ohm": [
+          0,
+          0,
+          0
+        ],
+        "source": "D12 synthetic F/H/s"
+      },
+      "reverse_model": {
+        "kind": "ideal_zero_drop",
+        "drop_v": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "declaration": "declared ideal mathematical branch"
+      },
+      "control": {
+        "on_time_s": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "voltage_tolerance_v": 1e-8,
+        "current_tolerance_a": 1e-8,
+        "time_tolerance_s": 1e-9,
+        "ideal_zero_delay": true,
+        "declaration": "D12 ideal synthetic control"
+      },
+      "port_model_id": "constant synthetic current"
+    },
+    "frozen_ports": {
+      "load_current_a": 1,
+      "other_modules_current_a": 0,
+      "declaration": "D12 synthetic constant current"
+    },
+    "cases": [
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 2,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.484350268244743,
+            "latest_s": 4.484350268989801,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            1.9999972286587395,
+            0,
+            0,
+            1.0034753514047425
+          ],
+          "inductor_current_a": [
+            0.007482617394419572,
+            1.993321748005307,
+            2.99499131100398
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.484350268989801,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            11.12725048147484,
+            3.958440499117849,
+            1.0270159727119212,
+            0,
+            0,
+            1.580503644954928
+          ],
+          "inductor_current_a": [
+            0.5698578173531563,
+            -9.084033525397217e-11,
+            1.4999999999318696
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 1.9999972286587395,
+          "end_vds_v": 1.0270159727119212,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 5.502504938144021,
+          "phase_charge_c": 2.67692079211499,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.8255841460290303,
+          "voltage_balance_residual_v": -2.220446049250313e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 3,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.333937859237192,
+            "latest_s": 4.3339378599822505,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            2.999991673112354,
+            0,
+            0,
+            1.0034796992199773
+          ],
+          "inductor_current_a": [
+            0.017482584383187477,
+            1.9933217383434856,
+            2.994991303757614
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.3339378599822505,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            10.054067595402174,
+            3.9073365521620085,
+            0.830576835493489,
+            0,
+            0,
+            1.7128807928112613
+          ],
+          "inductor_current_a": [
+            1.6405808447058834,
+            -1.4659273794848104e-10,
+            1.4999999998900548
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 2.999991673112354,
+          "end_vds_v": 0.830576835493489,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 8.253745934819168,
+          "phase_charge_c": 5.96861619897653,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.28512973584264,
+          "voltage_balance_residual_v": 1.3322676295501878e-15,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 4,
+          "out_v": 1,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 4.205330848395823,
+            "latest_s": 4.205330849140881,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            3.9999861175659683,
+            0,
+            0,
+            1.0034840470352122
+          ],
+          "inductor_current_a": [
+            0.027482551371955377,
+            1.9933217286816642,
+            2.994991296511248
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 4.205330849140881,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.065565168595382,
+            3.8602650080283514,
+            0.7285433643473765,
+            0,
+            0,
+            1.8352781115966712
+          ],
+          "inductor_current_a": [
+            2.7469851740742994,
+            -3.591853481310636e-10,
+            1.4999999997306102
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 3.9999861175659683,
+          "end_vds_v": 0.7285433643473765,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 11.004986931494313,
+          "phase_charge_c": 9.000577424056178,
+          "other_charge_c": 0,
+          "remaining_charge_c": 2.0044095074381345,
+          "voltage_balance_residual_v": 0,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 2,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1"
+        ],
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "events": [
+          "domain.iL2"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL2",
+            "earliest_s": 5.930753610730172,
+            "latest_s": 5.930753611475231,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  false,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 0.02,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            12,
+            4,
+            1.999994450887895,
+            0,
+            0,
+            0.5034800615402619
+          ],
+          "inductor_current_a": [
+            0.012482592434709904,
+            1.996655070871664,
+            2.997491303153748
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 5.930753611475231,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            10.289821116334267,
+            3.9185629103016315,
+            0.09340846853786344,
+            0,
+            0,
+            1.3777780266434396
+          ],
+          "inductor_current_a": [
+            0.18855808851351463,
+            -7.62780949514763e-11,
+            1.4999999999427915
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              false,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 1.999994450887895,
+          "end_vds_v": 0.09340846853786344,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 5.502497295784537,
+          "phase_charge_c": 5.24550665998313,
+          "other_charge_c": 0,
+          "remaining_charge_c": 0.2569906358014083,
+          "voltage_balance_residual_v": 4.440892098500626e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 3,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1",
+          "M2",
+          "M3"
+        ],
+        "failed_mode": "M4",
+        "last_action": "OTHER_M4_BOUNDARY_FIRST_OR_OVERLAP",
+        "events": [
+          "domain.iL1"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL1",
+            "earliest_s": 7.092737371921539,
+            "latest_s": 7.092737372666598,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  true,
+                  true,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 5.608248968124389,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.309055186578668,
+            3.87185977078946,
+            -2.9347968499848776e-10,
+            0,
+            0,
+            1.543507952456879
+          ],
+          "inductor_current_a": [
+            1.1654931657252066,
+            -1.6794166751710193e-11,
+            1.4999999999874045
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 7.092737372666598,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            9.309055186578668,
+            3.87185977078946,
+            -2.9347968499848776e-10,
+            0,
+            0,
+            1.5697380185010246
+          ],
+          "inductor_current_a": [
+            -2.563822487644529e-10,
+            -0.7769954438592972,
+            0.9172534171055271
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 2.999988895341509,
+          "end_vds_v": -2.9347968499848776e-10,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 8.253738292459682,
+          "phase_charge_c": 8.253738293267117,
+          "other_charge_c": 0,
+          "remaining_charge_c": -8.074378268174477e-10,
+          "voltage_balance_residual_v": -4.440892098500626e-16,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      },
+      {
+        "seed": {
+          "a2_v": 4,
+          "x1_v": 4,
+          "out_v": 0.5,
+          "current_a": [
+            -0.0025,
+            2,
+            3
+          ]
+        },
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "accepted_modes": [
+          "M1",
+          "M2",
+          "M3",
+          "M4"
+        ],
+        "failed_mode": "M5",
+        "last_action": "BLOCKED_BEFORE_JOINT_HIGH_EVENT",
+        "events": [
+          "domain.iL1"
+        ],
+        "event_windows": [
+          {
+            "name": "domain.iL1",
+            "earliest_s": 7.952529376447202,
+            "latest_s": 7.95252937719226,
+            "trace": [
+              {
+                "nP": 3,
+                "nM": 1,
+                "module": 1,
+                "output_boundary": "dynamic_Co_current_ports",
+                "alpha": 0.05,
+                "branch": "P25"
+              },
+              "D29 synthetic one-coordinate diagnostic",
+              "absolute",
+              0,
+              {
+                "high": [
+                  false,
+                  false,
+                  false
+                ],
+                "low": [
+                  true,
+                  false,
+                  true
+                ]
+              }
+            ],
+            "evidence": "numerical sign bracket; continuity/uniqueness conditional"
+          }
+        ],
+        "last_accepted": {
+          "time_s": 7.052471034675838,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.412075244845791,
+            3.829146440230752,
+            -6.849186773294491e-10,
+            0,
+            0,
+            1.7847270957605803
+          ],
+          "inductor_current_a": [
+            0.7941589326151492,
+            -1.0000000002851948,
+            0.7499999997861047
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "unaccepted_competing_endpoint": {
+          "time_s": 7.95252937719226,
+          "node_order": [
+            "a1",
+            "a2",
+            "x1",
+            "x2",
+            "x3",
+            "out"
+          ],
+          "node_voltage_v": [
+            8.431454057622126,
+            4.197343882981094,
+            -6.849186773294491e-10,
+            0.4059351307884651,
+            0,
+            1.7337769300726666
+          ],
+          "inductor_current_a": [
+            -1.3163248269165706e-10,
+            -1.4723967406960552,
+            0.3529205335668306
+          ],
+          "gates": {
+            "high": [
+              false,
+              false,
+              false
+            ],
+            "low": [
+              true,
+              false,
+              true
+            ]
+          }
+        },
+        "m2_charge": {
+          "target": "SL1",
+          "phase": 1,
+          "start_vds_v": 3.9999833397951234,
+          "end_vds_v": -6.849186773294491e-10,
+          "closed_form_capacitance_f": 2.7512562814070347,
+          "network_rate_capacitance_f": 2.751256281407036,
+          "required_charge_c": 11.004979289134829,
+          "phase_charge_c": 11.004979291019211,
+          "other_charge_c": 0,
+          "remaining_charge_c": -1.8843868132556456e-9,
+          "voltage_balance_residual_v": -1.3322676295501878e-15,
+          "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+        },
+        "state_return": null
+      }
+    ]
+  }
+]

@@ -118,6 +118,51 @@ contract. No new simulation or controller change accompanies that audit.
 
 ## Branch boundaries
 
+Latest local continuation:
+[D16 — three-phase commutation guards](02_P25_native/D16_THREE_PHASE_COMMUTATION_GUARDS.md)
+extends sampled event detection to M2/M5/M7/M10/M12/M15. This is guard
+coverage, not an assembled periodic trajectory.
+[D17 — three-phase handoff execution](02_P25_native/D17_THREE_PHASE_HANDOFF_EXECUTION.md)
+then extends low admission, next-current zero, negative-target and high
+admission to all three handoffs. High-on interval orchestration and complete
+cycle closure remain open.
+[D18 — high-on competing events](02_P25_native/D18_HIGH_ON_COMPETING_EVENTS.md)
+adds the original on-time endpoint with competing reverse/current guards.
+[D19 — single-period attempt](02_P25_native/D19_SINGLE_PERIOD_ATTEMPT.md)
+assembles all stages with continuous state transfer and first-failure records.
+The old synthetic seed still stops in M5; no periodic solution is implied.
+[D20 — fixed-boundary shooting contract](02_P25_native/D20_FIXED_BOUNDARY_SHOOTING_CONTRACT.md)
+defines six electrical seed coordinates and freezes devices, timing, ports and
+design-peak references. Measured-peak control still requires an observer.
+[D21 — seed feasibility versus state return](02_P25_native/D21_SEED_FEASIBILITY_VS_RETURN.md)
+keeps blocked trajectories separate from defined periodic residuals. Three
+synthetic i3-entry perturbations remain blocked in M5; no global claim follows.
+[D22 — all-low current-order bound](02_P25_native/D22_ALL_LOW_CURRENT_ORDER_BOUND.md)
+derives a necessary common-volt-second inequality without assuming constant Vo.
+The old third-phase margin is 3 V·s at the negative target, not a ZVS guarantee.
+[D23 — commutation charge deficit](02_P25_native/D23_COMMUTATION_CHARGE_DEFICIT.md)
+accounts for the same M5 failure with the full affine network: only about 5.2%
+of its required normalized commutation charge is supplied before i3 crosses zero.
+Synthetic units only; not device Qoss or a paper operating point.
+[D24 — phase-specific closed forms](02_P25_native/D24_PHASE_SPECIFIC_COMMUTATION_FORMULAS.md)
+derives three distinct capacitor-network transfer expressions and checks them
+against the unchanged full KKT network, including asymmetric banks.
+[D25 — forced commutation ODE](02_P25_native/D25_FORCED_COMMUTATION_ODE.md)
+keeps dynamic Vo and winding R, distinguishing target-voltage capacitance
+normalization from switch-node capacitance and isolated-LC approximations.
+[D26 — five-state coupled commutation](02_P25_native/D26_FIVE_STATE_COMMUTATION_MODEL.md)
+independently propagates target Vds, all currents and dynamic Vo. It agrees
+with the full local flow but cannot yet replace all-node reverse-guard checks.
+[D27 — full-node reconstruction](02_P25_native/D27_FULL_NODE_RECONSTRUCTION.md)
+recovers all node and switch voltages from the reduced trajectory; the main
+event scanner remains unchanged.
+[D28 — accepted-trace integral ledger](02_P25_native/D28_ACCEPTED_TRACE_INTEGRAL_LEDGER.md)
+checks all accepted segments' output charge, inductor flux and capacitor
+charge changes without treating failed trial endpoints as accepted states.
+[D29 — frozen seed neighborhood](02_P25_native/D29_FROZEN_SEED_NEIGHBORHOOD.md)
+records a 13-point synthetic one-coordinate audit at two grid resolutions:
+all remain blocked at the same M5/i3 boundary, with no global infeasibility claim.
+
 | Branch | Topology and timing source | Limitation |
 |---|---|---|
 | `01_P24_native` | P24 native structure and stated operations | Unreported states remain unknown |
@@ -132,3 +177,40 @@ multi-module validation.
 Raw optimizer traces are intentionally ignored by Git. The concise Markdown
 reports, model source and acceptance tests are tracked and are sufficient to
 audit or regenerate the reported calculations.
+# Latest mathematical necessity check
+
+[D38: ZVS admission versus next-phase rise](02_P25_native/D38_A2_OFFSET_ZVS_VS_RISE.md)
+derives a new a2 seed without changing devices/control; a continuous first
+high-side handoff passes but the next rising-current mode does not.
+
+[D37: same-path negative-target budget](02_P25_native/D37_SAME_PATH_NEGATIVE_TARGET_AND_COMMUTATION.md)
+separates failure before the negative target from failure during high-side
+commutation, and rejects a bound whose output-voltage premise no longer holds.
+
+[D36: two-voltage initial-state grid](02_P25_native/D36_TWO_VOLTAGE_SEED_GRID.md)
+finds local M2 passage under the same devices/control; the later M4/M5 failures
+remain explicit and no complete-cycle success is reported.
+
+[D35: low-side commutation charge](02_P25_native/D35_DOWN_COMMUTATION_CHARGE_ACCOUNTING.md)
+explains D34's two M2 diagnostic trajectories using full-network charge accounting,
+without accepting the failed interval or changing a parameter.
+
+[D34: negative-return seed diagnostic](02_P25_native/D34_NEGATIVE_RETURN_SEED_DIAGNOSTIC.md)
+keeps devices/control frozen and records M1/M2 obstacles, distinguishing
+search-horizon exhaustion from observed competing events.
+
+[D33: periodic-section direction correction](02_P25_native/D33_PERIODIC_SECTION_DIRECTION_AUDIT.md)
+identifies why the old positive-i1 diagnostic seed cannot itself be a periodic
+fixed point of the declared M15→M1 event sequence.
+
+[D32: accepted-trace energy ledger](02_P25_native/D32_ACCEPTED_TRACE_ENERGY_LEDGER.md)
+audits source/load/storage/winding energy and explicit ON-residual work;
+failed intervals are excluded and no periodicity claim is made.
+
+[D31: residual-preserving bound](02_P25_native/D31_RESIDUAL_PRESERVING_CHARGE_BOUND.md)
+explains the unchanged synthetic M5 obstruction without zeroing node residuals;
+it does not certify exact ideal-switch admissibility or accumulated solver error.
+
+[D30: charge/flux necessary bound](02_P25_native/D30_CHARGE_FLUX_NECESSARY_BOUND.md)
+adds an explicitly conditional analytical obstruction; it does not certify
+the earlier sampled failure or demonstrate a complete periodic orbit.

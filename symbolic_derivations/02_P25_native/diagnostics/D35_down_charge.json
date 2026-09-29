@@ -1,0 +1,43 @@
+{
+  "scope": "SYNTHETIC_P25_THREE_PHASE_ONE_MODULE_NOT_PAPER_VALUES",
+  "cases": [
+    {
+      "initial_i1_a": -0.0025,
+      "end_s": 4.484350268989801,
+      "coverage": "UNACCEPTED_M2_DIAGNOSTIC_TO_COMPETING_ROOT",
+      "budget": {
+        "target": "SL1",
+        "phase": 1,
+        "start_vds_v": 1.9999972286587395,
+        "end_vds_v": 1.0270159727119212,
+        "closed_form_capacitance_f": 2.7512562814070347,
+        "network_rate_capacitance_f": 2.751256281407036,
+        "required_charge_c": 5.502504938144021,
+        "phase_charge_c": 2.67692079211499,
+        "other_charge_c": -0.0,
+        "remaining_charge_c": 2.8255841460290303,
+        "voltage_balance_residual_v": -2.220446049250313e-16,
+        "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+      }
+    },
+    {
+      "initial_i1_a": -0.005,
+      "end_s": 4.484813607186079,
+      "coverage": "UNACCEPTED_M2_DIAGNOSTIC_TO_COMPETING_ROOT",
+      "budget": {
+        "target": "SL1",
+        "phase": 1,
+        "start_vds_v": 2.0000000064273475,
+        "end_vds_v": 1.0287424213257326,
+        "closed_form_capacitance_f": 2.7512562814070347,
+        "network_rate_capacitance_f": 2.751256281407036,
+        "required_charge_c": 5.502512580497353,
+        "phase_charge_c": 2.672178531875046,
+        "other_charge_c": -0.0,
+        "remaining_charge_c": 2.8303340486223054,
+        "voltage_balance_residual_v": -3.3306690738754696e-16,
+        "scope": "LOCAL_CONTINUATION_ACCOUNTING; caller owns first-event boundary; not device Qoss"
+      }
+    }
+  ]
+}

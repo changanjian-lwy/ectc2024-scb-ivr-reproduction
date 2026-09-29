@@ -1,0 +1,498 @@
+[
+  {
+    "scope": "SYNTHETIC_RETURN_DIRECTION_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+    "intervals": 200,
+    "down_horizon_s": 1,
+    "entry_rise_scale_a": 0.01,
+    "cases": [
+      {
+        "case": "entry_rise_scale_x0.25",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.0025,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "NO_DOWNWARD_BRACKET_OBSERVED",
+        "sampled_until_s": 1.02,
+        "events": [],
+        "windows": [],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.007482617394419572,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x0.5",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.005,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "NO_DOWNWARD_BRACKET_OBSERVED",
+        "sampled_until_s": 1.02,
+        "events": [],
+        "windows": [],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.004982642152823626,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x1.0",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.01,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.0000173083303682698,
+        "state_return": null
+      },
+      {
+        "case": "negative_target_scale_not_claimed_turnon_current",
+        "seed": [
+          4,
+          2,
+          1,
+          -1,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.9900075040023638,
+        "state_return": null
+      }
+    ]
+  },
+  {
+    "scope": "SYNTHETIC_RETURN_DIRECTION_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+    "intervals": 400,
+    "down_horizon_s": 1,
+    "entry_rise_scale_a": 0.01,
+    "cases": [
+      {
+        "case": "entry_rise_scale_x0.25",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.0025,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "NO_DOWNWARD_BRACKET_OBSERVED",
+        "sampled_until_s": 1.02,
+        "events": [],
+        "windows": [],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.007482617394419572,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x0.5",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.005,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "NO_DOWNWARD_BRACKET_OBSERVED",
+        "sampled_until_s": 1.02,
+        "events": [],
+        "windows": [],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.004982642152823626,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x1.0",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.01,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.0000173083303682698,
+        "state_return": null
+      },
+      {
+        "case": "negative_target_scale_not_claimed_turnon_current",
+        "seed": [
+          4,
+          2,
+          1,
+          -1,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.9900075040023638,
+        "state_return": null
+      }
+    ]
+  },
+  {
+    "scope": "SYNTHETIC_RETURN_DIRECTION_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+    "intervals": 200,
+    "down_horizon_s": 10,
+    "entry_rise_scale_a": 0.01,
+    "cases": [
+      {
+        "case": "entry_rise_scale_x0.25",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.0025,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "UNIQUE_EARLIEST_AMONG_SUPPLIED_WINDOWS",
+        "sampled_until_s": 4.52,
+        "events": [
+          "domain.iL2"
+        ],
+        "windows": [
+          {
+            "event": "domain.iL2",
+            "earliest_s": 4.484350268244743,
+            "latest_s": 4.484350268989801
+          }
+        ],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.007482617394419572,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x0.5",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.005,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "UNIQUE_EARLIEST_AMONG_SUPPLIED_WINDOWS",
+        "sampled_until_s": 4.52,
+        "events": [
+          "domain.iL2"
+        ],
+        "windows": [
+          {
+            "event": "domain.iL2",
+            "earliest_s": 4.484813606441021,
+            "latest_s": 4.484813607186079
+          }
+        ],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.004982642152823626,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x1.0",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.01,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.0000173083303682698,
+        "state_return": null
+      },
+      {
+        "case": "negative_target_scale_not_claimed_turnon_current",
+        "seed": [
+          4,
+          2,
+          1,
+          -1,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.9900075040023638,
+        "state_return": null
+      }
+    ]
+  },
+  {
+    "scope": "SYNTHETIC_RETURN_DIRECTION_DIAGNOSTIC_NOT_PAPER_REPRODUCTION",
+    "intervals": 400,
+    "down_horizon_s": 10,
+    "entry_rise_scale_a": 0.01,
+    "cases": [
+      {
+        "case": "entry_rise_scale_x0.25",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.0025,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "UNIQUE_EARLIEST_AMONG_SUPPLIED_WINDOWS",
+        "sampled_until_s": 4.495,
+        "events": [
+          "domain.iL2"
+        ],
+        "windows": [
+          {
+            "event": "domain.iL2",
+            "earliest_s": 4.484350268244743,
+            "latest_s": 4.484350268989801
+          }
+        ],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.007482617394419572,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x0.5",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.005,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M2",
+        "last_action": "BLOCKED_BEFORE_JOINT_LOW_EVENT",
+        "reason": "target/reverse pair not isolated as first supplied candidate set",
+        "scan_status": "UNIQUE_EARLIEST_AMONG_SUPPLIED_WINDOWS",
+        "sampled_until_s": 4.495,
+        "events": [
+          "domain.iL2"
+        ],
+        "windows": [
+          {
+            "event": "domain.iL2",
+            "earliest_s": 4.484813606441021,
+            "latest_s": 4.484813607186079
+          }
+        ],
+        "accepted_modes": [
+          "M1"
+        ],
+        "nominal_high_off_i1_continuation_a": 0.004982642152823626,
+        "state_return": null
+      },
+      {
+        "case": "entry_rise_scale_x1.0",
+        "seed": [
+          4,
+          2,
+          1,
+          -0.01,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.0000173083303682698,
+        "state_return": null
+      },
+      {
+        "case": "negative_target_scale_not_claimed_turnon_current",
+        "seed": [
+          4,
+          2,
+          1,
+          -1,
+          2,
+          3
+        ],
+        "direction": "NECESSARY_DIRECTION_PASSED_NOT_SUFFICIENT",
+        "failed_mode": "M1",
+        "last_action": "HIGH_OFF_EVENT_REJECTED",
+        "reason": "iL1 outside current-sign domain of high_off_to_low_zero",
+        "scan_status": "SCHEDULED_OFF_AFTER_SAMPLED_SCREEN",
+        "sampled_until_s": 0.02,
+        "events": [
+          "control.high_off"
+        ],
+        "windows": [
+          {
+            "event": "control.high_off",
+            "earliest_s": 0.02,
+            "latest_s": 0.02
+          }
+        ],
+        "accepted_modes": [],
+        "nominal_high_off_i1_continuation_a": -0.9900075040023638,
+        "state_return": null
+      }
+    ]
+  }
+]
