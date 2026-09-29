@@ -504,3 +504,16 @@ target with A76's adopted controller.
 - **The price.** Relative to the output power, conduction loss rises only
   4.8% to 5.2% up to 10%, while the turn-on proxy falls 5.3% to 2.3%. This
   is open loop, at unequal Vo.
+
+`A79_p24_output_voltage_loop` adds a per-cycle integral loop on the common
+Ton.
+- **It regulates the module to 1.0000 V.** Vo is inside 1% within
+  60-79 us of the handover, peak Vds is 25.6 V, and conduction loss is
+  4.9-5.1% of 250 W.
+- **At 5%, phase 4 has two coexisting states at the regulated point.** It
+  is soft at ki = 0.25 ns/V and restart-driven at 1.0 ns/V: the transient
+  decides.
+- **At 7.5% (-9.375 A), both gains settle soft,** for +2% conduction loss.
+  7.5% is the robust target.
+- **Dither.** The predictive dither is 1.0-1.25 A, just above the project's
+  1 A threshold.

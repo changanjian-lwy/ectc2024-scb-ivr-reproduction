@@ -347,10 +347,15 @@ each question:
      - **5% (P25's lower bound, -6.25 A) is the smallest target that
        meets the single-module criterion.**
      - Conduction loss barely changes; the turn-on proxy falls.
+   - **Done ([A79](../experiments/track_A_periodic_steady_state/A79_p24_output_voltage_loop/RESULTS.md), 2026-09-30): output-voltage loop.**
+     - An integral Ton loop regulates the module to 1.0000 V.
+     - At 5%, phase 4 is bistable: the soft and restart states coexist.
+     - At 7.5% (-9.375 A), both gains settle soft, for +2% conduction loss.
    - **Next (single-module level first).**
-     1. A79 at -6.25 A: the output-voltage loop (physical model).
-     2. A80: the full Verilog module controller from zero (mode S start-up,
-        handover, mode P, voltage loop), co-simulated.
+     1. A80 (running): the full Verilog module controller from zero (mode S
+        start-up, handover, mode P, voltage loop), co-simulated at 7.5%.
+     2. Mathematical model: whether two P24 orbits coexist at 5%, and
+        where the restart orbit ends.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
