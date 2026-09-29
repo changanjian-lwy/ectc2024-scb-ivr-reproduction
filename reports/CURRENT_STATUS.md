@@ -312,9 +312,16 @@ each question:
      - A71's "hand over with the load" rule is withdrawn (fixed timing
        under load does settle);
      - A69's deadlock and A70's recovery are re-verified.
-   - **Next, both models: adaptive phase shift.** In the P24 steady state,
-     phase 4 is turned on by the restart timer every cycle. The T0/4 shifts
-     do not match the 222.9 ns period.
+   - **Refuted ([A74](../experiments/track_A_periodic_steady_state/A74_p24_adaptive_phase_shift/RESULTS.md), 2026-09-30): adaptive phase shift.**
+     In the P24 steady state, phase 4 is turned on by the restart timer
+     every cycle. Shifts that follow the measured period do not change
+     that. At its timed turn-off, phase 4 carries +7.08 A (phases 2-3:
+     -3.35 A). The problem is its current level, not its timing.
+   - **Next, physical model: per-phase current sensing.** This separates
+     two candidates: phase N's structure (node capacitance 9.30 against
+     13.02 nF; on-state voltage `VCs3`), or a self-reinforcing restart
+     state. After that, the four-phase mathematical model with the valley
+     trigger.
    - **Open.** Track B's LTspice ramp-only run (R04E16) ended at ~55% of
      the ladder level. It has no diodes, so this defect does not explain it.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T

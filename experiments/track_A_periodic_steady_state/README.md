@@ -433,3 +433,16 @@ In steady state:
   T0/4 shifts do not match the stretched period.
 
 That makes an adaptive phase shift necessary at P24 scale.
+
+`A74_p24_adaptive_phase_shift` tested that and **refuted the cause**.
+- **The design.** A 2 x 2 of shift rule (fixed or period-following) and
+  restart time (20 or 60 ns).
+- **Phase 4 is still restart-driven in every cell** (Vds ≈ 11.03 V at
+  turn-on). The steady state still depends on the restart time: `VCs3`
+  moves, while the period and Vo change by ≤ 0.023 ns and 0.45 mV.
+- **A diagnostic log locates the cause.** At its timed low-side turn-off,
+  phase 4 carries +7.08 A under both rules, against -3.35 A for phases
+  2-3. The problem is phase 4's current level, not its timing.
+- **Next.** Per-phase current sensing, to separate two candidates: phase
+  N's different node capacitance and on-state voltage, or a
+  self-reinforcing restart state.

@@ -1,0 +1,10 @@
+{
+ "reference": "A73 run_r5_recheck_a72r9.json",
+ "candidate": "run_r0_fixed_rs20.json",
+ "sections_ref": 1801,
+ "sections_new": 1801,
+ "max_abs_diff_v_i": 0.0,
+ "max_abs_diff_t_s": 0.0,
+ "end_equal": true,
+ "pass": true
+}
