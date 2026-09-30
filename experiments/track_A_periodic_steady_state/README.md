@@ -601,3 +601,17 @@ controller is otherwise unchanged.
 - **The effect is the high-side curve's shape.** No single equivalent
   capacitance reproduces it (D44); the high-side curve alone does (D45
   part E).
+
+`A87_p24_reverse_conduction_drop` adds EPC2067's reverse-conduction drop
+(datasheet Fig. 8, A57's digitisation) to A86.
+- **The data.** Checked against EPC's public SPICE model within 6-12 mV.
+- **The model.** Fitted per device as Vf 2.089 V plus 6.01 mOhm.
+- **Soft switching survives** at 2-7.5%, and criterion 2 passes at all
+  four targets. Ton rises 1.8 ns.
+- **The reverse-conduction loss is 55-57 W at 250 W out.** The low side
+  conducts in reverse for 9.8 ns per edge, because of the adopted 10 ns
+  comparator-to-gate latency. With 2 ns it is 10 W.
+- **Cross-checked in the mathematical model.** D46, the event map with the
+  same drop, agrees within 0.05 A, 0.03 V and 0.03 W.
+- **The next step at this level is the low-side timing,** a controller
+  change.

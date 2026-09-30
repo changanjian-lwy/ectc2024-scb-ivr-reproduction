@@ -422,10 +422,28 @@ each question:
         **So "P24's 1-2% is not enough" is qualified:** 2% works with
         typical Coss, and 1-1.5% does not.
 
-        **Next within device realism:**
-        - the reverse-conduction drop (datasheet Fig. 8);
+     8. Done: the reverse-conduction drop.
+        - [A87](../experiments/track_A_periodic_steady_state/A87_p24_reverse_conduction_drop/RESULTS.md),
+          physical model.
+        - [D46](../symbolic_derivations/03_P24_native/D46_P24_REVERSE_DROP_EVENT_MAP.md),
+          mathematical model.
+
+        **The data.** EPC2067 Fig. 8 at 25 C, checked against EPC's public
+        SPICE model within 6-12 mV, and fitted per device as Vf 2.089 V
+        plus 6.01 mOhm.
+
+        **Results.**
+        - Every phase stays soft at 2-7.5% (criterion 2 passes).
+        - The loss is 55-57 W at 250 W out: 9.8 ns of low-side reverse
+          conduction per edge, from the adopted 10 ns comparator-to-gate
+          latency. It is 10 W at 2 ns.
+        - The two models agree within 0.05 A, 0.03 V and 0.03 W.
+
+        **Next at this level:** a predictive or adaptive low-side turn-on
+        (controller timing). After that:
         - temperature;
-        - Coss spread.
+        - Coss spread;
+        - gate-drive loss.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
