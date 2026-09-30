@@ -13,6 +13,17 @@ Records:
 **Model: the physical model** (A78's simulator plus the voltage loop). The
 loop acts through the full switching dynamics (BOUNDARY Section 2).
 
+## CORRECTION (2026-09-30, D43 and A82): the 5% bistability is a corrector lock-up
+
+- **Two orbits exist.** D43's exact event map confirms that the soft and restart states at 5% are two
+  stable orbits.
+- **But the restart state is not a circuit property.** It persists only because the corrector does
+  not sample at restart turn-ons, and phase 4's valley lies before the restart.
+- **With the fix.** With a corrector that also samples there (A82), the ki = 1.0 case of run 2 settles
+  soft, and so do 3% and 4%.
+
+The text below is kept unchanged as the record.
+
 ## 0. Verdict
 
 1. **A per-cycle integral loop on the common Ton regulates the P24 module

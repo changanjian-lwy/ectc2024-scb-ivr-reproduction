@@ -9,6 +9,18 @@ Track A, `CROSS_PAPER_EXTENSION`. Boundary: `BOUNDARY.md`. Records:
 The target is a quantitative operating-point question in P24's four-phase
 circuit (BOUNDARY Section 2).
 
+## CORRECTION (2026-09-30, D43 and A82): the 4-5% threshold is revised to 2.5-3%
+
+- **The verdict "P24's stated 1-2% is not enough" stands**, confirmed by D43's independent exact
+  event map and by A82.
+- **The threshold changes.** The "between 4% and 5%" threshold came from the corrector design. That
+  corrector learns only at predictive turn-ons. Once `dt_pred` passes the 20 ns restart, it locks,
+  although phase 4's natural valley lies before the restart at 3-5%.
+- **With the fix.** With a corrector that also samples at restart turn-ons (A82), every phase is soft
+  at 3%, 4% and 5%. 2.5% is the edge (soft on average, not periodic), and 2% stays restart-driven.
+
+The text below is kept unchanged as the record.
+
 ## 0. Verdict
 
 1. **P24's stated negative current (1-2% of the 125 A peak) is not enough

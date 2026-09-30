@@ -376,9 +376,14 @@ each question:
           to the soft orbit.
         - **Threshold.** At <= 2% (P24), phase 4 has no self-consistent soft
           orbit. The threshold is 2-2.5%, not A78's 4-5%.
-     3. Next, physical model (A82): test D43's prediction with a
-        corrector that also learns at restart edges. Expected: only soft
-        at 3-5%, still restart-driven at 2%.
+     3. Done ([A82](../experiments/track_A_periodic_steady_state/A82_p24_corrector_learns_at_restart/RESULTS.md)):
+        D43's prediction holds in the physical model. With the corrector
+        also learning at restart edges, 3-5% are all soft (criterion 2
+        met), 2% (P24) stays restart-driven, and 2.5% is the edge. The two
+        models agree within 0.16 ns / 0.2 A / 0.05 V.
+     4. Next: carry the corrector fix into the Verilog bridge and RTL
+        test; Roberts' minimum-duty-increment method for the remaining RTL
+        dither.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

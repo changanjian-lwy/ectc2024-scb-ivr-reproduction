@@ -547,3 +547,12 @@ sets the codes; a TDC reports the edges back.
   peak.
 - **Checks:** gate (async off) equals A80 f2 bit for bit; unit tests
   18/18; synthesis clean.
+
+`A82_p24_corrector_learns_at_restart` tests D43's prediction (mathematical
+model -> physical model). The corrector now also samples at restart turn-ons.
+- **3%, 4% and 5% (including the ki = 1.0 case that had locked) are all
+  soft and meet criterion 2.** Phase-4 delays, currents and turn-on
+  voltages agree with D43 within 0.16 ns, 0.2 A and 0.05 V.
+- **2% (P24) stays restart-driven.** 2.5% is the edge.
+- **Revisions.** A78's 4-5% threshold becomes 3%, and A79's bistability is
+  a corrector lock-up.
