@@ -632,3 +632,21 @@ dead time (LMG1210), and Zhang et al. (TPEL 2023).
 - **Cross-checked in the mathematical model.** D47, the event map with the
   timed low side, agrees within 0.04 A, 0.03 V and 3.5 ps of crossing
   time. Its orbits equal D45's ideal-diode orbits.
+
+`A89_verilog_predicted_low_side` carries A88's timed low side into the
+Verilog controller: A81's RTL, FB 7, co-simulated with A88's realistic
+plant at 5%.
+- **With the timed low side and 20 ns blanking (run r2):**
+  - the reverse-conduction loss is 0 W;
+  - criterion 2 holds in full (dither 0.91 A);
+  - peak values are normal (27.0 V, 173 A);
+  - it matches A88 within quantisation.
+- **With the RTL's old reactive low side (run g1):** 109 W, a 4.1 A dither
+  and slow settling.
+- **The first version (r1) shot through at the handover** (773 A, 38 V).
+  The asynchronous phase-1 front end was armed at the turn-off command,
+  10 ns before the physical turn-off. Blanking fixed it.
+- **The addition is opt-in.**
+  - A81's 18 unit tests pass (26 of 26 with the new ones).
+  - Synthesis is clean.
+  - Gates g0 and g0b are bit-identical to A85 r7, and g1b to g1.

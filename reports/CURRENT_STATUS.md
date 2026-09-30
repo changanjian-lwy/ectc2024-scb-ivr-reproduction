@@ -467,11 +467,27 @@ each question:
         - The dead time is 0.94-1.24 ns.
         - The two models agree within 0.04 A, 0.03 V and 3.5 ps.
 
-        **Next at this level, one at a time:**
-        1. the predicted low side in the Verilog controller (31 ps delay
-           line, well inside the window);
-        2. then further device realism: temperature, Coss spread, gate-drive
-           loss and gate dynamics.
+     10. Done: the predicted low side in the Verilog controller
+         ([A89](../experiments/track_A_periodic_steady_state/A89_verilog_predicted_low_side/RESULTS.md),
+         co-simulated with A88's realistic plant at 5%).
+         - **Result.** 0 W reverse-conduction loss, criterion 2 in full
+           (dither 0.91 A), peak 27.0 V / 173 A, matching A88 within the RTL
+           quantisation. The RTL's old reactive low side costs 109 W with the
+           realistic device.
+         - **A latent hazard, found and fixed.** A81's asynchronous
+           phase-1 front end was armed at the turn-off command, a 10 ns
+           driver delay before the physical turn-off. With the timed low side
+           this caused a shoot-through at the handover (773 A, 38 V). The fix
+           is 20 ns leading-edge blanking.
+         - **The addition is opt-in and gated.** 26 of 26 unit tests pass
+           (A81's 18 unchanged), synthesis is clean, and three co-simulation
+           gates are bit-identical.
+
+        **Next at this level, one at a time:** further device realism:
+        - temperature;
+        - Coss spread;
+        - gate-drive loss and gate dynamics (driver ramp, delay jitter
+          against the 0.16-0.22 ns window).
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
