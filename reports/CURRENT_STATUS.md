@@ -381,9 +381,14 @@ each question:
         also learning at restart edges, 3-5% are all soft (criterion 2
         met), 2% (P24) stays restart-driven, and 2.5% is the edge. The two
         models agree within 0.16 ns / 0.2 A / 0.05 V.
-     4. Next: carry the corrector fix into the Verilog bridge and RTL
-        test; Roberts' minimum-duty-increment method for the remaining RTL
-        dither.
+     4. Done ([A83](../experiments/track_A_periodic_steady_state/A83_verilog_corrector_fix/RESULTS.md)):
+        the fix in the Verilog co-simulation. 3% and 5% are soft with A81's
+        unchanged RTL; the dither is 1.6 A.
+     5. Next:
+        - A84: perturbation test of uniqueness. Kick phase 4's delay into
+          the restart state; the fixed corrector should return to soft,
+          the old one should stay.
+        - Roberts' minimum-duty-increment method for the RTL dither.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

@@ -556,3 +556,11 @@ model -> physical model). The corrector now also samples at restart turn-ons.
 - **2% (P24) stays restart-driven.** 2.5% is the edge.
 - **Revisions.** A78's 4-5% threshold becomes 3%, and A79's bistability is
   a corrector lock-up.
+
+`A83_verilog_corrector_fix` carries the fix into the Verilog co-simulation.
+A81's RTL is unchanged; the front end now also measures after restart
+turn-ons.
+- **5% (which had locked in A80 f1) and 3% both settle with every phase
+  soft.** Phase 4 turns on at 9.19 / 10.24 V, against Python's 9.24 /
+  10.16 V.
+- **Dither** remains 1.6 A.
