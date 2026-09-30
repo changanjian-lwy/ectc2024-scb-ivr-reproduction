@@ -439,6 +439,15 @@ each question:
           latency. It is 10 W at 2 ns.
         - The two models agree within 0.05 A, 0.03 V and 0.03 W.
 
+        **Literature check.** Zhang et al., TPEL 2023, DOI
+        10.1109/TPEL.2022.3217456 (A87 Section 4a).
+        - It confirms the static Vth - V_goff + R_on i form.
+        - It adds a dynamic threshold for Schottky-type p-GaN gates. It
+          cannot be quantified for EPC2067 from public data, so P_rev is
+          the static value.
+        - It frames dead time as a trade-off between turn-on and reverse-
+          conduction loss.
+
         **Next at this level:** a predictive or adaptive low-side turn-on
         (controller timing). After that:
         - temperature;

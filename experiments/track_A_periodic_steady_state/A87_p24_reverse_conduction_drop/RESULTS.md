@@ -165,6 +165,52 @@ starts at about 150 A and falls by about 23 A.
 - **r5 is a sensitivity run,** not an adopted controller change.
 - **The dither threshold (1 A) is a `PROJECT_DECISION`.**
 
+## 4a. Literature check (after the runs)
+
+Y. Zhang et al., "Analysis of Dead-Time Energy Loss in GaN-Based TCM
+Converters With an Improved GaN HEMT Model," IEEE TPEL 38(2), 2023,
+DOI 10.1109/TPEL.2022.3217456. The PDF is not in this repository.
+
+TCM is triangular-current-mode soft switching with a reverse current. It
+is the same mechanism as this module's negative-current target.
+
+1. **The model form is the standard one.** The paper writes the self-
+   commutated reverse-conduction voltage as V_RC = Vth - V_goff +
+   R_on i_d. A87's Vf + R I, fitted to the datasheet curve at VGS = 0 V,
+   is that static form.
+2. **A dynamic effect the static curve omits.** In Schottky-type p-GaN
+   gate HEMTs, the threshold rises with the voltage the device blocked
+   before conducting in reverse, by charge stored in the floating p-GaN
+   layer (their Eq. 2, from Xu et al., TPEL 36(5), 2021).
+   - This raises the reverse drop, and ignoring it underestimates the
+     reverse-conduction loss.
+   - For GaN Systems GS66516T they measure -4.41 V after blocking 20 V and
+     -4.61 V after 30 V (Fig. 7, small current, negative off bias).
+   - **For EPC2067 it cannot be quantified from public data.** The
+     coupling capacitance C_sh needs a double-pulse measurement, and EPC's
+     public SPICE model is static. This project has not established
+     whether EPC2067's gate is of that type.
+   - **A87's P_rev is therefore the static value.** If the low sides
+     (blocking 12 V) behaved like GS66516T, the drop would rise by about
+     0.1-0.2 V. That scale is taken from their device, not from ours.
+     P_rev would rise by about 4-8%.
+3. **Dead time is a trade-off, not a minimisation.**
+   - Too short: turn-on before zero voltage adds turn-on loss.
+   - Too long: reverse conduction.
+   - Unoptimised dead time was 44.5% of their converter's total loss.
+   - They compute a reference dead time from a model of the turn-off
+     transient. They note that adaptive methods need fast detection or
+     look-up tables.
+   - For this module the low-side edge follows a high-side turn-off at
+     about 150 A, and the node falls in about 1 ns. A predicted low-side
+     turn-on, with an early/late corrector like the high side's, is the
+     matching next step.
+4. **Gate-loop dynamics are also outside this model.** The gate driver's
+   finite ramp, the gate delay and the Miller plateau set the turn-off
+   time at high current; this model's channels switch ideally. They would
+   matter for a turn-off overlap loss, and they need the gate driver's
+   data, which P24 does not publish.
+
 ## 5a. Reproduction
 
 ```
