@@ -398,6 +398,34 @@ each question:
         corrected controller, in the physical model (Python and Verilog)
         and cross-checked in the mathematical model (D43).** P24's stated
         1-2% negative current is not enough in either model.
+     7. Done: device realism with EPC2067's datasheet Coss(V) (public; A59
+        digitisation checked against three printed values).
+        - [A86](../experiments/track_A_periodic_steady_state/A86_p24_nonlinear_coss_adopted_controller/RESULTS.md),
+          physical model.
+        - [D44](../symbolic_derivations/03_P24_native/D44_P24_EQUIVALENT_LINEAR_COSS.md)
+          and [D45](../symbolic_derivations/03_P24_native/D45_P24_NONLINEAR_COSS_EVENT_MAP.md),
+          mathematical model.
+
+        **Results.**
+        - **P24's 2% works with the datasheet curve:** every phase soft,
+          phase 4 at -1.85 A and 10.24 V, and a unique attractor.
+        - **The lower bound moves from 2.5-3% (linear) to 1.5-2%.** 1% is
+          restart-driven, and 1.5% is the edge.
+        - **The two models agree.** D45's nonlinear event map matches at
+          2-7.5% within 0.05 A and 0.03 V.
+        - **The mechanism is the high-side curve's shape.** No
+          equivalent-linear capacitance reproduces it (D44); the high-side
+          curve alone does (D45 part E).
+        - **Correction.** D43's valley times were one 0.25 ns grid step
+          early. The effect is at most 0.13 A; no conclusion changes.
+
+        **So "P24's 1-2% is not enough" is qualified:** 2% works with
+        typical Coss, and 1-1.5% does not.
+
+        **Next within device realism:**
+        - the reverse-conduction drop (datasheet Fig. 8);
+        - temperature;
+        - Coss spread.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

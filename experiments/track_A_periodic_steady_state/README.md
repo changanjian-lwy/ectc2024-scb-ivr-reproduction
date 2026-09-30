@@ -579,3 +579,25 @@ delay line (31 ps).
   was the edge / Ton resolution.
 - **The implementation-level controller now meets criterion 2 in full at
   5%.**
+
+`A86_p24_nonlinear_coss_adopted_controller` replaces the linear 1860 pF by
+EPC2067's datasheet Coss(V) (Fig. 5a, digitised in A59). The curve is
+checked against the three printed values within 0.06-0.7%. The adopted
+controller is otherwise unchanged.
+- **P24's 2% target now works:** every phase soft, no restart, phase 4 at
+  -1.85 A and 10.24 V. With linear Coss it was restart-driven (+6.82 A).
+  - 1% is restart-driven.
+  - 1.5% is the edge: soft on average, not periodic.
+  - The lower bound moves from 2.5-3% to 1.5-2%.
+  - A kick at 2% is undone after one restart.
+- **Checks.**
+  - The gates are bit-identical to A82 run 3.
+  - The nonlinear step matches an independent 1-D ODE exactly as well as
+    the linear step does.
+  - At D44's equivalent-linear L2 capacitance, the simulator reproduces
+    the mathematical model (runs e1 and e2).
+- **Cross-checked in the mathematical model.** D45's nonlinear event map
+  agrees at 2-7.5% within 0.05 A and 0.03 V.
+- **The effect is the high-side curve's shape.** No single equivalent
+  capacitance reproduces it (D44); the high-side curve alone does (D45
+  part E).
