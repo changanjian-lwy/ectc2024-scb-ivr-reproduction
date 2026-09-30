@@ -448,11 +448,30 @@ each question:
         - It frames dead time as a trade-off between turn-on and reverse-
           conduction loss.
 
-        **Next at this level:** a predictive or adaptive low-side turn-on
-        (controller timing). After that:
-        - temperature;
-        - Coss spread;
-        - gate-drive loss.
+     9. Done: a predicted low-side turn-on.
+        - [A88](../experiments/track_A_periodic_steady_state/A88_p24_predictive_low_side_turn_on/RESULTS.md),
+          physical model.
+        - [D47](../symbolic_derivations/03_P24_native/D47_P24_PREDICTED_LOW_SIDE_EVENT_MAP.md),
+          mathematical model.
+
+        **The rule.** The low side turns on at t_off + dtl. dtl is learned
+        from the V_DS = 0 crossing (late: set to it; early: +0.05 ns). This
+        is P25's timed dead time and a PWM-mode GaN driver's programmable
+        dead time (LMG1210).
+
+        **Results.**
+        - The reverse-conduction loss goes from 56 W to 0 W at 2-7.5%, and
+          every phase stays soft. The orbit equals the ideal-diode one.
+        - GaN's 2.09 V reverse threshold leaves 0.16-0.22 ns after the
+          crossing before any reverse conduction.
+        - The dead time is 0.94-1.24 ns.
+        - The two models agree within 0.04 A, 0.03 V and 3.5 ps.
+
+        **Next at this level, one at a time:**
+        1. the predicted low side in the Verilog controller (31 ps delay
+           line, well inside the window);
+        2. then further device realism: temperature, Coss spread, gate-drive
+           loss and gate dynamics.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

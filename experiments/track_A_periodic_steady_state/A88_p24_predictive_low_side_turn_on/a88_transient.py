@@ -1,0 +1,790 @@
+"""A88 - A87's simulator plus a predicted low-side turn-on (BOUNDARY.md), off by default (low_mode "reactive"):
+in mode P, phase k's low side turns on at t_off,k + dtl_k, a timed edge; the V_DS = 0 comparator only timestamps the
+zero crossing; at each edge dtl_k is set to the measured crossing time if the node had already crossed (late), or
+increased by low_step if it had not (early).
+
+A87 docstring follows.
+A87 - A86's simulator plus the EPC2067 reverse-conduction drop (BOUNDARY.md), off by default: a switch that
+conducts only in reverse (gate off) carries I = n (V_SD - Vf) / R instead of an ideal 0 V diode, with Vf and R per
+device fitted to datasheet Fig. 8 at 25 C (A57's digitisation, read-only); it turns on at V_DS < -Vf and is cut when
+V_DS > -Vf. The reverse-conduction energy, time and peak current are recorded per switch and per section.
+
+A86 docstring follows.
+A86 - A84's simulator plus EPC2067's nonlinear Coss(V) (BOUNDARY.md), off by default: the switch-capacitor
+charge change C_lin*dv is replaced by n*(q(v1) - q(v0)) with q the antiderivative of the datasheet Fig. 5a curve
+(digitised in A59, read-only), solved by chord iteration on the cached LU (full Newton as fallback).
+
+A84 docstring follows.
+A84 - A82's simulator plus a controller-state kick (BOUNDARY.md), off by default: at the first phase-1
+section at or after kick_t (mode P), phase kick_phase's predictive delay dt_pred is set to kick_dt once.
+
+A82 docstring follows.
+A82 - A79's simulator plus learn_at_restart (BOUNDARY.md), off by default: in predictive mode, a high-side
+turn-on made by the restart timer is also used as a sample of the predictive correction (early / late / flat),
+as a predictive turn-on is. Motivated by D43: at 3-5% the restart state is a lock-up of a corrector that learns
+only at predictive edges.
+
+A79 docstring follows.
+A79 - A78's simulator plus an output-voltage loop (BOUNDARY.md), off by default:
+vo_loop_ki > 0: in mode P, Vo is sampled once per cycle at phase 1's turn-on and a discrete integrator
+updates the common Ton, Ton += ki * (vref - Vo), clamped to ton_lim * Ton0; the new Ton applies from the
+next turn-ons (digital voltage-mode control sampled at the switching rate).
+
+A78 docstring follows.
+A78 - A76's simulator plus a per-section record of each phase's integral of i^2 dt (diagnostic only;
+conduction-loss accounting for the negative-current target sweep, BOUNDARY.md).
+
+A76 docstring follows.
+A76 - A75's simulator plus three control-rule options (BOUNDARY.md), all off by default:
+- trim_gain: per-phase current-comparator thresholds, self-trimmed at each comparator-decided
+  low-side turn-off edge (Schaef et al. ISSCC 2019);
+- qualify_current: phases 2..N turn their low side off only when the timed slot has passed AND
+  their own current is below the threshold (P25 Sec. II; UCC28063A);
+- zvs_reactive False: in predictive mode ZVS is left to the timed prediction (Chiang 2009).
+
+A75 docstring follows.
+A75 - A74's simulator plus controller latency and a predictive valley turn-on (BOUNDARY.md).
+
+Copied from A74 (a74_transient.py, unmodified there). New, off by default (mode P only):
+- t_d: latency from a comparator decision to the gate edge (ZVS low-on, phase-1 current
+  target, high-side ZVS and valley). Timer-generated edges are taken as pre-compensated;
+- valley_mode "predictive": the high side turns on at t_lo + dt_pred[k], a timed edge
+  (Chiang 2009's predictive turn-on / adaptive dead time); dt_pred starts at half the
+  node resonance period and is corrected every cycle: +dt_step if the node was still
+  falling at turn-on (early), else set to the observed valley time (late).
+
+A74 docstring follows.
+A74 - A73's simulator plus mode-P phase shifts that follow the measured period (BOUNDARY.md).
+
+Copied from A73 (a73_transient.py, unmodified there). New, off by default:
+- adaptive_shift: in mode P, phase k's low side turns off at t_ref + (k-1)*T_meas/N,
+  T_meas = the last phase-1 period, clamped to [0.5, 3]*T0;
+- a log of every high-side turn-on (mechanism, Vds at turn-on); it does not change the dynamics.
+
+A73 docstring follows.
+A73 - A72's simulator plus the published ladder-control start-up methods (BOUNDARY.md).
+
+Copied from A72 (a72_transient.py, unmodified there). New options, all off by default:
+- init_ladder: start from a precharged ladder (Wei et al. JSSC 2021 end state), Vin held;
+- t_ss: mode-S Ton ramped from 0 over t_ss (Kim et al. TPEL 2018 soft start);
+- k_b: mode-S high-state duration modulated by the sensed switching-node voltage
+  (Xia & Stauth JSSC 2022 balancing sliding mode, transferred to the SCB).
+
+A72 docstring follows.
+A72 - A71's zero-start simulator generalised to N phases and a resistive load.
+
+A71 (a71_transient.py, unmodified there) is the N = 3, constant-current special
+case; the regression gate (BOUNDARY Section 4) checks that. Node, switch and
+capacitor orderings follow A71 so that N = 3 reproduces it.
+
+    vin-SH1-a1-SH2-a2-...-a(N-1)-SHN-xN,  SLk: xk-0,  Csk: ak-xk (k < N),  Lk: xk-out
+    [Cm 0; 0 L] d/dt [v; i] = [[-G, -B], [B^T, -R]] [v; i] + f(t)
+    v = (a1..a(N-1), x1..xN, out), i = (i1..iN) (xk -> out)
+Modes as in A71: S (fixed timing, fixed dead time) from t = 0, P (D41 single-sensor
+rule + Chiang valley fallback) from the first phase-1 high-side turn-on at or
+after t_hand.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import numpy as np
+from scipy.linalg import lu_factor, lu_solve
+
+HERE = Path(__file__).resolve().parent
+COSS_CSV = HERE.parent / "A59_nonlinear_coss_epc2067" / "epc2067_coss_qoss_eoss_digitized.csv"   # A59, read-only
+FIG8_CSV = HERE.parent / "A57_datasheet_reverse_conduction_pricing" / "epc2067_fig8_reverse_characteristics.csv"  # A57
+
+
+def fit_fig8(lo=10.0, hi=100.0, temp=25, path=FIG8_CSV):
+    """A87: least-squares V_SD = Vf + R I per device over [lo, hi] A (1 A spacing) of the digitised Fig. 8 curve.
+    Returns (Vf, R, max |error| over the range)."""
+    import csv
+    pts = []
+    with open(path) as fh:
+        for row in csv.DictReader(fh):
+            if int(row["temperature_c"]) == temp:
+                pts.append((float(row["isd_a_per_device"]), float(row["vsd_v"])))
+    i_f, v_f = np.array(sorted(pts)).T
+    cur = np.arange(lo, hi + 1e-9, 1.0)
+    vol = np.interp(cur, i_f, v_f)
+    r, vf = np.polyfit(cur, vol, 1)
+    return float(vf), float(r), float(np.max(np.abs(vol - (vf + r * cur))))
+
+
+class EPC2067Coss:
+    """Per-device Coss(V) of the EPC2067 datasheet Fig. 5a (VGS = 0, typical), digitised in A59.
+    PCHIP on a 0.1 V grid (as A59), tabulated at 1 mV for fast linear-interpolation lookup; q = antiderivative,
+    C even and q odd in V; beyond 40 V the 40 V value is held (never reached here)."""
+
+    def __init__(self, path=COSS_CSV, v_max=40.0, dv=1e-3):
+        import csv
+        from scipy.interpolate import PchipInterpolator
+        pts = {}
+        with open(path) as fh:
+            for row in csv.DictReader(fh):
+                if row["curve"] == "coss":
+                    pts[round(float(row["vds_v"]), 4)] = float(row["value"]) * 1e-12
+        v = np.array(sorted(pts)); c = np.array([pts[x] for x in v]); keep = v > 0
+        v = np.concatenate([[0.0], v[keep]]); c = np.concatenate([[c[keep][0]], c[keep]])
+        grid = np.arange(0.0, v_max + 1e-9, 0.1)
+        ci = PchipInterpolator(grid, np.interp(grid, v, c), extrapolate=False)
+        qi = ci.antiderivative()
+        self.vt = np.arange(0.0, v_max + 1e-9, dv)
+        self.ct, self.qt = ci(self.vt), qi(self.vt)
+        self.v_max, self.c_end, self.q_end = v_max, float(self.ct[-1]), float(self.qt[-1])
+
+    def q(self, v):
+        a = np.abs(v)
+        out = np.interp(a, self.vt, self.qt)
+        out = np.where(a > self.v_max, self.q_end + self.c_end * (a - self.v_max), out)
+        return np.sign(v) * out
+
+    def c(self, v):
+        return np.interp(np.abs(v), self.vt, self.ct)
+# A71's P25-scale three-phase circuit (A69/A70 values, 4.9 mOhm, CC 67.5 A, T0 2 us, 20 ns dead time)
+P25_PRESET = dict(n=3, vin=12.0, L=30e-9, R=4.9e-3, c_high=0.69e-9, c_low=1.38e-9, cs=100e-6, co=100e-6,
+                  load_kind="cc", i_load=67.5, ton=500e-9, i_target=-2.5, t0=2e-6, t_dead=20e-9)
+
+
+@dataclass
+class Params:
+    n: int = 4
+    vin: float = 48.0
+    L: float = 1.4666667e-9
+    R: float = 0.54e-3
+    c_high: float = 2 * 1860e-12
+    c_low: float = 3 * 1860e-12
+    cs: float = 3e-6
+    co: float = 4.672e-3
+    load_kind: str = "r"        # "r": resistive r_load; "cc": constant current i_load
+    r_load: float = 4e-3
+    i_load: float = 250.0
+    ton: float = 16.667e-9
+    i_target: float = -2.5
+    t0: float = 200e-9
+    t_dead: float = 2.15e-9
+    g_on: float = 1e7
+    h: float = 10e-12
+    v_hys: float = 0.05
+    t_ramp: float = 68.61e-6
+    t_load: float = 88.61e-6
+    t_hand: float = 88.61e-6
+    t_end: float = 388.61e-6
+    shifts: tuple = ()
+    level_events: bool = False   # BOUNDARY 9: a condition already met fires at once (comparator), not only on a crossing
+    t_restart_high: float = 0.0  # BOUNDARY 9: mode P restart timer on the UP/DOWN waits (0 = off)
+    t_restart_low: float = 0.0   # BOUNDARY 9: mode P restart timer on phase 1's current-target wait (0 = off)
+    init_ladder: tuple = ()       # A73: flying-capacitor voltages at t = 0 (V); () = all zero
+    t_ss: float = 0.0             # A73: mode-S Ton ramp time (0 = off)
+    k_b: float = 0.0              # A73: mode-S balancing gain (0 = off)
+    k_b_vmin: float = 2.0         # A73: no balancing below this Vin
+    diode_check: bool = False
+    init_z: tuple = ()            # A73 BOUNDARY 10: N = 3 start from an A69 section (a2, x1, out, i1, i2, i3), SH1 on
+    valley: bool = True           # A73 BOUNDARY 10: False = A69 controller (no valley path)     # A73 BOUNDARY 8: a diode may not carry drain->source current within a step
+    stall_periods: float = 3.0   # STALLED if no phase-1 section for this many T0 (BOUNDARY 8: 20 for P24 runs)
+    adaptive_shift: bool = False  # A74: mode-P shifts k*T_meas/N instead of k*T0/N
+    t_meas_clamp: tuple = (0.5, 3.0)  # A74: T_meas limits in units of T0 (PROJECT_DECISION)
+    t_d: float = 0.0                  # A75: comparator-to-gate latency (s), mode P
+    valley_mode: str = "reactive"     # A75: "reactive" (A70 + latency) or "predictive" (timed valley)
+    dt_step: float = 0.2e-9           # A75: predictive correction step when early (PROJECT_DECISION)
+    trim_gain: float = 0.0            # A76: comparator self-trim gain per cycle (0 = off)
+    trim_clamp: tuple = (-10.0, 30.0) # A76: theta_k limits relative to i_target (A)
+    qualify_current: bool = False     # A76: phases 2..N low-off needs the slot AND i_k <= theta_k
+    zvs_reactive: bool = True         # A76: False = no reactive ZVS decision in predictive mode
+    vo_loop_ki: float = 0.0           # A79: integrator gain, s of Ton per V of error per cycle (0 = open loop)
+    learn_at_restart: bool = False    # A82: the predictive correction also samples restart turn-ons
+    kick_t: float = 0.0               # A84: time of the dt_pred kick (0 = no kick)
+    kick_phase: int = 4               # A84: 1-based phase whose dt_pred is kicked
+    kick_dt: float = 20.2e-9          # A84: the kicked value
+    nonlinear_coss: bool = False      # A86: EPC2067 datasheet Coss(V) on every switch branch
+    n_high: int = 2                   # A86: parallel devices per high-side switch (P24 Table 3, nM = 4)
+    n_low: int = 3                    # A86: parallel devices per low-side switch
+    rev_drop: bool = False            # A87: reverse conduction through Vf + R (per device) instead of an ideal diode
+    rev_vf: float = 0.0               # A87: V, set from the Fig. 8 fit when rev_drop
+    rev_r: float = 0.0                # A87: Ohm per device, set from the Fig. 8 fit when rev_drop
+    low_mode: str = "reactive"        # A88: "reactive" (A75: comparator + t_d) or "predictive" (timed dead time)
+    low_step: float = 0.05e-9         # A88: early-side step of the low-side dead time (PROJECT_DECISION)
+    low_cap: float = 10e-9            # A88: cap on the low-side dead time (PROJECT_DECISION)
+    vref: float = 1.0                 # A79: output reference (P24_EXPLICIT 1 V)
+    ton_lim: tuple = (0.5, 2.0)       # A79: Ton command limits in units of ton (PROJECT_DECISION)
+
+    def __post_init__(self):
+        if not self.shifts:
+            self.shifts = tuple((k * self.t0) / self.n for k in range(1, self.n))
+
+    def vin_at(self, t):
+        return self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
+
+    def ton_at(self, t):
+        return self.ton * min(t / self.t_ss, 1.0) if self.t_ss > 0 else self.ton
+
+    def load_at(self, t):
+        return self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
+
+
+def topology(n):
+    nodes = tuple(f"a{k}" for k in range(1, n)) + tuple(f"x{k}" for k in range(1, n + 1)) + ("out",)
+    highs = [("SH1", "vin", "a1")] + [(f"SH{k}", f"a{k - 1}", f"a{k}") for k in range(2, n)] + [(f"SH{n}", f"a{n - 1}", f"x{n}")]
+    lows = [(f"SL{k}", f"x{k}", None) for k in range(1, n + 1)]
+    return nodes, tuple(highs + lows)
+
+
+@dataclass
+class Sim:
+    p: Params
+    cache: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        p = self.p
+        self.nodes, self.switches = topology(p.n)
+        self.idx = {nm: k for k, nm in enumerate(self.nodes)}
+        nv = len(self.nodes); self.nv = nv
+        caps = ([(p.c_high, d, s) for _, d, s in self.switches[:p.n]] + [(p.c_low, d, s) for _, d, s in self.switches[p.n:]]
+                + [(p.cs, f"a{k}", f"x{k}") for k in range(1, p.n)] + [(p.co, "out", None)])
+        cm = np.zeros((nv, nv))
+        for c, a, b in caps:
+            ia, ib = self.idx.get(a), self.idx.get(b)
+            if ia is not None:
+                cm[ia, ia] += c
+            if ib is not None:
+                cm[ib, ib] += c
+            if ia is not None and ib is not None:
+                cm[ia, ib] -= c; cm[ib, ia] -= c
+        ns = nv + p.n
+        self.M = np.zeros((ns, ns)); self.M[:nv, :nv] = cm; self.M[nv:, nv:] = p.L * np.eye(p.n)
+        self.B = np.zeros((nv, p.n))
+        for k in range(p.n):
+            self.B[self.idx[f"x{k + 1}"], k] = 1.0; self.B[self.idx["out"], k] = -1.0
+        self.nsw = [p.n_high] * p.n + [p.n_low] * p.n            # A87: devices per switch position
+        self.nl = None
+        if p.nonlinear_coss:                                   # A86: switch-branch incidence for the charge correction
+            rsw = np.zeros((2 * p.n, ns)); vin_flag = np.zeros(2 * p.n)
+            for j, (_, d, s_) in enumerate(self.switches):
+                if d == "vin":
+                    vin_flag[j] = 1.0
+                else:
+                    rsw[j, self.idx[d]] += 1.0
+                if s_ is not None:
+                    rsw[j, self.idx[s_]] -= 1.0
+            nper = np.array([p.n_high] * p.n + [p.n_low] * p.n, float)
+            clin = np.array([p.c_high] * p.n + [p.c_low] * p.n)
+            self.nl = dict(r=rsw, vin=vin_flag, n=nper, clin=clin, model=EPC2067Coss(),
+                           stats={"steps": 0, "iters": 0, "max_iters": 0, "newton": 0})
+
+    def system(self, conducting, load_on, donly=None):
+        p = self.p; nv = self.nv
+        G = np.zeros((nv, nv)); gv = np.zeros(nv); frev = np.zeros(nv + p.n)
+        for j, (on, (name, d, s)) in enumerate(zip(conducting, self.switches)):
+            if not on:
+                continue
+            g = p.g_on
+            idd, iss = self.idx.get(d), self.idx.get(s)
+            if donly is not None and donly[j]:                 # A87: reverse conduction, I_ds = g (V_ds + Vf)
+                g = self.nsw[j] / p.rev_r
+                if iss is not None:
+                    frev[iss] += g * p.rev_vf
+                if idd is not None:
+                    frev[idd] -= g * p.rev_vf
+            if d == "vin":
+                G[iss, iss] += g; gv[iss] += g
+                continue
+            if idd is not None:
+                G[idd, idd] += g
+            if iss is not None:
+                G[iss, iss] += g
+            if idd is not None and iss is not None:
+                G[idd, iss] -= g; G[iss, idd] -= g
+        if load_on and p.load_kind == "r":
+            G[self.idx["out"], self.idx["out"]] += 1.0 / p.r_load
+        ns = nv + p.n
+        A = np.zeros((ns, ns)); A[:nv, :nv] = -G; A[:nv, nv:] = -self.B; A[nv:, :nv] = self.B.T; A[nv:, nv:] = -p.R * np.eye(p.n)
+        fv = np.zeros(ns); fv[:nv] = gv
+        fl = np.zeros(ns); fl[self.idx["out"]] = -1.0
+        return A, fv, fl, frev
+
+    def step(self, y, conducting, h, euler, t, load_on, donly=None):
+        key = (conducting, h, euler, load_on, donly)
+        entry = self.cache.get(key)
+        if entry is None:
+            A, fv, fl, frev = self.system(conducting, load_on, donly)
+            if euler:
+                lhs, rhs_m = self.M - h * A, self.M
+            else:
+                lhs, rhs_m = self.M - 0.5 * h * A, self.M + 0.5 * h * A
+            entry = (lu_factor(lhs), rhs_m, fv, fl, lhs, frev if (donly is not None and any(donly)) else None)
+            if h == self.p.h:
+                self.cache[key] = entry
+        lu, rhs_m, fv, fl, lhs, frev = entry
+        p = self.p
+        f1 = fv * p.vin_at(t + h) + fl * p.load_at(t + h)
+        if euler:
+            rhs = rhs_m @ y + h * f1
+        else:
+            f0 = fv * p.vin_at(t) + fl * p.load_at(t)
+            rhs = rhs_m @ y + 0.5 * h * (f0 + f1)
+        if frev is not None:                                   # A87: the constant Vf sources
+            rhs = rhs + h * frev
+        y1 = lu_solve(lu, rhs)
+        if self.nl is None:
+            return y1
+        return self._nonlinear(y, y1, lu, lhs, rhs, p.vin_at(t), p.vin_at(t + h))
+
+    def _nonlinear(self, y0, y1, lu, lhs, rhs, vin0, vin1):
+        """A86: F(y1) = lhs y1 - rhs + R^T [n (q(v1) - q(v0)) - C_lin (v1 - v0)] = 0; chord on the cached LU."""
+        nl = self.nl; r, n, clin, m = nl["r"], nl["n"], nl["clin"], nl["model"]
+        v0 = r @ y0 + nl["vin"] * vin0
+        q0 = n * m.q(v0)
+        st = nl["stats"]; st["steps"] += 1
+        for it in range(1, 9):
+            v1 = r @ y1 + nl["vin"] * vin1
+            corr = n * m.q(v1) - q0 - clin * (v1 - v0)
+            dz = lu_solve(lu, lhs @ y1 - rhs + r.T @ corr)
+            y1 = y1 - dz
+            if np.max(np.abs(dz)) < 1e-7:
+                st["iters"] += it; st["max_iters"] = max(st["max_iters"], it)
+                return y1
+        st["newton"] += 1                                          # fallback: full Newton
+        for it in range(1, 31):
+            v1 = r @ y1 + nl["vin"] * vin1
+            corr = n * m.q(v1) - q0 - clin * (v1 - v0)
+            jac = lhs + (r.T * (n * m.c(v1) - clin)) @ r
+            dz = np.linalg.solve(jac, lhs @ y1 - rhs + r.T @ corr)
+            y1 = y1 - dz
+            if np.max(np.abs(dz)) < 1e-7:
+                st["iters"] += 8 + it; st["max_iters"] = max(st["max_iters"], 8 + it)
+                return y1
+        raise RuntimeError("nonlinear Coss step did not converge")
+
+    def vds(self, y, j, vin):
+        name, d, s = self.switches[j]
+        vd = vin if d == "vin" else y[self.idx[d]]
+        vs = 0.0 if s is None else y[self.idx[s]]
+        return vd - vs
+
+
+def run(p: Params, log_every: int = 25, t_stop=None):
+    sim = Sim(p); n = p.n; nv = sim.nv
+    y = np.zeros(nv + n)
+    if p.init_ladder:                  # phase 1 HIGH at t = 0: a1 = Vin, x1 = Vin - VC1; phases 2..N low: xk = 0, ak = VCk
+        vin0 = p.vin_at(0.0)
+        y[sim.idx["a1"]] = vin0; y[sim.idx["x1"]] = vin0 - p.init_ladder[0]
+        for k in range(2, n):
+            y[sim.idx[f"a{k}"]] = p.init_ladder[k - 1]
+    if p.init_z:                       # A69's run(): y = (vin, a2, x1, 0, 0, out, i1, i2, i3), SH1 on, SL2/SL3 on
+        a2, x1, out, i1, i2, i3 = p.init_z
+        y[:] = [p.vin_at(0.0), a2, x1, 0.0, 0.0, out, i1, i2, i3]
+    state = ["HIGH"] + ["LOW"] * (n - 1)
+    t = 0.0; t_on = [0.0] + [None] * (n - 1); t_ref = 0.0; fired = [None] * n
+    t_off = [None] * n; t_lo = [None] * n; t_lon = [None] * n
+    restarts = []
+    t_meas = [p.t0]; clamps = [0]; turnons = []   # A74: last phase-1 period; clamped periods; high-side turn-on log
+    lowoffs = []                                  # A74 amendment 8: low-side turn-off log (diagnostic only)
+    half_res = np.pi * np.sqrt(p.L * (p.c_high + p.c_low))  # A75: node half resonance period
+    pending = [None] * n; t_vmin = [None] * n; v_lo = [None] * n; dt_pred = [half_res] * n   # A75
+    dtl = [p.t_dead] * n; t_cross = [None] * n; lowons = []; low_stats = {"early": 0, "late": 0, "exact": 0}  # A88
+    pred_stats = {"early": 0, "late": 0}; latent = {"detections": 0}
+    thr = [p.i_target] * n; trims = [0]                  # A76: comparator thresholds
+    acc_i2 = [0.0] * n                                     # A78: integral of i_k^2 dt since the last section
+    acc_rev = [0.0] * (2 * n); rev_time = [0.0] * (2 * n); rev_imax = [0.0] * (2 * n)   # A87, per switch, per section
+    last_donly = [False] * (2 * n)                         # A87: reverse-only devices of the last step
+    v_on = -p.rev_vf if p.rev_drop else 0                  # A87: reverse turn-on / cut threshold on V_DS
+    ton_cmd = [p.ton]                                      # A79: common Ton command of the voltage loop
+    kick = {"done": False, "t_s": None}                  # A84
+    tau = [0.0] * n; ton_used = [0.0] * n; ton_last = [None] * n
+
+    def bal_rate(yy, tt, k):
+        vin = p.vin_at(tt)
+        if p.k_b <= 0 or vin < p.k_b_vmin:
+            return 1.0
+        ref = vin / n
+        return min(4.0, max(0.25, 1.0 - p.k_b * (yy[ix[k]] - ref) / ref))
+    ctl = {"mode": "P" if p.t_hand <= 0 else "S", "t_hand_actual_s": 0.0 if p.t_hand <= 0 else None,
+           "load_done": p.t_load <= 0, "ipk": 0.0}
+    diode = [False] * (2 * n)
+    euler_left = 2
+    vmin = [None] * n
+    vds_max = [0.0] * (2 * n)
+    valley_events = []
+    t0w = time.time()
+    ia = [sim.idx[f"a{k}"] for k in range(1, n)]; ix = [sim.idx[f"x{k}"] for k in range(1, n + 1)]; io = sim.idx["out"]
+
+    def record(y, t):
+        vin = p.vin_at(t)
+        return {"t_s": t, "v": [float(v) for v in y[:nv]], "i": [float(v) for v in y[nv:]], "vo": float(y[io]),
+                "vin_v": vin, "vcs_v": [float(y[ia[k]] - y[ix[k]]) for k in range(n - 1)], "mode": ctl["mode"],
+                "load_on": ctl["load_done"], "ipk_a": ctl["ipk"], "valley_count": len(valley_events),
+                "ton_last_ns": [None if x is None else x * 1e9 for x in ton_last], "i2_int_a2s": list(acc_i2),
+                "rev_energy_j": list(acc_rev), "rev_time_s": list(rev_time), "rev_imax_dev_a": list(rev_imax),
+                "ton_cmd_ns": ton_cmd[0] * 1e9}
+
+    sections = [record(y, 0.0)]
+
+    def gates():
+        return [s == "HIGH" for s in state] + [s == "LOW" for s in state]
+
+    def event_values(y, t):
+        vin = p.vin_at(t)
+        ev = {}
+        if not ctl["load_done"]:
+            ev[("load_on", -1)] = p.t_load - t
+        S = ctl["mode"] == "S"
+        for k in range(n):
+            st = state[k]
+            if not S and pending[k] is not None:   # A75: decision taken, gate edge after the latency
+                ev[("pending", k)] = pending[k][1] - t
+                continue
+            if st == "HIGH":
+                if S and p.k_b > 0:
+                    tk = tau[k] if t == t_now[0] else tau[k] + (t - t_now[0]) * bal_rate(y, t, k)
+                    ev[("off_high", k)] = ton_used[k] - tk
+                    ev[("off_cap", k)] = (t_on[k] + 2 * ton_used[k]) - t
+                else:
+                    ev[("off_high", k)] = (t_on[k] + ton_used[k]) - t
+            elif st == "DOWN":
+                if not S and p.low_mode == "predictive":         # A88: timed low-side edge + zero-crossing timestamp
+                    ev[("low_pred", k)] = (t_off[k] + dtl[k]) - t
+                    if t_cross[k] is None:
+                        ev[("low_cross", k)] = sim.vds(y, n + k, vin)
+                else:
+                    ev[("low_on", k)] = (t_off[k] + p.t_dead) - t if S else sim.vds(y, n + k, vin)
+                if not S and p.t_restart_high > 0:
+                    ev[("low_on_restart", k)] = (t_off[k] + p.t_restart_high) - t
+            elif st == "LOW":
+                if k == 0:
+                    ev[("low_off", 0)] = (t_on[0] + p.t0 - p.t_dead) - t if S else y[nv] - thr[0]
+                    if not S and p.t_restart_low > 0:
+                        ev[("low_off_restart", 0)] = (t_lon[0] + p.t_restart_low) - t
+                elif fired[k] != t_ref:
+                    shift = k * t_meas[0] / n if (p.adaptive_shift and not S) else p.shifts[k - 1]
+                    if p.qualify_current and not S:            # A76: slot passed AND own current below theta
+                        ev[("low_off", k)] = max((t_ref + shift) - t, y[nv + k] - thr[k])
+                    else:
+                        ev[("low_off", k)] = (t_ref + shift) - t
+            elif st == "UP":
+                if S:
+                    ev[("high_on", k)] = (t_lo[k] + p.t_dead) - t
+                else:
+                    if p.zvs_reactive or p.valley_mode != "predictive":
+                        ev[("high_zvs", k)] = sim.vds(y, k, vin)
+                    if p.valley and p.valley_mode == "predictive":
+                        ev[("high_pred", k)] = (t_lo[k] + dt_pred[k]) - t
+                    elif p.valley:
+                        ev[("high_valley", k)] = (vmin[k] + p.v_hys) - sim.vds(y, k, vin)
+                    if p.t_restart_high > 0:
+                        ev[("high_restart", k)] = (t_lo[k] + p.t_restart_high) - t
+        return ev
+
+    t_now = [0.0]
+    ton_used[0] = p.ton_at(0.0)
+    t_end = p.t_end if t_stop is None else t_stop
+    max_steps = int(t_end / p.h * 1.6) + 1000
+    steps = 0
+    status = "COMPLETED"
+    diode_cuts = [0]
+
+    def advance(y, h, t, g, euler, lo):
+        """One step; with diode_check, a diode-only branch whose Vds ends > 0 is turned off and the step redone."""
+        d = list(diode)
+        for _ in range(2 * n + 1):
+            cond = tuple(bool(a or b) for a, b in zip(g, d))
+            donly = tuple(bool(b and not a) for a, b in zip(g, d)) if p.rev_drop else None
+            last_donly[:] = donly if donly is not None else [False] * (2 * n)
+            y1 = sim.step(y, cond, h, euler, t, lo, donly)
+            if not p.diode_check:
+                return y1, cond, d
+            vin1 = p.vin_at(t + h)
+            bad = [j for j in range(2 * n) if d[j] and not g[j] and sim.vds(y1, j, vin1) > v_on]
+            if not bad:
+                return y1, cond, d
+            for j in bad:
+                d[j] = False
+            diode_cuts[0] += len(bad)
+        return y1, cond, d
+
+    while t < t_end:
+        g = gates()
+        euler = euler_left > 0
+        lo = ctl["load_done"]
+        y1, conducting, dstep = advance(y, p.h, t, g, euler, lo)
+        if p.diode_check and dstep != diode:
+            diode = dstep; euler_left = 2
+        e0, e1 = event_values(y, t), event_values(y1, t + p.h)
+        crossed = [(k, e0[k] / (e0[k] - e1[k])) for k in e0 if e0[k] > 0 and e1.get(k, 1.0) <= 0]
+        if p.level_events:
+            crossed += [(k, 0.0) for k in e0 if e0[k] <= 0]
+        if crossed:
+            key, theta = min(crossed, key=lambda kv: kv[1])
+            hp = max(theta * p.h, 1e-18)
+            if p.diode_check:
+                y, conducting, dstep = advance(y, hp, t, g, euler, lo); diode = dstep
+            else:
+                y = sim.step(y, conducting, hp, euler, t, lo,
+                             tuple(bool(b and not a) for a, b in zip(g, diode)) if p.rev_drop else None)
+            t += hp
+            kind, k = key
+            vin = p.vin_at(t)
+            delayed = False
+            bind = None                        # A76: which condition decided a mode-P low-side turn-off
+            if kind == "low_off" and ctl["mode"] == "P":
+                if k == 0:
+                    bind = "current"
+                elif p.qualify_current:
+                    sh = k * t_meas[0] / n if p.adaptive_shift else p.shifts[k - 1]
+                    bind = "current" if (y[nv + k] - thr[k]) > ((t_ref + sh) - t) else "timer"
+                else:
+                    bind = "timer"
+            if kind == "pending":              # A75: the gate edge of a decision taken t_d earlier
+                kind, _, bind = pending[k]; pending[k] = None; delayed = True
+            elif (p.t_d > 0 and ctl["mode"] == "P"
+                  and (kind in ("low_on", "high_zvs", "high_valley") or (kind == "low_off" and bind == "current"))):
+                pending[k] = (kind, t + p.t_d, bind); latent["detections"] += 1
+                kind = "latent"                # no transition now
+            if kind in ("high_on", "high_zvs", "high_valley", "high_restart", "high_pred"):
+                turnons.append({"t_s": t, "phase": k + 1, "how": kind, "vds_v": float(sim.vds(y, k, vin)),
+                                "cycle": len(sections) - 1, "mode": ctl["mode"], "delayed": delayed,
+                                "vds_min_v": None if vmin[k] is None else float(vmin[k]),
+                                "t_since_lo_s": None if t_lo[k] is None else t - t_lo[k],
+                                "i_a": float(y[nv + k])})
+                if len(turnons) > 4000:
+                    del turnons[:2000]
+            if kind in ("low_off", "low_off_restart"):
+                lowoffs.append({"t_s": t, "phase": k + 1, "how": kind, "i_a": float(y[nv + k]),
+                                "t_since_ref_s": t - t_ref, "t_meas_s": t_meas[0], "cycle": len(sections) - 1,
+                                "mode": ctl["mode"], "vds_high_v": float(sim.vds(y, k, vin)),
+                                "states": list(state), "delayed": delayed, "bind": bind, "theta_a": thr[k]})
+                if len(lowoffs) > 4000:
+                    del lowoffs[:2000]
+            if kind == "low_cross":                        # A88: timestamp only, no transition
+                t_cross[k] = t; kind = "measure"
+            elif kind == "low_pred":                       # A88: correct the dead time at the timed edge
+                vl = float(sim.vds(y, n + k, vin))
+                if t_cross[k] is not None and t_cross[k] < t:
+                    dtl[k] = min(t_cross[k] - t_off[k], p.low_cap); how_l = "late"
+                elif vl > 0:
+                    dtl[k] = min(dtl[k] + p.low_step, p.low_cap); how_l = "early"
+                else:
+                    how_l = "exact"
+                low_stats[how_l] += 1
+                lowons.append({"t_s": t, "phase": k + 1, "vds_v": vl, "how": how_l, "dtl_s": dtl[k],
+                               "t_cross_rel_s": None if t_cross[k] is None else t_cross[k] - t_off[k],
+                               "cycle": len(sections) - 1, "mode": ctl["mode"]})
+                if len(lowons) > 4000:
+                    del lowons[:2000]
+                kind = "low_on"
+            was_restart_high = kind == "high_restart"      # A82
+            if kind.endswith("restart"):
+                restarts.append({"t_s": t, "phase": k + 1, "kind": kind, "cycle": len(sections) - 1})
+                kind = {"low_on_restart": "low_on", "low_off_restart": "low_off", "high_restart": "high_on"}[kind]
+            if kind == "off_cap":
+                kind = "off_high"
+            if kind == "load_on":
+                ctl["load_done"] = True
+            elif kind == "off_high":
+                state[k] = "DOWN"; t_off[k] = t; ton_last[k] = t - t_on[k]; t_cross[k] = None   # A88
+            elif kind == "low_on":
+                state[k] = "LOW"; t_lon[k] = t
+            elif kind == "low_off":
+                state[k] = "UP"; fired[k] = t_ref; t_lo[k] = t
+                vmin[k] = sim.vds(y, k, vin); t_vmin[k] = t; v_lo[k] = vmin[k]
+                if p.trim_gain > 0 and bind == "current":   # A76: self-trim toward i_target at the edge
+                    lo_t, hi_t = p.i_target + p.trim_clamp[0], p.i_target + p.trim_clamp[1]
+                    thr[k] = min(max(thr[k] + p.trim_gain * (p.i_target - float(y[nv + k])), lo_t), hi_t)
+                    trims[0] += 1
+            elif kind in ("high_on", "high_zvs", "high_valley", "high_pred"):
+                if kind == "high_pred" or (p.learn_at_restart and was_restart_high and p.valley_mode == "predictive"
+                                           and ctl["mode"] == "P"):   # A75 correction; A82: also at restarts
+                    if sim.vds(y, k, vin) < vmin[k]:                       # node still falling: early
+                        dt_pred[k] = min(dt_pred[k] + p.dt_step, 3 * half_res); pred_stats["early"] += 1
+                    elif vmin[k] < v_lo[k] - p.v_hys and t_vmin[k] > t_lo[k]:  # a dip was seen: late
+                        dt_pred[k] = t_vmin[k] - t_lo[k]; pred_stats["late"] += 1
+                    else:                                                  # flat node: no information
+                        pred_stats["flat"] = pred_stats.get("flat", 0) + 1
+                if kind == "high_valley":
+                    valley_events.append({"t_s": t, "phase": k + 1, "vds_v": float(sim.vds(y, k, vin)),
+                                          "vds_min_v": float(vmin[k]), "cycle": len(sections) - 1})
+                state[k] = "HIGH"; t_on[k] = t; tau[k] = 0.0
+                ton_used[k] = ton_cmd[0] if (p.vo_loop_ki > 0 and ctl["mode"] == "P") else p.ton_at(t)
+                if k == 0:
+                    tm = t - t_ref
+                    lo_c, hi_c = p.t_meas_clamp[0] * p.t0, p.t_meas_clamp[1] * p.t0
+                    if tm < lo_c or tm > hi_c:
+                        clamps[0] += 1
+                    t_meas[0] = min(max(tm, lo_c), hi_c)
+                    t_ref = t
+                    if ctl["mode"] == "S" and t >= p.t_hand:
+                        ctl["mode"] = "P"; ctl["t_hand_actual_s"] = t
+                    sections.append(record(y, t)); ctl["ipk"] = 0.0
+                    for j in range(n):
+                        acc_i2[j] = 0.0
+                    for j in range(2 * n):                     # A87
+                        acc_rev[j] = 0.0; rev_time[j] = 0.0; rev_imax[j] = 0.0
+                    if p.kick_t > 0 and not kick["done"] and ctl["mode"] == "P" and t >= p.kick_t:   # A84 kick
+                        dt_pred[p.kick_phase - 1] = p.kick_dt; kick.update(done=True, t_s=t)
+                    if p.vo_loop_ki > 0 and ctl["mode"] == "P":   # A79: sample Vo once per cycle, integrate
+                        ton_cmd[0] = min(max(ton_cmd[0] + p.vo_loop_ki * (p.vref - float(y[io])),
+                                             p.ton_lim[0] * p.ton), p.ton_lim[1] * p.ton)
+                    m = len(sections) - 1
+                    if log_every and m % log_every == 0:
+                        s = sections[-1]; vi = max(s["vin_v"], 1e-12)
+                        lad = [s["vcs_v"][j] / vi for j in range(n - 1)]
+                        print(f"  cycle {m:5d} t {t * 1e6:8.3f} us {s['mode']} Vin {s['vin_v']:6.2f} Vo {s['vo']:7.4f} "
+                              f"Cs/Vin {np.round(lad, 4)} i {np.round(s['i'], 1)} ipk {s['ipk_a']:6.1f} "
+                              f"valley {s['valley_count']} vdsmax {max(vds_max):5.1f} wall {time.time() - t0w:.0f}s", flush=True)
+            euler_left = 2
+        else:
+            t += p.h; y = y1
+            euler_left = max(0, euler_left - 1)
+        if p.k_b > 0:
+            for k in range(n):
+                if state[k] == "HIGH" and t_on[k] is not None and t_on[k] < t:
+                    tau[k] += (t - t_now[0]) * bal_rate(y, t, k)
+        dta = t - t_now[0]                 # A78: accumulate i^2 dt over the accepted step
+        for j in range(n):
+            acc_i2[j] += float(y[nv + j]) ** 2 * dta
+        if p.rev_drop:                                  # A87: reverse-conduction energy over the accepted step
+            vin_t = p.vin_at(t)
+            for j in range(2 * n):
+                if last_donly[j]:
+                    vsd = -sim.vds(y, j, vin_t)
+                    isd = sim.nsw[j] * (vsd - p.rev_vf) / p.rev_r
+                    if isd > 0:
+                        acc_rev[j] += vsd * isd * dta; rev_time[j] += dta
+                        rev_imax[j] = max(rev_imax[j], isd / sim.nsw[j])
+        t_now[0] = t
+        ctl["ipk"] = max(ctl["ipk"], float(np.max(np.abs(y[nv:]))))
+        vin = p.vin_at(t)
+        for k in range(n):             # valley tracking after every accepted (full or partial) step
+            if state[k] == "UP":
+                v = sim.vds(y, k, vin)
+                if v < vmin[k]:
+                    vmin[k] = v; t_vmin[k] = t
+        g = gates()
+        vd = [sim.vds(y, j, vin) for j in range(2 * n)]
+        for j in range(2 * n):
+            if vd[j] > vds_max[j]:
+                vds_max[j] = vd[j]
+        new_d = [(not g[j]) and vd[j] < v_on for j in range(2 * n)]
+        if new_d != diode:
+            diode = new_d; euler_left = 2
+        steps += 1
+        if steps > max_steps:
+            status = "STEP_GUARD"; break
+        if t - sections[-1]["t_s"] > p.stall_periods * p.t0:
+            status = "STALLED"; break
+    end = {"rev": {"on": p.rev_drop, "vf_v": p.rev_vf, "r_ohm_per_device": p.rev_r},
+           "low_mode": p.low_mode, "dtl_s": list(dtl), "low_stats": low_stats, "lowons_last": lowons[-1000:],
+           "nl_stats": None if sim.nl is None else dict(sim.nl["stats"]), "kick_t_s": kick["t_s"], "theta_final_a": list(thr), "trims": trims[0], "half_res_s": half_res, "dt_pred_s": list(dt_pred), "pred_stats": pred_stats,
+           "latent_detections": latent["detections"], "pending_at_end": [None if q is None else list(q) for q in pending],
+           "lowoffs_last": lowoffs[-1000:],
+           "turnons_last": turnons[-1000:], "t_meas_clamps": clamps[0], "t_meas_last_s": t_meas[0],
+           "diode_cuts": diode_cuts[0], "restarts": restarts[:500],"restart_count": len(restarts), "status": status, "t_s": t, "states": list(state), "y": y.tolist(), "mode": ctl["mode"],
+           "t_hand_actual_s": ctl["t_hand_actual_s"], "vin_v": p.vin_at(t),
+           "vds_max_v": {sim.switches[j][0]: vds_max[j] for j in range(2 * n)}}
+    return sections, valley_events, end
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("case")
+    ap.add_argument("--t-ramp", type=float, default=68.61, help="us")
+    ap.add_argument("--t-load", type=float, default=88.61, help="us")
+    ap.add_argument("--t-hand", type=float, default=88.61, help="us; <= 0: mode P from t = 0")
+    ap.add_argument("--t-end", type=float, default=388.61, help="us")
+    ap.add_argument("--h", type=float, default=10e-12)
+    ap.add_argument("--log-every", type=int, default=250)
+    ap.add_argument("--t-dead", type=float, default=2.15, help="ns, mode S fixed dead time")
+    ap.add_argument("--stall-periods", type=float, default=3.0)
+    ap.add_argument("--level-events", action="store_true")
+    ap.add_argument("--t-restart-high", type=float, default=0.0, help="ns")
+    ap.add_argument("--t-restart-low", type=float, default=0.0, help="ns")
+    ap.add_argument("--init-ladder", default="", help="comma-separated V, e.g. 36,24,12")
+    ap.add_argument("--t-ss", type=float, default=0.0, help="us")
+    ap.add_argument("--k-b", type=float, default=0.0)
+    ap.add_argument("--diode-check", action="store_true")
+    ap.add_argument("--preset", default="p24", choices=("p24", "p25"), help="p25: A71's three-phase P25-scale circuit (CC load)")
+    ap.add_argument("--init-z-json", default="", help="json with z_star (A69 section names) for an N = 3 start")
+    ap.add_argument("--no-valley", action="store_true")
+    ap.add_argument("--adaptive-shift", action="store_true", help="A74: mode-P shifts follow the measured period")
+    ap.add_argument("--t-d", type=float, default=0.0, help="A75: ns, comparator-to-gate latency in mode P")
+    ap.add_argument("--valley-mode", default="reactive", choices=("reactive", "predictive"))
+    ap.add_argument("--dt-step", type=float, default=0.2, help="A75: ns, predictive correction step")
+    ap.add_argument("--trim-gain", type=float, default=0.0, help="A76: comparator self-trim gain per cycle")
+    ap.add_argument("--qualify-current", action="store_true", help="A76: phases 2..N need i_k <= theta_k to turn off")
+    ap.add_argument("--no-zvs-reactive", action="store_true", help="A76: no reactive ZVS decision in predictive mode")
+    ap.add_argument("--i-target", type=float, default=None, help="A78: A, low-side turn-off current target")
+    ap.add_argument("--vo-loop-ki", type=float, default=0.0, help="A79: ns of Ton per V of error per cycle")
+    ap.add_argument("--vref", type=float, default=1.0, help="A79: V")
+    ap.add_argument("--learn-at-restart", action="store_true", help="A82")
+    ap.add_argument("--kick-t", type=float, default=0.0, help="A84: us")
+    ap.add_argument("--kick-dt", type=float, default=20.2, help="A84: ns")
+    ap.add_argument("--nonlinear-coss", action="store_true", help="A86: EPC2067 datasheet Coss(V)")
+    ap.add_argument("--low-mode", default="reactive", choices=("reactive", "predictive"), help="A88")
+    ap.add_argument("--low-step", type=float, default=0.05, help="A88: ns")
+    ap.add_argument("--low-cap", type=float, default=10.0, help="A88: ns")
+    ap.add_argument("--rev-drop", action="store_true", help="A87: EPC2067 Fig. 8 reverse drop (Vf + R fit)")
+    ap.add_argument("--rev-fit", default="10,100", help="A87: per-device fit range, A")
+    ap.add_argument("--c-high-pf", type=float, default=None, help="A86 amendment 8: per-device linear high-side C (pF); unset = Params")
+    ap.add_argument("--c-low-pf", type=float, default=None, help="A86 amendment 8: per-device linear low-side C (pF); unset = Params")
+    a = ap.parse_args()
+    kw = dict(t_ramp=a.t_ramp * 1e-6, t_load=a.t_load * 1e-6, t_hand=a.t_hand * 1e-6, t_end=a.t_end * 1e-6, h=a.h,
+              t_dead=a.t_dead * 1e-9, stall_periods=a.stall_periods, level_events=a.level_events,
+              t_restart_high=a.t_restart_high * 1e-9, t_restart_low=a.t_restart_low * 1e-9,
+              init_ladder=tuple(float(v) for v in a.init_ladder.split(",")) if a.init_ladder else (),
+              t_ss=a.t_ss * 1e-6, k_b=a.k_b, diode_check=a.diode_check)
+    if a.preset == "p25":
+        kw.update(P25_PRESET)          # the preset's circuit values (incl. t_dead 20 ns) take precedence
+    if a.init_z_json:
+        zs = json.loads(Path(a.init_z_json).read_text())["z_star"]
+        kw["init_z"] = tuple(zs[k] for k in ("a2_v", "x1_v", "out_v", "iL1_a", "iL2_a", "iL3_a"))
+    kw["valley"] = not a.no_valley
+    kw["adaptive_shift"] = a.adaptive_shift
+    kw.update(t_d=a.t_d * 1e-9, valley_mode=a.valley_mode, dt_step=a.dt_step * 1e-9)
+    kw.update(trim_gain=a.trim_gain, qualify_current=a.qualify_current, zvs_reactive=not a.no_zvs_reactive)
+    if a.i_target is not None:
+        kw["i_target"] = a.i_target
+    kw.update(vo_loop_ki=a.vo_loop_ki * 1e-9, vref=a.vref, learn_at_restart=a.learn_at_restart,
+              kick_t=a.kick_t * 1e-6, kick_dt=a.kick_dt * 1e-9, nonlinear_coss=a.nonlinear_coss)
+    if a.c_high_pf is not None:                      # amendment 8: equivalent-linear capacitance (D44 case L2)
+        kw["c_high"] = Params.n_high * a.c_high_pf * 1e-12
+    if a.c_low_pf is not None:
+        kw["c_low"] = Params.n_low * a.c_low_pf * 1e-12
+    if a.rev_drop:                                   # A87: fit Vf, R to Fig. 8 (25 C) at start-up
+        lo_i, hi_i = (float(x) for x in a.rev_fit.split(","))
+        vf, rr, err = fit_fig8(lo_i, hi_i)
+        kw.update(rev_drop=True, rev_vf=vf, rev_r=rr)
+        print(f"A87 reverse drop: Vf {vf:.4f} V, R {rr * 1e3:.3f} mOhm per device, max fit error {err * 1e3:.1f} mV "
+              f"over {lo_i:g}-{hi_i:g} A", flush=True)
+    kw.update(low_mode=a.low_mode, low_step=a.low_step * 1e-9, low_cap=a.low_cap * 1e-9)   # A88
+    p = Params(**kw)
+    print(f"A88 {a.case}: low_mode {p.low_mode}; c_high {p.c_high * 1e9:.4f} nF c_low {p.c_low * 1e9:.4f} nF; nonlinear_coss {a.nonlinear_coss}; kick {a.kick_t} us -> {a.kick_dt} ns; learn_at_restart {a.learn_at_restart}; ki {a.vo_loop_ki} ns/V vref {a.vref};  trim {p.trim_gain} qualify {p.qualify_current} zvs_reactive {p.zvs_reactive}; "
+          f"t_d {a.t_d} ns, valley {p.valley_mode}; adaptive_shift {p.adaptive_shift}; init_ladder {p.init_ladder} t_ss {a.t_ss} us k_b {p.k_b}; N={p.n} Vin {p.vin} V, t_ramp {a.t_ramp} us, t_load {a.t_load} us, t_hand {a.t_hand} us, "
+          f"t_end {a.t_end} us, load {p.load_kind} {p.r_load if p.load_kind == 'r' else p.i_load}, h {p.h * 1e12:.0f} ps", flush=True)
+    sections, valley_events, end = run(p, log_every=a.log_every)
+    print(f"end: {end['status']} at t={end['t_s'] * 1e6:.3f} us, mode {end['mode']}, states {end['states']}, "
+          f"{len(sections) - 1} sections, {len(valley_events)} valley firings, handover at "
+          f"{None if end['t_hand_actual_s'] is None else round(end['t_hand_actual_s'] * 1e6, 3)} us, "
+          f"vds max {max(end['vds_max_v'].values()):.2f} V", flush=True)
+    stride = max(1, (len(sections) - 1) // 4000)          # keep the file small: every stride-th section + the last 400
+    keep = sorted(set(range(0, len(sections), stride)) | set(range(max(0, len(sections) - 400), len(sections))))
+    out = {"case": a.case, "argv": sys.argv[1:],
+           "params": {k: (list(v) if isinstance(v, tuple) else v) for k, v in p.__dict__.items()},
+           "end": end, "valley_events_count": len(valley_events),
+           "valley_events_first_2000": valley_events[:2000], "valley_events_last_200": valley_events[-200:],
+           "section_stride": stride, "sections_total": len(sections), "sections": [sections[i] | {"index": i} for i in keep]}
+    path = HERE / f"run_{a.case}.json"
+    k = 2
+    while path.exists():
+        path = HERE / f"run_{a.case}_v{k}.json"
+        k += 1
+    path.write_text(json.dumps(out))
+    print(f"wrote {path.name}")
+
+
+if __name__ == "__main__":
+    main()

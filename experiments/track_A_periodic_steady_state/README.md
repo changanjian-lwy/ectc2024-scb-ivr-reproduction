@@ -615,3 +615,20 @@ controller is otherwise unchanged.
   same drop, agrees within 0.05 A, 0.03 V and 0.03 W.
 - **The next step at this level is the low-side timing,** a controller
   change.
+
+`A88_p24_predictive_low_side_turn_on` makes the mode-P low-side turn-on a
+timed edge, t_off + dtl. dtl is learned from the V_DS = 0 crossing:
+- late: set to the crossing time;
+- early: +0.05 ns.
+
+This follows P25's timed dead time, a PWM-mode GaN driver's programmable
+dead time (LMG1210), and Zhang et al. (TPEL 2023).
+- **The reverse-conduction loss goes from 56 W to 0 W** at 2-7.5%, and the
+  orbit returns to A86's ideal-diode orbit (Ton 17.52 ns at 3%).
+- **Why it is zero.** The edges sit within 0.05 ns of the crossing
+  (-0.65 to +0.08 V). GaN only conducts in reverse below -2.09 V, which
+  leaves a window of 0.16-0.22 ns after the crossing.
+- **The learned dead time is 0.94-1.24 ns.**
+- **Cross-checked in the mathematical model.** D47, the event map with the
+  timed low side, agrees within 0.04 A, 0.03 V and 3.5 ps of crossing
+  time. Its orbits equal D45's ideal-diode orbits.
