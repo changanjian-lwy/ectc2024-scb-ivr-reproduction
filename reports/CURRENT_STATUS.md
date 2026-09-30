@@ -361,9 +361,24 @@ each question:
         an asynchronous fast path for phase 1 removes its 4 ns edge
         jitter, and the dither halves (4.0 to 1.9 A). The remainder is
         probably Ton LSB toggling (not yet shown).
-     2. Mathematical model: the four-phase extension (the current code is
-        nP = 3). Then: do two P24 orbits coexist at 5%, and where does the
-        restart orbit end?
+     2. Done ([D43](../symbolic_derivations/03_P24_native/D43_P24_FOUR_PHASE_EXACT_EVENT_MAP.md), mathematical model):
+        a P24-native four-phase exact event map. It is independent of the
+        simulator: ideal switches, charge-conserving hard turn-ons, matrix-
+        exponential flow, roots on the exact trajectory.
+        - It reproduces A79's three steady states. The turn-on voltages
+          agree to ~0.01-0.1 V, and all orbits are stable (|mu| max 0.986).
+        - At 5% the soft and phase-4-restart states are two stable
+          orbits.
+        - **Mechanism.** At 3-5% the restart orbit's phase-4 valley comes
+          before the 20 ns restart. The restart state persists only because
+          the corrector learns at predictive edges only, and locks once
+          dt_pred passes 20 ns. Escaping along the valley always returns
+          to the soft orbit.
+        - **Threshold.** At <= 2% (P24), phase 4 has no self-consistent soft
+          orbit. The threshold is 2-2.5%, not A78's 4-5%.
+     3. Next, physical model (A82): test D43's prediction with a
+        corrector that also learns at restart edges. Expected: only soft
+        at 3-5%, still restart-driven at 2%.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
