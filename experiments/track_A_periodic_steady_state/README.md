@@ -572,3 +572,10 @@ established soft state.
 - **With the old corrector:** the same kick locks a soft 5% state into the
   restart state for the remaining ~600 cycles.
 - **So** the old controller has two attractors, and the fixed one has one.
+
+`A85_verilog_ton_resolution` leaves A81's RTL unchanged except for a 7-bit
+delay line (31 ps).
+- **The Verilog dither falls from 1.66 to 0.90 A,** so the remaining dither
+  was the edge / Ton resolution.
+- **The implementation-level controller now meets criterion 2 in full at
+  5%.**

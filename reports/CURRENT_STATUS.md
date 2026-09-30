@@ -389,7 +389,15 @@ each question:
           a kick into the restart state is undone in one cycle by the
           fixed corrector, and locks the old one for good. The fixed
           controller has one attractor.
-        - Roberts' minimum-duty-increment method for the RTL dither.
+        - Done ([A85](../experiments/track_A_periodic_steady_state/A85_verilog_ton_resolution/RESULTS.md)):
+          the RTL dither is the Ton / edge resolution. With 31 ps edges it
+          falls from 1.66 to 0.90 A, and the Verilog controller meets
+          criterion 2 in full at 5%. Roberts' minimum-duty-increment method
+          is the alternative to a finer delay line.
+     6. **Single-module level: all five criteria met at 3-7.5%, with the
+        corrected controller, in the physical model (Python and Verilog)
+        and cross-checked in the mathematical model (D43).** P24's stated
+        1-2% negative current is not enough in either model.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).
