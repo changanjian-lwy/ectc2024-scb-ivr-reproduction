@@ -385,9 +385,10 @@ each question:
         the fix in the Verilog co-simulation. 3% and 5% are soft with A81's
         unchanged RTL; the dither is 1.6 A.
      5. Next:
-        - A84: perturbation test of uniqueness. Kick phase 4's delay into
-          the restart state; the fixed corrector should return to soft,
-          the old one should stay.
+        - Done ([A84](../experiments/track_A_periodic_steady_state/A84_p24_perturbation_uniqueness/RESULTS.md)):
+          a kick into the restart state is undone in one cycle by the
+          fixed corrector, and locks the old one for good. The fixed
+          controller has one attractor.
         - Roberts' minimum-duty-increment method for the RTL dither.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;

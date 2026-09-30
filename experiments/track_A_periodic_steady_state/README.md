@@ -564,3 +564,11 @@ turn-ons.
   soft.** Phase 4 turns on at 9.19 / 10.24 V, against Python's 9.24 /
   10.16 V.
 - **Dither** remains 1.6 A.
+
+`A84_p24_perturbation_uniqueness` kicks phase 4's `dt_pred` to 20.2 ns in an
+established soft state.
+- **With the fixed corrector:** one restart, then soft again from the next
+  cycle, at 5% and 3%.
+- **With the old corrector:** the same kick locks a soft 5% state into the
+  restart state for the remaining ~600 cycles.
+- **So** the old controller has two attractors, and the fixed one has one.
