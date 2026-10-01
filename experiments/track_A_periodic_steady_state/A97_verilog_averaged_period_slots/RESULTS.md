@@ -313,20 +313,69 @@ predictions 1 and 2 holding in all four deterministic runs.
 
 ## 9. Literature read after the runs
 
-Freescale (NXP) application note AN4836, "Single Phase Two-Channel
-Interleaved PFC Operating in CrM" (2014, public, no DOI), Sections 2-4.
-Its text was extracted with PyMuPDF.
+BOUNDARY Section 2 cited Huber et al. 2008 from its abstract only. The
+full texts below were read after the runs (2026-10-01). The PDFs are kept
+locally and are not in the repository.
 
-- **Its slave shift is half of the previous switching period.** That is
-  A93's rule. The note states the assumption behind it: "the difference
-  between the two adjacent switching periods can be omitted". A93 is the
-  case where it fails, since adjacent periods alternate.
-- **Its period averaging is used only to choose the master leg** (the leg
-  with the longer average period), not for the shift.
-- **It also describes a shift computed from the master's duty cycle and
-  the input and output voltages,** updated every 1 ms. That is a heavily
-  filtered shift, not a two-period average.
+### 9.1 The previous-period rule assumes that adjacent periods are equal
 
-So the finding of BOUNDARY Section 2 stands: no published source was found
-for a two-period average. The note is a precedent for filtering the shift,
-and for the assumption that A97 removes.
+Three independent sources use the rule and state the assumption:
+
+| source | what it does |
+|---|---|
+| **Huber, Irving, Jovanovic, IEEE TPEL 23(4):1649-1657, 2008, DOI 10.1109/TPEL.2008.924611** | The slave's delay is half the master's period from its previous cycle. |
+| **Huber, Irving, Adragna, Jovanovic, APEC 2008, pp. 1010-1016, DOI 10.1109/APEC.2008.4522845** | Implements that rule: the present ramp is compared with half of the previous ramp's peak (Fig. 11). |
+| **Tsai, Wu, Wu, Chen, Lee, IEEE TPEL 23(3):1348-1357, 2008, DOI 10.1109/TPEL.2008.921152** | Two- and four-phase shifters that hold the previous period on a capacitor. The text says: "the difference between the adjacent two operation periods is negligible ... we can take the previous operation period to determine the present shift interval." |
+| **Freescale AN4836** (2014, no DOI) | The same rule, with the same stated assumption. Its period averaging only chooses the master leg. It also describes a shift computed from duty cycle and voltages and updated every 1 ms, which is a heavily filtered shift. |
+
+### 9.2 What Huber et al. 2008 shows and does not show
+
+**Section II and Table I confirm the abstract.** Synchronising the slave to
+the master's turn-on, with current-mode control, is the only open-loop
+method that returns to normal operation after a delay perturbation.
+- The analysis is graphical (Figs. 7, 8, 12): one perturbed delay, with
+  the master undisturbed.
+- It does not cover a master whose own period alternates.
+
+**Section III-B and Figs. 17-18 describe A93's mechanism.**
+- With a frequency limit and valley switching, the master jitters between
+  its first and second valley, so its period alternates.
+- Because the shift is sampled from the previous period, divided by two
+  and held for one cycle, "an improper phase shift and, therefore, an
+  increased current ripple occurs".
+- Fig. 18(a) shows the shift moving between 160 and 280°.
+- The paper notes only a "tendency of the circuit ... to correct itself"
+  and proposes no remedy.
+- A97's average is a remedy for this case: an exact alternation cancels.
+
+### 9.3 Closed-loop alternatives
+
+These methods filter the phase error, not the period:
+- **Huber, Irving, Jovanovic, IEEE TPEL 24(8):1992-1999, 2009, DOI
+  10.1109/TPEL.2009.2018560.**
+  - A master-slave or democratic PLL, with a cycle-by-cycle instant
+    averaging filter or an RC filter on the phase error.
+  - Its small-signal model has one or two poles, so it is "always
+    stable". This is shown by SIMPLIS simulation.
+  - In the experiment, interleaving is lost near the line zero crossing.
+- **Huber, Irving, Jovanovic, APEC 2009, pp. 991-997, DOI
+  10.1109/APEC.2009.4802783.** The conference version.
+- **Xu, Huang, APEC 2008, pp. 1033-1038, DOI 10.1109/APEC.2008.4522849, and
+  Xu, Liu, Huang, IEEE TPEL 24(12):3003-3013, 2009, DOI
+  10.1109/TPEL.2009.2019824.**
+  - A phase-error current through a gm stage adjusts the slave, without
+    the PLL's low-pass filter. The authors call the PLL's response slow.
+  - Stability is shown with a full-order averaged model.
+
+### 9.4 Consequences for A97 and D52
+
+- **BOUNDARY Section 2's finding stands:** no source averages two periods.
+- **The failure mode A97 removes is published** (Huber et al. 2008,
+  Section III-B). There it comes from valley skipping; here it comes from
+  the trim's ±1 LSB limit cycle (D52). In both cases it is a two-cycle
+  alternation of the master's period, read through the previous-period
+  rule.
+- **The PLL methods are the closed-loop counterpart** of A97's open-loop
+  average. A PLL-type slot rule, with the phase error filtered, is a
+  candidate if the residual broadband gain of Section 4 matters. D52's
+  closed-loop model can evaluate it before any RTL.
