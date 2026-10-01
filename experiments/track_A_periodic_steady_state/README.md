@@ -650,3 +650,22 @@ plant at 5%.
   - A81's 18 unit tests pass (26 of 26 with the new ones).
   - Synthesis is clean.
   - Gates g0 and g0b are bit-identical to A85 r7, and g1b to g1.
+
+`A90_p24_junction_temperature_125c` puts every switch at TJ = 125 C.
+- **The data.**
+  - RDS(on) x 1.586 (datasheet Fig. 9, digitised; within 0.25% of EPC's
+    SPICE model).
+  - Reverse drop from Fig. 8 at 125 C.
+  - Coss unchanged: there is no public temperature data, and the EPC model
+    has none either.
+- **The adopted module still works.**
+  - Every phase is soft at 2-7.5%, the reverse-conduction loss is 0 W, and
+    Vo settles as at 25 C.
+  - Criterion 2 passes at 2-5%; at 7.5% the dither is 1.09 A, a margin
+    question.
+  - Conduction loss rises from 12.2-12.7 to 19.4-20.2 W.
+  - Ton +0.17 ns, period -2.4 ns.
+- **Cross-checked in the mathematical model.** D48 agrees within 0.04 A,
+  0.03 V and 0.02 ns.
+- **The timing window** after the zero crossing narrows slightly, to
+  0.15-0.21 ns.

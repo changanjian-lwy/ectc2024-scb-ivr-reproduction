@@ -1,0 +1,51 @@
+{
+ "model_library_sha256": "9c8f2adc7e3c517824bb80b94836a3fb2ca685b48f3feb2c7d45f7c6d04f729d",
+ "vgs_v": 5.0,
+ "id_a": 37.0,
+ "rows": [
+  {
+   "tj_c": 0,
+   "model_mohm": 1.1099126353807691,
+   "model_ratio_to_25c": 0.8674573898624636,
+   "fig9_ratio_to_25c": 0.8668511504839278
+  },
+  {
+   "tj_c": 25,
+   "model_mohm": 1.2795010433385634,
+   "model_ratio_to_25c": 1.0,
+   "fig9_ratio_to_25c": 1.0
+  },
+  {
+   "tj_c": 50,
+   "model_mohm": 1.4539893043107404,
+   "model_ratio_to_25c": 1.1363721130831517,
+   "fig9_ratio_to_25c": 1.1372582226448817
+  },
+  {
+   "tj_c": 75,
+   "model_mohm": 1.6347598922901634,
+   "model_ratio_to_25c": 1.2776542081002402,
+   "fig9_ratio_to_25c": 1.2795439824281605
+  },
+  {
+   "tj_c": 100,
+   "model_mohm": 1.8237737270907006,
+   "model_ratio_to_25c": 1.4253788510652425,
+   "fig9_ratio_to_25c": 1.4282374366784263
+  },
+  {
+   "tj_c": 125,
+   "model_mohm": 2.023907692026817,
+   "model_ratio_to_25c": 1.5817944835323432,
+   "fig9_ratio_to_25c": 1.5857856865553492
+  },
+  {
+   "tj_c": 150,
+   "model_mohm": 2.23955973636143,
+   "model_ratio_to_25c": 1.750338343232464,
+   "fig9_ratio_to_25c": 1.7524860419065655
+  }
+ ],
+ "capacitance_lines_depend_on_temp": false,
+ "capacitance_lines": 6
+}

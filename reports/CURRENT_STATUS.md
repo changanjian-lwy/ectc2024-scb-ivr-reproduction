@@ -483,11 +483,29 @@ each question:
            (A81's 18 unchanged), synthesis is clean, and three co-simulation
            gates are bit-identical.
 
-        **Next at this level, one at a time:** further device realism:
-        - temperature;
+     11. Done: junction temperature 125 C.
+         - [A90](../experiments/track_A_periodic_steady_state/A90_p24_junction_temperature_125c/RESULTS.md),
+           physical model.
+         - [D48](../symbolic_derivations/03_P24_native/D48_P24_HOT_JUNCTION_EVENT_MAP.md),
+           mathematical model.
+
+         **The data.** RDS(on) x 1.586 (Fig. 9, within 0.25% of the EPC
+         model); reverse drop at 125 C; Coss unchanged (no public
+         temperature data).
+
+         **Results.**
+         - The module still works: every phase soft at 2-7.5%, 0 W reverse
+           loss, criterion 2 at 2-5% (7.5%: dither 1.09 A).
+         - Conduction loss rises from about 12.4 to about 19.8 W.
+         - The timing window narrows to 0.15-0.21 ns.
+         - The two models agree within 0.04 A and 0.03 V.
+
+        **Next at this level, one at a time:**
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp, delay jitter
-          against the 0.16-0.22 ns window).
+          against the 0.15-0.23 ns window);
+        - the 2% target in the Verilog co-simulation;
+        - load and line steps.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
         - start-up (mode S and the handover).

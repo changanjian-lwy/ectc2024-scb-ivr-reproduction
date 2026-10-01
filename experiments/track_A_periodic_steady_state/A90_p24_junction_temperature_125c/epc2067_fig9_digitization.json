@@ -1,0 +1,25 @@
+{
+ "source": "EPC EPC2067 datasheet, Fig. 9, typical normalised on-state resistance vs junction temperature, ID = 37 A, VGS = 5 V",
+ "category": "EXTERNAL_DEVICE_DATA",
+ "url": "https://epc-co.com/epc/Portals/0/epc/documents/datasheets/epc2067_datasheet.pdf",
+ "revision": "Revised October 21, 2021",
+ "sha256": "8271d9eb71a3f78285c4c024ccfd06c33af129583c1bdef484d7dde01ae2324f",
+ "method": "PDF vector Bezier paths; axis maps least-squares on tick labels",
+ "tick_fit_max_residual_pt": {
+  "tj_axis": 1.1523383004325751,
+  "rds_axis": 0.5267987932479627
+ },
+ "tick_fit_max_residual": {
+  "tj_c": 1.0584853568359232,
+  "normalized": 0.0038525948462571178
+ },
+ "values": {
+  "0": 0.8671428514494447,
+  "25": 1.0003357207538777,
+  "50": 1.1376368139822197,
+  "75": 1.2799720275570978,
+  "100": 1.4287112102399915,
+  "125": 1.5863161640921069,
+  "150": 1.7530662857698533
+ }
+}
