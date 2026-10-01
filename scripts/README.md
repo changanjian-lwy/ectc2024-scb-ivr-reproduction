@@ -19,5 +19,18 @@
 - `export_synchronized_model_data.py` exports the finest audited affine-period
   solution as a canonical JSON model interface and a flat event-state CSV.
 
+- `cosim_regression.py` replays archived co-simulation runs with the shared
+  package `src/scb_ivr/cosim/`, bit for bit (`--quick` to 100 us, `--full`
+  to the end, `--plant` to choose the plant). Run it after any change
+  there.
+- `p24_orbits.py` computes the P24 timed-low-side orbits of D47-D51 with
+  one solver (`src/scb_ivr/p24_orbit_solver.py`, `--variant`). `--gate`
+  recomputes the 13 archived orbits and compares them bit for bit. The
+  older per-derivation scripts `audit_p24_*_orbits.py` stay as they were.
+
+Co-simulation runs themselves:
+`PYTHONPATH=src python3 -m scb_ivr.cosim.run cfg.json ...` (see
+`src/scb_ivr/cosim/README.md`).
+
 Install the project first with `python3 -m pip install -e .`, then run a script
 from the repository root, for example `python3 scripts/run_reproduction.py`.

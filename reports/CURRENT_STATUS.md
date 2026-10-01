@@ -605,8 +605,11 @@ each question:
              the step loop, the bridge's monitors and the Newton fallback
              in C. Bit-identical; a full run takes about 2 min, 4 at a
              time (originally 24 min alone, 70-73 min in batches).
-         - In progress: one solver for the D47-D51 orbits
-           (`scripts/p24_orbits.py`), gated on the 13 archived orbits.
+           - One solver for the D47-D51 orbits:
+             `src/scb_ivr/p24_orbit_solver.py`, with the entry point
+             `scripts/p24_orbits.py --variant`. It replaces 5
+             copy-and-paste outer loops, and all 13 archived orbits are
+             recomputed bit-identically (`--gate`).
 
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
