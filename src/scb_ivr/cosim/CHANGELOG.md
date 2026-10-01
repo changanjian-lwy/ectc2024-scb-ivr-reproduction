@@ -4,6 +4,29 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (evening) - benchmark against the archived runs (`scripts/cosim_benchmark.py`)
+
+**`--batch`.** A92's 9 configurations, default plant, 4 at a time:
+- 147 s in total, 61-67 s per full run (16 s for the 96 us diagnostic);
+- all 9 are bit-identical to the archived runs;
+- for comparison, the archived batch took 4353-4452 s per run with 8-10
+  runs at once.
+
+**`--plants`.** A92 n0, the adopted design, full length. The first four
+ran at once, one core each; kernel2 ran alone.
+
+| implementation | wall time | result against the archived run |
+|---|---:|---|
+| archived A92 bridge and plant (the code before the clean-up) | 1998 s | bit-identical |
+| `reference` (same plant code, shared bridge) | 1983 s | bit-identical |
+| `fast` | 1151 s | bit-identical |
+| `kernel` | 423 s | bit-identical |
+| `kernel2` (default) | **53 s** | bit-identical |
+
+All five give Ton 17.750 ns, period 232.2025 ns, Vo 1.000183 V, dither
+0.7066 A, P_rev 0 W, settling 116.86 us after the handover, peak 186.19 A
+and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
+
 ## 2026-10-01 (later) - the step loop and the Newton fallback in C (A96)
 
 - **`plant_kernel.c` gains:**

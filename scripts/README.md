@@ -28,6 +28,10 @@
   recomputes the 13 archived orbits and compares them bit for bit. The
   older per-derivation scripts `audit_p24_*_orbits.py` stay as they were.
 
+- `cosim_benchmark.py` times the co-simulation against archived runs and
+  checks every result bit for bit (`--batch`: A92's batch; `--plants`:
+  every plant implementation on one configuration).
+
 Co-simulation runs themselves:
 `PYTHONPATH=src python3 -m scb_ivr.cosim.run cfg.json ...` (see
 `src/scb_ivr/cosim/README.md`).
