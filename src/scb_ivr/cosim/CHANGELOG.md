@@ -4,6 +4,38 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (night) - slots from the two-period average (A97); the preset adopts them
+
+- **`rtl/scb_ctrl.v`:** new input `cfg_slot_avg`.
+  - It keeps the period before last (t_per2) and a flag that three phase-1
+    turn-ons have been seen.
+  - With `cfg_slot_follow` as well, phase k's slot is
+    t_ref + (k-1)(T_meas + T_prev)/(2N).
+  - With the bit at 0, A93's expression is unchanged.
+- **`bridge.py`:** cfg key `slot_avg` (absent = 0).
+- **`run.py`:** the provenance's `cfg_path` is project-relative when the
+  configuration is inside the project, so published records carry no home
+  directory. This is a format change only; `--quick` still passes.
+- **`tb/`:**
+  - the fixture drives the new input (0 by default);
+  - `_phase1_cycle` can hold the current comparator for a different
+    period;
+  - 3 new tests; **39 of 39 pass**, with A93's 36 unchanged.
+- **Gates:**
+  - `scripts/cosim_regression.py --full` with the new RTL: A89 r2, A92
+    j100, A92 m3p and A93 m3n_both are bit-identical (61-64 s each);
+  - `tests/test_cosim_plants.py`: 3 passed;
+  - synthesis: 0 problems.
+- **`presets/p24_5pct_adopted.json`:**
+  - now has `slot_follow`, `slot_avg`, `slot_guard` = 1 and
+    `plant_impl` `kernel2` (bit-identical to the `kernel` it named);
+  - **A97 adopted these slots**
+    (`experiments/track_A_periodic_steady_state/A97_verilog_averaged_period_slots/RESULTS.md`
+    Section 7);
+  - the preset equals A97's `cfg_n0_avg_guard.json` except for `out` and
+    `note`;
+  - A92's adopted configuration remains in A92's folder.
+
 ## 2026-10-01 (evening) - process check (`scripts/cosim_trace_compare.py`)
 
 **What it checks.** That the trajectory, not only the result, is the same
@@ -108,6 +140,7 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
 | A89 | timed low side (`cfg_low_pred`, dtl corrector); leading-edge blanking (`cfg_blank`) |
 | A92 | error-based correctors (`cfg_err_low`, `cfg_err_high`, targets, gain) |
 | A93 | period-following slots (`cfg_slot_follow`), missed-slot guard (`cfg_slot_guard`). Not adopted: they raise the dither. |
+| A97 | slots from the two-period average (`cfg_slot_avg`). Adopted, with follow and guard: the dither returns to A92's and the m3n starvation stays removed. |
 
 ### Lineage of the plant (summary)
 

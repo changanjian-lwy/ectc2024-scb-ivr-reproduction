@@ -611,13 +611,41 @@ each question:
              copy-and-paste outer loops, and all 13 archived orbits are
              recomputed bit-identically (`--gate`).
 
+     17. Done, adopted: slots from the two-period average.
+         - [A97](../experiments/track_A_periodic_steady_state/A97_verilog_averaged_period_slots/RESULTS.md),
+           Verilog co-simulation, run on the shared package.
+         - [D52](../symbolic_derivations/03_P24_native/D52_P24_CLOSED_LOOP_SLOT_RULES.md),
+           mathematical model: the closed-loop linearisation with the
+           correctors.
+
+         **The rule.** Phase k's slot is at
+         (k-1)·(T_{n-1} + T_{n-2})/8, with the follow rule and the guard.
+
+         **Results.**
+         - m = -3.4 ns: 156 A, against A92's 827 A.
+         - The two-cycle component is back to A92's (0.13-0.18 A), and so
+           is the dither.
+         - A93's early high-side turn-ons are gone.
+         - The orbit is unchanged.
+         - With 100 ps jitter the turn-off spread is 5-14% above A92's.
+
+         **What D52 shows.**
+         - The two-cycle alternation is the closed loop's forced response
+           to the trim's ±1 LSB limit cycle; the modes are at
+           |λ| = 0.65-0.66.
+         - The follow rule injects (k-1)/4 of the period alternation into
+           phase k, amplified 4.9 times. Averaging removes it at z = -1.
+         - Both models agree.
+
+         **Adopted** (A97 RESULTS Section 7, with m3p's one-sided dither
+         reading stated there). `src/scb_ivr/cosim/presets/p24_5pct_adopted.json`
+         carries the three slot bits.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
-        - slots from a two-cycle average of the period (A93's follow-up),
-          then the A91/A92 matrix again;
-        - the closed-loop corrector model (D47 Jacobian with corrector
-          states) for the jitter gain;
+        - the jitter gain: D52's closed-loop model with the edge jitter as
+          inputs (A92 j30/j100, A97);
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp);
         - the 2% target in the Verilog co-simulation;

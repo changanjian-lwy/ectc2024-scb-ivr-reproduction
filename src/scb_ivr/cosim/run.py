@@ -28,6 +28,14 @@ OSS_BIN = Path.home() / "tools" / "oss-cad-suite" / "bin"
 RTL = [HERE / "rtl" / "sync2.v", HERE / "rtl" / "scb_phase.v", HERE / "rtl" / "scb_ctrl.v"]
 
 
+def project_relative(path: Path) -> str:
+    """The path relative to the project if it is inside it (no home directory in published records), else as is."""
+    try:
+        return str(path.resolve().relative_to(PROJECT))
+    except ValueError:
+        return str(path)
+
+
 def provenance(cfg_path: Path) -> dict:
     def git(*args):
         try:
@@ -38,7 +46,7 @@ def provenance(cfg_path: Path) -> dict:
     import scipy
     status = git("status", "--porcelain", "--", "src/scb_ivr/cosim")
     return {"git_commit": git("rev-parse", "HEAD"), "cosim_sources_modified": None if status is None else bool(status),
-            "cfg_sha256": hashlib.sha256(cfg_path.read_bytes()).hexdigest(), "cfg_path": str(cfg_path),
+            "cfg_sha256": hashlib.sha256(cfg_path.read_bytes()).hexdigest(), "cfg_path": project_relative(cfg_path),
             "python": sys.version.split()[0], "numpy": numpy.__version__, "scipy": scipy.__version__}
 
 

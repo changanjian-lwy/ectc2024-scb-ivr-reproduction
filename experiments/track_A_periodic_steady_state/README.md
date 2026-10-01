@@ -779,3 +779,32 @@ test) and the full-Newton fallback.
   replays.
 - **A full co-simulation run now takes about 2 min, 4 at a time.** It is
   the shared package's default plant (`kernel2`).
+
+`A97_verilog_averaged_period_slots` takes the period-following slots from
+the average of the last two periods, (T_{n-1} + T_{n-2})/2. It is a new
+opt-in bit in the shared RTL; the archived replays stay bit-identical.
+- **With the guard, the m = -3.4 ns starvation stays removed:** 156 A,
+  against A92's 827 A and A93's 172 A.
+  - Without the guard it is 198 A. A slot skipped at the handover waits
+    for the next, averaged slot, which is later than A93's.
+- **The two-cycle injection is gone.** Phases 2-4 are at 0.13-0.18 A,
+  against A92's 0.14-0.19 A and A93's 0.24-0.59 A.
+  - The dither is back to A92's: 0.29-0.58 A in the deterministic runs.
+- **A93's early high-side turn-ons are gone:** phase 4 went from 24-41% to
+  0.5-4.5%.
+- **The orbit is unchanged.**
+- **Jitter:**
+  - at 100 ps the turn-off current spread is 5-14% above A92's (A93:
+    21-68%);
+  - j30's pre-registered last-20 metric misses its ±30% prediction; the
+    windowed dither equals A92's.
+- **Adopted, with follow and guard.** The shared preset now carries the
+  three slot bits.
+- **D52, the mathematical model,** gives the closed-loop eigenvalues and
+  the two-cycle gains of the three rules. It agrees with A92/A97 within
+  the run-to-run spread, and with A93 to 10-25%.
+  - The mechanism: the follow rule moves phase k's slot by (k-1)/4 of the
+    0.093 ns period alternation, at the inductor slope of 0.68 A/ns. The
+    closed loop amplifies this 4.9 times.
+  - The alternation itself is the forced response to the trim's ±1 LSB
+    limit cycle. The two-cycle modes are at |λ| = 0.65-0.66.

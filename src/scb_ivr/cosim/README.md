@@ -20,7 +20,7 @@ below.
 | `bridge.py` | The cocotb test that runs one co-simulation from a configuration. |
 | `run.py` | Entry point and scheduler. |
 | `tb/` | The RTL unit tests (`python3 src/scb_ivr/cosim/tb/run_unit.py`). |
-| `presets/p24_5pct_adopted.json` | The adopted design at P24 5%, the starting configuration for new experiments. |
+| `presets/p24_5pct_adopted.json` | The adopted design at P24 5% (A92's, with A97's slots), the starting configuration for new experiments. |
 | `CHANGELOG.md` | Where each piece came from, and its gates. |
 
 ## Running
@@ -53,7 +53,7 @@ PYTHONPATH=src python3 -m scb_ivr.cosim.run path/to/cfg_a.json path/to/cfg_b.jso
 
 ## Gates after any change here
 
-1. RTL unit tests: `python3 src/scb_ivr/cosim/tb/run_unit.py` (36 tests).
+1. RTL unit tests: `python3 src/scb_ivr/cosim/tb/run_unit.py` (39 tests).
 2. Plant equivalence, in the portable suite: `tests/test_cosim_plants.py`.
 3. Replays against archived runs:
    - `python3 scripts/cosim_regression.py --quick` (to 100 us, under 1

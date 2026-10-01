@@ -3,8 +3,8 @@
 Time is in LSB units: 1 LSB = T_clk / 32 = 125 ps at the 250 MHz base case (the tests use FB = 5). The fixture
 drives every input; option bits default to 0. Groups: phase timing, comparators and slots; predictive correction
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
-blanking; the error-based correctors; the period-following slots and the missed-slot guard. From A93's tests
-(history: ../CHANGELOG.md).
+blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
+guard. From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -18,7 +18,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             start_s=0, t0=1600, tdead=17, ton_min=67, ton_max=266, vloop=0, vref=2000, ki=0, async_=0,
             low_pred=0, dtl_init=(8, 8, 8, 8), dtl_step=2, dtl_max=80, blank=0,   # A89
             err_low=0, err_high=0, el_tgt=0, eh_tgt=0, err_shift=0,              # A92
-            slot_follow=0, slot_guard=0)                                         # A93
+            slot_follow=0, slot_guard=0,                                         # A93
+            slot_avg=0)                                                          # A97
 
 
 def pack(values, width):
@@ -92,6 +93,7 @@ class Ctrl:
         d.m_err.value = 0
         d.cfg_slot_follow.value = cfg["slot_follow"]             # A93
         d.cfg_slot_guard.value = cfg["slot_guard"]
+        d.cfg_slot_avg.value = cfg["slot_avg"]                   # A97
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -634,13 +636,15 @@ async def err_bits_off_keep_a89_rules(dut):
 
 # ---------------- A93: period-following slots and the missed-slot guard ----------------
 
-async def _phase1_cycle(c, after):
+async def _phase1_cycle(c, after, hold=0):
     """Drive phase 1 through one mode-P cycle from HIGH: wait for its turn-off, then the zero-voltage comparator
-    (low side on), the current comparator (low side off) and the predictive turn-on (dt_pred 85). Returns the
-    turn-on time (LSB)."""
+    (low side on), the current comparator (low side off, `hold` clocks later than otherwise) and the predictive
+    turn-on (dt_pred 85). Returns the turn-on time (LSB)."""
     off = await c.until("H", 0, 1, after=after)
     await c.set(cmp_zl=0b0001)
     lon = await c.until("L", 1, 1, after=off[0] + off[1])
+    if hold:
+        await ClockCycles(c.dut.clk, hold)
     await c.set(cmp_zl=0, cmp_i=0b0001)
     lo = await c.until("L", 0, 1, after=lon[0] + lon[1])
     await c.set(cmp_i=0)
@@ -698,3 +702,47 @@ async def follow_needs_two_turn_ons(dut):
     t_on1 = await _phase1_cycle(c, -1)
     e = await c.until("L", 0, 2, limit=800)
     assert e[0] + e[1] == t_on1 + 600, (t_on1, e)
+
+
+@cocotb.test()
+async def avg_slots_from_two_periods(dut):
+    """cfg_slot_avg with cfg_slot_follow, fixed slots set far away (4000/8000/12000): after the third phase-1
+    turn-on, with two different periods P1 and P2, phase k turns its low side off at
+    t_on3 + (k - 1) * (P1 + P2) // 8, not at A93's t_on3 + (k - 1) * P2 // 4."""
+    c = Ctrl(dut)
+    await c.start(slot_follow=1, slot_avg=1, slot=(4000, 8000, 12000))
+    t_on1 = await _phase1_cycle(c, -1)
+    t_on2 = await _phase1_cycle(c, t_on1, hold=10)
+    t_on3 = await _phase1_cycle(c, t_on2)
+    p1, p2 = t_on2 - t_on1, t_on3 - t_on2
+    assert all(((k - 1) * (p1 + p2)) // 8 != ((k - 1) * p2) // 4 for k in (2, 3, 4)), (p1, p2)
+    for k in (2, 3, 4):
+        e = await c.until("L", 0, k, after=t_on3)
+        assert e[0] + e[1] == t_on3 + ((k - 1) * (p1 + p2)) // 8, (k, p1, p2, t_on3, e)
+
+
+@cocotb.test()
+async def avg_needs_three_turn_ons(dut):
+    """cfg_slot_avg with cfg_slot_follow: after two phase-1 turn-ons (one period known) the configured slot still
+    applies (phase 2 at t_on2 + 600), where A93's rule alone would give t_on2 + (t_on2 - t_on1) // 4."""
+    c = Ctrl(dut)
+    await c.start(slot_follow=1, slot_avg=1, slot=(600, 1200, 1800))
+    t_on1 = await _phase1_cycle(c, -1)
+    t_on2 = await _phase1_cycle(c, t_on1)
+    assert t_on1 < 600 and t_on2 - t_on1 < 600, (t_on1, t_on2)
+    e = await c.until("L", 0, 2, after=t_on2, limit=800)
+    assert e[0] + e[1] == t_on2 + 600, (t_on1, t_on2, e)
+
+
+@cocotb.test()
+async def avg_without_follow_keeps_the_configured_slot(dut):
+    """cfg_slot_avg alone (cfg_slot_follow 0): after three phase-1 turn-ons phase 2 still turns its low side off
+    at the configured slot, t_on3 + 600."""
+    c = Ctrl(dut)
+    await c.start(slot_avg=1, slot=(600, 1200, 1800))
+    t_on1 = await _phase1_cycle(c, -1)
+    t_on2 = await _phase1_cycle(c, t_on1)
+    t_on3 = await _phase1_cycle(c, t_on2)
+    assert max(t_on1, t_on2 - t_on1, t_on3 - t_on2) < 600, (t_on1, t_on2, t_on3)
+    e = await c.until("L", 0, 2, after=t_on3, limit=800)
+    assert e[0] + e[1] == t_on3 + 600, (t_on3, e)

@@ -36,7 +36,7 @@ sigma per edge (seeded); a turn-on applied while the same phase's complement con
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki),
 async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps, eh_tgt_ps,
-err_shift) and the slot rules (slot_follow, slot_guard); keys absent from cfg take the values that reproduce the
+err_shift) and the slot rules (slot_follow, slot_guard, slot_avg); keys absent from cfg take the values that reproduce the
 earlier experiments.
 
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
@@ -166,6 +166,7 @@ async def cosim(dut):
     dut.ml_err.value = 0; dut.m_err.value = 0
     dut.cfg_slot_follow.value = int(cfg.get("slot_follow", 0))        # A93
     dut.cfg_slot_guard.value = int(cfg.get("slot_guard", 0))
+    dut.cfg_slot_avg.value = int(cfg.get("slot_avg", 0))              # A97
     dut.cfg_blank.value = to_lsb(cfg.get("blank_ns", 0.0) * 1e-9)     # A89 amendment: comparator blanking
     dut.cfg_async.value = int(cfg.get("async", 0))
     dut.a_valid.value = 0

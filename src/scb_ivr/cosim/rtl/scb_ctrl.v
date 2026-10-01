@@ -5,7 +5,9 @@
 //   high-side turn-on switches to mode P.
 // - Slots: phase j's (j = 2..N) low-side turn-off is due at t_ref (phase 1's last turn-on) + cfg_slot[j - 1];
 //   with cfg_slot_follow, in mode P once two phase-1 turn-ons have been seen, at t_ref + (j - 1) * T_meas / N,
-//   T_meas = the last phase-1 period (P24/P25's phase shift T/nP). cfg_slot_guard is passed to phases 2..N.
+//   T_meas = the last phase-1 period (P24/P25's phase shift T/nP); with cfg_slot_avg as well, once three
+//   phase-1 turn-ons have been seen, at t_ref + (j - 1) * (T_meas + T_prev) / (2N), T_prev = the period before
+//   (the configured slot until then). cfg_slot_guard is passed to phases 2..N.
 // - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on),
 //   ton_acc += ki * (vref - adc_code) with FRAC fractional bits; Ton is the rounded integer part, clamped to
 //   [cfg_ton_min, cfg_ton_max]; otherwise Ton = cfg_ton.
@@ -77,6 +79,7 @@ module scb_ctrl #(
     input  wire [N*TW-1:0]     m_err,          // A92
     input  wire                cfg_slot_follow,// A93
     input  wire                cfg_slot_guard, // A93
+    input  wire                cfg_slot_avg,   // A97
     output wire                arm1,
     output wire [N-1:0]        gh_ev,
     output wire [N-1:0]        gh_lvl,
@@ -125,14 +128,21 @@ module scb_ctrl #(
     reg [TW-1:0] t_per;                        // A93: last phase-1 period, LSB
     reg [1:0]    n_ref;                        // A93: phase-1 turn-ons seen (saturates at 2)
     wire         per_ok = cfg_slot_follow && mode_p && (n_ref == 2'd2);
+    reg [TW-1:0] t_per2;                       // A97: the period before t_per, LSB
+    reg          per3;                         // A97: three phase-1 turn-ons seen (t_per2 valid)
+    wire         use_follow = cfg_slot_avg ? (per_ok && per3) : per_ok;
 
     always @(posedge clk) begin
         if (rst) begin
             t_per   <= {TW{1'b0}};
             n_ref   <= 2'd0;
+            t_per2  <= {TW{1'b0}};
+            per3    <= 1'b0;
         end else if (on_pulse[0]) begin
             t_per   <= t_on_all[TW-1:0] - t_ref;
             if (n_ref != 2'd2) n_ref <= n_ref + 1'b1;
+            t_per2  <= t_per;
+            if (n_ref == 2'd2) per3 <= 1'b1;
         end
     end
 
@@ -163,8 +173,9 @@ module scb_ctrl #(
             if (k == 0) begin : g_first
                 assign slot_t = {TW{1'b0}};
             end else begin : g_rest
-                wire [TW-1:0] slot_follow = (k * t_per) / N;           // A93: k * T / N
-                assign slot_t = t_ref + (per_ok ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
+                wire [TW-1:0] slot_follow = cfg_slot_avg ? (k * (t_per + t_per2)) / (2 * N)  // A97: k * T_avg / N
+                                                         : (k * t_per) / N;                  // A93: k * T / N
+                assign slot_t = t_ref + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
             end
             scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(k == 0 ? 1 : 0)) u_ph (
                 .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_now),

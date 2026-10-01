@@ -1,5 +1,5 @@
 {
- "note": "Adopted design at P24 5% (A92, with A97's slots): A88 plant (datasheet Coss(V), reverse drop), timed low side, 20 ns blanking, asynchronous phase-1 path, learning at restarts, ki 0.25 ns/V, error-based correctors (94 ps targets, gain 1/2), 4.5 ns mode-S dead time and dtl_init, ideal driver; period-following slots from the two-period average with the missed-slot guard (A97). Copy into an experiment folder and change what the experiment varies.",
+ "note": "A97 m3n_avg: the adopted design (preset) with period-following slots from the two-period average; driver m = -3.4 ns, sigma = 0.0 ps.",
  "t_clk_ns": 4.0,
  "fb": 7,
  "fine": 1,
@@ -22,7 +22,7 @@
  "init_run": "experiments/track_A_periodic_steady_state/A79_p24_output_voltage_loop/run_r1_ki0p25.json",
  "vloop": 1,
  "ki_ns_per_v": 0.25,
- "out": "run_p24_5pct_adopted.json.gz",
+ "out": "run_m3n_avg.json",
  "async": 1,
  "t_async_ns": 1.0,
  "learn_at_restart": 1,
@@ -35,7 +35,7 @@
  "dtl_max_ns": 10.0,
  "blank_ns": 20.0,
  "driver": {
-  "m_ns": 0.0,
+  "m_ns": -3.4,
   "sigma_ps": 0.0,
   "seed": 1
  },
@@ -48,5 +48,5 @@
  "plant_impl": "kernel2",
  "slot_follow": 1,
  "slot_avg": 1,
- "slot_guard": 1
+ "slot_guard": 0
 }

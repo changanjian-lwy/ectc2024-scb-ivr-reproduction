@@ -27,6 +27,14 @@
   one solver (`src/scb_ivr/p24_orbit_solver.py`, `--variant`). `--gate`
   recomputes the 13 archived orbits and compares them bit for bit. The
   older per-derivation scripts `audit_p24_*_orbits.py` stay as they were.
+- `p24_closed_loop_modes.py` (D52) linearises the P24 map with the
+  error-based correctors, the voltage loop and a slot rule (fixed, follow,
+  average) at D50's/D51's orbits (`src/scb_ivr/p24_closed_loop.py`).
+  - It gives the closed-loop eigenvalues and the gain from phase 1's
+    current threshold (the trim) to each phase's turn-off current, the
+    period and the edge errors.
+  - `--step-check` repeats the Jacobian with half and twice the
+    finite-difference steps.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:
