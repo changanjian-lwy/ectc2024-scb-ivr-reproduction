@@ -203,18 +203,21 @@ def covariance(A, Bw, C, Dw, sigma_ns, inputs=None):
 def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, jitter_inputs=None,
                 dt_step=6, dtl_step=2, tgt=3, shift=1, dt_max=1114, dtl_max=320, ton_ref=568, ki_code=262,
                 vref_code=2000, adc_lsb_v=0.0005, trim_offset_a=0.01, trim_lsb_a=0.25,
-                timed1=False, lo_shift=1, lo_step=2, lo_tgt=3, lo_max=12800, lo_sign=False):
+                timed1=False, lo_shift=1, lo_step=2, lo_tgt=3, lo_max=12800, lo_sign=False,
+                lo_adm=False, lo_smax=1, lo_ff=False, lo_kff=0):
     """Linearised circuit with the controller's exact rules (module docstring). Delays, slots, Ton and the measured
     period are integers in LSB (31.25 ps). ton_ref: the Ton code taken as the orbit's on-time; trim_offset_a: phase
     1's turn-off current above -6.25 A at the trim's upper level (A92's runs: -6.24 / -6.49 A). timed1 (D54): J and p0
     are the timed-turn-off map's; dlo (LSB) is corrected from e_lo like dtl (lo_shift, lo_step on an early turn-off,
-    lo_tgt) and the trim is not used; lo_sign: dlo steps +-1 LSB on the sign of e_lo - lo_tgt instead. Returns per-cycle
+    lo_tgt) and the trim is not used; lo_sign: dlo steps +-1 LSB on the sign of e_lo - lo_tgt instead (A100: lo_adm
+    doubles the step while decisions agree, up to lo_smax; lo_ff adds lo_kff times each change of Ton). Returns per-cycle
     arrays after the warm-up."""
     rng = np.random.default_rng(seed)
     sel = np.ones(NW) if jitter_inputs is None else np.array([1.0 if x in jitter_inputs else 0.0 for x in W_NAMES])
     Gw, Gp = jitter_map(timed1)
     lo_star = p0[I_U]
     dlo = int(round(lo_star / LSB))
+    step, last, seen, ton_prev = 1, False, False, ton_ref
     d_star, dl_star = p0[I_D:I_D + N], p0[I_DL:I_DL + N]
     slot_star, t_star = p0[I_SL:I_SL + N - 1], q0[Q_T]
     d = np.rint(d_star / LSB).astype(int); dl = np.rint(dl_star / LSB).astype(int)
@@ -228,6 +231,9 @@ def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, 
         adc = min(max(int(round(vo / adc_lsb_v)), 0), 4095)
         acc = acc + ki_code * (vref_code - adc)
         ton = (acc + (1 << 15)) >> 16
+        if timed1 and lo_ff and ton != ton_prev:            # A100: Ton feedforward, before this cycle's turn-off
+            dlo = max(dlo + lo_kff * (ton - ton_prev), 0)
+        ton_prev = ton
         if rule == "fixed":
             slot = [1600 * j for j in range(1, N)]
         elif rule == "follow":
@@ -266,8 +272,11 @@ def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, 
             else:
                 err = max(0, int(round(el[k] / LSB)))
                 dl[k] = min(max(dl[k] - ((err - tgt) >> shift), 0), dtl_max)
-        if timed1 and lo_sign:                              # dlo by the sign alone: +-1 LSB per cycle
-            dlo = min(max(dlo + (1 if elo < lo_tgt * LSB else -1), 0), lo_max)
+        if timed1 and lo_sign:                              # dlo by the sign: +-1 LSB, or the adaptive step (A100)
+            up = elo < lo_tgt * LSB
+            step = (min(2 * step, lo_smax) if (seen and up == last) else 1) if lo_adm else 1
+            last, seen = up, True
+            dlo = min(max(dlo + (step if up else -step), 0), lo_max)
         elif timed1:                                        # dlo: like dtl, from the comparator's crossing time
             if elo < 0:
                 dlo = min(dlo + lo_step, lo_max)

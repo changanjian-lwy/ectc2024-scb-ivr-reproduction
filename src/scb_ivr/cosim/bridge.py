@@ -37,7 +37,8 @@ applied while the same phase's complement conducts is counted, and with "stop_on
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki),
 async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps, eh_tgt_ps,
 err_shift), the slot rules (slot_follow, slot_guard, slot_avg) and the timed phase-1 turn-off (lo_pred, lo_learn,
-lo_tgt_ps; the bridge then measures phase 1's crossing of i_target and reports it at the turn-off); keys absent from cfg take the values that reproduce the
+lo_tgt_ps, lo_adm, lo_smax, lo_ff, lo_kff; the bridge then measures phase 1's crossing of i_target and reports it at
+the turn-off); keys absent from cfg take the values that reproduce the
 earlier experiments.
 
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
@@ -175,6 +176,10 @@ async def cosim(dut):
     dut.cfg_lo_learn.value = int(cfg.get("lo_learn", 0))
     dut.cfg_lo_tgt.value = to_lsb(cfg.get("lo_tgt_ps", 0.0) * 1e-12)
     dut.mlo_valid.value = 0; dut.mlo_early.value = 0; dut.mlo_err.value = 0
+    dut.cfg_lo_adm.value = int(cfg.get("lo_adm", 0))                  # A100: adaptive dlo step
+    dut.cfg_lo_smax.value = int(cfg.get("lo_smax", 0))
+    dut.cfg_lo_ff.value = int(cfg.get("lo_ff", 0))                    # A100: Ton feedforward to dlo
+    dut.cfg_lo_kff.value = int(cfg.get("lo_kff", 0))
     dut.cfg_blank.value = to_lsb(cfg.get("blank_ns", 0.0) * 1e-9)     # A89 amendment: comparator blanking
     dut.cfg_async.value = int(cfg.get("async", 0))
     dut.a_valid.value = 0

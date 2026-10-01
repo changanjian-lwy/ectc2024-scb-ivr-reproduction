@@ -4,7 +4,7 @@ Time is in LSB units: 1 LSB = T_clk / 32 = 125 ps at the 250 MHz base case (the 
 drives every input; option bits default to 0. Groups: phase timing, comparators and slots; predictive correction
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
-guard; the timed phase-1 turn-off. From A93's tests (history: ../CHANGELOG.md).
+guard; the timed phase-1 turn-off and its adaptive step and Ton feedforward. From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -20,7 +20,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             err_low=0, err_high=0, el_tgt=0, eh_tgt=0, err_shift=0,              # A92
             slot_follow=0, slot_guard=0,                                         # A93
             slot_avg=0,                                                          # A97
-            lo_pred=0, lo_learn=0, lo_tgt=0)                                     # A99
+            lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
+            lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0)                              # A100
 
 
 def pack(values, width):
@@ -99,6 +100,8 @@ class Ctrl:
         d.cfg_lo_learn.value = cfg["lo_learn"]
         d.cfg_lo_tgt.value = cfg["lo_tgt"]
         d.mlo_valid.value = 0; d.mlo_early.value = 0; d.mlo_err.value = 0
+        d.cfg_lo_adm.value = cfg["lo_adm"]; d.cfg_lo_smax.value = cfg["lo_smax"]   # A100
+        d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -813,4 +816,45 @@ async def lo_pred_timed_does_not_arm_the_front_end(dut):
         armed.append(int(dut.arm1.value))
     lo = c.find("L", 0, 1, after=lon[0] + lon[1])
     assert not any(armed) and lo is not None and lo[0] + lo[1] == lon[0] + lon[1] + WIN, (armed, lon, lo)
+
+
+@cocotb.test()
+async def lo_adm_doubles_while_decisions_agree(dut):
+    """cfg_lo_adm, cfg_lo_smax 4, once timed: three "up" reports step dlo by +1, +2, +4; a fourth by +4 (the cap);
+    then a "down" report steps it by -1 (back to the unit step)."""
+    c = Ctrl(dut)
+    await c.start(lo_pred=1, lo_learn=1, lo_tgt=3, lo_adm=1, lo_smax=4)
+    await _phase1_cycle(c, -1)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    d0 = int(dut.dlo1.value)
+    for early, err, delta in ((1, 0, +1), (0, 1, +2), (1, 0, +4), (0, 0, +4), (0, 9, -1)):
+        await c.set(mlo_valid=1, mlo_early=early, mlo_err=err)
+        await c.set(mlo_valid=0)
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        d1 = int(dut.dlo1.value)
+        assert d1 - d0 == delta, (early, err, d0, d1)
+        d0 = d1
+
+
+@cocotb.test()
+async def lo_ff_moves_dlo_with_ton(dut):
+    """cfg_lo_ff with cfg_lo_kff 9, once timed: raising ton by 2 LSB raises dlo by 18 LSB; lowering it by 1 LSB
+    lowers dlo by 9 LSB."""
+    c = Ctrl(dut)
+    await c.start(lo_pred=1, lo_learn=1, lo_ff=1, lo_kff=9)
+    await _phase1_cycle(c, -1)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    d0 = int(dut.dlo1.value)
+    await c.set(cfg_ton=BASE["ton"] + 2)
+    await ClockCycles(dut.clk, 2)
+    await ReadOnly()
+    d1 = int(dut.dlo1.value)
+    assert d1 - d0 == 18, (d0, d1)
+    await c.set(cfg_ton=BASE["ton"] + 1)
+    await ClockCycles(dut.clk, 2)
+    await ReadOnly()
+    assert int(dut.dlo1.value) - d1 == -9, (d1, int(dut.dlo1.value))
 

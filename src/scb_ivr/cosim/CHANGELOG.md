@@ -4,6 +4,22 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (night, A100) - adaptive dlo step and Ton feedforward
+
+- **`rtl/scb_phase.v`, `rtl/scb_ctrl.v`:**
+  - `cfg_lo_adm` / `cfg_lo_smax`: dlo's step doubles while consecutive
+    decisions agree, up to the cap, and returns to 1 when they differ
+    (Jayant's adaptive delta modulation).
+  - `cfg_lo_ff` / `cfg_lo_kff`: dlo moves by kff times every change of
+    ton.
+  - With both at 0, dlo's update is A99's ±1 with a floor at 0.
+- **`bridge.py`:** cfg keys `lo_adm`, `lo_smax`, `lo_ff`, `lo_kff`.
+- **`tb/`:** 2 new tests. **44 of 44 pass.**
+- **Gates:**
+  - `--full` regression PASS;
+  - A99 n0 replayed bit-identically;
+  - synthesis 0 problems, 43 924 cells.
+
 ## 2026-10-01 (night, A100) - load step and record length
 
 - **`circuit.py`, `plant_kernel.c`, `plant.py`:** a load current step

@@ -88,6 +88,10 @@ module scb_ctrl #(
     input  wire                mlo_valid,      // A99: phase 1's crossing report at its timed turn-off
     input  wire                mlo_early,      // A99
     input  wire [TW-1:0]       mlo_err,        // A99
+    input  wire                cfg_lo_adm,     // A100: adaptive dlo step
+    input  wire [7:0]          cfg_lo_smax,    // A100
+    input  wire                cfg_lo_ff,      // A100: Ton feedforward to dlo
+    input  wire [7:0]          cfg_lo_kff,     // A100
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire                arm1,
@@ -223,7 +227,8 @@ module scb_ctrl #(
                 .cfg_slot_guard(k == 0 ? 1'b0 : cfg_slot_guard),                              // A93
                 .cfg_lo_pred(k == 0 ? cfg_lo_pred : 1'b0), .cfg_lo_learn(cfg_lo_learn),        // A99
                 .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(k == 0 ? mlo_valid : 1'b0), .mlo_early(mlo_early),
-                .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k])
+                .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k]),
+                .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff)   // A100
             );
         end
     endgenerate
