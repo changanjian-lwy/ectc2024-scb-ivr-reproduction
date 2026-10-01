@@ -17,6 +17,55 @@ future design change is scored on this table (Section 5).
   `A99_.../a99_summary.json`, `A100_.../a100_summary.json`;
 - the mathematical models D52-D55.
 
+## 0. Correction (2026-10-01): the largest switching loss was missing
+
+**The high side does not turn on at zero voltage in any design here.** It
+turns on at the resonance valley.
+- High-side V_DS at turn-on is about 9 V of the ~12 V it blocks. The low
+  side does turn on at zero voltage (−0.01 V).
+- The orbit's turn-on V_DS against the negative-current target (D47):
+
+  | target | high-side turn-on V_DS |
+  |---|---:|
+  | 2% | 9.9 V |
+  | 3% | 9.7 V |
+  | **5% (used)** | **9.0 V** |
+  | 7.5% | 8.0 V |
+
+- The co-simulation agrees: 8.9-9.0 V.
+
+**The scorecard's "hard-on loss (A91's estimate)" row counts only early
+low-side turn-ons.** It is renamed below.
+
+**The high-side valley turn-on loss** is estimated with A91's method from
+the datasheet Coss: a lower bound Eoss(V) of the 2 high-side devices, an
+upper bound Qoss(V)·V of the 5 devices on the node.
+
+| target | 2% | 3% | **5%** | 7.5% |
+|---|---|---|---|---|
+| loss, all phases | 3.9-20 W | 3.7-19 W | **3.1-16 W** | 2.4-12 W |
+
+At 5% that is 1-6% of the ~250 W output. **It is 30-100 times larger than
+every loss the A92-A100 changes moved** (P_rev ≤ 0.17 W, early low-side
+turn-ons ≤ 0.1 W). It is the same in every design on this table, because
+none of them changes the orbit's turn-on voltage.
+
+**Why (estimate, not yet a computed orbit).**
+- The node carries 5 EPC2067 (about 2 nF each at 9 V, about 10 nF in
+  total) against L = 1.47 nH, so Z ≈ 0.38 Ω.
+- A full 12 V swing would need roughly 30 A of negative current, about
+  25% of the peak.
+- Extrapolating the 2-7.5% trend gives the same order.
+- P24 states that 1-2% is enough. That discrepancy is the most important
+  open question for Mihai: the snubber or node capacitance, and the
+  devices on the node.
+
+**Consequence for priorities.** The jitter and tracking work (A98-A100)
+moves second-order losses. The first-order item is the high-side turn-on:
+- the trade-off between the negative-current target (conduction loss of
+  the circulating current) and the turn-on voltage;
+- and the paper's ZVS claim.
+
 ## 1. The designs
 
 | design | what it changed | status |
@@ -43,7 +92,8 @@ listed meets them in every run made.**
 | 30 ps: high-side turn-ons before the valley, phases 2-4 | 21-27% | 29-37% | 22-26% | **12-16%** | 16-18% | 17-18% |
 | **100 ps jitter:** spread, phases 2-4 | 1.39-1.61 A | 1.95-2.69 A | 1.59-1.79 A | 1.65-1.88 A | **1.02-1.16 A** | 1.03-1.20 A |
 | 100 ps: reverse-conduction loss P_rev | 91 mW | 89 mW | 89 mW | **172 mW** | 74 mW | 74 mW |
-| 100 ps: hard-on loss (A91's estimate) | 31-102 mW | 30-102 mW | 31-102 mW | **12-39 mW** | 30-99 mW | 30-99 mW |
+| 100 ps: early low-side turn-on loss (A91's estimate; low side only) | 31-102 mW | 30-102 mW | 31-102 mW | **12-39 mW** | 30-99 mW | 30-99 mW |
+| **high-side valley turn-on loss** (turn-on at about 9 V; Section 0) | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W |
 | **phase 1's own turn-off current spread** (its ZVS margin), 30 / 100 ps | **0.17 / 0.19 A** | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.39 / 1.13 A | 0.43 / 1.16 A |
 | **load steps ±25 A / ±62.5 A:** phase 1's largest turn-off current deviation | (comparator: 0.37 A, the trim) | - | 0.37 A | - | **19-23 A** (±62.5 A) | 0.6-0.7 / 1.4-1.7 A |
 | load steps: Vo excursion ±25 A / ±62.5 A | - | - | 50 / 122-127 mV | - | 83-103 mV³ | 49-50 / 120-126 mV |
@@ -92,6 +142,7 @@ metrics:
 | T4 | **Period jitter of phases 2-4 ↔ phase 1's turn-off current** (comparator vs timed turn-off) | A99/A100: phases 2-4 −24 to −38%, period −37 to −82%; phase 1's spread 0.17 → 0.4-1.2 A | structural; the cost is moved onto phase 1's ZVS margin | Medium. If phase 1's ZVS margin becomes the binding constraint, the next fix would push the jitter back. **Phase 1's margin needs a hard limit before adoption.** |
 | T5 | **Load-step tracking ↔ jitter** (dlo rule) | D55/A100: ±1 → ADM32 costs +7-13% spread at 30 ps, buys tracking (19-23 A → 1.4-1.7 A) | ADM32 | **High, and coupled to T6.** |
 | T6 | **Voltage-loop speed ↔ the dlo rule's tracking burden** (not yet tested) | The required dlo moves 10× faster than Ton. A faster voltage loop (Vo now moves ±12% for ±25% steps) would make Ton, and so dlo, move faster. | open | **The most likely next loop:** a faster voltage loop → a larger dlo step → more jitter → ... It should be designed together with dlo, on this table. |
+| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **not yet studied; the largest loss term** | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
 | T7 | **Prediction ↔ reaction** (a recurring pattern: A89 low-side turn-on, A92 correctors, A99/A100 turn-off) | Each predicted edge removes a comparator's noise but needs learning and tracking, and moves the error elsewhere | design by design | Structural: each step is a new trade-off, not a reversal. |
 
 ## 5. How every change is scored from now on
