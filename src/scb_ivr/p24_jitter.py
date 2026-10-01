@@ -21,6 +21,11 @@ monte_carlo(): the same linearised circuit with the RTL's rules (bridge.py, rtl/
 integer delays in LSB, errors rounded to the LSB, d -= (err - tgt) >>> 1 clamped, a turn-on before the valley
 (crossing) adds dt_step (dtl_step), the trim steps +-1 on the sign of phase 1's turn-off current, the voltage loop
 in integers, and the slot rule in integers.
+
+D54's option timed1 (A99): phase 1's low side turns off at a timed edge, t_lon + dlo, instead of at its current
+comparator. In the map the threshold is put out of reach and the turn-off is the timed restart, so p's last entry is
+phase 1's on-low interval (ns) instead of u. The jitter enters it as dlo + loff_1 - lon_1; the comparator only
+measures, e_lo = (-6.25 A - i_off,1)/(Vo/L) = actual turn-off - crossing; dlo is corrected like dtl; no trim.
 """
 from __future__ import annotations
 
@@ -52,9 +57,12 @@ def core_edges(p):
     s, d, dl = p[:NS], p[I_D:I_D + N] * 1e-9, p[I_DL:I_DL + N] * 1e-9
     ton, sl, u = p[I_TON:I_TON + N] * 1e-9, p[I_SL:I_SL + N - 1] * 1e-9, p[I_U]
     t0, tb = c["t0_base"] * 1e-9, c["ton_base"] * 1e-9
-    ctl = ControlLP(ton=tb, i_target=c["target"] + u, d_high=tuple(d), t_restart_high=T_RS, d_low=tuple(dl), t0=t0,
+    kw = dict(i_target=c["target"] + u)
+    if c.get("timed1"):                                     # D54: timed phase-1 turn-off after u ns on-low
+        kw = dict(i_target=-1e9, t_restart_low=u * 1e-9)
+    ctl = ControlLP(ton=tb, d_high=tuple(d), t_restart_high=T_RS, d_low=tuple(dl), t0=t0,
                     ton_offset=tuple(x - tb for x in ton),
-                    slot_offset=(0.0,) + tuple(x - k * t0 / N for k, x in zip(range(1, N), sl)))
+                    slot_offset=(0.0,) + tuple(x - k * t0 / N for k, x in zip(range(1, N), sl)), **kw)
     emap = LowPredEventMap(Circuit(), ctl, coss=c["coss"], vf=c["vf"], r_dev=c["r_dev"])
     v, i = section_full(s, emap.ckt)
     v1, i1, lg = emap.run_cycle(v, i)
@@ -84,22 +92,30 @@ def p0_of(rec, t0_ns):
                            [k * t0_ns / N for k in range(1, N)], [0.0]])
 
 
-def edge_jacobian(rec, t0_ns, coss_factory, pct, vf, r_dev, jobs=4, scale=1.0):
+def edge_jacobian(rec, t0_ns, coss_factory, pct, vf, r_dev, jobs=4, scale=1.0, tlow1_ns=None):
+    """tlow1_ns: D54's timed phase-1 turn-off after this on-low interval (the last input), else the comparator."""
     p0 = p0_of(rec, t0_ns)
+    extra = {"t0_base": t0_ns, "ton_base": rec["ton_ns"]}
+    if tlow1_ns is not None:
+        p0[I_U] = tlow1_ns
+        extra["timed1"] = True
     q0, J, curv = pcl.core_jacobian(p0, coss_factory, pct, vf, r_dev, jobs=jobs, scale=scale, func=core_edges,
-                                    step_fn=steps_edges, extra={"t0_base": t0_ns, "ton_base": rec["ton_ns"]})
+                                    step_fn=steps_edges, extra=extra)
     return p0, q0, J, curv
 
 
-def jitter_map():
+def jitter_map(timed1=False):
     """(Gw, Gprev): the input deviations Delta p (rows P_NAMES) from this cycle's 16 jitters (columns W_NAMES) and
-    from eta(n-1), all in ns (u in A)."""
+    from eta(n-1), all in ns (u in A; with timed1 the last row is phase 1's on-low interval in ns)."""
     Gw, Gp = np.zeros((NP, NW)), np.zeros(NP)
     w = {n: j for j, n in enumerate(W_NAMES)}
     Gw[I_D + 0, w["eta"]] = 1.0; Gw[I_D + 0, w["loff1"]] = -1.0
     Gw[I_TON + 0, w["hoff1"]] = 1.0; Gp[I_TON + 0] = -1.0
     Gw[I_DL + 0, w["lon1"]] = 1.0; Gw[I_DL + 0, w["hoff1"]] = -1.0
-    Gw[I_U, w["loff1"]] = SLOPE_LOW
+    if timed1:                                              # timed turn-off: commanded from the commanded turn-on
+        Gw[I_U, w["loff1"]] = 1.0; Gw[I_U, w["lon1"]] = -1.0
+    else:                                                   # comparator: a delay moves the turn-off current
+        Gw[I_U, w["loff1"]] = SLOPE_LOW
     for k in range(2, N + 1):
         j = k - 1
         Gw[I_SL + j - 1, w[f"loff{k}"]] = 1.0; Gp[I_SL + j - 1] = -1.0
@@ -114,14 +130,16 @@ Y_NAMES = ([f"ilo{k}" for k in range(1, N + 1)] + ["T"] + [f"eh{k}" for k in ran
            + [f"isec{k}" for k in range(1, N + 1)])
 
 
-def linear_loop(J, rule, g=0.5, ki_ns_per_v=0.25):
+def linear_loop(J, rule, g=0.5, ki_ns_per_v=0.25, timed1=False, g_lo=0.5):
     """(A, Bw, Bu, C, Dw, Du): z(n+1) = A z + Bw w + Bu u_trim, y = C z + Dw w + Du u_trim, with
     z = (Delta s, Delta d, Delta dl, Delta acc, slot memory, eta(n-1)) and y as Y_NAMES (Delta isec_k: the section
-    current at the start of the cycle)."""
+    current at the start of the cycle). timed1 (D54): J is the timed-turn-off map; z gains Delta dlo, corrected with
+    gain g_lo from e_lo = (-6.25 - i_off,1)/(Vo/L); there is no trim input (Bu, Du = 0)."""
     m = {"fixed": 0, "follow": 1, "avg": 2}[rule]
     iz_d, iz_dl, iz_acc, iz_mem = NS, NS + N, NS + 2 * N, NS + 2 * N + 1
     iz_eta = iz_mem + m
-    nz = iz_eta + 1
+    iz_lo = iz_eta + 1
+    nz = iz_eta + 1 + (1 if timed1 else 0)
     Pz = np.zeros((NP, nz))
     Pz[:NS, :NS] = np.eye(NS)
     Pz[I_D:I_D + N, iz_d:iz_d + N] = np.eye(N)
@@ -133,8 +151,10 @@ def linear_loop(J, rule, g=0.5, ki_ns_per_v=0.25):
             Pz[I_SL + j - 1, iz_mem] = j / N
         elif rule == "avg":
             Pz[I_SL + j - 1, iz_mem] = Pz[I_SL + j - 1, iz_mem + 1] = j / (2 * N)
+    if timed1:
+        Pz[I_U, iz_lo] = 1.0
     ton_cmd = Pz[I_TON].copy()                             # the commanded Ton: acc - ki dVo, no jitter
-    Gw, Gp = jitter_map()
+    Gw, Gp = jitter_map(timed1)
     Pz[:, iz_eta] += Gp
     eu = np.zeros(NP); eu[I_U] = 1.0
     Qz, Qw, Qu = J @ Pz, J @ Gw, J @ eu
@@ -154,6 +174,11 @@ def linear_loop(J, rule, g=0.5, ki_ns_per_v=0.25):
     if m == 2:
         A[iz_mem + 1, iz_mem] = 1.0
     Bw[iz_eta, w_eta] = 1.0
+    if timed1:                                             # dlo' = dlo - g_lo (e_lo - e*), e_lo = -Delta i_off,1 / S
+        S = -SLOPE_LOW
+        A[iz_lo] = Pz[I_U] + (g_lo / S) * Qz[Q_LO]
+        Bw[iz_lo] = (g_lo / S) * Qw[Q_LO]
+        Bu[:] = 0.0
     Ez = np.zeros((NS, nz)); Ez[:, :NS] = np.eye(NS)
     C = np.vstack([Qz[Q_LO:Q_LO + N], Qz[Q_T:Q_T + 1], Pz[I_D:I_D + N] - Qz[Q_VA:Q_VA + N],
                    Pz[I_DL:I_DL + N] - Qz[Q_CR:Q_CR + N], Qz[Q_VA:Q_VA + N], Ez[N:2 * N]])
@@ -161,6 +186,8 @@ def linear_loop(J, rule, g=0.5, ki_ns_per_v=0.25):
                     Gw[I_DL:I_DL + N] - Qw[Q_CR:Q_CR + N], Qw[Q_VA:Q_VA + N], np.zeros((N, NW))])
     Du = np.concatenate([Qu[Q_LO:Q_LO + N], [Qu[Q_T]], -Qu[Q_VA:Q_VA + N], -Qu[Q_CR:Q_CR + N], Qu[Q_VA:Q_VA + N],
                          np.zeros(N)])
+    if timed1:
+        Du[:] = 0.0
     return A, Bw, Bu, C, Dw, Du
 
 
@@ -175,21 +202,26 @@ def covariance(A, Bw, C, Dw, sigma_ns, inputs=None):
 
 def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, jitter_inputs=None,
                 dt_step=6, dtl_step=2, tgt=3, shift=1, dt_max=1114, dtl_max=320, ton_ref=568, ki_code=262,
-                vref_code=2000, adc_lsb_v=0.0005, trim_offset_a=0.01, trim_lsb_a=0.25):
+                vref_code=2000, adc_lsb_v=0.0005, trim_offset_a=0.01, trim_lsb_a=0.25,
+                timed1=False, lo_shift=1, lo_step=2, lo_tgt=3, lo_max=12800, lo_sign=False):
     """Linearised circuit with the controller's exact rules (module docstring). Delays, slots, Ton and the measured
     period are integers in LSB (31.25 ps). ton_ref: the Ton code taken as the orbit's on-time; trim_offset_a: phase
-    1's turn-off current above -6.25 A at the trim's upper level (A92's runs: -6.24 / -6.49 A). Returns per-cycle
+    1's turn-off current above -6.25 A at the trim's upper level (A92's runs: -6.24 / -6.49 A). timed1 (D54): J and p0
+    are the timed-turn-off map's; dlo (LSB) is corrected from e_lo like dtl (lo_shift, lo_step on an early turn-off,
+    lo_tgt) and the trim is not used; lo_sign: dlo steps +-1 LSB on the sign of e_lo - lo_tgt instead. Returns per-cycle
     arrays after the warm-up."""
     rng = np.random.default_rng(seed)
     sel = np.ones(NW) if jitter_inputs is None else np.array([1.0 if x in jitter_inputs else 0.0 for x in W_NAMES])
-    Gw, Gp = jitter_map()
+    Gw, Gp = jitter_map(timed1)
+    lo_star = p0[I_U]
+    dlo = int(round(lo_star / LSB))
     d_star, dl_star = p0[I_D:I_D + N], p0[I_DL:I_DL + N]
     slot_star, t_star = p0[I_SL:I_SL + N - 1], q0[Q_T]
     d = np.rint(d_star / LSB).astype(int); dl = np.rint(dl_star / LSB).astype(int)
     acc, trim, eta_prev = ton_ref << 16, 0, 0.0
     tm = [int(round(t_star / LSB))] * 2
     ds = np.zeros(NS)
-    keys = ("ilo", "T", "eh", "el", "early_h", "early_l", "valley", "cross", "isec", "ton", "d", "dl", "vo")
+    keys = ("ilo", "T", "eh", "el", "early_h", "early_l", "valley", "cross", "isec", "ton", "d", "dl", "vo", "elo")
     rec = {k: [] for k in keys}
     for n in range(warmup + n_cycles):
         vo = 1.0 + ds[pcl.I_OUT]
@@ -209,15 +241,19 @@ def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, 
         dp[I_DL:I_DL + N] += dl * LSB - dl_star
         dp[I_TON:I_TON + N] += (ton - ton_ref) * LSB
         dp[I_SL:I_SL + N - 1] += np.array(slot) * LSB - slot_star
-        dp[I_U] += trim * trim_lsb_a + trim_offset_a
+        if timed1:
+            dp[I_U] += dlo * LSB - lo_star
+        else:
+            dp[I_U] += trim * trim_lsb_a + trim_offset_a
         q = q0 + J @ dp
+        elo = (-6.25 - q[Q_LO]) / -SLOPE_LOW                # actual turn-off - crossing of -6.25 A (ns)
         valley, cross = q[Q_VA:Q_VA + N], q[Q_CR:Q_CR + N]
         eh = d_star + dp[I_D:I_D + N] - valley
         el = dl_star + dp[I_DL:I_DL + N] - cross
         if n >= warmup:
             for k, v in (("ilo", q[Q_LO:Q_LO + N]), ("T", q[Q_T]), ("eh", eh), ("el", el), ("early_h", eh < 0),
                          ("early_l", el < 0), ("valley", valley), ("cross", cross), ("isec", ds[N:NS].copy()),
-                         ("ton", ton), ("d", d.copy()), ("dl", dl.copy()), ("vo", vo)):
+                         ("ton", ton), ("d", d.copy()), ("dl", dl.copy()), ("vo", vo), ("elo", elo)):
                 rec[k].append(v)
         for k in range(N):                                  # high side (rtl/scb_phase.v, bridge.py meas_m)
             if eh[k] < 0:
@@ -230,7 +266,16 @@ def monte_carlo(p0, q0, J, rule, sigma_ns, n_cycles=20000, warmup=3000, seed=1, 
             else:
                 err = max(0, int(round(el[k] / LSB)))
                 dl[k] = min(max(dl[k] - ((err - tgt) >> shift), 0), dtl_max)
-        trim += 1 if q[Q_LO] < -6.25 else -1                # i_target + u: below the target -> +1
+        if timed1 and lo_sign:                              # dlo by the sign alone: +-1 LSB per cycle
+            dlo = min(max(dlo + (1 if elo < lo_tgt * LSB else -1), 0), lo_max)
+        elif timed1:                                        # dlo: like dtl, from the comparator's crossing time
+            if elo < 0:
+                dlo = min(dlo + lo_step, lo_max)
+            else:
+                err = max(0, int(round(elo / LSB)))
+                dlo = min(max(dlo - ((err - lo_tgt) >> lo_shift), 0), lo_max)
+        else:
+            trim += 1 if q[Q_LO] < -6.25 else -1            # i_target + u: below the target -> +1
         tm = [int(round((t_star + (q[Q_T] - t_star) - w[0] + eta_prev) / LSB)), tm[0]]
         eta_prev = w[0]
         ds = q[:NS] - p0[:NS]                               # the circuit's deviation at the next section
