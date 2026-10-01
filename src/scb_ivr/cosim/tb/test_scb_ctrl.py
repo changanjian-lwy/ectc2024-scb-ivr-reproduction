@@ -4,7 +4,7 @@ Time is in LSB units: 1 LSB = T_clk / 32 = 125 ps at the 250 MHz base case (the 
 drives every input; option bits default to 0. Groups: phase timing, comparators and slots; predictive correction
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
-guard. From A93's tests (history: ../CHANGELOG.md).
+guard; the timed phase-1 turn-off. From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -19,7 +19,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             low_pred=0, dtl_init=(8, 8, 8, 8), dtl_step=2, dtl_max=80, blank=0,   # A89
             err_low=0, err_high=0, el_tgt=0, eh_tgt=0, err_shift=0,              # A92
             slot_follow=0, slot_guard=0,                                         # A93
-            slot_avg=0)                                                          # A97
+            slot_avg=0,                                                          # A97
+            lo_pred=0, lo_learn=0, lo_tgt=0)                                     # A99
 
 
 def pack(values, width):
@@ -94,6 +95,10 @@ class Ctrl:
         d.cfg_slot_follow.value = cfg["slot_follow"]             # A93
         d.cfg_slot_guard.value = cfg["slot_guard"]
         d.cfg_slot_avg.value = cfg["slot_avg"]                   # A97
+        d.cfg_lo_pred.value = cfg["lo_pred"]                     # A99
+        d.cfg_lo_learn.value = cfg["lo_learn"]
+        d.cfg_lo_tgt.value = cfg["lo_tgt"]
+        d.mlo_valid.value = 0; d.mlo_early.value = 0; d.mlo_err.value = 0
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -746,3 +751,66 @@ async def avg_without_follow_keeps_the_configured_slot(dut):
     assert max(t_on1, t_on2 - t_on1, t_on3 - t_on2) < 600, (t_on1, t_on2, t_on3)
     e = await c.until("L", 0, 2, after=t_on3, limit=800)
     assert e[0] + e[1] == t_on3 + 600, (t_on3, e)
+
+
+@cocotb.test()
+async def lo_pred_learns_then_times_phase1_turn_off(dut):
+    """cfg_lo_pred, cfg_lo_learn 2: the first two phase-1 turn-offs are comparator-decided and set dlo to their on-low
+    interval; then lo_timed1 is set and the third turn-off is a timed edge at t_lon + dlo, without the comparator."""
+    c = Ctrl(dut)
+    await c.start(lo_pred=1, lo_learn=2)
+    t1 = await _phase1_cycle(c, -1)
+    t2 = await _phase1_cycle(c, t1, hold=3)
+    lon = [e for e in c.edges if e[2] == "L" and e[3] == 1 and e[4] == 1][-1]
+    lo = [e for e in c.edges if e[2] == "L" and e[3] == 0 and e[4] == 1][-1]
+    learned = (lo[0] + lo[1]) - (lon[0] + lon[1])
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.dlo1.value) == learned and int(dut.lo_timed1.value) == 1, (int(dut.dlo1.value), learned)
+    off = await c.until("H", 0, 1, after=t2)
+    await c.set(cmp_zl=0b0001)
+    lon3 = await c.until("L", 1, 1, after=off[0] + off[1])
+    await c.set(cmp_zl=0)
+    lo3 = await c.until("L", 0, 1, after=lon3[0] + lon3[1], limit=800)
+    assert lo3[0] + lo3[1] == lon3[0] + lon3[1] + learned, (lon3, lo3, learned)
+
+
+@cocotb.test()
+async def lo_pred_sign_update(dut):
+    """Once timed, a crossing report that is early or below cfg_lo_tgt (3) raises dlo by 1 LSB; one at or above
+    the target lowers it by 1 LSB."""
+    c = Ctrl(dut)
+    await c.start(lo_pred=1, lo_learn=1, lo_tgt=3)
+    await _phase1_cycle(c, -1)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.lo_timed1.value) == 1
+    d0 = int(dut.dlo1.value)
+    for early, err, delta in ((1, 0, +1), (0, 5, -1), (0, 2, +1), (0, 3, -1)):
+        await c.set(mlo_valid=1, mlo_early=early, mlo_err=err)
+        await c.set(mlo_valid=0)
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        d1 = int(dut.dlo1.value)
+        assert d1 - d0 == delta, (early, err, d0, d1)
+        d0 = d1
+
+
+@cocotb.test()
+async def lo_pred_timed_does_not_arm_the_front_end(dut):
+    """cfg_async with cfg_lo_pred and cfg_lo_learn 0 (timed at once, dlo 0): phase 1's front end is never armed in
+    LOW, and its low side turns off at the timed edge t_lon + 0, placed in the next window (a late fire)."""
+    c = Ctrl(dut)
+    await c.start(async_=1, lo_pred=1, lo_learn=0)
+    off = await c.until("H", 0, 1)
+    await c.set(cmp_zl=0b0001)
+    lon = await c.until("L", 1, 1, after=off[0] + off[1])
+    await c.set(cmp_zl=0)
+    armed = []
+    for _ in range(10):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        armed.append(int(dut.arm1.value))
+    lo = c.find("L", 0, 1, after=lon[0] + lon[1])
+    assert not any(armed) and lo is not None and lo[0] + lo[1] == lon[0] + lon[1] + WIN, (armed, lon, lo)
+

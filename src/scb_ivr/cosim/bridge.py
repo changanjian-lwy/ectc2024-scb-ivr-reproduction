@@ -36,7 +36,8 @@ applied while the same phase's complement conducts is counted, and with "stop_on
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki),
 async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps, eh_tgt_ps,
-err_shift) and the slot rules (slot_follow, slot_guard, slot_avg); keys absent from cfg take the values that reproduce the
+err_shift), the slot rules (slot_follow, slot_guard, slot_avg) and the timed phase-1 turn-off (lo_pred, lo_learn,
+lo_tgt_ps; the bridge then measures phase 1's crossing of i_target and reports it at the turn-off); keys absent from cfg take the values that reproduce the
 earlier experiments.
 
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
@@ -167,6 +168,10 @@ async def cosim(dut):
     dut.cfg_slot_follow.value = int(cfg.get("slot_follow", 0))        # A93
     dut.cfg_slot_guard.value = int(cfg.get("slot_guard", 0))
     dut.cfg_slot_avg.value = int(cfg.get("slot_avg", 0))              # A97
+    dut.cfg_lo_pred.value = int(cfg.get("lo_pred", 0))                # A99: timed phase-1 turn-off
+    dut.cfg_lo_learn.value = int(cfg.get("lo_learn", 0))
+    dut.cfg_lo_tgt.value = to_lsb(cfg.get("lo_tgt_ps", 0.0) * 1e-12)
+    dut.mlo_valid.value = 0; dut.mlo_early.value = 0; dut.mlo_err.value = 0
     dut.cfg_blank.value = to_lsb(cfg.get("blank_ns", 0.0) * 1e-9)     # A89 amendment: comparator blanking
     dut.cfg_async.value = int(cfg.get("async", 0))
     dut.a_valid.value = 0
@@ -214,9 +219,17 @@ async def cosim(dut):
         heapq.heappush(pend, (t_apply(t_cmd + lat["dt0"] * lsb, 0), seq[0], 0, 1, {"how": 0, "bind": False})); seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
+    mlo = {"armed": False, "t": None, "report": None, "t_timed": None}   # A99: crossing measurement of phase 1
+    lo_reports = []
+
+    def mlo_fire():                                              # A99: phase 1's current reaches the target
+        mlo["t"] = plant.t
+
     def on_step():
         if lat["armed"] and not lat["fired"] and plant.y[nv] <= i_tgt + trim_now[0] * lsb_a:
             latch_fire()
+        if mlo["armed"] and mlo["t"] is None and plant.y[nv] <= i_tgt:
+            mlo_fire()
         mon.py_step(plant)                                       # A89 zero-crossing TDC, valley tracking
 
     trace = {"path": os.environ.get("COSIM_TRACE"), "h": None, "digests": []}
@@ -226,8 +239,11 @@ async def cosim(dut):
 
     def integrate_to(t_target):
         if use_c:
-            plant.integrate_to(t_target, None, monitors=mon,
-                               latch=(lat["armed"] and not lat["fired"], i_tgt + trim_now[0] * lsb_a, latch_fire))
+            if not (lat["armed"] and not lat["fired"]) and mlo["armed"] and mlo["t"] is None:
+                latch = (True, i_tgt, mlo_fire)                    # A99: measurement only
+            else:
+                latch = (lat["armed"] and not lat["fired"], i_tgt + trim_now[0] * lsb_a, latch_fire)
+            plant.integrate_to(t_target, None, monitors=mon, latch=latch)
         else:
             plant.integrate_to(t_target, on_step)
         if trace["h"] is not None:                    # checkpoint: t, y, diode flags, Euler counter
@@ -286,6 +302,14 @@ async def cosim(dut):
                 meas_l[k] = (not crossed, 0 if not crossed else max(0, to_lsb(rel)),
                              0 if not crossed else max(0, to_lsb(plant.t - tc)))      # A92: edge - crossing
             mon.hoff_set[k] = 0; mon.cross_set[k] = 0
+        if j == N and level and st.get("lo_timed"):  # A99: phase 1's low side on: measure its crossing
+            mlo["armed"] = True; mlo["t"] = None
+        if j == N and not level and mlo["armed"]:     # A99: its timed turn-off: report turn-off - crossing
+            early = mlo["t"] is None
+            mlo["report"] = (early, 0 if early else max(0, to_lsb(plant.t - mlo["t"])))
+            lo_reports.append({"t_s": plant.t, "early": early, "err_s": None if early else plant.t - mlo["t"],
+                               "i_a": float(plant.y[nv])})
+            mlo["armed"] = False
         if j >= N and not level:                # low-side turn-off edge
             i_e = float(plant.y[nv + k])
             lowoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": i_e, "bind_cur": meta["bind"]})
@@ -305,6 +329,10 @@ async def cosim(dut):
         if int(dut.mode_p.value) and not st["mode_p"]:
             st["t_mode_p"] = w * lsb
         st["mode_p"] = int(dut.mode_p.value)
+        if cfg.get("lo_pred", 0):                                # A99
+            st["lo_timed"] = int(dut.lo_timed1.value)
+            if st["lo_timed"] and mlo["t_timed"] is None:
+                mlo["t_timed"] = w * lsb
         if int(dut.arm1.value):
             lat["armed"] = True
         else:
@@ -331,6 +359,11 @@ async def cosim(dut):
         meas_l.clear()
         dut.ml_valid.value = ml_v; dut.ml_early.value = ml_e; dut.ml_tv.value = pack(ml_t, TW)
         dut.ml_err.value = pack(ml_r, TW); dut.m_err.value = pack(merr, TW)
+        if cfg.get("lo_pred", 0):                                # A99: one-cycle crossing report
+            rep = mlo["report"]; mlo["report"] = None
+            dut.mlo_valid.value = int(rep is not None)
+            dut.mlo_early.value = int(rep[0]) if rep else 0
+            dut.mlo_err.value = rep[1] if rep else 0
         meas_m.clear(); meas_r.clear()
         dut.m_valid.value = mv; dut.m_early.value = me; dut.m_flat.value = mf; dut.m_tv.value = pack(mtv, TW)
         dut.r_valid.value = rv; dut.r_below.value = rb
@@ -376,6 +409,8 @@ async def cosim(dut):
            "edges_log": edges_log, "driver": drv, "overlaps": ovl["count"], "first_overlap": ovl["first"],
            "status": "OVERLAP_STOP" if ovl["stop"] else "COMPLETED", "lowons_last": lowons[-1000:], "plant_flags": {"nonlinear_coss": p.nonlinear_coss, "rev_drop": p.rev_drop,
                                                             "rev_vf": p.rev_vf, "rev_r": p.rev_r}}
+    if cfg.get("lo_pred", 0):                                    # A99
+        out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=int(dut.dlo1.value), lo_reports_last=lo_reports[-1000:])
     out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
                              plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
     if prof is not None:

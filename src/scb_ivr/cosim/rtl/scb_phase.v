@@ -14,7 +14,10 @@
 //   into the turn-off window when it falls there); the restart timer cfg_rs_high is the guard;
 // - low-side turn-off: phase 1 at the synchronised current comparator, acting only once now - t_lon >= cfg_blank,
 //   or with cfg_async by the asynchronous front end (arm -> external latch and gate edges; the TDC report a_valid /
-//   a_tlo records t_lo and t_on = a_tlo + dt_pred); restart timer cfg_rs_low. Phases 2..N at their slot
+//   a_tlo records t_lo and t_on = a_tlo + dt_pred); restart timer cfg_rs_low. With cfg_lo_pred (phase 1), each
+//   comparator-decided turn-off sets dlo to its on-low interval (t_lo - t_lon), and after cfg_lo_learn of them the
+//   turn-off is a timed edge at t_lon + dlo (lo_timed; the front end is not armed), followed by the predictive
+//   turn-on; dlo then steps +1 when the crossing report is early or below cfg_lo_tgt, else -1. Phases 2..N at their slot
 //   (slot_time from scb_ctrl); with cfg_slot_guard a slot not yet fired when the reference changes fires at once
 //   (fine 0, a late fire) and counts as the new reference's slot;
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
@@ -83,6 +86,12 @@ module scb_phase #(
     input  wire [TW-1:0]        ml_err,        // A92: actual low-side turn-on - zero crossing, LSB
     input  wire [TW-1:0]        m_err,         // A92: actual high-side turn-on - valley, LSB
     input  wire                 cfg_slot_guard,// A93: fire a missed slot when the reference changes
+    input  wire                 cfg_lo_pred,   // A99: timed phase-1 low-side turn-off after learning
+    input  wire [15:0]          cfg_lo_learn,  // A99: comparator-decided mode-P turn-offs before it
+    input  wire [TW-1:0]        cfg_lo_tgt,    // A99: target of actual turn-off - crossing, LSB
+    input  wire                 mlo_valid,     // A99: crossing report at the timed turn-off (one-cycle pulse)
+    input  wire                 mlo_early,     // A99: the current had not reached the target at the turn-off
+    input  wire [TW-1:0]        mlo_err,       // A99: actual turn-off - crossing, LSB
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -99,7 +108,9 @@ module scb_phase #(
     output reg  signed [CW-1:0] trim,
     output reg  [TW-1:0]        dt_pred,
     output reg  [15:0]          late_fires,
-    output reg  [TW-1:0]        dtl            // A89: low-side dead time, LSB
+    output reg  [TW-1:0]        dtl,           // A89: low-side dead time, LSB
+    output reg  [TW-1:0]        dlo,           // A99: phase 1's on-low interval for the timed turn-off, LSB
+    output wire                 lo_timed       // A99: phase 1's turn-off is timed
 );
     localparam [1:0] HIGH = 2'd0, DOWN = 2'd1, LOW = 2'd2, UP = 2'd3;
     localparam [2:0] HOW_PRED = 3'd0, HOW_VALLEY = 3'd1, HOW_ZVS = 3'd2, HOW_RESTART = 3'd3, HOW_TIMED = 3'd4;
@@ -152,7 +163,11 @@ module scb_phase #(
     wire pred_first = due(d_pred) && !(due(d_rsu) && (d_rsu < d_pred));
     wire async_on   = FIRST && cfg_async && mode_p;
     wire lo_open    = $signed(now - t_lon) >= $signed(cfg_blank);   // A89: blanking elapsed
-    assign arm = async_on && (state == LOW) && lo_open;
+    reg  [15:0] lo_n;                                               // A99: learned turn-offs (saturating)
+    assign lo_timed = FIRST && cfg_lo_pred && mode_p && (lo_n >= cfg_lo_learn);
+    wire signed [TW-1:0] d_lo1t = t_lon + dlo - now;                // A99: timed turn-off
+    wire [FB-1:0] f_lo1t = fine(d_lo1t, cfg_fine);
+    assign arm = async_on && (state == LOW) && lo_open && !lo_timed;
     wire slot_new   = (fired_ref != ref_id);
     wire slot_miss  = cfg_slot_guard && pend_v && (pend_ref != ref_id);   // A93: the awaited slot was passed
     wire [TW-1:0] dt_next = dt_pred + cfg_dt_step;
@@ -198,6 +213,8 @@ module scb_phase #(
             dt_pred     <= dt_init;
             late_fires  <= 16'd0;
             dtl         <= dtl_init;
+            dlo         <= {TW{1'b0}};
+            lo_n        <= 16'd0;
         end else begin
             if (m_valid) begin
                 if (m_early)
@@ -212,6 +229,12 @@ module scb_phase #(
                     dtl <= dtl_err;
                 else
                     dtl <= (ml_tv > cfg_dtl_max) ? cfg_dtl_max : ml_tv;
+            end
+            if (mlo_valid && lo_timed) begin                     // A99: sign-based correction of dlo
+                if (mlo_early || (mlo_err < cfg_lo_tgt))
+                    dlo <= dlo + 1'b1;
+                else if (dlo != {TW{1'b0}})
+                    dlo <= dlo - 1'b1;
             end
             if (r_valid && cfg_trim && lo_bind_cur) begin
                 if (r_below && trim != TRIM_MAX)
@@ -283,10 +306,25 @@ module scb_phase #(
                                 state <= UP;
                             end
                         end
+                    end else if (lo_timed) begin                 // A99: timed phase-1 turn-off
+                        if (due(d_lo1t)) begin
+                            gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_lo1t;
+                            t_lo <= now + f_lo1t; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            if (d_lo1t[TW-1]) late_fires <= late_fires + 1'b1;
+                            state <= UP;
+                        end else if (due(d_rs1)) begin
+                            gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_rs1;
+                            t_lo <= now + f_rs1; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            state <= UP;
+                        end
                     end else if (async_on) begin
                         if (a_valid) begin                       // A81: edges made by the front end
                             t_lo <= a_tlo; lo_bind_cur <= 1'b1; lo_pulse <= 1'b1;
                             t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
+                            if (cfg_lo_pred) begin               // A99: learn the on-low interval
+                                dlo <= a_tlo - t_lon;
+                                if (lo_n != 16'hFFFF) lo_n <= lo_n + 1'b1;
+                            end
                             state <= HIGH;
                         end else if (due(d_rs1)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_rs1;
@@ -297,6 +335,10 @@ module scb_phase #(
                         if (c_i && lo_open) begin                // A89: blanking
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= {FB{1'b0}};
                             t_lo <= now; lo_bind_cur <= 1'b1; lo_pulse <= 1'b1;
+                            if (cfg_lo_pred) begin               // A99: learn the on-low interval
+                                dlo <= now - t_lon;
+                                if (lo_n != 16'hFFFF) lo_n <= lo_n + 1'b1;
+                            end
                             state <= UP;
                         end else if (due(d_rs1)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_rs1;

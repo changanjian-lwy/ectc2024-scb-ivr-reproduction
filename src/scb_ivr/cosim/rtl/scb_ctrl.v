@@ -8,6 +8,8 @@
 //   T_meas = the last phase-1 period (P24/P25's phase shift T/nP); with cfg_slot_avg as well, once three
 //   phase-1 turn-ons have been seen, at t_ref + (j - 1) * (T_meas + T_prev) / (2N), T_prev = the period before
 //   (the configured slot until then). cfg_slot_guard is passed to phases 2..N.
+// - Phase 1's turn-off (cfg_lo_pred): timed after cfg_lo_learn comparator-decided turn-offs (scb_phase); its crossing
+//   reports mlo_* go to phase 1 only.
 // - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on),
 //   ton_acc += ki * (vref - adc_code) with FRAC fractional bits; Ton is the rounded integer part, clamped to
 //   [cfg_ton_min, cfg_ton_max]; otherwise Ton = cfg_ton.
@@ -80,6 +82,14 @@ module scb_ctrl #(
     input  wire                cfg_slot_follow,// A93
     input  wire                cfg_slot_guard, // A93
     input  wire                cfg_slot_avg,   // A97
+    input  wire                cfg_lo_pred,    // A99: timed phase-1 turn-off after learning
+    input  wire [15:0]         cfg_lo_learn,   // A99
+    input  wire [TW-1:0]       cfg_lo_tgt,     // A99
+    input  wire                mlo_valid,      // A99: phase 1's crossing report at its timed turn-off
+    input  wire                mlo_early,      // A99
+    input  wire [TW-1:0]       mlo_err,        // A99
+    output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
+    output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire                arm1,
     output wire [N-1:0]        gh_ev,
     output wire [N-1:0]        gh_lvl,
@@ -166,6 +176,11 @@ module scb_ctrl #(
         end
     end
 
+    wire [N*TW-1:0] dlo_all;                   // A99
+    wire [N-1:0]    lo_timed_all;
+    assign dlo1 = dlo_all[TW-1:0];
+    assign lo_timed1 = lo_timed_all[0];
+
     genvar k;
     generate
         for (k = 0; k < N; k = k + 1) begin : g_ph
@@ -205,7 +220,10 @@ module scb_ctrl #(
                 .cfg_err_low(cfg_err_low), .cfg_err_high(cfg_err_high),                         // A92
                 .cfg_el_tgt(cfg_el_tgt), .cfg_eh_tgt(cfg_eh_tgt), .cfg_err_shift(cfg_err_shift),
                 .ml_err(ml_err[k * TW +: TW]), .m_err(m_err[k * TW +: TW]),
-                .cfg_slot_guard(k == 0 ? 1'b0 : cfg_slot_guard)                               // A93
+                .cfg_slot_guard(k == 0 ? 1'b0 : cfg_slot_guard),                              // A93
+                .cfg_lo_pred(k == 0 ? cfg_lo_pred : 1'b0), .cfg_lo_learn(cfg_lo_learn),        // A99
+                .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(k == 0 ? mlo_valid : 1'b0), .mlo_early(mlo_early),
+                .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k])
             );
         end
     endgenerate

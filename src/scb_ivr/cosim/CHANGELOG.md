@@ -4,6 +4,29 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (later still) - timed phase-1 turn-off (A99)
+
+- **`rtl/scb_phase.v` (phase 1), new `cfg_lo_pred`.**
+  - Each comparator-decided mode-P turn-off sets `dlo` to its on-low
+    interval.
+  - After `cfg_lo_learn` of them (`lo_timed`), the turn-off is a timed
+    edge at t_lon + dlo, followed by the predictive turn-on, and the
+    asynchronous front end is no longer armed.
+  - dlo then steps +1 LSB when the crossing report is early or below
+    `cfg_lo_tgt`, else −1.
+- **`rtl/scb_ctrl.v`:** the ports; `dlo1` and `lo_timed1` are outputs.
+- **`bridge.py`:** cfg keys `lo_pred`, `lo_learn`, `lo_tgt_ps`.
+  - In timed mode it measures phase 1's crossing of i_target with the C
+    loop's latch test, used as a measurement only.
+  - It reports actual turn-off − crossing (or early) at the turn-off.
+  - Output fields are added only when `lo_pred` is set.
+- **`tb/`:** 3 new tests (learning then timed; the ±1 update; no arming
+  when timed). **42 of 42 pass.**
+- **Gates:**
+  - `--full` regression PASS;
+  - `tests/test_cosim_plants.py` passed;
+  - synthesis: 0 problems, 41 605 cells.
+
 ## 2026-10-01 (late night) - jitter on one side's edges only (A98)
 
 - **`bridge.py`:** `driver.jitter_edges` = `"high"` or `"low"` restricts the
