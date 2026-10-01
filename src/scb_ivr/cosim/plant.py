@@ -484,7 +484,8 @@ class _Run(ctypes.Structure):
                [("rev_drop", ctypes.c_int32), ("load_cc", ctypes.c_int32)] + \
                [(nm, ctypes.c_void_p) for nm in ("nsw", "dsel", "ssel", "table", "hoff_set", "cross_set", "vprev_valid",
                                                  "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin")] + \
-               [("need_key", ctypes.c_int64), ("chord_iters", ctypes.c_int64)]
+               [("need_key", ctypes.c_int64), ("chord_iters", ctypes.c_int64)] + \
+               [("i_step", ctypes.c_double), ("t_step", ctypes.c_double)]                 # A100
 
 
 class KernelPlant2(KernelPlant):
@@ -514,6 +515,7 @@ class KernelPlant2(KernelPlant):
         r.p_h, r.v_on = p.h, float(self.v_on)
         r.rev_vf, r.rev_r, r.vin, r.t_ramp = float(p.rev_vf), float(p.rev_r), float(p.vin), float(p.t_ramp)
         r.i_load, r.t_load = float(p.i_load), float(p.t_load)
+        r.i_step, r.t_step = float(p.i_step), float(p.t_step)
         r.rev_drop, r.load_cc = int(bool(p.rev_drop)), int(p.load_kind == "cc")
         self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32))
         for nm, a in self._consts.items():

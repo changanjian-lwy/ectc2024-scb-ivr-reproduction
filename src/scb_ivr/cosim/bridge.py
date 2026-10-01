@@ -42,7 +42,8 @@ earlier experiments.
 
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
-plant steps and wall time, driver/overlap status.
+plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
+Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
 """
 import gzip
 import heapq
@@ -113,6 +114,8 @@ async def cosim(dut):
     if cfg.get("rev_drop", 0):
         vf, rr, _ = fit_fig8(10.0, 100.0)
         extra.update(rev_drop=True, rev_vf=vf, rev_r=rr)
+    if cfg.get("load_step"):                                          # A100: a load current step
+        extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
     p = Params(**{k: pr[k] for k in keep}, diode_check=True, **extra)
     plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, [0.0] * (2 * N + N), gh=[True] + [False] * (N - 1),
                                                     gl=[False] + [True] * (N - 1))      # 2N node voltages, N currents
@@ -398,19 +401,20 @@ async def cosim(dut):
 
     await RisingEdge(dut.clk)
     await ReadOnly()
+    keep_n = int(cfg.get("records_last", 1000))                      # A100: longer records on request
     out = {"cfg": cfg, "t_end_s": plant.t, "steps": plant.steps, "wall_s": time.time() - t0w,
            "late_fires": [field(dut.late_fires.value, k, 16) for k in range(N)],
            "trim_final": [signed(field(dut.trim.value, k, CW), CW) for k in range(N)],
            "dt_pred_final_ns": [field(dut.dt_pred.value, k, TW) * lsb * 1e9 for k in range(N)],
            "t_mode_p_s": st["t_mode_p"], "ton_final_lsb": int(dut.ton_now.value), "lsb_s": lsb,
            "vds_max_v": plant.vds_max, "ipk_a": plant.ipk, "async_fires": lat["fires"],
-           "sections": sections, "turnons_last": turnons[-1000:], "lowoffs_last": lowoffs[-1000:],
+           "sections": sections, "turnons_last": turnons[-keep_n:], "lowoffs_last": lowoffs[-keep_n:],
            "dtl_final_ns": [field(dut.dtl.value, k, TW) * lsb * 1e9 for k in range(N)],     # A89
            "edges_log": edges_log, "driver": drv, "overlaps": ovl["count"], "first_overlap": ovl["first"],
-           "status": "OVERLAP_STOP" if ovl["stop"] else "COMPLETED", "lowons_last": lowons[-1000:], "plant_flags": {"nonlinear_coss": p.nonlinear_coss, "rev_drop": p.rev_drop,
+           "status": "OVERLAP_STOP" if ovl["stop"] else "COMPLETED", "lowons_last": lowons[-keep_n:], "plant_flags": {"nonlinear_coss": p.nonlinear_coss, "rev_drop": p.rev_drop,
                                                             "rev_vf": p.rev_vf, "rev_r": p.rev_r}}
     if cfg.get("lo_pred", 0):                                    # A99
-        out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=int(dut.dlo1.value), lo_reports_last=lo_reports[-1000:])
+        out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=int(dut.dlo1.value), lo_reports_last=lo_reports[-keep_n:])
     out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
                              plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
     if prof is not None:

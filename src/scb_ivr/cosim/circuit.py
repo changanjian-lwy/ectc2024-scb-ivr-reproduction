@@ -99,12 +99,15 @@ class CircuitParams:
     rev_drop: bool = False
     rev_vf: float = 0.0          # V per device, from fit_fig8 when rev_drop
     rev_r: float = 0.0           # Ohm per device, from fit_fig8 when rev_drop
+    i_step: float = 0.0          # A100: a load current step drawn from the output from t_step on
+    t_step: float = float("inf")
 
     def vin_at(self, t):
         return self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
 
     def load_at(self, t):
-        return self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
+        a = self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
+        return a + (self.i_step if t >= self.t_step else 0.0)       # A100: + 0.0 without a step
 
 
 def topology(n):

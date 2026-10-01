@@ -4,6 +4,19 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (night, A100) - load step and record length
+
+- **`circuit.py`, `plant_kernel.c`, `plant.py`:** a load current step
+  (`i_step` from `t_step` on), on top of the load, in the source term.
+  - No step: a + 0.0, so nothing changes.
+  - The C run struct gains two doubles at its end, so no other field
+    moves.
+- **`bridge.py`:** cfg keys `load_step` {"t_us", "i_a"} and
+  `records_last` (default 1000).
+- **Gates:**
+  - `--full` regression PASS;
+  - `tests/test_cosim_plants.py` passed.
+
 ## 2026-10-01 (later still) - timed phase-1 turn-off (A99)
 
 - **`rtl/scb_phase.v` (phase 1), new `cfg_lo_pred`.**

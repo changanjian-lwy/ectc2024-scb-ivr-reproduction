@@ -219,6 +219,7 @@ typedef struct {
     double *t_cross, *v_prev, *t_prev, *vmin, *t_vmin;
     int64_t need_key;
     int64_t chord_iters;
+    double i_step, t_step;                            /* A100: load current step (0, inf without one) */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
@@ -227,7 +228,9 @@ static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
 }
 
 static double load_at(const run_t *r, double t) {     /* CircuitParams.load_at */
-    return (r->load_cc && t >= r->t_load) ? r->i_load : 0.0;
+    double a = (r->load_cc && t >= r->t_load) ? r->i_load : 0.0;
+    double b = (t >= r->t_step) ? r->i_step : 0.0;
+    return a + b;
 }
 
 static void vds_all(const run_t *r, const double *y, double vin, double *vd) {  /* FastSim.vds_all */
