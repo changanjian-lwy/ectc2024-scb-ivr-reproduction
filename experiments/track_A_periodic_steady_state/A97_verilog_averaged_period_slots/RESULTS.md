@@ -310,3 +310,23 @@ predictions 1 and 2 holding in all four deterministic runs.
   loss was not computed.
 - **The two-cycle measure** is sensitive to a parity slip within the
   200-cycle window. It is the same measure for all three experiments.
+
+## 9. Literature read after the runs
+
+Freescale (NXP) application note AN4836, "Single Phase Two-Channel
+Interleaved PFC Operating in CrM" (2014, public, no DOI), Sections 2-4.
+Its text was extracted with PyMuPDF.
+
+- **Its slave shift is half of the previous switching period.** That is
+  A93's rule. The note states the assumption behind it: "the difference
+  between the two adjacent switching periods can be omitted". A93 is the
+  case where it fails, since adjacent periods alternate.
+- **Its period averaging is used only to choose the master leg** (the leg
+  with the longer average period), not for the shift.
+- **It also describes a shift computed from the master's duty cycle and
+  the input and output voltages,** updated every 1 ms. That is a heavily
+  filtered shift, not a two-period average.
+
+So the finding of BOUNDARY Section 2 stands: no published source was found
+for a two-period average. The note is a precedent for filtering the shift,
+and for the assumption that A97 removes.
