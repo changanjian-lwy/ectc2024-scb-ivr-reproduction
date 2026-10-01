@@ -107,6 +107,12 @@ The RTL, its unit tests and the bridge are in the shared package
 
 The 8 runs took 4 minutes, 4 at a time.
 
+**The archived outputs come from runs of the committed code (8775727).**
+- They were rerun after the commit, because the first runs were made
+  before it: provenance "cosim_sources_modified".
+- Every field except `provenance` and `wall_s` is identical to the first
+  runs (`compare_full` and a key-by-key check, all 8).
+
 ## 2. The m3n case
 
 All runs have m = -3.4 ns. The start-up is identical up to the handover at
