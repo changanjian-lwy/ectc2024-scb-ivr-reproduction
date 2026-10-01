@@ -591,6 +591,19 @@ each question:
          - Scheduling: at most 4 runs at a time.
          - Then the agreed code clean-up, before new physics.
 
+     16. Code clean-up, in progress (agreed on 2026-10-01: results must not
+         change; less duplication; faster).
+         - Done:
+           - [A95](../experiments/track_A_periodic_steady_state/A95_cosim_c_kernel/RESULTS.md):
+             the plant step in C. Bit-identical, 3.17 times faster than
+             the original.
+           - The shared co-simulation package `src/scb_ivr/cosim/`: RTL,
+             bridge, plants, entry point, preset, unit tests. The full
+             replay gate passes on 4 archived runs.
+           - `.gitignore` for run logs and build directories.
+         - In progress: one solver for the D47-D51 orbits
+           (`scripts/p24_orbits.py`), gated on the 13 archived orbits.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

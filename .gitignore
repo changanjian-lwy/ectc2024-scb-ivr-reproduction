@@ -48,3 +48,9 @@ sim_build*/
 results.xml
 *.vcd
 *.fst
+
+# Co-simulation and run artefacts (local; never committed)
+log_*.txt
+sim_build*/
+results.xml
+plant_kernel*.so

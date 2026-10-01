@@ -752,3 +752,20 @@ plant arithmetic without its Python overhead.
   16 min, against 70-73 min in the 8-10-run batches.
 - **Earlier experiments keep their own plant.** Later ones may use the fast
   one.
+
+`A95_cosim_c_kernel` moves the plant step and the nonlinear-Coss chord
+iteration into C (`plant_kernel.c`), with numpy/scipy's exact operations.
+- It calls Accelerate's `dgemv` and `dgetrs` with numpy's and scipy's
+  arguments.
+- It uses numpy's FMA in `interp` and no other contraction.
+- **Bit-identical over 500 000 steps; 3.17 times faster** than the
+  original per co-simulation run.
+
+**From A95 on, new experiments use the shared co-simulation package
+`src/scb_ivr/cosim/`** (README and CHANGELOG there).
+- It holds one RTL, one bridge, the three plants (kernel by default), an
+  entry point that runs at most 4 at a time, provenance in every output,
+  and a preset of the adopted design.
+- `scripts/cosim_regression.py --full` replays A89 r2, A92 j100, A92 m3p
+  and A93 m3n_both bit-identically, about 9 min each, 4 at a time.
+- The archived folders above stay as they are.
