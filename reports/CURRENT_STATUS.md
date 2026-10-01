@@ -533,9 +533,40 @@ each question:
          of the adaptive dead-time literature), a floor on the actual dead
          time, and a start-up dead time above the maximum mismatch.
 
+     13. Done: error-based correctors.
+         - [A92](../experiments/track_A_periodic_steady_state/A92_verilog_error_based_correctors/RESULTS.md),
+           Verilog co-simulation.
+         - [D50](../symbolic_derivations/03_P24_native/D50_P24_ERROR_BASED_CORRECTORS.md),
+           mathematical model.
+
+         **The rule** follows APEC 2023 (DOI 10.1109/APEC43580.2023.10131397)
+         and ECCE Europe 2025 (DOI 10.1109/ECCE-Europe62795.2025.11238584):
+         - subtract the actual edge's error from the delay, with target
+           94 ps and gain 1/2;
+         - floors of 0;
+         - start from 4.5 ns.
+
+         **Results.**
+         - **No cross-conduction** at m = 0, ±1, ±3.4 ns or σ = 30, 100 ps.
+         - **The fixed point does not depend on m:** low-side edge 0.10-0.11 ns
+           after the crossing. P_rev is 0 W, or 11.79 W where the floor binds
+           (m = +3.4; D50 gives 11.77 W).
+         - **Steady-state dither** is 0.43-0.75 A.
+         - **The gate** is bit-identical to A89 r2.
+
+         **Open.**
+         - **The 826 A start-up/slot hazard (m = -3.4 ns).** Vo at the
+           handover depends on m, the period falls below phase 4's fixed
+           slot, and phase 4 starves.
+         - **Jitter amplification** (1.65 / 5.51 A). The valley moves with
+           the corrected edges, so the closed loop of correctors and
+           circuit has to be modelled.
+
         **Next at this level, one at a time:**
-        - A92: correctors that tolerate the driver (from A91), then the
-          A91 matrix again;
+        - start-up and slots: never skip a slot, or period-following slots
+          (the A92 m3n hazard); then the A91/A92 matrix again;
+        - the closed-loop corrector model (D47 Jacobian with corrector
+          states) for the jitter gain;
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp);
         - the 2% target in the Verilog co-simulation;

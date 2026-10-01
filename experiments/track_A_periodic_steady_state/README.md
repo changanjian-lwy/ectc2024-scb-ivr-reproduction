@@ -695,3 +695,27 @@ driver model off it is bit-identical to A89 r2.
   0.91 A.
 - **Next (A92):** an error-based update, a dead-time floor and a larger
   start-up dead time.
+
+`A92_verilog_error_based_correctors` replaces both corrector rules with
+the error-based update of the adaptive dead-time literature: APEC 2023's
+phase error detector, and ECCE Europe 2025's iterative steps from a large
+initial dead time.
+- **The change.** The actual edge's error against the crossing or valley
+  (target 94 ps, gain 1/2) is subtracted from the delay. Floors are 0, and
+  mode-S dead time and dtl_init are 4.5 ns. It is opt-in, and with the
+  bits off it is bit-identical to A89 r2 (32/32 unit tests).
+- **No cross-conduction in any run,** at m = 0, ±1, ±3.4 ns and σ = 30,
+  100 ps.
+  - The actual low-side edge sits 0.10-0.11 ns after the crossing
+    whatever m is. The command dead time absorbs -m.
+  - P_rev is 0 W, except at m = +3.4 ns, where the floor binds: 11.79 W
+    (D50: 11.77 W).
+  - The steady-state dither is 0.43-0.75 A.
+- **Two problems remain, outside the correctors.**
+  - The open-loop start-up ends at Vo 1.02-1.54 V depending on m. At
+    -3.4 ns the voltage loop then shortens the period to 141 ns, below
+    phase 4's fixed 150 ns slot. Phase 4's low side stays on for 969 ns
+    (-826 A).
+  - Jitter is still amplified (1.65 A at 30 ps, 5.51 A at 100 ps). The
+    valley moves with the corrected edges, which D50's scalar loop does not
+    model.
