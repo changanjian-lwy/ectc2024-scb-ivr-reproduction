@@ -217,12 +217,21 @@ async def cosim(dut):
             latch_fire()
         mon.py_step(plant)                                       # A89 zero-crossing TDC, valley tracking
 
+    trace = {"path": os.environ.get("COSIM_TRACE"), "h": None, "digests": []}
+    if trace["path"]:                                  # optional process trace: a running hash of the plant state
+        import hashlib
+        trace["h"] = hashlib.blake2b(digest_size=16)
+
     def integrate_to(t_target):
         if use_c:
             plant.integrate_to(t_target, None, monitors=mon,
                                latch=(lat["armed"] and not lat["fired"], i_tgt + trim_now[0] * lsb_a, latch_fire))
         else:
             plant.integrate_to(t_target, on_step)
+        if trace["h"] is not None:                    # checkpoint: t, y, diode flags, Euler counter
+            trace["h"].update(np.float64(plant.t).tobytes() + np.asarray(plant.y, dtype=np.float64).tobytes()
+                              + bytes(int(bool(x)) for x in plant.diode) + int(plant.euler_left).to_bytes(4, "little"))
+            trace["digests"].append(trace["h"].hexdigest())
 
     dbg = cfg.get("debug_edges_us")                            # A89 diagnostics only: log every applied edge
     edges_log = []
@@ -369,6 +378,8 @@ async def cosim(dut):
                              plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
     if prof is not None:
         prof.disable(); prof.dump_stats(os.environ["COSIM_PROFILE"])
+    if trace["h"] is not None:
+        Path(trace["path"]).write_text(json.dumps({"checkpoints": len(trace["digests"]), "digests": trace["digests"]}))
     dest = Path(os.environ.get("COSIM_OUT") or (cfg_path.parent / cfg["out"]))
     text = json.dumps(out)
     if dest.suffix == ".gz":

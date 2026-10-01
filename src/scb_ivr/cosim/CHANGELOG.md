@@ -4,6 +4,25 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (evening) - process check (`scripts/cosim_trace_compare.py`)
+
+**What it checks.** That the trajectory, not only the result, is the same
+before and after the clean-up. It uses the opt-in `COSIM_TRACE` in
+`bridge.py`.
+- A92 n0 runs twice: once with the archived A92 bridge and plant (copied
+  verbatim into tmp, with the same checkpoint lines), and once with
+  `kernel2`.
+- At every checkpoint both runs update a running BLAKE2b hash of t, the
+  full state y, the diode flags and the Euler counter. The checkpoints are
+  the plant integrated to each gate edge and to each 4 ns window end.
+
+**Result: 125 259 checkpoints, all identical.** Final digest
+82f7bab1ecfd3afb3bafee693dcc7e4f in both runs. Both outputs are also
+bit-identical to the archived run.
+
+**Wall time, each run alone:** 1444.7 s with the archived code, 54.7 s
+with `kernel2` (26 times faster).
+
 ## 2026-10-01 (evening) - benchmark against the archived runs (`scripts/cosim_benchmark.py`)
 
 **`--batch`.** A92's 9 configurations, default plant, 4 at a time:
