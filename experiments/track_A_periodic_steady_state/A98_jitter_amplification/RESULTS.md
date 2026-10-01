@@ -238,3 +238,38 @@ by more than the time the node takes to reach the diode's forward drop.
 - **Scope:** one load (5%), m = 0, seed 1, and 200 cycles per run.
   Sampling error on a variance share is about ±20%.
 - **The architectural levers of Section 0.7 were not tested.**
+
+## 8. Literature read after the runs (2026-10-01)
+
+**Two of BOUNDARY Section 2's sources:**
+- **Peterchev and Sanders (TPEL 2003)** and **Maksimovic and Zane (TPEL
+  2007)** were obtained and filed locally.
+- **Schirone et al. (IET Power Electronics 2017, DOI
+  10.1049/iet-pel.2015.0551) could not be obtained** through NUS. It is
+  replaced by Dong et al. 2022 below, which addresses the same question,
+  the tuning step of an adaptive ZVS loop.
+
+**Six recent papers (2021-2025)** were then read: three in full, the
+others from their abstracts and key sections. The PDFs are kept locally,
+not in the repository.
+
+| paper | what it does | bearing on A97/A98 |
+|---|---|---|
+| **Dong, Yang, Xu, Wei, Wang, IEEE PEAC 2022, pp. 247-251, DOI 10.1109/PEAC56338.2022.9959609** (read in full) | Adaptive ZVS in an interleaved GaN CRM totem-pole PFC. A comparator detects the ~2 V reverse-conduction voltage, and the SR on-time steps ±Δt each control cycle, around the optimum. The step is variable: the predicted rate of change times the control period, plus a small perturbation. Interleaving is open-loop at 180°. | **The same class of sign-based correction** as our early rule and trim. Their step trade-off (too small: ZVS lost while tracking; too large: over-regulation) is A98's: the large early step protects, and a smaller one makes things worse (D53). Their answer is a feedforward of the expected change; ours has none. |
+| **Zhou, Pan, Fu, Liang, Wang, IEEE TIE 72(6):6038-6048, 2025, DOI 10.1109/TIE.2024.3493174** (read in full) | Interleaving of a CRM totem-pole rectifier from a **predicted** switching cycle (zero-current prediction), with deadbeat duty for the slave during frequency transitions. | **It names A93's failure for the open-loop rule.** With Ts captured from the previous cycle, a period change produces a transition cycle [Ts(n) − Ts(n−1)]/2 + Ts(n), and slave-current fluctuations proportional to the period difference. The PLL alternative is bandwidth-limited and may oscillate at high frequency. **Their remedy is prediction rather than measurement**: the predicted cycle replaces the measured one. |
+| **Zhou, Peng, Liang, Fu, Wang, IEEE TPEL 38(7):8513-8527, 2023, DOI 10.1109/TPEL.2023.3259984** (read in full) | CRM control without a current sensor: an inductor-current estimator, using the executed on-time, predicts the current zero crossings and replaces the noisy zero-current comparator. A disturbance-damping term limits estimator error from inductance, resistance and Coss nonlinearity. | **The counterpart of A98's main lever.** Here, phase 1's current comparator converts on-time jitter into ×10.5 period jitter. A predicted (timed) phase-1 turn-off would instead let the jitter move phase 1's turn-off current, by about the on-slope times δ. |
+| **Zhu, Wang, Li, Yang, Chen, IEEE APEC 2021, pp. 1837-1842, DOI 10.1109/APEC42165.2021.9487095** | Detects body-diode conduction of both switches and tunes the SR turn-off and dead time on-line. Insensitive to tolerances and signal delays. | Reverse-conduction detection as the error signal: the loss that A98's gain-1/4 runs raised. |
+| **Yu, Fan, Wei, Xu, IEEE ECCE 2024, pp. 2831-2836, DOI 10.1109/ECCE55643.2024.10861218** (Navitas) | Interleaved GaN CrM PFC with dual loops and dual feedforward: a theoretical on-time feedforward, a current-sharing loop and a phase-interleaving loop. Small phase error. | An industrial closed-loop interleaving with feedforward, the alternative to the open-loop slot rules of A93/A97. |
+| **Thuc, Chen, IEEE TIA 60(6):9157-9170, 2024, DOI 10.1109/TIA.2024.3454198** | GaN driver IC with dual-edge adaptive dead time. A phase-error detector and a coarse/fine controller reach < 1 ns dead time. | The coarse/fine structure, a large step far from the target and a small one near it, is the pattern A98 found: the 0.2 ns early step protects, and fine correction belongs to the error-based update. |
+
+**Consequences:**
+- **D53's levers now have recent precedents:**
+  - a predicted rather than measured period for the slots (Zhou et al.
+    2025);
+  - a predicted turn-off instead of the current comparator (Zhou et al.
+    2023);
+  - feedforward in the step of a sign-based correction (Dong et al. 2022).
+- **Rough bound, not computed with the closed loop:** a timed phase-1
+  turn-off removes at most the share of phase 1's on-time edges, 60% of
+  the variance at 30 ps. That leaves about √0.4 ≈ 0.63 of the spread.
+
