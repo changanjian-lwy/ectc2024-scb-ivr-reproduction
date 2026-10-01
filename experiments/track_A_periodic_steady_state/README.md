@@ -769,3 +769,13 @@ iteration into C (`plant_kernel.c`), with numpy/scipy's exact operations.
 - `scripts/cosim_regression.py --full` replays A89 r2, A92 j100, A92 m3p
   and A93 m3n_both bit-identically, about 9 min each, 4 at a time.
 - The archived folders above stay as they are.
+
+`A96_cosim_c_loop` moves the whole step loop into C (`pk_run`), with the
+bridge's per-step monitors (zero-crossing TDC, valley tracking, latch
+test) and the full-Newton fallback.
+- The fallback uses dgemm and dgesv with numpy's arguments, checked bit
+  for bit.
+- **Bit-identical:** 519 395 steps with every monitor, and the full
+  replays.
+- **A full co-simulation run now takes about 2 min, 4 at a time.** It is
+  the shared package's default plant (`kernel2`).

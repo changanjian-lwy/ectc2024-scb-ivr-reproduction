@@ -601,6 +601,10 @@ each question:
              bridge, plants, entry point, preset, unit tests. The full
              replay gate passes on 4 archived runs.
            - `.gitignore` for run logs and build directories.
+           - [A96](../experiments/track_A_periodic_steady_state/A96_cosim_c_loop/RESULTS.md):
+             the step loop, the bridge's monitors and the Newton fallback
+             in C. Bit-identical; a full run takes about 2 min, 4 at a
+             time (originally 24 min alone, 70-73 min in batches).
          - In progress: one solver for the D47-D51 orbits
            (`scripts/p24_orbits.py`), gated on the 13 archived orbits.
 

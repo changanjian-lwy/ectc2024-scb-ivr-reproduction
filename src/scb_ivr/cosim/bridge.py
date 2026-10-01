@@ -1,5 +1,6 @@
 """Co-simulation bridge: the Verilog controller (rtl/, run by Icarus Verilog through cocotb) closes the loop around
-the P24 plant (plant.py, selected by cfg "plant_impl": "kernel" (default), "fast" or "reference"; all bit-identical).
+the P24 plant (plant.py, selected by cfg "plant_impl": "kernel2" (default, C step loop), "kernel", "fast" or
+"reference"; all bit-identical).
 Run through run.py. Configuration: the JSON file named by COSIM_CFG; optional overrides from run.py: COSIM_OUT
 (output path), COSIM_T_END_US (stop time), COSIM_PROVENANCE (JSON added to the output). An output path ending in
 ".gz" is written gzip-compressed. Derived from A94's bridge (see CHANGELOG.md); the loop itself is unchanged.
@@ -60,8 +61,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1]))                              # src/, for the package
 from scb_ivr.cosim.circuit import PROJECT, fit_fig8  # noqa: E402
 from scb_ivr.cosim.circuit import CircuitParams as Params  # noqa: E402
-from scb_ivr.cosim.plant import FastPlant, KernelPlant, ReferencePlant  # noqa: E402
-PLANTS = {"kernel": KernelPlant, "fast": FastPlant, "reference": ReferencePlant}
+from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant  # noqa: E402
+PLANTS = {"kernel": KernelPlant, "kernel2": KernelPlant2, "fast": FastPlant, "reference": ReferencePlant}
 
 N, TW, CW = 4, 32, 8
 
@@ -83,6 +84,10 @@ def signed(v, width):
 
 @cocotb.test()
 async def cosim(dut):
+    prof = None
+    if os.environ.get("COSIM_PROFILE"):                                 # optional: cProfile of the whole run
+        import cProfile
+        prof = cProfile.Profile(); prof.enable()
     cfg_path = Path(os.environ["COSIM_CFG"])
     cfg = json.loads(cfg_path.read_text())
     init = (cfg_path.parent / cfg["init_run"]).resolve()
@@ -108,7 +113,7 @@ async def cosim(dut):
         vf, rr, _ = fit_fig8(10.0, 100.0)
         extra.update(rev_drop=True, rev_vf=vf, rev_r=rr)
     p = Params(**{k: pr[k] for k in keep}, diode_check=True, **extra)
-    plant = PLANTS[cfg.get("plant_impl", "kernel")](p, [0.0] * (2 * N + N), gh=[True] + [False] * (N - 1),
+    plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, [0.0] * (2 * N + N), gh=[True] + [False] * (N - 1),
                                                     gl=[False] + [True] * (N - 1))      # 2N node voltages, N currents
     nv = plant.nv
     io = plant.sim.idx["out"]
@@ -171,7 +176,11 @@ async def cosim(dut):
     dut.rst.value = 0
 
     # Plant-side bookkeeping for the comparators and the measurements.
-    vmin = [None] * N; t_vmin = [None] * N; v_lo = [None] * N; t_lo_act = [None] * N
+    v_lo = [None] * N; t_lo_act = [None] * N
+    mon = Monitors(N)                           # zero-crossing TDC and valley tracking (shared with KernelPlant2's C loop)
+    use_c = hasattr(plant, "attach_monitors")
+    if use_c:
+        plant.attach_monitors(mon)
     pend = []                                   # heap of (t_apply, seq, j, level, meta)
     seq = [0]
     meas_m = {}; meas_r = {}                    # phase -> measurement to deliver
@@ -191,31 +200,29 @@ async def cosim(dut):
         if drv.get("sigma_ps", 0.0) > 0.0:
             d += rng.normal(0.0, drv["sigma_ps"] * 1e-12)
         return t_cmd + d
-    t_hoff = [None] * N; t_cross = [None] * N; v_prev = [None] * N; t_prev = [None] * N   # A89: zero-crossing TDC
     meas_l = {}; lowons = []
     trim_now = list(trim_init)
     t_end = float(os.environ.get("COSIM_T_END_US", cfg["t_end_us"])) * 1e-6
     t0w = time.time()
 
+    def latch_fire():                                            # A81 latch fires
+        lat["fired"] = True; lat["fires"] += 1
+        t_cmd = plant.t + t_async
+        heapq.heappush(pend, (t_apply(t_cmd, N + 0), seq[0], N + 0, 0, {"how": None, "bind": True})); seq[0] += 1
+        heapq.heappush(pend, (t_apply(t_cmd + lat["dt0"] * lsb, 0), seq[0], 0, 1, {"how": 0, "bind": False})); seq[0] += 1
+        lat["report"] = int(round(t_cmd / lsb))
+
     def on_step():
-        if lat["armed"] and not lat["fired"] and plant.y[nv] <= i_tgt + trim_now[0] * lsb_a:   # A81 latch fires
-            lat["fired"] = True; lat["fires"] += 1
-            t_cmd = plant.t + t_async
-            heapq.heappush(pend, (t_apply(t_cmd, N + 0), seq[0], N + 0, 0, {"how": None, "bind": True})); seq[0] += 1
-            heapq.heappush(pend, (t_apply(t_cmd + lat["dt0"] * lsb, 0), seq[0], 0, 1, {"how": 0, "bind": False})); seq[0] += 1
-            lat["report"] = int(round(t_cmd / lsb))
-        for k in range(N):                                      # A89: first V_DS(SL_k) <= 0 after the turn-off
-            if t_hoff[k] is not None and t_cross[k] is None and not plant.gh[k] and not plant.gl[k]:
-                v = plant.vds(N + k)
-                if v <= 0.0:
-                    vp, tp = v_prev[k], t_prev[k]
-                    t_cross[k] = (tp + (plant.t - tp) * vp / (vp - v)) if (vp is not None and vp > 0.0) else plant.t
-                v_prev[k] = v; t_prev[k] = plant.t
-        for k in range(N):
-            if vmin[k] is not None and not plant.gh[k] and not plant.gl[k]:
-                v = plant.vds(k)
-                if v < vmin[k]:
-                    vmin[k] = v; t_vmin[k] = plant.t
+        if lat["armed"] and not lat["fired"] and plant.y[nv] <= i_tgt + trim_now[0] * lsb_a:
+            latch_fire()
+        mon.py_step(plant)                                       # A89 zero-crossing TDC, valley tracking
+
+    def integrate_to(t_target):
+        if use_c:
+            plant.integrate_to(t_target, None, monitors=mon,
+                               latch=(lat["armed"] and not lat["fired"], i_tgt + trim_now[0] * lsb_a, latch_fire))
+        else:
+            plant.integrate_to(t_target, on_step)
 
     dbg = cfg.get("debug_edges_us")                            # A89 diagnostics only: log every applied edge
     edges_log = []
@@ -237,15 +244,16 @@ async def cosim(dut):
             rec = {"t_s": plant.t, "phase": k + 1, "how": meta["how"], "vds_v": float(v),
                    "i_a": float(plant.y[nv + k])}
             turnons.append(rec)
-            if (meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))) and vmin[k] is not None:
+            if (meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))) and mon.vmin_set[k]:
                 # early: the minimum was lowered by the step that landed on this edge (node still falling),
                 # the same test as A75's "Vds at the edge below the minimum of the previous steps"
-                early = t_vmin[k] is not None and abs(t_vmin[k] - plant.t) < 1e-15 and t_vmin[k] > t_lo_act[k]
-                dip = vmin[k] < v_lo[k] - v_hys and t_vmin[k] > t_lo_act[k]
-                err = 0 if early else max(0, to_lsb(plant.t - t_vmin[k]))      # A92: edge - valley
-                meas_m[k] = (early, not early and not dip, max(0, to_lsb(t_vmin[k] - t_lo_act[k])), err)
-                rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - t_vmin[k]
-            vmin[k] = None
+                tv, vm = float(mon.t_vmin[k]), float(mon.vmin[k])
+                early = abs(tv - plant.t) < 1e-15 and tv > t_lo_act[k]
+                dip = vm < v_lo[k] - v_hys and tv > t_lo_act[k]
+                err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
+                meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - t_lo_act[k])), err)
+                rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
+            mon.vmin_set[k] = 0
             if k == 0:
                 vo, vin = float(plant.y[io]), p.vin_at(plant.t)
                 ia = [plant.sim.idx[f"a{q}"] for q in range(1, N)]; ix = [plant.sim.idx[f"x{q}"] for q in range(1, N)]
@@ -256,22 +264,24 @@ async def cosim(dut):
                 plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
                 adc.append(min(max(int(round(vo / adc_lsb)), 0), adc_max))
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
-            t_hoff[k] = plant.t; t_cross[k] = None; v_prev[k] = None; t_prev[k] = None
-        if j >= N and level and t_hoff[k] is not None:    # A89: low-side turn-on edge
-            crossed = t_cross[k] is not None
-            rel = (t_cross[k] - t_hoff[k]) if crossed else None
+            mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
+        if j >= N and level and mon.hoff_set[k]:    # A89: low-side turn-on edge
+            crossed = bool(mon.cross_set[k])
+            th, tc = float(mon.t_hoff[k]), float(mon.t_cross[k])
+            rel = (tc - th) if crossed else None
             lowons.append({"t_s": plant.t, "phase": k + 1, "vds_v": float(plant.vds(N + k)), "mode_p": st["mode_p"],
-                           "crossed": crossed, "t_cross_rel_s": rel, "t_since_off_s": plant.t - t_hoff[k]})
+                           "crossed": crossed, "t_cross_rel_s": rel, "t_since_off_s": plant.t - th})
             if cfg.get("low_pred", 0) and st["mode_p"]:
                 meas_l[k] = (not crossed, 0 if not crossed else max(0, to_lsb(rel)),
-                             0 if not crossed else max(0, to_lsb(plant.t - t_cross[k])))      # A92: edge - crossing
-            t_hoff[k] = None; t_cross[k] = None
+                             0 if not crossed else max(0, to_lsb(plant.t - tc)))      # A92: edge - crossing
+            mon.hoff_set[k] = 0; mon.cross_set[k] = 0
         if j >= N and not level:                # low-side turn-off edge
             i_e = float(plant.y[nv + k])
             lowoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": i_e, "bind_cur": meta["bind"]})
             if meta["bind"]:
                 meas_r[k] = i_e < i_tgt
-            vmin[k] = v_lo[k] = plant.vds(k); t_vmin[k] = t_lo_act[k] = plant.t
+            v_lo[k] = plant.vds(k); t_lo_act[k] = plant.t
+            mon.vmin_set[k] = 1; mon.vmin[k] = v_lo[k]; mon.t_vmin[k] = t_lo_act[k]
         plant.set_gate(j, level)
 
     while plant.t < t_end and not ovl["stop"]:
@@ -325,21 +335,21 @@ async def cosim(dut):
         t_win_end = (w + (1 << fb)) * lsb
         while pend and pend[0][0] < t_win_end:
             ta, _, j, lvl, meta = heapq.heappop(pend)
-            plant.integrate_to(ta, on_step)
+            integrate_to(ta)
             apply(j, lvl, meta)
             if ovl["stop"]:                                     # A91: no integration through a shoot-through
                 break
         if ovl["stop"]:
             break
-        plant.integrate_to(t_win_end, on_step)
+        integrate_to(t_win_end)
         # comparators sampled at the window end
         ci = czl = czh = cva = 0
         for k in range(N):
             ci |= int(plant.y[nv + k] <= i_tgt + trim_now[k] * lsb_a) << k
             czl |= int(plant.vds(N + k) <= 0.0) << k
             czh |= int(plant.vds(k) <= 0.0) << k
-            if vmin[k] is not None:
-                cva |= int(plant.vds(k) >= vmin[k] + v_hys) << k
+            if mon.vmin_set[k]:
+                cva |= int(plant.vds(k) >= float(mon.vmin[k]) + v_hys) << k
         dut.cmp_i.value = ci; dut.cmp_zl.value = czl; dut.cmp_zh.value = czh; dut.cmp_valley.value = cva
 
     await RisingEdge(dut.clk)
@@ -356,7 +366,9 @@ async def cosim(dut):
            "status": "OVERLAP_STOP" if ovl["stop"] else "COMPLETED", "lowons_last": lowons[-1000:], "plant_flags": {"nonlinear_coss": p.nonlinear_coss, "rev_drop": p.rev_drop,
                                                             "rev_vf": p.rev_vf, "rev_r": p.rev_r}}
     out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
-                             plant_impl=cfg.get("plant_impl", "kernel"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
+                             plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
+    if prof is not None:
+        prof.disable(); prof.dump_stats(os.environ["COSIM_PROFILE"])
     dest = Path(os.environ.get("COSIM_OUT") or (cfg_path.parent / cfg["out"]))
     text = json.dumps(out)
     if dest.suffix == ".gz":

@@ -4,6 +4,32 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (later) - the step loop and the Newton fallback in C (A96)
+
+- **`plant_kernel.c` gains:**
+  - the full-Newton fallback (dgemm and dgesv with numpy's arguments);
+  - `pk_run`, the whole step loop with the bridge's per-step monitors.
+- **`plant.py` gains:**
+  - `KernelPlant2`, the plant whose `integrate_to` runs `pk_run`;
+  - `Monitors`, the shared monitor arrays and their Python update.
+- **`bridge.py`:**
+  - the monitor state moves to `Monitors`, for every plant;
+  - the latch actions move into `latch_fire()`;
+  - a `kernel2` plant choice;
+  - optional profiling (`COSIM_PROFILE`).
+- **Gates:**
+  - A96's step-level equivalence: 519 395 steps, every field and monitor
+    identical;
+  - `--quick` regression with `kernel` (the bridge refactor on the Python
+    path), with `kernel2`, and with the new default: PASS;
+  - **`--full` with `kernel2`:** A89 r2, A92 j100, A92 m3p and A93
+    m3n_both are bit-identical, **122-128 s each**, 4 at a time;
+  - **`--full` with `kernel`** (the Python-monitor path, and the C
+    fallback inside `pk_step`): bit-identical, 618-622 s each;
+  - `tests/test_cosim_plants.py`: a KernelPlant2 loop-and-monitors test
+    is added (3 tests).
+- **The default plant is now `kernel2`.**
+
 ## 2026-10-01 - the package is created (code clean-up)
 
 | piece | taken from | how it was checked |

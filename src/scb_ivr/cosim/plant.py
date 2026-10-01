@@ -353,7 +353,8 @@ class _Ctx(ctypes.Structure):
     _fields_ = [("n", ctypes.c_int), ("m", ctypes.c_int), ("nonlinear", ctypes.c_int),
                 ("r", ctypes.c_void_p), ("vinf", ctypes.c_void_p), ("nper", ctypes.c_void_p), ("clin", ctypes.c_void_p),
                 ("vt", ctypes.c_void_p), ("qt", ctypes.c_void_p), ("nt", ctypes.c_int64),
-                ("v_max", ctypes.c_double), ("q_end", ctypes.c_double), ("c_end", ctypes.c_double)]
+                ("v_max", ctypes.c_double), ("q_end", ctypes.c_double), ("c_end", ctypes.c_double),
+                ("ct", ctypes.c_void_p)]
 
 
 class _Ent(ctypes.Structure):
@@ -376,7 +377,7 @@ class KernelSim(FastSim):
         if self.nl is not None:
             vt, qt, v_max, q_end, c_end = self._q
             arrs = dict(r=_f64(self.nl["r"]), vinf=_f64(self.nl["vin"]), nper=_f64(self.nl["n"]), clin=_f64(self.nl["clin"]),
-                        vt=_f64(vt), qt=_f64(qt))
+                        vt=_f64(vt), qt=_f64(qt), ct=_f64(self.nl["model"].ct))
             for k, a in arrs.items():
                 setattr(ctx, k, a.ctypes.data); keep.append(a)
             ctx.nt, ctx.v_max, ctx.q_end, ctx.c_end = len(vt), float(v_max), float(q_end), float(c_end)
@@ -432,6 +433,10 @@ class KernelSim(FastSim):
             return y1
         if rc == 1:
             raise ValueError("array must not contain infs or NaNs")
+        if rc == 3:
+            raise RuntimeError("nonlinear Coss step did not converge")
+        if rc == 4:
+            raise np.linalg.LinAlgError("Singular matrix")
         self.kernel_stats["python_redo"] += 1                    # chord not converged: A94's Python step, A88 fallback
         return FastSim.step(self, y, conducting, h, euler, t, load_on, donly, vin0, vin1)
 
@@ -442,3 +447,184 @@ class KernelPlant(FastPlant):
     def __init__(self, p, y0, gh, gl):
         super().__init__(p, y0, gh, gl)
         self.sim = KernelSim(p)
+
+
+class Monitors:
+    """The bridge's per-step measurement state (zero-crossing TDC of each low side after its high-side turn-off;
+    V_DS minimum of each high side after its low-side turn-off), in arrays that KernelPlant2's C loop shares.
+    py_step(plant) is the Python update after one step, the same rules as the C loop's."""
+
+    def __init__(self, n):
+        self.n = n
+        self.hoff_set, self.cross_set, self.vprev_valid, self.vmin_set = (np.zeros(n, np.int32) for _ in range(4))
+        self.t_hoff, self.t_cross, self.v_prev, self.t_prev, self.vmin, self.t_vmin = (np.zeros(n) for _ in range(6))
+
+    def py_step(self, plant):
+        n, t = self.n, plant.t
+        for k in range(n):
+            if self.hoff_set[k] and not self.cross_set[k] and not plant.gh[k] and not plant.gl[k]:
+                v = plant.vds(n + k)
+                if v <= 0.0:
+                    vp, tp = self.v_prev[k], self.t_prev[k]
+                    self.t_cross[k] = (tp + (t - tp) * vp / (vp - v)) if (self.vprev_valid[k] and vp > 0.0) else t
+                    self.cross_set[k] = 1
+                self.v_prev[k] = v; self.t_prev[k] = t; self.vprev_valid[k] = 1
+        for k in range(n):
+            if self.vmin_set[k] and not plant.gh[k] and not plant.gl[k]:
+                v = plant.vds(k)
+                if v < self.vmin[k]:
+                    self.vmin[k] = v; self.t_vmin[k] = t
+
+
+class _Run(ctypes.Structure):
+    _fields_ = [("n", ctypes.c_int), ("m", ctypes.c_int), ("N", ctypes.c_int), ("nv", ctypes.c_int)] + \
+               [(nm, ctypes.c_void_p) for nm in ("y", "t", "rev_e", "rev_t", "vmax", "ipk", "vd", "gh", "gl", "diode",
+                                                 "euler_left", "last_donly", "load_on", "steps")] + \
+               [(nm, ctypes.c_double) for nm in ("p_h", "v_on", "rev_vf", "rev_r", "vin", "t_ramp", "i_load", "t_load")] + \
+               [("rev_drop", ctypes.c_int32), ("load_cc", ctypes.c_int32)] + \
+               [(nm, ctypes.c_void_p) for nm in ("nsw", "dsel", "ssel", "table", "hoff_set", "cross_set", "vprev_valid",
+                                                 "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin")] + \
+               [("need_key", ctypes.c_int64), ("chord_iters", ctypes.c_int64)]
+
+
+class KernelPlant2(KernelPlant):
+    """KernelPlant whose step loop runs in C (pk_run): FastPlant._advance and the bridge's per-step monitors for
+    every full step; partial steps, non-converged chords and missing topology entries come back to Python, which
+    does them with KernelPlant's code. The state is held in buffers shared with C; the attributes the bridge and
+    FastPlant use (y, t, diode, euler_left, steps, rev_e, rev_t, ipk, last_donly, load_on) are views of them.
+    integrate_to(t_target, on_step, monitors=None, latch=None): with monitors (a Monitors) the loop updates them;
+    latch = (armed, threshold, callback) stops after the step at which i1 <= threshold and calls callback()."""
+
+    def __init__(self, p, y0, gh, gl):
+        n2, N = 2 * p.n, p.n
+        self._buf = dict(y=np.array(y0, dtype=float), t=np.zeros(1), rev_e=np.zeros(n2), rev_t=np.zeros(n2),
+                         ipk=np.zeros(1), vd=np.zeros(n2), gh=np.zeros(N, np.int32), gl=np.zeros(N, np.int32),
+                         diode=np.zeros(n2, np.int32), euler_left=np.zeros(1, np.int32), last_donly=np.zeros(n2, np.int32),
+                         load_on=np.zeros(1, np.int32), steps=np.zeros(1, np.int64))
+        super().__init__(p, y0, gh, gl)
+        sim = self.sim
+        self._buf["vmax"] = self._vmax
+        self._buf["gh"][:] = [int(bool(x)) for x in self.gh]
+        self._buf["gl"][:] = [int(bool(x)) for x in self.gl]
+        self._table = (ctypes.c_void_p * (1 << (2 * n2 + 2)))()
+        self._table_keep = {}
+        r = _Run(n=sim.nv + N, m=n2, N=N, nv=sim.nv)
+        for nm, a in self._buf.items():
+            setattr(r, nm, a.ctypes.data)
+        r.p_h, r.v_on = p.h, float(self.v_on)
+        r.rev_vf, r.rev_r, r.vin, r.t_ramp = float(p.rev_vf), float(p.rev_r), float(p.vin), float(p.t_ramp)
+        r.i_load, r.t_load = float(p.i_load), float(p.t_load)
+        r.rev_drop, r.load_cc = int(bool(p.rev_drop)), int(p.load_kind == "cc")
+        self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32))
+        for nm, a in self._consts.items():
+            setattr(r, nm, a.ctypes.data)
+        r.table = ctypes.addressof(self._table)
+        self._run, self._runp = r, ctypes.addressof(r)
+        lib = sim._lib
+        lib.pk_run.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_double, ctypes.c_int, ctypes.c_double]
+        lib.pk_run.restype = ctypes.c_int
+        self._pk_run = lib.pk_run
+        self._mon = None
+
+    # state views (FastPlant and the bridge assign and read these)
+    def _get(nm, scalar=None):
+        def g(self):
+            a = self._buf[nm]
+            return (scalar(a[0]) if scalar else a)
+        def s(self, v):
+            a = self._buf[nm]
+            if scalar:
+                a[0] = v
+            else:
+                a[:] = v
+        return property(g, s)
+    y = _get("y")
+    t = _get("t", float)
+    rev_e = _get("rev_e")
+    rev_t = _get("rev_t")
+    ipk = _get("ipk", float)
+    euler_left = _get("euler_left", int)
+    steps = _get("steps", int)
+    load_on = _get("load_on", bool)
+    del _get
+
+    @property
+    def diode(self):
+        return [bool(x) for x in self._buf["diode"]]
+
+    @diode.setter
+    def diode(self, v):
+        self._buf["diode"][:] = [bool(x) for x in v]
+
+    @property
+    def last_donly(self):
+        return [bool(x) for x in self._buf["last_donly"]]
+
+    @last_donly.setter
+    def last_donly(self, v):
+        self._buf["last_donly"][:] = [bool(x) for x in v]
+
+    def set_gate(self, j, level):
+        super().set_gate(j, level)
+        self._buf["gh"][:] = [int(bool(x)) for x in self.gh]
+        self._buf["gl"][:] = [int(bool(x)) for x in self.gl]
+
+    def attach_monitors(self, mon):
+        r = self._run
+        for nm in ("hoff_set", "cross_set", "vprev_valid", "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin"):
+            setattr(r, nm, getattr(mon, nm).ctypes.data)
+        self._mon = mon
+
+    def _register(self, key):
+        """KernelSim's topology entry for the C key (cond bits, donly bits, euler, load_on) at h = p.h."""
+        n2, sim, p = 2 * self.n, self.sim, self.p
+        cond = tuple(bool((key >> j) & 1) for j in range(n2))
+        donly = tuple(bool((key >> (n2 + j)) & 1) for j in range(n2)) if p.rev_drop else None
+        euler, load_on = bool((key >> (2 * n2)) & 1), bool((key >> (2 * n2 + 1)) & 1)
+        k = (cond, p.h, euler, load_on, donly)
+        entry = sim.cache.get(k)
+        if entry is None:
+            A, fv, fl, frev = sim.system(cond, load_on, donly)
+            if euler:
+                lhs, rhs_m = sim.M - p.h * A, sim.M
+            else:
+                lhs, rhs_m = sim.M - 0.5 * p.h * A, sim.M + 0.5 * p.h * A
+            entry = (lu_factor(lhs), rhs_m, fv, fl, lhs, frev if (donly is not None and any(donly)) else None)
+            sim.cache[k] = entry
+        kent = sim._kentry(k, entry, True)
+        self._table[key] = kent[2]
+        self._table_keep[key] = kent
+
+    def integrate_to(self, t_target, on_step, monitors=None, latch=None):
+        if monitors is None or monitors is not self._mon:            # no shared monitors: KernelPlant's loop
+            while self.t < t_target - 1e-18:
+                self._advance(min(self.p.h, t_target - self.t))
+                on_step()
+            return
+        armed, thr, fire = latch if latch is not None else (False, 0.0, None)
+        while True:
+            rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
+            self._vd, self._vd_t = self._buf["vd"], self.t
+            if rc == 0:
+                return
+            if rc == 1:                                               # latch condition after a C step
+                armed = False
+                fire()
+                continue
+            if rc == 2:
+                self._register(int(self._run.need_key))
+                continue
+            if rc == 4:
+                raise ValueError("array must not contain infs or NaNs")
+            if rc == 5:
+                raise RuntimeError("nonlinear Coss step did not converge")
+            if rc == 6:
+                raise np.linalg.LinAlgError("Singular matrix")
+            # rc == 3: this step in Python (partial step or chord fallback), then the monitors and the latch
+            self._advance(min(self.p.h, t_target - self.t))
+            self._buf["vd"][:] = self._vd
+            self._vd = self._buf["vd"]
+            monitors.py_step(self)
+            if armed and self.y[self.nv] <= thr:
+                armed = False
+                fire()

@@ -1,0 +1,44 @@
+{
+ "cases": [
+  {
+   "case": "ramp",
+   "events": 120,
+   "steps": 173157,
+   "identical": true,
+   "first_difference": null,
+   "latch_fires": 2,
+   "t_ref_s": 19.995777918491513,
+   "t_c_s": 0.46920921257697046,
+   "speedup_vs_reference": 42.61591073344781,
+   "chord_iters_c": 305852,
+   "table_entries": 20
+  },
+  {
+   "case": "steady_300us",
+   "events": 120,
+   "steps": 173136,
+   "identical": true,
+   "first_difference": null,
+   "latch_fires": 33,
+   "t_ref_s": 19.048409255221486,
+   "t_c_s": 0.45871437154710293,
+   "speedup_vs_reference": 41.52564305098409,
+   "chord_iters_c": 321433,
+   "table_entries": 22
+  },
+  {
+   "case": "steady_200us",
+   "events": 120,
+   "steps": 173102,
+   "identical": true,
+   "first_difference": null,
+   "latch_fires": 34,
+   "t_ref_s": 17.618310539983213,
+   "t_c_s": 0.45056333276443183,
+   "speedup_vs_reference": 39.102850273869485,
+   "chord_iters_c": 323383,
+   "table_entries": 25
+  }
+ ],
+ "all_identical": true
+}

@@ -15,8 +15,8 @@ below.
 |---|---|
 | `rtl/scb_ctrl.v`, `rtl/scb_phase.v`, `rtl/sync2.v` | The controller. Every option is a configuration bit: 0 gives each path's original behaviour. |
 | `circuit.py` | Circuit parameters (`CircuitParams`), the EPC2067 data (datasheet Coss(V), Fig. 8 reverse drop) and the implicit stepper `Sim`. |
-| `plant.py` | Three plant implementations with one interface, chosen by cfg `"plant_impl"`: `"kernel"` (default, C kernel), `"fast"`, `"reference"`. All are bit-identical on this machine. |
-| `plant_kernel.c` | The C kernel: one plant step and the Coss chord iteration, with numpy/scipy's exact operations. Built on first use into `tmp/cosim_kernel/`. |
+| `plant.py` | Four plant implementations with one interface, chosen by cfg `"plant_impl"`: `"kernel2"` (default: the whole step loop in C), `"kernel"` (one C call per step), `"fast"`, `"reference"`. All are bit-identical on this machine. `Monitors` holds the bridge's per-step measurement state. |
+| `plant_kernel.c` | The C kernel: one plant step, with the Coss chord iteration and the full-Newton fallback, and `pk_run`, the step loop with the bridge's monitors. It uses numpy/scipy's exact operations and is built on first use into `tmp/cosim_kernel/`. |
 | `bridge.py` | The cocotb test that runs one co-simulation from a configuration. |
 | `run.py` | Entry point and scheduler. |
 | `tb/` | The RTL unit tests (`python3 src/scb_ivr/cosim/tb/run_unit.py`). |
@@ -56,19 +56,21 @@ PYTHONPATH=src python3 -m scb_ivr.cosim.run path/to/cfg_a.json path/to/cfg_b.jso
 1. RTL unit tests: `python3 src/scb_ivr/cosim/tb/run_unit.py` (36 tests).
 2. Plant equivalence, in the portable suite: `tests/test_cosim_plants.py`.
 3. Replays against archived runs:
-   - `python3 scripts/cosim_regression.py --quick` (to 100 us, about 3
+   - `python3 scripts/cosim_regression.py --quick` (to 100 us, under 1
      min);
-   - `--full` (4 complete runs, about 10 min).
+   - `--full` (4 complete runs, about 2 min).
+   - `--plant X` tests another plant.
    - Both must report `PASS`.
 
 ## Speed (this machine: 4 performance and 6 efficiency cores)
 
-A full run (388.61 us) alone:
+A full run (388.61 us):
 
 | plant | time |
-|---|---:|
-| original | about 24 min |
-| `fast` | about 14 min |
-| `kernel` | about 7 min |
+|---|---|
+| original | about 24 min alone; 70-73 min in batches of 8-10 |
+| `fast` | about 14 min alone |
+| `kernel` | about 9 min, 4 at a time |
+| `kernel2` (default) | **about 2 min, 4 at a time** |
 
 Run at most 4 at a time.
