@@ -641,11 +641,32 @@ each question:
          reading stated there). `src/scb_ivr/cosim/presets/p24_5pct_adopted.json`
          carries the three slot bits.
 
+     18. Done: why gate-driver jitter is amplified.
+         - [A98](../experiments/track_A_periodic_steady_state/A98_jitter_amplification/RESULTS.md),
+           Verilog co-simulation.
+         - [D53](../symbolic_derivations/03_P24_native/D53_P24_GATE_JITTER_CLOSED_LOOP.md),
+           mathematical model.
+
+         **The mechanism, in both models.**
+         - Phase 1's current-comparator turn-off turns on-time jitter into
+           period jitter (×10.5).
+         - Phases 2-4 inherit it through their slots (0.68 A/ns).
+         - The correctors cannot reduce it (≤ 7%).
+
+         **The models agree.** D53 (linear circuit, exact controller)
+         matches the co-simulation within 10-20%, and predicted 6 of A98's 7
+         runs within the registered bands.
+
+         **Gain 1/4 was tested and not adopted.** It halves the turn-ons
+         before the valley but costs more reverse-conduction loss than the
+         hard-on loss it saves.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
-        - the jitter gain: D52's closed-loop model with the edge jitter as
-          inputs (A92 j30/j100, A97);
+        - the jitter's architectural levers (D53 first):
+          - a filtered (PLL-type) slot timebase, after Huber et al. 2009;
+          - a timed phase-1 turn-off;
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp);
         - the 2% target in the Verilog co-simulation;

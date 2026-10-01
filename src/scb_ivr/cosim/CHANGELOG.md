@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-01 (late night) - jitter on one side's edges only (A98)
+
+- **`bridge.py`:** `driver.jitter_edges` = `"high"` or `"low"` restricts the
+  Gaussian edge jitter to that side's gate edges.
+  - Absent or `"all"`: every edge, and the same random sequence as before.
+- **Gate:** `scripts/cosim_regression.py --full` PASS (A92 j100 exercises
+  the jitter path).
+- **The preset is unchanged.** A98's gain-1/4 runs lowered the turn-ons
+  before the valley but raised the reverse-conduction loss by more than the
+  hard-on loss they saved.
+
 ## 2026-10-01 (night) - slots from the two-period average (A97); the preset adopts them
 
 - **`rtl/scb_ctrl.v`:** new input `cfg_slot_avg`.

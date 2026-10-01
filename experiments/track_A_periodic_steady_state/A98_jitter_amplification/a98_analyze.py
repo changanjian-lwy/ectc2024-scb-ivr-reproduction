@@ -5,7 +5,9 @@ cosim_stats(run): per phase, the low-side turn-off current spread and two-cycle 
 fraction (turn-on before the valley), the high-side error (turn-on - valley) mean and spread over the other
 turn-ons, and the valley time after the actual low-side turn-off; the low-side early fraction (turn-on before the
 crossing) and error (turn-on - crossing); the period spread; the windowed dither (A89's metric over windows of 20
-sections). Run as a script: the archived jitter runs of A92, A93 and A97 and A98's runs; writes a98_summary.json.
+sections). Run as a script: the archived jitter runs of A92, A93 and A97 and A98's runs, and A98's runs against
+D53's predictions (d53_predictions.json, BOUNDARY Section 5.3: spread within 20% and early fraction within 8
+points of the median, phases 2-4); writes a98_summary.json.
 """
 from __future__ import annotations
 
@@ -82,6 +84,19 @@ def main():
               f"{f([x[1] for x in s['eh_mean_sd_ns']])} | valley sd {f(s['valley_sd_ns'])} | early_l "
               f"{f(s['early_low_frac'])} | el sd {f([x[1] for x in s['el_mean_sd_ns']])} | T sd {s['period_sd_ns']:.3f} | "
               f"dither {s['dither_window_mean_sd_a'][0]:.2f}")
+    pred = json.loads((HERE / "d53_predictions.json").read_text())
+    out["against_d53"] = {}
+    for name, pr in pred.items():
+        r = out.get(f"A98_{name}")
+        if r is None:
+            continue
+        sd_med, eh_med = pr["ilo_sd_ph2_4_p5_p50_p95"][1], pr["early_high_ph2_4_p5_p50_p95"][1]
+        sd_rel = [r["ilo_sd_a"][k + 1] / sd_med[k] - 1 for k in range(3)]
+        eh_dif = [r["early_high_frac"][k + 1] - eh_med[k] for k in range(3)]
+        ok = all(abs(x) <= 0.20 for x in sd_rel) and all(abs(x) <= 0.08 for x in eh_dif)
+        out["against_d53"][name] = {"spread_rel_to_median": sd_rel, "early_minus_median": eh_dif, "agree": ok}
+        print(f"{name:8s} spread vs D53 median {[f'{x:+.0%}' for x in sd_rel]} | early - median "
+              f"{[f'{x * 100:+.1f} pt' for x in eh_dif]} | {'AGREES' if ok else 'OUTSIDE'} (BOUNDARY 5.3)")
     (HERE / "a98_summary.json").write_text(json.dumps(out, indent=1))
 
 

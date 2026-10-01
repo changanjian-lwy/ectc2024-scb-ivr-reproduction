@@ -35,6 +35,12 @@
     period and the edge errors.
   - `--step-check` repeats the Jacobian with half and twice the
     finite-difference steps.
+- `p24_jitter_modes.py` (D53) adds one input per gate edge
+  (`src/scb_ivr/p24_jitter.py`). It computes:
+  - the closed loop's linear covariance under independent edge jitter;
+  - a Monte Carlo of the linearised circuit with the controller's exact
+    RTL rules, for the fixed, follow and average slot rules.
+  - `--reuse` keeps the stored Jacobians.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

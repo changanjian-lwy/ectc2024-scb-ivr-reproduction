@@ -808,3 +808,28 @@ opt-in bit in the shared RTL; the archived replays stay bit-identical.
     closed loop amplifies this 4.9 times.
   - The alternation itself is the forced response to the trim's ±1 LSB
     limit cycle. The two-cycle modes are at |λ| = 0.65-0.66.
+
+`A98_jitter_amplification` (with D53, the mathematical model) explains why
+gate-driver jitter is amplified.
+
+**The amplifier is the circuit, not the correctors.**
+- Phase 1's current-comparator turn-off converts an on-time error into a
+  period error 10.5 times larger.
+- Phases 2-4's slots are referred to phase 1's turn-on, so they inherit it
+  at 0.68 A/ns.
+- The on-time edges carry 97% of the variance. Phase 1's trim is a
+  secondary path, which dominates only with low-side jitter alone.
+
+**D53** is the linearised circuit with the RTL's exact controller rules.
+- It reproduces the archived runs (A92/A93/A97, 0/30/100 ps) within
+  10-20%.
+- It predicted A98's 7 runs before they ran; 6 are within the registered
+  bands. s10 is 23% above on one phase.
+
+**No corrector setting reduces the spread.**
+- Gain 1/4 halves the turn-ons before the valley, as predicted.
+- But it raises the reverse-conduction loss by more than the hard-on loss
+  it saves. Not adopted.
+
+**The levers are architectural:** the slots' timebase (PLL-type), phase
+1's turn-off, and the driver itself.
