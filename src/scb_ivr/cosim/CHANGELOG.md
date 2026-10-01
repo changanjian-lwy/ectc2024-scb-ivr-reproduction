@@ -26,6 +26,9 @@ result.
   - `--full` regression PASS;
   - `tests/test_cosim_plants.py` passed;
   - synthesis: 0 problems, 41 605 cells.
+- **A99's result:** the timed mode lowers the jitter response of phases
+  2-4 by 30-38% and removes the trim's limit cycle.
+- **Not adopted yet** (load steps untested). The preset is unchanged.
 
 ## 2026-10-01 (late night) - jitter on one side's edges only (A98)
 

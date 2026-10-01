@@ -833,3 +833,21 @@ gate-driver jitter is amplified.
 
 **The levers are architectural:** the slots' timebase (PLL-type), phase
 1's turn-off, and the driver itself.
+
+`A99_timed_phase1_turn_off` (with D54) times phase 1's low-side turn-off
+instead of deciding it by the current comparator.
+- The comparator only measures. dlo steps ±1 LSB toward 94 ps after the
+  crossing, after 1024 learned comparator cycles.
+- **Both models agree:** ∂T/∂ton_1 falls from 10.5 to 1.0.
+- **Turn-off current spread of phases 2-4:**
+  - 30 ps: 0.56-0.66 → 0.39-0.43 A;
+  - 100 ps: 1.59-1.79 → 1.02-1.16 A.
+- **Period spread:** 30 ps: 0.59 → 0.19 ns; 100 ps: 1.65 → 0.29 ns.
+- **Without jitter, the trim's limit cycle is gone:** spread 0.018 A,
+  dither 0.04 A (A97: 0.18-0.21 A, 0.57 A). D54 predicted the same
+  numbers.
+- **The cost is phase 1's own turn-off current spread** (0.39 A at
+  30 ps). The hard-on loss is unchanged and P_rev is lower.
+- **D54's bands:** j100, n0 and m3n meet them. j30's period spread is 35%
+  above the band.
+- **Not adopted yet:** load steps need a faster (coarse/fine) dlo rule.

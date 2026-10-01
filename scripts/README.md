@@ -41,6 +41,10 @@
   - a Monte Carlo of the linearised circuit with the controller's exact
     RTL rules, for the fixed, follow and average slot rules.
   - `--reuse` keeps the stored Jacobians.
+- `p24_timed_modes.py` (D54) applies the same model with phase 1's
+  low-side turn-off timed instead of comparator-decided (option
+  `timed1`): the orbit gate, the Jacobian, and error-based and sign
+  dlo rules under jitter.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

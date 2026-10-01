@@ -661,12 +661,34 @@ each question:
          before the valley but costs more reverse-conduction loss than the
          hard-on loss it saves.
 
+     19. Done, not yet adopted: a timed phase-1 turn-off.
+         - [A99](../experiments/track_A_periodic_steady_state/A99_timed_phase1_turn_off/RESULTS.md),
+           Verilog co-simulation.
+         - [D54](../symbolic_derivations/03_P24_native/D54_P24_TIMED_PHASE1_TURN_OFF.md),
+           mathematical model.
+
+         **The change.** The comparator only measures. dlo steps ±1 LSB
+         toward 94 ps after the crossing.
+
+         **Results.**
+         - It removes the ×10.5 period amplification.
+         - Jitter response of phases 2-4: −30 to −38%.
+         - Without jitter, the trim's limit cycle is gone (0.018 A).
+         - Both models agree, mostly within the registered bands; j30's
+           period spread is 35% high.
+
+         **Waiting on** a load-step test with a coarse/fine dlo rule.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
-        - the jitter's architectural levers (D53 first):
-          - a filtered (PLL-type) slot timebase, after Huber et al. 2009;
-          - a timed phase-1 turn-off;
+        - the timed phase-1 turn-off under load and line steps:
+          - a coarse/fine dlo rule (error-based far from the target, sign
+            near it), D54 first;
+          - then the adoption decision;
+        - a filtered (PLL-type) or predicted slot timebase (Huber et al.
+          2009; Zhou et al. 2025) for the remaining phases 2-4 on-time
+          share;
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp);
         - the 2% target in the Verilog co-simulation;
