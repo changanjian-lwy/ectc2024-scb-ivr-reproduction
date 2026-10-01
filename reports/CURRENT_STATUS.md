@@ -500,10 +500,44 @@ each question:
          - The timing window narrows to 0.15-0.21 ns.
          - The two models agree within 0.04 A and 0.03 V.
 
+     12. Done: gate-driver timing.
+         - [A91](../experiments/track_A_periodic_steady_state/A91_verilog_gate_driver_timing/RESULTS.md),
+           Verilog co-simulation at 5%.
+         - [D49](../symbolic_derivations/03_P24_native/D49_P24_DRIVER_MISMATCH_OFFSET.md),
+           mathematical model.
+
+         **The data.** LMG1210: high/low delay mismatch 1 ns typical,
+         3.4 ns maximum. There is no jitter specification, so σ = 30 and
+         100 ps are a sensitivity.
+
+         **Results.**
+         - **The adopted correctors do not absorb a static mismatch.**
+           They set their delay to a time measured from the actual edge,
+           but add it to the command time.
+         - **m = ±3.4 ns:**
+           - the fixed 2.15 ns start-up dead time shoots through;
+           - with 4.5 ns, both signs still shoot through after the
+             handover. At +3.4 ns the high-side corrector learned a
+             1.2 ns swing time from a transient.
+         - **m = -1 ns:** 94% hard low-side turn-ons (an estimated
+           2.0-6.9 W), then a shoot-through. Phase 4's crossing, 0.98 ns,
+           is shorter than |m|; D47 gives 0.96 ns.
+         - **m = +1 ns:** runs. P_rev 4.30 W, and D49 gives 4.31 W. The
+           dither is 2.35 A.
+         - **Jitter:** no shoot-through and at most 0.06 W, but the
+           dither is 2.75 A (30 ps) and 4.73 A (100 ps), against 0.91 A.
+         - **The gate (driver model off)** is bit-identical to A89 r2.
+
+         **So the controller has to change before the next factor.** That
+         is A92: an error-based update (the body-diode-conduction sensing
+         of the adaptive dead-time literature), a floor on the actual dead
+         time, and a start-up dead time above the maximum mismatch.
+
         **Next at this level, one at a time:**
+        - A92: correctors that tolerate the driver (from A91), then the
+          A91 matrix again;
         - Coss spread;
-        - gate-drive loss and gate dynamics (driver ramp, delay jitter
-          against the 0.15-0.23 ns window);
+        - gate-drive loss and gate dynamics (driver ramp);
         - the 2% target in the Verilog co-simulation;
         - load and line steps.
      3. RTL:

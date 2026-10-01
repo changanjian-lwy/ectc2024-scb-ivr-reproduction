@@ -669,3 +669,29 @@ plant at 5%.
   0.03 V and 0.02 ns.
 - **The timing window** after the zero crossing narrows slightly, to
   0.15-0.21 ns.
+
+`A91_verilog_gate_driver_timing` adds the gate driver's timing to the
+A89 co-simulation (5%): a static high/low delay mismatch m (LMG1210: 1 ns
+typical, 3.4 ns maximum) and per-edge jitter σ (no datasheet value; 30 and
+100 ps). The bridge is a copy of A89's, the RTL is unchanged, and with the
+driver model off it is bit-identical to A89 r2.
+- **The adopted controller does not tolerate the mismatch.**
+  - At ±3.4 ns, P24's fixed 2.15 ns start-up dead time shoots through.
+  - With a 4.5 ns start-up dead time, both signs still shoot through
+    after the handover.
+  - At m = -1 ns, 94% of the low-side turn-ons are hard, and the run
+    shoots through at 138 us: phase 4's zero crossing comes 0.98 ns after
+    the turn-off, which is less than |m|.
+- **At m = +1 ns it runs.**
+  - P_rev is 4.30 W; D49 gives 4.31 W.
+  - The high side runs a sawtooth, and the dither rises to 2.35 A.
+- **The mechanism.** Both correctors set their delay to a time measured
+  from an actual edge, but add it to a command time.
+  - A static mismatch is never learned.
+  - The actual dead time on the faster side becomes the natural
+    transition time - |m|, with no floor.
+- **Jitter** of 30 and 100 ps costs at most 0.06 W, with no shoot-through.
+  But the correctors amplify it: the dither is 2.75 and 4.73 A, against
+  0.91 A.
+- **Next (A92):** an error-based update, a dead-time floor and a larger
+  start-up dead time.
