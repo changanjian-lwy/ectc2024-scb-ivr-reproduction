@@ -719,3 +719,36 @@ initial dead time.
   - Jitter is still amplified (1.65 A at 30 ps, 5.51 A at 100 ps). The
     valley moves with the corrected edges, which D50's scalar loop does not
     model.
+
+`A93_verilog_period_following_slots` adds two opt-in slot rules to A92's
+RTL.
+- **Period-following slots.** Phase k's low-side turn-off moves to
+  t_ref + (k-1)·T_meas/4, P24/P25's phase shift T/nP. The fixed slots were
+  k·T0/4 with T0 = 200 ns, the mode-S period.
+- **A missed-slot guard.**
+- **The starvation is gone with period-following slots:** at m = -3.4 ns
+  the peak is 172-174 A, against 827 A. The guard alone only bounds it
+  (267 A).
+- **But period-following raises the steady-state dither above 1 A**
+  (1.04-1.60 A, against 0.43-0.75 A). The two-cycle component of phases
+  2-4 grows in proportion to the slot index. The interpretation: the
+  period's own two-cycle alternation is injected through (k-1)/4·T_meas.
+- **The orbit itself does not move.** D51 gives Ton +0.0035 ns and currents
+  ≤ 0.005 A.
+- **Not adopted as is.** The next step is slots from a two-cycle average of
+  the period.
+
+`A94_cosim_plant_speedup` is infrastructure: `fast_plant.py` runs A88's
+plant arithmetic without its Python overhead.
+- **What goes.** The `lu_solve` wrapper (the same LAPACK `getrs` is called
+  directly), repeated evaluations, and per-switch loops. Every BLAS product
+  is kept as it was.
+- **It is bit-identical.**
+  - 300 000 steps from three states, including the full-Newton fallback.
+  - Full replays of A89 r2, A92 j100 and A93 m3n_both: every section,
+    register and recorded edge.
+- **1.66 times faster per run** alone (0.475 against 0.287 us/s). With at
+  most 4 runs at a time on the 4 performance cores, a full run takes about
+  16 min, against 70-73 min in the 8-10-run batches.
+- **Earlier experiments keep their own plant.** Later ones may use the fast
+  one.

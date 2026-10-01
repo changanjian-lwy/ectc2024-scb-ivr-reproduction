@@ -1,0 +1,154 @@
+{
+ "replays": {
+  "a89r2": {
+   "reference": "A89_verilog_predicted_low_side/cosim/run_r2_device_low_pred_blank.json",
+   "gate": {
+    "reference": "A89_verilog_predicted_low_side/cosim/run_r2_device_low_pred_blank.json",
+    "sections": [
+     1747,
+     1747
+    ],
+    "max_abs_diff_v_i": 0.0,
+    "max_abs_diff_t_s": 0.0,
+    "equal_registers": {
+     "dt_pred_final_ns": true,
+     "trim_final": true,
+     "ton_final_lsb": true,
+     "late_fires": true,
+     "async_fires": true,
+     "steps": true,
+     "vds_max_v": true,
+     "ipk_a": true
+    },
+    "pass": true
+   },
+   "equal_records": {
+    "turnons_last": true,
+    "lowoffs_last": true,
+    "lowons_last": true,
+    "late_fires": true,
+    "trim_final": true,
+    "dt_pred_final_ns": true,
+    "dtl_final_ns": true,
+    "async_fires": true,
+    "t_mode_p_s": true,
+    "ton_final_lsb": true,
+    "t_end_s": true
+   },
+   "format_additions": [
+    "driver",
+    "first_overlap",
+    "overlaps",
+    "status",
+    "turnons_last: early, err_s"
+   ],
+   "bit_identical": true,
+   "wall_s": 943.6899771690369,
+   "reference_wall_s": 1747.8847789764404,
+   "sim_us": 388.612
+  },
+  "a92j100": {
+   "reference": "A92_verilog_error_based_correctors/cosim/run_j100_jitter_100ps.json",
+   "gate": {
+    "reference": "A92_verilog_error_based_correctors/cosim/run_j100_jitter_100ps.json",
+    "sections": [
+     1757,
+     1757
+    ],
+    "max_abs_diff_v_i": 0.0,
+    "max_abs_diff_t_s": 0.0,
+    "equal_registers": {
+     "dt_pred_final_ns": true,
+     "trim_final": true,
+     "ton_final_lsb": true,
+     "late_fires": true,
+     "async_fires": true,
+     "steps": true,
+     "vds_max_v": true,
+     "ipk_a": true
+    },
+    "pass": true
+   },
+   "equal_records": {
+    "turnons_last": true,
+    "lowoffs_last": true,
+    "lowons_last": true,
+    "late_fires": true,
+    "trim_final": true,
+    "dt_pred_final_ns": true,
+    "dtl_final_ns": true,
+    "async_fires": true,
+    "t_mode_p_s": true,
+    "ton_final_lsb": true,
+    "t_end_s": true,
+    "first_overlap": true,
+    "overlaps": true,
+    "status": true
+   },
+   "format_additions": [],
+   "bit_identical": true,
+   "wall_s": 969.7351219654083,
+   "reference_wall_s": 4373.076707839966,
+   "sim_us": 388.612
+  },
+  "a93m3nboth": {
+   "reference": "A93_verilog_period_following_slots/cosim/run_m3n_both.json",
+   "gate": {
+    "reference": "A93_verilog_period_following_slots/cosim/run_m3n_both.json",
+    "sections": [
+     1793,
+     1793
+    ],
+    "max_abs_diff_v_i": 0.0,
+    "max_abs_diff_t_s": 0.0,
+    "equal_registers": {
+     "dt_pred_final_ns": true,
+     "trim_final": true,
+     "ton_final_lsb": true,
+     "late_fires": true,
+     "async_fires": true,
+     "steps": true,
+     "vds_max_v": true,
+     "ipk_a": true
+    },
+    "pass": true
+   },
+   "equal_records": {
+    "turnons_last": true,
+    "lowoffs_last": true,
+    "lowons_last": true,
+    "late_fires": true,
+    "trim_final": true,
+    "dt_pred_final_ns": true,
+    "dtl_final_ns": true,
+    "async_fires": true,
+    "t_mode_p_s": true,
+    "ton_final_lsb": true,
+    "t_end_s": true,
+    "first_overlap": true,
+    "overlaps": true,
+    "status": true
+   },
+   "format_additions": [],
+   "bit_identical": true,
+   "wall_s": 971.4847371578217,
+   "reference_wall_s": 4172.945132017136,
+   "sim_us": 388.612
+  }
+ },
+ "speed": {
+  "speed_fast_60us": {
+   "wall_s": 126.3306930065155,
+   "sim_us": 60.0,
+   "us_per_s": 0.4749439631183334,
+   "steps": 6003599
+  },
+  "speed_orig_60us": {
+   "wall_s": 209.1798129081726,
+   "sim_us": 60.0,
+   "us_per_s": 0.28683456192945,
+   "steps": 6003599
+  }
+ },
+ "all_bit_identical": true
+}

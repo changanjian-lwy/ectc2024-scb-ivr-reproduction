@@ -562,9 +562,40 @@ each question:
            the corrected edges, so the closed loop of correctors and
            circuit has to be modelled.
 
-        **Next at this level, one at a time:**
-        - start-up and slots: never skip a slot, or period-following slots
-          (the A92 m3n hazard); then the A91/A92 matrix again;
+     14. Done, not adopted: period-following slots.
+         - [A93](../experiments/track_A_periodic_steady_state/A93_verilog_period_following_slots/RESULTS.md),
+           Verilog co-simulation.
+         - [D51](../symbolic_derivations/03_P24_native/D51_P24_PERIOD_FOLLOWING_SLOTS.md),
+           mathematical model.
+
+         **The rules.**
+         - Slots at (k-1)·T_meas/4 (P24/P25's T/nP), against the fixed
+           T0/4 multiples.
+         - A missed-slot guard.
+
+         **Results.**
+         - The m = -3.4 ns starvation is gone: 172-174 A, against 827 A.
+           The guard alone gives 267 A.
+         - **But** the steady-state dither rises to 1.04-1.60 A. The
+           two-cycle component grows with the slot index, because the
+           period's alternation is injected into the slots.
+         - The orbit does not move (D51).
+         - **Next:** slots from a two-cycle average of the period. The
+           adopted design stays A92 until then.
+
+     15. Done: a faster co-simulation plant.
+         - [A94](../experiments/track_A_periodic_steady_state/A94_cosim_plant_speedup/RESULTS.md).
+         - It reproduces the original plant bit for bit: 300k steps, and
+           full replays of A89 r2, A92 j100 and A93 m3n_both.
+         - It is 1.66 times faster per run.
+         - Scheduling: at most 4 runs at a time.
+         - Then the agreed code clean-up, before new physics.
+
+        **Next at this level, one at a time** (after the code clean-up
+        agreed on 2026-10-01: one shared adopted version per component,
+        bit-identical gates, the fast plant):
+        - slots from a two-cycle average of the period (A93's follow-up),
+          then the A91/A92 matrix again;
         - the closed-loop corrector model (D47 Jacobian with corrector
           states) for the jitter gain;
         - Coss spread;
