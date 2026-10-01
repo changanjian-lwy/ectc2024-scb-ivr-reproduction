@@ -19,6 +19,10 @@ result.
   - `--full` regression PASS;
   - A99 n0 replayed bit-identically;
   - synthesis 0 problems, 43 924 cells.
+- **A100's result:** ADM32 (`lo_adm` 1, `lo_smax` 32) tracks ±25 and
+  ±62.5 A steps within 1.7 A.
+- **Recommended, not yet in the preset**, pending the trade-off review
+  (`reports/TRADEOFF_SCORECARD.md`).
 
 ## 2026-10-01 (night, A100) - load step and record length
 

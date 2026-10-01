@@ -45,6 +45,9 @@
   low-side turn-off timed instead of comparator-decided (option
   `timed1`): the orbit gate, the Jacobian, and error-based and sign
   dlo rules under jitter.
+- `p24_dlo_rules.py` (D55) replays dlo rules against the interval phase 1
+  needs, measured in A100's comparator load-step runs, and runs D54's
+  Monte Carlo for each rule: tracking against jitter.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

@@ -679,13 +679,33 @@ each question:
 
          **Waiting on** a load-step test with a coarse/fine dlo rule.
 
+     20. Done, recommended: the timed turn-off under load steps.
+         - [A100](../experiments/track_A_periodic_steady_state/A100_timed_turn_off_load_steps/RESULTS.md),
+           Verilog co-simulation.
+         - [D55](../symbolic_derivations/03_P24_native/D55_P24_DLO_RULE_LOAD_STEPS.md),
+           mathematical model.
+
+         **The rule.** dlo's step doubles while consecutive decisions
+         agree, up to 32 LSB.
+
+         **Results.**
+         - Under ±25 and ±62.5 A steps, phase 1's turn-off current stays
+           within 0.6-1.7 A; A99's ±1 rule is off by 19-23 A.
+         - Vo moves as in the comparator design.
+         - Jitter: −24 to −35% against A97.
+
+         **Trade-off review:**
+         [`reports/TRADEOFF_SCORECARD.md`](TRADEOFF_SCORECARD.md), with
+         one table for A92-A100, the loops to avoid, and the priorities to
+         set.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
-        - the timed phase-1 turn-off under load and line steps:
-          - a coarse/fine dlo rule (error-based far from the target, sign
-            near it), D54 first;
-          - then the adoption decision;
+        - the adoption decision for A100: the priorities and phase 1's ZVS
+          limit in TRADEOFF_SCORECARD Section 6, then the standard matrix
+          (m ≠ 0, line steps);
+        - the voltage loop, designed together with dlo (scorecard T6);
         - a filtered (PLL-type) or predicted slot timebase (Huber et al.
           2009; Zhou et al. 2025) for the remaining phases 2-4 on-time
           share;

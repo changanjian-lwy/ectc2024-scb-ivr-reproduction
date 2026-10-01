@@ -851,3 +851,15 @@ instead of deciding it by the current comparator.
 - **D54's bands:** j100, n0 and m3n meet them. j30's period spread is 35%
   above the band.
 - **Not adopted yet:** load steps need a faster (coarse/fine) dlo rule.
+
+`A100_timed_turn_off_load_steps` (with D55) gives the timed turn-off a dlo
+rule that tracks load steps. The step doubles while consecutive decisions
+agree, up to 32 LSB (adaptive delta modulation).
+- **Load steps:** under ±25 A and ±62.5 A steps, phase 1's turn-off current
+  stays within 0.6-1.7 A of its value (A99's ±1 rule: 19-23 A), and Vo
+  moves as in the comparator design.
+- **Jitter:** the benefit stays at −24 to −35% against A97. That is +7-13%
+  against the ±1 rule, the measured price of tracking.
+- **Both models agree;** j30's period spread is again above the model.
+- **Status:** recommended, pending the project's trade-off review
+  (`reports/TRADEOFF_SCORECARD.md`).
