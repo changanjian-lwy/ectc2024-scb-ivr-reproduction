@@ -17,8 +17,12 @@ from .p24_drop_event_map import DropEventMap
 
 @dataclass(frozen=True)
 class ControlLP(Control):
-    """D43's Control plus the low-side dead times d_low (s) after each phase's high-side turn-off."""
+    """D43's Control plus the low-side dead times d_low (s) after each phase's high-side turn-off. D53: optional
+    per-phase offsets (s) of the on-time (ton_offset) and of the slot (slot_offset, phases 2..N); zero by default,
+    which leaves every time unchanged."""
     d_low: tuple = (1.2e-9, 1.2e-9, 1.2e-9, 1.2e-9)
+    ton_offset: tuple = (0.0, 0.0, 0.0, 0.0)
+    slot_offset: tuple = (0.0, 0.0, 0.0, 0.0)
 
 
 class LowPredEventMap(DropEventMap):
@@ -40,7 +44,7 @@ class LowPredEventMap(DropEventMap):
         state = [HIGH] + [LOW] * (n - 1)
         t_on = [0.0] + [None] * (n - 1); t_off = [None] * n; t_lo = [None] * n; t_lon = [0.0] * n
         t_zvs = [None] * n; fired = [False] * n
-        slots = [None] + [k * ctl.t0 / n for k in range(1, n)]
+        slots = [None] + [k * ctl.t0 / n + ctl.slot_offset[k] for k in range(1, n)]
         log = {"lowoff": [], "turnon": [], "events": [], "rev_energy_j": [0.0] * (2 * n), "rev_time_s": [0.0] * (2 * n),
                "low_cross_rel": [None] * n, "low_on_vds": [None] * n}
         topo = self.topo2(chan, diode)
@@ -56,7 +60,7 @@ class LowPredEventMap(DropEventMap):
             timed = []
             for k in range(n):
                 if state[k] == HIGH:
-                    timed.append((t_on[k] + ctl.ton, k, "high_off"))
+                    timed.append((t_on[k] + (ctl.ton + ctl.ton_offset[k]), k, "high_off"))
                 elif state[k] == DOWN:
                     timed.append((t_off[k] + ctl.d_low[k], k, "low_on"))            # D47: a timed edge
                 elif state[k] == LOW:

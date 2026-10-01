@@ -44,8 +44,8 @@ Y_NAMES = [f"ilo{k}" for k in range(1, N + 1)] + ["T"] + [f"eh{k}" for k in rang
 _CTX = {}
 
 
-def _init(coss_factory, pct, vf, r_dev):
-    _CTX.update(coss=coss_factory(), target=-pct / 100 * PEAK, vf=vf, r_dev=r_dev)
+def _init(coss_factory, pct, vf, r_dev, extra=None):
+    _CTX.update(coss=coss_factory(), target=-pct / 100 * PEAK, vf=vf, r_dev=r_dev, **(extra or {}))
 
 
 def core(p):
@@ -78,18 +78,19 @@ def steps(p0, scale=1.0):
     return h * scale
 
 
-def core_jacobian(p0, coss_factory, pct, vf, r_dev, jobs=4, scale=1.0):
+def core_jacobian(p0, coss_factory, pct, vf, r_dev, jobs=4, scale=1.0, func=core, step_fn=steps, extra=None):
     """(q0, J, curvature), with the Coss curve from coss_factory() (a module-level function, so that each worker
     process builds its own): J[:, c] = (q(p0 + h_c) - q(p0 - h_c)) / 2h_c; curvature[c] = max|q+ + q- - 2 q0| /
-    max|q+ - q-| (second-order part relative to the first-order change, a linearity check per column)."""
+    max|q+ - q-| (second-order part relative to the first-order change, a linearity check per column). func and
+    step_fn replace the core map and its steps (D53's per-edge map); extra is added to each worker's context."""
     p0 = np.asarray(p0, float)
-    h = steps(p0, scale)
+    h = step_fn(p0, scale)
     pts = [p0]
     for c in range(len(p0)):
         e = np.zeros(len(p0)); e[c] = h[c]
         pts += [p0 + e, p0 - e]
-    with ProcessPoolExecutor(max_workers=jobs, initializer=_init, initargs=(coss_factory, pct, vf, r_dev)) as pool:
-        q = list(pool.map(core, pts))
+    with ProcessPoolExecutor(max_workers=jobs, initializer=_init, initargs=(coss_factory, pct, vf, r_dev, extra)) as pool:
+        q = list(pool.map(func, pts))
     q0 = q[0]
     J = np.zeros((len(q0), len(p0)))
     curv = np.zeros(len(p0))

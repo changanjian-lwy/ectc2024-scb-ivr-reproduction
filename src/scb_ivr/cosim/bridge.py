@@ -31,8 +31,8 @@ Controller-side analog functions modelled here:
   turn-on (voltage loop).
 
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
-sigma per edge (seeded); a turn-on applied while the same phase's complement conducts is counted, and with
-"stop_on_overlap" the run ends there.
+sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
+applied while the same phase's complement conducts is counted, and with "stop_on_overlap" the run ends there.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki),
 async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps, eh_tgt_ps,
@@ -198,7 +198,8 @@ async def cosim(dut):
         if not drv:
             return t_cmd + t_drv
         d = t_drv + (drv.get("m_ns", 0.0) * 1e-9 if j >= N else 0.0)
-        if drv.get("sigma_ps", 0.0) > 0.0:
+        edges = drv.get("jitter_edges", "all")                   # A98: "high" or "low" restricts the jitter
+        if drv.get("sigma_ps", 0.0) > 0.0 and (edges == "all" or (edges == "high") == (j < N)):
             d += rng.normal(0.0, drv["sigma_ps"] * 1e-12)
         return t_cmd + d
     meas_l = {}; lowons = []
