@@ -59,7 +59,10 @@ def main():
             if row == "n0":
                 n0 = x
                 a = load(A110 / f"run_n{pct}.json")
-                diff = [k for k in set(d) | set(a) if k not in SKIP and json.dumps(d.get(k)) != json.dumps(a.get(k))]
+                strip = lambda r: {k: ({q: u for q, u in v.items() if q not in ("note", "out")} if k == "cfg" else v)
+                                   for k, v in r.items() if k not in SKIP}          # the note and output name differ by design
+                sd, sa = strip(d), strip(a)
+                diff = [k for k in set(sd) | set(sa) if json.dumps(sd.get(k)) != json.dumps(sa.get(k))]
                 x["identical_to_a110"] = not diff
             c = {"no_overlap": x["overlaps"] == 0}
             if pct == 20:

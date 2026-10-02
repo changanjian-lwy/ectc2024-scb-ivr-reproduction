@@ -33,6 +33,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A109": (TA / "A109_p24_slot_valley_trim", "a109_analyze.py", "a109_summary.json"),
     "A110": (TA / "A110_p24_high_side_zvs", "a110_analyze.py", "a110_summary.json"),
     "A111": (TA / "A111_p24_zero_voltage_valley", "a111_analyze.py", "a111_summary.json"),
+    "A112": (TA / "A112_p24_zvs_designs_matrix", "a112_analyze.py", "a112_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -81,6 +82,14 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
                              ("z30_s_p62", "step_25pct"), ("z30_s_p62", "back_15us"), ("z30_s_m62", "peak_200a"),
                              ("z30_s_m62", "step_25pct"), ("z30_s_m62", "back_15us"), ("z30_j30", "peak_200a"),
                              ("z30_j30", "sd_band"), ("z30_j30", "hs_0p5V"))}},
+    "A112": {**{(r, "run_peak_200a"): "20% line-step peaks at the 200 A limit, 201-204 A (RESULTS 0.2)"
+                for r in ("p20_l_m48_1us", "p20_l_p48_1us", "p20_l_p48_10us")},
+             **{(r, "line_peak_pred"): "the +17 / +24 A shift predicted the 1 us peaks too high, the 10 us ones too low (RESULTS 1)"
+                for r in ("p20_l_p48_1us", "p20_l_p48_10us", "p25_l_p48_1us", "p25_l_p48_10us")},
+             **{(r, "step_30pct"): "line-step Vo extremes change sign or grow with a large negative current (RESULTS 1)"
+                for r in ("p20_l_m48_1us", "p20_l_m80_10us", "p20_l_p48_1us", "p20_l_p48_10us", "p25_l_m48_1us",
+                          "p25_l_m48_10us", "p25_l_m80_10us", "p25_l_p48_1us", "p25_l_p48_10us")},
+             ("p25_s_m62", "step_30pct"): "25%: phase 1's turn-off does not follow Ton; a slow oscillation (RESULTS 0.3; A113)"},
 }
 
 

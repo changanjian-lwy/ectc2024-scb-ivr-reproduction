@@ -1029,6 +1029,18 @@ each question:
            loss 0.04 W against 8.9 W at 5%.
          - **Next (A112):** 20% and 25% through the standard matrix.
 
+     39. The 20% and 25% designs on the standard matrix:
+         [A112](../experiments/track_A_periodic_steady_state/A112_p24_zvs_designs_matrix/RESULTS.md).
+         - **Both are robust in steady state:** no overlap; the high side's
+           level holds under mismatch and jitter.
+         - **20% passes** except the line-step edges: peaks 199-204 A,
+           the 1 µs falling step recovers in 75 µs.
+         - **25% oscillates slowly after load decreases and falling line
+           steps:** 160-180 µs to settle. Phase 1's learned turn-off does
+           not follow Ton.
+         - **Next (A113):** A100's Ton feed-forward, or the comparator
+           turn-off, at 25%.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
