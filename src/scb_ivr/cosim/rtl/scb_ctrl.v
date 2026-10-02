@@ -16,6 +16,9 @@
 //   Ton = cfg_ton. With cfg_kp = 0 the loop is A79's integral loop.
 // - Comparators (current, low/high V_DS = 0, valley) pass a 2-flip-flop synchroniser; measurement reports
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses.
+// - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
+//   SLAVE = 1, phase 1 is a slotted phase like phases 2..N, its low-side turn-off at ext_slot once per reference
+//   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -25,7 +28,8 @@ module scb_ctrl #(
     parameter AW   = 12,   // ADC code width
     parameter KW   = 16,   // loop gain width
     parameter KPW  = 24,   // proportional gain width (A104)
-    parameter FRAC = 16    // fractional bits of the Ton accumulator
+    parameter FRAC = 16,   // fractional bits of the Ton accumulator
+    parameter SLAVE = 0    // C2: 1 = a slave module, its phase 1 at the external slot (ext_slot, ext_ref)
 ) (
     input  wire                clk,
     input  wire                rst,
@@ -49,6 +53,10 @@ module scb_ctrl #(
     input  wire [AW-1:0]       cfg_vref_code,
     input  wire [KW-1:0]       cfg_ki,
     input  wire [KPW-1:0]      cfg_kp,         // A104: proportional gain
+    input  wire                cfg_ext_ton,    // C2: in mode P, Ton = ext_ton (the master's, broadcast)
+    input  wire [TW-1:0]       ext_ton,        // C2
+    input  wire [TW-1:0]       ext_slot,       // C2 (SLAVE): phase 1's low-side turn-off slot
+    input  wire [TW-1:0]       ext_ref,        // C2 (SLAVE): the reference that slot belongs to (the master's t_ref)
     input  wire [N*TW-1:0]     dt_init,
     input  wire [N*CW-1:0]     trim_init,
     input  wire [N-1:0]        cmp_i,
@@ -137,7 +145,7 @@ module scb_ctrl #(
     wire signed [AW1-1:0] ton_cl   = (ton_sum < acc_min) ? acc_min : (ton_sum > acc_max) ? acc_max : ton_sum;
     wire signed [AW1-1:0] acc_rnd  = ton_cl + (1 <<< (FRAC - 1));
     wire [TW-1:0] ton_loop = acc_rnd[AW1-1:FRAC];
-    assign ton_now = (cfg_vloop && mode_p) ? ton_loop : cfg_ton;
+    assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;   // C2
 
     wire [4*N-1:0] cmp_s;
     sync2 #(.W(4 * N)) u_sync (
@@ -199,14 +207,16 @@ module scb_ctrl #(
     generate
         for (k = 0; k < N; k = k + 1) begin : g_ph
             wire [TW-1:0] slot_t;
+            wire [TW-1:0] ref_k = (k == 0 && SLAVE) ? ext_ref : t_ref;             // C2
             if (k == 0) begin : g_first
-                assign slot_t = {TW{1'b0}};
+                assign slot_t = SLAVE ? ext_slot : {TW{1'b0}};                         // C2
             end else begin : g_rest
                 wire [TW-1:0] slot_follow = cfg_slot_avg ? (k * (t_per + t_per2)) / (2 * N)  // A97: k * T_avg / N
                                                          : (k * t_per) / N;                  // A93: k * T / N
                 assign slot_t = t_ref + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
             end
-            scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(k == 0 ? 1 : 0)) u_ph (
+            localparam IS_FIRST = (k == 0 && !SLAVE) ? 1 : 0;                         // C2
+            scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(IS_FIRST)) u_ph (
                 .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_now),
                 .cfg_t0(cfg_t0), .cfg_tdead(cfg_tdead),
                 .cfg_rs_high(cfg_rs_high), .cfg_rs_low(cfg_rs_low),
@@ -214,11 +224,11 @@ module scb_ctrl #(
                 .cfg_pred(cfg_pred), .cfg_zvs_react(cfg_zvs_react), .cfg_trim(cfg_trim),
                 .cfg_fine(cfg_fine),
                 .dt_init(dt_init[k * TW +: TW]), .trim_init(trim_init[k * CW +: CW]),
-                .slot_time(slot_t), .ref_id(t_ref),
+                .slot_time(slot_t), .ref_id(ref_k),
                 .c_i(cmp_s[k]), .c_zl(cmp_s[N + k]), .c_zh(cmp_s[2 * N + k]), .c_valley(cmp_s[3 * N + k]),
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
-                .cfg_async(k == 0 ? cfg_async : 1'b0), .a_valid(k == 0 ? a_valid : 1'b0), .a_tlo(a_tlo),
+                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid(IS_FIRST ? a_valid : 1'b0), .a_tlo(a_tlo),
                 .arm(arm_all[k]),
                 .gh_ev(gh_ev[k]), .gh_lvl(gh_lvl[k]), .gh_fine(gh_fine[k * FB +: FB]),
                 .gl_ev(gl_ev[k]), .gl_lvl(gl_lvl[k]), .gl_fine(gl_fine[k * FB +: FB]),
@@ -234,9 +244,9 @@ module scb_ctrl #(
                 .cfg_err_low(cfg_err_low), .cfg_err_high(cfg_err_high),                         // A92
                 .cfg_el_tgt(cfg_el_tgt), .cfg_eh_tgt(cfg_eh_tgt), .cfg_err_shift(cfg_err_shift),
                 .ml_err(ml_err[k * TW +: TW]), .m_err(m_err[k * TW +: TW]),
-                .cfg_slot_guard(k == 0 ? 1'b0 : cfg_slot_guard),                              // A93
-                .cfg_lo_pred(k == 0 ? cfg_lo_pred : 1'b0), .cfg_lo_learn(cfg_lo_learn),        // A99
-                .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(k == 0 ? mlo_valid : 1'b0), .mlo_early(mlo_early),
+                .cfg_slot_guard(IS_FIRST ? 1'b0 : cfg_slot_guard),                            // A93
+                .cfg_lo_pred(IS_FIRST ? cfg_lo_pred : 1'b0), .cfg_lo_learn(cfg_lo_learn),      // A99
+                .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(IS_FIRST ? mlo_valid : 1'b0), .mlo_early(mlo_early),
                 .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k]),
                 .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff)   // A100
             );

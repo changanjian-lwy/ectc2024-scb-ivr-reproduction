@@ -49,9 +49,7 @@ def drift_time_us(m: Module, d_ton_lsb, ton=568.0, vo=1.0, vr=12.0, n_slots=16):
 def simulate(strategy, n_mod=4, eps=(0.0, 0.0, 0.0, 0.0), adc_offset_v=(0.0, 0.0, 0.0, 0.0), m: Module = Module(),
              fc=100e3, r_droop=0.0, t_end=400e-6, dt=5e-9, vref=1.0, i_step=0.0, t_step=200e-6, ton0=568.0):
     """M modules into one output (Co and load scaled by M). Returns t, vo, I (per module), Ton (per module)."""
-    kp, ki = design_pi(fc, m)              # per module, D59; the shared loop sees M times the plant gain
-    if strategy == "shared":
-        kp, ki = kp / n_mod, ki / n_mod
+    kp, ki = design_pi(fc, m)              # per module, D59; a shared loop sees M times the gain and M times Co: the same
     co, r_load = m.co * n_mod, m.r_load / n_mod
     lo, hi = 0.5 * ton0, 2.0 * ton0
     vo = vref

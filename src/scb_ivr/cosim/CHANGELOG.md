@@ -4,6 +4,42 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (C2, C3, track C) - multi-module: slave modules and the M-module system
+
+- **`rtl/scb_ctrl.v`:**
+  - inputs `cfg_ext_ton` and `ext_ton`: in mode P, Ton is ext_ton (the
+    master's, broadcast);
+  - parameter `SLAVE` (default 0) with inputs `ext_slot` and `ext_ref`:
+    a slave's phase 1 is a slotted phase like phases 2..N, its low-side
+    turn-off at ext_slot once per reference ext_ref. It resets LOW, and
+    phase 1's front end and timed turn-off are off for it.
+- **`rtl/gen_multi.py` → `rtl/scb_multi.v` (generated):** M instances,
+  0 the master and 1..M-1 slaves. Every port except clk and rst is M
+  times as wide.
+- **`run.py`:** cfg `modules` > 1 builds `scb_multi` with M.
+- **`bridge.py`:**
+  - `MultiCtl`: module m's slice of the wrapper's signals; combined
+    writes through a shared cache.
+  - `cosim_multi`: M `ModuleSim`s, each the single-module plant with its
+    own Co and load, so the system has M Co and the load / M.
+    - Output nodes joined after every window by charge conservation; the
+      largest and mean differences are recorded.
+    - The master's Ton is broadcast.
+    - Slave m's phase-1 slot is t_ref + m T / (M N) after each master
+      turn-on (T: the master's last period, or the mean of its last two).
+  - cfg keys `modules`, `module_circuit` (per-module circuit values); a
+    load step's i_a is the system's.
+  - The new inputs are set to 0 for a single module.
+- **Gates:**
+  - RTL unit tests 47 of 47 (new: `external_ton`);
+  - synthesis `check -assert` clean: SLAVE = 0, 46 566 cells (A104
+    46 468); SLAVE = 1, 40 447;
+  - `tests/test_cosim_wrapper.py`: the wrapper regenerates identically;
+  - M = 1: `--full` regression and the four feature-rich reruns (C1's)
+    identical;
+  - M = 2 smoke run (A105 I2 to 120 µs): no overlap; both modules in
+    mode P at 72 µs; Vo 1.0000 V; equal currents; join difference ≤ 50 µV.
+
 ## 2026-10-02 (C1, track C) - the bridge per module, for multi-module runs
 
 - **`bridge.py`:** restructured with no change in behaviour.

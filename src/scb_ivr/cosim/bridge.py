@@ -116,6 +116,39 @@ class Ctl:
         getattr(self.dut, name).value = value
 
 
+class MultiCtl:
+    """Module m's slice of the M-module wrapper's signals (scb_multi, C3). clk and rst are shared. Writes go through a
+    cache of the packed values shared by the M modules, so that their writes in one phase combine."""
+    SHARED = ("clk", "rst")
+
+    def __init__(self, dut, m, n_mod, cache):
+        self.dut, self.m, self.n_mod, self.cache = dut, m, n_mod, cache
+
+    def sig(self, name):
+        return getattr(self.dut, name)
+
+    def _w(self, name):
+        key = ("w", name)
+        if key not in self.cache:
+            self.cache[key] = len(getattr(self.dut, name)) // self.n_mod
+        return self.cache[key]
+
+    def get(self, name):
+        if name in self.SHARED:
+            return int(getattr(self.dut, name).value)
+        return field(int(getattr(self.dut, name).value), self.m, self._w(name))
+
+    def set(self, name, value):
+        if name in self.SHARED:
+            getattr(self.dut, name).value = value
+            return
+        w = self._w(name)
+        mask = ((1 << w) - 1) << (self.m * w)
+        new = (self.cache.get(name, 0) & ~mask) | ((int(value) & ((1 << w) - 1)) << (self.m * w))
+        self.cache[name] = new
+        getattr(self.dut, name).value = new
+
+
 def load_cfg():
     cfg_path = Path(os.environ["COSIM_CFG"])
     cfg = json.loads(cfg_path.read_text())
@@ -164,7 +197,7 @@ class ModuleSim:
     Per 4 ns window: read_rising (the controller's edge requests), write_falling (measurement pulses, ADC, handover,
     load), run_window (the plant through the window, edges at their times), sample (the comparators)."""
 
-    def __init__(self, cfg, p, ctl):
+    def __init__(self, cfg, p, ctl, first_high=True):
         self.cfg, self.p, self.ctl = cfg, p, ctl
         t_clk = cfg["t_clk_ns"] * 1e-9
         self.fb = int(cfg["fb"])
@@ -174,7 +207,8 @@ class ModuleSim:
         self.na = na = len(p.aux_phases)
         self.vm0 = list(p.aux_vm0) if isinstance(p.aux_vm0, (list, tuple)) else [p.aux_vm0] * na   # A102: per branch
         y0 = [0.0] * (2 * N) + self.vm0 + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
-        self.plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[True] + [False] * (N - 1), gl=[False] + [True] * (N - 1))
+        g1 = bool(first_high)                                          # C3: a slave resets with phase 1 LOW
+        self.plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[g1] + [False] * (N - 1), gl=[not g1] + [True] * (N - 1))
         self.nv = self.plant.nv
         self.i_out = self.plant.sim.idx["out"]
         self.adc_lsb, self.adc_max = cfg["adc_lsb_v"], (1 << 12) - 1
@@ -216,6 +250,7 @@ class ModuleSim:
         # ki in ns of Ton per V -> Ton LSB per ADC LSB, 16 fractional bits
         c.set("cfg_ki", int(round(cfg["ki_ns_per_v"] * self.adc_lsb / (self.lsb * 1e9) * 65536)))
         c.set("cfg_kp", int(round(cfg.get("kp_ns_per_v", 0.0) * self.adc_lsb / (self.lsb * 1e9) * 65536)))   # A104
+        c.set("cfg_ext_ton", 0); c.set("ext_ton", 0); c.set("ext_slot", 0); c.set("ext_ref", 0)   # C2: set per module
         c.set("adc_valid", 0)
         c.set("adc_code", 0)
         c.set("cfg_low_pred", int(cfg.get("low_pred", 0)))            # A89
@@ -518,6 +553,103 @@ class ModuleSim:
         return out
 
 
+def write_out(cfg_path, cfg, out):
+    dest = Path(os.environ.get("COSIM_OUT") or (cfg_path.parent / cfg["out"]))
+    text = json.dumps(out)
+    if dest.suffix == ".gz":
+        with gzip.open(dest, "wt") as fh:
+            fh.write(text)
+    else:
+        dest.write_text(text)
+
+
+async def cosim_multi(dut, cfg_path, cfg, ref):
+    """M modules (C3) on one output: each module is a ModuleSim with the single-module plant (its own Co and load);
+    after every window the output nodes are joined by charge conservation (equal Co: their mean). The master
+    (module 0) runs the voltage loop; the system broadcasts its Ton to the slaves (cfg_ext_ton) and gives slave m's
+    phase 1 the slot t_ref + m T / (M N) after each master turn-on, T the master's last period (the mean of its last
+    two once three turn-ons are seen; cfg t0 before), the reference id its t_ref. cfg "module_circuit" (list, one dict
+    per module) adds per-module circuit values; a load step's i_a is the system's, shared equally."""
+    n_mod = int(cfg["modules"])
+    cache = {}
+    mods = []
+    for m in range(n_mod):
+        cm = dict(cfg)
+        circ = dict(cfg.get("circuit") or {})
+        circ.update((cfg.get("module_circuit") or [{}] * n_mod)[m] or {})
+        cm["circuit"] = circ
+        if cfg.get("load_step"):
+            cm["load_step"] = dict(cfg["load_step"], i_a=float(cfg["load_step"]["i_a"]) / n_mod)
+        if m > 0:
+            cm["vloop"] = 0
+            if cm.get("driver"):                                  # each module its own jitter sequence
+                cm["driver"] = dict(cm["driver"], seed=int(cm["driver"].get("seed", 1)) + 1000 * m)
+        mods.append(ModuleSim(cm, make_params(cm, ref), MultiCtl(dut, m, n_mod, cache), first_high=(m == 0)))
+    cocotb.start_soon(Clock(dut.clk, cfg["t_clk_ns"], unit="ns").start())
+    for mod in mods:
+        mod.configure()
+    for mod in mods[1:]:
+        mod.ctl.set("cfg_ext_ton", 1)
+    await ClockCycles(dut.clk, 3)
+    await FallingEdge(dut.clk)
+    dut.rst.value = 0
+    for mod in mods:
+        mod.start()
+    t_end = float(os.environ.get("COSIM_T_END_US", cfg["t_end_us"])) * 1e-6
+    t0w = time.time()
+    master = mods[0]
+    nn = n_mod * N
+    sync = {"t_ref": None, "hist": [], "period": master.to_lsb(cfg["t0_ns"] * 1e-9)}
+    eq = {"max_v": 0.0, "sum_v": 0.0, "n": 0}
+    while master.plant.t < t_end and not any(md.ovl["stop"] for md in mods):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        ws = [md.read_rising() for md in mods]
+        w = ws[0]
+        ton_m = master.st["ton"]
+        t_ref = master.ctl.get("t_ref")
+        if t_ref != sync["t_ref"]:                               # a master turn-on: the slaves' new slots
+            if sync["t_ref"] is not None:
+                sync["hist"].append((t_ref - sync["t_ref"]) % (1 << TW))
+                h = sync["hist"]
+                sync["period"] = h[-1] if len(h) < 2 else (h[-1] + h[-2]) // 2
+            sync["t_ref"] = t_ref
+        await FallingEdge(dut.clk)
+        for md in mods:
+            md.write_falling()
+        for m, md in enumerate(mods[1:], start=1):
+            md.ctl.set("ext_ton", ton_m)
+            if sync["t_ref"] is not None:
+                md.ctl.set("ext_ref", sync["t_ref"])
+                md.ctl.set("ext_slot", (sync["t_ref"] + (m * sync["period"]) // nn) % (1 << TW))
+        t_win_end = (w + (1 << master.fb)) * master.lsb
+        stop = False
+        for md in mods:
+            if not md.run_window(t_win_end):
+                stop = True
+        if stop:
+            break
+        vs = [float(md.plant.y[md.i_out]) for md in mods]           # join the output nodes (equal Co)
+        v_eq = sum(vs) / n_mod
+        dev = max(abs(v - v_eq) for v in vs)
+        eq["max_v"] = max(eq["max_v"], dev); eq["sum_v"] += dev; eq["n"] += 1
+        for md in mods:
+            md.plant.y[md.i_out] = v_eq
+        for md in mods:
+            md.sample()
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    wall = time.time() - t0w
+    out = master.result(wall)
+    out["modules_rest"] = [md.result(wall) for md in mods[1:]]
+    out["system"] = {"modules": n_mod, "equalisation_max_v": eq["max_v"], "equalisation_mean_v": eq["sum_v"] / max(eq["n"], 1),
+                     "windows": eq["n"], "status": "OVERLAP_STOP" if any(md.ovl["stop"] for md in mods) else "COMPLETED",
+                     "overlaps": [md.ovl["count"] for md in mods], "ipk_a": [md.plant.ipk for md in mods]}
+    out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
+                             plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
+    write_out(cfg_path, cfg, out)
+
+
 @cocotb.test()
 async def cosim(dut):
     prof = None
@@ -525,6 +657,9 @@ async def cosim(dut):
         import cProfile
         prof = cProfile.Profile(); prof.enable()
     cfg_path, cfg, ref = load_cfg()
+    if int(cfg.get("modules", 1)) > 1:                                 # C3: the M-module system
+        await cosim_multi(dut, cfg_path, cfg, ref)
+        return
     p = make_params(cfg, ref)
     mod = ModuleSim(cfg, p, Ctl(dut))
     cocotb.start_soon(Clock(dut.clk, cfg["t_clk_ns"], unit="ns").start())
@@ -557,10 +692,4 @@ async def cosim(dut):
     trace = mod.trace
     if trace["h"] is not None:
         Path(trace["path"]).write_text(json.dumps({"checkpoints": len(trace["digests"]), "digests": trace["digests"]}))
-    dest = Path(os.environ.get("COSIM_OUT") or (cfg_path.parent / cfg["out"]))
-    text = json.dumps(out)
-    if dest.suffix == ".gz":
-        with gzip.open(dest, "wt") as fh:
-            fh.write(text)
-    else:
-        dest.write_text(text)
+    write_out(cfg_path, cfg, out)

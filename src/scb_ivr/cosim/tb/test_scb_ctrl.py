@@ -22,7 +22,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_avg=0,                                                          # A97
             lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
-            kp=0)                                                                # A104
+            kp=0,                                                                # A104
+            ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0)                      # C2
 
 
 def pack(values, width):
@@ -75,6 +76,8 @@ class Ctrl:
         d.cfg_vref_code.value = cfg["vref"]
         d.cfg_ki.value = cfg["ki"]
         d.cfg_kp.value = cfg["kp"]                               # A104
+        d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
+        d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
         d.adc_code.value = 0
         d.cfg_async.value = cfg["async_"]
@@ -417,6 +420,17 @@ async def voltage_loop_pi(dut):
     await c.set(adc_valid=0)
     await ReadOnly()
     assert int(dut.ton_now.value) == 143, int(dut.ton_now.value)
+
+
+@cocotb.test()
+async def external_ton(dut):
+    """C2: with cfg_ext_ton (loop off), Ton in mode P follows ext_ton at once; in mode S it stays cfg_ton."""
+    c = Ctrl(dut)
+    await c.start(vloop=0, ext_ton_en=1, ext_ton=150)
+    assert int(dut.ton_now.value) == 150, int(dut.ton_now.value)
+    await c.set(ext_ton=170)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 170, int(dut.ton_now.value)
 
 
 # ---------------- A81: asynchronous fast path of phase 1 ----------------

@@ -62,14 +62,19 @@ def run_single(cfg_path: Path, out: Path | None, t_end_us: float | None) -> None
     tag = hashlib.sha256(f"{cfg_path}|{out}|{t_end_us}".encode()).hexdigest()[:10]
     build = PROJECT / "tmp" / "cosim_build" / f"{cfg_path.stem}-{tag}"
     runner = get_runner("icarus")
-    runner.build(sources=RTL, hdl_toplevel="scb_ctrl", parameters={"N": 4, "TW": 32, "FB": int(cfg["fb"]), "CW": 8},
-                 build_dir=build, always=True)
+    m_mod = int(cfg.get("modules", 1))                                 # C3: M modules -> the generated wrapper
+    top = "scb_ctrl" if m_mod == 1 else "scb_multi"
+    params = {"N": 4, "TW": 32, "FB": int(cfg["fb"]), "CW": 8}
+    if m_mod > 1:
+        params["M"] = m_mod
+    runner.build(sources=RTL + ([HERE / "rtl" / "scb_multi.v"] if m_mod > 1 else []), hdl_toplevel=top,
+                 parameters=params, build_dir=build, always=True)
     env = {"COSIM_CFG": str(cfg_path), "COSIM_PROVENANCE": json.dumps(provenance(cfg_path))}
     if out is not None:
         env["COSIM_OUT"] = str(out)
     if t_end_us is not None:
         env["COSIM_T_END_US"] = str(t_end_us)
-    runner.test(hdl_toplevel="scb_ctrl", test_module="bridge", build_dir=build, test_dir=HERE, extra_env=env,
+    runner.test(hdl_toplevel=top, test_module="bridge", build_dir=build, test_dir=HERE, extra_env=env,
                 results_xml=str(build / "results.xml"))
 
 
