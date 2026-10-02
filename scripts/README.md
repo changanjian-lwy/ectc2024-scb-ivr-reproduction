@@ -49,6 +49,7 @@
   needs, measured in A100's comparator load-step runs, and runs D54's
   Monte Carlo for each rule: tracking against jitter.
 - The auxiliary-branch scripts (D56, D57) are an extension: `extensions/aux_commutation_branch/scripts/`.
+- `p24_startup_averaged.py` (D58) runs the averaged start-up model: validation against the reference start-up and A103's cases.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

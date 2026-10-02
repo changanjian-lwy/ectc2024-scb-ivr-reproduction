@@ -864,6 +864,14 @@ agree, up to 32 LSB (adaptive delta modulation).
 - **Status:** recommended, pending the project's trade-off review
   (`reports/TRADEOFF_SCORECARD.md`).
 
+`A103_p24_startup_sequence` (with D58, an averaged start-up model) fixes the
+start-up by sequence only. Load from t = 0, handover at 72 µs, mode S Ton at
+the full-load value:
+- Vo peaks at 1.013 V, 17.6 µs above 1 V, within 1% from 73.5 µs (before:
+  1.277 V, then 0.903 V, 205.7 µs);
+- this meets VRD 11.1's overshoot limits;
+- it needs a boot load near the full load.
+
 A101 and A102 (with D56 and D57) are an extension, not the reproduction:
 an auxiliary commutation branch added to P24's topology. They moved to
 `extensions/aux_commutation_branch/` on 2026-10-02.

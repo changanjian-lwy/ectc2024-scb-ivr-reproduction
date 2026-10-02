@@ -721,6 +721,27 @@ each question:
            reaches 1.277 V at the handover (88.6 µs), dips to 0.903 V and
            settles by about 150 µs. The start-up is the next main-line item.
 
+     22. Done: the start-up sequence (main line).
+         - [A103](../experiments/track_A_periodic_steady_state/A103_p24_startup_sequence/RESULTS.md),
+           Verilog co-simulation.
+         - [D58](../symbolic_derivations/03_P24_native/D58_P24_STARTUP_AVERAGED.md),
+           averaged model: mode S is a voltage source, mode P a Ton-set
+           current source, plus the integral loop. Within 0.03 V of the
+           reference start-up.
+
+         **Results.**
+         - **The cause.** The overshoot (1.277 V) was mode S open loop at no
+           load. The dip (0.903 V) was the load arriving at the handover.
+         - **The fix, by sequence only.** Load from t = 0, handover at 72 µs,
+           mode S Ton at the full-load value. Vo peaks at 1.013 V, is
+           17.6 µs above 1 V and within 1% from 73.5 µs (before: 205.7 µs).
+           This meets VRD 11.1's overshoot limits; the final state is
+           unchanged.
+         - **The condition.** The boot load must be ≳ 70% of full load. A
+           light boot load needs a regulated mode S with a reference soft
+           start (RTL), and mode P's light-load limit (≈ 100 A at the lower
+           Ton clamp) remains.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
@@ -737,7 +758,7 @@ each question:
         - load and line steps.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;
-        - start-up (mode S and the handover).
+        - start-up: the sequence is done (A103); a regulated mode S for a light boot load is open.
 
      After that, the four-phase mathematical model with the valley
      trigger.
