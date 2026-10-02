@@ -1,0 +1,39 @@
+{
+ "design": "fc100",
+ "kp_lsb_per_v": 6043.224581759363,
+ "ki_lsb_per_v_per_sample": 176.33593033605013,
+ "steps": {
+  "m25": {
+   "extreme_mv": 6.230834595537971,
+   "t_extreme_us": 3.220000000001721,
+   "back_within_1pct_us": 0.0,
+   "ton_final_lsb": 516.4489333333333,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.505618282806819
+  },
+  "p25": {
+   "extreme_mv": -6.3425050687578866,
+   "t_extreme_us": 2.8200000000015213,
+   "back_within_1pct_us": 0.0,
+   "ton_final_lsb": 619.3974,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5139834448741887
+  },
+  "m62": {
+   "extreme_mv": 15.450696312368839,
+   "t_extreme_us": 2.8000000000015115,
+   "back_within_1pct_us": 6.698000000003455,
+   "ton_final_lsb": 439.2221333333333,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5059830097150497
+  },
+  "p62": {
+   "extreme_mv": -15.932882277699512,
+   "t_extreme_us": 3.11800000000167,
+   "back_within_1pct_us": 8.948000000004576,
+   "ton_final_lsb": 696.7444666666667,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5061479443412287
+  }
+ }
+}
