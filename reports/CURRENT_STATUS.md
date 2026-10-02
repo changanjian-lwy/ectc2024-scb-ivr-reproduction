@@ -971,6 +971,21 @@ each question:
          - **Open:** derive the per-phase current split during ladder
            motion.
 
+     35. Module spread, and the multi-module level closed.
+         - [C04](../experiments/track_C_multi_module/C04_module_spread/RESULTS.md):
+           - Cs ±20%: currents ±0.4%;
+           - R ±30%: ±1.3% (the slaves act as ~3.3 mΩ sources);
+           - with L ±5%: −5.2 / +6.1%.
+           - No overlap, uniform interleave, zero voltage kept.
+         - **Summary for evaluation:**
+           [MULTI_MODULE_SUMMARY_2026-10-02.md](MULTI_MODULE_SUMMARY_2026-10-02.md):
+           - the design;
+           - the results;
+           - the differences from P24;
+           - the choices (sharing, bus slew, zero voltage during ladder
+             motion, Ton resolution, slave reference);
+           - what is not in this level.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
