@@ -46,11 +46,13 @@ the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final 
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
 Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
-"vm0_v" 0.0, "phases" 1..N, "valley_zero" 0}, A101): per phase Lr and a bidirectional switch (2 dies of alpha x
-EPC2067 in series, 2 RDS(on) / alpha) from Cm to x_k, switched with the low side complemented and opening at zero
-current; with "valley_zero" 1 the high side's valley measurement stops at its first V_DS <= 0 (in A101 this made the
-turn-off currents of phases 2-4 unstable; the plain valley measurement is stable). Sections add Cm's
-voltages and each branch's int i^2 dt and extremes since the last section. Every run records the phase current (and
+"vm0_v" 0.0 (or one per branch), "phases" 1..N, "valley_zero" 0, "t_en_us" 0}, A101, A102): per phase Lr and a
+bidirectional switch (2 dies of alpha x EPC2067 in series, 2 RDS(on) / alpha) from Cm (precharged to vm0_v) to x_k,
+switched with the low side complemented and opening at zero current; with t_en_us > 0 the branches stay open until
+the first window at or after t_en_us and each starts at its next low-side turn-off; with "valley_zero" 1 the high
+side's valley measurement stops at its first V_DS <= 0 (in A101 this made the turn-off currents of phases 2-4
+unstable; the plain valley measurement is stable). Sections add Cm's voltages and each branch's int i^2 dt and
+extremes since the last section. Every run records the phase current (and
 the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
 """
 import gzip
@@ -129,10 +131,11 @@ async def cosim(dut):
         r_bds = 2 * aux.get("rds_on_mohm", 1.3) * 1e-3 / aux["alpha"]
         extra.update(aux_phases=tuple(aux.get("phases", range(1, N + 1))), aux_l=aux["lr_nh"] * 1e-9,
                      aux_r=r_bds + aux.get("r_lr_mohm", 0.2) * 1e-3, aux_c=aux.get("cm_uf", 1.0) * 1e-6,
-                     aux_vm0=aux.get("vm0_v", 0.0))
+                     aux_vm0=tuple(aux["vm0_v"]) if isinstance(aux.get("vm0_v"), list) else aux.get("vm0_v", 0.0))
     p = Params(**{k: pr[k] for k in keep}, diode_check=True, **extra)
     na = len(p.aux_phases)
-    y0 = [0.0] * (2 * N) + [p.aux_vm0] * na + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
+    vm0 = list(p.aux_vm0) if isinstance(p.aux_vm0, (list, tuple)) else [p.aux_vm0] * na   # A102: per branch
+    y0 = [0.0] * (2 * N) + vm0 + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
     plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[True] + [False] * (N - 1), gl=[False] + [True] * (N - 1))
     nv = plant.nv
     io = plant.sim.idx["out"]
@@ -210,6 +213,10 @@ async def cosim(dut):
     use_c = hasattr(plant, "attach_monitors")
     if use_c:
         plant.attach_monitors(mon)
+    t_en = aux.get("t_en_us", 0.0) * 1e-6 if aux else 0.0             # A102: branches disarmed until t_en
+    en = {"t": None if t_en > 0 else 0.0}
+    if t_en > 0:
+        plant.aux_armed = [False] * na; plant.aux_cmd = [False] * na; plant.aux_on = [False] * na
     pend = []                                   # heap of (t_apply, seq, j, level, meta)
     seq = [0]
     meas_m = {}; meas_r = {}                    # phase -> measurement to deliver
@@ -408,6 +415,8 @@ async def cosim(dut):
         adc.clear()
         dut.hand_req.value = int(plant.t >= p.t_hand)
         plant.load_on = plant.t >= p.t_load
+        if en["t"] is None and plant.t >= t_en:                  # A102: arm the branches (each starts at its
+            plant.aux_armed = [True] * na; en["t"] = plant.t     # next low-side turn-off)
         # plant through window [w, w + 2^fb) LSB
         t_win_end = (w + (1 << fb)) * lsb
         while pend and pend[0][0] < t_win_end:
@@ -448,7 +457,8 @@ async def cosim(dut):
     out["highoffs_last"] = highoffs[-keep_n:]                    # A101
     if na:
         out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
-                             "vm0_v": p.aux_vm0, "valley_zero": int(mon.vmin_zero)}
+                             "vm0_v": vm0, "valley_zero": int(mon.vmin_zero), "t_en_us": t_en * 1e6,
+                             "t_armed_s": en["t"]}
     out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
                              plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
     if prof is not None:

@@ -28,7 +28,9 @@ from .circuit import PROJECT, Sim
 def _aux_setup(plant, p, gl):
     """A101: the auxiliary branches' state. Each branch's bidirectional switch is commanded with its phase's low side
     complemented (on at the low-side turn-off, open-command at the low-side turn-on) and conducts from the command
-    on until its current reaches zero after the open-command."""
+    on until its current reaches zero after the open-command. aux_armed (A102, default all True): a disarmed
+    branch ignores its low side's edges; the bridge arms it at the enable time, so it starts at the next low-side
+    turn-off."""
     plant.aux_k = [int(k) - 1 for k in p.aux_phases]
     plant.na = len(plant.aux_k)
     plant.aux_col = [plant.nv + p.n + a for a in range(plant.na)]     # state index of each branch current
@@ -36,6 +38,7 @@ def _aux_setup(plant, p, gl):
     plant.aux_cmd = list(cmd)
     plant.aux_on = list(cmd)
     plant.aux_e2 = [0.0] * plant.na; plant.aux_imax = [0.0] * plant.na; plant.aux_imin = [0.0] * plant.na
+    plant.aux_armed = [True] * plant.na
 
 
 def _aux_after(plant, i_prev, h):
@@ -63,9 +66,11 @@ def _aux_after(plant, i_prev, h):
 
 
 def _aux_gate(plant, j, level):
-    """A101: a low-side edge of a phase with a branch sets its switch command to the complement."""
+    """A101: a low-side edge of a phase with an armed branch sets its switch command to the complement."""
     if plant.na and j >= plant.n and (j - plant.n) in plant.aux_k:
         a = plant.aux_k.index(j - plant.n)
+        if not plant.aux_armed[a]:
+            return
         cmd = list(plant.aux_cmd); cmd[a] = not bool(level); plant.aux_cmd = cmd
         if not level:
             on = list(plant.aux_on); on[a] = True; plant.aux_on = on

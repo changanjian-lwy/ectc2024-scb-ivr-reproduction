@@ -4,6 +4,27 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A102) - branch enable time and per-branch precharge
+
+- **`plant.py`:** `aux_armed` (default all True). A disarmed branch
+  ignores its low side's edges, so its switch stays open; once armed it
+  starts at its next low-side turn-off. Python-side only (`_aux_gate`),
+  shared by all four plants; the C kernel is unchanged.
+- **`bridge.py`:** cfg `aux` keys `t_en_us` (default 0: armed from the
+  start, as A101) and `vm0_v` as one value or one per branch. With
+  `t_en_us` > 0 the branches start disarmed and open, and are armed at
+  the first window at or after `t_en_us`. `aux_params` records `vm0_v`
+  as a list per branch, `t_en_us` and `t_armed_s`.
+- **Gates:**
+  - `--full` regression PASS (format additions as before);
+  - `tests/test_cosim_plants.py`: `CosimPlantAuxEnable` (disarmed for
+    150 ns, then armed; per-branch precharges): FastPlant and KernelPlant
+    bit-identical with ReferencePlant, and no branch current while
+    disarmed;
+  - A101's `dz_vz0` and `p125` rerun to 100 µs: every section equal to
+    the archived runs.
+- **RTL unchanged.**
+
 ## 2026-10-02 (A101) - auxiliary commutation branches
 
 - **`circuit.py`:** `aux_phases`, `aux_l`, `aux_r`, `aux_c`, `aux_vm0`.

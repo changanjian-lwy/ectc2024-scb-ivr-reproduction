@@ -202,5 +202,43 @@ class CosimPlantAuxEquivalence(unittest.TestCase):
         self.assertGreater(r.steps, 20000)
 
 
+class CosimPlantAuxEnable(CosimPlantAuxEquivalence):
+    """A102: the same branches disarmed for the first 150 ns (they ignore their low sides' edges and carry no current),
+    then armed (each starts at its next low-side turn-off); per-branch precharges 8.5-9.4 V."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.y0 = cls.y0[:2 * N] + [8.5, 8.8, 9.1, 9.4] + cls.y0[3 * N:]
+
+    def lockstep(self, other_cls):
+        p = self.p
+        gh, gl = [True] + [False] * (N - 1), [False] + [True] * (N - 1)
+        r, f = ReferencePlant(p, self.y0, gh, gl), other_cls(p, self.y0, gh, gl)
+        for pl in (r, f):
+            pl.t = self.t0; pl.load_on = True
+            pl.aux_armed = [False] * N; pl.aux_cmd = [False] * N; pl.aux_on = [False] * N
+        t_arm, armed, opened = self.t0 + 150e-9, False, 0
+        for te, j, lvl in schedule(np.random.default_rng(5), r.t, r.t + 300e-9):
+            while r.t < te - 1e-18:
+                hh = min(p.h, te - r.t)
+                before = list(r.aux_on)
+                r._advance(hh); f._advance(hh)
+                opened += sum(1 for a, b in zip(before, r.aux_on) if a and not b)
+                self.check(r, f)
+                if not armed:
+                    self.assertEqual([r.y[c] for c in r.aux_col], [0.0] * N)
+                    self.assertFalse(any(r.aux_on))
+            if not armed and te >= t_arm:
+                r.aux_armed = [True] * N; f.aux_armed = [True] * N; armed = True
+            r.set_gate(j, lvl); f.set_gate(j, lvl)
+        self.assertTrue(armed)
+        self.assertGreater(opened, 0)
+        self.assertGreater(max(r.aux_imax), 5.0); self.assertLess(min(r.aux_imin), -5.0)
+
+    def test_kernel_plant2_loop_is_bit_identical(self):
+        self.skipTest("the C loop is covered by CosimPlantAuxEquivalence; arming is Python-side (_aux_gate)")
+
+
 if __name__ == "__main__":
     unittest.main()
