@@ -882,3 +882,17 @@ Verilog co-simulation (the branch is an opt-in part of the shared plant).
     zero voltage are kept.
   - Net −4 to −5 W for four phases (central estimate). It depends on the
     hard turn-on loss model: +0.3 to +2 W with A91's lower bound.
+
+`A102_aux_branch_scenarios` (with D57) runs the branch over the values
+A101's verdict rested on, as cases for evaluation rather than questions to
+Mihai.
+- **Losses:** the central hard turn-on estimate is the energy balance's
+  minimum, so A91's lower bound is unreachable. Net −2.6 to −5.2 W with
+  air-core Lr, a 50% gate supply and a 5 A residual included.
+- **Area:** +10-12% dies, +3.6-3.8% inductor, +1-5.5% capacitors.
+- **P24's 1-2%:** at least 5.3% for zero voltage without a branch.
+- **Co-simulation (15 runs):**
+  - enabling at 200 µs is stable but lifts Vo to 1.09-1.11 V (Ton must
+    fall 16-19%);
+  - ±62.5 A steps meet every criterion;
+  - with a branch, 2% and 5% end within 0.3 W.

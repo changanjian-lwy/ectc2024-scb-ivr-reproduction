@@ -142,8 +142,9 @@ metrics:
 | T4 | **Period jitter of phases 2-4 ↔ phase 1's turn-off current** (comparator vs timed turn-off) | A99/A100: phases 2-4 −24 to −38%, period −37 to −82%; phase 1's spread 0.17 → 0.4-1.2 A | structural; the cost is moved onto phase 1's ZVS margin | Medium. If phase 1's ZVS margin becomes the binding constraint, the next fix would push the jitter back. **Phase 1's margin needs a hard limit before adoption.** |
 | T5 | **Load-step tracking ↔ jitter** (dlo rule) | D55/A100: ±1 → ADM32 costs +7-13% spread at 30 ps, buys tracking (19-23 A → 1.4-1.7 A) | ADM32 | **High, and coupled to T6.** |
 | T6 | **Voltage-loop speed ↔ the dlo rule's tracking burden** (not yet tested) | The required dlo moves 10× faster than Ton. A faster voltage loop (Vo now moves ±12% for ±25% steps) would make Ton, and so dlo, move faster. | open | **The most likely next loop:** a faster voltage loop → a larger dlo step → more jitter → ... It should be designed together with dlo, on this table. |
-| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **not yet mapped; the largest loss term.** D56 (2026-10-02): without a source above half the rail, raising the target is the only way to zero voltage, because the 1.47 nH filter inductor needs ~33 A at the turn-off for any branch to 0 V or Vo | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
-| **T9** | **High-side turn-on loss ↔ auxiliary branch losses** (A101/D56) | A branch to a self-balanced Cm (Lr 0.75 nH): −540 nJ saved; +110 conduction, +51 gate, +55 BDS Coss, +25 high-side conduction, +9-34 turn-off overlap | A101 co-simulation: −5.0 to −5.3 W at 1.25 nH (2.1 V), −4.4 to −4.8 W at 0.75 nH (zero voltage); ripple and the low side's zero voltage kept | Low as a loop; **high as an uncertainty**: the sign depends on the hard turn-on loss model (central −4 to −5 W; A91's lower bound +0.3 to +2 W). |
+| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **Mapped for the branch (A102):** with a branch, 2% and 5% end within 0.3 W; without one, 2% loses ~2.4 W against 5%. P24's own inductor values need ≥ 5.3% for zero voltage without a branch (D57). D56 (2026-10-02): without a source above half the rail, raising the target is the only way to zero voltage, because the 1.47 nH filter inductor needs ~33 A at the turn-off for any branch to 0 V or Vo | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
+| **T9** | **High-side turn-on loss ↔ auxiliary branch losses** (A101/D56) | A branch to a self-balanced Cm (Lr 0.75 nH): −540 nJ saved; +110 conduction, +51 gate, +55 BDS Coss, +25 high-side conduction, +9-34 turn-off overlap | A101 co-simulation: −5.0 to −5.3 W at 1.25 nH (2.1 V), −4.4 to −4.8 W at 0.75 nH (zero voltage); ripple and the low side's zero voltage kept | Low as a loop. **The uncertainty is resolved by A102/D57:** the central estimate is the energy balance's minimum, so A91's lower bound is unreachable; with every other penalty (air-core Lr, 50% gate supply, 5 A residual) the net is −2.6 to −5.2 W; area +10-12% dies, +3.6-3.8% inductor, +1-5.5% capacitors. |
+| **T11** | **Branch enable ↔ Vo** (A102) | With the branch, Ton falls 16-19% (568 → 459-479 LSB) | Enabling at 200 µs: Vo to 1.09-1.11 V, within 1% after 53 µs; the precharge only sets the branch current peak (43-264 A) | Medium: a Ton feed-forward at the enable (−90 to −110 LSB) would decouple it; not tested. |
 | **T10** | **Branch saving ↔ jitter of phases 2-4** (A101) | 30 ps: turn-off-current spread 0.6 → 0.9-1.3 A, period spread 0.58 → 0.76-0.84 ns | measured, not resolved | Medium: with the branch the high side's zero voltage no longer depends on that current, so the spread costs less margin; a jitter fix must not remove the branch's timing slack. |
 | T7 | **Prediction ↔ reaction** (a recurring pattern: A89 low-side turn-on, A92 correctors, A99/A100 turn-off) | Each predicted edge removes a comparator's noise but needs learning and tracking, and moves the error elsewhere | design by design | Structural: each step is a new trade-off, not a reversal. |
 
@@ -179,6 +180,14 @@ These are design priorities, for the user and Mihai:
 - **The voltage loop.** Is ±12% on a ±25% step acceptable? If not, T6
   makes it the next item, designed together with dlo.
 - **The complexity budget.** A100 is +9% cells over A97.
+- **The auxiliary branch (A102: cases for evaluation, not questions).**
+  - Is 1-2% of the output (2.6-5.2 W) worth the area: +10-12% dies,
+    +3.6-3.8% inductor, +1-5.5% capacitors, four more floating drivers
+    per module?
+  - Which design: 1.25 nH (2 V, robust to load) or 0.75 nH (zero
+    voltage, 0.3-0.4 V at light load)?
+  - The enable transient: a Ton feed-forward, or a start with the branch
+    active?
 
 ## 7. Not yet known
 

@@ -52,6 +52,9 @@
   auxiliary commutation branch: validation against the full model, the
   branch current needed for zero voltage, Cm's charge balance, loss
   bookkeeping, timing, and A101's per-phase predictions.
+- `p24_aux_scenarios.py` (D57) runs the branch over its assumed values: P24's 1-2% claim against its own
+  inductor values, the loss grid (hard turn-on model, Lr technology, gate supply, residual current), area,
+  enable, load, and A102's per-phase predictions (5% with air-core Lr, the 2% target).
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

@@ -730,6 +730,39 @@ each question:
            handover, Cm precharged); jitter spread ×2 on phases 2-4; a real
            bidirectional switch.
 
+     22. Done, not adopted: the branch over its assumed values, as cases
+         for Mihai to evaluate instead of questions to him.
+         - [A102](../experiments/track_A_periodic_steady_state/A102_aux_branch_scenarios/RESULTS.md),
+           15 Verilog co-simulations.
+         - [D57](../symbolic_derivations/03_P24_native/D57_P24_AUX_SCENARIOS.md),
+           mathematical model.
+
+         **Worth it.** The sign rested only on the hard turn-on model. D56's
+         central estimate is the energy balance's minimum (Qoss·V for
+         identical devices), so A91's lower bound is not reachable. Net
+         saving with every penalty considered (air-core Lr, 50% gate supply,
+         5 A residual): 2.6-5.2 W, 1-2% of the output.
+
+         **Area.** Against the main stage:
+         - BDS dies +10-12%;
+         - Lr +3.6-3.8% (by peak stored energy);
+         - Cm +1-5.5%;
+         - plus four floating drivers per module.
+
+         **P24's 1-2%.** None of P24's own inductor values or node
+         compositions gives zero voltage below 5.3%.
+
+         **Co-simulation.**
+         - Enabling at 200 µs (after the handover): stable, settles in
+           24-32 µs.
+         - **New: Vo rises to 1.09-1.11 V**, because Ton must fall 16-19%
+           with the branch. A Ton feed-forward at the enable is not tested.
+         - ±62.5 A load steps: all criteria met, Vo extremes as without a
+           branch.
+         - With the branch, 2% and 5% end within 0.3 W of each other.
+         - D57 predicted the co-simulation within 0.15 V (Vm) and 0.21 V
+           (V_DS), except past-the-rail turn-ons.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
