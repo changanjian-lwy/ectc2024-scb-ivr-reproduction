@@ -35,12 +35,11 @@ Driver model ("driver", optional): low-side edges m later than high-side ones, p
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
 applied while the same phase's complement conducts is counted, and with "stop_on_overlap" the run ends there.
 
-RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki),
-async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps, eh_tgt_ps,
-err_shift), the slot rules (slot_follow, slot_guard, slot_avg) and the timed phase-1 turn-off (lo_pred, lo_learn,
-lo_tgt_ps, lo_adm, lo_smax, lo_ff, lo_kff; the bridge then measures phase 1's crossing of i_target and reports it at
-the turn-off); keys absent from cfg take the values that reproduce the
-earlier experiments.
+RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
+from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
+eh_tgt_ps, err_shift), the slot rules (slot_follow, slot_guard, slot_avg) and the timed phase-1 turn-off (lo_pred,
+lo_learn, lo_tgt_ps, lo_adm, lo_smax, lo_ff, lo_kff; the bridge then measures phase 1's crossing of i_target and
+reports it at the turn-off); keys absent from cfg take the values that reproduce the earlier experiments.
 
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
@@ -177,6 +176,7 @@ async def cosim(dut):
     dut.cfg_vref_code.value = int(round(cfg["vref_v"] / adc_lsb))
     # ki in ns of Ton per V -> Ton LSB per ADC LSB, 16 fractional bits
     dut.cfg_ki.value = int(round(cfg["ki_ns_per_v"] * adc_lsb / (lsb * 1e9) * 65536))
+    dut.cfg_kp.value = int(round(cfg.get("kp_ns_per_v", 0.0) * adc_lsb / (lsb * 1e9) * 65536))   # A104
     dut.adc_valid.value = 0
     dut.adc_code.value = 0
     dut.cfg_low_pred.value = int(cfg.get("low_pred", 0))            # A89

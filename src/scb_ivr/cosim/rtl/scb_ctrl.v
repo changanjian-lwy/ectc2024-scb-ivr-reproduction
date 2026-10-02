@@ -10,9 +10,10 @@
 //   (the configured slot until then). cfg_slot_guard is passed to phases 2..N.
 // - Phase 1's turn-off (cfg_lo_pred): timed after cfg_lo_learn comparator-decided turn-offs (scb_phase); its crossing
 //   reports mlo_* go to phase 1 only.
-// - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on),
-//   ton_acc += ki * (vref - adc_code) with FRAC fractional bits; Ton is the rounded integer part, clamped to
-//   [cfg_ton_min, cfg_ton_max]; otherwise Ton = cfg_ton.
+// - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on), e = vref - adc_code;
+//   ton_acc += ki * e (clamped) and the proportional term p_term = kp * e (A104), both with FRAC fractional bits;
+//   Ton is the rounded integer part of ton_acc + p_term, clamped to [cfg_ton_min, cfg_ton_max]; otherwise
+//   Ton = cfg_ton. With cfg_kp = 0 the loop is A79's integral loop.
 // - Comparators (current, low/high V_DS = 0, valley) pass a 2-flip-flop synchroniser; measurement reports
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses.
 // From A93's rtl (history: CHANGELOG.md).
@@ -23,6 +24,7 @@ module scb_ctrl #(
     parameter CW   = 8,
     parameter AW   = 12,   // ADC code width
     parameter KW   = 16,   // loop gain width
+    parameter KPW  = 24,   // proportional gain width (A104)
     parameter FRAC = 16    // fractional bits of the Ton accumulator
 ) (
     input  wire                clk,
@@ -46,6 +48,7 @@ module scb_ctrl #(
     input  wire                cfg_vloop,
     input  wire [AW-1:0]       cfg_vref_code,
     input  wire [KW-1:0]       cfg_ki,
+    input  wire [KPW-1:0]      cfg_kp,         // A104: proportional gain
     input  wire [N*TW-1:0]     dt_init,
     input  wire [N*CW-1:0]     trim_init,
     input  wire [N-1:0]        cmp_i,
@@ -128,7 +131,11 @@ module scb_ctrl #(
     wire signed [AW1-1:0] acc_next = ton_acc + {{(AW1 - AW - KW - 2){step[AW+KW+1]}}, step};
     wire signed [AW1-1:0] acc_min  = $signed({cfg_ton_min, {FRAC{1'b0}}});
     wire signed [AW1-1:0] acc_max  = $signed({cfg_ton_max, {FRAC{1'b0}}});
-    wire signed [AW1-1:0] acc_rnd  = ton_acc + (1 <<< (FRAC - 1));
+    reg  signed [AW1-1:0] p_term;                                  // A104
+    wire signed [AW+KPW+1:0] pstep = err * $signed({1'b0, cfg_kp});
+    wire signed [AW1-1:0] ton_sum  = ton_acc + p_term;
+    wire signed [AW1-1:0] ton_cl   = (ton_sum < acc_min) ? acc_min : (ton_sum > acc_max) ? acc_max : ton_sum;
+    wire signed [AW1-1:0] acc_rnd  = ton_cl + (1 <<< (FRAC - 1));
     wire [TW-1:0] ton_loop = acc_rnd[AW1-1:FRAC];
     assign ton_now = (cfg_vloop && mode_p) ? ton_loop : cfg_ton;
 
@@ -167,6 +174,7 @@ module scb_ctrl #(
             t_ref   <= {TW{1'b0}};
             mode_p  <= !cfg_start_s;
             ton_acc <= $signed({cfg_ton, {FRAC{1'b0}}});
+            p_term  <= {AW1{1'b0}};
         end else begin
             cyc   <= cyc + 1'b1;
             win_q <= now;
@@ -175,8 +183,10 @@ module scb_ctrl #(
                 if (!mode_p && hand_req)
                     mode_p <= 1'b1;
             end
-            if (adc_valid && cfg_vloop && mode_p)
+            if (adc_valid && cfg_vloop && mode_p) begin
                 ton_acc <= (acc_next < acc_min) ? acc_min : (acc_next > acc_max) ? acc_max : acc_next;
+                p_term  <= {{(AW1 - AW - KPW - 2){pstep[AW+KPW+1]}}, pstep};
+            end
         end
     end
 

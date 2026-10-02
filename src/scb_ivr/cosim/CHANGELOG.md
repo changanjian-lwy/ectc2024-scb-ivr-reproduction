@@ -4,6 +4,22 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A104) - proportional term in the voltage loop
+
+- **`rtl/scb_ctrl.v`:** input `cfg_kp` (parameter KPW = 24, FRAC = 16
+  fractional bits).
+  - At each ADC sample in mode P with the loop on, p_term = kp × e is
+    held.
+  - Ton = round(ton_acc + p_term), clamped to [ton_min, ton_max].
+  - With cfg_kp = 0, Ton is A79's round(ton_acc).
+- **`bridge.py`:** cfg key `kp_ns_per_v` (default 0), in the same units as
+  `ki_ns_per_v`.
+- **Gates:**
+  - RTL unit tests 46 of 46 (2 new: `voltage_loop_proportional`,
+    `voltage_loop_pi`);
+  - synthesis `check -assert` clean, 46 468 cells (A100: 43 924);
+  - `--full` regression PASS.
+
 ## 2026-10-02 (A103) - start-up sequence timing
 
 - **`bridge.py`:** cfg keys `t_load_us` and `t_hand_us` override the init

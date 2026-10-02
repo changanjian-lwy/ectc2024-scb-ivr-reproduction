@@ -21,7 +21,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_follow=0, slot_guard=0,                                         # A93
             slot_avg=0,                                                          # A97
             lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
-            lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0)                              # A100
+            lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
+            kp=0)                                                                # A104
 
 
 def pack(values, width):
@@ -73,6 +74,7 @@ class Ctrl:
         d.cfg_vloop.value = cfg["vloop"]
         d.cfg_vref_code.value = cfg["vref"]
         d.cfg_ki.value = cfg["ki"]
+        d.cfg_kp.value = cfg["kp"]                               # A104
         d.adc_valid.value = 0
         d.adc_code.value = 0
         d.cfg_async.value = cfg["async_"]
@@ -372,6 +374,49 @@ async def voltage_loop_clamps(dut):
     await c.set(adc_valid=0)
     await ReadOnly()
     assert int(dut.ton_now.value) == 67
+
+
+@cocotb.test()
+async def voltage_loop_proportional(dut):
+    """A104: Ton = round(ton_acc + kp * e), the proportional term held from one ADC sample to the next; with ki = 0
+    Ton returns to the accumulator when the error is zero; the sum is clamped."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=65536)          # 1 LSB of Ton per ADC LSB of error
+    assert int(dut.ton_now.value) == 133
+    await c.set(adc_valid=1, adc_code=2000 - 40)   # 40 LSB below vref: +40 LSB while the sample holds
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 173, int(dut.ton_now.value)
+    await ClockCycles(dut.clk, 5)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 173, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000)        # zero error: back to the accumulator
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 133, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 - 1000) # +1000 LSB: clamped at ton_max
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 266, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 + 1000)
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 67, int(dut.ton_now.value)
+
+
+@cocotb.test()
+async def voltage_loop_pi(dut):
+    """A104: with ki and kp together, the integral keeps its sum and the proportional part follows the last sample."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=65536 // 4, kp=65536 // 2)
+    await c.set(adc_valid=1, adc_code=2000 - 40)   # integral +10, proportional +20
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 163, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000)        # integral stays +10, proportional 0
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 143, int(dut.ton_now.value)
 
 
 # ---------------- A81: asynchronous fast path of phase 1 ----------------
