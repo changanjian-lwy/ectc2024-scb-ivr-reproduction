@@ -916,6 +916,24 @@ each question:
          - **Recommended for the design from C03** (the four-module
            standard matrix).
 
+     32. The four-module standard matrix:
+         [C03](../experiments/track_C_multi_module/C03_four_module_standard_matrix/RESULTS.md).
+         - **The matrix:** 18 runs, no overlap in 72 module-runs. Each
+           module equals its single-module row (valleys within 0.05 A,
+           V_DS within 0.01 V). Steps within 8% of the single module's.
+         - **A slave at +10% L** keeps zero-voltage switching (valleys
+           ≤ −3.9 A; current −8.6%). D61's scheme A suffices to ±10%.
+         - **Open:**
+           - l_p48_1us's 207 A: phase 1's rail takes the whole step;
+             scenarios (a)-(d) for A108;
+           - rare late fires: slave 1 (C02's latency), and phase 1 with
+             `slot_lo` in line steps (mechanism not identified; late fires
+             are not time-stamped).
+         - **Literature:**
+           [LITERATURE.md](../experiments/track_C_multi_module/LITERATURE.md).
+           The decisions mapped to papers, with DOIs; eight papers added
+           and read.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
