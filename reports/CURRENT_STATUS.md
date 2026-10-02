@@ -833,6 +833,27 @@ each question:
            more spread.
          - **D60 has the structure but not the rate** at a large Cs.
 
+     28. Done: multi-module readiness (averaged, no co-simulation).
+         - [D61](../symbolic_derivations/03_P24_native/D61_P24_MULTIMODULE_READINESS.md).
+         - **The physics.** In mode P a phase's current goes as Ton/L, while
+           its period depends on Ton alone, not on L or i_neg. With unequal
+           inductors, Ton cannot give equal currents and equal periods
+           together.
+         - **Independent integrators** on a shared output diverge (±0.5 mV
+           ADC offsets).
+         - **Free-running modules slip an interleaving slot** in 9 µs per
+           LSB of Ton difference: active synchronisation is required.
+         - **Baseline:** one shared voltage loop, a common Ton, and slave
+           modules slot-synchronised. The current sharing error then equals
+           the inductor tolerance. Optionally, i_neg trims the sharing if the
+           inductors match within +6%.
+         - **The module interface:** common Ton in, phase-1 slot reference
+           in, i_neg trim in, enable/pre-bias in; module current out,
+           phase-1 timing out.
+         - **What moves to the system level:** the voltage loop (A104's
+           gains), Cout and the start-up sequence. The Cout experiment on
+           one module is dropped.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
