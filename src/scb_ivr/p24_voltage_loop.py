@@ -62,16 +62,20 @@ def _loop(m, kp, ki, vo, acc, vref, lo, hi):
     return acc, int(round(min(max(acc + kp * e, lo), hi)))
 
 
-def step(i_step, kp, ki, m: Module = Module(), t_end=150e-6, t_step=20e-6, dt=2e-9, vref=1.0, ton0=568.0, vo0=None):
+def step(i_step, kp, ki, m: Module = Module(), t_end=150e-6, t_step=20e-6, dt=2e-9, vref=1.0, ton0=568.0, vo0=None,
+         dvin=0.0, t_slew=0.0):
     """Arrays t, vo, ton from the full-load steady state (or from Vo = vo0 with Ton = ton0); i_step (A) added to the
-    load from t_step."""
-    k, t_x, vr = m.k, m.t_x, m.vin / m.n
+    load from t_step; the input changed by dvin (V) from t_step, linearly over t_slew (A106's line step; the series
+    capacitors are taken as following the input, V_rail = Vin / 4)."""
+    k, t_x = m.k, m.t_x
+    vin_at = lambda t: m.vin + dvin * (min(max((t - t_step) / t_slew, 0.0), 1.0) if t_slew > 0 else float(t >= t_step))
     lo, hi = 0.5 * ton0, 2.0 * ton0
     vo, acc, ton_cmd, t, nxt = (vref if vo0 is None else vo0), ton0, int(ton0), 0.0, 0.0
     ton_ph = [ton_cmd] * m.n
     t_ph = [TS * j / m.n for j in range(m.n)]
     out_t, out_v, out_n = [], [], []
     while t < t_end:
+        vr = vin_at(t) / m.n
         if t >= nxt:
             acc, ton_cmd = _loop(m, kp, ki, vo, acc, vref, lo, hi)
             nxt += m.period_raw(ton_cmd, vo, vr) + t_x

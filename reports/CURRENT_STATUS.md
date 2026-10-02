@@ -761,6 +761,33 @@ each question:
            jitter.
          - **Recommended: 100 kHz** (±1.7%, within 1% in 10 µs).
 
+     24. Done: the integrated single-module design on the standard matrix.
+         - [A105](../experiments/track_A_periodic_steady_state/A105_p24_integrated_standard_matrix/RESULTS.md),
+           22 Verilog co-simulations.
+
+         **The single-module level's finish line** (A105 BOUNDARY Section 1):
+         1. one integrated design passes the standard matrix (**done**);
+         2. the model cross-checks (**done**);
+         3. a summary of the open choices for evaluation (open).
+
+         Line steps are the one operating condition left (A106).
+
+         **Results.**
+         - Both candidates pass every hard constraint in 22 of 22 runs: no
+           overlap, peaks 165-176 A.
+         - **I2 (timed phase-1 turn-off + A103's start + PI 100 kHz) is
+           recommended.**
+           - It is better than I1 (comparator) on every switching row:
+             j30 0.49-0.53 A against 0.63-0.72 A; j100 1.04-1.19 against
+             1.64-1.84 A; mismatch 0.02-0.16 against 0.22-0.32 A.
+           - It is equal on the steps: ±25 A within ±6 mV, ±62.5 A within
+             ±15 mV.
+         - **T6's open half is not a blocking loop:** phase 1's sd is
+           0.16 A at 0 ps.
+         - **I1's proportional term** turns ADC-code toggling into Ton
+           dither under driver mismatch. A deadband would fix it; not
+           tested.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
