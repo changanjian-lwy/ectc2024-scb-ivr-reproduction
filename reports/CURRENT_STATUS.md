@@ -742,13 +742,32 @@ each question:
            start (RTL), and mode P's light-load limit (≈ 100 A at the lower
            Ton clamp) remains.
 
+     23. Done: the output-voltage loop as a PI on Ton (main line, T6).
+         - [A104](../experiments/track_A_periodic_steady_state/A104_p24_voltage_loop_pi/RESULTS.md),
+           Verilog co-simulation. New RTL input `cfg_kp`: +5.8% cells.
+         - [D59](../symbolic_derivations/03_P24_native/D59_P24_VOLTAGE_LOOP.md),
+           a sampled PI on D58's current-source plant. It reproduces A100's
+           steps within 2 mV.
+
+         **Results.**
+         - PI at 30-150 kHz (the present loop is 7.5 kHz) cuts ±62.5 A steps
+           from ±12% to ±4.6-1.1%, with recovery in 51-3 µs instead of
+           ~100 µs. Every registered criterion is met in all ten runs, and
+           D59 was within 7% on the excursions.
+         - The series-capacitor resonance (140 kHz) showed no effect, even
+           at 153 kHz.
+         - The cost is Ton dither: at light load, phases 2-4's turn-off sd
+           goes from 0.24 A to 0.27-0.36 A (100-150 kHz); +6-9% under 30 ps
+           jitter.
+         - **Recommended: 100 kHz** (±1.7%, within 1% in 10 µs).
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
         - the adoption decision for A100: the priorities and phase 1's ZVS
           limit in TRADEOFF_SCORECARD Section 6, then the standard matrix
           (m ≠ 0, line steps);
-        - the voltage loop, designed together with dlo (scorecard T6);
+        - the voltage loop: done for the comparator design (A104); with the timed turn-off (dlo) not yet;
         - a filtered (PLL-type) or predicted slot timebase (Huber et al.
           2009; Zhou et al. 2025) for the remaining phases 2-4 on-time
           share;

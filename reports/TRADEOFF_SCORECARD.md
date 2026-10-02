@@ -141,7 +141,7 @@ metrics:
 | T3 | **Early-step size ↔ protection** | D53: a smaller early step makes early turn-ons more frequent (25 → 32-36%) | kept at 0.2 ns | Low. |
 | T4 | **Period jitter of phases 2-4 ↔ phase 1's turn-off current** (comparator vs timed turn-off) | A99/A100: phases 2-4 −24 to −38%, period −37 to −82%; phase 1's spread 0.17 → 0.4-1.2 A | structural; the cost is moved onto phase 1's ZVS margin | Medium. If phase 1's ZVS margin becomes the binding constraint, the next fix would push the jitter back. **Phase 1's margin needs a hard limit before adoption.** |
 | T5 | **Load-step tracking ↔ jitter** (dlo rule) | D55/A100: ±1 → ADM32 costs +7-13% spread at 30 ps, buys tracking (19-23 A → 1.4-1.7 A) | ADM32 | **High, and coupled to T6.** |
-| T6 | **Voltage-loop speed ↔ the dlo rule's tracking burden** (not yet tested) | The required dlo moves 10× faster than Ton. A faster voltage loop (Vo now moves ±12% for ±25% steps) would make Ton, and so dlo, move faster. | open | **The most likely next loop:** a faster voltage loop → a larger dlo step → more jitter → ... It should be designed together with dlo, on this table. |
+| T6 | **Voltage-loop speed ↔ ZVS spread; ↔ the dlo rule's tracking burden** | A104 (comparator design): PI at 30-150 kHz cuts ±62.5 A steps from ±12% to ±4.6-1.1%. The cost is Ton dither (1-9 LSB): phases 2-4's turn-off sd at light load 0.24 → 0.27-0.36 A (100-150 kHz), +6-9% under 30 ps jitter. | **measured for the comparator design** (A104; 100 kHz recommended). With the timed turn-off (A100) the faster Ton would also move dlo faster: **not yet tested.** | Low for the comparator design. **Still the likely loop for the timed design:** a faster loop → a larger dlo step → more jitter. |
 | **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **P24's own inductor values need ≥ 5.3% for zero voltage without a branch (D57).** Without a branch, 2% loses ~2.4 W against 5% (A102's runs). The branch (an extension, `extensions/aux_commutation_branch/`) changes this trade. D56 (2026-10-02): without a source above half the rail, raising the target is the only way to zero voltage, because the 1.47 nH filter inductor needs ~33 A at the turn-off for any branch to 0 V or Vo | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
 | **T9-T11** | **The auxiliary commutation branch** (an extension, not the reproduction) | - | moved to `extensions/aux_commutation_branch/README.md` | - |
 | T7 | **Prediction ↔ reaction** (a recurring pattern: A89 low-side turn-on, A92 correctors, A99/A100 turn-off) | Each predicted edge removes a comparator's noise but needs learning and tracking, and moves the error elsewhere | design by design | Structural: each step is a new trade-off, not a reversal. |
@@ -175,8 +175,7 @@ These are design priorities, for the user and Mihai:
   stays at -6.7 to -5.8 A.
 - **Jitter against tracking.** How much spread at 30 ps is acceptable for
   how fast a load step?
-- **The voltage loop.** Is ±12% on a ±25% step acceptable? If not, T6
-  makes it the next item, designed together with dlo.
+- **The voltage loop (A104).** Which bandwidth: 60 kHz (no spread cost, ±2.6%), 100 kHz (±1.7%, +15% spread at light load) or 150 kHz (±1.1%, +40%)?
 - **The complexity budget.** A100 is +9% cells over A97.
 - **The auxiliary branch** is an extension; its open decisions are in
   `extensions/aux_commutation_branch/README.md` Section 3.

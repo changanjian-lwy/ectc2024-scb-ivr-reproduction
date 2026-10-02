@@ -872,6 +872,14 @@ the full-load value:
 - this meets VRD 11.1's overshoot limits;
 - it needs a boot load near the full load.
 
+`A104_p24_voltage_loop_pi` (with D59) adds a proportional term to the voltage
+loop (RTL `cfg_kp`).
+- PI at 30-150 kHz cuts ±62.5 A steps from ±12% to ±4.6-1.1% (recovery in
+  51-3 µs), with every criterion met.
+- D59 is within 7% on the excursions.
+- The cost is Ton dither and a slightly wider turn-off-current spread.
+- 100 kHz is recommended.
+
 A101 and A102 (with D56 and D57) are an extension, not the reproduction:
 an auxiliary commutation branch added to P24's topology. They moved to
 `extensions/aux_commutation_branch/` on 2026-10-02.
