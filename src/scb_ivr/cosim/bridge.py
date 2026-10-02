@@ -46,6 +46,8 @@ the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final 
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
 Line step (cfg "line_step" {"t_us", "dv", "slew_us" 0}, A106): the input changes by dv from t_us, linearly over slew_us.
+Circuit values (cfg "circuit" {name: value in SI units}, A107): any of CIRCUIT_KEYS (vin, L, R, c_high, c_low, cs, co,
+r_load, i_load, g_on) replaces the init run's value; other names are refused.
 Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
 "vm0_v" 0.0 (or one per branch), "phases" 1..N, "valley_zero" 0, "t_en_us" 0}, A101, A102): per phase Lr and a
 bidirectional switch (2 dies of alpha x EPC2067 in series, 2 RDS(on) / alpha) from Cm (precharged to vm0_v) to x_k,
@@ -75,6 +77,7 @@ sys.path.insert(0, str(HERE.parents[1]))                              # src/, fo
 from scb_ivr.cosim.circuit import PROJECT, fit_fig8  # noqa: E402
 from scb_ivr.cosim.circuit import CircuitParams as Params  # noqa: E402
 from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant  # noqa: E402
+CIRCUIT_KEYS = ("vin", "L", "R", "c_high", "c_low", "cs", "co", "r_load", "i_load", "g_on")   # A107: cfg "circuit"
 PLANTS = {"kernel": KernelPlant, "kernel2": KernelPlant2, "fast": FastPlant, "reference": ReferencePlant}
 
 N, TW, CW = 4, 32, 8
@@ -120,6 +123,11 @@ async def cosim(dut):
     keep = ("n", "vin", "L", "R", "c_high", "c_low", "cs", "co", "load_kind", "r_load", "i_load", "g_on", "h",
             "t_ramp", "t_load", "t_hand")
     extra = {}
+    circuit = cfg.get("circuit") or {}                                # A107: circuit values as scenario inputs (SI units)
+    unknown = set(circuit) - set(CIRCUIT_KEYS)
+    if unknown:
+        raise ValueError(f"cfg 'circuit': not a circuit value: {sorted(unknown)}")
+    extra.update({k: float(v) for k, v in circuit.items()})
     if cfg.get("nonlinear_coss", 0):                                  # A89: device realism of A86-A88
         extra["nonlinear_coss"] = True
     if cfg.get("rev_drop", 0):

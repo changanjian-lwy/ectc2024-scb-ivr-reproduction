@@ -1,0 +1,92 @@
+{
+ "cs0p6": {
+  "relaxation_us": [
+   2.214312266095383,
+   0.6485570470747868,
+   0.37991592220376424
+  ],
+  "mode_s": {
+   "f_hz": [
+    364432.25522685633,
+    673383.0031820439,
+    879817.2931348897
+   ],
+   "ramp_margin_x": 71.43913437461318
+  },
+  "l_m48_1us": {
+   "extreme_mv": -8.198678921226609,
+   "t_extreme_us": 4.068000000002144,
+   "back_within_1pct_us": 0.0,
+   "ladder_dev_peak": 0.058682114541243245,
+   "ladder_back_below_1pct_us": 5.466000000002841
+  },
+  "l_p48_1us": {
+   "extreme_mv": 6.960190235652863,
+   "t_extreme_us": 3.2860000000017537,
+   "back_within_1pct_us": 0.0,
+   "ladder_dev_peak": 0.0513530830138483,
+   "ladder_back_below_1pct_us": 6.854000000003533
+  },
+  "s_m62": {
+   "extreme_mv": 15.450696312368839,
+   "t_extreme_us": 2.8000000000015115,
+   "back_within_1pct_us": 6.698000000003455,
+   "ton_final_lsb": 439.2221333333333,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5059830097150497
+  },
+  "s_p62": {
+   "extreme_mv": -15.932882277699512,
+   "t_extreme_us": 3.11800000000167,
+   "back_within_1pct_us": 8.948000000004576,
+   "ton_final_lsb": 696.7444666666667,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5061479443412287
+  }
+ },
+ "cs8p7": {
+  "relaxation_us": [
+   32.10752785838305,
+   9.404077182584409,
+   5.508780871954581
+  ],
+  "mode_s": {
+   "f_hz": [
+    95704.59890572495,
+    176839.04019240275,
+    231051.34065967848
+   ],
+   "ramp_margin_x": 18.760835802633682
+  },
+  "l_m48_1us": {
+   "extreme_mv": -8.218201764492283,
+   "t_extreme_us": 4.068000000002144,
+   "back_within_1pct_us": 0.0,
+   "ladder_dev_peak": 0.08499166608724769,
+   "ladder_back_below_1pct_us": 66.05400000002375
+  },
+  "l_p48_1us": {
+   "extreme_mv": 6.944999613734515,
+   "t_extreme_us": 3.2860000000017537,
+   "back_within_1pct_us": 0.0,
+   "ladder_dev_peak": 0.07073134814245015,
+   "ladder_back_below_1pct_us": 92.08400000008082
+  },
+  "s_m62": {
+   "extreme_mv": 15.450696312368839,
+   "t_extreme_us": 2.8000000000015115,
+   "back_within_1pct_us": 6.698000000003455,
+   "ton_final_lsb": 439.2221333333333,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5059830097150497
+  },
+  "s_p62": {
+   "extreme_mv": -15.932882277699512,
+   "t_extreme_us": 3.11800000000167,
+   "back_within_1pct_us": 8.948000000004576,
+   "ton_final_lsb": 696.7444666666667,
+   "ton_pp_late_lsb": 7.0,
+   "vo_pp_late_mv": 0.5061479443412287
+  }
+ }
+}

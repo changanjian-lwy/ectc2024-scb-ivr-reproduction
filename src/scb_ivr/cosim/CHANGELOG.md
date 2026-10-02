@@ -4,6 +4,26 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A107) - circuit values as scenario inputs; the shared standard matrix
+
+- **`bridge.py`:** cfg key `circuit` {name: value, SI}.
+  - Any of `CIRCUIT_KEYS` (vin, L, R, c_high, c_low, cs, co, r_load,
+    i_load, g_on) replaces the init run's value.
+  - Other names are refused. Structural values (n, load kind) stay out.
+  - One mechanism for every circuit-value scenario, instead of a key per
+    value.
+- **`matrix.py` (new):** the standard matrix as one definition: rows,
+  configurations from a step-free base, `window_stats`, `step_stats`.
+  - It replaces copies in experiment folders. A105's `matrix_stats.py`
+    stays as the record.
+- **Gates:**
+  - `--full` regression PASS;
+  - `circuit: {cs: 3e-6}` (the default) gives sections and steps
+    identical to no override (A105 i2_n0 to 30 µs);
+  - `tests/test_cosim_matrix.py`: the module regenerates A105's and
+    A106's configurations exactly, and its statistics equal A105's and
+    A106's.
+
 ## 2026-10-02 (A106) - input (line) step
 
 - **`circuit.py`:** `vin_step`, `t_vstep`, `t_vslew`. `vin_at` adds
