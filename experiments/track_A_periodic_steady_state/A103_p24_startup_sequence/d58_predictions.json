@@ -1,0 +1,78 @@
+{
+ "c0_reference": {
+  "vo_max_v": 1.2691813088985249,
+  "t_vo_max_us": 88.6199999999929,
+  "t_above_vid_us": 43.44999999997777,
+  "vo_min_after_handover_v": 0.8826933513647778,
+  "settle_1pct_us": 205.94999999993215,
+  "vo_final_v": 1.0002571619465654,
+  "sequence": {
+   "t_load": 8.861e-05,
+   "t_hand": 8.861e-05,
+   "t_ramp": 6.861e-05,
+   "ton_s": 533.0,
+   "vref": 1.0,
+   "ton_min_frac": 0.5,
+   "ton_max_frac": 2.0
+  },
+  "ton_at_handover_lsb": 531.0,
+  "vo_at_handover_v": 1.2689852899904663
+ },
+ "c1_load_from_0": {
+  "vo_max_v": 1.0111454194049554,
+  "t_vo_max_us": 147.45999999996243,
+  "t_above_vid_us": 59.79999999996904,
+  "vo_min_after_handover_v": 0.9318968945339384,
+  "settle_1pct_us": 156.2399999999579,
+  "vo_final_v": 1.000025376804472,
+  "sequence": {
+   "t_load": 0.0,
+   "t_hand": 8.861e-05,
+   "t_ramp": 6.861e-05,
+   "ton_s": 533.0,
+   "vref": 1.0,
+   "ton_min_frac": 0.5,
+   "ton_max_frac": 2.0
+  },
+  "ton_at_handover_lsb": 534.0,
+  "vo_at_handover_v": 0.9319014240134051
+ },
+ "c1b_load_from_0_hand_72": {
+  "vo_max_v": 1.017708701370937,
+  "t_vo_max_us": 125.18999999997396,
+  "t_above_vid_us": 60.299999999968776,
+  "vo_min_after_handover_v": 0.8984075544459476,
+  "settle_1pct_us": 145.51999999996343,
+  "vo_final_v": 1.000020164369162,
+  "sequence": {
+   "t_load": 0.0,
+   "t_hand": 7.2e-05,
+   "t_ramp": 6.861e-05,
+   "ton_s": 533.0,
+   "vref": 1.0,
+   "ton_min_frac": 0.5,
+   "ton_max_frac": 2.0
+  },
+  "ton_at_handover_lsb": 534.0,
+  "vo_at_handover_v": 0.8984316944727947
+ },
+ "c1d_load_from_0_hand_72_ton568": {
+  "vo_max_v": 1.0126962379322562,
+  "t_vo_max_us": 112.09999999998074,
+  "t_above_vid_us": 60.579999999968635,
+  "vo_min_after_handover_v": 0.9574024219986836,
+  "settle_1pct_us": 125.21999999997395,
+  "vo_final_v": 1.000004760693271,
+  "sequence": {
+   "t_load": 0.0,
+   "t_hand": 7.2e-05,
+   "t_ramp": 6.861e-05,
+   "ton_s": 568.0,
+   "vref": 1.0,
+   "ton_min_frac": 0.5,
+   "ton_max_frac": 2.0
+  },
+  "ton_at_handover_lsb": 568.0,
+  "vo_at_handover_v": 0.9574275030031646
+ }
+}

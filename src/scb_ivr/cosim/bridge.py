@@ -13,9 +13,10 @@ Time base. Each 4 ns clock cycle n covers the plant window [n*T_clk, (n+1)*T_clk
 3. it samples the comparators at the window end (current <= target + trim, low/high V_DS <= 0, valley) and writes
    them back; measurements taken at plant edges return as one-cycle pulses in the next window.
 
-Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase 1 HIGH and phases 2..N LOW, input ramp, load
-connection and handover request at t_hand; "nonlinear_coss" (datasheet Coss(V), A86) and "rev_drop" (Fig. 8
-reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
+Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase
+1 HIGH and phases 2..N LOW, input ramp, load connection at t_load and handover request at t_hand (cfg "t_load_us" /
+"t_hand_us" override them, A103); "nonlinear_coss" (datasheet Coss(V), A86) and "rev_drop" (Fig. 8 reverse
+conduction Vf + R per device, A87; reverse energy and time recorded per section).
 
 Controller-side analog functions modelled here:
 - phase 1's asynchronous front end ("async"): while arm1 is high, a latch fires at the plant step where
@@ -124,6 +125,9 @@ async def cosim(dut):
     if cfg.get("rev_drop", 0):
         vf, rr, _ = fit_fig8(10.0, 100.0)
         extra.update(rev_drop=True, rev_vf=vf, rev_r=rr)
+    for key, name in (("t_load_us", "t_load"), ("t_hand_us", "t_hand")):  # A103: start-up sequence timing
+        if key in cfg:
+            extra[name] = float(cfg[key]) * 1e-6
     if cfg.get("load_step"):                                          # A100: a load current step
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
     aux = cfg.get("aux")                                              # A101: auxiliary commutation branches
@@ -132,7 +136,7 @@ async def cosim(dut):
         extra.update(aux_phases=tuple(aux.get("phases", range(1, N + 1))), aux_l=aux["lr_nh"] * 1e-9,
                      aux_r=r_bds + aux.get("r_lr_mohm", 0.2) * 1e-3, aux_c=aux.get("cm_uf", 1.0) * 1e-6,
                      aux_vm0=tuple(aux["vm0_v"]) if isinstance(aux.get("vm0_v"), list) else aux.get("vm0_v", 0.0))
-    p = Params(**{k: pr[k] for k in keep}, diode_check=True, **extra)
+    p = Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
     na = len(p.aux_phases)
     vm0 = list(p.aux_vm0) if isinstance(p.aux_vm0, (list, tuple)) else [p.aux_vm0] * na   # A102: per branch
     y0 = [0.0] * (2 * N) + vm0 + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)

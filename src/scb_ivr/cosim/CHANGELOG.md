@@ -4,6 +4,14 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A103) - start-up sequence timing
+
+- **`bridge.py`:** cfg keys `t_load_us` and `t_hand_us` override the init
+  run's load connection and handover request times (default: the init
+  run's, 88.61 µs each).
+- **Gate:** `--full` regression PASS.
+- **RTL and plant unchanged.**
+
 ## 2026-10-02 (A102) - branch enable time and per-branch precharge
 
 - **`plant.py`:** `aux_armed` (default all True). A disarmed branch
