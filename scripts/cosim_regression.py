@@ -2,7 +2,7 @@
 
     python3 scripts/cosim_regression.py --quick      # each case to 100 us (start-up, handover, early mode P); ~3 min
     python3 scripts/cosim_regression.py --full       # each case to its end (388.61 us); ~10 min
-    [--plant kernel|fast|reference] [--jobs 4]
+    [--plant kernel|fast|reference] [--jobs N, default every core]
 
 The archived configurations are read in place (nothing is written into experiment folders); outputs go to
 tmp/regression/<mode>/. Quick: every section up to the stop time must equal the archived run's. Full: A89's gate()
@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -71,7 +72,7 @@ def main():
     mode.add_argument("--quick", action="store_true")
     mode.add_argument("--full", action="store_true")
     ap.add_argument("--plant", default=None, help="override cfg plant_impl (default: the bridge's default, kernel)")
-    ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     a = ap.parse_args()
     name = "quick" if a.quick else "full"
     out_dir = PROJECT / "tmp" / "regression" / (name + (f"_{a.plant}" if a.plant else ""))

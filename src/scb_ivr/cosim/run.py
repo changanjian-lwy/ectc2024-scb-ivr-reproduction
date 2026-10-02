@@ -3,8 +3,11 @@
     PYTHONPATH=src python3 -m scb_ivr.cosim.run CFG.json [CFG.json ...] [--jobs 4] [--out-dir DIR] [--t-end-us T]
 
 Each configuration runs in its own process: Icarus Verilog builds rtl/, cocotb runs bridge.py. At most --jobs run
-at a time (default 4, this machine's performance cores); configurations are started in the order given, so put the
-decisive ones first. Output: cfg["out"] next to the configuration, or the same file name in --out-dir; the log
+at a time (default: every core, performance and efficiency; measured 2026-10-03 on the M5: 10 jobs give ~50% more
+single-module and ~30% more four-module throughput than 4); configurations are started in the order given, so put
+the decisive ones first. When fewer configurations run at once than there are cores, an M-module run integrates its
+plants in parallel threads (COSIM_THREADS = cores // runs at once, at most M; an explicit COSIM_THREADS wins): a
+four-module run alone is ~1.7 times faster. Threads and jobs change only the wall time, never a result. Output: cfg["out"] next to the configuration, or the same file name in --out-dir; the log
 log_<stem>.txt next to the output. --t-end-us stops earlier (regression smoke runs). Every output carries
 "provenance": the git commit, whether src/scb_ivr/cosim had uncommitted changes, the configuration's sha256, the
 Python / numpy / scipy versions and the plant implementation. Build directories go to tmp/cosim_build/.
@@ -78,13 +81,14 @@ def run_single(cfg_path: Path, out: Path | None, t_end_us: float | None) -> None
                 results_xml=str(build / "results.xml"))
 
 
-def launch(cfg_path: Path, out_dir: Path | None, t_end_us: float | None) -> tuple[Path, int, float]:
+def launch(cfg_path: Path, out_dir: Path | None, t_end_us: float | None, threads: int = 1) -> tuple[Path, int, float]:
     out = out_path(cfg_path, out_dir)
     out.parent.mkdir(parents=True, exist_ok=True)
     log = out.parent / f"log_{cfg_path.stem}.txt"
     env = dict(os.environ)
     env["PATH"] = f"{OSS_BIN}:{env.get('PATH', '')}"
     env["PYTHONPATH"] = f"{SRC}:{env.get('PYTHONPATH', '')}"
+    env.setdefault("COSIM_THREADS", str(threads))
     cmd = [sys.executable, "-m", "scb_ivr.cosim.run", "--single", str(cfg_path), "--out", str(out)]
     if t_end_us is not None:
         cmd += ["--t-end-us", str(t_end_us)]
@@ -99,7 +103,7 @@ def launch(cfg_path: Path, out_dir: Path | None, t_end_us: float | None) -> tupl
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("cfgs", nargs="+", type=Path)
-    ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--out-dir", type=Path)
     ap.add_argument("--t-end-us", type=float)
     ap.add_argument("--single", action="store_true", help=argparse.SUPPRESS)
@@ -109,8 +113,10 @@ def main(argv=None):
         run_single(a.cfgs[0].resolve(), a.out, a.t_end_us)
         return 0
     cfgs = [c.resolve() for c in a.cfgs]
-    with ThreadPoolExecutor(max_workers=max(1, a.jobs)) as pool:
-        res = list(pool.map(lambda c: launch(c, a.out_dir.resolve() if a.out_dir else None, a.t_end_us), cfgs))
+    jobs = max(1, a.jobs)
+    threads = max(1, (os.cpu_count() or 1) // min(jobs, len(cfgs)))
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        res = list(pool.map(lambda c: launch(c, a.out_dir.resolve() if a.out_dir else None, a.t_end_us, threads), cfgs))
     failed = [str(o) for o, rc, _ in res if rc]
     print(f"{len(res) - len(failed)} of {len(res)} done" + (f"; failed: {failed}" if failed else ""))
     return 1 if failed else 0

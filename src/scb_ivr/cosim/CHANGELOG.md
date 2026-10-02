@@ -4,6 +4,43 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-03 (speed) - every core: more jobs by default, plant threads in M-module runs; no change in results
+
+**Asked by the user:** use more cores while running.
+
+**Measured on the M5** (4 performance + 6 efficiency cores, 16 GB):
+
+| batch | 4 jobs (before) | more jobs |
+|---|---|---|
+| 10 one-module runs, 150 µs | 81 s | **49 s** (10 jobs) |
+| 8 four-module runs, 100 µs | 143 s | **111 s** (8 jobs); 3 jobs × 4 threads 157 s; 5 jobs × 2 threads 142 s |
+
+For batches, more processes beat threads. Threads help when fewer runs
+than cores are going.
+
+**Changes:**
+- **`run.py`:** `--jobs` defaults to every core (`os.cpu_count()`).
+  - Each child gets `COSIM_THREADS = cores // (runs at once)`. An
+    explicit COSIM_THREADS wins.
+- **`bridge.py` `cosim_multi`:** with COSIM_THREADS > 1, the M plants'
+  window integration runs in a thread pool (at most M threads). The C
+  kernel releases the GIL.
+  - The window step touches only its own module's plant, monitors and
+    records, never the simulator, and every module still runs before
+    the stop check.
+  - Default COSIM_THREADS 1 when the bridge runs outside run.py.
+- **`scripts/cosim_regression.py`:** `--jobs` defaults to every core.
+- **Memory:** 252 MB per run at most (sampled), so 10 at once use
+  ~2.5 GB.
+
+**Gates (identical in every record except `wall_s` and `provenance`):**
+
+| run | how | wall (archived → now) |
+|---|---|---|
+| C02 m4_n0 | alone, 4 plant threads | 400 → 144 s |
+| C03 ls_p10 and l_p48_1us | together, 4 threads each | 353 → 203 s; 429 → 230 s |
+| `--full` regression | default jobs | PASS, 69 s |
+
 ## 2026-10-02 (speed) - fewer signal writes and reads, a partial-step cache, -O3 -mcpu=native; no change in results
 
 **Source:** a cProfile of 100 µs runs (`COSIM_PROFILE`, now also dumped

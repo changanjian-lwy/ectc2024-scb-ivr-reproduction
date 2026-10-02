@@ -63,6 +63,7 @@ the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
 """
 import gzip
 import heapq
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import sys
@@ -642,6 +643,8 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
     master = mods[0]
     nn = n_mod * N
     slot_lo = int(cfg.get("slot_lo", 0))                         # C02
+    threads = int(os.environ.get("COSIM_THREADS", "1"))          # execution only: plants integrated in parallel
+    pool = ThreadPoolExecutor(max_workers=min(threads, n_mod)) if threads > 1 else None
     sync = {"t_ref": None, "hist": [], "period": master.to_lsb(cfg["t0_ns"] * 1e-9)}
     eq = {"max_v": 0.0, "sum_v": 0.0, "n": 0}
     while master.plant.t < t_end and not any(md.ovl["stop"] for md in mods):
@@ -669,10 +672,10 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
                 md.ctl.set("ext_ref", ref_m)
                 md.ctl.set("ext_slot", (ref_m + (m * sync["period"]) // nn) % (1 << TW))
         t_win_end = (w + (1 << master.fb)) * master.lsb
-        stop = False
-        for md in mods:
-            if not md.run_window(t_win_end):
-                stop = True
+        if pool is None:
+            stop = not all([md.run_window(t_win_end) for md in mods])
+        else:                                                    # the plants in parallel (the kernel releases the GIL)
+            stop = not all([f.result() for f in [pool.submit(md.run_window, t_win_end) for md in mods]])
         flush_writes(dut, cache)
         if stop:
             break
@@ -685,6 +688,8 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         for md in mods:
             md.sample()
         flush_writes(dut, cache)
+    if pool is not None:
+        pool.shutdown()
     await RisingEdge(dut.clk)
     await ReadOnly()
     cache[READS] = {}
