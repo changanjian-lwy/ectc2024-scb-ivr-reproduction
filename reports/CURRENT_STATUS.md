@@ -854,6 +854,20 @@ each question:
            gains), Cout and the start-up sequence. The Cout experiment on
            one module is dropped.
 
+     29. Done: the module's loss budget and efficiency.
+         - [D62](../symbolic_derivations/03_P24_native/D62_P24_LOSS_BUDGET.md),
+           on A105 I2's measured waveforms and the EPC2067 datasheet.
+         - **Efficiency at 250 W out:** 80.7-89.3% with magnetic-core
+           inductors (middle case 87.9%; 85.8% at 125 C).
+         - **The middle case's three largest terms:** switch conduction
+           (36%), the high side's valley hard turn-on (26%), gate drive
+           (21%).
+         - **P24 Table 2's air-core embedded inductors** (4-6 mΩ/nH) would
+           give ~52%. At 1.47 nH and 125 A, only a low-R/L magnetic core is
+           viable.
+         - **Erratum:** the extension's D57 "as_main_inductor" case was the
+           switch resistance. The effect is small.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

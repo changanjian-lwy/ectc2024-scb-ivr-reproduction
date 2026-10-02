@@ -1,0 +1,164 @@
+{
+ "measured": {
+  "phases": [
+   {
+    "valley": -6.3062045904583846,
+    "peak": 133.7319683060654,
+    "vds_on": 8.963367266915778
+   },
+   {
+    "valley": -6.919411036693383,
+    "peak": 133.3945840424064,
+    "vds_on": 8.911298210463803
+   },
+   {
+    "valley": -6.923919822777805,
+    "peak": 133.39526457208459,
+    "vds_on": 8.908643387650532
+   },
+   {
+    "valley": -5.862407477450421,
+    "peak": 135.84229107904432,
+    "vds_on": 9.061456332246992
+   }
+  ],
+  "ton_s": 1.7744375000000004e-08,
+  "period_s": 2.320394158291458e-07,
+  "rails_v": [
+   12.227037294067621,
+   11.898229094818387,
+   11.912576403439108,
+   11.962157207674885
+  ],
+  "dv_next_v": [
+   11.898229094818387,
+   11.912576403439108,
+   11.962157207674885,
+   0.0
+  ],
+  "p_rev_w": 0.0,
+  "p_out_w": 250.04458969223896
+ },
+ "scenarios": {
+  "best": {
+   "assumptions": {
+    "ron": 0.0013,
+    "l_tech": "mpc_hbs1_500nH",
+    "esr_cs": 0.0005,
+    "q_gate": 1.51e-08,
+    "t_f": 5e-10
+   },
+   "w": {
+    "switch_conduction": 10.289171787803483,
+    "inductor_copper": 2.6364306007757548,
+    "series_caps": 1.305710631537254,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.23917611630482474,
+    "gate_drive": 6.507515090073474,
+    "reverse_conduction": 0.0,
+    "total": 29.910128499567968,
+    "efficiency": 0.8931608343922409
+   }
+  },
+  "middle": {
+   "assumptions": {
+    "ron": 0.00155,
+    "l_tech": "mpc_hbs1_500nH",
+    "esr_cs": 0.001,
+    "q_gate": 1.71e-08,
+    "t_f": 7.5e-10
+   },
+   "w": {
+    "switch_conduction": 12.267858670073384,
+    "inductor_copper": 2.6364306007757548,
+    "series_caps": 2.611421263074508,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.5381462616858557,
+    "gate_drive": 7.369437618560028,
+    "reverse_conduction": 0.0,
+    "total": 34.35541868724271,
+    "efficiency": 0.8792003597925304
+   }
+  },
+  "worst_magnetic": {
+   "assumptions": {
+    "ron": 0.00155,
+    "l_tech": "mpc_hbs1_20nH",
+    "esr_cs": 0.002,
+    "q_gate": 2.23e-08,
+    "t_f": 1e-09
+   },
+   "w": {
+    "switch_conduction": 12.267858670073384,
+    "inductor_copper": 22.808814357856402,
+    "series_caps": 5.222842526149016,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.956704465219299,
+    "gate_drive": 9.610436192625064,
+    "reverse_conduction": 0.0,
+    "total": 59.79878048499634,
+    "efficiency": 0.8070031950311201
+   }
+  },
+  "middle_125C": {
+   "assumptions": {
+    "ron": 0.0024578981481481474,
+    "l_tech": "mpc_hbs1_500nH",
+    "esr_cs": 0.001,
+    "q_gate": 1.71e-08,
+    "t_f": 7.5e-10
+   },
+   "w": {
+    "switch_conduction": 19.453643294784882,
+    "inductor_copper": 2.6364306007757548,
+    "series_caps": 2.611421263074508,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.5381462616858557,
+    "gate_drive": 7.369437618560028,
+    "reverse_conduction": 0.0,
+    "total": 41.541203311954206,
+    "efficiency": 0.8575335139481338
+   }
+  },
+  "middle_ideal_inductor": {
+   "assumptions": {
+    "ron": 0.00155,
+    "l_tech": "ideal",
+    "esr_cs": 0.001,
+    "q_gate": 1.71e-08,
+    "t_f": 7.5e-10
+   },
+   "w": {
+    "switch_conduction": 12.267858670073384,
+    "inductor_copper": 0.0,
+    "series_caps": 2.611421263074508,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.5381462616858557,
+    "gate_drive": 7.369437618560028,
+    "reverse_conduction": 0.0,
+    "total": 31.718988086466954,
+    "efficiency": 0.8874269402151803
+   }
+  },
+  "middle_air_core_inductor": {
+   "assumptions": {
+    "ron": 0.00155,
+    "l_tech": "substrate_air",
+    "esr_cs": 0.001,
+    "q_gate": 1.71e-08,
+    "t_f": 7.5e-10
+   },
+   "w": {
+    "switch_conduction": 12.267858670073384,
+    "inductor_copper": 195.66384865808192,
+    "series_caps": 2.611421263074508,
+    "hard_turn_on": 8.932124273073178,
+    "turn_off_overlap": 0.5381462616858557,
+    "gate_drive": 7.369437618560028,
+    "reverse_conduction": 0.0,
+    "total": 227.38283674454888,
+    "efficiency": 0.5237331913635783
+   }
+  }
+ }
+}

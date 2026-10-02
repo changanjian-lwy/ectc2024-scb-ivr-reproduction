@@ -105,3 +105,12 @@ A101's and A102's BOUNDARY and RESULTS are registered records and keep the paths
 - The run records' provenance keeps the configuration paths they ran with.
 - After the move, the analyses and both scripts were rerun from the new places, and every output equals the
   committed one.
+
+## Erratum (2026-10-02, found in D62)
+
+D57's Lr technology "as_main_inductor" (0.54 mΩ per 1.4667 nH) is not the main
+inductor's resistance. It is the plant's duty-weighted switch on-resistance
+(A72). The main inductor's DCR is 0 in this model.
+- **Effect on the branch's nets:** small. That case gives 0.28-0.46 mΩ
+  against the fixed 0.2 mΩ; the Table 2 cases are unaffected.
+- **Real inductor technologies:** see the main line's D62.
