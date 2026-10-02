@@ -868,6 +868,32 @@ each question:
          - **Erratum:** the extension's D57 "as_main_inductor" case was the
            switch resistance. The effect is small.
 
+     30. Track C started (multi-module): 4 modules, 16 phases, 1 kW.
+         - **Framework:**
+           - [Track C README](../experiments/track_C_multi_module/README.md):
+             module count and the P24 consistency table;
+           - C1: the bridge per module, bit-identical;
+           - C2/C3: slave RTL, the generated `scb_multi`, M plants joined
+             at every 4 ns window; M = 1 bit-identical.
+         - **First experiment:**
+           [C01](../experiments/track_C_multi_module/C01_four_modules_baseline/RESULTS.md),
+           four A105 I2 modules on one output (D61 scheme A).
+           - Every registered criterion passes except the L5 sharing check
+             as written. Its metric reads 2% high; normalised, the result
+             is within 2.3 A of D61.
+           - Four identical modules behave as one module ×4:
+             - steps +11.4 / −14.6 mV vs +11.65 / −14.68 mV;
+             - start-up 1.0131 V;
+             - valleys and high-side turn-on equal.
+           - ±5% L shares ±4.7% (D61 ±5.5%).
+         - **Flagged deviation:** the 16-phase interleave is not uniform.
+           Phase 1 of each module sits one valley delay (9.44 ns) early
+           (A93/A97's slot reference). The output current ripple is
+           45.9 A rms against 6.6 A for a uniform grid. Correction: C02.
+         - **New mechanism:** the slaves' valleys are not regulated (only
+           the master's phase 1 is boundary-timed). D61's scheme B (i_neg
+           trim) needs a per-slave valley target.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

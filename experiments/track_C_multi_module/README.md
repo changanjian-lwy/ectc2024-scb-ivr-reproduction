@@ -18,7 +18,7 @@ Started 2026-10-02, after the single-module level closed:
 
 | point | P24 (where) | here | tag |
 |---|---|---|---|
-| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number |
+| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; the aim is a uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number. **DEVIATION found in C01:** phase 1 of each module sits one valley delay (9.44 ns) early (A93/A97's slot reference), gaps 4.4-23.9 ns for 14.5 ns, output current ripple 45.9 A rms against 6.6 A uniform. Correction: C02 |
 | all high sides at the same frequency and duty cycle; the same for the low sides | Sec. III-B | one shared Ton for every module (D61's baseline); the period follows Ton | consistent |
 | IL_peak per phase = 2 Io / (nP · nM) | Eq. / Table 1 | 4 × 4, 125 A | P24_EXPLICIT |
 | current sharing between phases and modules is "the primary challenge" | Sec. III-B | no method in P24; ours: a shared loop and common Ton, sharing error = inductor tolerance (D61); option: negative-current trim | PROJECT_DECISION |
@@ -47,3 +47,11 @@ Started 2026-10-02, after the single-module level closed:
   - Gates: M = 1 reproduces the single module; then M = 2.
 - **C4. M = 4 on the standard matrix**, with inductor tolerances, against
   D61; the system-level start-up and line feed-forward.
+
+## 4. Experiments
+
+| experiment | one factor | result |
+|---|---|---|
+| [C01](C01_four_modules_baseline/RESULTS.md) | module count 1 → 4 (A105's I2, D61 scheme A) | works as D61 predicts: locked periods, ±5% L → ±4.7% sharing, steps and start-up equal to one module. Flagged: the interleave is not uniform (ripple ×7 in rms); the slaves' valleys are unregulated |
+| C02 (next) | the interleave reference: phases 2-4 and the slaves slotted from phase 1's low-side turn-off | - |
+| C03 (planned) | the four-module standard matrix (driver mismatch, j100, line steps, +5% L on a slave) | - |
