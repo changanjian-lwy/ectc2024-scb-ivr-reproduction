@@ -2644,8 +2644,8 @@ Optimizing module $paramod$ee5efb1378799d86298dc5d8e521cbae9af0c529\scb_phase.
 
 4.20. Executing TECHMAP pass (map to technology primitives).
 
-4.20.1. Executing Verilog-2005 frontend: /Users/lawyer/tools/oss-cad-suite/libexec/../share/yosys/techmap.v
-Parsing Verilog input from `/Users/lawyer/tools/oss-cad-suite/libexec/../share/yosys/techmap.v' to AST representation.
+4.20.1. Executing Verilog-2005 frontend: ~/tools/oss-cad-suite/libexec/../share/yosys/techmap.v
+Parsing Verilog input from `~/tools/oss-cad-suite/libexec/../share/yosys/techmap.v' to AST representation.
 Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
 Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
 Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
