@@ -61,6 +61,7 @@ dynamic output capacitor. Check the case boundary before transferring results.
 | Events & control | Zero crossings, ZVS admission, latched targets and gate transitions | [reusable modules](src/scb_ivr/README.md) |
 | Devices & experiments | Explicit models and controlled comparisons | [experiments](experiments/README.md) |
 | Verification | Tests, first-failure diagnostics and circuit cross-checks | [tests](tests/README.md) · [validation](validation/README.md) |
+| Extensions | Our additions beyond P24 and P25 (topology or hardware the papers do not have), kept apart from the reproduction | [extensions](extensions/README.md) |
 
 P24/P25 conflicts create separate branches. A three-phase result is never
 silently relabeled as four-phase. Capacitor/current states are not reset to

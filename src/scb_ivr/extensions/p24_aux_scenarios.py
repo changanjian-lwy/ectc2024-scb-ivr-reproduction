@@ -23,7 +23,7 @@ from dataclasses import replace
 import numpy as np
 from scipy.optimize import brentq
 
-from scb_ivr.p24_aux_commutation import AuxBranch, EdgeCircuit, Model
+from scb_ivr.extensions.p24_aux_commutation import AuxBranch, EdgeCircuit, Model
 
 EPC2067_DIE_MM2 = 2.85 * 3.25        # EPC2067 datasheet die, as P24 Table 3 counts it (80 x 3.25 x 2.85 = 741 mm^2)
 P24_PEAK_A = 125.0                   # P24 Table I / Table 3: 4 phases x 4 modules, IL_peak per phase = 2 Io / (nP nM)

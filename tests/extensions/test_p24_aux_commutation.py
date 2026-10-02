@@ -1,12 +1,12 @@
-"""Tests of the D56 single-phase edge and auxiliary-branch model (src/scb_ivr/p24_aux_commutation.py)."""
+"""Tests of the D56 single-phase edge and auxiliary-branch model (src/scb_ivr/extensions/p24_aux_commutation.py; an extension)."""
 import json
 import unittest
 from dataclasses import replace
 from pathlib import Path
 
-from scb_ivr.p24_aux_commutation import AuxBranch, Model, phase_circuits
+from scb_ivr.extensions.p24_aux_commutation import AuxBranch, Model, phase_circuits
 
-ORBIT = Path(__file__).resolve().parents[1] / "symbolic_derivations" / "03_P24_native" / "diagnostics" / "D51_orbit_5p0pct_m0p0.json"
+ORBIT = Path(__file__).resolve().parents[2] / "symbolic_derivations" / "03_P24_native" / "diagnostics" / "D51_orbit_5p0pct_m0p0.json"
 
 
 class AuxCommutationTests(unittest.TestCase):

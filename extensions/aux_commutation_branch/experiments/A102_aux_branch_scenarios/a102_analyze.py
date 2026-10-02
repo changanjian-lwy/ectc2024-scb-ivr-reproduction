@@ -22,16 +22,17 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-TA = HERE.parent
-PROJECT = HERE.parents[2]
-sys.path.insert(0, str(PROJECT / "src")); sys.path.insert(0, str(TA / "A101_aux_commutation_branch"))
+EXPS = HERE.parent                                   # this extension's experiments
+PROJECT = HERE.parents[3]
+TA = PROJECT / "experiments" / "track_A_periodic_steady_state"
+sys.path.insert(0, str(PROJECT / "src")); sys.path.insert(0, str(EXPS / "A101_aux_commutation_branch"))
 from a101_analyze import bookkeeping, stats  # noqa: E402
-from scb_ivr.p24_aux_commutation import QG, VGATE, Model, phase_circuits  # noqa: E402
-from scb_ivr.p24_aux_scenarios import hard_on, zcs_residual  # noqa: E402
+from scb_ivr.extensions.p24_aux_commutation import QG, VGATE, Model, phase_circuits  # noqa: E402
+from scb_ivr.extensions.p24_aux_scenarios import hard_on, zcs_residual  # noqa: E402
 
 N, LAST = 4, 200
 DIAG = PROJECT / "symbolic_derivations" / "03_P24_native" / "diagnostics"
-A101C, A100C, C = TA / "A101_aux_commutation_branch" / "cosim", TA / "A100_timed_turn_off_load_steps" / "cosim", HERE / "cosim"
+A101C, A100C, C = EXPS / "A101_aux_commutation_branch" / "cosim", TA / "A100_timed_turn_off_load_steps" / "cosim", HERE / "cosim"
 FINAL = {"125": "p125", "075": "dz_vz0"}
 LSB_NS = 4.0 / 128
 R_L, R_HS, R_LS = 0.54e-3, 1.3e-3 / 2, 1.3e-3 / 3
@@ -99,7 +100,7 @@ def main():
     models5 = [Model(c) for c in phase_circuits(orbit5)]
     models2 = [Model(c) for c in phase_circuits(orbit2)]
     pred = json.loads((HERE / "d57_predictions.json").read_text())
-    d56 = json.loads((DIAG / "D56_aux_commutation_5p0pct.json").read_text())
+    d56 = json.loads((HERE.parents[1] / "derivations" / "diagnostics" / "D56_aux_commutation_5p0pct.json").read_text())
     main_cond = {r["lr_nh"]: r["energy_nj"]["hs_conduction"] + r["energy_nj"]["ls_tail_conduction"]
                  for r in d56["cycle"] if r["dead_time"] == "retuned"}
     out = {"enable": {}, "steps": {}, "two_pct": {}, "realism": {}, "loss_scenarios": {}, "conduction": {}}

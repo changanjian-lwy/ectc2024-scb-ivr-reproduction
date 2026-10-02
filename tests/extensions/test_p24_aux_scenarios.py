@@ -1,11 +1,11 @@
-"""D57 (src/scb_ivr/p24_aux_scenarios.py): the scenario helpers on D56's model."""
+"""D57 (src/scb_ivr/extensions/p24_aux_scenarios.py; an extension): the scenario helpers on D56's model."""
 import unittest
 from dataclasses import replace
 
 import numpy as np
 
-from scb_ivr.p24_aux_commutation import EdgeCircuit, Model
-from scb_ivr.p24_aux_scenarios import area, hard_on, linear_floor, node_model, r_lr, required_i_neg, zcs_residual
+from scb_ivr.extensions.p24_aux_commutation import EdgeCircuit, Model
+from scb_ivr.extensions.p24_aux_scenarios import area, hard_on, linear_floor, node_model, r_lr, required_i_neg, zcs_residual
 
 
 class AuxScenarios(unittest.TestCase):

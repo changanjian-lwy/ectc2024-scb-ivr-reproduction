@@ -1,7 +1,9 @@
 # D56：高侧零电压开通的辅助换流支路——单相边沿与整周期模型（A101的数学模型）
 
-2026-10-02。代码 `src/scb_ivr/p24_aux_commutation.py`，运行 `scripts/p24_aux_commutation.py`，记录
-`diagnostics/D56_aux_commutation_5p0pct.json`，测试 `tests/test_p24_aux_commutation.py`（6个）。
+2026-10-02。**拓展（P24/P25 都没有的拓扑），见 `extensions/aux_commutation_branch/README.md`。**
+代码 `src/scb_ivr/extensions/p24_aux_commutation.py`，运行 `extensions/aux_commutation_branch/scripts/p24_aux_commutation.py`，
+记录 `extensions/aux_commutation_branch/derivations/diagnostics/D56_aux_commutation_5p0pct.json`，
+测试 `tests/extensions/test_p24_aux_commutation.py`（6个）。
 
 **工作顺序：** 本文的探索先于 A101 BOUNDARY；A101 BOUNDARY 在任何协同仿真代码之前登记预测。
 

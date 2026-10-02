@@ -1,6 +1,6 @@
 """D56: an auxiliary commutation branch for the P24 high side's zero-voltage turn-on (A101).
 
-    python3 scripts/p24_aux_commutation.py
+    python3 extensions/aux_commutation_branch/scripts/p24_aux_commutation.py
 
 1. Validation: the single-phase edge model against the full model's valley table (D47's 5% state).
 2. Requirement at the edge: the auxiliary current needed at the low-side turn-off for the node to reach the rail,
@@ -10,7 +10,7 @@
 4. Loss bookkeeping per cycle against the baseline (the same model without the branch), the die area alpha chosen
    per Lr; powers for four phases at the orbit's period.
 5. Timing: the BDS turn-on offset from the low-side turn-off, and the high side's turn-on window.
-Writes symbolic_derivations/03_P24_native/diagnostics/D56_aux_commutation_5p0pct.json.
+Writes extensions/aux_commutation_branch/derivations/diagnostics/D56_aux_commutation_5p0pct.json.
 """
 from __future__ import annotations
 
@@ -19,11 +19,12 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]          # the project
+EXT = Path(__file__).resolve().parents[1]           # this extension
 sys.path.insert(0, str(ROOT / "src")); sys.path.insert(0, str(ROOT))
 import numpy as np  # noqa: E402
 
-from scb_ivr.p24_aux_commutation import AuxBranch, Model, losses, phase_circuits, validation  # noqa: E402
+from scb_ivr.extensions.p24_aux_commutation import AuxBranch, Model, losses, phase_circuits, validation  # noqa: E402
 from scripts.p24_orbits import DIAG  # noqa: E402
 
 I_NEG = 6.25
@@ -177,7 +178,7 @@ def main():
         pred[name] = {"lr_nh": lr_nh, "alpha": al, "r_lr_ohm": R_LR, "phases": rows, "net_w_four_phases": tot}
         print(f"   {name}: four phases net {tot[0]:+.2f}..{tot[1]:+.2f} W")
     out["per_phase"] = pred
-    path = DIAG / "D56_aux_commutation_5p0pct.json"
+    path = EXT / "derivations" / "diagnostics" / "D56_aux_commutation_5p0pct.json"
     path.write_text(json.dumps(out, indent=1, default=float))
     print(f"\nwrote {path.relative_to(ROOT)}")
 

@@ -864,35 +864,6 @@ agree, up to 32 LSB (adaptive delta modulation).
 - **Status:** recommended, pending the project's trade-off review
   (`reports/TRADEOFF_SCORECARD.md`).
 
-`A101_aux_commutation_branch` (with D56) adds an auxiliary commutation
-branch for the high side's zero-voltage turn-on, in D56's model and in the
-Verilog co-simulation (the branch is an opt-in part of the shared plant).
-- **Co-simulation:** Lr 1.25 nH meets every registered criterion (V_DS
-  2.1 V, −5.0 to −5.3 W); Lr 0.75 nH reaches zero voltage (−4.4 to
-  −4.8 W) with the existing valley measurement. A new "stop at V_DS ≤ 0"
-  measurement destabilised phases 2-4 and is off by default.
-- **Open:** start-up currents (enable after the handover), jitter spread
-  ×2 on phases 2-4, a real bidirectional switch. Not adopted.
-- **D56:** a single-phase edge model, within 0.05 V of the full model on
-  all four phases.
-  - P24's 1.47 nH filter inductor makes any branch to 0 V or to Vo need
-    about 33 A at the turn-off.
-  - A bidirectional switch and Lr to a self-balanced capacitor at
-    8-9.5 V reaches zero voltage at 0.75 nH. The ripple and the low side's
-    zero voltage are kept.
-  - Net −4 to −5 W for four phases (central estimate). It depends on the
-    hard turn-on loss model: +0.3 to +2 W with A91's lower bound.
-
-`A102_aux_branch_scenarios` (with D57) runs the branch over the values
-A101's verdict rested on, as cases for evaluation rather than questions to
-Mihai.
-- **Losses:** the central hard turn-on estimate is the energy balance's
-  minimum, so A91's lower bound is unreachable. Net −2.6 to −5.2 W with
-  air-core Lr, a 50% gate supply and a 5 A residual included.
-- **Area:** +10-12% dies, +3.6-3.8% inductor, +1-5.5% capacitors.
-- **P24's 1-2%:** at least 5.3% for zero voltage without a branch.
-- **Co-simulation (15 runs):**
-  - enabling at 200 µs is stable but lifts Vo to 1.09-1.11 V (Ton must
-    fall 16-19%);
-  - ±62.5 A steps meet every criterion;
-  - with a branch, 2% and 5% end within 0.3 W.
+A101 and A102 (with D56 and D57) are an extension, not the reproduction:
+an auxiliary commutation branch added to P24's topology. They moved to
+`extensions/aux_commutation_branch/` on 2026-10-02.

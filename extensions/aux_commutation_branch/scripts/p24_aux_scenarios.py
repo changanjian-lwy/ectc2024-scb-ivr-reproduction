@@ -1,6 +1,6 @@
 """D57: scenarios for the auxiliary commutation branch (D56, A101) over the values its verdict rests on (A102).
 
-    python3 scripts/p24_aux_scenarios.py
+    python3 extensions/aux_commutation_branch/scripts/p24_aux_scenarios.py
 
 1. P24's 1-2% claim: the negative current a phase needs, without a branch, for the high side to reach zero voltage,
    over P24's own inductor values (Table I) and three node compositions; the capacitance 2% would allow.
@@ -14,7 +14,7 @@
    corrector keeps it).
 6. Per-phase predictions for A102's co-simulation: the designs at 5% (as D56) with Lr's R of P24 Table 2's substrate
    air core (p125); the 2% target (D51's 2% orbit).
-Writes symbolic_derivations/03_P24_native/diagnostics/D57_aux_scenarios.json and A102's d57_predictions.json.
+Writes extensions/aux_commutation_branch/derivations/diagnostics/D57_aux_scenarios.json and A102's d57_predictions.json.
 """
 from __future__ import annotations
 
@@ -24,16 +24,18 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]          # the project
+EXT = Path(__file__).resolve().parents[1]           # this extension
 sys.path.insert(0, str(ROOT / "src")); sys.path.insert(0, str(ROOT))
 import numpy as np  # noqa: E402
 
-from scb_ivr.p24_aux_commutation import QG, VGATE, AuxBranch, EdgeCircuit, Model, losses, phase_circuits  # noqa: E402
-from scb_ivr.p24_aux_scenarios import (LR_TECH, NODES, P24_LF_NH, P24_PEAK_A, area, first_cycle, hard_on,  # noqa: E402
+from scb_ivr.extensions.p24_aux_commutation import QG, VGATE, AuxBranch, EdgeCircuit, Model, losses, phase_circuits  # noqa: E402
+from scb_ivr.extensions.p24_aux_scenarios import (LR_TECH, NODES, P24_LF_NH, P24_PEAK_A, area, first_cycle, hard_on,  # noqa: E402
                                        linear_floor, node_model, r_lr, required_i_neg, zcs_residual)
 from scripts.p24_orbits import DIAG  # noqa: E402
 
-A102 = ROOT / "experiments" / "track_A_periodic_steady_state" / "A102_aux_branch_scenarios"
+A102 = EXT / "experiments" / "A102_aux_branch_scenarios"
+OUT = EXT / "derivations" / "diagnostics"
 N_PH = 4
 I_NEG = 6.25
 DESIGNS = {"z075": (0.75e-9, 0.3), "lr100": (1.0e-9, 0.25), "p125": (1.25e-9, 0.25)}
@@ -231,10 +233,10 @@ def main():
                   + f" | net {tot[0]:+.2f}..{tot[1]:+.2f} W")
     print(f"   Cm 0.22 uF: Vm excursion within a cycle {', '.join(f'{v:.2f}' for v in pred['cm_0p22uF_vm_excursion_v'])} V")
     out["predictions"] = pred
-    (DIAG / "D57_aux_scenarios.json").write_text(json.dumps(out, indent=1, default=float))
+    (OUT / "D57_aux_scenarios.json").write_text(json.dumps(out, indent=1, default=float))
     A102.mkdir(parents=True, exist_ok=True)
     (A102 / "d57_predictions.json").write_text(json.dumps(pred, indent=1, default=float))
-    print(f"\nwrote {(DIAG / 'D57_aux_scenarios.json').relative_to(ROOT)} and {(A102 / 'd57_predictions.json').relative_to(ROOT)}")
+    print(f"\nwrote {(OUT / 'D57_aux_scenarios.json').relative_to(ROOT)} and {(A102 / 'd57_predictions.json').relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

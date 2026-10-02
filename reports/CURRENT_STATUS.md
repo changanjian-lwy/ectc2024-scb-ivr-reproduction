@@ -699,69 +699,27 @@ each question:
          one table for A92-A100, the loops to avoid, and the priorities to
          set.
 
-     21. Done, not adopted: the high side's zero-voltage turn-on with an
-         auxiliary commutation branch.
-         - [A101](../experiments/track_A_periodic_steady_state/A101_aux_commutation_branch/RESULTS.md),
-           Verilog co-simulation with the branch in the shared plant.
-         - [D56](../symbolic_derivations/03_P24_native/D56_P24_AUX_COMMUTATION.md),
-           mathematical model (single-phase edge, validated against the
-           full model within 0.05 V on all four phases).
+     21. **Extension, kept separate (not part of the reproduction):** an
+         auxiliary commutation branch for the high side's zero-voltage
+         turn-on (A101, A102, D56, D57). Everything is in
+         [`extensions/aux_commutation_branch/`](../extensions/aux_commutation_branch/README.md).
+         Built and evaluated as cases; not adopted.
 
-         **Finding.** P24's 1.47 nH filter inductor sets a floor of about
-         33 A at the turn-off for any branch to 0 V or to Vo. A branch must
-         be driven from a source above half the rail.
-
-         **Candidate.** Lr and a bidirectional switch to a self-balanced
-         capacitor (Vm 8-9.5 V).
-         - High-side zero voltage at Lr 0.75 nH; 2 V at 1.25 nH.
-         - Main ripple and low-side zero voltage kept; low-side dead time
-           shortened to about 1.0 ns.
-         - Net −4 to −5 W for four phases with D56's central hard turn-on
-           estimate; +0.3 to +2 W with A91's lower bound.
-
-         **Co-simulation (A101).**
-         - Lr 1.25 nH meets every registered criterion: high-side V_DS
-           2.1 V, −5.0 to −5.3 W.
-         - Lr 0.75 nH reaches zero voltage (−0.7 V) and meets them too,
-           with the existing valley measurement: −4.4 to −4.8 W. With the
-           new "stop at V_DS ≤ 0" measurement it was unstable; that option
-           now defaults off.
-         - **Open:** start-up currents up to 430 A (enable after the
-           handover, Cm precharged); jitter spread ×2 on phases 2-4; a real
-           bidirectional switch.
-
-     22. Done, not adopted: the branch over its assumed values, as cases
-         for Mihai to evaluate instead of questions to him.
-         - [A102](../experiments/track_A_periodic_steady_state/A102_aux_branch_scenarios/RESULTS.md),
-           15 Verilog co-simulations.
-         - [D57](../symbolic_derivations/03_P24_native/D57_P24_AUX_SCENARIOS.md),
-           mathematical model.
-
-         **Worth it.** The sign rested only on the hard turn-on model. D56's
-         central estimate is the energy balance's minimum (Qoss·V for
-         identical devices), so A91's lower bound is not reachable. Net
-         saving with every penalty considered (air-core Lr, 50% gate supply,
-         5 A residual): 2.6-5.2 W, 1-2% of the output.
-
-         **Area.** Against the main stage:
-         - BDS dies +10-12%;
-         - Lr +3.6-3.8% (by peak stored energy);
-         - Cm +1-5.5%;
-         - plus four floating drivers per module.
-
-         **P24's 1-2%.** None of P24's own inductor values or node
-         compositions gives zero voltage below 5.3%.
-
-         **Co-simulation.**
-         - Enabling at 200 µs (after the handover): stable, settles in
-           24-32 µs.
-         - **New: Vo rises to 1.09-1.11 V**, because Ton must fall 16-19%
-           with the branch. A Ton feed-forward at the enable is not tested.
-         - ±62.5 A load steps: all criteria met, Vo extremes as without a
-           branch.
-         - With the branch, 2% and 5% end within 0.3 W of each other.
-         - D57 predicted the co-simulation within 0.15 V (Vm) and 0.21 V
-           (V_DS), except past-the-rail turn-ons.
+         **Main-line results computed there:**
+         - **P24's 1-2%.** With P24's own inductor values (Table I) and
+           node compositions, full high-side zero voltage without a branch
+           needs at least 5.3% (D57 Section 2).
+         - **Hard turn-on loss.** D56's central estimate (own Eoss plus the
+           other node capacitances' charge through the channel; Qoss·V for
+           identical devices) is the energy balance's minimum: 9.3 W for four
+           phases at 5%. A91's lower bound is not reachable.
+         - **The 2% target in the Verilog co-simulation.**
+           - The adopted design is soft (A102 `ref_2pct`) and matches D51's
+             2% orbit within 0.05 V.
+           - The orbit, D51 at 2%, is in `symbolic_derivations/03_P24_native/diagnostics/`.
+         - **The start-up overshoot.** The adopted design's own start-up
+           reaches 1.277 V at the handover (88.6 µs), dips to 0.903 V and
+           settles by about 150 µs. The start-up is the next main-line item.
 
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
@@ -775,7 +733,7 @@ each question:
           share;
         - Coss spread;
         - gate-drive loss and gate dynamics (driver ramp);
-        - the 2% target in the Verilog co-simulation;
+        - the 2% target in the Verilog co-simulation (done: soft, see item 21);
         - load and line steps.
      3. RTL:
         - a predictive phase-1 turn-off, to remove the 4 ns jitter;

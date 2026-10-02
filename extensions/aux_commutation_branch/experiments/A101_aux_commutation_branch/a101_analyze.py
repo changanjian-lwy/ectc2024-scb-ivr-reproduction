@@ -18,9 +18,9 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-PROJECT = HERE.parents[2]
+PROJECT = HERE.parents[3]
 sys.path.insert(0, str(PROJECT / "src"))
-from scb_ivr.p24_aux_commutation import QG, VGATE, Model, phase_circuits, turn_off_overlap  # noqa: E402
+from scb_ivr.extensions.p24_aux_commutation import QG, VGATE, Model, phase_circuits, turn_off_overlap  # noqa: E402
 
 N, LAST = 4, 200
 ORBIT = PROJECT / "symbolic_derivations" / "03_P24_native" / "diagnostics" / "D51_orbit_5p0pct_m0p0.json"
@@ -101,7 +101,7 @@ def main():
     orbit = json.loads(ORBIT.read_text())
     models = [Model(c) for c in phase_circuits(orbit)]
     pred = json.loads((HERE / "d56_predictions.json").read_text())
-    d56 = json.loads((PROJECT / "symbolic_derivations" / "03_P24_native" / "diagnostics" / "D56_aux_commutation_5p0pct.json").read_text())
+    d56 = json.loads((HERE.parents[1] / "derivations" / "diagnostics" / "D56_aux_commutation_5p0pct.json").read_text())
     main_cond = {}                                               # D56 phase-1 main-switch extra conduction, per design
     for row in d56["cycle"]:
         if row["dead_time"] == "retuned":

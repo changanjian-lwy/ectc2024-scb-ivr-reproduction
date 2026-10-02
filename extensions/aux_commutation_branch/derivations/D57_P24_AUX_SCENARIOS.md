@@ -1,9 +1,11 @@
 # D57：辅助换流支路在各种假设值下的情况（A102 的数学模型）
 
-2026-10-02。代码 `src/scb_ivr/p24_aux_scenarios.py`，运行 `scripts/p24_aux_scenarios.py`，记录
-`diagnostics/D57_aux_scenarios.json`，测试 `tests/test_p24_aux_scenarios.py`（5个）。
-2% 轨道 `diagnostics/D50_orbit_2p0pct_m0p0.json`、`D51_orbit_2p0pct_m0p0.json` 由存档代码
-（`scripts/p24_orbits.py`）为本次求解。
+2026-10-02。**拓展（P24/P25 都没有的拓扑），见 `extensions/aux_commutation_branch/README.md`。**
+代码 `src/scb_ivr/extensions/p24_aux_scenarios.py`，运行 `extensions/aux_commutation_branch/scripts/p24_aux_scenarios.py`，
+记录 `extensions/aux_commutation_branch/derivations/diagnostics/D57_aux_scenarios.json`，
+测试 `tests/extensions/test_p24_aux_scenarios.py`（5个）。
+2% 轨道 `symbolic_derivations/03_P24_native/diagnostics/D50_orbit_2p0pct_m0p0.json`、`D51_orbit_2p0pct_m0p0.json`
+由主线的存档代码（`scripts/p24_orbits.py`）为本次求解，属于主线，留在原处。
 
 **工作顺序：** 第1-6节先于 A102 的任何协同仿真运行，与 A102 BOUNDARY 一同提交（0b3eec7）。
 
