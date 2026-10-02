@@ -129,6 +129,21 @@ class CosimPlantEquivalence(unittest.TestCase):
 
 
 
+class CosimPlantLineStep(CosimPlantEquivalence):
+    """A106: the same lockstep with an input step of -4.8 V starting 5 ns into the window, over 10 ns."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.p = replace(cls.p, vin_step=-4.8, t_vstep=cls.s["t_s"] + 5e-9, t_vslew=10e-9)
+
+    def test_the_step_is_inside_the_window(self):
+        t0 = self.s["t_s"]
+        self.assertEqual(self.p.vin_at(t0), 48.0)
+        self.assertAlmostEqual(self.p.vin_at(t0 + 10e-9), 45.6)
+        self.assertAlmostEqual(self.p.vin_at(t0 + 20e-9), 43.2)
+
+
 class CosimPlantAuxEquivalence(unittest.TestCase):
     """A101: the same lockstep with an auxiliary branch on every phase (Lr 0.75 nH, Cm 1 uF at 9 V), whose switches
     follow the low sides and open at zero current; the C loop with the high side's minimum stopped at V_DS <= 0."""

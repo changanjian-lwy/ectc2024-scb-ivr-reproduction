@@ -224,11 +224,19 @@ typedef struct {
     int32_t *aux_cmd, *aux_on;                        /* A101: branch switch command and conduction state */
     const int32_t *aux_idx;                           /* A101: state index of each branch current */
     double *aux_e2, *aux_imax, *aux_imin;             /* A101: int i^2 dt and extremes since the bridge's reset */
+    double vin_step, t_vstep, t_vslew;                /* A106: input step (0, inf, 0 without one) */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
-    if (r->t_ramp > 0) { double a = t / r->t_ramp; return r->vin * (a < 1.0 ? a : 1.0); }
-    return r->vin;
+    double v;
+    if (r->t_ramp > 0) { double a = t / r->t_ramp; v = r->vin * (a < 1.0 ? a : 1.0); }
+    else v = r->vin;
+    if (r->vin_step != 0.0 && t >= r->t_vstep) {      /* A106 */
+        double s = 1.0;
+        if (r->t_vslew > 0) { s = (t - r->t_vstep) / r->t_vslew; s = (1.0 < s) ? 1.0 : s; }
+        v += r->vin_step * s;
+    }
+    return v;
 }
 
 static double load_at(const run_t *r, double t) {     /* CircuitParams.load_at */

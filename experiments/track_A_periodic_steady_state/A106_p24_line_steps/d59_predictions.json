@@ -1,0 +1,92 @@
+{
+ "pi100_m48_1us": {
+  "extreme_mv": -8.17270471556808,
+  "t_extreme_us": 4.068000000002144,
+  "back_within_1pct_us": 0.0,
+  "ton_final_lsb": 637.4471333333333,
+  "ton_pp_late_lsb": 7.0,
+  "vo_pp_late_mv": 0.5082653239606438,
+  "dv": -4.8,
+  "slew_us": 1.0
+ },
+ "pi100_p48_1us": {
+  "extreme_mv": 6.990495234781902,
+  "t_extreme_us": 3.2860000000017537,
+  "back_within_1pct_us": 0.0,
+  "ton_final_lsb": 512.1254,
+  "ton_pp_late_lsb": 4.0,
+  "vo_pp_late_mv": 0.3809935617578031,
+  "dv": 4.8,
+  "slew_us": 1.0
+ },
+ "pi100_m48_10us": {
+  "extreme_mv": -6.340351698130187,
+  "t_extreme_us": 10.674000000005174,
+  "back_within_1pct_us": 0.0,
+  "ton_final_lsb": 637.4834,
+  "ton_pp_late_lsb": 7.0,
+  "vo_pp_late_mv": 0.5083123572220405,
+  "dv": -4.8,
+  "slew_us": 10.0
+ },
+ "pi100_p48_10us": {
+  "extreme_mv": 5.1676877453086245,
+  "t_extreme_us": 10.732000000005105,
+  "back_within_1pct_us": 0.0,
+  "ton_final_lsb": 512.0,
+  "ton_pp_late_lsb": 0.0,
+  "vo_pp_late_mv": 0.04712477407742277,
+  "dv": 4.8,
+  "slew_us": 10.0
+ },
+ "pi100_m80_10us": {
+  "extreme_mv": -11.571105980969886,
+  "t_extreme_us": 11.060000000004711,
+  "back_within_1pct_us": 13.47000000000183,
+  "ton_final_lsb": 694.2606666666667,
+  "ton_pp_late_lsb": 7.0,
+  "vo_pp_late_mv": 0.5049803660229779,
+  "dv": -8.0,
+  "slew_us": 10.0
+ },
+ "ionly_m48_1us": {
+  "extreme_mv": -60.50161603641124,
+  "t_extreme_us": 21.369999999992388,
+  "back_within_1pct_us": 57.72800000000549,
+  "ton_final_lsb": 637.2542,
+  "ton_pp_late_lsb": 1.0,
+  "vo_pp_late_mv": 0.8051966462535587,
+  "dv": -4.8,
+  "slew_us": 1.0
+ },
+ "ionly_p48_1us": {
+  "extreme_mv": 58.3798294575395,
+  "t_extreme_us": 20.149999999993845,
+  "back_within_1pct_us": 85.63800000006668,
+  "ton_final_lsb": 512.0,
+  "ton_pp_late_lsb": 0.0,
+  "vo_pp_late_mv": 1.4127179504188625,
+  "dv": 4.8,
+  "slew_us": 1.0
+ },
+ "ionly_m48_10us": {
+  "extreme_mv": -59.73969761905884,
+  "t_extreme_us": 26.399999999986374,
+  "back_within_1pct_us": 62.39200000001571,
+  "ton_final_lsb": 637.0988666666667,
+  "ton_pp_late_lsb": 1.0,
+  "vo_pp_late_mv": 0.5081359520157092,
+  "dv": -4.8,
+  "slew_us": 10.0
+ },
+ "ionly_p48_10us": {
+  "extreme_mv": 57.44400832959906,
+  "t_extreme_us": 24.909999999988155,
+  "back_within_1pct_us": 89.76200000007573,
+  "ton_final_lsb": 512.0,
+  "ton_pp_late_lsb": 0.0,
+  "vo_pp_late_mv": 1.775371775494916,
+  "dv": 4.8,
+  "slew_us": 10.0
+ }
+}

@@ -4,6 +4,20 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A106) - input (line) step
+
+- **`circuit.py`:** `vin_step`, `t_vstep`, `t_vslew`. `vin_at` adds
+  vin_step × min((t − t_vstep)/t_vslew, 1) from t_vstep (at once if the
+  slew is 0); nothing without a step.
+- **`plant_kernel.c`, `plant.py`:** the same in the C `vin_at`; the run
+  struct and `_Run` gain the three fields at the end.
+- **`bridge.py`:** cfg key `line_step` {"t_us", "dv", "slew_us"}.
+- **Gates:**
+  - `--full` regression PASS;
+  - `tests/test_cosim_plants.py` `CosimPlantLineStep`: −4.8 V over 10 ns
+    inside the lockstep window. Fast, Kernel and Kernel2 (loop and
+    monitors) are bit-identical with Reference.
+
 ## 2026-10-02 (A104) - proportional term in the voltage loop
 
 - **`rtl/scb_ctrl.v`:** input `cfg_kp` (parameter KPW = 24, FRAC = 16

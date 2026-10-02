@@ -45,6 +45,7 @@ Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-ca
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
+Line step (cfg "line_step" {"t_us", "dv", "slew_us" 0}, A106): the input changes by dv from t_us, linearly over slew_us.
 Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
 "vm0_v" 0.0 (or one per branch), "phases" 1..N, "valley_zero" 0, "t_en_us" 0}, A101, A102): per phase Lr and a
 bidirectional switch (2 dies of alpha x EPC2067 in series, 2 RDS(on) / alpha) from Cm (precharged to vm0_v) to x_k,
@@ -127,6 +128,9 @@ async def cosim(dut):
     for key, name in (("t_load_us", "t_load"), ("t_hand_us", "t_hand")):  # A103: start-up sequence timing
         if key in cfg:
             extra[name] = float(cfg[key]) * 1e-6
+    if cfg.get("line_step"):                                          # A106: an input step
+        ls = cfg["line_step"]
+        extra.update(vin_step=float(ls["dv"]), t_vstep=float(ls["t_us"]) * 1e-6, t_vslew=float(ls.get("slew_us", 0.0)) * 1e-6)
     if cfg.get("load_step"):                                          # A100: a load current step
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
     aux = cfg.get("aux")                                              # A101: auxiliary commutation branches

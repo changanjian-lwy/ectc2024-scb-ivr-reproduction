@@ -110,9 +110,15 @@ class CircuitParams:
     aux_r: float = 0.0
     aux_c: float = 1e-6
     aux_vm0: float = 0.0
+    vin_step: float = 0.0        # A106: the input changes by vin_step (V) from t_vstep, linearly over t_vslew (0: at once)
+    t_vstep: float = float("inf")
+    t_vslew: float = 0.0
 
     def vin_at(self, t):
-        return self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
+        v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
+        if self.vin_step != 0.0 and t >= self.t_vstep:                 # A106
+            v += self.vin_step * (min((t - self.t_vstep) / self.t_vslew, 1.0) if self.t_vslew > 0 else 1.0)
+        return v
 
     def load_at(self, t):
         a = self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
