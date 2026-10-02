@@ -12,6 +12,12 @@ A106 = TRACK_A / "A106_p24_line_steps"
 C01 = TRACK_A.parent / "track_C_multi_module" / "C01_four_modules_baseline"
 
 
+def close(a, b, rel=1e-12):
+    """Equal up to the last bits: C01's stored values were computed on another platform, whose summation order
+    over the large waveform arrays can differ in the final bit."""
+    return abs(a - b) <= rel * max(abs(a), abs(b))
+
+
 def strip(c):
     return {k: v for k, v in c.items() if k not in ("note", "out")}
 
@@ -52,9 +58,11 @@ class Matrix(unittest.TestCase):
                       "no_module_interleave": lambda m, k: -m * per / 16}
             for case, f in shifts.items():
                 r = output_ripple(mods, shift=f)
-                self.assertEqual((r["pkpk_a"], r["rms_ac_a"]), (old[name]["ripple"][case]["pkpk_a"], old[name]["ripple"][case]["rms_ac_a"]), (name, case))
+                for key in ("pkpk_a", "rms_ac_a"):
+                    self.assertTrue(close(r[key], old[name]["ripple"][case][key]), (name, case, key, r[key]))
             for m, md in enumerate(mods):
-                self.assertEqual([x * 1e9 for x in lsoff_after(d, md)], old[name]["modules"][m]["lsoff_after_master_ns"], (name, m))
+                for a, b in zip(lsoff_after(d, md), old[name]["modules"][m]["lsoff_after_master_ns"]):
+                    self.assertTrue(close(a * 1e9, b), (name, m, a * 1e9, b))
 
 
 if __name__ == "__main__":
