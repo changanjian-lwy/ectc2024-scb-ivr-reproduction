@@ -894,6 +894,28 @@ each question:
            the master's phase 1 is boundary-timed). D61's scheme B (i_neg
            trim) needs a per-slave valley target.
 
+     31. The interleave deviation corrected:
+         [C02](../experiments/track_C_multi_module/C02_uniform_interleave/RESULTS.md).
+         - **The change:** opt-in `slot_lo`. Phases 2-4 and the slaves are
+           slotted from phase 1's low-side turn-off. Default off; gates
+           bit-identical.
+         - **One module:** low-side turn-offs exactly T/4 apart. Identical
+           to A105 up to the handover; valleys, V_DS, steps and jitter
+           unchanged.
+         - **Four modules:**
+           - the 16 gaps are 14.49-14.54 ns (C01 4.4-23.9);
+           - output current ripple 45.9 → 6.75 A rms; switching ripple per
+             period 162.8 → 31.0 A pk-pk, as predicted;
+           - sharing, steps and start-up equal to C01.
+         - **Missed as registered:**
+           - the window pk-pk (the Ton limit cycle moves the per-period
+             mean by 10.7 A);
+           - slave 1's late fires in j30 (6, each < 0.2 ns, mostly while
+             the master's turn-off is still learning). Flagged: a
+             predicted slave reference.
+         - **Recommended for the design from C03** (the four-module
+           standard matrix).
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

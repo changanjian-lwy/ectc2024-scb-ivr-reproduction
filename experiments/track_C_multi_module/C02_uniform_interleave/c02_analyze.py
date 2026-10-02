@@ -6,6 +6,9 @@ A. one module (s1_*) against A105 i2_*: the sections before 72 us identical; the
 B. four modules (m4_*) against C01's runs: the 16 low-side turn-offs' gaps; the system's output current ripple; locked
    periods; currents (piecewise-linear, normalised to the load) and valleys against C01; steps, start-up, join,
    overlaps, peak, late fires.
+Added after the runs (RESULTS Section 2): the summed current's pk-pk within each period (median, max) and the spread
+of its per-period means, which separate the switching ripple from the voltage loop's Ton limit cycle; and Ton's
+values over the window.
 Writes c02_summary.json."""
 from __future__ import annotations
 
@@ -113,6 +116,23 @@ def part_a():
     return res
 
 
+def per_period(mods, t1, trim=20):
+    """The summed current per master period: pk-pk median and max, and the spread of the period means (A)."""
+    t_on, _ = ref_turnons(mods[0], t1)
+    g = np.arange(t_on[trim], t_on[-trim], GRID_S)
+    tot = sum(phase_waveform(r, k, g) for r in mods for k in range(1, 5))
+    idx = np.searchsorted(g, t_on[trim:-trim])
+    pp = [float(np.ptp(tot[a:b])) for a, b in zip(idx[:-1], idx[1:])]
+    mu = [float(tot[a:b].mean()) for a, b in zip(idx[:-1], idx[1:])]
+    return {"pkpk_median_a": float(np.median(pp)), "pkpk_max_a": max(pp), "mean_spread_a": float(np.ptp(mu))}
+
+
+def ton_counts(d, t1):
+    secs = [s for s in d["sections"] if t1 is None or s["t_s"] < t1][-200:]
+    v, n = np.unique([s["ton_lsb"] for s in secs], return_counts=True)
+    return {int(a): int(b) for a, b in zip(v, n)}
+
+
 def system(d, t1):
     mods = [d] + d["modules_rest"]
     t_on, per = ref_turnons(d, t1)
@@ -123,7 +143,8 @@ def system(d, t1):
     out = {"modules": [module_stats(r, t1) for r in mods], "period_ns": per * 1e9,
            "currents_norm_a": [x / sum(pl) * vo / R_SYS for x in pl], "lsoff_after_master_ns": [o * 1e9 for o in offs],
            "gaps_ns": [x * 1e9 for x in gaps(offs, per)], "ripple": output_ripple(mods, t1=t1),
-           "join_max_v": d["system"]["equalisation_max_v"], "startup_max_v": startup_max(d), "vo_mean_v": vo}
+           "join_max_v": d["system"]["equalisation_max_v"], "startup_max_v": startup_max(d), "vo_mean_v": vo,
+           "per_period": per_period(mods, t1), "ton_counts": ton_counts(d, t1)}
     if t1:
         out["step"] = step_stats(d)
     return out
@@ -154,6 +175,9 @@ def part_b():
               f"(C01 {[m['late_fires'] for m in mr]}), join {x['join_max_v'] * 1e6:.1f} uV, T {x['period_ns']:.2f} ns (C01 {r['period_ns']:.2f})")
         print(f"   gaps {min(x['gaps_ns']):.2f}-{max(x['gaps_ns']):.2f} ns (C01 {min(r['gaps_ns']):.2f}-{max(r['gaps_ns']):.2f}); ripple {x['ripple']['pkpk_a']:.1f} A pk-pk / "
               f"{x['ripple']['rms_ac_a']:.2f} A rms (C01 {r['ripple']['pkpk_a']:.1f} / {r['ripple']['rms_ac_a']:.2f})")
+        print(f"   added: per period pk-pk median {x['per_period']['pkpk_median_a']:.1f} A, max {x['per_period']['pkpk_max_a']:.1f} A, period means spread "
+              f"{x['per_period']['mean_spread_a']:.1f} A (C01 {r['per_period']['pkpk_median_a']:.1f} / {r['per_period']['pkpk_max_a']:.1f} / {r['per_period']['mean_spread_a']:.1f}); "
+              f"Ton {x['ton_counts']} (C01 {r['ton_counts']})")
         print("   currents " + "/".join(f"{v:.1f}" for v in x["currents_norm_a"]) + " (C01 " + "/".join(f"{v:.1f}" for v in r["currents_norm_a"]) + ") A; Vo "
               f"{x['vo_mean_v']:.5f}; start-up {x['startup_max_v']:.4f} V")
         for m, (a, b) in enumerate(zip(mx, mr)):

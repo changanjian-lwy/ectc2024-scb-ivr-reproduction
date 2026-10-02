@@ -18,7 +18,7 @@ Started 2026-10-02, after the single-module level closed:
 
 | point | P24 (where) | here | tag |
 |---|---|---|---|
-| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; the aim is a uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number. **DEVIATION found in C01:** phase 1 of each module sits one valley delay (9.44 ns) early (A93/A97's slot reference), gaps 4.4-23.9 ns for 14.5 ns, output current ripple 45.9 A rms against 6.6 A uniform. Correction: C02 |
+| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; the aim is a uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number. **DEVIATION found in C01:** phase 1 of each module sat one valley delay (9.44 ns) early (A93/A97's slot reference), gaps 4.4-23.9 ns for 14.5 ns, output current ripple 45.9 A rms. **Corrected in C02** (`slot_lo`): gaps 14.49-14.54 ns, 6.75 A rms, switching ripple 162.8 → 31.0 A pk-pk per period |
 | all high sides at the same frequency and duty cycle; the same for the low sides | Sec. III-B | one shared Ton for every module (D61's baseline); the period follows Ton | consistent |
 | IL_peak per phase = 2 Io / (nP · nM) | Eq. / Table 1 | 4 × 4, 125 A | P24_EXPLICIT |
 | current sharing between phases and modules is "the primary challenge" | Sec. III-B | no method in P24; ours: a shared loop and common Ton, sharing error = inductor tolerance (D61); option: negative-current trim | PROJECT_DECISION |
@@ -53,5 +53,5 @@ Started 2026-10-02, after the single-module level closed:
 | experiment | one factor | result |
 |---|---|---|
 | [C01](C01_four_modules_baseline/RESULTS.md) | module count 1 → 4 (A105's I2, D61 scheme A) | works as D61 predicts: locked periods, ±5% L → ±4.7% sharing, steps and start-up equal to one module. Flagged: the interleave is not uniform (ripple ×7 in rms); the slaves' valleys are unregulated |
-| C02 (next) | the interleave reference: phases 2-4 and the slaves slotted from phase 1's low-side turn-off | - |
-| C03 (planned) | the four-module standard matrix (driver mismatch, j100, line steps, +5% L on a slave) | - |
+| [C02](C02_uniform_interleave/RESULTS.md) | the interleave reference: phases 2-4 and the slaves slotted from phase 1's low-side turn-off (`slot_lo`) | uniform: 16 gaps 14.49-14.54 ns; ripple 45.9 → 6.75 A rms; soft switching, sharing, steps and start-up unchanged (one module identical to A105 up to the handover). Misses as registered: the window pk-pk (Ton limit cycle), slave 1's late fires < 0.2 ns in j30 (reference latency while the master learns). Recommended for the design from C03 on |
+| C03 (next) | the four-module standard matrix with `slot_lo` (driver mismatch, j100, line steps, +5% L on a slave) | - |
