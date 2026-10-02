@@ -39,7 +39,8 @@ applied while the same phase's complement conducts is counted, and with "stop_on
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
 from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
 eh_tgt_ps, err_shift), the slot rules (slot_follow, slot_guard, slot_avg; slot_lo, C02: the following slots from phase
-1's low-side turn-off) and the timed phase-1 turn-off (lo_pred,
+1's low-side turn-off; slot_trim and st_smax, A109: the slots' valley trim, the residual-current sign then reported at
+every low-side turn-off) and the timed phase-1 turn-off (lo_pred,
 lo_learn, lo_tgt_ps, lo_adm, lo_smax, lo_ff, lo_kff; the bridge then measures phase 1's crossing of i_target and
 reports it at the turn-off); keys absent from cfg take the values that reproduce the earlier experiments.
 
@@ -269,6 +270,8 @@ class ModuleSim:
         c.set("cfg_slot_guard", int(cfg.get("slot_guard", 0)))
         c.set("cfg_slot_avg", int(cfg.get("slot_avg", 0)))              # A97
         c.set("cfg_slot_lo", int(cfg.get("slot_lo", 0)))                # C02
+        c.set("cfg_slot_trim", int(cfg.get("slot_trim", 0)))            # A109: valley trim of the slots
+        c.set("cfg_st_smax", int(cfg.get("st_smax", 1)))
         c.set("cfg_lo_pred", int(cfg.get("lo_pred", 0)))                # A99: timed phase-1 turn-off
         c.set("cfg_lo_learn", int(cfg.get("lo_learn", 0)))
         c.set("cfg_lo_tgt", to_lsb(cfg.get("lo_tgt_ps", 0.0) * 1e-12))
@@ -435,7 +438,7 @@ class ModuleSim:
         if j >= N and not level:                # low-side turn-off edge
             i_e = float(plant.y[nv + k])
             self.lowoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": i_e, "bind_cur": meta["bind"]})
-            if meta["bind"]:
+            if meta["bind"] or self.cfg.get("slot_trim", 0):    # A109: also at the slots' turn-offs
                 self.meas_r[k] = i_e < self.i_tgt
             self.v_lo[k] = plant.vds(k); self.t_lo_act[k] = plant.t
             mon.vmin_set[k] = 1; mon.vmin[k] = self.v_lo[k]; mon.t_vmin[k] = self.t_lo_act[k]
@@ -548,6 +551,8 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if cfg.get("slot_trim", 0):                                  # A109
+            out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
                                  "vm0_v": self.vm0, "valley_zero": int(self.mon.vmin_zero), "t_en_us": self.t_en * 1e6,

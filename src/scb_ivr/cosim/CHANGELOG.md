@@ -4,6 +4,38 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A109) - a valley trim for the slotted phases
+
+Source: A108 RESULTS 0.3. The slotted phases' turn-offs had no
+correction from their own current, so a lagging ladder left their
+valleys positive. C01 found the same gap for slave modules.
+
+- **`rtl/scb_phase.v`:**
+  - inputs `cfg_slot_trim` and `cfg_st_smax`; output `sofs`, a signed
+    offset added to a slotted phase's slot in mode P;
+  - each residual-current report (r_valid) at a slot turn-off moves it
+    later (r_below 0) or earlier, by a step that doubles while decisions
+    agree (up to cfg_st_smax), as A100;
+  - |sofs| ≤ 1024 LSB;
+  - a master's phase 1 is not affected.
+- **`rtl/scb_ctrl.v`:** the inputs passed to every phase; output
+  `slot_ofs`.
+- **`rtl/scb_multi.v`:** regenerated.
+- **`bridge.py`:** cfg keys `slot_trim` (default 0) and `st_smax`.
+  - With `slot_trim`, the residual-current sign is reported at every
+    low-side turn-off.
+  - `slot_ofs_final_lsb` is recorded.
+- **Gates:**
+  - RTL unit tests 53 of 53 (new: `slot_trim_adaptive_step`,
+    `slot_trim_moves_the_slot`, `slot_trim_not_phase1`,
+    `slot_trim_not_in_mode_s`);
+  - synthesis `check -assert` clean: SLAVE 0, 47 914 cells; SLAVE 1,
+    42 072;
+  - wrapper and matrix tests;
+  - `--full` regression PASS;
+  - with the default, A105 i2_s_p62 and C02 m4_n0 rerun: every record
+    identical except `wall_s` and `provenance`.
+
 ## 2026-10-02 (C02, track C) - slots referenced to phase 1's low-side turn-off; shared interleave statistics
 
 Source: C01 RESULTS Section 2. Phase 1 of every module sat one valley

@@ -24,6 +24,8 @@
 //   configured slots (mode S, or before the period is known) stay referenced to t_ref. A phase still learns of a
 //   new cycle from t_ref, so its slot must lie after t_ref is seen: T/N - dt_pred > ~2 windows (a passed slot fires
 //   late, counted in late_fires). t_lo1 is an output (the system's reference for slave modules).
+// - A109: cfg_slot_trim gives every slotted phase (phases 2..N, and a slave's phase 1) a valley trim of its slot
+//   from its residual-current reports (scb_phase); slot_ofs reports the offsets.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -99,6 +101,8 @@ module scb_ctrl #(
     input  wire                cfg_slot_guard, // A93
     input  wire                cfg_slot_avg,   // A97
     input  wire                cfg_slot_lo,    // C02: following slots from phase 1's low-side turn-off
+    input  wire                cfg_slot_trim,  // A109: valley trim of the slotted phases' turn-offs
+    input  wire [7:0]          cfg_st_smax,    // A109: its largest step, LSB
     input  wire                cfg_lo_pred,    // A99: timed phase-1 turn-off after learning
     input  wire [15:0]         cfg_lo_learn,   // A99
     input  wire [TW-1:0]       cfg_lo_tgt,     // A99
@@ -112,6 +116,7 @@ module scb_ctrl #(
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
+    output wire [N*TW-1:0]     slot_ofs,       // A109: each phase's slot valley-trim offset, LSB (signed)
     output wire                arm1,
     output wire [N-1:0]        gh_ev,
     output wire [N-1:0]        gh_lvl,
@@ -259,7 +264,9 @@ module scb_ctrl #(
                 .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(IS_FIRST ? mlo_valid : 1'b0), .mlo_early(mlo_early),
                 .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k]),
                 .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff),  // A100
-                .t_lo_q(t_lo_all[k * TW +: TW])                                                 // C02
+                .t_lo_q(t_lo_all[k * TW +: TW]),                                                // C02
+                .cfg_slot_trim(cfg_slot_trim), .cfg_st_smax(cfg_st_smax),                       // A109
+                .sofs(slot_ofs[k * TW +: TW])
             );
         end
     endgenerate

@@ -4,7 +4,7 @@ Time is in LSB units: 1 LSB = T_clk / 32 = 125 ps at the 250 MHz base case (the 
 drives every input; option bits default to 0. Groups: phase timing, comparators and slots; predictive correction
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
-guard, and their reference at phase 1's low-side turn-off (C02); the timed phase-1 turn-off and its adaptive
+guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
 step and Ton feedforward. From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
@@ -25,7 +25,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
             kp=0,                                                                # A104
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
-            slot_lo=0)                                                           # C02
+            slot_lo=0,                                                           # C02
+            slot_trim=0, st_smax=1)                                              # A109
 
 
 def pack(values, width):
@@ -104,6 +105,7 @@ class Ctrl:
         d.cfg_slot_guard.value = cfg["slot_guard"]
         d.cfg_slot_avg.value = cfg["slot_avg"]                   # A97
         d.cfg_slot_lo.value = cfg["slot_lo"]                     # C02
+        d.cfg_slot_trim.value = cfg["slot_trim"]; d.cfg_st_smax.value = cfg["st_smax"]   # A109
         d.cfg_lo_pred.value = cfg["lo_pred"]                     # A99
         d.cfg_lo_learn.value = cfg["lo_learn"]
         d.cfg_lo_tgt.value = cfg["lo_tgt"]
@@ -953,3 +955,54 @@ async def slot_lo_keeps_configured_slots_at_t_ref(dut):
     t_on1 = await _phase1_cycle(c, -1)
     e = await c.until("L", 0, 2, limit=800)
     assert e[0] + e[1] == t_on1 + 600, (t_on1, e)
+
+
+# ---------------- A109: valley trim of the slotted phases ----------------
+
+async def _report_r(c, dut, k, below):
+    await c.set(r_valid=1 << k, r_below=below << k)
+    await c.set(r_valid=0, r_below=0)
+    await ReadOnly()
+    return signed(field(dut.slot_ofs.value, k, TW), TW)
+
+
+@cocotb.test()
+async def slot_trim_adaptive_step(dut):
+    """cfg_slot_trim, st_smax 8, mode P: phase 2's reports 'above the target' move its slot later by 1, 2, 4, 8, 8
+    (sofs 1, 3, 7, 15, 23); a 'below' report then moves it earlier by 1 (22), a second by 2 (20)."""
+    c = Ctrl(dut)
+    await c.start(slot_trim=1, st_smax=8)
+    got = [await _report_r(c, dut, 1, 0) for _ in range(5)]
+    got += [await _report_r(c, dut, 1, 1) for _ in range(2)]
+    assert got == [1, 3, 7, 15, 23, 22, 20], got
+
+
+@cocotb.test()
+async def slot_trim_moves_the_slot(dut):
+    """cfg_slot_trim, fixed slots 400/800/1200: three 'above' reports on phase 2 before its slot (sofs 7) turn its
+    low side off at 407 instead of 400; phase 3, without reports, stays at 800."""
+    c = Ctrl(dut)
+    await c.start(slot_trim=1, st_smax=8)
+    for _ in range(3):
+        await _report_r(c, dut, 1, 0)
+    e = await c.until("L", 0, 2)
+    assert e[0] + e[1] == 407, e
+    e = await c.until("L", 0, 3)
+    assert e[0] + e[1] == 800, e
+
+
+@cocotb.test()
+async def slot_trim_not_phase1(dut):
+    """cfg_slot_trim: reports on phase 1 (not a slotted phase in a master) leave its offset at 0."""
+    c = Ctrl(dut)
+    await c.start(slot_trim=1, st_smax=8)
+    assert [await _report_r(c, dut, 0, 0) for _ in range(3)] == [0, 0, 0]
+
+
+@cocotb.test()
+async def slot_trim_not_in_mode_s(dut):
+    """cfg_slot_trim: in mode S (start_s) a slotted phase's reports leave its offset at 0."""
+    c = Ctrl(dut)
+    await c.start(slot_trim=1, st_smax=8, start_s=1)
+    assert [await _report_r(c, dut, 1, 0) for _ in range(3)] == [0, 0, 0]
+

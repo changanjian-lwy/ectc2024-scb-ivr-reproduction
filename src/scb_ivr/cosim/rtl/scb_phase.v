@@ -25,6 +25,10 @@
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
 //   (cfg_zvs_react); restart timer cfg_rs_high.
 // - t_lo_q (C02): the last low-side turn-off time, for slots referenced to it (scb_ctrl cfg_slot_lo).
+// - Slot valley trim (A109, cfg_slot_trim, slotted phases, mode P): the slot moves by sofs; each residual-current
+//   report (r_valid) at a slot turn-off moves sofs later when the current was above the target (r_below 0), else
+//   earlier, by a step that doubles while the decisions agree (up to cfg_st_smax) and returns to 1 when they differ;
+//   |sofs| <= 1024 LSB.
 //
 // Correctors (one report per edge):
 // - dt_pred: early -> + cfg_dt_step (capped at cfg_dt_max); flat -> hold; otherwise the measured valley time m_tv, or
@@ -99,6 +103,8 @@ module scb_phase #(
     input  wire [7:0]           cfg_lo_smax,   // A100: its largest step, LSB
     input  wire                 cfg_lo_ff,     // A100: Ton feedforward
     input  wire [7:0]           cfg_lo_kff,    // A100: dlo change per LSB of ton
+    input  wire                 cfg_slot_trim, // A109: valley trim of a slotted phase's turn-off (mode P)
+    input  wire [7:0]           cfg_st_smax,   // A109: its largest step, LSB
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -118,7 +124,8 @@ module scb_phase #(
     output reg  [TW-1:0]        dtl,           // A89: low-side dead time, LSB
     output reg  [TW-1:0]        dlo,           // A99: phase 1's on-low interval for the timed turn-off, LSB
     output wire                 lo_timed,      // A99: phase 1's turn-off is timed
-    output wire [TW-1:0]        t_lo_q         // C02: the last low-side turn-off time (t_lo)
+    output wire [TW-1:0]        t_lo_q,        // C02: the last low-side turn-off time (t_lo)
+    output reg  signed [TW-1:0] sofs           // A109: the slot's valley-trim offset, LSB
 );
     localparam [1:0] HIGH = 2'd0, DOWN = 2'd1, LOW = 2'd2, UP = 2'd3;
     localparam [2:0] HOW_PRED = 3'd0, HOW_VALLEY = 3'd1, HOW_ZVS = 3'd2, HOW_RESTART = 3'd3, HOW_TIMED = 3'd4;
@@ -134,7 +141,8 @@ module scb_phase #(
     wire signed [TW-1:0] d_off   = t_on + ton - now;
     wire signed [TW-1:0] d_rsd   = t_off + cfg_rs_high - now;
     wire signed [TW-1:0] d_rs1   = t_lon + cfg_rs_low - now;
-    wire signed [TW-1:0] d_slot  = slot_time - now;
+    wire          st_on    = !FIRST && cfg_slot_trim && mode_p;                // A109
+    wire signed [TW-1:0] d_slot  = slot_time + (st_on ? sofs : {TW{1'b0}}) - now;
     wire signed [TW-1:0] d_pred  = t_lo + dt_pred - now;
     wire signed [TW-1:0] d_rsu   = t_lo + cfg_rs_high - now;
     // mode S
@@ -178,6 +186,13 @@ module scb_phase #(
     // A100: dlo's next value from the report (step 1, or adaptive) and the Ton feedforward, floored at 0
     reg  [TW-1:0] ton_q;
     reg  [7:0]    lo_step;
+    reg  [7:0]    st_step;                                          // A109
+    reg           st_last, st_seen;
+    wire          st_up    = !r_below;                              // the current was above the target: later
+    wire [7:0]    st_adm   = (st_seen && (st_up == st_last)) ?
+                             ((st_step >= (cfg_st_smax >> 1)) ? cfg_st_smax : (st_step << 1)) : 8'd1;
+    wire signed [TW-1:0] sofs_n = sofs + (st_up ? $signed({{(TW-8){1'b0}}, st_adm}) : -$signed({{(TW-8){1'b0}}, st_adm}));
+    localparam signed [TW-1:0] SOFS_MAX = 1024;
     reg           lo_last, lo_seen;
     wire          lo_up    = mlo_early || (mlo_err < cfg_lo_tgt);
     wire [7:0]    adm_s    = (lo_seen && (lo_up == lo_last)) ?
@@ -242,6 +257,10 @@ module scb_phase #(
             lo_step     <= 8'd1;
             lo_last     <= 1'b0;
             lo_seen     <= 1'b0;
+            sofs        <= {TW{1'b0}};                           // A109
+            st_step     <= 8'd1;
+            st_last     <= 1'b0;
+            st_seen     <= 1'b0;
         end else begin
             if (m_valid) begin
                 if (m_early)
@@ -263,6 +282,10 @@ module scb_phase #(
                 if (mlo_valid) begin
                     lo_step <= step_u; lo_last <= lo_up; lo_seen <= 1'b1;
                 end
+            end
+            if (st_on && r_valid && !lo_bind_cur) begin          // A109: sign-based, adaptive step
+                sofs    <= (sofs_n > SOFS_MAX) ? SOFS_MAX : (sofs_n < -SOFS_MAX) ? -SOFS_MAX : sofs_n;
+                st_step <= st_adm; st_last <= st_up; st_seen <= 1'b1;
             end
             if (r_valid && cfg_trim && lo_bind_cur) begin
                 if (r_below && trim != TRIM_MAX)
