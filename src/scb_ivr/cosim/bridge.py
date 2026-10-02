@@ -46,9 +46,10 @@ the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final 
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
 Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
-"vm0_v" 0.0, "phases" 1..N, "valley_zero" 1}, A101): per phase Lr and a bidirectional switch (2 dies of alpha x
+"vm0_v" 0.0, "phases" 1..N, "valley_zero" 0}, A101): per phase Lr and a bidirectional switch (2 dies of alpha x
 EPC2067 in series, 2 RDS(on) / alpha) from Cm to x_k, switched with the low side complemented and opening at zero
-current; with "valley_zero" the high side's valley measurement stops at its first V_DS <= 0. Sections add Cm's
+current; with "valley_zero" 1 the high side's valley measurement stops at its first V_DS <= 0 (in A101 this made the
+turn-off currents of phases 2-4 unstable; the plain valley measurement is stable). Sections add Cm's
 voltages and each branch's int i^2 dt and extremes since the last section. Every run records the phase current (and
 the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
 """
@@ -204,8 +205,8 @@ async def cosim(dut):
 
     # Plant-side bookkeeping for the comparators and the measurements.
     v_lo = [None] * N; t_lo_act = [None] * N
-    mon = Monitors(N, vmin_zero=int(aux.get("valley_zero", 1)) if aux else 0)   # zero-crossing TDC and valley tracking
-    #   (shared with KernelPlant2's C loop); A101: with branches the high side's minimum stops at its first V_DS <= 0
+    mon = Monitors(N, vmin_zero=int(aux.get("valley_zero", 0)) if aux else 0)   # zero-crossing TDC and valley tracking
+    #   (shared with KernelPlant2's C loop); A101 option: the high side's minimum stops at its first V_DS <= 0
     use_c = hasattr(plant, "attach_monitors")
     if use_c:
         plant.attach_monitors(mon)

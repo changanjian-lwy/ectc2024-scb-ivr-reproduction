@@ -34,6 +34,10 @@ result.
     phase. ReferencePlant, FastPlant, KernelPlant and KernelPlant2 are
     bit-identical, including the zero-current openings.
 - **RTL unchanged.**
+- **Later the same day:** `valley_zero` defaults to 0. With 1, the
+  turn-off currents of phases 2-4 became unstable in A101 (z075); with
+  the plain valley measurement the same design is stable (dz_vz0). All
+  A101 configurations set the key explicitly.
 
 ## 2026-10-01 (night, A100) - adaptive dlo step and Ton feedforward
 

@@ -58,7 +58,7 @@ def stats(d, models):
             ph.update(i_peak_mean_a=float(ia.mean()), i_aux_hs_off_mean_a=float(ib.mean()),
                       i_hs_off_mean_a=float((ia - ib).mean()), ripple_pp_a=float(ia.mean() - valley.mean()),
                       i_mid_a=float(0.5 * (ia.mean() + valley.mean())))
-        if "aux_params" in d:
+        if "aux_params" in d and k + 1 in d["aux_params"]["phases"]:
             a = d["aux_params"]["phases"].index(k + 1)
             vm = np.array([s["vm_v"][a] for s in sec])
             ph.update(vm_mean_v=float(vm.mean()), vm_pp_v=float(vm.max() - vm.min()),
@@ -117,19 +117,31 @@ def main():
     for k, ph in enumerate(ref["phases"]):
         print(f"   phase {k + 1}: HS on {ph['hs_on_vds_mean_v']:.2f} V (hard {ph['e_hard_on_nj']:.0f} nJ), LS on {ph['ls_on_vds_mean_v']:+.2f} V, "
               f"valley {ph['i_lowoff_mean_a']:+.2f} A" + (f", peak {ph['i_peak_mean_a']:.1f} A, ripple {ph['ripple_pp_a']:.1f} A" if "i_peak_mean_a" in ph else ""))
-    for name, design in (("z075", "zvs_0p75nH"), ("p125", "partial_1p25nH"), ("z075_j30", "zvs_0p75nH")):
+    runs = (("z075", "zvs_0p75nH"), ("p125", "partial_1p25nH"), ("z075_j30", "zvs_0p75nH"),     # registered
+            ("dz_vz0", "zvs_0p75nH"), ("dz_lr100", None), ("dz_cm10", "zvs_0p75nH"), ("dz_ph1", None))  # diagnostics
+    for name, design in runs:
         d = load(name)
         if d is None:
             continue
         cfg = json.loads((HERE / "cosim" / f"cfg_{name}.json").read_text())
         r = stats(d, models)
         out["runs"][name] = r
-        pp = pred[design]["phases"]
+        print(f"\n{name}{' (diagnostic)' if name.startswith('dz_') else ''}: {r['status']} to {r['t_end_us']:.0f} us, "
+              f"overlaps {r['overlaps']}, ipk {r['ipk_a']:.0f} A, period {r['period_ns']:.1f} ns, Vo {r['vo_mean_v']:.4f} V")
+        if len(cfg["aux"].get("phases", [1, 2, 3, 4])) < N:
+            print("   branch on some phases only: no bookkeeping")
+            continue
         d56rows = [{"main_conduction_nj": main_cond[cfg["aux"]["lr_nh"]]} for _ in range(N)]
         bk = bookkeeping(ref, r, cfg, models, d56rows) if "i_peak_mean_a" in ref["phases"][0] else None
         r["bookkeeping"] = bk
-        print(f"\n{name}: {r['status']} to {r['t_end_us']:.0f} us, overlaps {r['overlaps']}, ipk {r['ipk_a']:.0f} A, "
-              f"period {r['period_ns']:.1f} ns, Vo {r['vo_mean_v']:.4f} V")
+        if design is None:
+            for k, ph in enumerate(r["phases"]):
+                print(f"   phase {k + 1}: Vm {ph['vm_mean_v']:.2f} V, HS on {ph['hs_on_vds_mean_v']:+.2f} V, i_r {ph['ir_max_a']:+.1f}/{ph['ir_min_a']:+.1f} A, "
+                      f"HS off {ph['i_hs_off_mean_a']:.1f} A, LS on max {ph['ls_on_vds_max_v']:+.2f} V, ripple {ph['ripple_pp_a']:.1f} A, mid {ph['i_mid_a']:.1f} A")
+            print(f"   net four phases {bk['net_w_four_phases'][0]:+.2f}..{bk['net_w_four_phases'][1]:+.2f} W; phase 1 (nJ): " + ", ".join(
+                f"{kk} {v:+.0f}" if not isinstance(v, list) else f"{kk} {v[0]:+.0f}..{v[1]:+.0f}" for kk, v in bk["per_phase_nj"][0].items()))
+            continue
+        pp = pred[design]["phases"]
         checks = []
         for k, ph in enumerate(r["phases"]):
             q, b = pp[k], ref["phases"][k]
