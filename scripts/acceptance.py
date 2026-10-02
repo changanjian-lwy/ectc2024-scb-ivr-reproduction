@@ -32,6 +32,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A108": (TA / "A108_p24_line_slew_tolerance", "a108_analyze.py", "a108_summary.json"),
     "A109": (TA / "A109_p24_slot_valley_trim", "a109_analyze.py", "a109_summary.json"),
     "A110": (TA / "A110_p24_high_side_zvs", "a110_analyze.py", "a110_summary.json"),
+    "A111": (TA / "A111_p24_zero_voltage_valley", "a111_analyze.py", "a111_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -71,6 +72,15 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
                 for r, c in (("n30", "peak_200a"), ("n30", "ls_zvs"), ("n30", "peak_5A"), ("n30", "hs_zvs_0p3V"),
                              ("n30_s_p62", "peak_200a"), ("n30_s_m62", "peak_200a"), ("n30_s_m62", "step_25pct"),
                              ("n30_j30", "peak_200a"), ("n30_j30", "sd_band"), ("n30_j30", "hs_zvs_0p5V"))}},
+    "A111": {**{(r, "identical"): "the handover transient reaches V_DS <= 0 at 5% and 20% too; steady states agree (RESULTS 0.2)"
+                for r in ("z5", "z20")},
+             **{(r, c): "the zero-arrival valley destabilises 25-30%: falsified (RESULTS 0.1)"
+                for r, c in (("z25", "peak_200a"), ("z25", "hs_mean_0p9V"), ("z30", "peak_200a"), ("z30", "hs_mean_0p3V"),
+                             ("z30", "hs_max_1V"), ("z30", "ls_zvs"), ("z30", "sd_0p5A"), ("z30", "late_5"),
+                             ("z30", "eff_ge_a110"), ("z30", "eff_pred"), ("z30_s_p62", "peak_200a"),
+                             ("z30_s_p62", "step_25pct"), ("z30_s_p62", "back_15us"), ("z30_s_m62", "peak_200a"),
+                             ("z30_s_m62", "step_25pct"), ("z30_s_m62", "back_15us"), ("z30_j30", "peak_200a"),
+                             ("z30_j30", "sd_band"), ("z30_j30", "hs_0p5V"))}},
 }
 
 

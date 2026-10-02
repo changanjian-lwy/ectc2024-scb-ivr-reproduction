@@ -1019,6 +1019,16 @@ each question:
          - **Next (A111):** a zero-voltage-aware turn-on measurement; then
            20% through the standard matrix as the efficiency candidate.
 
+     38. The zero-voltage valley is falsified:
+         [A111](../experiments/track_A_periodic_steady_state/A111_p24_zero_voltage_valley/RESULTS.md).
+         - Targeting the node's arrival at the rail destabilises 25-30%,
+           as A101 found with the branch: spreads 7-17 A, hard turn-ons
+           to 10 V, peaks 227-270 A. Not adopted.
+         - **Practical high-side zero voltage is reached at 25% with the
+           existing controller (A110):** −0.16 to +0.86 V, the hard-turn-on
+           loss 0.04 W against 8.9 W at 5%.
+         - **Next (A112):** 20% and 25% through the standard matrix.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
