@@ -4,6 +4,37 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (A101) - auxiliary commutation branches
+
+- **`circuit.py`:** `aux_phases`, `aux_l`, `aux_r`, `aux_c`, `aux_vm0`.
+  - Per listed phase, a node m_k with Cm to ground (after "out") and a
+    branch current (after the phase currents) through Lr from m_k into
+    x_k while its bidirectional switch conducts.
+  - The switch states follow the 2N switches in `conducting`. An open
+    branch is uncoupled, with di/dt = 0.
+  - Without branches every matrix is as before.
+- **`plant.py`, `plant_kernel.c`:** the same in all four plants.
+  - The switch is commanded with its phase's low side complemented.
+  - It opens at the step where its current reaches or crosses zero after
+    the open-command (current set to 0, Euler restart).
+  - Per branch: int i² dt and the current extremes.
+  - The peak phase current counts the phase currents only.
+  - Monitors' `vmin_zero`: the high side's minimum stops at its first
+    V_DS ≤ 0.
+  - The C run struct gains its fields at the end.
+- **`bridge.py`:**
+  - cfg key `aux`;
+  - Cm voltages and branch records in the sections;
+  - `highoffs_last` (phase and branch currents at every high-side
+    turn-off) in every run, a format addition.
+- **Gates:**
+  - `--full` regression PASS (`highoffs_last` listed as a format
+    addition);
+  - `tests/test_cosim_plants.py`: 3 new tests with branches on every
+    phase. ReferencePlant, FastPlant, KernelPlant and KernelPlant2 are
+    bit-identical, including the zero-current openings.
+- **RTL unchanged.**
+
 ## 2026-10-01 (night, A100) - adaptive dlo step and Ton feedforward
 
 - **`rtl/scb_phase.v`, `rtl/scb_ctrl.v`:**

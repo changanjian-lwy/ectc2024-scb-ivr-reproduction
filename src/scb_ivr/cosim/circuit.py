@@ -9,6 +9,10 @@ Circuit (N phases):
 - switch capacitances are linear (c_high, c_low) or, with nonlinear_coss, the EPC2067 datasheet Fig. 5a Coss(V)
   (A59 data): the charge change n (q(v1) - q(v0)) solved by chord iteration on the cached LU, full Newton as fallback;
 - one step: trapezoid, or backward Euler after a topology change; LU factors cached per topology.
+- optional auxiliary branches (aux_phases, A101): per listed phase k a node m_k with aux_c to ground (after "out" in
+  v) and a branch current (after the phase currents in i) through aux_l and aux_r from m_k into x_k while its
+  bidirectional switch conducts; the switch states follow the 2N switches in `conducting`; an open branch is
+  uncoupled with di/dt = 0. Without aux_phases every matrix is as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -101,6 +105,11 @@ class CircuitParams:
     rev_r: float = 0.0           # Ohm per device, from fit_fig8 when rev_drop
     i_step: float = 0.0          # A100: a load current step drawn from the output from t_step on
     t_step: float = float("inf")
+    aux_phases: tuple = ()       # A101: phases (1-based) with an auxiliary branch: Lr and a bidirectional switch (BDS)
+    aux_l: float = 0.0           #   from a capacitor node m_k (aux_c to ground) to x_k; aux_r = BDS + Lr resistance
+    aux_r: float = 0.0
+    aux_c: float = 1e-6
+    aux_vm0: float = 0.0
 
     def vin_at(self, t):
         return self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
@@ -125,10 +134,16 @@ class Sim:
     def __post_init__(self):
         p = self.p
         self.nodes, self.switches = topology(p.n)
+        self.aux = tuple(int(k) for k in p.aux_phases)            # A101: the branches' phases; nodes m_k after "out"
+        na = len(self.aux); self.na = na
+        if na:
+            self.nodes = self.nodes + tuple(f"m{k}" for k in self.aux)
         self.idx = {nm: k for k, nm in enumerate(self.nodes)}
         nv = len(self.nodes); self.nv = nv
         caps = ([(p.c_high, d, s) for _, d, s in self.switches[:p.n]] + [(p.c_low, d, s) for _, d, s in self.switches[p.n:]]
                 + [(p.cs, f"a{k}", f"x{k}") for k in range(1, p.n)] + [(p.co, "out", None)])
+        if na:
+            caps += [(p.aux_c, f"m{k}", None) for k in self.aux]
         cm = np.zeros((nv, nv))
         for c, a, b in caps:
             ia, ib = self.idx.get(a), self.idx.get(b)
@@ -138,11 +153,16 @@ class Sim:
                 cm[ib, ib] += c
             if ia is not None and ib is not None:
                 cm[ia, ib] -= c; cm[ib, ia] -= c
-        ns = nv + p.n
-        self.M = np.zeros((ns, ns)); self.M[:nv, :nv] = cm; self.M[nv:, nv:] = p.L * np.eye(p.n)
+        ns = nv + p.n + na; self.ns = ns                         # state: node voltages, phase currents, branch currents
+        self.M = np.zeros((ns, ns)); self.M[:nv, :nv] = cm; self.M[nv:nv + p.n, nv:nv + p.n] = p.L * np.eye(p.n)
         self.B = np.zeros((nv, p.n))
         for k in range(p.n):
             self.B[self.idx[f"x{k + 1}"], k] = 1.0; self.B[self.idx["out"], k] = -1.0
+        if na:                                                 # A101: branch a carries current from m_k into x_k
+            self.M[nv + p.n:, nv + p.n:] = p.aux_l * np.eye(na)
+            self.Baux = np.zeros((nv, na))
+            for a, k in enumerate(self.aux):
+                self.Baux[self.idx[f"m{k}"], a] = 1.0; self.Baux[self.idx[f"x{k}"], a] = -1.0
         self.nsw = [p.n_high] * p.n + [p.n_low] * p.n            # devices per switch position
         self.nl = None
         if p.nonlinear_coss:                                   # switch-branch incidence for the charge correction
@@ -161,7 +181,7 @@ class Sim:
 
     def system(self, conducting, load_on, donly=None):
         p = self.p; nv = self.nv
-        G = np.zeros((nv, nv)); gv = np.zeros(nv); frev = np.zeros(nv + p.n)
+        G = np.zeros((nv, nv)); gv = np.zeros(nv); frev = np.zeros(self.ns)
         for j, (on, (name, d, s)) in enumerate(zip(conducting, self.switches)):
             if not on:
                 continue
@@ -184,8 +204,13 @@ class Sim:
                 G[idd, iss] -= g; G[iss, idd] -= g
         if load_on and p.load_kind == "r":
             G[self.idx["out"], self.idx["out"]] += 1.0 / p.r_load
-        ns = nv + p.n
-        A = np.zeros((ns, ns)); A[:nv, :nv] = -G; A[:nv, nv:] = -self.B; A[nv:, :nv] = self.B.T; A[nv:, nv:] = -p.R * np.eye(p.n)
+        ns, n = self.ns, p.n
+        A = np.zeros((ns, ns)); A[:nv, :nv] = -G; A[:nv, nv:nv + n] = -self.B; A[nv:nv + n, :nv] = self.B.T
+        A[nv:nv + n, nv:nv + n] = -p.R * np.eye(n)
+        for a in range(self.na):                               # A101: conducting entries after the switches; an open
+            if conducting[2 * n + a]:                          # branch is uncoupled with di/dt = 0 (its current is 0)
+                c = nv + n + a
+                A[:nv, c] = -self.Baux[:, a]; A[c, :nv] = self.Baux[:, a]; A[c, c] = -p.aux_r
         fv = np.zeros(ns); fv[:nv] = gv
         fl = np.zeros(ns); fl[self.idx["out"]] = -1.0
         return A, fv, fl, frev

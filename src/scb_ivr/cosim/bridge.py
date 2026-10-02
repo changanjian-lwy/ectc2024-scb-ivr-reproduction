@@ -45,6 +45,12 @@ Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-ca
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
+Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
+"vm0_v" 0.0, "phases" 1..N, "valley_zero" 1}, A101): per phase Lr and a bidirectional switch (2 dies of alpha x
+EPC2067 in series, 2 RDS(on) / alpha) from Cm to x_k, switched with the low side complemented and opening at zero
+current; with "valley_zero" the high side's valley measurement stops at its first V_DS <= 0. Sections add Cm's
+voltages and each branch's int i^2 dt and extremes since the last section. Every run records the phase current (and
+the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
 """
 import gzip
 import heapq
@@ -117,9 +123,16 @@ async def cosim(dut):
         extra.update(rev_drop=True, rev_vf=vf, rev_r=rr)
     if cfg.get("load_step"):                                          # A100: a load current step
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
+    aux = cfg.get("aux")                                              # A101: auxiliary commutation branches
+    if aux:
+        r_bds = 2 * aux.get("rds_on_mohm", 1.3) * 1e-3 / aux["alpha"]
+        extra.update(aux_phases=tuple(aux.get("phases", range(1, N + 1))), aux_l=aux["lr_nh"] * 1e-9,
+                     aux_r=r_bds + aux.get("r_lr_mohm", 0.2) * 1e-3, aux_c=aux.get("cm_uf", 1.0) * 1e-6,
+                     aux_vm0=aux.get("vm0_v", 0.0))
     p = Params(**{k: pr[k] for k in keep}, diode_check=True, **extra)
-    plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, [0.0] * (2 * N + N), gh=[True] + [False] * (N - 1),
-                                                    gl=[False] + [True] * (N - 1))      # 2N node voltages, N currents
+    na = len(p.aux_phases)
+    y0 = [0.0] * (2 * N) + [p.aux_vm0] * na + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
+    plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[True] + [False] * (N - 1), gl=[False] + [True] * (N - 1))
     nv = plant.nv
     io = plant.sim.idx["out"]
     adc_lsb, adc_max = cfg["adc_lsb_v"], (1 << 12) - 1
@@ -191,7 +204,8 @@ async def cosim(dut):
 
     # Plant-side bookkeeping for the comparators and the measurements.
     v_lo = [None] * N; t_lo_act = [None] * N
-    mon = Monitors(N)                           # zero-crossing TDC and valley tracking (shared with KernelPlant2's C loop)
+    mon = Monitors(N, vmin_zero=int(aux.get("valley_zero", 1)) if aux else 0)   # zero-crossing TDC and valley tracking
+    #   (shared with KernelPlant2's C loop); A101: with branches the high side's minimum stops at its first V_DS <= 0
     use_c = hasattr(plant, "attach_monitors")
     if use_c:
         plant.attach_monitors(mon)
@@ -202,6 +216,8 @@ async def cosim(dut):
     st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
     lat = {"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0}   # A81 front end of phase 1
     sections, turnons, lowoffs = [], [], []
+    highoffs = []                                                # A101: phase (and branch) currents at high-side turn-offs
+    im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
     drv = cfg.get("driver")                                      # A91: driver timing model
     rng = np.random.default_rng(int(drv.get("seed", 1))) if drv else None
     ovl = {"count": 0, "first": None, "stop": False}
@@ -297,9 +313,17 @@ async def cosim(dut):
                                  "vcs_v": [float(plant.y[a] - plant.y[x]) for a, x in zip(ia, ix)],
                                  "rev_energy_j": list(plant.rev_e), "rev_time_s": list(plant.rev_t)})   # A89
                 plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
+                if na:                                          # A101: Cm voltages, branch int i^2 dt and extremes
+                    sections[-1].update(vm_v=[float(plant.y[x]) for x in im], aux_i2s=[float(x) for x in plant.aux_e2],
+                                        aux_imax_a=[float(x) for x in plant.aux_imax],
+                                        aux_imin_a=[float(x) for x in plant.aux_imin])
+                    plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
                 adc.append(min(max(int(round(vo / adc_lsb)), 0), adc_max))
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
             mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
+            ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
+            highoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k]),
+                             "i_aux_a": float(ib[0]) if ib else 0.0})
         if j >= N and level and mon.hoff_set[k]:    # A89: low-side turn-on edge
             crossed = bool(mon.cross_set[k])
             th, tc = float(mon.t_hoff[k]), float(mon.t_cross[k])
@@ -420,6 +444,10 @@ async def cosim(dut):
                                                             "rev_vf": p.rev_vf, "rev_r": p.rev_r}}
     if cfg.get("lo_pred", 0):                                    # A99
         out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=int(dut.dlo1.value), lo_reports_last=lo_reports[-keep_n:])
+    out["highoffs_last"] = highoffs[-keep_n:]                    # A101
+    if na:
+        out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
+                             "vm0_v": p.aux_vm0, "valley_zero": int(mon.vmin_zero)}
     out["provenance"] = dict(json.loads(os.environ.get("COSIM_PROVENANCE", "{}")),
                              plant_impl=cfg.get("plant_impl", "kernel2"), t_end_us_override=os.environ.get("COSIM_T_END_US"))
     if prof is not None:

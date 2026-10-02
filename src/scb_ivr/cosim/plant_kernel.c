@@ -220,6 +220,10 @@ typedef struct {
     int64_t need_key;
     int64_t chord_iters;
     double i_step, t_step;                            /* A100: load current step (0, inf without one) */
+    int32_t na, vmin_zero;                            /* A101: auxiliary branches; high-side minimum stops at V_DS <= 0 */
+    int32_t *aux_cmd, *aux_on;                        /* A101: branch switch command and conduction state */
+    const int32_t *aux_idx;                           /* A101: state index of each branch current */
+    double *aux_e2, *aux_imax, *aux_imin;             /* A101: int i^2 dt and extremes since the bridge's reset */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
@@ -260,6 +264,7 @@ static int advance(const ctx_t *c, run_t *r, double h) {      /* FastPlant._adva
         }
         key |= (int64_t)euler << (2 * m);
         key |= (int64_t)(*r->load_on != 0) << (2 * m + 1);
+        for (int a = 0; a < r->na; a++) key |= (int64_t)(r->aux_on[a] != 0) << (2 * m + 2 + a);   /* A101 */
         const ent_t *e = r->table[key];
         if (!e) { r->need_key = key; return RUN_NEED; }
         double ld1 = load_at(r, t1), ld0 = euler ? 0.0 : load_at(r, t0);
@@ -282,9 +287,25 @@ static int advance(const ctx_t *c, run_t *r, double h) {      /* FastPlant._adva
     for (int j = 0; j < m; j++) if (d[j] != (r->diode[j] != 0)) changed = 1;
     if (changed) { for (int j = 0; j < m; j++) r->diode[j] = d[j]; *r->euler_left = 2; }
     for (int j = 0; j < m; j++) r->last_donly[j] = donly[j];
+    double iprev[NMAX];
+    for (int a = 0; a < r->na; a++) iprev[a] = r->y[r->aux_idx[a]];
     for (int i = 0; i < n; i++) r->y[i] = y1[i];
     *r->t = t1;
     *r->euler_left = *r->euler_left - 1 > 0 ? *r->euler_left - 1 : 0;
+    if (r->na) {                                       /* A101: plant._aux_after */
+        int changed = 0;
+        for (int a = 0; a < r->na; a++) {
+            int ci = r->aux_idx[a];
+            double i1 = r->y[ci], i0 = iprev[a];
+            double q = i1 * i1; q = q * h; r->aux_e2[a] = r->aux_e2[a] + q;
+            r->aux_imax[a] = i1 > r->aux_imax[a] ? i1 : r->aux_imax[a];
+            r->aux_imin[a] = i1 < r->aux_imin[a] ? i1 : r->aux_imin[a];
+            if (r->aux_on[a] && !r->aux_cmd[a] && (i0 == 0.0 || (i0 > 0.0 && i1 <= 0.0) || (i0 < 0.0 && i1 >= 0.0))) {
+                r->y[ci] = 0.0; r->aux_on[a] = 0; changed = 1;
+            }
+        }
+        if (changed) *r->euler_left = 2;
+    }
     vds_all(r, r->y, vin1, r->vd);
     if (r->rev_drop) {
         for (int j = 0; j < m; j++) {
@@ -297,7 +318,7 @@ static int advance(const ctx_t *c, run_t *r, double h) {      /* FastPlant._adva
     }
     for (int j = 0; j < m; j++) { double a = r->vmax[j], b = r->vd[j]; r->vmax[j] = (a >= b || isnan(a)) ? a : b; }
     double mx = 0.0; int first = 1, nan = 0;
-    for (int i = r->nv; i < n; i++) { double a = fabs(r->y[i]); if (isnan(a)) nan = 1; if (first || a > mx) mx = a; first = 0; }
+    for (int i = r->nv; i < r->nv + N; i++) { double a = fabs(r->y[i]); if (isnan(a)) nan = 1; if (first || a > mx) mx = a; first = 0; }
     if (nan) mx = NAN;
     if (mx > *r->ipk) *r->ipk = mx;
     int nd[NMAX], ch2 = 0;
@@ -329,7 +350,7 @@ static void monitors(run_t *r) {                       /* the bridge's on_step, 
     for (int k = 0; k < N; k++) {
         if (r->vmin_set[k] && !r->gh[k] && !r->gl[k]) {
             double v = r->vd[k];
-            if (v < r->vmin[k]) { r->vmin[k] = v; r->t_vmin[k] = t; }
+            if (v < r->vmin[k] && !(r->vmin_zero && r->vmin[k] <= 0.0)) { r->vmin[k] = v; r->t_vmin[k] = t; }
         }
     }
 }

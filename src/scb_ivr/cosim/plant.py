@@ -25,6 +25,52 @@ from pathlib import Path
 
 from .circuit import PROJECT, Sim
 
+def _aux_setup(plant, p, gl):
+    """A101: the auxiliary branches' state. Each branch's bidirectional switch is commanded with its phase's low side
+    complemented (on at the low-side turn-off, open-command at the low-side turn-on) and conducts from the command
+    on until its current reaches zero after the open-command."""
+    plant.aux_k = [int(k) - 1 for k in p.aux_phases]
+    plant.na = len(plant.aux_k)
+    plant.aux_col = [plant.nv + p.n + a for a in range(plant.na)]     # state index of each branch current
+    cmd = [not bool(gl[k]) for k in plant.aux_k]
+    plant.aux_cmd = list(cmd)
+    plant.aux_on = list(cmd)
+    plant.aux_e2 = [0.0] * plant.na; plant.aux_imax = [0.0] * plant.na; plant.aux_imin = [0.0] * plant.na
+
+
+def _aux_after(plant, i_prev, h):
+    """A101, after a committed step: each branch's int i^2 dt and current extremes (since the bridge's last reset);
+    a branch commanded open opens at the step where its current reaches or crosses zero: the current is set to 0
+    and the next steps are Euler."""
+    y = plant.y
+    on, cmd = list(plant.aux_on), list(plant.aux_cmd)
+    e2, imx, imn = list(plant.aux_e2), list(plant.aux_imax), list(plant.aux_imin)
+    changed = False
+    for a in range(plant.na):
+        c = plant.aux_col[a]
+        i1, i0 = float(y[c]), i_prev[a]
+        e2[a] = e2[a] + i1 * i1 * h
+        imx[a] = i1 if i1 > imx[a] else imx[a]
+        imn[a] = i1 if i1 < imn[a] else imn[a]
+        if on[a] and not cmd[a] and (i0 == 0.0 or (i0 > 0.0 and i1 <= 0.0) or (i0 < 0.0 and i1 >= 0.0)):
+            y[c] = 0.0
+            on[a] = False
+            changed = True
+    plant.aux_e2, plant.aux_imax, plant.aux_imin = e2, imx, imn
+    if changed:
+        plant.aux_on = on
+        plant.euler_left = 2
+
+
+def _aux_gate(plant, j, level):
+    """A101: a low-side edge of a phase with a branch sets its switch command to the complement."""
+    if plant.na and j >= plant.n and (j - plant.n) in plant.aux_k:
+        a = plant.aux_k.index(j - plant.n)
+        cmd = list(plant.aux_cmd); cmd[a] = not bool(level); plant.aux_cmd = cmd
+        if not level:
+            on = list(plant.aux_on); on[a] = True; plant.aux_on = on
+
+
 class ReferencePlant:
     """The plant as the bridges A89-A93 stepped it (circuit.Sim, one Python step at a time); the reference for the
     equivalence gates. Switch order: SH1..SHN, SL1..SLN."""
@@ -44,6 +90,7 @@ class ReferencePlant:
         self.v_on = -p.rev_vf if p.rev_drop else 0                    # A89: reverse turn-on / cut threshold
         self.rev_e = [0.0] * (2 * self.n); self.rev_t = [0.0] * (2 * self.n)   # A89: since the last section
         self.last_donly = [False] * (2 * self.n)
+        _aux_setup(self, p, gl)                                       # A101 (no branches: na = 0)
 
     def gates(self):
         return self.gh + self.gl
@@ -56,8 +103,9 @@ class ReferencePlant:
         n, g = self.n, self.gates()
         d = list(self.diode)
         euler = self.euler_left > 0
+        aux = tuple(bool(x) for x in self.aux_on) if self.na else ()    # A101
         for _ in range(2 * n + 1):
-            cond = tuple(bool(a or b) for a, b in zip(g, d))
+            cond = tuple(bool(a or b) for a, b in zip(g, d)) + aux
             donly = tuple(bool(b and not a) for a, b in zip(g, d)) if self.p.rev_drop else None   # A89
             y1 = self.sim.step(self.y, cond, h, euler, self.t, self.load_on, donly)
             vin1 = self.p.vin_at(self.t + h)
@@ -70,9 +118,12 @@ class ReferencePlant:
             self.diode = d
             self.euler_left = 2
         self.last_donly = list(donly) if donly is not None else [False] * (2 * n)
+        i_prev = [float(self.y[c]) for c in self.aux_col]
         self.y = y1
         self.t += h
         self.euler_left = max(0, self.euler_left - 1)
+        if self.na:
+            _aux_after(self, i_prev, h)
         vd = [self.sim.vds(self.y, j, self.p.vin_at(self.t)) for j in range(2 * n)]
         if self.p.rev_drop:                                          # A89: reverse-conduction energy (A87)
             for j in range(2 * n):
@@ -81,7 +132,7 @@ class ReferencePlant:
                     if isd > 0:
                         self.rev_e[j] += -vd[j] * isd * h; self.rev_t[j] += h
         self.vds_max = [max(a, b) for a, b in zip(self.vds_max, vd)]          # peak Vds per switch
-        self.ipk = max(self.ipk, float(np.max(np.abs(self.y[self.nv:]))))     # peak phase current
+        self.ipk = max(self.ipk, float(np.max(np.abs(self.y[self.nv:self.nv + n]))))     # peak phase current
         new_d = [(not g[j]) and vd[j] < self.v_on for j in range(2 * n)]
         if new_d != self.diode:
             self.diode = new_d
@@ -99,6 +150,7 @@ class ReferencePlant:
         else:
             self.gl[j - self.n] = bool(level)
         self.euler_left = 2
+        _aux_gate(self, j, level)
 
 
 class FastSim(Sim):
@@ -252,6 +304,7 @@ class FastPlant:
         self.rev_e = [0.0] * (2 * self.n); self.rev_t = [0.0] * (2 * self.n)
         self.last_donly = [False] * (2 * self.n)
         self._vd = None; self._vd_t = None
+        _aux_setup(self, p, gl)                                       # A101 (no branches: na = 0)
 
     @property
     def vds_max(self):
@@ -276,8 +329,9 @@ class FastPlant:
         rev = self.p.rev_drop
         t0, t1 = self.t, self.t + h
         vin0, vin1 = self._vin(t0), self._vin(t1)
+        aux = tuple(bool(x) for x in self.aux_on) if self.na else ()    # A101
         for _ in range(n2 + 1):
-            cond = tuple([bool(a or b) for a, b in zip(g, d)])
+            cond = tuple([bool(a or b) for a, b in zip(g, d)]) + aux
             donly = tuple([bool(b and not a) for a, b in zip(g, d)]) if rev else None
             y1 = self.sim.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1)
             cand = [j for j in range(n2) if d[j] and not g[j]]
@@ -293,9 +347,12 @@ class FastPlant:
             self.diode = d
             self.euler_left = 2
         self.last_donly = list(donly) if donly is not None else [False] * n2
+        i_prev = [float(self.y[c]) for c in self.aux_col]
         self.y = y1
         self.t = t1
         self.euler_left = max(0, self.euler_left - 1)
+        if self.na:
+            _aux_after(self, i_prev, h)
         vd = self.sim.vds_all(self.y, vin1)
         self._vd, self._vd_t = vd, self.t
         if rev:                                                       # A89: reverse-conduction energy (A87)
@@ -306,7 +363,7 @@ class FastPlant:
                     if isd > 0:
                         self.rev_e[j] += -vj * isd * h; self.rev_t[j] += h
         np.maximum(self._vmax, vd, out=self._vmax)                    # peak Vds per switch
-        self.ipk = max(self.ipk, float(np.abs(self.y[self.nv:]).max()))   # peak phase current
+        self.ipk = max(self.ipk, float(np.abs(self.y[self.nv:self.nv + self.n]).max()))   # peak phase current
         below = (vd < self.v_on).tolist()
         new_d = [(not g[j]) and below[j] for j in range(n2)]
         if new_d != self.diode:
@@ -325,6 +382,7 @@ class FastPlant:
         else:
             self.gl[j - self.n] = bool(level)
         self.euler_left = 2
+        _aux_gate(self, j, level)
 
 
 SRC = Path(__file__).resolve().parent / "plant_kernel.c"
@@ -371,7 +429,7 @@ class KernelSim(FastSim):
     def __post_init__(self):
         super().__post_init__()
         self._lib = _load()
-        n, m = self.nv + self.p.n, 2 * self.p.n
+        n, m = self.ns, 2 * self.p.n
         keep = []
         ctx = _Ctx(n=n, m=m, nonlinear=int(self.nl is not None))
         if self.nl is not None:
@@ -422,7 +480,7 @@ class KernelSim(FastSim):
         ld1 = p.load_at(t + h)
         ld0 = 0.0 if euler else p.load_at(t)
         y = np.ascontiguousarray(y, dtype=np.float64)
-        y1 = np.empty(self.nv + p.n)
+        y1 = np.empty(self.ns)
         rc = self._lib.pk_step(self._ctxp, kent[2], y.ctypes.data, y1.ctypes.data, h, int(bool(euler)), vin0, vin1,
                                ld0, ld1, ctypes.byref(self._iters))
         self.kernel_stats["steps"] += 1
@@ -454,8 +512,9 @@ class Monitors:
     V_DS minimum of each high side after its low-side turn-off), in arrays that KernelPlant2's C loop shares.
     py_step(plant) is the Python update after one step, the same rules as the C loop's."""
 
-    def __init__(self, n):
+    def __init__(self, n, vmin_zero=0):
         self.n = n
+        self.vmin_zero = int(vmin_zero)      # A101: the high side's minimum stops at its first V_DS <= 0
         self.hoff_set, self.cross_set, self.vprev_valid, self.vmin_set = (np.zeros(n, np.int32) for _ in range(4))
         self.t_hoff, self.t_cross, self.v_prev, self.t_prev, self.vmin, self.t_vmin = (np.zeros(n) for _ in range(6))
 
@@ -472,7 +531,7 @@ class Monitors:
         for k in range(n):
             if self.vmin_set[k] and not plant.gh[k] and not plant.gl[k]:
                 v = plant.vds(k)
-                if v < self.vmin[k]:
+                if v < self.vmin[k] and not (self.vmin_zero and self.vmin[k] <= 0.0):
                     self.vmin[k] = v; self.t_vmin[k] = t
 
 
@@ -485,7 +544,9 @@ class _Run(ctypes.Structure):
                [(nm, ctypes.c_void_p) for nm in ("nsw", "dsel", "ssel", "table", "hoff_set", "cross_set", "vprev_valid",
                                                  "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin")] + \
                [("need_key", ctypes.c_int64), ("chord_iters", ctypes.c_int64)] + \
-               [("i_step", ctypes.c_double), ("t_step", ctypes.c_double)]                 # A100
+               [("i_step", ctypes.c_double), ("t_step", ctypes.c_double)] + \
+               [("na", ctypes.c_int32), ("vmin_zero", ctypes.c_int32)] + \
+               [(nm, ctypes.c_void_p) for nm in ("aux_cmd", "aux_on", "aux_idx", "aux_e2", "aux_imax", "aux_imin")]   # A101
 
 
 class KernelPlant2(KernelPlant):
@@ -498,18 +559,21 @@ class KernelPlant2(KernelPlant):
 
     def __init__(self, p, y0, gh, gl):
         n2, N = 2 * p.n, p.n
+        na = len(p.aux_phases)
         self._buf = dict(y=np.array(y0, dtype=float), t=np.zeros(1), rev_e=np.zeros(n2), rev_t=np.zeros(n2),
                          ipk=np.zeros(1), vd=np.zeros(n2), gh=np.zeros(N, np.int32), gl=np.zeros(N, np.int32),
                          diode=np.zeros(n2, np.int32), euler_left=np.zeros(1, np.int32), last_donly=np.zeros(n2, np.int32),
-                         load_on=np.zeros(1, np.int32), steps=np.zeros(1, np.int64))
+                         load_on=np.zeros(1, np.int32), steps=np.zeros(1, np.int64),
+                         aux_cmd=np.zeros(na, np.int32), aux_on=np.zeros(na, np.int32), aux_e2=np.zeros(na),
+                         aux_imax=np.zeros(na), aux_imin=np.zeros(na))          # A101
         super().__init__(p, y0, gh, gl)
         sim = self.sim
         self._buf["vmax"] = self._vmax
         self._buf["gh"][:] = [int(bool(x)) for x in self.gh]
         self._buf["gl"][:] = [int(bool(x)) for x in self.gl]
-        self._table = (ctypes.c_void_p * (1 << (2 * n2 + 2)))()
+        self._table = (ctypes.c_void_p * (1 << (2 * n2 + 2 + na)))()
         self._table_keep = {}
-        r = _Run(n=sim.nv + N, m=n2, N=N, nv=sim.nv)
+        r = _Run(n=sim.ns, m=n2, N=N, nv=sim.nv, na=na)
         for nm, a in self._buf.items():
             setattr(r, nm, a.ctypes.data)
         r.p_h, r.v_on = p.h, float(self.v_on)
@@ -517,7 +581,8 @@ class KernelPlant2(KernelPlant):
         r.i_load, r.t_load = float(p.i_load), float(p.t_load)
         r.i_step, r.t_step = float(p.i_step), float(p.t_step)
         r.rev_drop, r.load_cc = int(bool(p.rev_drop)), int(p.load_kind == "cc")
-        self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32))
+        self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32),
+                            aux_idx=np.asarray(self.aux_col, np.int32))
         for nm, a in self._consts.items():
             setattr(r, nm, a.ctypes.data)
         r.table = ctypes.addressof(self._table)
@@ -566,6 +631,27 @@ class KernelPlant2(KernelPlant):
     def last_donly(self, v):
         self._buf["last_donly"][:] = [bool(x) for x in v]
 
+    def _flags(nm):                                                    # A101: branch switch command and state
+        def g(self):
+            return [bool(x) for x in self._buf[nm]]
+        def s(self, v):
+            self._buf[nm][:] = [bool(x) for x in v]
+        return property(g, s)
+    aux_cmd = _flags("aux_cmd")
+    aux_on = _flags("aux_on")
+    del _flags
+
+    def _vals(nm):
+        def g(self):
+            return self._buf[nm]
+        def s(self, v):
+            self._buf[nm][:] = v
+        return property(g, s)
+    aux_e2 = _vals("aux_e2")
+    aux_imax = _vals("aux_imax")
+    aux_imin = _vals("aux_imin")
+    del _vals
+
     def set_gate(self, j, level):
         super().set_gate(j, level)
         self._buf["gh"][:] = [int(bool(x)) for x in self.gh]
@@ -575,12 +661,14 @@ class KernelPlant2(KernelPlant):
         r = self._run
         for nm in ("hoff_set", "cross_set", "vprev_valid", "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin"):
             setattr(r, nm, getattr(mon, nm).ctypes.data)
+        r.vmin_zero = int(mon.vmin_zero)
         self._mon = mon
 
     def _register(self, key):
-        """KernelSim's topology entry for the C key (cond bits, donly bits, euler, load_on) at h = p.h."""
+        """KernelSim's topology entry for the C key (cond bits, donly bits, euler, load_on, then A101's branch
+        switches) at h = p.h."""
         n2, sim, p = 2 * self.n, self.sim, self.p
-        cond = tuple(bool((key >> j) & 1) for j in range(n2))
+        cond = tuple(bool((key >> j) & 1) for j in range(n2)) + tuple(bool((key >> (2 * n2 + 2 + a)) & 1) for a in range(self.na))
         donly = tuple(bool((key >> (n2 + j)) & 1) for j in range(n2)) if p.rev_drop else None
         euler, load_on = bool((key >> (2 * n2)) & 1), bool((key >> (2 * n2 + 1)) & 1)
         k = (cond, p.h, euler, load_on, donly)

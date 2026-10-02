@@ -7,6 +7,7 @@ import json
 import shutil
 import sys
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -125,6 +126,80 @@ class CosimPlantEquivalence(unittest.TestCase):
                     mon.vmin_set[k] = 1; mon.vmin[k] = pl.vds(k); mon.t_vmin[k] = pl.t
             r.set_gate(j, lvl); f.set_gate(j, lvl)
         self.assertGreater(r.steps, 3000)
+
+
+
+class CosimPlantAuxEquivalence(unittest.TestCase):
+    """A101: the same lockstep with an auxiliary branch on every phase (Lr 0.75 nH, Cm 1 uF at 9 V), whose switches
+    follow the low sides and open at zero current; the C loop with the high side's minimum stopped at V_DS <= 0."""
+
+    @classmethod
+    def setUpClass(cls):
+        d = json.loads((TRACK_A / "A92_verilog_error_based_correctors" / "cosim" / "run_n0_nominal.json").read_text())
+        s = min(d["sections"], key=lambda x: abs(x["t_s"] - 300e-6))
+        cls.p = replace(params(), aux_phases=(1, 2, 3, 4), aux_l=0.75e-9, aux_r=2 * 1.3e-3 / 0.3 + 0.2e-3, aux_c=1e-6)
+        cls.y0, cls.t0 = s["v"] + [9.0] * N + s["i"] + [0.0] * N, s["t_s"]
+
+    def check(self, r, f):
+        self.assertEqual(bits(r.y), bits(f.y)); self.assertEqual(r.t, f.t)
+        self.assertEqual([bool(x) for x in r.diode], [bool(x) for x in f.diode])
+        self.assertEqual([bool(x) for x in r.aux_on], [bool(x) for x in f.aux_on])
+        self.assertEqual(bits(list(r.aux_e2) + list(r.aux_imax) + list(r.aux_imin)),
+                         bits(list(f.aux_e2) + list(f.aux_imax) + list(f.aux_imin)))
+        self.assertEqual(bits(r.vds_max), bits(f.vds_max)); self.assertEqual(r.ipk, f.ipk)
+
+    def lockstep(self, other_cls):
+        p = self.p
+        gh, gl = [True] + [False] * (N - 1), [False] + [True] * (N - 1)
+        r, f = ReferencePlant(p, self.y0, gh, gl), other_cls(p, self.y0, gh, gl)
+        r.t = f.t = self.t0; r.load_on = f.load_on = True
+        opened = [0]
+        for te, j, lvl in schedule(np.random.default_rng(5), r.t, r.t + 300e-9):
+            while r.t < te - 1e-18:
+                hh = min(p.h, te - r.t)
+                before = list(r.aux_on)
+                r._advance(hh); f._advance(hh)
+                opened[0] += sum(1 for a, b in zip(before, r.aux_on) if a and not b)
+                self.check(r, f)
+            r.set_gate(j, lvl); f.set_gate(j, lvl)
+        self.assertGreater(opened[0], 2)                         # branches opened at zero current
+        self.assertGreater(max(r.aux_imax), 5.0); self.assertLess(min(r.aux_imin), -5.0)
+
+    def test_fast_plant_is_bit_identical(self):
+        self.lockstep(FastPlant)
+
+    @unittest.skipUnless(sys.platform == "darwin" and shutil.which("cc"), "C kernel needs macOS Accelerate and cc")
+    def test_kernel_plant_is_bit_identical(self):
+        from scb_ivr.cosim.plant import KernelPlant
+        self.lockstep(KernelPlant)
+
+    @unittest.skipUnless(sys.platform == "darwin" and shutil.which("cc"), "C kernel needs macOS Accelerate and cc")
+    def test_kernel_plant2_loop_is_bit_identical(self):
+        from scb_ivr.cosim.plant import KernelPlant2, Monitors
+        p = self.p
+        gh, gl = [True] + [False] * (N - 1), [False] + [True] * (N - 1)
+        r, f = ReferencePlant(p, self.y0, gh, gl), KernelPlant2(p, self.y0, gh, gl)
+        mr, mf = Monitors(N, vmin_zero=1), Monitors(N, vmin_zero=1)
+        f.attach_monitors(mf)
+        r.t = f.t = self.t0; r.load_on = f.load_on = True
+        for te, j, lvl in schedule(np.random.default_rng(13), r.t, r.t + 300e-9):
+            r.integrate_to(te, lambda: mr.py_step(r))
+            f.integrate_to(te, None, monitors=mf, latch=(False, 0.0, None))
+            self.check(r, f); self.assertEqual(r.steps, f.steps)
+            for nm in ("hoff_set", "cross_set", "vprev_valid", "vmin_set", "t_cross", "v_prev", "t_prev", "vmin", "t_vmin"):
+                self.assertEqual(bits(getattr(mr, nm)), bits(getattr(mf, nm)), nm)
+            k = j % N
+            for mon, pl in ((mr, r), (mf, f)):
+                if j < N and lvl:
+                    mon.vmin_set[k] = 0
+                if j < N and not lvl:
+                    mon.hoff_set[k] = 1; mon.t_hoff[k] = pl.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
+                if j >= N and lvl:
+                    mon.hoff_set[k] = 0; mon.cross_set[k] = 0
+                if j >= N and not lvl:
+                    mon.vmin_set[k] = 1; mon.vmin[k] = pl.vds(k); mon.t_vmin[k] = pl.t
+            r.set_gate(j, lvl); f.set_gate(j, lvl)
+        self.assertGreater(r.steps, 20000)
 
 
 if __name__ == "__main__":
