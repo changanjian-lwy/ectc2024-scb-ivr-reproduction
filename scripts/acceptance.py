@@ -34,6 +34,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A110": (TA / "A110_p24_high_side_zvs", "a110_analyze.py", "a110_summary.json"),
     "A111": (TA / "A111_p24_zero_voltage_valley", "a111_analyze.py", "a111_summary.json"),
     "A112": (TA / "A112_p24_zvs_designs_matrix", "a112_analyze.py", "a112_summary.json"),
+    "A113": (TA / "A113_p24_zvs_turn_off_following", "a113_analyze.py", "a113_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -90,6 +91,14 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
                 for r in ("p20_l_m48_1us", "p20_l_m80_10us", "p20_l_p48_1us", "p20_l_p48_10us", "p25_l_m48_1us",
                           "p25_l_m48_10us", "p25_l_m80_10us", "p25_l_p48_1us", "p25_l_p48_10us")},
              ("p25_s_m62", "step_30pct"): "25%: phase 1's turn-off does not follow Ton; a slow oscillation (RESULTS 0.3; A113)"},
+    "A113": {("ff_s_m62", "overshoot_30pct"): "+16.9 mV against +11.65 mV, recovered in 8.9 us (RESULTS 0.3)",
+             ("cmp_s_m62", "overshoot_30pct"): "+16.9 mV against +11.65 mV, recovered in 8.9 us (RESULTS 0.3)",
+             ("ff_l_m48_1us", "back"): "the dlo feed-forward is falsified for line steps (RESULTS 0.1)",
+             ("ff_l_m48_1us", "peak_le_a112"): "the dlo feed-forward is falsified for line steps (RESULTS 0.1)",
+             ("ff_l_m80_10us", "back"): "the dlo feed-forward is falsified for line steps (RESULTS 0.1)",
+             ("ff_l_m80_10us", "peak_le_a112"): "the dlo feed-forward is falsified for line steps (RESULTS 0.1)",
+             ("cmp_l_m80_10us", "back"): "-8 V / 10 us still settles in 175 us: another mechanism (RESULTS 0.2)",
+             ("cmp_l_m80_10us", "peak_le_a112"): "197.9 against 193.6 A (RESULTS 1)"},
 }
 
 
