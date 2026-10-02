@@ -195,7 +195,7 @@ interleave reference):
   ±0.25 mV). So the turn-off sd is 0.02 A.
 - A105 i2 n0 toggles 567/568 (Vo pk-pk 0.51 mV, sd 0.16 A).
 - Whether the equilibrium falls inside the zero bin is the
-  Peterson-Erickson condition and depends on 0.1 mV-level details. It
+  Peterchev-Sanders condition and depends on 0.1 mV-level details. It
   is not a multi-module property.
 
 ## 4. Consistency with P24 (updated from `../README.md` Section 2)

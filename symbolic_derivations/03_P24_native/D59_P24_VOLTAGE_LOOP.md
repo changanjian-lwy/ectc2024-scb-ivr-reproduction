@@ -59,7 +59,7 @@
 
 **量化：**
 - 一个 Ton LSB 让 Vo 变化约 1.8 mV，而 ADC 一个 LSB 是 0.5 mV；
-- 按 Peterson-Erickson 的条件会出现几个 LSB 的抖动，模型给出 Ton 峰峰值 1-9 LSB，Vo 约 0.5 mV。
+- 按 Peterchev-Sanders 的条件会出现几个 LSB 的抖动，模型给出 Ton 峰峰值 1-9 LSB，Vo 约 0.5 mV。
 
 ## 6. 模型没有包含的
 

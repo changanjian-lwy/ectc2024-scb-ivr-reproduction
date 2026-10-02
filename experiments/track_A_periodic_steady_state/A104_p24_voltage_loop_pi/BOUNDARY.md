@@ -34,7 +34,7 @@ A79's loop is integral only, ki = 0.25 ns/V, picked without a design:
   - D. Maksimović and R. Zane, "Small-Signal Discrete-Time Modeling of
     Digitally Controlled PWM Converters" (local PDF), for the sampling
     delay;
-  - Peterson and Erickson, "Quantization resolution and limit cycling in
+  - Peterchev and Sanders, "Quantization resolution and limit cycling in
     digitally controlled PWM converters" (local PDF). Limit-cycle
     conditions: the DPWM step must move Vo by less than an ADC step, and
     the integral gain must be small. **Here one Ton LSB moves Vo by

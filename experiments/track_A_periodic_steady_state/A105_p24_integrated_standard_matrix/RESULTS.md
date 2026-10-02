@@ -55,7 +55,7 @@ predictions (b4f7fb3) before any run.
    - With a mismatch, Vo toggles between two ADC codes (0.5 mV
      peak-to-peak; n0 stays inside one code, 0.09 mV).
    - The PI's proportional term turns each toggle into ~3 LSB of Ton.
-     This is Peterson and Erickson's quantisation condition.
+     This is Peterchev and Sanders's quantisation condition.
    - In absolute terms it is 0.22-0.32 A, half of the 30 ps jitter's
      spread.
    - A ±1-code deadband or a two-sample average on the proportional path

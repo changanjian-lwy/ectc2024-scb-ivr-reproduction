@@ -47,7 +47,7 @@ the predictions (74298e6) before any run.
    **The series-capacitor resonance (140 kHz, unmodelled) shows no effect
    even at 153 kHz.** The fc150 runs are as stable and as close to D59 as
    the others.
-3. **The price is Ton dither, as Peterson and Erickson's conditions
+3. **The price is Ton dither, as Peterchev and Sanders's conditions
    predict.** One Ton LSB moves Vo by ~1.8 mV against a 0.5 mV ADC LSB.
    - Ton peak-to-peak after the step:
      - ref: 2 LSB;

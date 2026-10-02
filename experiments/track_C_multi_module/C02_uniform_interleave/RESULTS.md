@@ -55,7 +55,7 @@ unmodified.
    the correction.**
    - **m4_n0 window pk-pk (55.2 A, predicted 31.3 ± 30%):**
      - The voltage loop's Ton now toggles 567/568, and occasionally
-       564/571: the Peterson-Erickson limit cycle that A105's single
+       564/571: the Peterchev-Sanders limit cycle that A105's single
        module also has.
      - So the per-period mean current moves by 10.7 A, and the window's
        pk-pk adds that to the switching ripple.
