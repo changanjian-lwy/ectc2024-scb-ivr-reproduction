@@ -255,5 +255,21 @@ class CosimPlantAuxEnable(CosimPlantAuxEquivalence):
         self.skipTest("the C loop is covered by CosimPlantAuxEquivalence; arming is Python-side (_aux_gate)")
 
 
+class JoinNodes(unittest.TestCase):
+    """plant.join_nodes, the M-module output join (C3; Co-weighted since 2026-10-03)."""
+
+    def test_equal_caps_is_the_plain_mean(self):
+        from scb_ivr.cosim.plant import join_nodes
+        vs = [1.0001234, 0.9998765, 1.0000011, 0.9999992]
+        self.assertEqual(join_nodes(vs, [4.672e-3] * 4), sum(vs) / 4)
+
+    def test_unequal_caps_conserve_charge(self):
+        from scb_ivr.cosim.plant import join_nodes
+        vs, cs = [1.01, 0.99, 1.0, 1.0], [6e-3, 3e-3, 4.672e-3, 4.672e-3]
+        v = join_nodes(vs, cs)
+        self.assertAlmostEqual(sum(c * (v - x) for c, x in zip(cs, vs)), 0.0, delta=1e-17)
+        self.assertNotAlmostEqual(v, sum(vs) / 4, places=6)
+
+
 if __name__ == "__main__":
     unittest.main()

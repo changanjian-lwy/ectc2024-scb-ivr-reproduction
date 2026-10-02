@@ -5,7 +5,7 @@ import json
 import unittest
 
 from scb_ivr.cosim.circuit import TRACK_A
-from scb_ivr.cosim.matrix import ROWS, configs, lsoff_after, output_ripple, ref_turnons, step_stats, window_stats
+from scb_ivr.cosim.matrix import ROWS, configs, gaps_per_cycle, lsoff_after, output_ripple, ref_turnons, step_stats, window_stats
 
 A105 = TRACK_A / "A105_p24_integrated_standard_matrix"
 A106 = TRACK_A / "A106_p24_line_steps"
@@ -63,6 +63,24 @@ class Matrix(unittest.TestCase):
             for m, md in enumerate(mods):
                 for a, b in zip(lsoff_after(d, md), old[name]["modules"][m]["lsoff_after_master_ns"]):
                     self.assertTrue(close(a * 1e9, b), (name, m, a * 1e9, b))
+
+    def test_step_stats_not_recovered_is_inf(self):
+        """A trace that steps to 0.98 V and stays there has not recovered (the 2026-10-03 review's counterexample);
+        one that returns inside the band reports the last exit."""
+        secs = [{"t_s": 390e-6 + i * 1e-7, "vo": 1.0 if 390e-6 + i * 1e-7 < 400e-6 else 0.98, "vin_v": 48.0,
+                 "vcs_v": [36.0, 24.0, 12.0]} for i in range(400)]
+        self.assertEqual(step_stats({"sections": secs})["back_within_1pct_us"], float("inf"))
+        secs2 = [dict(x, vo=1.0) if x["t_s"] >= 410e-6 else x for x in secs]
+        self.assertTrue(9.0 < step_stats({"sections": secs2})["back_within_1pct_us"] < 10.0)
+
+    def test_gaps_per_cycle_c03_n0(self):
+        """The cycle-by-cycle 16-phase spacing of C03 n0 over its last 200 master periods: max 0.578 ns, sd 0.028 ns
+        (the mean positions are within 0.05 ns)."""
+        d = json.loads((C01.parent / "C03_four_module_standard_matrix" / "cosim" / "run_n0.json").read_text())
+        t, _ = ref_turnons(d)
+        g = gaps_per_cycle([d] + d["modules_rest"], t[0], t[-1])
+        self.assertAlmostEqual(g["max_abs_ns"], 0.578, places=3)
+        self.assertAlmostEqual(g["sd_ns"], 0.028, places=3)
 
 
 if __name__ == "__main__":

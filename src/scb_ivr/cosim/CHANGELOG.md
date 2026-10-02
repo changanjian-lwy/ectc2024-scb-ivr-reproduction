@@ -4,6 +4,49 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-03 (review) - recovery time, the output join, per-cycle gaps, an acceptance gate
+
+**Source:** an external review of the multi-module level. All five
+points were checked and found true. The results corrections are in
+`reports/MULTI_MODULE_SUMMARY_2026-10-02.md` Section 7 and the C02 /
+C03 / C04 / A108 errata.
+
+**Changes:**
+- **`matrix.step_stats`:** a trace still outside its band at its last
+  sample has not recovered: `back_within_1pct_us` and
+  `ladder_back_below_1pct_us` are inf.
+  - Before, a trace stuck at 0.98 V reported 29.9 µs.
+  - Every archived value is unchanged, since every step run recovered.
+- **`matrix.gaps_per_cycle`** (new): every consecutive pair of low-side
+  turn-offs against the local master period / (M N).
+  - `lsoff_after` gives mean positions, which hid the cycle-by-cycle
+    error: 0.58 ns max in C03 n0, against 0.05 ns of the means.
+- **`plant.join_nodes`** (new), used by `cosim_multi`: the joined output
+  voltage is the Co-weighted mean, or the plain mean when the Co are
+  equal. That is the previous expression, so the result is
+  bit-identical. Before, unequal `co` in `module_circuit` broke charge
+  conservation.
+- **`scripts/acceptance.py`** (new): the gate over the registered
+  criteria of C01-C04, A108 and A109.
+  - Each criterion is PASS, DOCUMENTED (listed with the RESULTS section
+    explaining it) or FAIL.
+  - Missing runs, rows absent from a summary, and listed exceptions that
+    now pass fail the gate.
+  - `--reanalyse` reruns the experiments' scripts.
+  - **Now:** all ACCEPTED, 43 documented, 0 unexplained.
+- **Profiling:** `COSIM_PROFILE` already dumped for the M-module system
+  (2026-10-02 speed entry).
+
+**Gates:**
+- the whole test suite, 612 passed, 1 skipped, including:
+  - `test_step_stats_not_recovered_is_inf`;
+  - `test_gaps_per_cycle_c03_n0`;
+  - `JoinNodes` (equal Co gives the plain mean; unequal Co conserves
+    charge);
+  - `tests/test_acceptance.py` (fail, documented, missing, outdated);
+- C02 m4_n0 to 100 µs identical to the run before the change;
+- `acceptance.py C04 --reanalyse` regenerates C04's summary identically.
+
 ## 2026-10-03 (speed) - every core: more jobs by default, plant threads in M-module runs; no change in results
 
 **Asked by the user:** use more cores while running.

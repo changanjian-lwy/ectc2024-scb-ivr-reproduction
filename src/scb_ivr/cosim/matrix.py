@@ -9,10 +9,12 @@ The matrix is TRADEOFF_SCORECARD Section 5's, plus A106's line steps.
   current (mean, sd), the high-side turn-on V_DS (mean) and the low-side turn-on V_DS (maximum). A105's statistics.
 - step_stats(run, t_step=400e-6): Vo's extreme after the step and its time, the last exit from 1 V +/- 1%; the ladder
   deviation max |VCs_k / Vin - (N - k) / N| (A73's formula) before the step, its peak after it, and the last time it
-  is above 1%. A106's statistics.
+  is above 1%. A106's statistics. A trace still outside its band at its last sample has not recovered: inf.
 - Interleave (C01/C02): phase_waveform (a phase's current, linear between its low-side turn-off, high-side turn-on and
-  high-side turn-off events), lsoff_after (each phase's low-side turn-off after a reference run's phase-1 turn-on),
-  output_ripple (the summed current of several modules' phases, pk-pk and ac rms, optionally re-placed).
+  high-side turn-off events), lsoff_after (each phase's MEAN low-side turn-off after a reference run's phase-1
+  turn-on), output_ripple (the summed current of several modules' phases, pk-pk and ac rms, optionally re-placed),
+  gaps_per_cycle (every consecutive pair of low-side turn-offs of all phases against the local master period / (M N):
+  the cycle-by-cycle spacing error, which the mean positions hide).
 """
 from __future__ import annotations
 
@@ -96,10 +98,16 @@ def step_stats(d, t_step=T_STEP_S, vref=1.0):
     dev = np.max(np.abs(vcs / vin[:, None] - np.array([(n - k) / n for k in range(1, n)])), axis=1)
     da = dev[a]
     lad = np.nonzero(da > 0.01)[0]
+    back = float((ta[bad[-1]] - t_step) * 1e6) if len(bad) else 0.0
+    if len(bad) and bad[-1] == len(va) - 1:                  # still outside at the last sample: not recovered
+        back = float("inf")
+    lad_back = float((ta[lad[-1]] - t_step) * 1e6) if len(lad) else 0.0
+    if len(lad) and lad[-1] == len(da) - 1:
+        lad_back = float("inf")
     return {"extreme_mv": float((va[i] - vref) * 1e3), "t_extreme_us": float((ta[i] - t_step) * 1e6),
-            "back_within_1pct_us": float((ta[bad[-1]] - t_step) * 1e6) if len(bad) else 0.0,
+            "back_within_1pct_us": back,
             "ladder_dev_before": float(dev[~a][-200:].max()), "ladder_dev_peak": float(da.max()),
-            "ladder_back_below_1pct_us": float((ta[lad[-1]] - t_step) * 1e6) if len(lad) else 0.0}
+            "ladder_back_below_1pct_us": lad_back}
 
 
 GRID_S = 15.625e-12                # the waveform grid, 1/2 LSB at 250 MHz
@@ -139,3 +147,16 @@ def output_ripple(runs, ref=None, t1=None, n_periods=200, n_phases=4, shift=None
     tot = sum(phase_waveform(r, k, g, shift(m, k) if shift else 0.0)
               for m, r in enumerate(runs) for k in range(1, n_phases + 1))
     return {"pkpk_a": float(np.ptp(tot)), "rms_ac_a": float(np.std(tot)), "mean_a": float(np.mean(tot))}
+
+
+def gaps_per_cycle(runs, t0, t1, n_phases=4):
+    """Every consecutive pair of low-side turn-offs of all phases of runs (a list of module results, the master first)
+    in [t0, t1], against the master period containing it divided by the number of phases: {"max_abs_ns", "sd_ns",
+    "n"}. Unlike lsoff_after's mean positions, this is the spacing of each switching cycle."""
+    on = np.array([s["t_s"] for s in runs[0]["sections"]])
+    ev = np.sort(np.array([x["t_s"] for r in runs for x in r["lowoffs_last"] if t0 <= x["t_s"] <= t1]))
+    g = np.diff(ev)
+    idx = np.clip(np.searchsorted(on, ev[:-1]) - 1, 0, len(on) - 2)
+    dev = (g - (on[idx + 1] - on[idx]) / (len(runs) * n_phases)) * 1e9
+    return {"max_abs_ns": float(np.abs(dev).max()), "sd_ns": float(np.std(dev)), "n": int(len(g))}
+

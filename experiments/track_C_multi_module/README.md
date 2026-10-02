@@ -18,7 +18,7 @@ Started 2026-10-02, after the single-module level closed:
 
 | point | P24 (where) | here | tag |
 |---|---|---|---|
-| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; the aim is a uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number. **DEVIATION found in C01:** phase 1 of each module sat one valley delay (9.44 ns) early (A93/A97's slot reference), gaps 4.4-23.9 ns for 14.5 ns, output current ripple 45.9 A rms. **Corrected in C02** (`slot_lo`): gaps 14.49-14.54 ns, 6.75 A rms, switching ripple 162.8 → 31.0 A pk-pk per period |
+| modules in parallel on one output, interleaved to reduce the output current ripple, 1 kW | Sec. III-B, Fig. 3 | M modules on one output node; the aim is a uniform interleave of all M·N phases (T / (M·N) apart) | P24_EXPLICIT (parallel, interleaved); the uniform T/(M·N) shift is our reading, P24 gives no number. **DEVIATION found in C01:** phase 1 of each module sat one valley delay (9.44 ns) early (A93/A97's slot reference), gaps 4.4-23.9 ns for 14.5 ns, output current ripple 45.9 A rms. **Corrected in C02** (`slot_lo`): mean gaps 14.49-14.54 ns (each cycle within 0.6 ns; 2 ns through steps), 6.75 A rms, switching ripple 162.8 → 31.0 A pk-pk per period |
 | all high sides at the same frequency and duty cycle; the same for the low sides | Sec. III-B | one shared Ton for every module (D61's baseline); the period follows Ton | consistent |
 | IL_peak per phase = 2 Io / (nP · nM) | Eq. / Table 1 | 4 × 4, 125 A | P24_EXPLICIT |
 | current sharing between phases and modules is "the primary challenge" | Sec. III-B | no method in P24; ours: a shared loop and common Ton, sharing error = inductor tolerance (D61); option: negative-current trim | PROJECT_DECISION |
@@ -50,11 +50,12 @@ Started 2026-10-02, after the single-module level closed:
 
 ## 4. Experiments
 
-**The level is closed:** `../../reports/MULTI_MODULE_SUMMARY_2026-10-02.md`.
+**The level is closed:** `../../reports/MULTI_MODULE_SUMMARY_2026-10-02.md` (corrected 2026-10-03, its Section 7).
+**Acceptance gate:** `python3 scripts/acceptance.py` (every registered criterion: pass, documented miss or fail).
 
 | experiment | one factor | result |
 |---|---|---|
 | [C01](C01_four_modules_baseline/RESULTS.md) | module count 1 → 4 (A105's I2, D61 scheme A) | works as D61 predicts: locked periods, ±5% L → ±4.7% sharing, steps and start-up equal to one module. Flagged: the interleave is not uniform (ripple ×7 in rms); the slaves' valleys are unregulated |
-| [C02](C02_uniform_interleave/RESULTS.md) | the interleave reference: phases 2-4 and the slaves slotted from phase 1's low-side turn-off (`slot_lo`) | uniform: 16 gaps 14.49-14.54 ns; ripple 45.9 → 6.75 A rms; soft switching, sharing, steps and start-up unchanged (one module identical to A105 up to the handover). Misses as registered: the window pk-pk (Ton limit cycle), slave 1's late fires < 0.2 ns in j30 (reference latency while the master learns). Recommended for the design from C03 on |
-| [C03](C03_four_module_standard_matrix/RESULTS.md) | the four-module standard matrix with `slot_lo` (16 rows) and slave 1 at +5% / +10% L | passes as the single module: no overlap in 72 module-runs, steps within 8% of the single module's, gaps T/16 ± 0.05 ns. A slave at +10% L: −8.6% current, valleys ≤ −3.9 A, zero-voltage switching kept. Open: l_p48_1us 207 A (single-module, A108), rare late fires (< 10 per run) |
-| [C04](C04_module_spread/RESULTS.md) | module-to-module spread: Cs ±20%, R ±30%, all with L ±5%, and a load step | holds: no overlap, gaps T/16 ± 0.05 ns, valleys ≤ −3.6 A. Cs ±0.4%, R ±1.3% (slaves act as ~3.3 mΩ sources), all together −5.2 / +6.1% |
+| [C02](C02_uniform_interleave/RESULTS.md) | the interleave reference: phases 2-4 and the slaves slotted from phase 1's low-side turn-off (`slot_lo`) | uniform: mean gaps 14.49-14.54 ns (each cycle ≤ 0.6 ns); ripple 45.9 → 6.75 A rms; soft switching, sharing, steps and start-up unchanged (one module identical to A105 up to the handover). Misses as registered: the window pk-pk (Ton limit cycle), slave 1's late fires < 0.2 ns in j30 (reference latency while the master learns). Recommended for the design from C03 on |
+| [C03](C03_four_module_standard_matrix/RESULTS.md) | the four-module standard matrix with `slot_lo` (16 rows) and slave 1 at +5% / +10% L | passes as the single module: no overlap in 72 module-runs, steps within 8% of the single module's, mean gaps T/16 ± 0.05 ns (each cycle ≤ 0.62 ns; ≤ 2 ns through steps). A slave at +10% L: −8.6% current, valleys ≤ −3.9 A, low side at zero voltage, high side at its valley (≤ 9.62 V). Open: l_p48_1us 207 A (single-module, A108), rare late fires (< 10 per run) |
+| [C04](C04_module_spread/RESULTS.md) | module-to-module spread: Cs ±20%, R ±30%, all with L ±5%, and a load step | holds: no overlap, mean gaps T/16 ± 0.05 ns (each cycle ≤ 0.61 ns), valleys ≤ −3.6 A, low side at zero voltage. Cs ±0.4%, R ±1.3% (slaves act as ~3.3 mΩ sources), all together −5.2 / +6.1% |

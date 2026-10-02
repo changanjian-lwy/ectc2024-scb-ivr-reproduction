@@ -986,6 +986,24 @@ each question:
              motion, Ton resolution, slave reference);
            - what is not in this level.
 
+     36. External review of the multi-module level (2026-10-03): five
+         points, all checked true, all fixed.
+         - **Wording:** the high side turns on at its valley (~9 V, up to
+           9.62 V), not at zero voltage; only the low side switches at
+           zero voltage. Corrected in the summary and the errata.
+         - **Interleave:** ±0.05 ns is the mean. Cycle by cycle: ≤ 0.62 ns
+           steady, ≤ 1.4 ns with jitter, ≤ 2 ns through steps
+           (`matrix.gaps_per_cycle`).
+         - **Code:**
+           - `step_stats` returns inf when not recovered;
+           - `plant.join_nodes` (Co-weighted, bit-identical for equal Co);
+           - `scripts/acceptance.py`, the gate: all experiments ACCEPTED,
+             43 misses documented, 0 unexplained.
+         - **Safe to tell Mihai:** the four-module co-simulation runs and
+           reproduces; the modules stay locked and interleaved; the low
+           sides switch at zero voltage, the high sides at their valleys.
+         - **Not safe to say:** "all ZVS" or "±0.05 ns throughout".
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

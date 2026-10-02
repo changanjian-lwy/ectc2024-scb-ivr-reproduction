@@ -145,3 +145,16 @@ The second mechanism in Section 0.3 is wrong in its cause.
   ramp rate.
 - **Still open:** the size of the extra current. It is larger than
   tracking the ramp alone needs (A109 RESULTS Section 1).
+
+## Erratum 2 (2026-10-03, external review): what "zero-voltage turn-on" meant here
+
+**Valley sign:** "zero-voltage turn-on (every valley negative)" names
+the condition by the wrong term.
+- **A negative valley:** the high side turns on at its valley, ~9 V of
+  the 12 V rail, as in steady state (single-module summary: not zero
+  voltage).
+- **A positive valley:** it turns on hard, up to 18.8 V here.
+
+**Read "soft (valley) high-side turn-on" for "zero-voltage turn-on"**
+throughout. The low side stays at zero voltage in these runs except
+where the tables show otherwise. The numbers are unchanged.

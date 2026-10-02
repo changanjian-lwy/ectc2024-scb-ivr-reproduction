@@ -18,6 +18,14 @@
 This closes the multi-module level. Each open point is given as cases,
 with the value it rests on, for evaluation.
 
+**Corrected 2026-10-03** after an external review (Section 7).
+- **Soft switching:** the high side turns on at its valley (~9 V of the
+  12 V rail), not at zero voltage. Only the low side switches at zero
+  voltage.
+- **Interleave accuracy:** the mean positions are within ±0.05 ns.
+  Each switching cycle's spacing is less precise; Section 7 gives the
+  numbers.
+
 ## 1. The system design
 
 | part | what | where |
@@ -33,10 +41,10 @@ with the value it rests on, for evaluation.
 | condition | result |
 |---|---|
 | four identical modules | each module equals the single module: load steps +11.4 / −14.6 mV (single +11.65 / −14.68), start-up 1.0131 V, valleys and V_DS within 0.02 A / 0.01 V |
-| synchronisation | periods equal to 0.01 ns; the 16 low-side turn-offs T/16 ± 0.05 ns in every condition without jitter |
+| synchronisation | periods equal to 0.01 ns. The 16 low-side turn-offs: mean positions T/16 ± 0.05 ns in every condition without jitter. **Cycle by cycle:** steady state max 0.05-0.62 ns (sd ≤ 0.04 ns); with 30 / 100 ps jitter max 1.25 / 1.40 ns; in the 30 µs after a load or line step max 1.5-2.0 ns (sd ≤ 0.28 ns), of T/16 = 14.5 ns |
 | output current ripple (16 phases) | **6.75 A rms**, 31 A pk-pk per period. With the original slot reference (C01): 45.9 A rms. Without module interleave: 114 A rms |
 | standard matrix (16 rows: driver mismatch, jitter, load and line steps) | no overlap in 72 module-runs. Steps within 8% of the single module's. Peak ≤ 200 A except the +10% line step over 1 µs (207 A, as the single module) |
-| inductor tolerance | ±5% → currents ±4.7%; one slave at +10% → −8.6%, its valleys −3.9 A, zero voltage kept |
+| inductor tolerance | ±5% → currents ±4.7%; one slave at +10% → −8.6%, its valleys −3.9 A. Its low side stays at zero voltage; its high side turns on at its valley, 9.38-9.62 V (nominal modules 8.9-9.1 V) |
 | component spread | Cs ±20%: currents ±0.4%. R ±30%: ±1.3%. L ±5%, Cs ±20% and R ±30% together: −5.2% / +6.1%, every valley ≤ −5 A |
 | input slew (single module, shared input) | peak ≤ 200 A from 2.4 V/µs; every valley negative only for rising inputs ≤ 0.24 V/µs. Falling inputs, even at 0.096 V/µs, leave the high-rail phases with positive valleys while the series capacitors re-divide |
 | model agreement | D61's sharing law within 2.3 A per module (normalised). D59's step within 30%. D60's ladder relaxation explains the line-slew behaviour; the size of the per-phase current split during ladder motion is not yet derived |
@@ -66,9 +74,9 @@ with the value it rests on, for evaluation.
 
 | choice | cases | rests on |
 |---|---|---|
-| **current sharing** | **Common Ton (chosen):** ±4.7% for ±5% L, ±8.6% for +10% L, plus ~±1% for ±30% R; no extra hardware. **A per-module trim:** it cannot be built on slot timing (A109: no authority). It needs a per-module current measurement acting on Ton or i_neg, which moves the interleave or the zero-voltage margin (D61) | inductor tolerance (assumed ±5-10%); the thermal limit of a module carrying +5-9% |
-| **bus slew the system must ride** | ≥ 2.4 V/µs per 10%: peak above 200 A. 0.24-2.4 V/µs: within 200 A, zero-voltage turn-on lost on some phases for ~2-20 µs. Slower rising: soft. Falling down to 0.096 V/µs: high-rail phases lose zero voltage while the ladder re-divides | the 48 V bus's real slew (bulk capacitance; unknown) |
-| **zero voltage during ladder motion** | **accept** the short loss (chosen for now); **per-phase boundary turn-off** during transients (the interleave slides); **active series-capacitor balancing**; **slew shaping** | how often line transients occur; their loss in D62's terms |
+| **current sharing** | **Common Ton (chosen):** ±4.7% for ±5% L, ±8.6% for +10% L, plus ~±1% for ±30% R; no extra hardware. **A per-module trim:** it cannot be built on slot timing (A109: no authority). It needs a per-module current measurement acting on Ton or i_neg, which moves the interleave or the negative-current margin (D61) | inductor tolerance (assumed ±5-10%); the thermal limit of a module carrying +5-9% |
+| **bus slew the system must ride** | ≥ 2.4 V/µs per 10%: peak above 200 A. 0.24-2.4 V/µs: within 200 A, but some phases' valleys go positive for ~2-20 µs (a hard high-side turn-on at up to 18.8 V instead of the ~9 V valley). Slower rising: valleys stay negative. Falling down to 0.096 V/µs: high-rail phases' valleys go positive while the ladder re-divides | the 48 V bus's real slew (bulk capacitance; unknown) |
+| **negative valleys (valley turn-on) during ladder motion** | **accept** the short loss (chosen for now); **per-phase boundary turn-off** during transients (the interleave slides); **active series-capacitor balancing**; **slew shaping** | how often line transients occur; their loss in D62's terms |
 | **Ton resolution** | the 31.25 ps Ton step moves Vo ~1.8 mV against a 0.5 mV ADC, so Ton may toggle (a 0.5 mV limit cycle, whether it appears depends on the equilibrium). A dyadic DPWM (Crovetti et al. 2020) adds 2-3 bits | the ADC resolution; the 31.25 ps timing step |
 | **slave reference** | the master's low-side turn-off, as now: rare late fires (< 0.2 ns) in slave 1 while the master's turn-off is learning. A predicted reference (last turn-off + period, Zhou et al. 2024) gives a period of margin | timing latency of the master's TDC report |
 
@@ -90,3 +98,27 @@ with the value it rests on, for evaluation.
   DOIs) and `experiments/track_A_periodic_steady_state/` (A108, A109).
 - **Derivations:** `symbolic_derivations/03_P24_native/` (D58-D62).
 - **Running status:** `reports/CURRENT_STATUS.md` (items 30-35).
+
+## 7. Corrections after the external review (2026-10-03)
+
+| # | the review's point | checked | what changed |
+|---|---|---|---|
+| 1 | "zero voltage kept" read as high-side ZVS | true: high-side turn-on 8.91-9.07 V (n0), up to 9.62 V (slave at +10% L) | wording here and in C03 / C04 / A108 (errata). The high side turns on at its valley; only the low side is at zero voltage |
+| 2 | ±0.05 ns is the mean position, not each cycle | true: max 0.58 ns (n0), 1.97 ns after the +250 A step | numbers above. New `matrix.gaps_per_cycle` (tested on C03 n0). C02 / C03 / C04 errata |
+| 3 | `step_stats` called a never-recovered trace recovered | true: a trace stuck at 0.98 V gave 29.9 µs | it now returns inf when the trace ends outside the band (tested). Every existing value is unchanged: all recovered |
+| 4 | the output join used the plain mean for any Co | true (all runs so far had equal Co) | `plant.join_nodes`: the Co-weighted mean, the plain mean when equal (bit-identical; tested) |
+| 5 | an analysis script that runs is not a gate | true: false criteria only printed, missing runs skipped | `scripts/acceptance.py`: every registered criterion is PASS, DOCUMENTED (listed with its RESULTS section) or FAIL; missing runs and outdated exceptions fail. Now: C01-C04, A108, A109 ACCEPTED, 43 documented misses, 0 unexplained |
+
+**What may be said:**
+- A four-module co-simulation runs and reproduces.
+- The modules stay locked and interleaved. Mean spacing is within
+  0.05 ns, each cycle within 0.6 ns in steady state and 2 ns through
+  load and line steps.
+- The low sides switch at zero voltage. The high sides turn on at their
+  valleys, ~9 V, as in the single module, and hard during fast line
+  transients.
+
+**What may not be said:**
+- "All switches ZVS";
+- "±0.05 ns throughout".
+

@@ -391,6 +391,14 @@ class FastPlant:
         _aux_gate(self, j, level)
 
 
+
+def join_nodes(vs, caps):
+    """The common voltage of capacitor nodes joined by charge conservation, sum(C v) / sum(C) (C3's M-module output).
+    With equal C it is the plain mean, the expression every run before 2026-10-03 used, kept for bit-identical results."""
+    if all(c == caps[0] for c in caps):
+        return sum(vs) / len(vs)
+    return sum(c * v for c, v in zip(caps, vs)) / sum(caps)
+
 SRC = Path(__file__).resolve().parent / "plant_kernel.c"
 BUILD = PROJECT / "tmp" / "cosim_kernel"
 CFLAGS = ["-O3", "-mcpu=native", "-ffp-contract=off", "-fno-fast-math", "-shared", "-fPIC"]

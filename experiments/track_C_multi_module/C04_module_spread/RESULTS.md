@@ -65,3 +65,13 @@ Track C, the last experiment of the multi-module level.
 - **Coss spread.** It needs a scale on the datasheet curve, a plant
   change.
 - **Per-module driver delay.** It needs a bridge key.
+
+## Erratum (2026-10-03, external review)
+
+- **"Gaps T/16 ± 0.05 ns"** are mean positions.
+  - **Cycle by cycle:** max 0.30-0.61 ns in the four runs.
+  - **all_s_p62, in the 30 µs after the step:** 1.93 ns.
+- **"Zero voltage kept"** means the low side. The high side turns on at
+  its valley:
+  - 8.41-9.76 V across the spread;
+  - the highest is the low-R module, whose valley is shallowest.

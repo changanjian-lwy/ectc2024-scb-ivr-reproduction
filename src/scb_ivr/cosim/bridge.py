@@ -80,7 +80,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1]))                              # src/, for the package
 from scb_ivr.cosim.circuit import PROJECT, fit_fig8  # noqa: E402
 from scb_ivr.cosim.circuit import CircuitParams as Params  # noqa: E402
-from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant  # noqa: E402
+from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant, join_nodes  # noqa: E402
 CIRCUIT_KEYS = ("vin", "L", "R", "c_high", "c_low", "cs", "co", "r_load", "i_load", "g_on")   # A107: cfg "circuit"
 PLANTS = {"kernel": KernelPlant, "kernel2": KernelPlant2, "fast": FastPlant, "reference": ReferencePlant}
 
@@ -604,7 +604,8 @@ def write_out(cfg_path, cfg, out):
 
 async def cosim_multi(dut, cfg_path, cfg, ref):
     """M modules (C3) on one output: each module is a ModuleSim with the single-module plant (its own Co and load);
-    after every window the output nodes are joined by charge conservation (equal Co: their mean). The master
+    after every window the output nodes are joined by charge conservation (plant.join_nodes: the
+    Co-weighted mean; the plain mean when the Co are equal). The master
     (module 0) runs the voltage loop; the system broadcasts its Ton to the slaves (cfg_ext_ton) and gives slave m's
     phase 1 the slot t_ref + m T / (M N) after each master turn-on, T the master's last period (the mean of its last
     two once three turn-ons are seen; cfg t0 before), the reference id its t_ref. With cfg "slot_lo" (C02) the reference
@@ -679,8 +680,8 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         flush_writes(dut, cache)
         if stop:
             break
-        vs = [float(md.plant.y[md.i_out]) for md in mods]           # join the output nodes (equal Co)
-        v_eq = sum(vs) / n_mod
+        vs = [float(md.plant.y[md.i_out]) for md in mods]           # join the output nodes (charge conservation)
+        v_eq = join_nodes(vs, [md.p.co for md in mods])
         dev = max(abs(v - v_eq) for v in vs)
         eq["max_v"] = max(eq["max_v"], dev); eq["sum_v"] += dev; eq["n"] += 1
         for md in mods:

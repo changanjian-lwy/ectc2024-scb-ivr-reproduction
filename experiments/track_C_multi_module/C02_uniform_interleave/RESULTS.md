@@ -173,3 +173,18 @@ configurations were rerun to 160 and 320 µs into `tmp/`
   - the Ton limit cycle's effect on the low-frequency output current
     (10.7 A per-period wander), which belongs with the loop's ADC
     resolution, not the interleave.
+
+## Erratum (2026-10-03, external review)
+
+**"16 gaps 14.49-14.54 ns"** (Sections 0 and 2) are gaps between each
+phase's **mean** low-side turn-off over 200 periods (`lsoff_after`).
+- **Cycle by cycle** (`matrix.gaps_per_cycle`): m4_n0's spacing has
+  sd 0.028 ns and max 0.58 ns from T/16 = 14.5 ns. The Ton dither moves
+  each period; the slaves follow the averaged period.
+- The interleave is uniform on average and to ±0.6 ns in each cycle.
+- The ripple results are unaffected: they sum the recorded waveforms of
+  every cycle.
+
+**"Soft switching unchanged"** here means the low side at zero voltage
+and the high side at its valley (~9 V). The high side does not switch at
+zero voltage (single-module summary).

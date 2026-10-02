@@ -155,3 +155,24 @@ single module's (e.g. l_m48_1us 0.0700 against 0.0697).
   - Cs, Coss or controller differences between modules;
   - a module starting into a running system (pre-bias);
   - shedding modules at light load (Cousineau et al. 2021).
+
+## Erratum (2026-10-03, external review)
+
+1. **"Keeps zero-voltage switching"** (0.2 and the ls_p10 rows): the
+   **low side** stays at zero voltage (low-side turn-on V_DS ≤ −0.8 V).
+   The **high side** turns on at its valley:
+   - 8.91-9.07 V in nominal modules;
+   - 9.38-9.62 V in the slave at +10% L.
+   That is valley switching, not zero voltage.
+2. **"Gaps T/16 ± 0.05 ns"** are gaps of the mean positions (and, for
+   step rows, before the step). Cycle by cycle (`matrix.gaps_per_cycle`):
+   - **jitter-free rows:** max 0.05-0.62 ns (sd ≤ 0.04 ns);
+   - **j30 / j100:** max 1.25 / 1.40 ns;
+   - **the 30 µs after load and line steps:** max 1.48-1.97 ns (sd
+     0.13-0.28 ns), of T/16 = 14.5 ns.
+
+   The interleave stays locked through every step, but not to 0.05 ns
+   in each cycle.
+3. **This analysis script prints MISS but exits 0.**
+   `scripts/acceptance.py` is the gate. It lists all 16 misses here as
+   documented, with their sections.
