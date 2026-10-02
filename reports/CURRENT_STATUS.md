@@ -1004,6 +1004,21 @@ each question:
            sides switch at zero voltage, the high sides at their valleys.
          - **Not safe to say:** "all ZVS" or "±0.05 ns throughout".
 
+     37. High-side zero voltage by the negative current:
+         [A110](../experiments/track_A_periodic_steady_state/A110_p24_high_side_zvs/RESULTS.md).
+         - **Raising the target from 5% to 10-30%** brings the high-side
+           turn-on from 9.0 V down to ~0. It follows D57's energy balance
+           within 0.2 V: zero voltage first at 25% (D57: 26.7%).
+         - **Efficiency** (D62 middle case on the measured waveforms) is
+           best at **20%: 90.17%, +2.25 points over 5%**. The high side's
+           hard turn-on (8.9 → 0.7 W) and the gate drive (lower
+           frequency) outweigh the extra conduction.
+         - **At 30% the valley-based turn-on timing breaks down** once the
+           node clamps at the rail: 236 A peaks, hard turn-ons in between,
+           the −62.5 A step does not recover, jitter spread 7-20 A.
+         - **Next (A111):** a zero-voltage-aware turn-on measurement; then
+           20% through the standard matrix as the efficiency candidate.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
