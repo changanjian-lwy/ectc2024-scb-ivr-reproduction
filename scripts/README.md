@@ -48,6 +48,10 @@
 - `p24_dlo_rules.py` (D55) replays dlo rules against the interval phase 1
   needs, measured in A100's comparator load-step runs, and runs D54's
   Monte Carlo for each rule: tracking against jitter.
+- `p24_aux_commutation.py` (D56) runs the single-phase edge model with an
+  auxiliary commutation branch: validation against the full model, the
+  branch current needed for zero voltage, Cm's charge balance, loss
+  bookkeeping, timing, and A101's per-phase predictions.
 
 - `cosim_benchmark.py` times the co-simulation against archived runs and
   checks every result bit for bit (`--batch`: A92's batch; `--plants`:

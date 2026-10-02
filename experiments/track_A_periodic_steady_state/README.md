@@ -863,3 +863,16 @@ agree, up to 32 LSB (adaptive delta modulation).
 - **Both models agree;** j30's period spread is again above the model.
 - **Status:** recommended, pending the project's trade-off review
   (`reports/TRADEOFF_SCORECARD.md`).
+
+`A101_aux_commutation_branch` (with D56) adds an auxiliary commutation
+branch for the high side's zero-voltage turn-on; the boundary and the
+registered predictions are written, the co-simulation is next.
+- **D56:** a single-phase edge model, within 0.05 V of the full model on
+  all four phases.
+  - P24's 1.47 nH filter inductor makes any branch to 0 V or to Vo need
+    about 33 A at the turn-off.
+  - A bidirectional switch and Lr to a self-balanced capacitor at
+    8-9.5 V reaches zero voltage at 0.75 nH. The ripple and the low side's
+    zero voltage are kept.
+  - Net −4 to −5 W for four phases (central estimate). It depends on the
+    hard turn-on loss model: +0.3 to +2 W with A91's lower bound.

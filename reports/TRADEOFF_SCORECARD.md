@@ -142,7 +142,8 @@ metrics:
 | T4 | **Period jitter of phases 2-4 ↔ phase 1's turn-off current** (comparator vs timed turn-off) | A99/A100: phases 2-4 −24 to −38%, period −37 to −82%; phase 1's spread 0.17 → 0.4-1.2 A | structural; the cost is moved onto phase 1's ZVS margin | Medium. If phase 1's ZVS margin becomes the binding constraint, the next fix would push the jitter back. **Phase 1's margin needs a hard limit before adoption.** |
 | T5 | **Load-step tracking ↔ jitter** (dlo rule) | D55/A100: ±1 → ADM32 costs +7-13% spread at 30 ps, buys tracking (19-23 A → 1.4-1.7 A) | ADM32 | **High, and coupled to T6.** |
 | T6 | **Voltage-loop speed ↔ the dlo rule's tracking burden** (not yet tested) | The required dlo moves 10× faster than Ton. A faster voltage loop (Vo now moves ±12% for ±25% steps) would make Ton, and so dlo, move faster. | open | **The most likely next loop:** a faster voltage loop → a larger dlo step → more jitter → ... It should be designed together with dlo, on this table. |
-| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **not yet studied; the largest loss term** | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
+| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **not yet mapped; the largest loss term.** D56 (2026-10-02): without a source above half the rail, raising the target is the only way to zero voltage, because the 1.47 nH filter inductor needs ~33 A at the turn-off for any branch to 0 V or Vo | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
+| **T9** | **High-side turn-on loss ↔ auxiliary branch losses** (A101/D56) | A branch to a self-balanced Cm (Lr 0.75 nH): −540 nJ saved; +110 conduction, +51 gate, +55 BDS Coss, +25 high-side conduction, +9-34 turn-off overlap | mathematical model only; co-simulation next | Low as a loop; **high as an uncertainty**: the sign depends on the hard turn-on loss model (central −4 to −5 W; A91's lower bound +0.3 to +2 W). |
 | T7 | **Prediction ↔ reaction** (a recurring pattern: A89 low-side turn-on, A92 correctors, A99/A100 turn-off) | Each predicted edge removes a comparator's noise but needs learning and tracking, and moves the error elsewhere | design by design | Structural: each step is a new trade-off, not a reversal. |
 
 ## 5. How every change is scored from now on
@@ -184,4 +185,6 @@ These are design priorities, for the user and Mihai:
   targets, temperature, line steps.
 - **The learning length:** 1024 cycles, chosen for this start-up.
 - **Losses:** only P_rev and A91's hard-on estimate are scored. Gate
-  charge, conduction and overlap losses are not modelled yet.
+  charge, conduction and overlap losses are not modelled yet, except in
+  D56's bookkeeping for the auxiliary branch (T9), which also gives a
+  central hard turn-on estimate: 540 nJ per cycle per phase, 9.3 W at 5%.

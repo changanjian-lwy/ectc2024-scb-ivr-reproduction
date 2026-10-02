@@ -699,6 +699,26 @@ each question:
          one table for A92-A100, the loops to avoid, and the priorities to
          set.
 
+     21. In progress: the high side's zero-voltage turn-on with an
+         auxiliary commutation branch.
+         - [A101](../experiments/track_A_periodic_steady_state/A101_aux_commutation_branch/BOUNDARY.md),
+           boundary and registered predictions; co-simulation next.
+         - [D56](../symbolic_derivations/03_P24_native/D56_P24_AUX_COMMUTATION.md),
+           mathematical model (single-phase edge, validated against the
+           full model within 0.05 V on all four phases).
+
+         **Finding.** P24's 1.47 nH filter inductor sets a floor of about
+         33 A at the turn-off for any branch to 0 V or to Vo. A branch must
+         be driven from a source above half the rail.
+
+         **Candidate.** Lr and a bidirectional switch to a self-balanced
+         capacitor (Vm 8-9.5 V).
+         - High-side zero voltage at Lr 0.75 nH; 2 V at 1.25 nH.
+         - Main ripple and low-side zero voltage kept; low-side dead time
+           shortened to about 1.0 ns.
+         - Net −4 to −5 W for four phases with D56's central hard turn-on
+           estimate; +0.3 to +2 W with A91's lower bound.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
