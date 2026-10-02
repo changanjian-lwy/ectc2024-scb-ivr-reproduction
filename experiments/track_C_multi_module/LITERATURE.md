@@ -135,3 +135,37 @@ local PDF embeds its own DOI, it agrees.
 | Shenoy, Lazaro, Amaro, Ramani et al., automatic current sharing in the SCB, ECCE 2015 | 10.1109/ECCE.2015.7309943 |
 | Peterchev, Sanders, quantization resolution and limit cycling, IEEE TPEL 2003 | 10.1109/TPEL.2002.807092 |
 | Maksimović, Zane, small-signal discrete-time modeling, IEEE TPEL 2007 | 10.1109/TPEL.2007.909776 |
+
+## 7. Read 2026-10-02 (eight added papers), and what each decides
+
+| paper (DOI) | what it says that we use | decision |
+|---|---|---|
+| Liu, Huang, Lee, MHz CRM interleaving, APEC 2016 (10.1109/APEC.2016.7468119) | at MHz, open-loop interleaving (slave delayed by a fraction of the master's measured period) beats closed-loop on an MCU; < 3° phase error at 1 MHz | supports our open-loop slots. Ours: ±0.04 ns of 232 ns (±0.06°) in C02 |
+| Zhang et al., triangle phase-shift control, ECCE 2016 (10.1109/ECCE.2016.7854796) | slave phase from a ramp built on the master phase's current | an alternative to slots, not needed while the open-loop slots hold |
+| Liu, Cheng, Mercier, COT small-signal, TPEL 2023 (10.1109/TPEL.2023.3268613) | the COT loop's Q depends on duty cycle; commercial COT uses adaptive on-time (on-time set from Vin and Vo) | our mode P is COT-like. The boundary-mode equivalent of adaptive on-time is the feed-forward Ton ∝ (V_rail0 − Vo) / (V_rail − Vo) (D58's current law) |
+| Crovetti et al., dyadic DPWM, TPEL 2020 (10.1109/TPEL.2020.2978696) | LCO-free needs q_ADC > q_DPWM; a dyadic sequence adds M bits of effective resolution with less ripple than dithering | our Ton LSB moves Vo ~1.8 mV against a 0.5 mV ADC, so 2-3 extra bits would remove the toggling seen in C02. Low priority: its effect is ~0.5 mV |
+| Wang et al., 48 V VRM overview, CPSS TPEA 2022 (10.24295/cpsstpea.2022.00026) | architectures of 48 V-to-1 V VRMs | context; no start-up method. The system start-up stays without a literature method (Section 6) |
+| Cousineau et al., decentralised phase shedding, Energies 2021 (10.3390/en14206748) | each local controller sheds its own leg from its own current, daisy-chained | the method for shedding whole modules at light load (D61 Section 6), later |
+| Joseph, Kapat, Mukherjee, adaptive on-time in multilevel CrM, INTELEC 2024 (10.1109/INTELEC60315.2024.10678982) | COT in CrM tracks average current only if the on-time adapts to each switching state's voltage | the same point as the per-phase rail feed-forward below |
+| Antoszczuk et al., BCM vs CCM magnetic volume, TPEL 2016 (10.1109/TPEL.2016.2558469) | interleaved BCM recovers the RMS penalty of BCM and can beat a single CCM in volume | context for P24's choice of the boundary mode with interleaving |
+
+**The fast rising line step (A106's open item), re-read with these papers.**
+
+A106 pi100_p48_1us (+4.8 V over 1 µs):
+- **Phase 1's rail** jumps 12.23 → 15.91 V. Phases 2-4 move < 0.2 V in
+  the first µs, and the rails re-divide over ~20 µs.
+- **Phase 1** peaks at 202 A; phases 2-4 at 137-145 A (134 A steady).
+
+So a feed-forward from Vin alone (Ton × (V_rail0 − Vo)/(Vin/4 − Vo))
+corrects the average but not phase 1's spike. The scenarios for
+evaluation:
+- **(a) A module Vin feed-forward:** one input ADC; phase 1's peak
+  estimated ~182 A (Ton −10%), little margin.
+- **(b) Per-phase rail feed-forward:** Ton_k ∝ (V_rail0 − Vo)/(V_rail,k −
+  Vo). It needs each phase's rail (the Cs voltages). Phase 1's Ton −26%,
+  removing the spike.
+- **(c) A cycle-by-cycle peak current limit per phase:** the standard VR
+  protection, bounding the peak directly.
+- **(d) A bus slew limit:** a property of the 48 V bus, not the module.
+
+Each is an opt-in factor for one experiment (A108). This is not run yet.
