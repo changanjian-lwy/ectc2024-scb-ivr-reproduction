@@ -954,6 +954,23 @@ each question:
          - **Candidate A109:** a per-phase valley trim of the slots. It
            also gives slaves the valley target D61's scheme B needs.
 
+     34. The valley trim of the slots is falsified:
+         [A109](../experiments/track_A_periodic_steady_state/A109_p24_slot_valley_trim/RESULTS.md).
+         - The offsets wound up to their bound. Valleys did not move,
+           jitter rose to 1.6 A sd, and four modules lost their
+           interleave. No line step improved.
+         - **The cause:** in the SCB at a common period, the high-rail
+           phases carry the ladder's restoring current while it
+           re-divides (phase 4: +13% at 0.096 V/µs). The extra current
+           lifts their valleys. Slot timing cannot change that.
+         - **Erratum** added to A108's mechanism.
+         - **Not adopted** (default off; candidate for removal).
+         - **Options left:** accept a short loss of zero-voltage turn-on;
+           per-phase boundary turn-off during transients (the interleave
+           slides); input slew shaping or active Cs balancing.
+         - **Open:** derive the per-phase current split during ladder
+           motion.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

@@ -128,3 +128,20 @@ their runs), when no slew up to 10 µs had kept the valleys negative.
   should stay negative.
 - **The same feature gives each slave module a valley target**, which
   D61's scheme B needs (C01 Section 3).
+
+## Erratum (2026-10-02, found in A109)
+
+The second mechanism in Section 0.3 is wrong in its cause.
+
+- **Not the cause:** the slotted phases are not "turned off early".
+- **The cause:** while the ladder re-divides, the phases whose rails sit
+  above Vin/4 carry more current. At 0.096 V/µs falling, phase 4 carries
+  73.5 A against 65 A, with its rail 0.26 V above Vin/4. At a common
+  period and Ton, that extra current lifts their waveform, and the valley
+  goes positive.
+- A109 confirmed it: a slot-timing correction has no authority over
+  these valleys.
+- **What stands:** the measured tolerances and their scaling with the
+  ramp rate.
+- **Still open:** the size of the extra current. It is larger than
+  tracking the ramp alone needs (A109 RESULTS Section 1).
