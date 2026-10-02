@@ -48,6 +48,9 @@ Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-ca
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
+Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
+valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
+instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
 Line step (cfg "line_step" {"t_us", "dv", "slew_us" 0}, A106): the input changes by dv from t_us, linearly over slew_us.
 Circuit values (cfg "circuit" {name: value in SI units}, A107): any of CIRCUIT_KEYS (vin, L, R, c_high, c_low, cs, co,
 r_load, i_load, g_on) replaces the init run's value; other names are refused.
@@ -322,7 +325,8 @@ class ModuleSim:
         cfg, p, plant, na = self.cfg, self.p, self.plant, self.na
         self.v_lo = [None] * N; self.t_lo_act = [None] * N
         aux = cfg.get("aux")
-        self.mon = Monitors(N, vmin_zero=int(aux.get("valley_zero", 0)) if aux else 0)   # zero-crossing TDC and valley tracking
+        vz = int(aux.get("valley_zero", 0)) if aux else int(cfg.get("valley_zero", 0))  # A111: also without a branch
+        self.mon = Monitors(N, vmin_zero=vz)                     # zero-crossing TDC and valley tracking
         #   (shared with KernelPlant2's C loop); A101 option: the high side's minimum stops at its first V_DS <= 0
         self.use_c = hasattr(plant, "attach_monitors")
         if self.use_c:
