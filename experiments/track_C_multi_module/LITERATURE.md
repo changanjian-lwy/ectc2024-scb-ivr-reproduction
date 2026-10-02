@@ -114,3 +114,24 @@ integrators (D61). Their periods must be locked actively.
   P24 gives none; Intel VRD 11.1's soft-start and Roberts' input ramp
   are the references so far.
 - Input feed-forward for fast line steps in boundary-mode SCB modules.
+
+## DOIs
+
+Checked 2026-10-02 against Crossref (title and authors). Where the
+local PDF embeds its own DOI, it agrees.
+
+| paper | DOI |
+|---|---|
+| P24: Khorasani, Li, Kim, Murali et al., ECTC 2024 | 10.1109/ECTC51529.2024.00054 |
+| Huber, Irving, Jovanović, open-loop interleaving, IEEE TPEL 2008 | 10.1109/TPEL.2008.924611 |
+| Huber, Irving, Jovanović, closed-loop interleaving, APEC 2009 | 10.1109/APEC.2009.4802783 |
+| Huber, Irving, Jovanović, PLL-based interleaving stability, IEEE TPEL 2009 | 10.1109/TPEL.2009.2018560 |
+| Choi, Balogh, cross-coupled master-slave BCM interleaving, IEEE TPEL 2012 | 10.1109/TPEL.2012.2190426 |
+| Yu, Fan, Wei, Xu, digital interleaving GaN CrM totem-pole PFC, ECCE 2024 | 10.1109/ECCE55643.2024.10861218 |
+| Zhou, Peng, Liang, Fu, zero-crossing prediction CRM control, IEEE TPEL 2023 | 10.1109/TPEL.2023.3259984 |
+| Zhou, Pan, Fu, Liang, cycle-estimation deadbeat interleaving, IEEE TIE 2025 (online 2024) | 10.1109/TIE.2024.3493174 |
+| Roberts, Prodić, high-phase-count SCB modulation, COMPEL 2023 | 10.1109/COMPEL52896.2023.10220443 |
+| Schuck, Pilawa-Podgurski, ripple cancellation in asymmetric interleaved converters, PECI 2013 | 10.1109/PECI.2013.6506052 |
+| Shenoy, Lazaro, Amaro, Ramani et al., automatic current sharing in the SCB, ECCE 2015 | 10.1109/ECCE.2015.7309943 |
+| Peterchev, Sanders, quantization resolution and limit cycling, IEEE TPEL 2003 | 10.1109/TPEL.2002.807092 |
+| Maksimović, Zane, small-signal discrete-time modeling, IEEE TPEL 2007 | 10.1109/TPEL.2007.909776 |
