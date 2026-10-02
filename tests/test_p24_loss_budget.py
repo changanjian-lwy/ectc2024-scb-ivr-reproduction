@@ -30,6 +30,17 @@ class LossBudget(unittest.TestCase):
         self.assertAlmostEqual(parts, b["total"])
         self.assertAlmostEqual(b["efficiency"], 250.0 / (250.0 + b["total"]))
 
+    def test_measure_equals_the_d62_script(self):
+        """measure(run) is scripts/p24_loss_budget.py's measurement for any run: equal on A105 i2_n0."""
+        import importlib.util
+        import json
+        from pathlib import Path
+        from scb_ivr.p24_loss_budget import measure
+        root = Path(__file__).resolve().parents[1]
+        spec = importlib.util.spec_from_file_location("d62_script", root / "scripts" / "p24_loss_budget.py")
+        script = importlib.util.module_from_spec(spec); spec.loader.exec_module(script)
+        self.assertEqual(json.dumps(measure(json.loads(script.RUN.read_text()))), json.dumps(script.measured()))
+
 
 if __name__ == "__main__":
     unittest.main()

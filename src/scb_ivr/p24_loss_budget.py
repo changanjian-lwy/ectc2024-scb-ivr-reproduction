@@ -83,3 +83,29 @@ def budget(phases, ton, period, lf, scenario, rails, dv_next, p_rev=0.0, p_out=2
     out["total"] = total
     out["efficiency"] = p_out / (p_out + total)
     return out
+
+
+def measure(d, n_periods=200, vin=48.0, r_load=4e-3, lsb=4e-9 / 128, t1=None):
+    """budget()'s inputs from a one-module co-simulation result d over its last n periods (before t1 if given): each
+    phase's mean valley, peak and high-side turn-on V_DS, Ton, the period, the rails and the next phase's rail from the
+    series-capacitor voltages, the reverse-conduction power and the output power. scripts/p24_loss_budget.py's
+    measurement for any run (A110)."""
+    secs = [s for s in d["sections"] if t1 is None or s["t_s"] < t1][-n_periods:]
+    t0, t1w = secs[0]["t_s"], secs[-1]["t_s"]
+    period = float(np.mean(np.diff([s["t_s"] for s in secs])))
+    ton = float(np.mean([s["ton_lsb"] for s in secs])) * lsb
+    vcs = np.mean([s["vcs_v"] for s in secs], axis=0)
+    chain = [vin] + list(vcs) + [0.0]
+    rails = [chain[k] - chain[k + 1] for k in range(4)]
+    dv_next = [chain[k + 1] - chain[k + 2] for k in range(3)] + [0.0]
+    phases = []
+    for k in range(4):
+        win = lambda recs: [r for r in recs if r["phase"] == k + 1 and t0 <= r["t_s"] <= t1w]
+        phases.append({"valley": float(np.mean([r["i_a"] for r in win(d["lowoffs_last"])])),
+                       "peak": float(np.mean([r["i_a"] for r in win(d["highoffs_last"])])),
+                       "vds_on": float(np.mean([r["vds_v"] for r in win(d["turnons_last"])]))})
+    p_rev = float(np.mean([sum(s["rev_energy_j"]) for s in secs[1:]]) / period)
+    p_out = float(np.mean([s["vo"] for s in secs])) ** 2 / r_load
+    return {"phases": phases, "ton_s": ton, "period_s": period, "rails_v": rails, "dv_next_v": dv_next, "p_rev_w": p_rev,
+            "p_out_w": p_out}
+
