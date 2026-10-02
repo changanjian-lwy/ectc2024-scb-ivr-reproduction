@@ -10,6 +10,9 @@ The matrix is TRADEOFF_SCORECARD Section 5's, plus A106's line steps.
 - step_stats(run, t_step=400e-6): Vo's extreme after the step and its time, the last exit from 1 V +/- 1%; the ladder
   deviation max |VCs_k / Vin - (N - k) / N| (A73's formula) before the step, its peak after it, and the last time it
   is above 1%. A106's statistics.
+- Interleave (C01/C02): phase_waveform (a phase's current, linear between its low-side turn-off, high-side turn-on and
+  high-side turn-off events), lsoff_after (each phase's low-side turn-off after a reference run's phase-1 turn-on),
+  output_ripple (the summed current of several modules' phases, pk-pk and ac rms, optionally re-placed).
 """
 from __future__ import annotations
 
@@ -97,3 +100,42 @@ def step_stats(d, t_step=T_STEP_S, vref=1.0):
             "back_within_1pct_us": float((ta[bad[-1]] - t_step) * 1e6) if len(bad) else 0.0,
             "ladder_dev_before": float(dev[~a][-200:].max()), "ladder_dev_peak": float(da.max()),
             "ladder_back_below_1pct_us": float((ta[lad[-1]] - t_step) * 1e6) if len(lad) else 0.0}
+
+
+GRID_S = 15.625e-12                # the waveform grid, 1/2 LSB at 250 MHz
+
+
+def phase_waveform(d, k, g, shift=0.0):
+    """Phase k's current (A) on the time grid g (s), linear between its recorded low-side turn-off (valley), high-side
+    turn-on and high-side turn-off (peak) events, the events moved by shift (s)."""
+    ev = sorted((x["t_s"], x["i_a"]) for key in ("lowoffs_last", "turnons_last", "highoffs_last") for x in d[key]
+                if x["phase"] == k)
+    return np.interp(g, np.array([e[0] for e in ev]) + shift, np.array([e[1] for e in ev]))
+
+
+def ref_turnons(ref, t1=None, n_periods=200):
+    """The reference run's last n phase-1 turn-on times (s) before t1, and their mean period (s)."""
+    secs = [s for s in ref["sections"] if t1 is None or s["t_s"] < t1][-n_periods:]
+    t = np.array([s["t_s"] for s in secs])
+    return t, float(np.mean(np.diff(t)))
+
+
+def lsoff_after(ref, d, t1=None, n_periods=200, n_phases=4):
+    """Per phase of run d, the mean time (s) from the reference run's last phase-1 turn-on to the phase's low-side
+    turn-off, over the reference's last n periods (before t1)."""
+    t_on, _ = ref_turnons(ref, t1, n_periods)
+    out = []
+    for k in range(1, n_phases + 1):
+        ts = [x["t_s"] for x in d["lowoffs_last"] if x["phase"] == k and t_on[0] <= x["t_s"] <= t_on[-1]]
+        out.append(float(np.mean([t - t_on[t_on <= t][-1] for t in ts])))
+    return out
+
+
+def output_ripple(runs, ref=None, t1=None, n_periods=200, n_phases=4, shift=None, trim=20):
+    """The summed current of every phase of runs (a list of module results) over the reference's last n periods with
+    trim periods cut at each end: {"pkpk_a", "rms_ac_a", "mean_a"}. shift(m, k) (s) re-places module m's phase k."""
+    t_on, _ = ref_turnons(ref or runs[0], t1, n_periods)
+    g = np.arange(t_on[trim], t_on[-trim], GRID_S)
+    tot = sum(phase_waveform(r, k, g, shift(m, k) if shift else 0.0)
+              for m, r in enumerate(runs) for k in range(1, n_phases + 1))
+    return {"pkpk_a": float(np.ptp(tot)), "rms_ac_a": float(np.std(tot)), "mean_a": float(np.mean(tot))}

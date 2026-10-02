@@ -4,6 +4,37 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (C02, track C) - slots referenced to phase 1's low-side turn-off; shared interleave statistics
+
+Source: C01 RESULTS Section 2. Phase 1 of every module sat one valley
+delay (9.44 ns) early, so the 16-phase interleave was not uniform.
+
+- **`rtl/scb_ctrl.v`:**
+  - input `cfg_slot_lo`: in mode P with following slots, the slots of
+    phases 2..N are t_lo1 + (k − 1) T/N instead of t_ref + (k − 1) T/N.
+    Configured slots stay on t_ref.
+  - output `t_lo1`: phase 1's last low-side turn-off.
+  - A phase still learns of a new cycle from t_ref, so the slot must
+    lie after it: T/N − dt_pred > ~2 windows.
+- **`rtl/scb_phase.v`:** output `t_lo_q` (its t_lo).
+- **`rtl/scb_multi.v`:** regenerated.
+- **`bridge.py`:** cfg key `slot_lo` (default 0). With it, the slaves'
+  slot base and reference id are the master's t_lo1.
+- **`matrix.py`:** `phase_waveform`, `ref_turnons`, `lsoff_after` and
+  `output_ripple`, C01's interleave statistics as shared functions. C01's
+  own script stays as the record.
+- **Gates:**
+  - RTL unit tests 49 of 49 (new: `follow_slots_from_phase1_low_off`,
+    `slot_lo_keeps_configured_slots_at_t_ref`);
+  - synthesis `check -assert` clean: SLAVE = 0, 46 443 cells; SLAVE = 1,
+    40 127;
+  - `--full` regression PASS;
+  - `tests/test_cosim_matrix.py`: the shared interleave statistics equal
+    C01's (ripple in four placements, low-side turn-off times);
+  - with the default (`slot_lo` 0), A105 i2_s_p62 (one module, to
+    600 µs) and C01 m4_n0 (four modules, to 500 µs) rerun: every record
+    identical except `wall_s` and `provenance`.
+
 ## 2026-10-02 (C2, C3, track C) - multi-module: slave modules and the M-module system
 
 - **`rtl/scb_ctrl.v`:**

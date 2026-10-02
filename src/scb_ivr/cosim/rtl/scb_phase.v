@@ -24,6 +24,7 @@
 //   (fine 0, a late fire) and counts as the new reference's slot;
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
 //   (cfg_zvs_react); restart timer cfg_rs_high.
+// - t_lo_q (C02): the last low-side turn-off time, for slots referenced to it (scb_ctrl cfg_slot_lo).
 //
 // Correctors (one report per edge):
 // - dt_pred: early -> + cfg_dt_step (capped at cfg_dt_max); flat -> hold; otherwise the measured valley time m_tv, or
@@ -116,7 +117,8 @@ module scb_phase #(
     output reg  [15:0]          late_fires,
     output reg  [TW-1:0]        dtl,           // A89: low-side dead time, LSB
     output reg  [TW-1:0]        dlo,           // A99: phase 1's on-low interval for the timed turn-off, LSB
-    output wire                 lo_timed       // A99: phase 1's turn-off is timed
+    output wire                 lo_timed,      // A99: phase 1's turn-off is timed
+    output wire [TW-1:0]        t_lo_q         // C02: the last low-side turn-off time (t_lo)
 );
     localparam [1:0] HIGH = 2'd0, DOWN = 2'd1, LOW = 2'd2, UP = 2'd3;
     localparam [2:0] HOW_PRED = 3'd0, HOW_VALLEY = 3'd1, HOW_ZVS = 3'd2, HOW_RESTART = 3'd3, HOW_TIMED = 3'd4;
@@ -125,6 +127,7 @@ module scb_phase #(
     localparam signed [CW-1:0] TRIM_MIN = -(1 << (CW - 1));
 
     reg [TW-1:0] t_off, t_lon, t_lo, fired_ref;
+    assign t_lo_q = t_lo;                                            // C02
     reg [TW-1:0] pend_ref;                                           // A93: reference whose slot is awaited
     reg          pend_v;
 

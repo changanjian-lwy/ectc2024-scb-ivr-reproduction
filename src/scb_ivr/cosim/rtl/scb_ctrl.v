@@ -19,6 +19,11 @@
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
 //   SLAVE = 1, phase 1 is a slotted phase like phases 2..N, its low-side turn-off at ext_slot once per reference
 //   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off.
+// - C02: with cfg_slot_lo, the period-following slots of phases 2..N are referenced to phase 1's last low-side
+//   turn-off (t_lo1) instead of its high-side turn-on (t_ref), so all N low-side turn-offs are T/N apart; the
+//   configured slots (mode S, or before the period is known) stay referenced to t_ref. A phase still learns of a
+//   new cycle from t_ref, so its slot must lie after t_ref is seen: T/N - dt_pred > ~2 windows (a passed slot fires
+//   late, counted in late_fires). t_lo1 is an output (the system's reference for slave modules).
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -93,6 +98,7 @@ module scb_ctrl #(
     input  wire                cfg_slot_follow,// A93
     input  wire                cfg_slot_guard, // A93
     input  wire                cfg_slot_avg,   // A97
+    input  wire                cfg_slot_lo,    // C02: following slots from phase 1's low-side turn-off
     input  wire                cfg_lo_pred,    // A99: timed phase-1 turn-off after learning
     input  wire [15:0]         cfg_lo_learn,   // A99
     input  wire [TW-1:0]       cfg_lo_tgt,     // A99
@@ -105,6 +111,7 @@ module scb_ctrl #(
     input  wire [7:0]          cfg_lo_kff,     // A100
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
+    output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
     output wire                arm1,
     output wire [N-1:0]        gh_ev,
     output wire [N-1:0]        gh_lvl,
@@ -202,6 +209,8 @@ module scb_ctrl #(
     wire [N-1:0]    lo_timed_all;
     assign dlo1 = dlo_all[TW-1:0];
     assign lo_timed1 = lo_timed_all[0];
+    wire [N*TW-1:0] t_lo_all;                  // C02
+    assign t_lo1 = t_lo_all[TW-1:0];
 
     genvar k;
     generate
@@ -213,7 +222,8 @@ module scb_ctrl #(
             end else begin : g_rest
                 wire [TW-1:0] slot_follow = cfg_slot_avg ? (k * (t_per + t_per2)) / (2 * N)  // A97: k * T_avg / N
                                                          : (k * t_per) / N;                  // A93: k * T / N
-                assign slot_t = t_ref + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
+                assign slot_t = ((use_follow && cfg_slot_lo) ? t_lo1 : t_ref)                // C02
+                                + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
             end
             localparam IS_FIRST = (k == 0 && !SLAVE) ? 1 : 0;                         // C2
             scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(IS_FIRST)) u_ph (
@@ -248,7 +258,8 @@ module scb_ctrl #(
                 .cfg_lo_pred(IS_FIRST ? cfg_lo_pred : 1'b0), .cfg_lo_learn(cfg_lo_learn),      // A99
                 .cfg_lo_tgt(cfg_lo_tgt), .mlo_valid(IS_FIRST ? mlo_valid : 1'b0), .mlo_early(mlo_early),
                 .mlo_err(mlo_err), .dlo(dlo_all[k * TW +: TW]), .lo_timed(lo_timed_all[k]),
-                .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff)   // A100
+                .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff),  // A100
+                .t_lo_q(t_lo_all[k * TW +: TW])                                                 // C02
             );
         end
     endgenerate

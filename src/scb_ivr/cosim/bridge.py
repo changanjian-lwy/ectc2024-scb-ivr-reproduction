@@ -38,7 +38,8 @@ applied while the same phase's complement conducts is counted, and with "stop_on
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
 from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
-eh_tgt_ps, err_shift), the slot rules (slot_follow, slot_guard, slot_avg) and the timed phase-1 turn-off (lo_pred,
+eh_tgt_ps, err_shift), the slot rules (slot_follow, slot_guard, slot_avg; slot_lo, C02: the following slots from phase
+1's low-side turn-off) and the timed phase-1 turn-off (lo_pred,
 lo_learn, lo_tgt_ps, lo_adm, lo_smax, lo_ff, lo_kff; the bridge then measures phase 1's crossing of i_target and
 reports it at the turn-off); keys absent from cfg take the values that reproduce the earlier experiments.
 
@@ -267,6 +268,7 @@ class ModuleSim:
         c.set("cfg_slot_follow", int(cfg.get("slot_follow", 0)))        # A93
         c.set("cfg_slot_guard", int(cfg.get("slot_guard", 0)))
         c.set("cfg_slot_avg", int(cfg.get("slot_avg", 0)))              # A97
+        c.set("cfg_slot_lo", int(cfg.get("slot_lo", 0)))                # C02
         c.set("cfg_lo_pred", int(cfg.get("lo_pred", 0)))                # A99: timed phase-1 turn-off
         c.set("cfg_lo_learn", int(cfg.get("lo_learn", 0)))
         c.set("cfg_lo_tgt", to_lsb(cfg.get("lo_tgt_ps", 0.0) * 1e-12))
@@ -568,8 +570,10 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
     after every window the output nodes are joined by charge conservation (equal Co: their mean). The master
     (module 0) runs the voltage loop; the system broadcasts its Ton to the slaves (cfg_ext_ton) and gives slave m's
     phase 1 the slot t_ref + m T / (M N) after each master turn-on, T the master's last period (the mean of its last
-    two once three turn-ons are seen; cfg t0 before), the reference id its t_ref. cfg "module_circuit" (list, one dict
-    per module) adds per-module circuit values; a load step's i_a is the system's, shared equally."""
+    two once three turn-ons are seen; cfg t0 before), the reference id its t_ref. With cfg "slot_lo" (C02) the reference
+    is the master's phase-1 low-side turn-off instead (t_lo1, both slot base and id), so each slave is the master
+    shifted by m T / (M N). cfg "module_circuit" (list, one dict per module) adds per-module circuit values; a load
+    step's i_a is the system's, shared equally."""
     n_mod = int(cfg["modules"])
     cache = {}
     mods = []
@@ -599,6 +603,7 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
     t0w = time.time()
     master = mods[0]
     nn = n_mod * N
+    slot_lo = int(cfg.get("slot_lo", 0))                         # C02
     sync = {"t_ref": None, "hist": [], "period": master.to_lsb(cfg["t0_ns"] * 1e-9)}
     eq = {"max_v": 0.0, "sum_v": 0.0, "n": 0}
     while master.plant.t < t_end and not any(md.ovl["stop"] for md in mods):
@@ -608,6 +613,7 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         w = ws[0]
         ton_m = master.st["ton"]
         t_ref = master.ctl.get("t_ref")
+        t_lo1 = master.ctl.get("t_lo1") if slot_lo else None
         if t_ref != sync["t_ref"]:                               # a master turn-on: the slaves' new slots
             if sync["t_ref"] is not None:
                 sync["hist"].append((t_ref - sync["t_ref"]) % (1 << TW))
@@ -620,8 +626,9 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         for m, md in enumerate(mods[1:], start=1):
             md.ctl.set("ext_ton", ton_m)
             if sync["t_ref"] is not None:
-                md.ctl.set("ext_ref", sync["t_ref"])
-                md.ctl.set("ext_slot", (sync["t_ref"] + (m * sync["period"]) // nn) % (1 << TW))
+                ref_m = t_lo1 if slot_lo else sync["t_ref"]
+                md.ctl.set("ext_ref", ref_m)
+                md.ctl.set("ext_slot", (ref_m + (m * sync["period"]) // nn) % (1 << TW))
         t_win_end = (w + (1 << master.fb)) * master.lsb
         stop = False
         for md in mods:

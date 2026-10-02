@@ -4,7 +4,8 @@ Time is in LSB units: 1 LSB = T_clk / 32 = 125 ps at the 250 MHz base case (the 
 drives every input; option bits default to 0. Groups: phase timing, comparators and slots; predictive correction
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
-guard; the timed phase-1 turn-off and its adaptive step and Ton feedforward. From A93's tests (history: ../CHANGELOG.md).
+guard, and their reference at phase 1's low-side turn-off (C02); the timed phase-1 turn-off and its adaptive
+step and Ton feedforward. From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -23,7 +24,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
             kp=0,                                                                # A104
-            ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0)                      # C2
+            ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
+            slot_lo=0)                                                           # C02
 
 
 def pack(values, width):
@@ -101,6 +103,7 @@ class Ctrl:
         d.cfg_slot_follow.value = cfg["slot_follow"]             # A93
         d.cfg_slot_guard.value = cfg["slot_guard"]
         d.cfg_slot_avg.value = cfg["slot_avg"]                   # A97
+        d.cfg_slot_lo.value = cfg["slot_lo"]                     # C02
         d.cfg_lo_pred.value = cfg["lo_pred"]                     # A99
         d.cfg_lo_learn.value = cfg["lo_learn"]
         d.cfg_lo_tgt.value = cfg["lo_tgt"]
@@ -917,3 +920,36 @@ async def lo_ff_moves_dlo_with_ton(dut):
     await ReadOnly()
     assert int(dut.dlo1.value) - d1 == -9, (d1, int(dut.dlo1.value))
 
+
+# ---------------- C02: slots referenced to phase 1's low-side turn-off ----------------
+
+@cocotb.test()
+async def follow_slots_from_phase1_low_off(dut):
+    """cfg_slot_lo with cfg_slot_follow, fixed slots set far away (4000/8000/12000): after the second phase-1
+    turn-on, phase k turns its low side off at t_lo + (k - 1) * (t_on2 - t_on1) // 4, t_lo phase 1's low-side
+    turn-off before t_on2 (one predictive delay earlier than A93's reference t_on2); t_lo1 reports it. The second
+    cycle is held 10 clocks so that phase 2's slot lies two windows after t_on2 (T/N - dt_pred > 2 windows, as in
+    the circuit: 58 - 9.4 ns)."""
+    c = Ctrl(dut)
+    await c.start(slot_follow=1, slot_lo=1, slot=(4000, 8000, 12000))
+    t_on1 = await _phase1_cycle(c, -1)
+    t_on2 = await _phase1_cycle(c, t_on1, hold=10)
+    lo = [e for e in c.edges if e[2] == "L" and e[3] == 0 and e[4] == 1 and t_on1 < e[0] + e[1] < t_on2][-1]
+    t_lo = lo[0] + lo[1]
+    per = t_on2 - t_on1
+    assert 0 < t_on2 - t_lo and t_lo + per // 4 > t_on2 + 2 * WIN, (t_on1, t_lo, t_on2)
+    assert int(dut.t_lo1.value) == t_lo, (int(dut.t_lo1.value), t_lo)
+    for k in (2, 3, 4):
+        e = await c.until("L", 0, k, after=t_on2)
+        assert e[0] + e[1] == t_lo + ((k - 1) * per) // 4, (k, t_lo, per, e)
+
+
+@cocotb.test()
+async def slot_lo_keeps_configured_slots_at_t_ref(dut):
+    """cfg_slot_lo without the period known (one phase-1 turn-on, cfg_slot_follow 1): the configured slot stays
+    referenced to the turn-on, phase 2 at t_on1 + 600."""
+    c = Ctrl(dut)
+    await c.start(slot_follow=1, slot_lo=1, slot=(600, 1200, 1800))
+    t_on1 = await _phase1_cycle(c, -1)
+    e = await c.until("L", 0, 2, limit=800)
+    assert e[0] + e[1] == t_on1 + 600, (t_on1, e)

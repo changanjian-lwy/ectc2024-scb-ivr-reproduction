@@ -1,13 +1,15 @@
-"""src/scb_ivr/cosim/matrix.py: the shared standard matrix reproduces A105's and A106's configurations and statistics."""
+"""src/scb_ivr/cosim/matrix.py: the shared standard matrix reproduces A105's and A106's configurations and statistics,
+and the interleave statistics reproduce C01's."""
 import importlib.util
 import json
 import unittest
 
 from scb_ivr.cosim.circuit import TRACK_A
-from scb_ivr.cosim.matrix import ROWS, configs, step_stats, window_stats
+from scb_ivr.cosim.matrix import ROWS, configs, lsoff_after, output_ripple, ref_turnons, step_stats, window_stats
 
 A105 = TRACK_A / "A105_p24_integrated_standard_matrix"
 A106 = TRACK_A / "A106_p24_line_steps"
+C01 = TRACK_A.parent / "track_C_multi_module" / "C01_four_modules_baseline"
 
 
 def strip(c):
@@ -37,6 +39,22 @@ class Matrix(unittest.TestCase):
         x = step_stats(json.loads((A106 / "cosim" / "run_pi100_p48_1us.json").read_text()))
         for k in ("extreme_mv", "t_extreme_us", "back_within_1pct_us", "ladder_dev_peak", "ladder_back_below_1pct_us", "ladder_dev_before"):
             self.assertEqual(x[k], s[k], k)
+
+    def test_interleave_stats_equal_c01s(self):
+        old = json.loads((C01 / "c01_summary.json").read_text())
+        for name in ("m4_n0", "m4_L5"):
+            d = json.loads((C01 / "cosim" / f"run_{name}.json").read_text())
+            mods = [d] + d["modules_rest"]
+            dtp = d["dt_pred_final_ns"][0] * 1e-9
+            _, per = ref_turnons(d)
+            shifts = {"actual": None, "slaves_ref_master_lsoff": lambda m, k: -dtp if m else 0.0,
+                      "uniform": lambda m, k: (-dtp if m else 0.0) + (dtp if k == 1 else 0.0),
+                      "no_module_interleave": lambda m, k: -m * per / 16}
+            for case, f in shifts.items():
+                r = output_ripple(mods, shift=f)
+                self.assertEqual((r["pkpk_a"], r["rms_ac_a"]), (old[name]["ripple"][case]["pkpk_a"], old[name]["ripple"][case]["rms_ac_a"]), (name, case))
+            for m, md in enumerate(mods):
+                self.assertEqual([x * 1e9 for x in lsoff_after(d, md)], old[name]["modules"][m]["lsoff_after_master_ns"], (name, m))
 
 
 if __name__ == "__main__":
