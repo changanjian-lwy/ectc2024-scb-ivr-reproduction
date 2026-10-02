@@ -1,0 +1,212 @@
+{
+ "source": "D56 (scripts/p24_aux_commutation.py, symbolic_derivations/03_P24_native/diagnostics/D56_aux_commutation_5p0pct.json)",
+ "registered": "2026-10-02, before any A101 co-simulation code",
+ "conditions": "P24 single module, 5% target (-6.25 A on phase 1), ~250 A resistive load, 25 C, datasheet Coss(V) and reverse drop; a bidirectional switch and Lr from each switch node to its own capacitor Cm (1 uF) to ground; BDS on at the low-side turn-off, off at the first zero of its current after the low-side turn-on; low-side dead time retuned",
+ "criteria": {
+  "vm_v": "steady Vm of each phase within +-0.4 V of the prediction",
+  "vds_on_v": "zvs design: high-side turn-on V_DS <= 0.5 V on every phase; partial design: within +-0.5 V",
+  "ir_extremes_a": "within +-20% of the prediction",
+  "i_hs_off_a": "within +-12 A of the prediction",
+  "low_side": "low-side turn-on V_DS <= 0 V on every phase (zero voltage kept); no overlap",
+  "ripple": "each phase's inductor ripple p-p within +-3% of the reference run (the 5% target unchanged)",
+  "vo": "Vo mean within +-5 mV of the reference run",
+  "sharing": "phase average currents within 1.5 A of the reference run",
+  "start": "Cm self-starts from 0 V and settles within 2% of its final Vm"
+ },
+ "zvs_0p75nH": {
+  "lr_nh": 0.75,
+  "alpha": 0.3,
+  "net_w_four_phases_central": [
+   -4.513478536598264,
+   -4.0535993134931125
+  ],
+  "phases": [
+   {
+    "phase": 1,
+    "vm_v": 9.0635,
+    "vds_on_v": -0.0,
+    "t_hs_on_ns": 6.502,
+    "baseline_vds_on_v": 8.9603,
+    "baseline_t_hs_on_ns": 9.3461,
+    "ir_max_a": 32.9367,
+    "ir_min_a": -36.6478,
+    "i_hs_off_a": 170.886,
+    "baseline_i_hs_off_a": 134.5961,
+    "dead_time_low_ns": 1.0085,
+    "baseline_dead_time_low_ns": 1.2639,
+    "low_on_vds_v": -0.6881,
+    "t_tail_ns": 2.5165,
+    "q_excursion_nc": 248.2907,
+    "net_w_per_phase": [
+     -1.2274,
+     -1.1167
+    ],
+    "hard_on_saved_w_per_phase": -2.3285
+   },
+   {
+    "phase": 2,
+    "vm_v": 9.184,
+    "vds_on_v": 0.0,
+    "t_hs_on_ns": 6.3893,
+    "baseline_vds_on_v": 8.8786,
+    "baseline_t_hs_on_ns": 9.1632,
+    "ir_max_a": 32.9313,
+    "ir_min_a": -36.5315,
+    "i_hs_off_a": 171.9955,
+    "baseline_i_hs_off_a": 135.8137,
+    "dead_time_low_ns": 0.9942,
+    "baseline_dead_time_low_ns": 1.2432,
+    "low_on_vds_v": -0.523,
+    "t_tail_ns": 2.483,
+    "q_excursion_nc": 247.3011,
+    "net_w_per_phase": [
+     -1.1745,
+     -1.0631
+    ],
+    "hard_on_saved_w_per_phase": -2.2797
+   },
+   {
+    "phase": 3,
+    "vm_v": 9.194,
+    "vds_on_v": 0.0,
+    "t_hs_on_ns": 6.3891,
+    "baseline_vds_on_v": 8.8897,
+    "baseline_t_hs_on_ns": 9.1574,
+    "ir_max_a": 32.9564,
+    "ir_min_a": -36.5613,
+    "i_hs_off_a": 172.178,
+    "baseline_i_hs_off_a": 135.9666,
+    "dead_time_low_ns": 0.9939,
+    "baseline_dead_time_low_ns": 1.2427,
+    "low_on_vds_v": -0.5275,
+    "t_tail_ns": 2.4822,
+    "q_excursion_nc": 247.4669,
+    "net_w_per_phase": [
+     -1.1774,
+     -1.0658
+    ],
+    "hard_on_saved_w_per_phase": -2.2842
+   },
+   {
+    "phase": 4,
+    "vm_v": 9.4482,
+    "vds_on_v": 0.0,
+    "t_hs_on_ns": 5.7596,
+    "baseline_vds_on_v": 9.0465,
+    "baseline_t_hs_on_ns": 8.1098,
+    "ir_max_a": 30.7122,
+    "ir_min_a": -33.8059,
+    "i_hs_off_a": 170.057,
+    "baseline_i_hs_off_a": 136.5086,
+    "dead_time_low_ns": 0.8546,
+    "baseline_dead_time_low_ns": 1.0527,
+    "low_on_vds_v": -1.0479,
+    "t_tail_ns": 2.2385,
+    "q_excursion_nc": 220.2299,
+    "net_w_per_phase": [
+     -0.9342,
+     -0.808
+    ],
+    "hard_on_saved_w_per_phase": -1.9611
+   }
+  ]
+ },
+ "partial_1p25nH": {
+  "lr_nh": 1.25,
+  "alpha": 0.25,
+  "net_w_four_phases_central": [
+   -5.190538180843987,
+   -4.853326408401604
+  ],
+  "phases": [
+   {
+    "phase": 1,
+    "vm_v": 8.2754,
+    "vds_on_v": 2.1357,
+    "t_hs_on_ns": 8.6729,
+    "baseline_vds_on_v": 8.9603,
+    "baseline_t_hs_on_ns": 9.3461,
+    "ir_max_a": 22.1372,
+    "ir_min_a": -27.7239,
+    "i_hs_off_a": 161.933,
+    "baseline_i_hs_off_a": 134.5961,
+    "dead_time_low_ns": 1.0585,
+    "baseline_dead_time_low_ns": 1.2639,
+    "low_on_vds_v": -0.6881,
+    "t_tail_ns": 3.6554,
+    "q_excursion_nc": 201.4172,
+    "net_w_per_phase": [
+     -1.3895,
+     -1.3086
+    ],
+    "hard_on_saved_w_per_phase": -2.2042
+   },
+   {
+    "phase": 2,
+    "vm_v": 8.4059,
+    "vds_on_v": 2.0533,
+    "t_hs_on_ns": 8.5982,
+    "baseline_vds_on_v": 8.8786,
+    "baseline_t_hs_on_ns": 9.1632,
+    "ir_max_a": 22.0981,
+    "ir_min_a": -27.5858,
+    "i_hs_off_a": 163.0222,
+    "baseline_i_hs_off_a": 135.8137,
+    "dead_time_low_ns": 1.0434,
+    "baseline_dead_time_low_ns": 1.2432,
+    "low_on_vds_v": -0.523,
+    "t_tail_ns": 3.5873,
+    "q_excursion_nc": 199.7564,
+    "net_w_per_phase": [
+     -1.3492,
+     -1.2679
+    ],
+    "hard_on_saved_w_per_phase": -2.1651
+   },
+   {
+    "phase": 3,
+    "vm_v": 8.415,
+    "vds_on_v": 2.0579,
+    "t_hs_on_ns": 8.5956,
+    "baseline_vds_on_v": 8.8897,
+    "baseline_t_hs_on_ns": 9.1574,
+    "ir_max_a": 22.1157,
+    "ir_min_a": -27.6096,
+    "i_hs_off_a": 163.1987,
+    "baseline_i_hs_off_a": 135.9666,
+    "dead_time_low_ns": 1.043,
+    "baseline_dead_time_low_ns": 1.2427,
+    "low_on_vds_v": -0.5275,
+    "t_tail_ns": 3.5864,
+    "q_excursion_nc": 199.8992,
+    "net_w_per_phase": [
+     -1.3521,
+     -1.2706
+    ],
+    "hard_on_saved_w_per_phase": -2.1691
+   },
+   {
+    "phase": 4,
+    "vm_v": 8.6844,
+    "vds_on_v": 2.0269,
+    "t_hs_on_ns": 7.825,
+    "baseline_vds_on_v": 9.0465,
+    "baseline_t_hs_on_ns": 8.1098,
+    "ir_max_a": 20.8232,
+    "ir_min_a": -25.7989,
+    "i_hs_off_a": 162.0251,
+    "baseline_i_hs_off_a": 136.5086,
+    "dead_time_low_ns": 0.8927,
+    "baseline_dead_time_low_ns": 1.0527,
+    "low_on_vds_v": -1.0479,
+    "t_tail_ns": 3.2549,
+    "q_excursion_nc": 178.978,
+    "net_w_per_phase": [
+     -1.0997,
+     -1.0063
+    ],
+    "hard_on_saved_w_per_phase": -1.8677
+   }
+  ]
+ }
+}
