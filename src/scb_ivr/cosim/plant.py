@@ -16,6 +16,7 @@ import hashlib
 import os
 import subprocess
 import tempfile
+from collections import OrderedDict
 
 import numpy as np
 from numpy._core.multiarray import interp as _cinterp
@@ -392,7 +393,7 @@ class FastPlant:
 
 SRC = Path(__file__).resolve().parent / "plant_kernel.c"
 BUILD = PROJECT / "tmp" / "cosim_kernel"
-CFLAGS = ["-O2", "-ffp-contract=off", "-fno-fast-math", "-shared", "-fPIC"]
+CFLAGS = ["-O3", "-mcpu=native", "-ffp-contract=off", "-fno-fast-math", "-shared", "-fPIC"]
 
 
 def _load():
@@ -431,9 +432,12 @@ def _f64(a, order="C"):
 
 
 class KernelSim(FastSim):
+    PARTIAL_CACHE = 4096                # entries for steps shorter than p.h (gate edges, window ends), least recently used out
+
     def __post_init__(self):
         super().__post_init__()
         self._lib = _load()
+        self._pcache = OrderedDict()   # (key) -> (entry, kernel entry) for h != p.h: the same values as rebuilding them
         n, m = self.ns, 2 * self.p.n
         keep = []
         ctx = _Ctx(n=n, m=m, nonlinear=int(self.nl is not None))
@@ -467,6 +471,12 @@ class KernelSim(FastSim):
     def step(self, y, conducting, h, euler, t, load_on, donly=None, vin0=None, vin1=None):
         key = (conducting, h, euler, load_on, donly)
         entry = self.cache.get(key)
+        kent = None
+        if entry is None and h != self.p.h:                     # a partial step: its own bounded cache
+            hit = self._pcache.get(key)
+            if hit is not None:
+                self._pcache.move_to_end(key)
+                entry, kent = hit
         if entry is None:                                       # A88 Sim.step's entry, unchanged
             A, fv, fl, frev = self.system(conducting, load_on, donly)
             if euler:
@@ -476,7 +486,12 @@ class KernelSim(FastSim):
             entry = (lu_factor(lhs), rhs_m, fv, fl, lhs, frev if (donly is not None and any(donly)) else None)
             if h == self.p.h:
                 self.cache[key] = entry
-        kent = self._kentry(key, entry, h == self.p.h)
+        if kent is None:
+            kent = self._kentry(key, entry, h == self.p.h)
+            if h != self.p.h:
+                self._pcache[key] = (entry, kent)
+                if len(self._pcache) > self.PARTIAL_CACHE:
+                    self._pcache.popitem(last=False)
         p = self.p
         if vin1 is None:
             vin1 = p.vin_at(t + h)

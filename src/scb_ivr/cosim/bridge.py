@@ -103,10 +103,12 @@ def signed(v, width):
 
 class Ctl:
     """The controller's signals for one module (C1): get(name) reads a signal as an int, set(name, value) writes it,
-    sig(name) is the signal handle. With one module this is the DUT itself."""
+    sig(name) is the signal handle. With one module this is the DUT itself. A write of the value last written to the
+    same input is skipped: only the bridge drives these inputs, so the signal already holds it."""
 
     def __init__(self, dut):
         self.dut = dut
+        self.last = {}
 
     def sig(self, name):
         return getattr(self.dut, name)
@@ -115,12 +117,17 @@ class Ctl:
         return int(getattr(self.dut, name).value)
 
     def set(self, name, value):
+        if self.last.get(name) == value and isinstance(value, int):
+            return
         getattr(self.dut, name).value = value
+        self.last[name] = value
 
 
 class MultiCtl:
     """Module m's slice of the M-module wrapper's signals (scb_multi, C3). clk and rst are shared. Writes go through a
-    cache of the packed values shared by the M modules, so that their writes in one phase combine."""
+    cache of the packed values shared by the M modules, so that their writes in one phase combine; they reach the DUT
+    at flush_writes() (once per signal and phase, skipped when unchanged). Reads in a read-only phase come from a
+    per-phase cache (cache[READS], cleared by the caller at each read-only phase; absent: read through)."""
     SHARED = ("clk", "rst")
 
     def __init__(self, dut, m, n_mod, cache):
@@ -138,7 +145,14 @@ class MultiCtl:
     def get(self, name):
         if name in self.SHARED:
             return int(getattr(self.dut, name).value)
-        return field(int(getattr(self.dut, name).value), self.m, self._w(name))
+        rc = self.cache.get(READS)
+        if rc is None:
+            v = int(getattr(self.dut, name).value)
+        else:
+            v = rc.get(name)
+            if v is None:
+                v = rc[name] = int(getattr(self.dut, name).value)
+        return field(v, self.m, self._w(name))
 
     def set(self, name, value):
         if name in self.SHARED:
@@ -148,7 +162,24 @@ class MultiCtl:
         mask = ((1 << w) - 1) << (self.m * w)
         new = (self.cache.get(name, 0) & ~mask) | ((int(value) & ((1 << w) - 1)) << (self.m * w))
         self.cache[name] = new
-        getattr(self.dut, name).value = new
+        self.cache.setdefault(DIRTY, set()).add(name)
+
+
+READS, DIRTY, LAST = ("_reads",), ("_dirty",), ("_last",)
+
+
+def flush_writes(dut, cache):
+    """Write every packed input changed since the last flush (MultiCtl), once, if it differs from the last written."""
+    dirty = cache.get(DIRTY)
+    if not dirty:
+        return
+    last = cache.setdefault(LAST, {})
+    for name in sorted(dirty):
+        v = cache[name]
+        if last.get(name) != v:
+            getattr(dut, name).value = v
+            last[name] = v
+    dirty.clear()
 
 
 def load_cfg():
@@ -599,11 +630,13 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         mod.configure()
     for mod in mods[1:]:
         mod.ctl.set("cfg_ext_ton", 1)
+    flush_writes(dut, cache)
     await ClockCycles(dut.clk, 3)
     await FallingEdge(dut.clk)
     dut.rst.value = 0
     for mod in mods:
         mod.start()
+    flush_writes(dut, cache)
     t_end = float(os.environ.get("COSIM_T_END_US", cfg["t_end_us"])) * 1e-6
     t0w = time.time()
     master = mods[0]
@@ -614,6 +647,7 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
     while master.plant.t < t_end and not any(md.ovl["stop"] for md in mods):
         await RisingEdge(dut.clk)
         await ReadOnly()
+        cache[READS] = {}
         ws = [md.read_rising() for md in mods]
         w = ws[0]
         ton_m = master.st["ton"]
@@ -639,6 +673,7 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         for md in mods:
             if not md.run_window(t_win_end):
                 stop = True
+        flush_writes(dut, cache)
         if stop:
             break
         vs = [float(md.plant.y[md.i_out]) for md in mods]           # join the output nodes (equal Co)
@@ -649,8 +684,10 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
             md.plant.y[md.i_out] = v_eq
         for md in mods:
             md.sample()
+        flush_writes(dut, cache)
     await RisingEdge(dut.clk)
     await ReadOnly()
+    cache[READS] = {}
     wall = time.time() - t0w
     out = master.result(wall)
     out["modules_rest"] = [md.result(wall) for md in mods[1:]]
@@ -671,6 +708,8 @@ async def cosim(dut):
     cfg_path, cfg, ref = load_cfg()
     if int(cfg.get("modules", 1)) > 1:                                 # C3: the M-module system
         await cosim_multi(dut, cfg_path, cfg, ref)
+        if prof is not None:
+            prof.disable(); prof.dump_stats(os.environ["COSIM_PROFILE"])
         return
     p = make_params(cfg, ref)
     mod = ModuleSim(cfg, p, Ctl(dut))

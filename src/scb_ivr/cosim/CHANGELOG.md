@@ -4,6 +4,55 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (speed) - fewer signal writes and reads, a partial-step cache, -O3 -mcpu=native; no change in results
+
+**Source:** a cProfile of 100 µs runs (`COSIM_PROFILE`, now also dumped
+for the M-module system).
+- **Four modules:** 81 s; the C kernel 45 s, signal writes 9.6 s
+  (2.5 M), reads 8.5 s (1.95 M), Python partial steps 7.2 s.
+- **One module:** 23 s; the kernel 11.9 s.
+
+**Changes:**
+- **`bridge.py` `Ctl.set`:** a write of the integer value last written
+  to the same input is skipped. Only the bridge drives these inputs,
+  and the reset is written directly.
+- **`bridge.py` `MultiCtl`:**
+  - writes combine in the shared cache and reach the DUT at
+    `flush_writes()`, once per signal and phase, skipped when unchanged.
+    `cosim_multi` flushes before every await that follows writes: after
+    configuration, after start, after the windows' integration, after
+    the sampling.
+  - reads in a read-only phase come from a per-phase cache, cleared at
+    each read-only phase. Every read happens in `read_rising`, the
+    master's t_ref / t_lo1 reads, and `result`, all in read-only
+    phases.
+- **`plant.py` `KernelSim.step`:**
+  - a step shorter than p.h (a gate edge or a window end inside the
+    grid) keeps its factorisation and kernel entry in a bounded LRU
+    cache (4096 entries) instead of rebuilding them. They are the same
+    values; 95% hit rate.
+- **`plant.py` `CFLAGS`:** `-O3 -mcpu=native` (was `-O2`), keeping
+  `-ffp-contract=off -fno-fast-math`, so no fused or reassociated
+  floating-point operations.
+
+**Gates:**
+- `tests/test_cosim_plants.py`, wrapper and matrix tests: 17 passed, 1
+  skipped;
+- `--full` regression PASS;
+- full-length reruns identical in every record except `wall_s` and
+  `provenance`, four at a time as before:
+
+| run | wall before → after |
+|---|---|
+| C02 m4_n0 (four modules, 500 µs) | 400 → 287 s |
+| C03 l_p48_1us (four modules, line step, 600 µs) | 429 → 322 s |
+| A105 i2_s_p62 (one module, 600 µs) | 110 → 94 s |
+| A109 s1_m48_10us (one module, `slot_trim`) | 135 → 86 s |
+
+**What remains:** ~85% of a run is now the C kernel's fixed 10 ps
+steps. Going further means a different integrator, which changes
+results and so would be a new plant, not a speed change.
+
 ## 2026-10-02 (A109) - a valley trim for the slotted phases
 
 Source: A108 RESULTS 0.3. The slotted phases' turn-offs had no
