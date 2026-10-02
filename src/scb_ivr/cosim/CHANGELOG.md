@@ -4,6 +4,22 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-02 (C1, track C) - the bridge per module, for multi-module runs
+
+- **`bridge.py`:** restructured with no change in behaviour.
+  - One module's plant, controller-side analog functions, measurements
+    and records are a `ModuleSim`, with the window steps `read_rising`,
+    `write_falling`, `run_window` and `sample`.
+  - The controller's signals go through `Ctl` (with one module, the DUT).
+  - `load_cfg` and `make_params` are shared.
+  - Every operation keeps its order.
+- **Gates:**
+  - `--full` regression PASS;
+  - A105 i2_s_p62 (timed turn-off, PI, load step), A106 pi100_p48_1us
+    (line step), A102 e125_5v (branch enable) and A107 cs8p7_n0 (cfg
+    `circuit`) rerun to their ends: every record identical except
+    `wall_s` and `provenance`.
+
 ## 2026-10-02 (A107) - circuit values as scenario inputs; the shared standard matrix
 
 - **`bridge.py`:** cfg key `circuit` {name: value, SI}.
