@@ -699,10 +699,10 @@ each question:
          one table for A92-A100, the loops to avoid, and the priorities to
          set.
 
-     21. In progress: the high side's zero-voltage turn-on with an
+     21. Done, not adopted: the high side's zero-voltage turn-on with an
          auxiliary commutation branch.
-         - [A101](../experiments/track_A_periodic_steady_state/A101_aux_commutation_branch/BOUNDARY.md),
-           boundary and registered predictions; co-simulation next.
+         - [A101](../experiments/track_A_periodic_steady_state/A101_aux_commutation_branch/RESULTS.md),
+           Verilog co-simulation with the branch in the shared plant.
          - [D56](../symbolic_derivations/03_P24_native/D56_P24_AUX_COMMUTATION.md),
            mathematical model (single-phase edge, validated against the
            full model within 0.05 V on all four phases).
@@ -718,6 +718,17 @@ each question:
            shortened to about 1.0 ns.
          - Net −4 to −5 W for four phases with D56's central hard turn-on
            estimate; +0.3 to +2 W with A91's lower bound.
+
+         **Co-simulation (A101).**
+         - Lr 1.25 nH meets every registered criterion: high-side V_DS
+           2.1 V, −5.0 to −5.3 W.
+         - Lr 0.75 nH reaches zero voltage (−0.7 V) and meets them too,
+           with the existing valley measurement: −4.4 to −4.8 W. With the
+           new "stop at V_DS ≤ 0" measurement it was unstable; that option
+           now defaults off.
+         - **Open:** start-up currents up to 430 A (enable after the
+           handover, Cm precharged); jitter spread ×2 on phases 2-4; a real
+           bidirectional switch.
 
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

@@ -865,8 +865,14 @@ agree, up to 32 LSB (adaptive delta modulation).
   (`reports/TRADEOFF_SCORECARD.md`).
 
 `A101_aux_commutation_branch` (with D56) adds an auxiliary commutation
-branch for the high side's zero-voltage turn-on; the boundary and the
-registered predictions are written, the co-simulation is next.
+branch for the high side's zero-voltage turn-on, in D56's model and in the
+Verilog co-simulation (the branch is an opt-in part of the shared plant).
+- **Co-simulation:** Lr 1.25 nH meets every registered criterion (V_DS
+  2.1 V, −5.0 to −5.3 W); Lr 0.75 nH reaches zero voltage (−4.4 to
+  −4.8 W) with the existing valley measurement. A new "stop at V_DS ≤ 0"
+  measurement destabilised phases 2-4 and is off by default.
+- **Open:** start-up currents (enable after the handover), jitter spread
+  ×2 on phases 2-4, a real bidirectional switch. Not adopted.
 - **D56:** a single-phase edge model, within 0.05 V of the full model on
   all four phases.
   - P24's 1.47 nH filter inductor makes any branch to 0 V or to Vo need
