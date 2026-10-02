@@ -788,6 +788,19 @@ each question:
            dither under driver mismatch. A deadband would fix it; not
            tested.
 
+     25. Done: line steps on the integrated design.
+         - [A106](../experiments/track_A_periodic_steady_state/A106_p24_line_steps/RESULTS.md),
+           Verilog co-simulation with an input step (new opt-in plant
+           feature).
+         - **Results.** ±10% input steps move Vo by ≤ 18.5 mV with the PI
+           (39-70 mV with the I-only loop). The ladder re-divides within
+           25 µs. No overlap; zero voltage kept.
+         - **One hard-constraint miss.** A +10% step over 1 µs peaks at
+           207 A (> 200 A); over 10 µs, 171 A.
+           - Input feed-forward or a bus slew limit would address it; not
+             tested.
+           - D59 misses the fast steps: it lacks the ladder's dynamics.
+
         **Next at this level, one at a time** (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
