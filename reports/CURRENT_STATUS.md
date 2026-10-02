@@ -801,7 +801,20 @@ each question:
              tested.
            - D59 misses the fast steps: it lacks the ladder's dynamics.
 
-        **Next at this level, one at a time** (after the code clean-up
+     26. **The single-module level is closed (2026-10-02).** All three
+         items of the finish line are done:
+         1. the integrated design (A105's I2) passes the standard matrix;
+         2. the models cross-check it;
+         3. the open choices are written up as cases:
+            [`SINGLE_MODULE_SUMMARY_2026-10-02.md`](SINGLE_MODULE_SUMMARY_2026-10-02.md).
+
+         Line steps (A106) were added, with one miss: a +10% step over
+         1 µs peaks at 207 A.
+
+         The next level (multi-module, package, thermal, protection,
+         light load) is to be chosen with Mihai.
+
+        **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
         - the adoption decision for A100: the priorities and phase 1's ZVS
