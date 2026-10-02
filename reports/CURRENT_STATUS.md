@@ -814,6 +814,25 @@ each question:
          The next level (multi-module, package, thermal, protection,
          light load) is to be chosen with Mihai.
 
+     27. Done: the integrated design over the series-capacitor range.
+         - [A107](../experiments/track_A_periodic_steady_state/A107_p24_series_capacitor_range/RESULTS.md),
+           Cs 0.6 and 8.7 µF.
+         - [D60](../symbolic_derivations/03_P24_native/D60_P24_LADDER_RELAXATION.md):
+           in mode P the ladder relaxes and does not resonate.
+         - Also new: cfg `circuit` (any circuit value as a scenario) and
+           the shared standard matrix `scb_ivr.cosim.matrix`.
+
+         **Results.**
+         - **No resonance anywhere.** The 100 kHz loop holds over the
+           range, and load steps do not depend on Cs.
+         - **At 8.7 µF the start-up peaks at 215 A.** That is mode S: the
+           fixed ramp's margin is 19x. The ramp should scale with √Cs (a
+           parameter; not run).
+         - **At 8.7 µF fast line steps reach 221-244 A.**
+         - **At 0.6 µF:** +1.7 V blocking, the high side turns on at ~10 V,
+           more spread.
+         - **D60 has the structure but not the rate** at a large Cs.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
