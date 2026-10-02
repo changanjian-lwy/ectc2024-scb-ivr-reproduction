@@ -934,6 +934,26 @@ each question:
            The decisions mapped to papers, with DOIs; eight papers added
            and read.
 
+     33. Line-slew tolerance:
+         [A108](../experiments/track_A_periodic_steady_state/A108_p24_line_slew_tolerance/RESULTS.md),
+         the adopted single module, ±4.8 V over 1-50 µs.
+         - **Peak ≤ 200 A** from 2.4 V/µs rising, and at every falling
+           slew.
+         - **Every valley negative** only at ≤ 0.24 V/µs rising; falling
+           not even at 0.096 V/µs (phases 3-4 at +9.6 / +12.1 A).
+         - **Mechanisms, both quantitative:**
+           - phase 1's timed turn-off adapts ≤ 1 ns per cycle, which
+             follows ≤ 0.24 V/µs;
+           - the slotted phases have no current correction, and the
+             ladder lags a ramp by about rate × 11 µs, ~12 A per volt.
+         - **Remedies screened:**
+           - a per-phase Ton feed-forward makes the ladder unstable for a
+             fraction above 0.53;
+           - a peak limit is too slow (11 ns path).
+         - **For evaluation:** the bus slew the module must ride.
+         - **Candidate A109:** a per-phase valley trim of the slots. It
+           also gives slaves the valley target D61's scheme B needs.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
