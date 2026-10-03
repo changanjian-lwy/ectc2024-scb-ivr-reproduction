@@ -1225,8 +1225,15 @@ each question:
            181.5/175.4 A, −4.8 V 1 µs 175.5 A; steady state and loads
            unchanged; vff off bit-identical.
          - **Cost:** −8 V / 10 µs peak 168.5 → 188.2 A, Vo −28 → +38 mV
-           (registered no-harm Vo criterion misses). Bus-slew spec
-           (≥ 5 µs) stays. **Next:** A129 gates the term by Vin's slope.
+           (registered no-harm Vo criterion misses).
+         - **A129** ([RESULTS](../extensions/ml_design_assist/experiments/A129_cosim_vff_slope_gate/RESULTS.md)):
+           a latched slope gate (cfg vff "gth" 100 codes = 2 V; on at
+           g ≥ gth, off at g = 0) removes the cost: −8 V / 10 µs 170.9 A,
+           |Vo| 28.6 mV (A124 168.5 / 28.2); −4.8 V / 1 µs 173.6 A; worst
+           row 181.5 A. The 2.5 MHz standard matrix (m, j, ±25 A) passes
+           with and without it. **Adopted** as the line-step closure:
+           steps ≤ 4.8 V at any tested slew ≥ 1 µs; −8 V / 5 µs is 208 A
+           with the gate closed, so 8 V falls still need ≥ 10 µs.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
