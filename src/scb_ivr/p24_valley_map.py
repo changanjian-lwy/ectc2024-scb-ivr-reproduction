@@ -106,10 +106,12 @@ class ValleyMap:
         return {"vo": d.vref, "vc": [d.vin * (n - j) / n for j in range(1, n)], "acc": ton, "ton_ph1": ton,
                 "valley": [d.i_tgt] * n, "dlo": None, "step": 1, "last_up": None, "t_hist": [None, None], "t": 0.0}
 
-    def period(self, s, vin, i_step, rule=None):
+    def period(self, s, vin, i_step, rule=None, ton_scale=None, ton_cap=None):
         """One phase-1 period from state s (updated in place). Returns the record. rule ("cmp", "timed", "floor")
         overrides the design's turn-off rule for this period (A122's agent); after a comparator period dlo takes its
-        on-low interval, as the RTL's learning does."""
+        on-low interval, as the RTL's learning does. ton_scale (one factor per phase) scales each phase's Ton after
+        the loop, and ton_cap (one per phase, s) caps it, both quantised to the LSB (A126's feed-forward); None
+        leaves every phase on the loop's Ton."""
         d, n = self.d, self.d.n
         mode = rule or d.mode
         code = round(s["vo"] / d.adc_lsb)
@@ -121,6 +123,9 @@ class ValleyMap:
         vo = s["vo"]
         pk, q_on, q_tot, i_on, depth = [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n
         tons = [ton_new] * n
+        if ton_scale is not None or ton_cap is not None:
+            sc, cap = ton_scale or [1.0] * n, ton_cap or [math.inf] * n
+            tons = [max(round(min(ton_new * f, c) / LSB), 0) * LSB for f, c in zip(sc, cap)]
         for k in range(n):
             v, th = s["valley"][k], self.ith(k, rails[k])
             if v >= 0:

@@ -64,13 +64,19 @@ class MLP:
         else:
             loss = float(np.sum(w * (p - y) ** 2) / n)
         delta = w * (p - y) / n * (1.0 if self.out == "sigmoid" else 2.0)
+        gW, gb = self.backward(acts, delta)
+        return loss, gW, gb
+
+    def backward(self, acts, delta):
+        """The gradients of every W, b for dL/dz at the output layer (delta, one row per sample), from forward()'s
+        activations. Used by loss_grads and by the policy-gradient losses (ml_ppo)."""
         gW, gb = [None] * len(self.W), [None] * len(self.W)
         for i in range(len(self.W) - 1, -1, -1):
             gW[i] = acts[i].T @ delta
             gb[i] = delta.sum(axis=0)
             if i > 0:
                 delta = (delta @ self.W[i].T) * (1.0 - acts[i] ** 2)     # back through tanh
-        return loss, gW, gb
+        return gW, gb
 
     # ---- training ----
     def fit(self, x, y, xv, yv, epochs=400, batch=128, lr=2e-3, l2=1e-5, patience=40, seed=0, weight=None, log=None):
@@ -122,3 +128,24 @@ class MLP:
         m.W = [z[f"W{i}"] for i in range(n)]
         m.b = [z[f"b{i}"] for i in range(n)]
         return m, z
+
+
+class Adam:
+    """Adam (beta 0.9 / 0.999) over a list of parameter arrays, updated in place."""
+
+    def __init__(self, params, lr=3e-4, b1=0.9, b2=0.999):
+        self.params, self.lr, self.b1, self.b2, self.t = params, lr, b1, b2, 0
+        self.m = [np.zeros_like(a) for a in params]
+        self.v = [np.zeros_like(a) for a in params]
+
+    def step(self, grads, max_norm=None):
+        """grads: same order as params (descent direction: the gradient of the loss). max_norm clips the global norm."""
+        if max_norm is not None:
+            norm = float(np.sqrt(sum(np.sum(g * g) for g in grads)))
+            if norm > max_norm:
+                grads = [g * (max_norm / norm) for g in grads]
+        self.t += 1
+        for k, (par, g) in enumerate(zip(self.params, grads)):
+            self.m[k] = self.b1 * self.m[k] + (1 - self.b1) * g
+            self.v[k] = self.b2 * self.v[k] + (1 - self.b2) * g * g
+            par -= self.lr * (self.m[k] / (1 - self.b1 ** self.t)) / (np.sqrt(self.v[k] / (1 - self.b2 ** self.t)) + 1e-8)
