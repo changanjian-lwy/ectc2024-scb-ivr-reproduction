@@ -18,7 +18,8 @@
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses.
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
 //   SLAVE = 1, phase 1 is a slotted phase like phases 2..N, its low-side turn-off at ext_slot once per reference
-//   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off.
+//   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off,
+//   except C06's cfg_slave_floor: the front end armed before the slot as a floor (scb_phase cfg_slot_floor).
 // - C02: with cfg_slot_lo, the period-following slots of phases 2..N are referenced to phase 1's last low-side
 //   turn-off (t_lo1) instead of its high-side turn-on (t_ref), so all N low-side turn-offs are T/N apart; the
 //   configured slots (mode S, or before the period is known) stay referenced to t_ref. A phase still learns of a
@@ -115,6 +116,7 @@ module scb_ctrl #(
     input  wire                cfg_lo_ff,      // A100: Ton feedforward to dlo
     input  wire [7:0]          cfg_lo_kff,     // A100
     input  wire                cfg_lo_floor,   // A118: phase 1's front end as a floor in timed mode
+    input  wire                cfg_slave_floor,// C06 (SLAVE): phase 1's front end as a floor before its slot
     input  wire                cfg_vff,        // A128: Vin feed-forward on each phase's Ton (scb_vff), mode P
     input  wire                vin_valid,      // A128: Vin ADC sample (with Vo's)
     input  wire [AW-1:0]       vin_code,       // A128
@@ -261,7 +263,7 @@ module scb_ctrl #(
                 .c_i(cmp_s[k]), .c_zl(cmp_s[N + k]), .c_zh(cmp_s[2 * N + k]), .c_valley(cmp_s[3 * N + k]),
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
-                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid(IS_FIRST ? a_valid : 1'b0), .a_tlo(a_tlo),
+                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : 1'b0), .a_tlo(a_tlo),
                 .arm(arm_all[k]),
                 .gh_ev(gh_ev[k]), .gh_lvl(gh_lvl[k]), .gh_fine(gh_fine[k * FB +: FB]),
                 .gl_ev(gl_ev[k]), .gl_lvl(gl_lvl[k]), .gl_fine(gl_fine[k * FB +: FB]),
@@ -285,6 +287,7 @@ module scb_ctrl #(
                 .t_lo_q(t_lo_all[k * TW +: TW]),                                                // C02
                 .cfg_slot_trim(cfg_slot_trim), .cfg_st_smax(cfg_st_smax),                       // A109
                 .cfg_lo_floor(IS_FIRST ? cfg_lo_floor : 1'b0),                                  // A118
+                .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : 1'b0),                    // C06
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end

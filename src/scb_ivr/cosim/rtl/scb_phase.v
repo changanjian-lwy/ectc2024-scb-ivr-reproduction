@@ -27,6 +27,10 @@
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
 //   (cfg_zvs_react); restart timer cfg_rs_high.
 // - t_lo_q (C02): the last low-side turn-off time, for slots referenced to it (scb_ctrl cfg_slot_lo).
+// - Slot floor (C06, cfg_slot_floor, a slotted phase 1 of a slave module, mode P): the front end is armed in LOW at
+//   the floor threshold the bridge sets; a report (a_valid / a_tlo) before the slot is the turn-off, as A118's floor
+//   (t_lo = a_tlo, t_on = a_tlo + dt_pred, no trim). It counts as the current reference's slot, or, when the floor
+//   comes before that reference has arrived, as the next one's (skip_pend).
 // - Slot valley trim (A109, cfg_slot_trim, slotted phases, mode P): the slot moves by sofs; each residual-current
 //   report (r_valid) at a slot turn-off moves sofs later when the current was above the target (r_below 0), else
 //   earlier, by a step that doubles while the decisions agree (up to cfg_st_smax) and returns to 1 when they differ;
@@ -108,6 +112,7 @@ module scb_phase #(
     input  wire                 cfg_slot_trim, // A109: valley trim of a slotted phase's turn-off (mode P)
     input  wire [7:0]           cfg_st_smax,   // A109: its largest step, LSB
     input  wire                 cfg_lo_floor,  // A118: the front end stays armed in timed mode, as a floor
+    input  wire                 cfg_slot_floor,// C06: a slotted phase's front end armed as a floor (slave phase 1)
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -140,6 +145,7 @@ module scb_phase #(
     assign t_lo_q = t_lo;                                            // C02
     reg [TW-1:0] pend_ref;                                           // A93: reference whose slot is awaited
     reg          pend_v;
+    reg          skip_pend;                                          // C06: the floor came before its reference
 
     wire signed [TW-1:0] d_off   = t_on + ton - now;
     wire signed [TW-1:0] d_rsd   = t_off + cfg_rs_high - now;
@@ -182,6 +188,7 @@ module scb_phase #(
 
     wire pred_first = due(d_pred) && !(due(d_rsu) && (d_rsu < d_pred));
     wire async_on   = FIRST && cfg_async && mode_p;
+    wire sfloor_on  = !FIRST && cfg_slot_floor && mode_p;            // C06
     wire lo_open    = $signed(now - t_lon) >= $signed(cfg_blank);   // A89: blanking elapsed
     reg  [15:0] lo_n;                                               // A99: learned turn-offs (saturating)
     assign lo_timed = FIRST && cfg_lo_pred && mode_p && (lo_n >= cfg_lo_learn);
@@ -208,7 +215,8 @@ module scb_phase #(
     wire signed [TW+11:0] dlo_s = $signed({12'd0, dlo}) + (ff_on ? ff_p : 0) + fb_p;
     wire [TW-1:0]         dlo_next = dlo_s[TW+11] ? {TW{1'b0}} : dlo_s[TW-1:0];
     wire [FB-1:0] f_lo1t = fine(d_lo1t, cfg_fine);
-    assign arm = async_on && (state == LOW) && lo_open && (!lo_timed || cfg_lo_floor);   // A118: or as the floor
+    assign arm = (async_on && (state == LOW) && lo_open && (!lo_timed || cfg_lo_floor))   // A118: or as the floor
+              || (sfloor_on && (state == LOW) && lo_open);                                // C06: the slot floor
     wire slot_new   = (fired_ref != ref_id);
     wire slot_miss  = cfg_slot_guard && pend_v && (pend_ref != ref_id);   // A93: the awaited slot was passed
     wire [TW-1:0] dt_next = dt_pred + cfg_dt_step;
@@ -244,6 +252,7 @@ module scb_phase #(
             fired_ref   <= {TW{1'b1}};
             pend_ref    <= {TW{1'b0}};
             pend_v      <= 1'b0;
+            skip_pend   <= 1'b0;                                 // C06
             gh_lvl      <= FIRST ? 1'b1 : 1'b0;
             gl_lvl      <= FIRST ? 1'b0 : 1'b1;
             gh_fine     <= {FB{1'b0}};
@@ -295,6 +304,10 @@ module scb_phase #(
                     trim <= trim + 1'b1;
                 else if (!r_below && trim != TRIM_MIN)
                     trim <= trim - 1'b1;
+            end
+
+            if (skip_pend && slot_new) begin                     // C06: that reference's slot was the floor
+                fired_ref <= ref_id; pend_v <= 1'b0; skip_pend <= 1'b0;
             end
 
             case (state)
@@ -403,13 +416,19 @@ module scb_phase #(
                             t_lo <= now + f_rs1; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
                             state <= UP;
                         end
-                    end else if (slot_new && (slot_miss || due(d_slot))) begin   // A93: or a missed slot
+                    end else if (sfloor_on && a_valid) begin             // C06: the floor came first
+                        t_lo <= a_tlo; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                        t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
+                        if (slot_new && !skip_pend) begin fired_ref <= ref_id; pend_v <= 1'b0; end
+                        else skip_pend <= 1'b1;
+                        state <= HIGH;
+                    end else if (slot_new && !skip_pend && (slot_miss || due(d_slot))) begin   // A93: or a missed slot
                         gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= slot_miss ? {FB{1'b0}} : f_slot;
                         t_lo <= now + (slot_miss ? {FB{1'b0}} : f_slot); lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
                         fired_ref <= ref_id; pend_v <= 1'b0;
                         if (slot_miss || d_slot[TW-1]) late_fires <= late_fires + 1'b1;
                         state <= UP;
-                    end else if (slot_new) begin                         // A93: waiting for this reference
+                    end else if (slot_new && !skip_pend) begin           // A93: waiting for this reference
                         pend_ref <= ref_id; pend_v <= 1'b1;
                     end
                 end

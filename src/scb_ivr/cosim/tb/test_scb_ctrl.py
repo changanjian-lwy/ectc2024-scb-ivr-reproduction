@@ -28,6 +28,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
             lo_floor=0,                                                          # A118
+            slave_floor=0,                                                       # C06
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0)                                                           # A129
 
@@ -116,6 +117,7 @@ class Ctrl:
         d.cfg_lo_adm.value = cfg["lo_adm"]; d.cfg_lo_smax.value = cfg["lo_smax"]   # A100
         d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
         d.cfg_lo_floor.value = cfg["lo_floor"]                   # A118
+        d.cfg_slave_floor.value = cfg["slave_floor"]             # C06
         d.cfg_vff.value = cfg["vff"]                             # A128
         d.cfg_vff_c.value = pack([x & 0xFFF for x in cfg["vff_c"]], 12)
         d.cfg_vff_k.value = cfg["vff_k"]; d.cfg_vff_sh2.value = cfg["vff_sh2"]; d.cfg_vff_sh20.value = cfg["vff_sh20"]

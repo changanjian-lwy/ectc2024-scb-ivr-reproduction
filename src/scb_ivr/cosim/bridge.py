@@ -33,7 +33,9 @@ Controller-side analog functions modelled here:
   turn-on (voltage loop);
 - the floor (cfg "lo_floor" 1, A118): once phase 1's turn-off is timed, its front end stays armed at i_target + trim
   - "lo_floor_a" (default 2 A); if the current reaches it before the timed edge it makes the turn-off as above,
-  reports no residual (the trim holds), and the crossing measurement of i_target is taken first.
+  reports no residual (the trim holds), and the crossing measurement of i_target is taken first;
+- the slave floor (cfg "slave_floor" 1, C06, multi-module): a slave's slotted phase 1 has the same front end armed in
+  LOW (mode P) at i_target + trim - "lo_floor_a"; if the current reaches it before the slot it makes the turn-off.
 
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
@@ -248,6 +250,7 @@ class ModuleSim:
         self.vm0 = list(p.aux_vm0) if isinstance(p.aux_vm0, (list, tuple)) else [p.aux_vm0] * na   # A102: per branch
         y0 = [0.0] * (2 * N) + self.vm0 + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
         g1 = bool(first_high)                                          # C3: a slave resets with phase 1 LOW
+        self.slave_floor = (not g1) and bool(cfg.get("slave_floor", 0))  # C06
         self.plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[g1] + [False] * (N - 1), gl=[not g1] + [True] * (N - 1))
         self.nv = self.plant.nv
         self.i_out = self.plant.sim.idx["out"]
@@ -319,6 +322,7 @@ class ModuleSim:
         c.set("cfg_lo_ff", int(cfg.get("lo_ff", 0)))                    # A100: Ton feedforward to dlo
         c.set("cfg_lo_kff", int(cfg.get("lo_kff", 0)))
         c.set("cfg_lo_floor", int(cfg.get("lo_floor", 0)))              # A118: the front end as a floor when timed
+        c.set("cfg_slave_floor", int(cfg.get("slave_floor", 0)))        # C06: a slave's phase 1, floor before its slot
         vff = cfg.get("vff") or {}                                       # A128: Vin feed-forward (extension)
         self.vin_lsb = float(vff.get("vin_lsb_v", 0.02))
         c.set("cfg_vff", int(bool(vff)))
@@ -383,7 +387,10 @@ class ModuleSim:
         return t_cmd + d
 
     def floor_on(self):
-        """A118: phase 1's turn-off is timed and its front end is armed as a floor."""
+        """A118: phase 1's turn-off is timed and its front end is armed as a floor; C06: a slave's slotted phase 1
+        with "slave_floor" in mode P."""
+        if self.slave_floor:
+            return bool(self.st.get("mode_p"))
         return bool(self.cfg.get("lo_floor", 0)) and bool(self.st.get("lo_timed"))
 
     def latch_thr(self):
