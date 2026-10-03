@@ -13,6 +13,9 @@ Update: `epochs` passes over shuffled minibatches of the clipped surrogate
 with the gradients written out: d log pi / d mu = (a - mu) / sigma^2, d log pi / d log sigma = ((a - mu) / sigma)^2
 - 1, dL / d log pi = -rho A / n where the unclipped term is the minimum (else 0), dH / d log sigma = 1. The critic
 minimises the mean of (V - R)^2. A pass stops early when the approximate KL divergence exceeds kl_stop.
+Anchored residual policy (A127): with anchor(O) (the observations with their transient features zeroed), the mean is
+mu(o) = net(o) - net(anchor(o)), so the action is exactly zero wherever the transient features are; the gradient
+backpropagates through both evaluations (+delta and -delta).
 """
 from __future__ import annotations
 
@@ -24,13 +27,31 @@ from scb_ivr.extensions.ml_nn import MLP, Adam
 
 
 class GaussianPolicy:
-    def __init__(self, n_obs, n_act, hidden=(64, 64), log_std=-1.0, seed=0):
+    def __init__(self, n_obs, n_act, hidden=(64, 64), log_std=-1.0, seed=0, anchor=None):
         self.net = MLP([n_obs, *hidden, n_act], seed=seed)
         self.net.W[-1] *= 0.01                      # start near the zero action
         self.log_std = np.full(n_act, float(log_std))
+        self.anchor = anchor
+
+    def forward(self, O):
+        """(mean, cache) for a batch of observations."""
+        acts = self.net.forward(O)
+        if self.anchor is None:
+            return acts[-1], (acts, None)
+        acts0 = self.net.forward(self.anchor(O))
+        return acts[-1] - acts0[-1], (acts, acts0)
+
+    def backward(self, cache, d_mu):
+        acts, acts0 = cache
+        gW, gb = self.net.backward(acts, d_mu)
+        if acts0 is not None:
+            gW0, gb0 = self.net.backward(acts0, -d_mu)
+            gW = [a + b for a, b in zip(gW, gW0)]
+            gb = [a + b for a, b in zip(gb, gb0)]
+        return gW, gb
 
     def mean(self, o):
-        return self.net.predict(np.atleast_2d(o))
+        return self.forward(np.atleast_2d(o))[0]
 
     def logp(self, a, mu):
         z = (a - mu) / np.exp(self.log_std)
@@ -79,14 +100,13 @@ def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, 
         idx = rng.permutation(n)
         for k in range(0, n, mb):
             j = idx[k:k + mb]
-            acts = pol.net.forward(O[j])
-            mu = acts[-1]
+            mu, cache = pol.forward(O[j])
             sd = np.exp(pol.log_std)
             lp = pol.logp(A[j], mu)
             rho = np.exp(lp - LP0[j])
             use = rho * ADV[j] <= np.clip(rho, 1 - clip, 1 + clip) * ADV[j]
             d_lp = -np.where(use, rho * ADV[j], 0.0) / len(j)
-            gW, gb = pol.net.backward(acts, d_lp[:, None] * (A[j] - mu) / sd ** 2)
+            gW, gb = pol.backward(cache, d_lp[:, None] * (A[j] - mu) / sd ** 2)
             g_ls = np.sum(d_lp[:, None] * (((A[j] - mu) / sd) ** 2 - 1.0), axis=0) - ent
             opt_pi.step(gW + gb + [g_ls], max_norm=max_norm)
             ca = critic.forward(O[j])
@@ -99,10 +119,10 @@ def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, 
 
 
 def train(env, n_obs, n_act, iters=200, episodes=32, lr=3e-4, gamma=0.99, lam=0.95, log_std=-1.0, hidden=(64, 64), seed=0,
-          log=None, **kw):
+          log=None, anchor=None, **kw):
     """PPO from scratch. Returns (policy, critic, history of mean episode returns)."""
     rng = np.random.default_rng(seed)
-    pol = GaussianPolicy(n_obs, n_act, hidden, log_std, seed)
+    pol = GaussianPolicy(n_obs, n_act, hidden, log_std, seed, anchor)
     critic = MLP([n_obs, *hidden, 1], seed=seed + 1)
     opt_pi, opt_v = Adam(pol.params(), lr), Adam(critic.W + critic.b, lr)
     hist = []

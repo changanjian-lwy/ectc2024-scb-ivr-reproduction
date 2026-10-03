@@ -9,12 +9,17 @@ Observations (the sensor set):
   change over the last period (per 5 ns), phase 1's last turn-off current against the target (per 5 A), a constant;
 - "vin": + the input voltage sampled once per period: Vin - 48 V (per 4.8 V), its change over the period (per 0.5 V),
   and Vin minus its low-passes with 2, 8 and 32 us (per 2 V) - a hardware addition (P24 has no Vin sensing);
-- "rails": + each rail's deviation from Vin / 4 (per 2 V) - sensing the series capacitors too.
+- "rails": + each rail's deviation from Vin / 4 (per 2 V) - sensing the series capacitors too;
+- A127: "vin_ff": the Vin features and the constant only (a pure feed-forward); "vin_fb": the same as "vin".
+anchor(O) zeroes each set's transient features (ANCHOR_ZERO: every one but Vin - 48 V and the constant), for the
+anchored residual policy (ml_ppo), whose action is then zero in a steady state at any Vin.
 Action: a in R^4, scale_k = clip(1 + 0.25 a_k, 0.5, 1.25).
 Reward per period: -( e^2 / 10 (e = Vo error per 10 mV) + x / 2 + x^2 / 50 (x = max(0, largest peak - I_LIM)) +
 0.02 sum_k |rail_k - Vin / 4| (V) + sum_k (scale_k - 1)^2 ); -200 and the end if the map diverges.
 I_LIM = 178 A = 200 A / 1.125: A125's 80% band for D63's peak on rising line steps, so a D63 peak at I_LIM is a
 co-simulated peak <= 200 A at that level.
+Reward "v2" (A127): -( e^2 / 4 + x / 2 + x^2 / 50 + 0.05 sum_k |rail_k - Vin / 4| + sum_k (scale_k - 1)^2
++ 2 sum_k (scale_k - previous scale_k)^2 ); -200 on divergence.
 Fixed laws for comparison (step_law): no feed-forward; phase 1's Ton capped at the Ton that reaches I_CAP from 0 A at
 its rail, the rail from the rails themselves (oracle) or from Vin alone (V_1 ~ 3/4 of Vin's low-pass, tau 20 us).
 """
@@ -35,7 +40,9 @@ ONSET = 4
 I_LIM = 200.0 / 1.125
 I_CAP = 180.0
 TAUS = (2e-6, 8e-6, 32e-6)
-SENSORS = {"rtl": 5, "vin": 10, "rails": 14}
+SENSORS = {"rtl": 5, "vin": 10, "rails": 14, "vin_ff": 6, "vin_fb": 10}
+ANCHOR_ZERO = {"rtl": [0, 1, 2, 3], "vin": [0, 1, 2, 3, 6, 7, 8, 9], "vin_fb": [0, 1, 2, 3, 6, 7, 8, 9],
+               "rails": [0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13], "vin_ff": [1, 2, 3, 4]}
 
 
 def design(cfg_path, cs=6e-6):
@@ -74,8 +81,8 @@ def sample_dist(rng):
 
 
 class Env:
-    def __init__(self, cfg_path, sensors="vin", horizon=120):
-        self.sensors, self.horizon = sensors, horizon
+    def __init__(self, cfg_path, sensors="vin", horizon=120, reward="v1"):
+        self.sensors, self.horizon, self.reward = sensors, horizon, reward
         self.n_obs = SENSORS[sensors]
         self.warm = {}
         for f in CS_FACTORS:
@@ -98,7 +105,13 @@ class Env:
         self.lp = [self.d.vin] * len(TAUS)
         self.t_on = None
         self.recs = []
+        self.scale_prev = [1.0] * 4
         return self.obs()
+
+    def anchor(self, O):
+        O = np.array(O, float)
+        O[:, ANCHOR_ZERO[self.sensors]] = 0.0
+        return O
 
     def vin_at(self, t):
         if self.dist[0] != "line" or self.t_on is None:
@@ -107,10 +120,13 @@ class Env:
 
     def obs(self):
         s, d = self.s, self.d
+        vin = [(self.vin - 48.0) / 4.8, (self.vin - self.vin_prev) / 0.5] + [(self.vin - x) / 2.0 for x in self.lp]
+        if self.sensors == "vin_ff":
+            return np.clip(np.array(vin + [1.0]), -10.0, 10.0)
         o = [(s["vo"] - d.vref) / 0.01, (s["ton_ph1"] - self.ton_ss) / 5e-9, (s["ton_ph1"] - self.ton_prev) / 5e-9,
              (s["valley"][0] - d.i_tgt) / 5.0, 1.0]
-        if self.sensors in ("vin", "rails"):
-            o += [(self.vin - 48.0) / 4.8, (self.vin - self.vin_prev) / 0.5] + [(self.vin - x) / 2.0 for x in self.lp]
+        if self.sensors in ("vin", "rails", "vin_fb"):
+            o += vin
         if self.sensors == "rails":
             o += [(r - self.vin / 4) / 2.0 for r in rails_of(s, self.vin)]
         return np.clip(np.array(o), -10.0, 10.0)
@@ -136,7 +152,13 @@ class Env:
         x = max(0.0, max(rec["peak"]) - I_LIM)
         lad = sum(abs(r - vin / 4) for r in rec["rails"])
         act = sum((f - 1.0) ** 2 for f in scale) if scale is not None else 0.0
-        r = -(e * e / 10.0 + x / 2.0 + x * x / 50.0 + 0.02 * lad + act)
+        if self.reward == "v2":
+            sc = scale if scale is not None else [1.0] * 4
+            dact = sum((f - g) ** 2 for f, g in zip(sc, self.scale_prev))
+            self.scale_prev = list(sc)
+            r = -(e * e / 4.0 + x / 2.0 + x * x / 50.0 + 0.05 * lad + act + 2.0 * dact)
+        else:
+            r = -(e * e / 10.0 + x / 2.0 + x * x / 50.0 + 0.02 * lad + act)
         return self.obs(), r, self.k >= self.horizon, {"terminal": False, "rec": rec}
 
     def step(self, a):

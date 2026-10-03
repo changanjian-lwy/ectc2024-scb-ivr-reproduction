@@ -36,6 +36,27 @@ class Gradient(unittest.TestCase):
                 self.assertAlmostEqual((up - dn) / (2 * eps), g[idx], places=5)
 
 
+class Anchored(unittest.TestCase):
+    def test_zero_at_anchor_and_gradient(self):
+        rng = np.random.default_rng(2)
+        anchor = lambda O: np.concatenate([np.zeros((len(O), 2)), O[:, 2:]], axis=1)
+        pol = GaussianPolicy(3, 2, (8,), log_std=-0.5, seed=1, anchor=anchor)
+        pol.net.W[-1] *= 100.0
+        self.assertTrue(np.allclose(pol.mean(np.array([[0.0, 0.0, 1.0]])), 0.0))
+        O = rng.normal(size=(30, 3)); A = pol.mean(O) + 0.3 * rng.normal(size=(30, 2))
+        LP0 = pol.logp(A, pol.mean(O)) + 0.05 * rng.normal(size=30); ADV = rng.normal(size=30)
+        mu, cache = pol.forward(O); sd = np.exp(pol.log_std)
+        rho = np.exp(pol.logp(A, mu) - LP0)
+        d_lp = -np.where(rho * ADV <= np.clip(rho, 0.8, 1.2) * ADV, rho * ADV, 0.0) / 30
+        gW, _ = pol.backward(cache, d_lp[:, None] * (A - mu) / sd ** 2)
+        par, eps = pol.net.W[0], 1e-6
+        old = par[0, 0]
+        par[0, 0] = old + eps; up = surrogate(pol, O, A, LP0, ADV)
+        par[0, 0] = old - eps; dn = surrogate(pol, O, A, LP0, ADV)
+        par[0, 0] = old
+        self.assertAlmostEqual((up - dn) / (2 * eps), gW[0][0, 0], places=5)
+
+
 class Scalar:
     """x' = 0.9 x + 0.5 a + noise, reward -x^2 - 0.01 a^2, 30 steps from x ~ U(-2, 2)."""
 
