@@ -108,6 +108,14 @@ class Env:
         self.scale_prev = [1.0] * 4
         return self.obs()
 
+    def critic_obs(self, o=None):
+        """The privileged observation for an asymmetric critic (training only): the "rails" sensor set (controller
+        signals, Vin features, every rail) and phases 2-4's valleys against the target (per 5 A)."""
+        sensors, self.sensors = self.sensors, "rails"
+        c = self.obs()
+        self.sensors = sensors
+        return np.concatenate([c, np.clip([(v - self.d.i_tgt) / 5.0 for v in self.s["valley"][1:]], -10.0, 10.0)])
+
     def anchor(self, O):
         O = np.array(O, float)
         O[:, ANCHOR_ZERO[self.sensors]] = 0.0

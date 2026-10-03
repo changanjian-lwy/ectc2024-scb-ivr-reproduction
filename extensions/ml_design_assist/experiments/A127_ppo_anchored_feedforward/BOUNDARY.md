@@ -72,3 +72,27 @@ that freedom by construction.
   per-phase Ton scale, bit-identical when off) and the co-simulation of
   A124's rows, registered with A125's bands.
 - **Otherwise,** cap_vin goes to A128.
+
+## 6. Amendment (before retraining; no policy had been evaluated)
+
+**Round 1 failed to train vin_ff.** Its return fell from −364..−542 to
+−2895..−3683 over 600 iterations, and the exploration sd grew to
+0.5-0.64. vin_fb trained normally (−33..−38). See
+`a127_round1_training.json`; the round-1 policies were discarded
+unevaluated.
+
+**Cause:** the critic saw only the actor's observations. For vin_ff those
+are Vin features alone, so it cannot attribute penalties to the
+converter's state. The advantages are noise, and the sd drifts up, which
+destabilises the episodes.
+
+**Fix:**
+- **An asymmetric actor-critic** (Pinto et al. 2018):
+  - the critic sees the simulator's full state (`Env.critic_obs`: the
+    "rails" set plus phases 2-4's valleys, 17 inputs);
+  - the actor is unchanged (vin_ff: Vin only);
+  - the critic is used in training only, so it puts nothing into the RTL.
+- **The exploration sd is capped** at e^−1 (log_std ≤ −1).
+- **Both sensor sets are retrained** this way.
+
+**Criteria, checks and the decision rule are unchanged.**

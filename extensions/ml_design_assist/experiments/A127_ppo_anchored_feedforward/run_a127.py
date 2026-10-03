@@ -118,7 +118,8 @@ def _train(args):
     t0 = time.time()
     with open(LOGS / f"a127_{sensors}_s{seed}.log", "w") as f:
         pol, _, hist = train(env, env.n_obs, 4, iters=ITERS, episodes=EPISODES, lr=LR, log_std=-1.0, seed=seed,
-                             anchor=env.anchor, log=lambda s: (f.write(s + "\n"), f.flush()))
+                             anchor=env.anchor, critic_obs=lambda e, o: e.critic_obs(), n_critic=17, log_std_max=-1.0,
+                             log=lambda s: (f.write(s + "\n"), f.flush()))
     np.savez(HERE / f"a127_policy_{sensors}_s{seed}.npz", hist=np.array(hist), log_std=pol.log_std,
              **{f"W{i}": w for i, w in enumerate(pol.net.W)}, **{f"b{i}": b for i, b in enumerate(pol.net.b)})
     return f"{sensors} s{seed}: {time.time() - t0:.0f} s, return {np.mean(hist[:5]):.1f} -> {np.mean(hist[-10:]):.1f}"

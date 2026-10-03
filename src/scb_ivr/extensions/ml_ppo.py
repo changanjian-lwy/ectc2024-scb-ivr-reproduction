@@ -13,6 +13,9 @@ Update: `epochs` passes over shuffled minibatches of the clipped surrogate
 with the gradients written out: d log pi / d mu = (a - mu) / sigma^2, d log pi / d log sigma = ((a - mu) / sigma)^2
 - 1, dL / d log pi = -rho A / n where the unclipped term is the minimum (else 0), dH / d log sigma = 1. The critic
 minimises the mean of (V - R)^2. A pass stops early when the approximate KL divergence exceeds kl_stop.
+Asymmetric actor-critic (A127; Pinto et al. 2018): with critic_obs(env), the critic sees a privileged observation (the
+simulator's full state) while the actor sees only its sensors; the critic is used in training only. log_std_max caps
+the exploration noise.
 Anchored residual policy (A127): with anchor(O) (the observations with their transient features zeroed), the mean is
 mu(o) = net(o) - net(anchor(o)), so the action is exactly zero wherever the transient features are; the gradient
 backpropagates through both evaluations (+delta and -delta).
@@ -66,33 +69,35 @@ class GaussianPolicy:
         return self.net.W + self.net.b + [self.log_std]
 
 
-def collect(env, pol, critic, n_episodes, rng, gamma=0.99, lam=0.95):
-    """n_episodes rollouts with the stochastic policy. Returns arrays O, A, logp, advantages, returns and the
-    episodes' total rewards."""
-    O, A, LP, ADV, RET, totals = [], [], [], [], [], []
+def collect(env, pol, critic, n_episodes, rng, gamma=0.99, lam=0.95, critic_obs=None):
+    """n_episodes rollouts with the stochastic policy. Returns arrays O, A, logp, advantages, returns, the critic's
+    observations C (O itself without critic_obs) and the episodes' total rewards."""
+    O, A, LP, ADV, RET, C, totals = [], [], [], [], [], [], []
+    cobs = critic_obs or (lambda e, o: o)
     for _ in range(n_episodes):
         o = env.reset(rng)
-        obs, acts, lps, rews = [], [], [], []
+        obs, acts, lps, rews, cs = [], [], [], [], []
         done, info = False, {}
         while not done:
             a, lp = pol.sample(o, rng)
-            obs.append(o); acts.append(a); lps.append(lp)
+            obs.append(o); acts.append(a); lps.append(lp); cs.append(cobs(env, o))
             o, r, done, info = env.step(a)
             rews.append(r)
-        v = critic.predict(np.array(obs))[:, 0]
-        v_last = 0.0 if info.get("terminal") else float(critic.predict(np.atleast_2d(o))[0, 0])
+        v = critic.predict(np.array(cs))[:, 0]
+        v_last = 0.0 if info.get("terminal") else float(critic.predict(np.atleast_2d(cobs(env, o)))[0, 0])
         adv = np.zeros(len(rews))
         g = 0.0
         for t in range(len(rews) - 1, -1, -1):
             v_next = v[t + 1] if t + 1 < len(rews) else v_last
             g = rews[t] + gamma * v_next - v[t] + gamma * lam * g
             adv[t] = g
-        O += obs; A += acts; LP += lps; ADV += adv.tolist(); RET += (adv + v).tolist(); totals.append(float(sum(rews)))
-    return np.array(O), np.array(A), np.array(LP), np.array(ADV), np.array(RET), totals
+        O += obs; A += acts; LP += lps; ADV += adv.tolist(); RET += (adv + v).tolist(); C += cs; totals.append(float(sum(rews)))
+    return np.array(O), np.array(A), np.array(LP), np.array(ADV), np.array(RET), np.array(C), totals
 
 
-def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, ent=0.0, kl_stop=0.03, max_norm=0.5):
-    O, A, LP0, ADV, RET = batch
+def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, ent=0.0, kl_stop=0.03, max_norm=0.5,
+           log_std_max=None):
+    O, A, LP0, ADV, RET, C = batch
     ADV = (ADV - ADV.mean()) / (ADV.std() + 1e-8)
     n = len(O)
     sd = None
@@ -109,7 +114,9 @@ def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, 
             gW, gb = pol.backward(cache, d_lp[:, None] * (A[j] - mu) / sd ** 2)
             g_ls = np.sum(d_lp[:, None] * (((A[j] - mu) / sd) ** 2 - 1.0), axis=0) - ent
             opt_pi.step(gW + gb + [g_ls], max_norm=max_norm)
-            ca = critic.forward(O[j])
+            if log_std_max is not None:
+                np.minimum(pol.log_std, log_std_max, out=pol.log_std)
+            ca = critic.forward(C[j])
             gW, gb = critic.backward(ca, 2.0 * (ca[-1] - RET[j][:, None]) / len(j))
             opt_v.step(gW + gb, max_norm=max_norm)
         kl = float(np.mean(LP0 - pol.logp(A, pol.mean(O))))
@@ -119,15 +126,15 @@ def update(pol, critic, opt_pi, opt_v, batch, rng, epochs=10, mb=256, clip=0.2, 
 
 
 def train(env, n_obs, n_act, iters=200, episodes=32, lr=3e-4, gamma=0.99, lam=0.95, log_std=-1.0, hidden=(64, 64), seed=0,
-          log=None, anchor=None, **kw):
+          log=None, anchor=None, critic_obs=None, n_critic=None, **kw):
     """PPO from scratch. Returns (policy, critic, history of mean episode returns)."""
     rng = np.random.default_rng(seed)
     pol = GaussianPolicy(n_obs, n_act, hidden, log_std, seed, anchor)
-    critic = MLP([n_obs, *hidden, 1], seed=seed + 1)
+    critic = MLP([n_critic or n_obs, *hidden, 1], seed=seed + 1)
     opt_pi, opt_v = Adam(pol.params(), lr), Adam(critic.W + critic.b, lr)
     hist = []
     for it in range(iters):
-        *batch, totals = collect(env, pol, critic, episodes, rng, gamma, lam)
+        *batch, totals = collect(env, pol, critic, episodes, rng, gamma, lam, critic_obs)
         info = update(pol, critic, opt_pi, opt_v, batch, rng, **kw)
         hist.append(float(np.mean(totals)))
         if log and (it % 10 == 0 or it == iters - 1):

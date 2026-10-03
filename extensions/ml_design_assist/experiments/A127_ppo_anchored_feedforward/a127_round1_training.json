@@ -1,0 +1,12 @@
+{
+ "round": 1,
+ "critic": "same observations as the actor",
+ "train_summary": [
+  "vin_ff s0: 516 s, return -364.5 -> -3023.1",
+  "vin_ff s1: 521 s, return -542.3 -> -3683.3",
+  "vin_ff s2: 515 s, return -540.0 -> -2894.6",
+  "vin_fb s0: 497 s, return -358.3 -> -33.0",
+  "vin_fb s1: 461 s, return -543.9 -> -37.0",
+  "vin_fb s2: 468 s, return -570.4 -> -38.2"
+ ]
+}
