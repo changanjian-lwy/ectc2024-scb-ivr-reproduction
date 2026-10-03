@@ -47,8 +47,16 @@ turn-off (comparator / timed); 60 kHz loop; 1 MHz, 10%.
        88.8 to 45 ns at once, so the valleys pass the threshold. The
        5× faster ladder and the 60 kHz loop then oscillate with a
        ~15 µs period. It settles by ~1500 µs.
-     - D63 predicted this coupling for fast large transients at 3 µF
-       (it "diverges"). The handover is such a transient.
+     - **D63 does not explain it** (checked after the runs).
+       - From the handover's true state, its ladder near balance and Vo
+         1.070 V, the map gives 149 A and no oscillation.
+       - The sections sample C1 at its in-cycle low. At 3 µF that is
+         ~1 V under the mean, the same in steady state (34.55 against
+         34.77 V at the handover).
+       - Fed those samples as the ladder, the map diverges, but for the
+         wrong reason.
+       - **The in-cycle ripple, which D63 does not model, is the likely
+         cause. Open.**
    - **A fast rising step with the comparator also runs away**
      (+4.8 V / 5 µs: 282 A, 249 late fires, not recovered), as D63
      predicted.
@@ -121,8 +129,9 @@ No overlap in any run.
 
 1. **Refit D63's outcome rule** (0.1) and register it for the next
    test.
-2. **A Cs sweep in D63** (5-10 µF) for the window between the 15 µF
-   line-step peaks and the 3 µF handover, with the handover modelled:
-   mode S's final Vo and the PI's first cut.
+2. **The 3 µF handover** needs the co-simulation (D63 cannot see it).
+   - Try a handover at Vo ≈ 1.0 V (A103's rule: mode S's Ton at the
+     loaded value).
+   - Try a Cs between 3 and 15 µF.
 3. **A118: the floor turn-off** (an RTL option), on the Cs D63 picks:
    load steps, line steps and the start-up.

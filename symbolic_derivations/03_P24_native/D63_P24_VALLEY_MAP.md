@@ -178,9 +178,18 @@ the others. The exception is the timed 60 kHz design on 1 µs steps.
 **It is fitted after the runs; the next test must register it.**
 
 **Confirmed:**
-- Cs 3 µF couples the faster ladder with the loop in large fast
-  transients. The handover oscillates for ~1.1 ms to 517 A, and a
-  +4.8 V / 5 µs step runs away with the comparator.
+- At 3 µF, a +4.8 V / 5 µs step runs away with the comparator, as the
+  map diverges.
+- The falling 1 µs step, where it also diverges, does not run away
+  (208 A).
+
+**Not explained:** the 3 µF handover's ~1.1 ms oscillation to 517 A.
+- `handover()` from the true state (the ladder near balance, Vo
+  1.070 V) gives 149 A.
+- The co-simulation's section samples put C1 ~1 V low at 3 µF: its
+  in-cycle low, as in steady state. They are not the ladder's mean and
+  must not be fed to the map.
+- The in-cycle ripple, not in the map, is the likely cause.
 - The comparator's rising-step failure at 15 µF does not end with
   slower slews (225 A at 50 µs).
 

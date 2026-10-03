@@ -225,6 +225,25 @@ def simulate(d: Design, t_end, t_step, i_step=0.0, dvin=0.0, t_slew=0.0, ton0=No
     return out
 
 
+def handover(d: Design, t_end, vo0, vcs0, ton0, valley0=None):
+    """Mode P from mode S's final state (A103's handover): Vo, the series capacitors and Ton as mode S left them, the
+    valleys at the target unless given; the comparator turn-off (the RTL learns for lo_learn turn-offs before a timed
+    one). Records from t = 0 (the handover)."""
+    m = ValleyMap(replace(d, mode="cmp"))
+    s = m.init_state(ton0)
+    s["vo"], s["vc"] = vo0, list(vcs0)
+    if valley0 is not None:
+        s["valley"] = list(valley0)
+    out = []
+    while s["t"] < t_end:
+        rec = m.period(s, d.vin, 0.0)
+        out.append(rec)
+        if not all(math.isfinite(x) and abs(x) < DIVERGED_A for x in rec["valley"] + rec["peak"]):
+            rec["diverged"] = True
+            break
+    return out
+
+
 def metrics(recs, t_step, vref=1.0, band=0.01):
     """Vo's extreme after the step (mV) and the last exit from vref +/- band (us); per phase the valley range after the
     step, the deepest crossing (A) and the number of periods with a crossing; the largest peak (A)."""
