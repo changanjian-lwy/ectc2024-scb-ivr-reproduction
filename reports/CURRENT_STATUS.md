@@ -1209,6 +1209,24 @@ each question:
          - **From now on** each boundary registers the conformal band
            (Mondrian and signed, 80%) next to D63's point; the hand
            ±10% is retired.
+     50. Vin feed-forward for rising line steps:
+         [A126](../extensions/ml_design_assist/experiments/A126_ppo_line_feedforward/RESULTS.md),
+         [A127](../extensions/ml_design_assist/experiments/A127_ppo_anchored_feedforward/RESULTS.md),
+         [A128](../extensions/ml_design_assist/experiments/A128_cosim_vin_feedforward/RESULTS.md)
+         (extension `ml_design_assist`).
+         - **A126:** PPO policies gamed the reward (steady state
+           shifted); invalid.
+         - **A127:** anchored pure feed-forward (asymmetric critic)
+           passes the steady and long checks 3/3; distilled to a
+           6-parameter falling-step rule (Ton from phases 4, 2-3 to
+           phase 1 while Vin falls).
+         - **A128 (cosim, 2.5 MHz, RTL `scb_vff.v`, opt-in cfg "vff"):**
+           every A124 row <= 200 A (worst 188 A): +4.8 V 1/5 µs
+           181.5/175.4 A, −4.8 V 1 µs 175.5 A; steady state and loads
+           unchanged; vff off bit-identical.
+         - **Cost:** −8 V / 10 µs peak 168.5 → 188.2 A, Vo −28 → +38 mV
+           (registered no-harm Vo criterion misses). Bus-slew spec
+           (≥ 5 µs) stays. **Next:** A129 gates the term by Vin's slope.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

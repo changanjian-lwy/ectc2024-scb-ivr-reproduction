@@ -32,6 +32,9 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
 | [A121](experiments/A121_gp_residual_active/RESULTS.md) | Gaussian process | the residual co-simulation − D63 with its uncertainty; choosing the next co-simulation runs (active learning) | **done:** all criteria met; registered before A118 ran, it predicted A118 with MAE 9.7 A (D63 10.5) and 92% coverage. With 37 points, active learning reduces to space-filling |
 | [A122](experiments/A122_rl_turn_off_policy/RESULTS.md) | reinforcement learning (policy gradient) | phase 1's turn-off decided per period in the D63 environment, against the hand rules (comparator, timed, floor) | **done:** REINFORCE rediscovers the floor (return −30.5 = always-floor; timed −54.5, comparator −152.8) |
 | [A125](experiments/A125_conformal_registration/RESULTS.md) | conformal prediction (split, signed, Mondrian, adaptive) | distribution-free bands around D63's registered predictions, tested in run order on 43 registered rows | **done:** peak coverage 74% (S) / 82% (signed) at nominal 80%; the hand ±10% was a 76% band; finds D63's second weak domain (−8 V / 10 µs at 1 MHz, +18-22%). Bands are registered from the next experiment on |
+| [A126](experiments/A126_ppo_line_feedforward/RESULTS.md) | reinforcement learning (PPO) | line-step feed-forward learned in the D63 environment | **invalid:** the policies gamed the reward (steady state shifted) |
+| [A127](experiments/A127_ppo_anchored_feedforward/RESULTS.md) | PPO, anchored pure feed-forward (asymmetric critic) | the same task with the steady state anchored; distilled to a 6-parameter falling-step rule | **done:** 3/3 pass steady and long checks |
+| [A128](experiments/A128_cosim_vin_feedforward/RESULTS.md) | co-simulation of the distilled rule (RTL `scb_vff.v`, cfg "vff") | 2.5 MHz, the A124 rows | **done:** every row <= 200 A (worst 188 A); cost: -8 V/10 us peak 168.5 -> 188.2 A, Vo -28 -> +38 mV |
 
 ## Code
 
@@ -46,6 +49,11 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
   signed, Mondrian, adaptive); tested in
   `tests/extensions/test_ml_conformal.py` against the finite-sample
   guarantee.
+- `src/scb_ivr/extensions/ml_ppo.py`: Gaussian policy and PPO.
+- `src/scb_ivr/extensions/ml_rl_ff.py`: the line-step environment
+  (sensors rtl | vin | rails) and its fixed laws.
+- `src/scb_ivr/cosim/rtl/scb_vff.v`: the Vin feed-forward (opt-in, off =
+  bit-identical).
 
 ## What the three found together
 
