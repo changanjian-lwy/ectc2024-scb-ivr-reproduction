@@ -1,4 +1,4 @@
-# Trade-off map - the P24 module and system, through A118, D63 and A120-A122
+# Trade-off map - the P24 module and system, through A119, D63 and A120-A122
 
 2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
@@ -81,7 +81,7 @@ quantity, **the valley margin**:
 | −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ | +34.9 mV, 26 µs, **201 A** ✗ (by 1 A) |
 | +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs | **206 A** ✗ (by 6 A), no runaway |
 | ±4.8 V / 5 µs, peak | - | - | - | - | 201 A ✗ (−4.8 V, A117) | **191 / 193 A** |
-| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) | not run (0.00) |
+| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) | 0.14-0.17 A (0.00) |
 | start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A | 157 A |
 
 **Notes:**
@@ -110,6 +110,12 @@ quantity, **the valley margin**:
    - The 1 µs steps miss by 1 and 6 A.
    - Three independent routes pointed to it before A118 ran: D63's map,
      A120's surrogate search, and A122's reinforcement learning.
+   - **On the full standard matrix (A119)** it passes:
+     - every driver row (j30 sd 0.17 A, 0.01 over);
+     - ±25 A; the 10 µs line steps.
+     - **Misses:** −8 V / 10 µs at 205 A, and the 1 µs steps.
+     - **At 40 V input the floor also removes the low-line limit cycle**
+       (the target is past the threshold there).
 
 ## 3. The trade-offs
 
@@ -276,13 +282,15 @@ trade-off.
 | Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |
 | a smaller node (P24 Sec. IV's 1 + 2 devices) | I_th falls (D57: 9.5-12.8% at 1 MHz), so the margin grows at the same i_neg | T12; not yet run |
 | a hotter junction (125 C) | R_on ×1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
+| the gate drivers' high-to-low mismatch can exceed the node's fall (~1-2 ns) | budget ~0.25 points per ns at 1 MHz: +3.4 ns cost 0.85 points (A119 m3p) | driver (A91, A119) |
 | more modules | interleave per C02; slaves tolerate ±10% L | T17 |
 
 ## 8. Not yet known
 
 - **The transient valley-excursion model** (Section 4's open link).
 - **At 1 MHz:**
-  - the standard matrix for the A118 candidate (driver mismatch, jitter, ±25 A, −8 V / 10 µs);
+  - the candidate's last misses (1 µs steps, −8 V / 10 µs: 1-6 A over 200 A): floor depth, fc up to ~68 kHz, a line-dependent target;
+  - four modules at 1 MHz with the candidate;
   - the floor depth (2 A, not optimised) and the load-decrease recovery (32-47 µs, slower than D63's 18 µs);
   - the neighbourhood of the candidate (A121's 8 proposed runs);
   - D63's refitted outcome rule, registered and tested;
@@ -336,7 +344,14 @@ trade-off.
 
 这个方案先后由三条独立路径找到：D63 的设计图、神经网络代理模型的搜索（A120）、强化学习（A122）。然后 cosim 证实。
 
-**下一步：** 对候选设计跑标准矩阵（驱动失配、抖动、±25 A、−8 V/10 µs）。
+**A119：候选设计跑完了整个标准矩阵。**
+- 驱动失配、抖动、±25 A、10 µs 的线电压阶跃都通过；
+- 剩下 −8 V/10 µs（205 A）和 1 µs 快阶跃（201/206 A）各超几安培；
+- 输入降到 40 V 时，地板还消除了低输入下的极限环。
+
+**下一步：**
+1. 用地板深度、电压环带宽（最高约 68 kHz）把最后几安培压下来；
+2. 1 MHz 的四模块系统。
 
 **以后怎么调：** 先定两件事，其余跟着走。
 1. **电感工艺：** 决定选哪个频率。

@@ -40,6 +40,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A116": (TA / "A116_p24_one_mhz_transients", "a116_analyze.py", "a116_summary.json"),
     "A117": (TA / "A117_p24_one_mhz_line_slew_cs", "a117_analyze.py", "a117_summary.json"),
     "A118": (TA / "A118_p24_floor_turn_off", "a118_analyze.py", "a118_summary.json"),
+    "A119": (TA / "A119_p24_one_mhz_candidate_matrix", "a119_analyze.py", "a119_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -134,6 +135,8 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
     "A118": {**{(r, "back_30us"): "the floor's load-decrease recovery is slower than D63's (31.8 / 46.8 against 17.6 us) (RESULTS 0.1)"
                 for r in ("f6_s_m62", "f15_s_m62")},
              ("f15_l_m48_5us", "peak_10pct_d63"): "211 against D63's 187 A (+13%) at 15 uF (RESULTS 0.4)"},
+    "A119": {("j30", "sd_0.16A"): "0.17 against 0.16 A (RESULTS 0.1)",
+             ("l_m80_10us", "peak_200a"): "205 A on the step to 40 V; no limit cycle (RESULTS 0.1, 0.2)"},
 }
 
 

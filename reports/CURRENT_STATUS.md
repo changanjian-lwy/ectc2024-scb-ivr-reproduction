@@ -1156,6 +1156,19 @@ each question:
            error bars (92%).
          - **Next:** the standard matrix for the candidate.
 
+     46. The candidate on the standard matrix:
+         [A119](../experiments/track_A_periodic_steady_state/A119_p24_one_mhz_candidate_matrix/RESULTS.md).
+         - **Passes:** driver mismatch and jitter (j30 sd 0.17 A, 0.01
+           over), ±25 A, ±4.8 V / 10 µs.
+         - **Misses:** −8 V / 10 µs at 205 A; with A118's 1 µs steps,
+           the misses are all 1-6 A over 200 A.
+         - **The floor also removes the low-line limit cycle at 40 V**,
+           where the target sits past the threshold.
+         - **A +3.4 ns driver mismatch costs 0.85 points** (reverse
+           conduction 2.4 W; dtl cannot go below 0).
+         - **Next:** the last amps (floor depth, fc), then four modules at
+           1 MHz.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
