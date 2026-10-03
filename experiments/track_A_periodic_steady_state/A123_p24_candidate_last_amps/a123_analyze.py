@@ -45,9 +45,12 @@ def main():
             c[f"no_overlap_{row}"] = d["overlaps"] == 0
             c[f"no_runaway_{row}"] = late <= 100 and pk <= 400.0
             peaks.append(pk)
+        res[f"{v}_n0"] = {**x["n0"], "criteria": {k: c[k] for k in ("no_overlap_n0", "startup_200a", "efficiency_0p1")}}
+        for row, st in x["steps"].items():
+            res[f"{v}_{row}"] = {**st, "criteria": {k: c[f"{k}_{row}"] for k in ("no_overlap", "no_runaway")}}
         c["closes_all_le_200a"] = all(pk <= 200.0 for pk in peaks)
+        res[f"{v}_closes"] = {"peaks_a": peaks, "criteria": {"closes_all_le_200a": c["closes_all_le_200a"]}}
         x["criteria"] = c
-        res[v] = x
         print(f"{v}: start-up {x['n0']['startup_ipk_a']:.0f} A, efficiency {x['n0']['efficiency_pct']:.2f}% (f6 {f6['efficiency_pct']:.2f}); "
               + "; ".join(f"{row} {s['peak_after_a']:.0f} A (f6 {s['f6_peak_a']}, D63 {s['d63_peak_a']:.0f}), {s['extreme_mv']:+.1f} mV, back {s['back_us']:.1f} us, late {s['late']}"
                           for row, s in x["steps"].items()))
