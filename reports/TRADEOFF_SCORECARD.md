@@ -265,6 +265,7 @@ trade-off.
 | only high-R/L inductors | 5 MHz, i_neg 15-20% | T8 optimum; margin 8-14 A |
 | the transient specification tightens | lower i_neg (more margin), or the comparator turn-off plus a bus slew limit | T12, T13 |
 | the timed turn-off is kept | keep the margin above ~1 A at the lowest input voltage (I_th ∝ the rail) | T12 (A116 t30 at 43.2 V) |
+| a bus slew of ≥ 5 µs can be specified | at 1 MHz: the floor rule with Cs ~5-8 µF; at 10% D63 finds most of that region feasible (A120's surrogate search, D63-checked; the 3 µF handover excluded by A117) | T13, T15, T18 (A120) |
 | fast line steps must be met at 1 MHz | a Cs inside the window (between 3 and 15 µF: D63 maps the line steps, the co-simulation the handover), with a softer handover; and the floor turn-off for the falling steps. A slew limit alone does not save the comparator's rising steps (A117: 225 A at 50 µs). | T13, T15, T18 |
 | the bus slew is limited to ≲ 2.4 V/µs | the +4.8 V / 1 µs peak stops binding | T18 |
 | Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |

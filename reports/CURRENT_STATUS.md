@@ -1120,6 +1120,23 @@ each question:
          - **Next:** a Cs window and a softer handover in D63; A118, the
            floor turn-off.
 
+     44. Machine learning as an extension
+         ([ml_design_assist](../extensions/ml_design_assist/README.md),
+         asked for 2026-10-03):
+         - **A120:** a numpy MLP surrogate of D63, every registered target
+           met (test peak MAE 2.0 A; co-simulation error 8.7 against
+           D63's 9.2 A; 11 000× faster).
+         - **Its search of 100 000 designs:**
+           - at 1 MHz the 1 µs line step is binding;
+           - with a bus slew ≥ 5 µs, the floor rule with Cs ≲ 8 µF is
+             feasible in most of its range;
+           - the comparator never is.
+         - **Optimising on the surrogate selects its errors** (+7 A at
+           the optimum), so every choice is re-checked by D63 and the
+           co-simulation.
+         - **Next:** A121 (Gaussian-process residual, active learning),
+           A122 (a policy-gradient turn-off rule).
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
