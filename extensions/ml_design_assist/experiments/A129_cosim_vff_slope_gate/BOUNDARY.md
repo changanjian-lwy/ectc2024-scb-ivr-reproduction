@@ -38,7 +38,9 @@ cores) + unit tests + full regression, ~45 min.
 5. **Matrix, both arms:** no overlap or runaway; peak ≤ 200 A; per phase, HS turn-on V_DS within ±0.5 V of the arm's n0
    and LS turn-on V_DS ≤ 0 in the m rows (A112); j30 turn-off sd ≤ 0.5 A per phase (A115); ±25 A back within 1% in
    ≤ 60 µs (A115).
-6. **Matrix, gated vs off, per row:** peak ±3 A; load rows' Vo extreme ±3 mV; HS turn-on V_DS ±0.1 V; turn-off sd ±20%.
+6. **Matrix, gated vs off, per row:** peak ±3 A; load rows' Vo extreme ±3 mV; HS turn-on V_DS ±0.1 V; turn-off sd
+   ±20% or ±0.05 A, whichever is larger (amended before the stage 2 runs: without jitter the sd is ~0.01 A, where
+   ±20% is numerical noise).
 
 ## 3. Predictions (D63 with the RTL law; A125 bands at 80%, peak in A)
 | row | D63 gated (A128, none) | M80 | G80 | D63 Vo, mV | cosim expectation |
