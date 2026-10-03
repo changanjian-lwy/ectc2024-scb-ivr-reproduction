@@ -1,4 +1,4 @@
-# Trade-off map - the P24 module and system, through A117 and D63
+# Trade-off map - the P24 module and system, through A118, D63 and A120-A122
 
 2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
@@ -67,21 +67,22 @@ quantity, **the valley margin**:
 
 ## 2. The design points, scored on one table
 
-| metric | **5 MHz, 5%, I2** (adopted: A105/C02) | 5 MHz, 20%, I2 (A110/A112) | 5 MHz, 25%, comparator (A114 c25) | 1 MHz, 10%, I2, 60 kHz (A115) | **1 MHz, 10%, comparator, 60 kHz** (A116 c60) |
-|---|---|---|---|---|---|
-| **valley margin** I_th − i_neg (at 43.2 / 48 V) | 27.1 A | 8.4 A | 2.1 A | 0.95 / **2.4 A** | 0.95 / 2.4 A |
-| high-side turn-on V_DS | 8.9-9.1 V | 2.2-3.0 V | −0.13-+0.88 V | 0.9-1.9 V | 0.85-1.86 V |
-| hard turn-on loss | 8.93 W | 0.66 W | ~0 | 0.05 W | 0.04 W |
-| **efficiency, D62 middle / ideal inductor** | 87.92 / 88.74% | **90.17 / 91.18%** | 90.15 / ~91.2% | 88.98 / **93.57%** | 88.97 / 93.57% |
-| inductor copper (middle R/L) | 2.64 W | 3.05 W | 3.23 W | **13.78 W** | 13.8 W |
-| **ripple per phase, peak − valley** | 140.6 A | 177.3 A | 190.0 A | 152.7 A | 152.9 A |
-| output current pk-pk (one module) | 100.9 A | 122.6 A | 133.7 A | 107.8 A | 108.2 A |
-| Vo ripple (Co 4.672 mF) | 0.19 mV | 0.27 mV | 0.31 mV | 1.00 mV | 1.00 mV |
-| ±62.5 A load step | +11.6 / −14.7 mV, ≤ 10 µs | within the 5% design's | ≤ 11 µs | −19.9 mV / 13.7 µs; **−62.5 A runs away** | +28.0 / −28.6 mV, 16 / 22 µs |
-| −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ |
-| +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs |
-| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) |
-| start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A |
+| metric | **5 MHz, 5%, I2** (adopted: A105/C02) | 5 MHz, 20%, I2 (A110/A112) | 5 MHz, 25%, comparator (A114 c25) | 1 MHz, 10%, I2, 60 kHz (A115) | 1 MHz, 10%, comparator, 60 kHz (A116 c60) | **1 MHz, 10%, I2 + floor, Cs 6 µF** (A118 f6, the 1 MHz candidate) |
+|---|---|---|---|---|---|---|
+| **valley margin** I_th − i_neg (at 43.2 / 48 V) | 27.1 A | 8.4 A | 2.1 A | 0.95 / **2.4 A** | 0.95 / 2.4 A | 0.95 / 2.4 A, but phase 1 held at the floor |
+| high-side turn-on V_DS | 8.9-9.1 V | 2.2-3.0 V | −0.13-+0.88 V | 0.9-1.9 V | 0.85-1.86 V | 1.17-2.36 V |
+| hard turn-on loss | 8.93 W | 0.66 W | ~0 | 0.05 W | 0.04 W | 0.05 W |
+| **efficiency, D62 middle / ideal inductor** | 87.92 / 88.74% | **90.17 / 91.18%** | 90.15 / ~91.2% | 88.98 / **93.57%** | 88.97 / 93.57% | 88.97 / 93.57% |
+| inductor copper (middle R/L) | 2.64 W | 3.05 W | 3.23 W | **13.78 W** | 13.8 W | 13.8 W |
+| **ripple per phase, peak − valley** | 140.6 A | 177.3 A | 190.0 A | 152.7 A | 152.9 A | 153.7 A |
+| output current pk-pk (one module) | 100.9 A | 122.6 A | 133.7 A | 107.8 A | 108.2 A | 109.2 A |
+| Vo ripple (Co 4.672 mF) | 0.19 mV | 0.27 mV | 0.31 mV | 1.00 mV | 1.00 mV | 1.01 mV |
+| ±62.5 A load step | +11.6 / −14.7 mV, ≤ 10 µs | within the 5% design's | ≤ 11 µs | −19.9 mV / 13.7 µs; **−62.5 A runs away** | +28.0 / −28.6 mV, 16 / 22 µs | +25.6 / −19.1 mV, 32 / 13 µs |
+| −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ | +34.9 mV, 26 µs, **201 A** ✗ (by 1 A) |
+| +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs | **206 A** ✗ (by 6 A), no runaway |
+| ±4.8 V / 5 µs, peak | - | - | - | - | 201 A ✗ (−4.8 V, A117) | **191 / 193 A** |
+| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) | not run (0.00) |
+| start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A | 157 A |
 
 **Notes:**
 - **"I2":** A105's timed phase-1 turn-off; **"comparator":** A105's I1.
@@ -102,9 +103,13 @@ quantity, **the valley margin**:
      ladder is also 5× slower (Cs 15 µF).
 3. **The column with 8.4 A passes everything but the line-step edges
    (199-204 A).**
-4. **At 1 MHz the comparator turn-off (A116 c60) fixes the load steps
-   at no steady-state cost.** It is the provisional 1 MHz controller.
-   Its open limit is the fast line step.
+4. **At 1 MHz the timed turn-off with a comparator floor and Cs 6 µF
+   (A118) is the candidate.**
+   - It meets the load steps and the ±4.8 V steps over ≥ 5 µs at no
+     steady-state cost.
+   - The 1 µs steps miss by 1 and 6 A.
+   - Three independent routes pointed to it before A118 ran: D63's map,
+     A120's surrogate search, and A122's reinforcement learning.
 
 ## 3. The trade-offs
 
@@ -127,9 +132,9 @@ Loop risk: whether fixing it tends to undo another.
 | **T8** | **High-side turn-on voltage ↔ circulating current ↔ ripple** (L2) | 5 MHz (A110): 5% → 20% saves 8.3 W of hard turn-on, costs +1.9 W of conduction and +26% ripple (140.6 → 177.3 A). The optimum is 20%: 90.17%. Zero voltage at 25%, +35% ripple. 1 MHz (A115): 10% gives 0.05 W at +8.6% ripple. | open: 20% robust at 5 MHz; 1 MHz pending A116 | feeds T12 |
 | T9-T11 | **Auxiliary commutation branch** (extension) | saves 2.6-3.4 W net at 5% (A102); +10-12% switch area | open, outside the reproduction | `extensions/aux_commutation_branch/README.md` |
 | **T12** | **Valley margin ↔ timing robustness** (L2 with L1) | **The unifying limit.** Margin ≤ 2.5 A fails transients: A112 p25 (2.1 A: −62.5 A step 183 µs, falling line 182 µs); A115 n10 (2.4 A: −62.5 A runaway, 554 A); A115 n12p5 (−0.6 A: ±45 mV oscillation until the turn-off is timed). Margin 8.4 A (A112 p20) passes except the line-step edges. Margin 27 A (5%) passes everything but +4.8 V / 1 µs. A111's zero-voltage valley measurement, a fix by measurement, is falsified. **A116 confirms the trigger (H1):** with a 30 kHz loop the timed design's valleys still reach −54 A; the loop's speed decides only between a runaway and a slow oscillation. A short ~3 A crossing (c60, +62.5 A) is tolerated. **The margin moves with the input** (D57: I_th 13.45 / 14.90 / 16.32 A at 43.2 / 48 / 52.8 V). The timed design needs more than ~1 A at the lowest input (t30 at 43.2 V: ±18 mV limit cycle); the comparator design does not. | **open: the binding constraint** | **the loop closes here** (Section 4) |
-| **T13** | **Timed ↔ comparator phase-1 turn-off in transients** (L5) | Mirror failures at large i_neg. Timed: phase 1's valley rises on falling steps and deepens on load decreases (A112, A115). Comparator: phase 1 stays at its boundary, stretches on rising steps, and the slotted phases follow its period (A114: 246-290 A). dlo feed-forward k = 11 fixes load steps but wrecks line steps (A113). | **1 MHz: comparator** (A116: the load steps need it; timed runs away). Both fail the 1 µs line steps at 1 MHz. | **high:** fixing one direction breaks the other; needs an architecture change (each phase on its own boundary) or a slew limit |
+| **T13** | **Timed ↔ comparator phase-1 turn-off in transients** (L5) | Mirror failures at large i_neg. Timed: phase 1's valley rises on falling steps and deepens on load decreases (A112, A115). Comparator: phase 1 stays at its boundary, stretches on rising steps, and the slotted phases follow its period (A114: 246-290 A). dlo feed-forward k = 11 fixes load steps but wrecks line steps (A113). | **1 MHz: resolved by the floor** (A118). The timed edge stays, and a comparator floor 2 A below the target stops phase 1's valley at −14.5 A. The load decrease and falling steps no longer break the timing (no floor: 671 A runaway, A118 t6). Found by D63, the A120 search and A122's RL; confirmed in the co-simulation. | **high:** fixing one direction breaks the other; needs an architecture change (each phase on its own boundary) or a slew limit |
 | **T14** | **Switching frequency ↔ inductor ↔ loop** (L1) | 5 → 1 MHz (A115): switching losses 16.84 → 1.59 W; I_th 33.4 → 14.9 A; inductor copper 2.64 → 13.78 W (middle R/L); Vo ripple ×5 (Co unchanged); loop ceiling 100 → 60 kHz. **Break-even (D62, measured waveforms):** 1 MHz 10% beats 5 MHz 5% below 103 µΩ/nH (0.75 mΩ per phase at 7.33 nH), and 5 MHz 20% below 51 µΩ/nH (0.38 mΩ). | open: rests on the inductor's R/L | medium |
-| **T15** | **Cs: switching quality ↔ ladder speed ↔ large-transient stability** (L3) | A107 at 5 MHz: 0.6 µF costs ~1 V of high-side turn-on (Q/Cs 1.8 V); 8.7 µF raises the start-up to 215 A and fast line steps to 244 A. The fix is a parameter: the input ramp ∝ √(L Cs). At 1 MHz, Cs ×5 keeps Q/Cs, but the ladder relaxes 5× slower (τ ∝ Cs). | resolved at 5 MHz: Q/Cs ≈ 3% of the rail, ramp ∝ √(L Cs). **Reopened at 1 MHz:** A116's 1 µs line steps fail in both directions while V_Cs1 takes ~15 µs to follow. **A117 at 1 MHz: 3 µF passes the fast line steps** (timed +4.8 V / 1 µs 188 A; comparator +4.8 V / 20 µs 174 A). The efficiency is unchanged, and the in-cycle ripple moves the turn-ons ±1 V. **But the 5× faster ladder couples with the loop in large fast transients:** the handover oscillates ~1.1 ms to 517 A (not reproduced by D63: the in-cycle ripple is suspected), and a 5 µs rising step runs away with the comparator (D63 predicted it). So Cs has a window: too large, slow ladder; too small, unstable large transients. | **high at 1 MHz:** the window, and the handover's softness, are the next design variables |
+| **T15** | **Cs: switching quality ↔ ladder speed ↔ large-transient stability** (L3) | A107 at 5 MHz: 0.6 µF costs ~1 V of high-side turn-on (Q/Cs 1.8 V); 8.7 µF raises the start-up to 215 A and fast line steps to 244 A. The fix is a parameter: the input ramp ∝ √(L Cs). At 1 MHz, Cs ×5 keeps Q/Cs, but the ladder relaxes 5× slower (τ ∝ Cs). | resolved at 5 MHz: Q/Cs ≈ 3% of the rail, ramp ∝ √(L Cs). **Reopened at 1 MHz:** A116's 1 µs line steps fail in both directions while V_Cs1 takes ~15 µs to follow. **A117 at 1 MHz: 3 µF passes the fast line steps** (timed +4.8 V / 1 µs 188 A; comparator +4.8 V / 20 µs 174 A). The efficiency is unchanged, and the in-cycle ripple moves the turn-ons ±1 V. **A118: 6 µF is inside the window** (start-up 157 A; ±4.8 V / 5 µs 191 / 193 A with the floor; 15 µF reaches 211 / 241 A). **The 3 µF failure:** the 5× faster ladder couples with the loop in large fast transients: the handover oscillates ~1.1 ms to 517 A (not reproduced by D63: the in-cycle ripple is suspected), and a 5 µs rising step runs away with the comparator (D63 predicted it). So Cs has a window: too large, slow ladder; too small, unstable large transients. | **high at 1 MHz:** the window, and the handover's softness, are the next design variables |
 | **T16** | **Slotted phases ↔ their own valley** (L6) | Phases 2-4 have no correction from their own current. Input drift costs phases 3-4 zero voltage (A108: falling ≥ 0.1 V/µs), and slaves' valleys float with R spread (C04: ±2.2 A). The per-phase valley trim of the slot is falsified (A109: the slot does not control the valley; it winds up). | open | high: the same gap behind T13's comparator failure |
 | **T17** | **Interleave ↔ slave valleys** (L8) | Uniform T/16 (C02) cuts the 16-phase output ripple ×5 pk-pk and ×7 rms. Slaves run at the master's timing, so ±10% L in a slave costs ±9% sharing and +0.5 V of turn-on, and stays soft-switched (C03). | resolved: `slot_lo`, ±10% L tolerated | low |
 | **T18** | **Input slew ↔ peak and soft switching** (environment) | The 200 A limit holds from 2.4 V/µs rising; zero-voltage valleys need ≤ 0.24 V/µs rising, and falling fails even at 0.096 V/µs (A108). | open: needs the bus specification. At 1 MHz 4.8 V/µs fails every variant (A116); the tolerated slew is A117's question. | coupled to T13, T15 and T16 |
@@ -265,7 +270,7 @@ trade-off.
 | only high-R/L inductors | 5 MHz, i_neg 15-20% | T8 optimum; margin 8-14 A |
 | the transient specification tightens | lower i_neg (more margin), or the comparator turn-off plus a bus slew limit | T12, T13 |
 | the timed turn-off is kept | keep the margin above ~1 A at the lowest input voltage (I_th ∝ the rail) | T12 (A116 t30 at 43.2 V) |
-| a bus slew of ≥ 5 µs can be specified | at 1 MHz: the floor rule with Cs ~5-8 µF; at 10% D63 finds most of that region feasible (A120's surrogate search, D63-checked; the 3 µF handover excluded by A117) | T13, T15, T18 (A120) |
+| a bus slew of ≥ 5 µs can be specified | at 1 MHz: the floor with Cs 6 µF, **confirmed in the co-simulation** (A118: every load and ±4.8 V / ≥ 5 µs step within 200 A) | T13, T15, T18 (A118, A120) |
 | fast line steps must be met at 1 MHz | a Cs inside the window (between 3 and 15 µF: D63 maps the line steps, the co-simulation the handover), with a softer handover; and the floor turn-off for the falling steps. A slew limit alone does not save the comparator's rising steps (A117: 225 A at 50 µs). | T13, T15, T18 |
 | the bus slew is limited to ≲ 2.4 V/µs | the +4.8 V / 1 µs peak stops binding | T18 |
 | Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |
@@ -277,8 +282,9 @@ trade-off.
 
 - **The transient valley-excursion model** (Section 4's open link).
 - **At 1 MHz:**
-  - the Cs window and a softer handover (the handover needs the co-simulation: D63 does not reproduce the 3 µF oscillation);
-  - the floor turn-off (D63's proposal; an RTL option, A118);
+  - the standard matrix for the A118 candidate (driver mismatch, jitter, ±25 A, −8 V / 10 µs);
+  - the floor depth (2 A, not optimised) and the load-decrease recovery (32-47 µs, slower than D63's 18 µs);
+  - the neighbourhood of the candidate (A121's 8 proposed runs);
   - D63's refitted outcome rule, registered and tested;
   - the standard matrix beyond A116's rows (m, j30 / j100 for c60,
     ±25 A, the 10 µs and −8 V line steps);
@@ -323,9 +329,14 @@ trade-off.
 - 15 µF：阶梯太慢，线电压阶跃峰值高；
 - 3 µF：线电压阶跃过了（定时关断 +4.8 V/1 µs 188 A），但交接时振荡到 517 A。
 
-**下一步：**
-1. 找 Cs 窗口并把交接做软。线电压阶跃用 D63 扫；交接振荡 D63 解释不了（多半是周期内纹波），要靠 cosim；
-2. A118 做“定时关断 + 比较器地板”（D63 找出来的方案）。
+**A118 确认了 1 MHz 的候选设计：** 定时关断 + 2 A 比较器地板 + Cs 6 µF。
+- 负载阶跃，以及压摆 ≥5 µs 的 ±4.8 V 线电压阶跃，峰值全部在 200 A 以内；
+- 启动 157 A，效率 88.97%；
+- 1 µs 的快阶跃只超 1–6 A。
+
+这个方案先后由三条独立路径找到：D63 的设计图、神经网络代理模型的搜索（A120）、强化学习（A122）。然后 cosim 证实。
+
+**下一步：** 对候选设计跑标准矩阵（驱动失配、抖动、±25 A、−8 V/10 µs）。
 
 **以后怎么调：** 先定两件事，其余跟着走。
 1. **电感工艺：** 决定选哪个频率。

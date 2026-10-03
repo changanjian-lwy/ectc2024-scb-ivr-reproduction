@@ -196,3 +196,16 @@ the others. The exception is the timed 60 kHz design on 1 µs steps.
 **Not modelled, now measured:** the in-cycle Cs ripple at 3 µF shifts
 the turn-ons (phases 1/4 +1.1 V, phases 2/3 −0.8 V) at no efficiency
 cost.
+
+## 8. Tested by A118 (the floor, an RTL option; 13 step rows registered from D63)
+
+- **The floor behaves as the map's "floor" mode:**
+  - phase 1 held at −14.5 to −14.7 A;
+  - the load decrease recovers: +25.6 / +26.4 mV against +27.2;
+  - the controls without it cross as the map says (t6 −62.5 A runs away).
+- **Peaks within 10% in 6 of 7 bounded rows** (f15 −4.8 V / 5 µs: 211
+  against 187 A).
+- **The rising rows flagged weak were close at 6 µF** (206 / 208, 193 /
+  191, 183 / 169 A), but 18% under at 15 µF (241 / 204).
+- **The map's recovery times run short with the floor** (17.6 against
+  31.8-46.8 µs).

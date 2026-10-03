@@ -29,11 +29,30 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
 | # | method | what | status |
 |---|---|---|---|
 | [A120](experiments/A120_d63_surrogate_mlp/RESULTS.md) | deep learning: a multilayer perceptron | a surrogate of D63 (design + disturbance → peak, Vo extreme, phase 1's crossing, recovery), for fast design-space queries | **done:** all targets met (test peak MAE 2.0 A, 11 000× faster, co-simulation error 8.7 against D63's 9.2 A); the search finds the floor rule with Cs ≲ 8 µF feasible once the bus slew is ≥ 5 µs |
-| A121 | Gaussian process | the residual co-simulation − D63 with its uncertainty; choosing the next co-simulation runs (active learning) | planned |
-| A122 | reinforcement learning (policy gradient) | phase 1's turn-off decided per period in the D63 environment, against the hand rules (comparator, timed, floor) | planned |
+| [A121](experiments/A121_gp_residual_active/RESULTS.md) | Gaussian process | the residual co-simulation − D63 with its uncertainty; choosing the next co-simulation runs (active learning) | **done:** all criteria met; registered before A118 ran, it predicted A118 with MAE 9.7 A (D63 10.5) and 92% coverage. With 37 points, active learning reduces to space-filling |
+| [A122](experiments/A122_rl_turn_off_policy/RESULTS.md) | reinforcement learning (policy gradient) | phase 1's turn-off decided per period in the D63 environment, against the hand rules (comparator, timed, floor) | **done:** REINFORCE rediscovers the floor (return −30.5 = always-floor; timed −54.5, comparator −152.8) |
 
 ## Code
 
 - `src/scb_ivr/extensions/ml_nn.py`: the MLP; tested in
   `tests/extensions/test_ml_nn.py` against finite differences.
 - `src/scb_ivr/extensions/ml_d63_data.py`: D63 datasets.
+- `src/scb_ivr/extensions/ml_gp.py`: the Gaussian process; tested in
+  `tests/extensions/test_ml_gp.py` against brute-force leave-one-out.
+- `src/scb_ivr/extensions/ml_rl.py`: the D63 environment, the softmax
+  policy, REINFORCE.
+
+## What the three found together
+
+The 1 MHz turn-off question (T13 in `reports/TRADEOFF_SCORECARD.md`) was
+answered three ways:
+- **A120:** the surrogate's search of 100 000 designs put the floor rule
+  with Cs ≲ 8 µF in the feasible region.
+- **A122:** reinforcement learning, which knows nothing of that reasoning,
+  converged to the same rule.
+- **A121:** the GP gave calibrated error bars before the co-simulation.
+
+**A118's co-simulation then confirmed the design:** the floor with Cs
+6 µF meets the load steps and the ±4.8 V steps over ≥ 5 µs.
+
+**The models proposed; the co-simulation decided.**

@@ -39,6 +39,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A115": (TA / "A115_p24_one_mhz_design_point", "a115_analyze.py", "a115_summary.json"),
     "A116": (TA / "A116_p24_one_mhz_transients", "a116_analyze.py", "a116_summary.json"),
     "A117": (TA / "A117_p24_one_mhz_line_slew_cs", "a117_analyze.py", "a117_summary.json"),
+    "A118": (TA / "A118_p24_floor_turn_off", "a118_analyze.py", "a118_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -130,6 +131,9 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
              **{(r, "peak_200a"): "the 3 uF handover oscillates ~1.1 ms to 517 A (RESULTS 0.2)" for r in ("c3_tim_n0", "c3_cmp_n0")},
              **{(r, "hs_up_0p5_1p5V"): "the in-cycle Cs ripple moves phases 1/4 +1.1 V and phases 2/3 -0.8 V (RESULTS 0.2)"
                 for r in ("c3_tim_n0", "c3_cmp_n0")}},
+    "A118": {**{(r, "back_30us"): "the floor's load-decrease recovery is slower than D63's (31.8 / 46.8 against 17.6 us) (RESULTS 0.1)"
+                for r in ("f6_s_m62", "f15_s_m62")},
+             ("f15_l_m48_5us", "peak_10pct_d63"): "211 against D63's 187 A (+13%) at 15 uF (RESULTS 0.4)"},
 }
 
 

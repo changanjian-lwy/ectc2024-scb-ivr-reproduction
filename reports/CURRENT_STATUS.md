@@ -1137,6 +1137,25 @@ each question:
          - **Next:** A121 (Gaussian-process residual, active learning),
            A122 (a policy-gradient turn-off rule).
 
+     45. The floor, and a 1 MHz candidate:
+         [A118](../experiments/track_A_periodic_steady_state/A118_p24_floor_turn_off/RESULTS.md),
+         [A121](../extensions/ml_design_assist/experiments/A121_gp_residual_active/RESULTS.md),
+         [A122](../extensions/ml_design_assist/experiments/A122_rl_turn_off_policy/RESULTS.md).
+         - **RTL option `cfg_lo_floor`** (+35 cells; default bit-identical):
+           phase 1's turn-off is the earlier of the timed edge and its
+           current reaching i_target − 2 A.
+         - **A118:**
+           - the floor holds phase 1 at −14.5 A in every step and fixes
+             A115's runaway;
+           - **floor + Cs 6 µF meets the load steps and the ±4.8 V steps
+             over ≥ 5 µs** (≤ 193 A); start-up 157 A; efficiency 88.97%;
+           - the 1 µs steps reach 201 / 206 A;
+           - 15 µF fails ±4.8 V / 5 µs (211 / 241 A).
+         - **A122:** RL in D63 rediscovers the floor.
+         - **A121:** a GP registered before A118 predicted it within its
+           error bars (92%).
+         - **Next:** the standard matrix for the candidate.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
