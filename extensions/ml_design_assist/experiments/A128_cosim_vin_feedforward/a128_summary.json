@@ -1,0 +1,235 @@
+{
+ "identity": {
+  "sections": 2458,
+  "identical": true
+ },
+ "p125_l_p48_1us": {
+  "peak_after_a": 181.4766082441401,
+  "a124_peak_a": 217.6785015575897,
+  "step": {
+   "extreme_mv": -12.26039343116614,
+   "t_extreme_us": 6.768437500000082,
+   "back_within_1pct_us": 7.288750000000082,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.07028674628819309,
+   "ladder_back_below_1pct_us": 43.650168749998244
+  },
+  "a124_extreme_mv": 13.68624934387408,
+  "ph1_min_a": -19.746836937959557,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": false,
+  "in_mv_band": false
+ },
+ "p125_l_p48_5us": {
+  "peak_after_a": 175.3947601685695,
+  "a124_peak_a": 210.22941194719917,
+  "step": {
+   "extreme_mv": 10.852637912787566,
+   "t_extreme_us": 39.45979749999165,
+   "back_within_1pct_us": 40.4423074999976,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.06013840221728106,
+   "ladder_back_below_1pct_us": 33.5614062500001
+  },
+  "a124_extreme_mv": -7.646844139734044,
+  "ph1_min_a": -20.230078201050983,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": false
+ },
+ "p125_l_m48_1us": {
+  "peak_after_a": 175.52054412186266,
+  "a124_peak_a": 215.8678061455863,
+  "step": {
+   "extreme_mv": 17.1719142285911,
+   "t_extreme_us": 4.491683749993712,
+   "back_within_1pct_us": 5.875733749993511,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.07690397210783217,
+   "ladder_back_below_1pct_us": 22.871156250000073
+  },
+  "a124_extreme_mv": 42.86067252260351,
+  "ph1_min_a": -19.43813298558987,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": true
+ },
+ "p125_l_m48_5us": {
+  "peak_after_a": 175.27904374497285,
+  "a124_peak_a": 173.6820349060332,
+  "step": {
+   "extreme_mv": 17.637815828731142,
+   "t_extreme_us": 8.172361249990834,
+   "back_within_1pct_us": 9.53534124999492,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.065914532948395,
+   "ladder_back_below_1pct_us": 24.621156250000087
+  },
+  "a124_extreme_mv": 22.622825739265995,
+  "ph1_min_a": -19.410443716790013,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": true
+ },
+ "p125_l_m80_10us": {
+  "peak_after_a": 188.151422596297,
+  "a124_peak_a": 168.5015140950406,
+  "step": {
+   "extreme_mv": 38.07865314661596,
+   "t_extreme_us": 9.652797499996565,
+   "back_within_1pct_us": 25.00918750000011,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.07199350220311307,
+   "ladder_back_below_1pct_us": 27.798062500000068
+  },
+  "a124_extreme_mv": -28.198790032962773,
+  "ph1_min_a": -19.487868154614944,
+  "late": 1,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": true
+ },
+ "p125_s_p62": {
+  "peak_after_a": 177.80355672909116,
+  "a124_peak_a": 177.69573107629745,
+  "step": {
+   "extreme_mv": -11.760397560130254,
+   "t_extreme_us": 1.6964062500000356,
+   "back_within_1pct_us": 3.7495000000001104,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.009330675522310039,
+   "ladder_back_below_1pct_us": 0.0
+  },
+  "a124_extreme_mv": -11.982223048112473,
+  "ph1_min_a": -16.318084121358424,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": true
+ },
+ "p125_s_m62": {
+  "peak_after_a": 143.94377486263576,
+  "a124_peak_a": 143.92855344618195,
+  "step": {
+   "extreme_mv": 15.835677330392484,
+   "t_extreme_us": 2.9438137499922377,
+   "back_within_1pct_us": 6.753773749984408,
+   "ladder_dev_before": 0.00599365028422838,
+   "ladder_dev_peak": 0.006019425899206676,
+   "ladder_back_below_1pct_us": 0.0
+  },
+  "a124_extreme_mv": 15.87953645274709,
+  "ph1_min_a": -19.605736001787655,
+  "late": 0,
+  "overlaps": 0,
+  "in_M80": true,
+  "in_G80": true,
+  "in_mv_band": true
+ },
+ "v125_n0": {
+  "hs_on_vds_v": [
+   3.9280179198416207,
+   3.7036579755842767,
+   3.70968783226635,
+   3.2620103374331566
+  ],
+  "hs_on_vds_max_v": [
+   3.936575180307095,
+   3.712220721893992,
+   3.723144932779043,
+   3.276709862036231
+  ],
+  "valleys_a": [
+   -15.653082106164002,
+   -16.347984107530475,
+   -16.340936686552535,
+   -15.653044037452839
+  ],
+  "peaks_a": [
+   143.14370518652368,
+   142.51391235252217,
+   142.5204992342517,
+   143.9549704221326
+  ],
+  "ripple_a": [
+   158.79678729268767,
+   158.86189646005263,
+   158.86143592080424,
+   159.60801445958543
+  ],
+  "ls_on_vds_max_v": [
+   -1.1207166799426997,
+   -1.0200808383309778,
+   -1.0140670017168947,
+   -1.2425685931829566
+  ],
+  "off_sd_a": [
+   0.011550779814687868,
+   0.011568955293119737,
+   0.01776092957416469,
+   0.017796400598865857
+  ],
+  "ton_ns": 37.78125,
+  "period_ns": 505.1771356783909,
+  "rails_v": [
+   12.287675600545626,
+   11.905927755470397,
+   11.924316295423136,
+   11.88208034856084
+  ],
+  "vo_mean_v": 1.0000048463875946,
+  "overlaps": 0,
+  "ipk_a": 163.3754982211519,
+  "late_fires": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "budget_w": {
+   "switch_conduction": 13.168676156621913,
+   "inductor_copper": 5.664634303899449,
+   "series_caps": 2.7473399986280316,
+   "hard_turn_on": 0.6631297813362055,
+   "turn_off_overlap": 0.2812388851551023,
+   "gate_drive": 3.3849512957542705,
+   "reverse_conduction": 0.0,
+   "total": 25.909970421394974,
+   "efficiency": 0.9060934882940435
+  },
+  "efficiency_pct": 90.60934882940434,
+  "efficiency_ideal_inductor_pct": 92.50860167401595,
+  "p_rev_w": 0.0,
+  "dt_pred_final_ns": [
+   11.03125,
+   10.96875,
+   10.96875,
+   9.78125
+  ],
+  "startup_ipk_a": 163.3754982211519
+ },
+ "criteria": {
+  "1_p48_5us_200a": true,
+  "2_m48_1us_200a": true,
+  "3_p48_1us_minus10a": true,
+  "4_loads_3a": true,
+  "4_vo_3mv": false,
+  "4_no_overlap_runaway": true,
+  "4_n0": true
+ },
+ "a125_prospective": {
+  "M80": "7/7",
+  "G80": "6/7",
+  "mv": "5/7"
+ }
+}
