@@ -27,7 +27,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
-            lo_floor=0)                                                          # A118
+            lo_floor=0,                                                          # A118
+            vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50)  # A128
 
 
 def pack(values, width):
@@ -114,6 +115,10 @@ class Ctrl:
         d.cfg_lo_adm.value = cfg["lo_adm"]; d.cfg_lo_smax.value = cfg["lo_smax"]   # A100
         d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
         d.cfg_lo_floor.value = cfg["lo_floor"]                   # A118
+        d.cfg_vff.value = cfg["vff"]                             # A128
+        d.cfg_vff_c.value = pack([x & 0xFFF for x in cfg["vff_c"]], 12)
+        d.cfg_vff_k.value = cfg["vff_k"]; d.cfg_vff_sh2.value = cfg["vff_sh2"]; d.cfg_vff_sh20.value = cfg["vff_sh20"]
+        d.cfg_vff_vo.value = cfg["vff_vo"]; d.vin_valid.value = 0; d.vin_code.value = 0
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1065,3 +1070,63 @@ async def lo_floor_timed_edge_first(dut):
     t_lon = await _floor_to_timed_low(c)
     lo = await c.until("L", 0, 1, after=t_lon, limit=60)
     assert lo[0] + lo[1] == t_lon + 600, (t_lon, lo)
+
+
+# ---- A128: Vin feed-forward (scb_vff) ----
+async def _vin(dut, code, n=1):
+    for _ in range(n):
+        dut.vin_code.value = code; dut.vin_valid.value = 1
+        await RisingEdge(dut.clk)
+        dut.vin_valid.value = 0
+        for _ in range(40):
+            await RisingEdge(dut.clk)
+
+
+def _ton_ph(dut, k):
+    return field(dut.u_vff.ton_ph.value, k, TW)
+
+
+@cocotb.test()
+async def vff_off_passes_ton(dut):
+    """cfg_vff = 0: every phase gets ton_now, whatever Vin does."""
+    c = Ctrl(dut)
+    await c.start(vff=0, vff_c=(64, -47, -47, -139), vff_k=100000)
+    await _vin(dut, 2400, 4)
+    await _vin(dut, 2160, 2)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4
+
+
+@cocotb.test()
+async def vff_falling_step_scales_each_phase(dut):
+    """A Vin drop 2400 -> 2160 codes: g = 3/4 x 240 = 180 codes; ton_k = 133 + round(133 c_k g 2^8 / 2^24)."""
+    c = Ctrl(dut)
+    cs = (64, -47, -47, -139)
+    await c.start(vff=1, vff_c=cs, vff_k=0)
+    await _vin(dut, 2400, 4)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4                      # constant Vin: no change
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2160)
+    await ReadOnly()
+    g = 180 * 256
+    want = [133 + ((133 * max(min(ck * g, 4194304), -8388608) + 8388608) >> 24) for ck in cs]
+    assert [_ton_ph(dut, k) for k in range(4)] == want, ([_ton_ph(dut, k) for k in range(4)], want)
+
+
+@cocotb.test()
+async def vff_rising_step_caps_phase_1(dut):
+    """A Vin rise 2400 -> 2640 codes: rail = (2 x 2640 - 2400) - 3/4 lp20 - 50 (lp20 = 2400 + 240 / 64), cap =
+    k 2^8 / rail = 97 LSB < ton 133 on phase 1 only, after the divider (32 clocks); a cap above ton does nothing."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=100000)
+    await _vin(dut, 2400, 4)
+    await ReadOnly()
+    assert _ton_ph(dut, 0) == 133                                                  # cap 25600000 / 599 x 256 > 133
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2640)
+    await ReadOnly()
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    assert [_ton_ph(dut, k) for k in range(4)] == [(100000 << 8) // rail, 133, 133, 133]
+

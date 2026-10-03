@@ -26,6 +26,7 @@
 //   late, counted in late_fires). t_lo1 is an output (the system's reference for slave modules).
 // - A109: cfg_slot_trim gives every slotted phase (phases 2..N, and a slave's phase 1) a valley trim of its slot
 //   from its residual-current reports (scb_phase); slot_ofs reports the offsets.
+// - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -114,6 +115,14 @@ module scb_ctrl #(
     input  wire                cfg_lo_ff,      // A100: Ton feedforward to dlo
     input  wire [7:0]          cfg_lo_kff,     // A100
     input  wire                cfg_lo_floor,   // A118: phase 1's front end as a floor in timed mode
+    input  wire                cfg_vff,        // A128: Vin feed-forward on each phase's Ton (scb_vff), mode P
+    input  wire                vin_valid,      // A128: Vin ADC sample (with Vo's)
+    input  wire [AW-1:0]       vin_code,       // A128
+    input  wire [N*12-1:0]     cfg_vff_c,      // A128: falling-step coefficients, Q16 per Vin code
+    input  wire [23:0]         cfg_vff_k,      // A128: phase-1 cap constant, LSB x Vin code
+    input  wire [3:0]          cfg_vff_sh2,    // A128
+    input  wire [3:0]          cfg_vff_sh20,   // A128
+    input  wire [AW-1:0]       cfg_vff_vo,     // A128: Vo in Vin codes
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
@@ -159,6 +168,12 @@ module scb_ctrl #(
     wire signed [AW1-1:0] acc_rnd  = ton_cl + (1 <<< (FRAC - 1));
     wire [TW-1:0] ton_loop = acc_rnd[AW1-1:FRAC];
     assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;   // C2
+
+    wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
+    scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
+        .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
+        .k(cfg_vff_k), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .vo_code(cfg_vff_vo), .ton(ton_now), .ton_ph(ton_ph)
+    );
 
     wire [4*N-1:0] cmp_s;
     sync2 #(.W(4 * N)) u_sync (
@@ -233,7 +248,7 @@ module scb_ctrl #(
             end
             localparam IS_FIRST = (k == 0 && !SLAVE) ? 1 : 0;                         // C2
             scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(IS_FIRST)) u_ph (
-                .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_now),
+                .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_ph[k * TW +: TW]),
                 .cfg_t0(cfg_t0), .cfg_tdead(cfg_tdead),
                 .cfg_rs_high(cfg_rs_high), .cfg_rs_low(cfg_rs_low),
                 .cfg_dt_step(cfg_dt_step), .cfg_dt_max(cfg_dt_max),

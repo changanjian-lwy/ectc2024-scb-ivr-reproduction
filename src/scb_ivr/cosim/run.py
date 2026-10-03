@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE.parents[1]
 PROJECT = HERE.parents[2]
 OSS_BIN = Path.home() / "tools" / "oss-cad-suite" / "bin"
-RTL = [HERE / "rtl" / "sync2.v", HERE / "rtl" / "scb_phase.v", HERE / "rtl" / "scb_ctrl.v"]
+RTL = [HERE / "rtl" / "sync2.v", HERE / "rtl" / "scb_phase.v", HERE / "rtl" / "scb_ctrl.v", HERE / "rtl" / "scb_vff.v"]
 
 
 def project_relative(path: Path) -> str:

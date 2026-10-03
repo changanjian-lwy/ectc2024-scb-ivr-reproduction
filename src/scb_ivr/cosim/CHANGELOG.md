@@ -634,3 +634,14 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
 | A87 | reverse drop |
 | A94 | FastPlant: Python overhead removed, bit-identical, 1.66 times faster |
 | A95 | C kernel, bit-identical, 3.17 times faster than the original |
+
+## A128 (extension ml_design_assist): Vin feed-forward, opt-in
+
+- New `rtl/scb_vff.v`, instantiated in `scb_ctrl.v`; `scb_multi.v` was
+  regenerated.
+- The bridge samples Vin with Vo's ADC sample (cfg "vff": c, k, sh2,
+  sh20, vin_lsb_v).
+- With "vff" absent, every phase gets ton_now bit for bit.
+  - `cosim_regression.py --full` passes.
+  - Unit tests: 59/59, 3 of them new.
+- Spec: `extensions/ml_design_assist/experiments/A128_cosim_vin_feedforward/SPEC_RTL.md`.

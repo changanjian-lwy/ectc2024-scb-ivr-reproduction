@@ -319,6 +319,13 @@ class ModuleSim:
         c.set("cfg_lo_ff", int(cfg.get("lo_ff", 0)))                    # A100: Ton feedforward to dlo
         c.set("cfg_lo_kff", int(cfg.get("lo_kff", 0)))
         c.set("cfg_lo_floor", int(cfg.get("lo_floor", 0)))              # A118: the front end as a floor when timed
+        vff = cfg.get("vff") or {}                                       # A128: Vin feed-forward (extension)
+        self.vin_lsb = float(vff.get("vin_lsb_v", 0.02))
+        c.set("cfg_vff", int(bool(vff)))
+        c.set("cfg_vff_c", pack([int(x) & 0xFFF for x in vff.get("c", [0] * N)], 12))
+        c.set("cfg_vff_k", int(vff.get("k", 0))); c.set("cfg_vff_sh2", int(vff.get("sh2", 2)))
+        c.set("cfg_vff_sh20", int(vff.get("sh20", 6))); c.set("cfg_vff_vo", int(round(cfg["vref_v"] / self.vin_lsb)))
+        c.set("vin_valid", 0); c.set("vin_code", 0)
         c.set("cfg_blank", to_lsb(cfg.get("blank_ns", 0.0) * 1e-9))     # A89 amendment: comparator blanking
         c.set("cfg_async", int(cfg.get("async", 0)))
         c.set("a_valid", 0)
@@ -343,6 +350,7 @@ class ModuleSim:
         self.seq = [0]
         self.meas_m = {}; self.meas_r = {}          # phase -> measurement to deliver
         self.adc = []                               # pending ADC sample of Vo (taken at phase 1's turn-on)
+        self.adc_vin = []                           # A128: pending Vin sample (same instant)
         self.st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
         self.lat = {"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0}   # A81 front end of phase 1
         self.sections, self.turnons, self.lowoffs = [], [], []
@@ -464,6 +472,7 @@ class ModuleSim:
                                              aux_imin_a=[float(x) for x in plant.aux_imin])
                     plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
                 self.adc.append(min(max(int(round(vo / self.adc_lsb)), 0), self.adc_max))
+                self.adc_vin.append(min(max(int(round(vin / self.vin_lsb)), 0), self.adc_max))   # A128
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
             mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
             ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
@@ -556,6 +565,9 @@ class ModuleSim:
         c.set("adc_valid", int(bool(self.adc)))
         c.set("adc_code", self.adc[-1] if self.adc else 0)
         self.adc.clear()
+        c.set("vin_valid", int(bool(self.adc_vin)))                       # A128
+        c.set("vin_code", self.adc_vin[-1] if self.adc_vin else 0)
+        self.adc_vin.clear()
         c.set("hand_req", int(plant.t >= p.t_hand))
         plant.load_on = plant.t >= p.t_load
         if self.en["t"] is None and plant.t >= self.t_en:        # A102: arm the branches (each starts at its

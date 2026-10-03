@@ -15,7 +15,7 @@ BUILD = HERE.parents[3] / "tmp" / "cosim_unit"
 os.environ["PATH"] = f"{Path.home() / 'tools' / 'oss-cad-suite' / 'bin'}:{os.environ.get('PATH', '')}"
 
 runner = get_runner("icarus")
-runner.build(sources=[RTL / "sync2.v", RTL / "scb_phase.v", RTL / "scb_ctrl.v"], hdl_toplevel="scb_ctrl",
+runner.build(sources=[RTL / "sync2.v", RTL / "scb_phase.v", RTL / "scb_ctrl.v", RTL / "scb_vff.v"], hdl_toplevel="scb_ctrl",
              parameters={"N": 4, "TW": 32, "FB": 5, "CW": 8}, build_dir=BUILD, always=True)
 xml = runner.test(hdl_toplevel="scb_ctrl", test_module="test_scb_ctrl", build_dir=BUILD, test_dir=HERE,
                   results_xml=str(BUILD / "results.xml"))
