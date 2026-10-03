@@ -11,6 +11,13 @@ Boundary: 8125ffb. Records: cosim/run_*.json (18), c05_summary.json (c05_analyze
 - Minor misses (no hard constraint): Vo extreme vs single beyond +-10% in l_p48_5us (12.04 vs 10.85 mV, +11%) and l_m80_10us (-32.7 vs +28.6 mV, sign flip, known D63 blind spot); one phase's LS turn-on V_DS in j30 above single + 0.3 V; line rows show 1 late fire where the single has 0.
 - Cause of the three failures not diagnosed here (it is a result against the prediction): the failing rows are the ones where the master / slaves see a negative driver offset or large jitter at T/16 ~ 31.6 ns, while the steady state without disturbance is exact.
 
+## 0b. Diagnosis (post hoc, reruns in tmp/ to 260 us with full records; m1n reproduces bit for bit)
+- All three failures are in the post-handover transient (handover 144 us; m1n peaks 243-255 us, m3n before 243 us, j100 overlap 198.5 us); after ~260 us every row is the single module's steady state.
+- **Mechanism: the slaves' phase-1 valley is not regulated** (slotted at master t_lo1 + m T/16, no current comparison; C01 Section 3). The master's phase-1 valley stays at -15.6 A; slave M3's runs to -96 A (m1n) / -130 A (j100), M1's to -93 A (m1n). The slave then sinks current, the master's loop raises Ton (to its cap 2272 LSB = 71 ns), the period grows 0.40 -> 0.71 us, which deepens the slaves' valleys further: positive feedback; late fires and the 203-250 A peaks follow from the capped Ton.
+- **Two modules (T/8 slot spacing) do not run away:** m1n with 2 modules, the slave's valley dips to -25 A and returns to -15.6 A (late 6/4, peak 163/174 A).
+- Slave slots are placed correctly (offset = m T/16 of the current period, no skipped periods); the defect is the open-loop valley, not the slot.
+- Candidate fix (C06): A118's floor on the slaves' phase 1 (front end armed at i_target - lo_floor_a; fires before the slot if the current gets there first), cfg-gated, bit-identical when off; it bounds the slave valley near -17.6 A. The full version is D61 scheme B (per-slave valley loop).
+
 ## 1. Criteria
 | # | criterion | result |
 |---|---|---|
