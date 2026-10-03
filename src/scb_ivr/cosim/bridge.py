@@ -30,7 +30,10 @@ Controller-side analog functions modelled here:
   time after the actual high-side turn-off (ml_valid, ml_early, ml_tv) and the edge's error against the crossing
   (ml_err);
 - the residual-current sign at current-decided turn-offs (trim) and a 12-bit ADC sample of Vo at each phase-1
-  turn-on (voltage loop).
+  turn-on (voltage loop);
+- the floor (cfg "lo_floor" 1, A118): once phase 1's turn-off is timed, its front end stays armed at i_target + trim
+  - "lo_floor_a" (default 2 A); if the current reaches it before the timed edge it makes the turn-off as above,
+  reports no residual (the trim holds), and the crossing measurement of i_target is taken first.
 
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
@@ -315,6 +318,7 @@ class ModuleSim:
         c.set("cfg_lo_smax", int(cfg.get("lo_smax", 0)))
         c.set("cfg_lo_ff", int(cfg.get("lo_ff", 0)))                    # A100: Ton feedforward to dlo
         c.set("cfg_lo_kff", int(cfg.get("lo_kff", 0)))
+        c.set("cfg_lo_floor", int(cfg.get("lo_floor", 0)))              # A118: the front end as a floor when timed
         c.set("cfg_blank", to_lsb(cfg.get("blank_ns", 0.0) * 1e-9))     # A89 amendment: comparator blanking
         c.set("cfg_async", int(cfg.get("async", 0)))
         c.set("a_valid", 0)
@@ -369,11 +373,20 @@ class ModuleSim:
             d += self.rng.normal(0.0, drv["sigma_ps"] * 1e-12)
         return t_cmd + d
 
+    def floor_on(self):
+        """A118: phase 1's turn-off is timed and its front end is armed as a floor."""
+        return bool(self.cfg.get("lo_floor", 0)) and bool(self.st.get("lo_timed"))
+
+    def latch_thr(self):
+        thr = self.i_tgt + self.trim_now[0] * self.lsb_a
+        return thr - float(self.cfg.get("lo_floor_a", 2.0)) if self.floor_on() else thr
+
     def latch_fire(self):                                        # A81 latch fires
         lat, lsb = self.lat, self.lsb
         lat["fired"] = True; lat["fires"] += 1
         t_cmd = self.plant.t + self.t_async
-        heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": True})); self.seq[0] += 1
+        bind = not self.floor_on()                               # A118: a floor turn-off reports no residual (no trim)
+        heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": bind})); self.seq[0] += 1
         heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
@@ -382,7 +395,7 @@ class ModuleSim:
 
     def on_step(self):
         lat, mlo, plant, nv = self.lat, self.mlo, self.plant, self.nv
-        if lat["armed"] and not lat["fired"] and plant.y[nv] <= self.i_tgt + self.trim_now[0] * self.lsb_a:
+        if lat["armed"] and not lat["fired"] and plant.y[nv] <= self.latch_thr():
             self.latch_fire()
         if mlo["armed"] and mlo["t"] is None and plant.y[nv] <= self.i_tgt:
             self.mlo_fire()
@@ -393,6 +406,9 @@ class ModuleSim:
         if self.use_c:
             if not (lat["armed"] and not lat["fired"]) and mlo["armed"] and mlo["t"] is None:
                 latch = (True, self.i_tgt, self.mlo_fire)              # A99: measurement only
+            elif self.floor_on() and lat["armed"] and not lat["fired"]:
+                latch = ([(True, self.i_tgt, self.mlo_fire)] if mlo["armed"] and mlo["t"] is None else []) + \
+                        [(True, self.latch_thr(), self.latch_fire)]     # A118: the crossing, then the floor
             else:
                 latch = (lat["armed"] and not lat["fired"], self.i_tgt + self.trim_now[0] * self.lsb_a, self.latch_fire)
             plant.integrate_to(t_target, None, monitors=self.mon, latch=latch)

@@ -9,7 +9,7 @@
 //   phase-1 turn-ons have been seen, at t_ref + (j - 1) * (T_meas + T_prev) / (2N), T_prev = the period before
 //   (the configured slot until then). cfg_slot_guard is passed to phases 2..N.
 // - Phase 1's turn-off (cfg_lo_pred): timed after cfg_lo_learn comparator-decided turn-offs (scb_phase); its crossing
-//   reports mlo_* go to phase 1 only.
+//   reports mlo_* go to phase 1 only; cfg_lo_floor (A118) keeps its front end armed in timed mode, as a floor.
 // - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on), e = vref - adc_code;
 //   ton_acc += ki * e (clamped) and the proportional term p_term = kp * e (A104), both with FRAC fractional bits;
 //   Ton is the rounded integer part of ton_acc + p_term, clamped to [cfg_ton_min, cfg_ton_max]; otherwise
@@ -113,6 +113,7 @@ module scb_ctrl #(
     input  wire [7:0]          cfg_lo_smax,    // A100
     input  wire                cfg_lo_ff,      // A100: Ton feedforward to dlo
     input  wire [7:0]          cfg_lo_kff,     // A100
+    input  wire                cfg_lo_floor,   // A118: phase 1's front end as a floor in timed mode
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
@@ -266,6 +267,7 @@ module scb_ctrl #(
                 .cfg_lo_adm(cfg_lo_adm), .cfg_lo_smax(cfg_lo_smax), .cfg_lo_ff(cfg_lo_ff), .cfg_lo_kff(cfg_lo_kff),  // A100
                 .t_lo_q(t_lo_all[k * TW +: TW]),                                                // C02
                 .cfg_slot_trim(cfg_slot_trim), .cfg_st_smax(cfg_st_smax),                       // A109
+                .cfg_lo_floor(IS_FIRST ? cfg_lo_floor : 1'b0),                                  // A118
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end

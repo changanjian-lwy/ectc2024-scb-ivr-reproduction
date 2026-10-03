@@ -5,7 +5,7 @@ drives every input; option bits default to 0. Groups: phase timing, comparators 
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
-step and Ton feedforward. From A93's tests (history: ../CHANGELOG.md).
+step and Ton feedforward, and its floor (A118). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -26,7 +26,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             kp=0,                                                                # A104
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
-            slot_trim=0, st_smax=1)                                              # A109
+            slot_trim=0, st_smax=1,                                              # A109
+            lo_floor=0)                                                          # A118
 
 
 def pack(values, width):
@@ -112,6 +113,7 @@ class Ctrl:
         d.mlo_valid.value = 0; d.mlo_early.value = 0; d.mlo_err.value = 0
         d.cfg_lo_adm.value = cfg["lo_adm"]; d.cfg_lo_smax.value = cfg["lo_smax"]   # A100
         d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
+        d.cfg_lo_floor.value = cfg["lo_floor"]                   # A118
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1006,3 +1008,60 @@ async def slot_trim_not_in_mode_s(dut):
     await c.start(slot_trim=1, st_smax=8, start_s=1)
     assert [await _report_r(c, dut, 1, 0) for _ in range(3)] == [0, 0, 0]
 
+
+
+# ---------------- A118: the floor in timed mode ----------------
+
+async def _floor_to_timed_low(c):
+    """cfg_async, cfg_lo_pred, cfg_lo_learn 1: the first turn-off is the front end's report at t_lon + 600 (dlo
+    learned 600); returns the second cycle's low-side turn-on time, phase 1 now timed and in LOW."""
+    on = await _phase1_to_low(c)
+    t_lon = on[0] + on[1]
+    await c.set(a_valid=1, a_tlo=t_lon + 600)
+    await c.set(a_valid=0)
+    off = await c.until("H", 0, 1, after=t_lon + 600)
+    await c.set(cmp_zl=0b0001)
+    lon = await c.until("L", 1, 1, after=off[0] + off[1])
+    await c.set(cmp_zl=0)
+    return lon[0] + lon[1]
+
+
+@cocotb.test()
+async def lo_floor_arms_in_timed_mode(dut):
+    """cfg_lo_floor: once phase 1's turn-off is timed, its front end is armed in LOW (as the floor)."""
+    c = Ctrl(dut)
+    await c.start(async_=1, lo_pred=1, lo_learn=1, lo_floor=1)
+    await _floor_to_timed_low(c)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.lo_timed1.value) == 1 and int(dut.dlo1.value) == 600 and int(dut.arm1.value) == 1
+
+
+@cocotb.test()
+async def lo_floor_report_before_the_timed_edge_is_the_turn_off(dut):
+    """cfg_lo_floor, timed: a front-end report at t_lon + 300 (before the timed edge at t_lon + 600) sets t_lo and
+    t_on = a_tlo + dt_pred, enters HIGH without a phase-1 gate event, and is not current-bound (no trim update)."""
+    c = Ctrl(dut)
+    await c.start(async_=1, lo_pred=1, lo_learn=1, lo_floor=1)
+    t_lon = await _floor_to_timed_low(c)
+    await c.set(a_valid=1, a_tlo=t_lon + 300)
+    await c.set(a_valid=0)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert field(dut.state.value, 0, 2) == 0 and int(dut.arm1.value) == 0        # HIGH, disarmed
+    assert field(dut.lo_bind_cur.value, 0, 1) == 0
+    assert int(dut.t_ref.value) == t_lon + 300 + 85, int(dut.t_ref.value)
+    for _ in range(30):
+        await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert c.find("L", 0, 1, after=t_lon) is None                                 # the timed edge never came
+
+
+@cocotb.test()
+async def lo_floor_timed_edge_first(dut):
+    """cfg_lo_floor, timed, no front-end report: the turn-off is the timed edge at t_lon + dlo (600)."""
+    c = Ctrl(dut)
+    await c.start(async_=1, lo_pred=1, lo_learn=1, lo_floor=1)
+    t_lon = await _floor_to_timed_low(c)
+    lo = await c.until("L", 0, 1, after=t_lon, limit=60)
+    assert lo[0] + lo[1] == t_lon + 600, (t_lon, lo)

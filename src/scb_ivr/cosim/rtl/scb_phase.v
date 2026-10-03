@@ -19,7 +19,9 @@
 //   turn-off is a timed edge at t_lon + dlo (lo_timed; the front end is not armed), followed by the predictive
 //   turn-on; dlo then steps +1 when the crossing report is early or below cfg_lo_tgt, else -1 (A100: with cfg_lo_adm
 //   the step doubles while consecutive decisions agree, up to cfg_lo_smax, and returns to 1 when they differ; with
-//   cfg_lo_ff, dlo also moves by cfg_lo_kff times every change of ton). Phases 2..N at their slot
+//   cfg_lo_ff, dlo also moves by cfg_lo_kff times every change of ton; A118: with cfg_lo_floor the front end stays
+//   armed in timed mode, at the floor threshold the bridge sets, and its report before the timed edge is the turn-off,
+//   as with cfg_async, without a trim update). Phases 2..N at their slot
 //   (slot_time from scb_ctrl); with cfg_slot_guard a slot not yet fired when the reference changes fires at once
 //   (fine 0, a late fire) and counts as the new reference's slot;
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
@@ -105,6 +107,7 @@ module scb_phase #(
     input  wire [7:0]           cfg_lo_kff,    // A100: dlo change per LSB of ton
     input  wire                 cfg_slot_trim, // A109: valley trim of a slotted phase's turn-off (mode P)
     input  wire [7:0]           cfg_st_smax,   // A109: its largest step, LSB
+    input  wire                 cfg_lo_floor,  // A118: the front end stays armed in timed mode, as a floor
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -205,7 +208,7 @@ module scb_phase #(
     wire signed [TW+11:0] dlo_s = $signed({12'd0, dlo}) + (ff_on ? ff_p : 0) + fb_p;
     wire [TW-1:0]         dlo_next = dlo_s[TW+11] ? {TW{1'b0}} : dlo_s[TW-1:0];
     wire [FB-1:0] f_lo1t = fine(d_lo1t, cfg_fine);
-    assign arm = async_on && (state == LOW) && lo_open && !lo_timed;
+    assign arm = async_on && (state == LOW) && lo_open && (!lo_timed || cfg_lo_floor);   // A118: or as the floor
     wire slot_new   = (fired_ref != ref_id);
     wire slot_miss  = cfg_slot_guard && pend_v && (pend_ref != ref_id);   // A93: the awaited slot was passed
     wire [TW-1:0] dt_next = dt_pred + cfg_dt_step;
@@ -358,7 +361,11 @@ module scb_phase #(
                             end
                         end
                     end else if (lo_timed) begin                 // A99: timed phase-1 turn-off
-                        if (due(d_lo1t)) begin
+                        if (cfg_lo_floor && async_on && a_valid) begin   // A118: the floor came first; its edges made
+                            t_lo <= a_tlo; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;   // by the front end; no trim
+                            t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
+                            state <= HIGH;
+                        end else if (due(d_lo1t)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_lo1t;
                             t_lo <= now + f_lo1t; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
                             if (d_lo1t[TW-1]) late_fires <= late_fires + 1'b1;

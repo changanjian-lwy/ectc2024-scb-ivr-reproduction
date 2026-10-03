@@ -584,7 +584,8 @@ class KernelPlant2(KernelPlant):
     does them with KernelPlant's code. The state is held in buffers shared with C; the attributes the bridge and
     FastPlant use (y, t, diode, euler_left, steps, rev_e, rev_t, ipk, last_donly, load_on) are views of them.
     integrate_to(t_target, on_step, monitors=None, latch=None): with monitors (a Monitors) the loop updates them;
-    latch = (armed, threshold, callback) stops after the step at which i1 <= threshold and calls callback()."""
+    latch = (armed, threshold, callback) stops after the step at which i1 <= threshold and calls callback(); a list
+    of them (A118) is taken in order, each armed after the one before it has fired."""
 
     def __init__(self, p, y0, gh, gl):
         n2, N = 2 * p.n, p.n
@@ -721,7 +722,8 @@ class KernelPlant2(KernelPlant):
                 self._advance(min(self.p.h, t_target - self.t))
                 on_step()
             return
-        armed, thr, fire = latch if latch is not None else (False, 0.0, None)
+        chain = list(latch) if isinstance(latch, list) else [latch if latch is not None else (False, 0.0, None)]
+        armed, thr, fire = chain.pop(0)
         while True:
             rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
             self._vd, self._vd_t = self._buf["vd"], self.t
@@ -730,6 +732,8 @@ class KernelPlant2(KernelPlant):
             if rc == 1:                                               # latch condition after a C step
                 armed = False
                 fire()
+                if chain:                                             # A118: the next latch of a chain
+                    armed, thr, fire = chain.pop(0)
                 continue
             if rc == 2:
                 self._register(int(self._run.need_key))
@@ -748,3 +752,5 @@ class KernelPlant2(KernelPlant):
             if armed and self.y[self.nv] <= thr:
                 armed = False
                 fire()
+                if chain:
+                    armed, thr, fire = chain.pop(0)

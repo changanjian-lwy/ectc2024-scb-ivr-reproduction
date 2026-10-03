@@ -4,6 +4,46 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-03 (A118) - the floor: phase 1's front end armed in timed mode
+
+**Source:** D63's design map and A120's search. The timed turn-off fails
+on load decreases and falling input steps, where phase 1's valley passes
+the zero-voltage threshold. A comparator floor below the target stops
+that, and keeps the timed edge everywhere else.
+
+**Changes:**
+- **`rtl/scb_phase.v`:**
+  - input `cfg_lo_floor`;
+  - with it, phase 1's front end stays armed in timed mode
+    (`arm = ... && (!lo_timed || cfg_lo_floor)`);
+  - a front-end report that arrives before the timed edge is the
+    turn-off, as with cfg_async (t_lo, t_on = a_tlo + dt_pred, HIGH), and
+    is not current-bound, so there is no trim update.
+- **`rtl/scb_ctrl.v`:** the input, passed to phase 1 only.
+- **`rtl/scb_multi.v`:** regenerated.
+- **`plant.py`:** `KernelPlant2.integrate_to` takes a chain of latches,
+  each armed after the one before it fires. A single latch is the same
+  code path as before.
+- **`bridge.py`:** cfg `lo_floor` (default 0) and `lo_floor_a` (A,
+  default 2).
+  - While phase 1 is timed, the front end's threshold is i_target + trim
+    − lo_floor_a.
+  - The crossing measurement of i_target is chained before it.
+  - A floor turn-off is not bound (no residual report).
+
+**Gates:**
+- RTL unit tests 56 of 56 (new: `lo_floor_arms_in_timed_mode`,
+  `lo_floor_report_before_the_timed_edge_is_the_turn_off`,
+  `lo_floor_timed_edge_first`);
+- synthesis `check -assert` clean. Same flow before and after: SLAVE 0,
+  41 963 → 41 998 cells; SLAVE 1, 36 887 → 36 948;
+- the Python tests;
+- `--full` regression PASS (the default is the previous behaviour);
+- **identity on the front-end paths the regression cases predate:** A115
+  n10 (comparator learning, then timed) and A116 c60_n0 (the front end
+  throughout), rerun to 1700 µs. All 1478 sections are identical to the
+  archived runs.
+
 ## 2026-10-03 (A115) - the input ramp as a configuration value
 
 **Source:** A115 (P24's 1 MHz design point). The start-up ramp must
