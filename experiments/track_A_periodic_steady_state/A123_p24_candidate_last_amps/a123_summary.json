@@ -1,0 +1,170 @@
+{
+ "c45": {
+  "steps": {
+   "l_p48_1us": {
+    "peak_after_a": 194.5000768330358,
+    "extreme_mv": 21.138969521656836,
+    "back_us": 19.85984999998457,
+    "late": 0,
+    "d63_peak_a": 206.05445560924636,
+    "f6_peak_a": 206
+   },
+   "l_m48_1us": {
+    "peak_after_a": 208.7217633458451,
+    "extreme_mv": 53.00759212401562,
+    "back_us": 30.642906249999953,
+    "late": 0,
+    "d63_peak_a": 202.20081043921164,
+    "f6_peak_a": 201
+   },
+   "l_m80_10us": {
+    "peak_after_a": 198.68710159538384,
+    "extreme_mv": -65.7811945140081,
+    "back_us": 40.24321875000002,
+    "late": 0,
+    "d63_peak_a": 163.60233236592103,
+    "f6_peak_a": 205
+   }
+  },
+  "n0": {
+   "startup_ipk_a": 152.33031701856717,
+   "efficiency_pct": 88.96228692487111,
+   "hs_on_vds_v": [
+    2.6001115779116244,
+    1.0100735682745567,
+    1.0194104833080944,
+    1.5983810506977785
+   ],
+   "off_sd_a": [
+    0.002569788522594185,
+    0.0026175458155090043,
+    0.0026059479830981168,
+    0.0024520408858304554
+   ]
+  },
+  "criteria": {
+   "no_overlap_n0": true,
+   "startup_200a": true,
+   "efficiency_0p1": true,
+   "no_overlap_l_p48_1us": true,
+   "no_runaway_l_p48_1us": true,
+   "no_overlap_l_m48_1us": true,
+   "no_runaway_l_m48_1us": true,
+   "no_overlap_l_m80_10us": true,
+   "no_runaway_l_m80_10us": true,
+   "closes_all_le_200a": false
+  }
+ },
+ "f3": {
+  "steps": {
+   "l_p48_1us": {
+    "peak_after_a": 205.57688043572955,
+    "extreme_mv": 24.707322483519924,
+    "back_us": 21.24234499998982,
+    "late": 0,
+    "d63_peak_a": 208.37257195265192,
+    "f6_peak_a": 206
+   },
+   "l_m48_1us": {
+    "peak_after_a": 202.7457154249431,
+    "extreme_mv": 33.56701027910458,
+    "back_us": 26.141406250000145,
+    "late": 1,
+    "d63_peak_a": 203.04136716679568,
+    "f6_peak_a": 201
+   },
+   "l_m80_10us": {
+    "peak_after_a": 200.44574479131336,
+    "extreme_mv": -92.11049347937028,
+    "back_us": 50.46306250000013,
+    "late": 1,
+    "d63_peak_a": 168.43619470816702,
+    "f6_peak_a": 205
+   }
+  },
+  "n0": {
+   "startup_ipk_a": 157.32249946342344,
+   "efficiency_pct": 88.96984971556031,
+   "hs_on_vds_v": [
+    2.3601774289516193,
+    1.168908246857641,
+    1.2004360261226423,
+    1.3891580142969187
+   ],
+   "off_sd_a": [
+    0.002571662647825288,
+    0.002605731854226239,
+    0.0025789756345059667,
+    0.002429649908082002
+   ]
+  },
+  "criteria": {
+   "no_overlap_n0": true,
+   "startup_200a": true,
+   "efficiency_0p1": true,
+   "no_overlap_l_p48_1us": true,
+   "no_runaway_l_p48_1us": true,
+   "no_overlap_l_m48_1us": true,
+   "no_runaway_l_m48_1us": true,
+   "no_overlap_l_m80_10us": true,
+   "no_runaway_l_m80_10us": true,
+   "closes_all_le_200a": false
+  }
+ },
+ "k66": {
+  "steps": {
+   "l_p48_1us": {
+    "peak_after_a": 204.45287478078484,
+    "extreme_mv": 24.221543543406334,
+    "back_us": 14.136499999999833,
+    "late": 0,
+    "d63_peak_a": 206.74089544838716,
+    "f6_peak_a": 206
+   },
+   "l_m48_1us": {
+    "peak_after_a": 194.6597708371693,
+    "extreme_mv": 34.05370452894463,
+    "back_us": 24.9395625,
+    "late": 1,
+    "d63_peak_a": 199.48942473152783,
+    "f6_peak_a": 201
+   },
+   "l_m80_10us": {
+    "peak_after_a": 194.08296444054446,
+    "extreme_mv": -83.40455117667844,
+    "back_us": 47.12687500000017,
+    "late": 1,
+    "d63_peak_a": 164.9949115877098,
+    "f6_peak_a": 205
+   }
+  },
+  "n0": {
+   "startup_ipk_a": 153.91341726232696,
+   "efficiency_pct": 88.96963050637451,
+   "hs_on_vds_v": [
+    2.3632783881409636,
+    1.1729293513266421,
+    1.169381509831387,
+    1.392652040071613
+   ],
+   "off_sd_a": [
+    0.0025719750861030884,
+    0.0026047209454030914,
+    0.0025892873818514563,
+    0.002430736567068099
+   ]
+  },
+  "criteria": {
+   "no_overlap_n0": true,
+   "startup_200a": true,
+   "efficiency_0p1": true,
+   "no_overlap_l_p48_1us": true,
+   "no_runaway_l_p48_1us": true,
+   "no_overlap_l_m48_1us": true,
+   "no_runaway_l_m48_1us": true,
+   "no_overlap_l_m80_10us": true,
+   "no_runaway_l_m80_10us": true,
+   "closes_all_le_200a": false
+  }
+ }
+}
