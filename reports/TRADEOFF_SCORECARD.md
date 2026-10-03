@@ -1,4 +1,4 @@
-# Trade-off map - the P24 module and system, through A119, D63 and A120-A122
+# Trade-off map - the P24 module and system, through A119, D63, D64 and A120-A122
 
 2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
@@ -139,7 +139,7 @@ Loop risk: whether fixing it tends to undo another.
 | T9-T11 | **Auxiliary commutation branch** (extension) | saves 2.6-3.4 W net at 5% (A102); +10-12% switch area | open, outside the reproduction | `extensions/aux_commutation_branch/README.md` |
 | **T12** | **Valley margin ↔ timing robustness** (L2 with L1) | **The unifying limit.** Margin ≤ 2.5 A fails transients: A112 p25 (2.1 A: −62.5 A step 183 µs, falling line 182 µs); A115 n10 (2.4 A: −62.5 A runaway, 554 A); A115 n12p5 (−0.6 A: ±45 mV oscillation until the turn-off is timed). Margin 8.4 A (A112 p20) passes except the line-step edges. Margin 27 A (5%) passes everything but +4.8 V / 1 µs. A111's zero-voltage valley measurement, a fix by measurement, is falsified. **A116 confirms the trigger (H1):** with a 30 kHz loop the timed design's valleys still reach −54 A; the loop's speed decides only between a runaway and a slow oscillation. A short ~3 A crossing (c60, +62.5 A) is tolerated. **The margin moves with the input** (D57: I_th 13.45 / 14.90 / 16.32 A at 43.2 / 48 / 52.8 V). The timed design needs more than ~1 A at the lowest input (t30 at 43.2 V: ±18 mV limit cycle); the comparator design does not. | **open: the binding constraint** | **the loop closes here** (Section 4) |
 | **T13** | **Timed ↔ comparator phase-1 turn-off in transients** (L5) | Mirror failures at large i_neg. Timed: phase 1's valley rises on falling steps and deepens on load decreases (A112, A115). Comparator: phase 1 stays at its boundary, stretches on rising steps, and the slotted phases follow its period (A114: 246-290 A). dlo feed-forward k = 11 fixes load steps but wrecks line steps (A113). | **1 MHz: resolved by the floor** (A118). The timed edge stays, and a comparator floor 2 A below the target stops phase 1's valley at −14.5 A. The load decrease and falling steps no longer break the timing (no floor: 671 A runaway, A118 t6). Found by D63, the A120 search and A122's RL; confirmed in the co-simulation. | **high:** fixing one direction breaks the other; needs an architecture change (each phase on its own boundary) or a slew limit |
-| **T14** | **Switching frequency ↔ inductor ↔ loop** (L1) | 5 → 1 MHz (A115): switching losses 16.84 → 1.59 W; I_th 33.4 → 14.9 A; inductor copper 2.64 → 13.78 W (middle R/L); Vo ripple ×5 (Co unchanged); loop ceiling 100 → 60 kHz. **Break-even (D62, measured waveforms):** 1 MHz 10% beats 5 MHz 5% below 103 µΩ/nH (0.75 mΩ per phase at 7.33 nH), and 5 MHz 20% below 51 µΩ/nH (0.38 mΩ). | open: rests on the inductor's R/L | medium |
+| **T14** | **Switching frequency ↔ inductor ↔ loop** (L1) | 5 → 1 MHz (A115): switching losses 16.84 → 1.59 W; I_th 33.4 → 14.9 A; inductor copper 2.64 → 13.78 W (middle R/L); Vo ripple ×5 (Co unchanged); loop ceiling 100 → 60 kHz. **Break-even (D62, measured waveforms):** 1 MHz 10% beats 5 MHz 5% below 103 µΩ/nH (0.75 mΩ per phase at 7.33 nH), and 5 MHz 20% below 51 µΩ/nH (0.38 mΩ). | **resolved in the model by D64**, a first-principles stripline inductor: R_dc/L = 2ρ/(μ0 h t), R_ac/L = 2ρ/(μ0 h δ). At P24's in-package scale (≤ 2 cm² per phase, h ≤ 2 mm) the best frequency is **2-5 MHz, never 1 MHz** (1 MHz: 46-86%; best: 84.5-89.3%). 1 MHz wins only with a bulky inductor (~6 cm² × 4 mm per phase). The likely sweet spot is 2-3 MHz with a 10-15% target (margin 5-10 A). | medium; it redirects the frequency choice |
 | **T15** | **Cs: switching quality ↔ ladder speed ↔ large-transient stability** (L3) | A107 at 5 MHz: 0.6 µF costs ~1 V of high-side turn-on (Q/Cs 1.8 V); 8.7 µF raises the start-up to 215 A and fast line steps to 244 A. The fix is a parameter: the input ramp ∝ √(L Cs). At 1 MHz, Cs ×5 keeps Q/Cs, but the ladder relaxes 5× slower (τ ∝ Cs). | resolved at 5 MHz: Q/Cs ≈ 3% of the rail, ramp ∝ √(L Cs). **Reopened at 1 MHz:** A116's 1 µs line steps fail in both directions while V_Cs1 takes ~15 µs to follow. **A117 at 1 MHz: 3 µF passes the fast line steps** (timed +4.8 V / 1 µs 188 A; comparator +4.8 V / 20 µs 174 A). The efficiency is unchanged, and the in-cycle ripple moves the turn-ons ±1 V. **A118: 6 µF is inside the window** (start-up 157 A; ±4.8 V / 5 µs 191 / 193 A with the floor; 15 µF reaches 211 / 241 A). **The 3 µF failure:** the 5× faster ladder couples with the loop in large fast transients: the handover oscillates ~1.1 ms to 517 A (not reproduced by D63: the in-cycle ripple is suspected), and a 5 µs rising step runs away with the comparator (D63 predicted it). So Cs has a window: too large, slow ladder; too small, unstable large transients. | **high at 1 MHz:** the window, and the handover's softness, are the next design variables |
 | **T16** | **Slotted phases ↔ their own valley** (L6) | Phases 2-4 have no correction from their own current. Input drift costs phases 3-4 zero voltage (A108: falling ≥ 0.1 V/µs), and slaves' valleys float with R spread (C04: ±2.2 A). The per-phase valley trim of the slot is falsified (A109: the slot does not control the valley; it winds up). | open | high: the same gap behind T13's comparator failure |
 | **T17** | **Interleave ↔ slave valleys** (L8) | Uniform T/16 (C02) cuts the 16-phase output ripple ×5 pk-pk and ×7 rms. Slaves run at the master's timing, so ±10% L in a slave costs ±9% sharing and +0.5 V of turn-on, and stays soft-switched (C03). | resolved: `slot_lo`, ±10% L tolerated | low |
@@ -272,7 +272,8 @@ trade-off.
 
 | if this changes | move | because |
 |---|---|---|
-| a lower-R/L inductor becomes available | toward 1 MHz, i_neg 10% | T14 break-even |
+| the inductor's footprint per phase is fixed (in-package) | D64: ≤ 0.5 cm² → 5 MHz; 1-2 cm² → 2-3 MHz with a 10-15% target; never 1 MHz below ~6 cm² | T14 (D64) |
+| a bulky off-package inductor is allowed (h·t ≳ 0.5 mm², ~6 cm² per phase) | toward 1-1.5 MHz, i_neg 7.5-10% with the floor (A118) | T14 (D64) |
 | only high-R/L inductors | 5 MHz, i_neg 15-20% | T8 optimum; margin 8-14 A |
 | the transient specification tightens | lower i_neg (more margin), or the comparator turn-off plus a bus slew limit | T12, T13 |
 | the timed turn-off is kept | keep the margin above ~1 A at the lowest input voltage (I_th ∝ the rail) | T12 (A116 t30 at 43.2 V) |
@@ -352,6 +353,12 @@ trade-off.
 **下一步：**
 1. 用地板深度、电压环带宽（最高约 68 kHz）把最后几安培压下来；
 2. 1 MHz 的四模块系统。
+
+**D64（电感的第一性原理模型）把“频率选哪个”这一环也闭上了：**
+- 用平行板空心电感推出 R/L = 2ρ/(μ0·h·t)，只取决于电感高度和铜厚。
+- 在 P24 那种封装内集成的尺度（每相 ≤2 cm²、高度 ≤2 mm）下，最优频率是 2–5 MHz，1 MHz 一次都不是最优。
+- 1 MHz 要胜出，电感得做到每相约 6 cm²、4 mm 高，那就不是集成方案了。
+- 最可能的甜点：2–3 MHz、负电流 10–15%，离 ZVS 门槛还有 5–10 A 的裕量，瞬态比 1 MHz 更好处理。
 
 **以后怎么调：** 先定两件事，其余跟着走。
 1. **电感工艺：** 决定选哪个频率。

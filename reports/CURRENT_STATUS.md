@@ -1169,6 +1169,19 @@ each question:
          - **Next:** the last amps (floor depth, fc), then four modules at
            1 MHz.
 
+     47. The inductor from first principles, and the frequency it implies:
+         [D64](../symbolic_derivations/03_P24_native/D64_P24_INDUCTOR_FREQUENCY.md).
+         - **Model:** a stripline air-core inductor, R_dc/L =
+           2ρ/(μ0 h t) and R_ac/L = 2ρ/(μ0 h δ), joined to the converter
+           model at 0.5-5 MHz.
+         - **At P24's in-package scale** (≤ 2 cm² per phase) the best
+           frequency is 2-5 MHz, never 1 MHz. 1 MHz needs ~6 cm² × 4 mm
+           per phase.
+         - **The likely sweet spot:** 2-3 MHz with a 10-15% target
+           (margin 5-10 A).
+         - **Redirects the plan:** a 2-3 MHz design point before four
+           modules at 1 MHz.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
