@@ -42,6 +42,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A118": (TA / "A118_p24_floor_turn_off", "a118_analyze.py", "a118_summary.json"),
     "A119": (TA / "A119_p24_one_mhz_candidate_matrix", "a119_analyze.py", "a119_summary.json"),
     "A123": (TA / "A123_p24_candidate_last_amps", "a123_analyze.py", "a123_summary.json"),
+    "A124": (TA / "A124_p24_two_point_five_mhz", "a124_analyze.py", "a124_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -140,6 +141,9 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
              ("l_m80_10us", "peak_200a"): "205 A on the step to 40 V; no limit cycle (RESULTS 0.1, 0.2)"},
     "A123": {(f"{v}_closes", "closes_all_le_200a"): "no single lever closes all three steps; each moves 1-11 A (RESULTS 0)"
              for v in ("c45", "f3", "k66")},
+    "A124": {**{(r, "floor_holds"): "registration error: the front end's 11 ns delay overshoots ~3.75 A at 2.5 MHz, not 1 A "
+                "(RESULTS 0.4)" for r in ("p125_s_m62", "p125_l_m48_5us", "p125_l_m80_10us", "p125_l_p48_5us")},
+             ("p125_l_p48_5us", "peak_200a"): "210 A: the rising-step limit common to every frequency (RESULTS 0.3)"},
 }
 
 

@@ -1182,6 +1182,21 @@ each question:
          - **Redirects the plan:** a 2-3 MHz design point before four
            modules at 1 MHz.
 
+     48. The 2.5 MHz design point:
+         [A123](../experiments/track_A_periodic_steady_state/A123_p24_candidate_last_amps/RESULTS.md),
+         [A124](../experiments/track_A_periodic_steady_state/A124_p24_two_point_five_mhz/RESULTS.md).
+         - **A123:** no single lever closes 1 MHz's last 1-6 A.
+         - **A124, 2.5 MHz, 12.5%, floor, Cs 6 µF, 100 kHz:**
+           - **90.61%**, the best measured;
+           - a 7.9 A margin;
+           - load steps +15.9 / −12.0 mV;
+           - falling line steps pass;
+           - the no-floor control recovers (D63's refitted rule,
+             prospective).
+         - **Open:** rising line steps (+4.8 V / 5 µs 210 A), a limit
+           common to every frequency.
+         - **Recommended design:** 2.5 MHz / 12.5%.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

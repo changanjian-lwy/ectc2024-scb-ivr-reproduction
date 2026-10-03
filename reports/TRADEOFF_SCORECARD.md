@@ -1,4 +1,4 @@
-# Trade-off map - the P24 module and system, through A119, D63, D64 and A120-A122
+# Trade-off map - the P24 module and system, through A124, D63, D64 and A120-A122
 
 2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
@@ -67,22 +67,22 @@ quantity, **the valley margin**:
 
 ## 2. The design points, scored on one table
 
-| metric | **5 MHz, 5%, I2** (adopted: A105/C02) | 5 MHz, 20%, I2 (A110/A112) | 5 MHz, 25%, comparator (A114 c25) | 1 MHz, 10%, I2, 60 kHz (A115) | 1 MHz, 10%, comparator, 60 kHz (A116 c60) | **1 MHz, 10%, I2 + floor, Cs 6 µF** (A118 f6, the 1 MHz candidate) |
-|---|---|---|---|---|---|---|
-| **valley margin** I_th − i_neg (at 43.2 / 48 V) | 27.1 A | 8.4 A | 2.1 A | 0.95 / **2.4 A** | 0.95 / 2.4 A | 0.95 / 2.4 A, but phase 1 held at the floor |
-| high-side turn-on V_DS | 8.9-9.1 V | 2.2-3.0 V | −0.13-+0.88 V | 0.9-1.9 V | 0.85-1.86 V | 1.17-2.36 V |
-| hard turn-on loss | 8.93 W | 0.66 W | ~0 | 0.05 W | 0.04 W | 0.05 W |
-| **efficiency, D62 middle / ideal inductor** | 87.92 / 88.74% | **90.17 / 91.18%** | 90.15 / ~91.2% | 88.98 / **93.57%** | 88.97 / 93.57% | 88.97 / 93.57% |
-| inductor copper (middle R/L) | 2.64 W | 3.05 W | 3.23 W | **13.78 W** | 13.8 W | 13.8 W |
-| **ripple per phase, peak − valley** | 140.6 A | 177.3 A | 190.0 A | 152.7 A | 152.9 A | 153.7 A |
-| output current pk-pk (one module) | 100.9 A | 122.6 A | 133.7 A | 107.8 A | 108.2 A | 109.2 A |
-| Vo ripple (Co 4.672 mF) | 0.19 mV | 0.27 mV | 0.31 mV | 1.00 mV | 1.00 mV | 1.01 mV |
-| ±62.5 A load step | +11.6 / −14.7 mV, ≤ 10 µs | within the 5% design's | ≤ 11 µs | −19.9 mV / 13.7 µs; **−62.5 A runs away** | +28.0 / −28.6 mV, 16 / 22 µs | +25.6 / −19.1 mV, 32 / 13 µs |
-| −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ | +34.9 mV, 26 µs, **201 A** ✗ (by 1 A) |
-| +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs | **206 A** ✗ (by 6 A), no runaway |
-| ±4.8 V / 5 µs, peak | - | - | - | - | 201 A ✗ (−4.8 V, A117) | **191 / 193 A** |
-| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) | 0.14-0.17 A (0.00) |
-| start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A | 157 A |
+| metric | **5 MHz, 5%, I2** (adopted: A105/C02) | 5 MHz, 20%, I2 (A110/A112) | 5 MHz, 25%, comparator (A114 c25) | 1 MHz, 10%, I2, 60 kHz (A115) | 1 MHz, 10%, comparator, 60 kHz (A116 c60) | 1 MHz, 10%, I2 + floor, Cs 6 µF (A118 f6) | **2.5 MHz, 12.5%, I2 + floor, Cs 6 µF (A124, recommended)** |
+|---|---|---|---|---|---|---|---|
+| **valley margin** I_th − i_neg (at 43.2 / 48 V) | 27.1 A | 8.4 A | 2.1 A | 0.95 / **2.4 A** | 0.95 / 2.4 A | 0.95 / 2.4 A, but phase 1 held at the floor | **7.9 A** |
+| high-side turn-on V_DS | 8.9-9.1 V | 2.2-3.0 V | −0.13-+0.88 V | 0.9-1.9 V | 0.85-1.86 V | 1.17-2.36 V | 3.26-3.93 V |
+| hard turn-on loss | 8.93 W | 0.66 W | ~0 | 0.05 W | 0.04 W | 0.05 W | 0.66 W |
+| **efficiency, D62 middle / ideal inductor** | 87.92 / 88.74% | **90.17 / 91.18%** | 90.15 / ~91.2% | 88.98 / **93.57%** | 88.97 / 93.57% | 88.97 / 93.57% | **90.61 / 92.51%** |
+| inductor copper (middle R/L) | 2.64 W | 3.05 W | 3.23 W | **13.78 W** | 13.8 W | 13.8 W | 5.66 W |
+| **ripple per phase, peak − valley** | 140.6 A | 177.3 A | 190.0 A | 152.7 A | 152.9 A | 153.7 A | 159.0 A |
+| output current pk-pk (one module) | 100.9 A | 122.6 A | 133.7 A | 107.8 A | 108.2 A | 109.2 A | 110.0 A |
+| Vo ripple (Co 4.672 mF) | 0.19 mV | 0.27 mV | 0.31 mV | 1.00 mV | 1.00 mV | 1.01 mV | 0.44 mV |
+| ±62.5 A load step | +11.6 / −14.7 mV, ≤ 10 µs | within the 5% design's | ≤ 11 µs | −19.9 mV / 13.7 µs; **−62.5 A runs away** | +28.0 / −28.6 mV, 16 / 22 µs | +25.6 / −19.1 mV, 32 / 13 µs | **+15.9 / −12.0 mV, 6.6 / 3.6 µs** |
+| −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ | +34.9 mV, 26 µs, **201 A** ✗ (by 1 A) | 216 A ✗ |
+| +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs | **206 A** ✗ (by 6 A), no runaway | 218 A ✗ |
+| ±4.8 V / 5 µs, peak | - | - | - | - | 201 A ✗ (−4.8 V, A117) | **191 / 193 A** | 174 / **210 A** ✗ |
+| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) | 0.14-0.17 A (0.00) | not run (0.01) |
+| start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A | 157 A | 163 A |
 
 **Notes:**
 - **"I2":** A105's timed phase-1 turn-off; **"comparator":** A105's I1.
@@ -110,7 +110,12 @@ quantity, **the valley margin**:
    - The 1 µs steps miss by 1 and 6 A.
    - Three independent routes pointed to it before A118 ran: D63's map,
      A120's surrogate search, and A122's reinforcement learning.
-   - **On the full standard matrix (A119)** it passes:
+   - **D64 then showed 1 MHz is not the efficiency optimum at P24's
+     in-package scale. A124's 2.5 MHz design is better:** 90.61%, a
+     7.9 A margin, load steps as at 5 MHz, falling line steps pass.
+     Rising line steps faster than ~10 µs per 4.8 V remain open at every
+     frequency (205-218 A).
+   - **On the full standard matrix (A119)** the 1 MHz candidate passes:
      - every driver row (j30 sd 0.17 A, 0.01 over);
      - ±25 A; the 10 µs line steps.
      - **Misses:** −8 V / 10 µs at 205 A, and the 1 µs steps.
@@ -359,6 +364,11 @@ trade-off.
 - 在 P24 那种封装内集成的尺度（每相 ≤2 cm²、高度 ≤2 mm）下，最优频率是 2–5 MHz，1 MHz 一次都不是最优。
 - 1 MHz 要胜出，电感得做到每相约 6 cm²、4 mm 高，那就不是集成方案了。
 - 最可能的甜点：2–3 MHz、负电流 10–15%，离 ZVS 门槛还有 5–10 A 的裕量，瞬态比 1 MHz 更好处理。
+
+**A124（2.5 MHz、负电流 12.5%）验证了 D64 的方向：**
+- 效率 90.61%，是项目里最高的（5 MHz 最优 90.17%，1 MHz 候选 88.97%）；
+- 离 ZVS 门槛 7.9 A，负载阶跃和 5 MHz 一样好，下降的线电压阶跃都通过；
+- 剩下的是上升的快线电压阶跃（5 µs 内 +4.8 V 时 210 A），这一条在每个频率下都存在，靠母线压摆规格、更小的 Cs 或输入前馈解决。
 
 **以后怎么调：** 先定两件事，其余跟着走。
 1. **电感工艺：** 决定选哪个频率。
