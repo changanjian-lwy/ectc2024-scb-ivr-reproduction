@@ -163,4 +163,64 @@ def evaluate():
 
 
 if __name__ == "__main__":
-    {"baselines": baselines, "train": train_all, "evaluate": evaluate}[sys.argv[1]]()
+    if sys.argv[1] != "distill":
+        {"baselines": baselines, "train": train_all, "evaluate": evaluate}[sys.argv[1]]()
+
+
+# ---- distillation (BOUNDARY Section 5): a rule with <= 6 parameters, linear in rectified Vin features per phase group
+FEAT = {"dvin": 1, "hp2": 2, "hp8": 3, "hp32": 4}            # vin_ff observation indices of the transient features
+GROUPS = {"1|234": [[0], [1, 2, 3]], "1|23|4": [[0], [1, 2], [3]]}
+
+
+def rule_features(o, j):
+    x = o[FEAT[j]]
+    return np.array([max(x, 0.0), max(-x, 0.0)])
+
+
+def fit_rule(O, A, j, groups):
+    """Least squares per group: a_k = w+ relu(f) + w- relu(-f), shared by the group's phases (2 parameters per group)."""
+    X = np.array([rule_features(o, j) for o in O])
+    W = np.zeros((4, 2))
+    for g in groups:
+        y = A[:, g].mean(axis=1)
+        w, *_ = np.linalg.lstsq(X, y, rcond=None)
+        W[g] = w
+    return W
+
+
+def rule_fn(W, j):
+    return lambda o: W @ rule_features(o, j)
+
+
+def distill(policy="vin_ff_s1"):
+    env = make_env("vin_ff")
+    fn, _ = load_policy("vin_ff", int(policy[-1]), env)
+    rng = np.random.default_rng(777)
+    O, A = [], []
+    for _ in range(200):                                     # on-policy states from the training distribution
+        o = env.reset(rng)
+        done = False
+        while not done:
+            a = fn(o)
+            O.append(o); A.append(a)
+            o, _, done, _ = env.step(a)
+    O, A = np.array(O), np.array(A)
+    base = json.loads((HERE / "a127_baselines.json").read_text())
+    ref = base["reference"]
+    pol = json.loads((HERE / "a127_summary.json").read_text())["policies"][policy]
+    gain_pol = pol["mean_return"] - base["none"]["mean_return"]
+    out = {"policy": policy, "policy_return": pol["mean_return"], "rules": {}}
+    for gname, groups in GROUPS.items():
+        for j in FEAT:
+            W = fit_rule(O, A, j, groups)
+            r = A126.score(env, ("policy", rule_fn(W, j)))
+            r["checks"] = checks(env, ("policy", rule_fn(W, j)), ref)
+            r["W"] = W.tolist(); r["n_params"] = 2 * len(groups)
+            r["kept"] = (r["mean_return"] - base["none"]["mean_return"]) / gain_pol
+            out["rules"][f"{gname}/{j}"] = r
+            print(line(f"{gname}/{j}", r)[:150] + f" | kept {r['kept']:.0%}")
+    (HERE / f"a127_distill_{policy}.json").write_text(json.dumps(out, indent=1, default=float) + "\n")
+
+
+if __name__ == "__main__" and sys.argv[1] == "distill":
+    distill(sys.argv[2] if len(sys.argv) > 2 else "vin_ff_s1")
