@@ -1,0 +1,69 @@
+"""D63 valley map: the steady orbit, the crossing physics, and the validated load steps (thresholds from the cached
+D63 diagnostics file, so no D57 solve here)."""
+import json
+import math
+import unittest
+from dataclasses import replace
+from pathlib import Path
+
+from scb_ivr.p24_valley_map import Design, ValleyMap, metrics, simulate, steady_ton
+
+ROOT = Path(__file__).resolve().parents[1]
+DIAG = ROOT / "symbolic_derivations" / "03_P24_native" / "diagnostics" / "D63_valley_map.json"
+TH = tuple(tuple(x) for x in json.loads(DIAG.read_text())["thresholds"]["7.3333333e-09"])
+D = Design(ith=TH, t_tr=(16.904e-9,) * 3 + (15.082e-9,))
+
+
+class SteadyOrbit(unittest.TestCase):
+    def test_matches_a115_orbit(self):
+        # A115's registered orbit at 1 MHz 10%: Ton 93.80 ns, period 1195.1 ns (a115_predictions.json)
+        r = simulate(D, 20e-6, 1.0)
+        last = r[-1]
+        self.assertAlmostEqual(last["ton"] * 1e9, 93.80, delta=0.3)
+        self.assertAlmostEqual(last["period"] * 1e9, 1195.1, delta=3.0)
+        self.assertTrue(all(abs(v + 12.5) < 0.3 for v in last["valley"]))   # phase 4 -12.75 (co-simulation -12.6)
+
+    def test_steady_ton(self):
+        self.assertAlmostEqual(steady_ton(D) * 1e9, 93.8, delta=0.3)
+
+
+class Crossing(unittest.TestCase):
+    def _i_on(self, valley, k=0):
+        m = ValleyMap(D)
+        s = m.init_state(steady_ton(D))
+        s["valley"] = [valley] * 4
+        return m.period(s, 48.0, 0.0)["i_on"][k]
+
+    def test_within_threshold_starts_at_zero(self):
+        self.assertEqual(self._i_on(-14.0), 0.0)
+
+    def test_shallow_crossing_leaves_no_memory(self):
+        # the reverse conduction ramps the current back to zero before the predictive turn-on
+        self.assertEqual(self._i_on(-18.0), 0.0)
+
+    def test_deep_crossing_leaves_memory(self):
+        self.assertLess(self._i_on(-40.0), -5.0)
+
+    def test_positive_valley_decays_before_turn_on(self):
+        i0 = self._i_on(20.0)
+        self.assertAlmostEqual(i0, 20.0 - (1.0 + 2.0) / 7.3333333e-9 * 16.904e-9, delta=0.3)
+
+
+class LoadSteps(unittest.TestCase):
+    def test_comparator_minus_62(self):        # A116 c60_s_m62: +28.04 mV, back 16.12 us
+        m = metrics(simulate(D, 200e-6, 50e-6, i_step=-62.5), 50e-6)
+        self.assertAlmostEqual(m["extreme_mv"], 28.04, delta=2.8)
+        self.assertAlmostEqual(m["back_us"], 16.12, delta=3.0)
+
+    def test_timed_minus_62_crosses_phase1(self):   # A115 n10_s_m62 ran away: phase 1's valley passes the threshold
+        r = simulate(replace(D, mode="timed"), 200e-6, 50e-6, i_step=-62.5)
+        depth = max(x["depth"][0] for x in r if x["t"] >= 50e-6)
+        self.assertGreater(depth, 10.0)
+
+    def test_floor_holds_phase1(self):
+        r = simulate(replace(D, mode="floor", floor_a=2.0), 200e-6, 50e-6, i_step=-62.5)
+        self.assertLess(max(x["depth"][0] for x in r if x["t"] >= 50e-6), 1.0)
+
+
+if __name__ == "__main__":
+    unittest.main()
