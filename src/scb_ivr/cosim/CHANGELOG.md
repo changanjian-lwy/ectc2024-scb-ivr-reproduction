@@ -4,6 +4,21 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-03 (A115) - the input ramp as a configuration value
+
+**Source:** A115 (P24's 1 MHz design point). The start-up ramp must
+grow with √(L Cs), D60's margin over Roberts' first ladder resonance.
+
+**Change:**
+- **`bridge.py`:** cfg key `t_ramp_us` overrides the init run's input
+  ramp (`t_ramp`), as `t_load_us` / `t_hand_us` do.
+
+**Gates:**
+- Absent the key, `make_params` builds the same parameters: the loop
+  only adds keys present in cfg.
+- A 20 µs start check of A115's `cfg_n12p5`: Vin 2.66 V at 19 µs,
+  48 V × 19 / 343.05.
+
 ## 2026-10-03 (review) - recovery time, the output join, per-cycle gaps, an acceptance gate
 
 **Source:** an external review of the multi-module level. All five

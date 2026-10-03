@@ -1,0 +1,327 @@
+{
+ "conditions": {
+  "l_1mhz_h": 7.3333333e-09,
+  "l_5mhz_h": 1.4666667e-09,
+  "r_ohm": 0.00054,
+  "v_rail_v": 12.0,
+  "t_dn_s": 1.26e-09,
+  "required_pct_phase1": {
+   "1MHz": 11.92245706702119,
+   "5MHz": 26.6802142738783
+  }
+ },
+ "check_5mhz_a110": {
+  "n5": {
+   "ton_ratio": 0.9673929047939763,
+   "period_ratio": 0.9995805515750156,
+   "peak_offset_a": -3.0248598723650844,
+   "efficiency_offset_pts": 0.2522046353456773
+  },
+  "n10": {
+   "ton_ratio": 0.9673050889589689,
+   "period_ratio": 1.0004266717267905,
+   "peak_offset_a": -2.8353941072792566,
+   "efficiency_offset_pts": 0.25864372589950335
+  },
+  "n15": {
+   "ton_ratio": 0.9675887515450511,
+   "period_ratio": 1.0015262369721896,
+   "peak_offset_a": -2.532737930848185,
+   "efficiency_offset_pts": 0.26472370693751657
+  },
+  "n20": {
+   "ton_ratio": 0.9678784985573947,
+   "period_ratio": 1.0018477699402206,
+   "peak_offset_a": -2.3102519355890934,
+   "efficiency_offset_pts": 0.26652501104035764
+  },
+  "n25": {
+   "ton_ratio": 0.967140114385707,
+   "period_ratio": 1.0024071857647117,
+   "peak_offset_a": -2.028662952300266,
+   "efficiency_offset_pts": 0.2604052131493688
+  }
+ },
+ "5MHz_n5": {
+  "i_neg_a": 6.25,
+  "hs_on_vds_v_phase1": 8.960319366868012,
+  "t_valley_ns_phase1": 9.346096025779671,
+  "hs_on_vds_v_phase4": 8.536322957615406,
+  "t_valley_ns_phase4": 8.025305322899063,
+  "peak_a": 137.11947674763806,
+  "ton_ns": 18.344407853373067,
+  "period_ns": 232.144011887392,
+  "f_mhz": 4.307670880113324,
+  "ripple_pp_a": 143.36947674763806,
+  "budget_middle_w": {
+   "switch_conduction": 12.878345362800014,
+   "inductor_copper": 2.7642325777089547,
+   "series_caps": 2.842222507861643,
+   "hard_turn_on": 8.752753904697967,
+   "turn_off_overlap": 0.5624427420996508,
+   "gate_drive": 7.366117204993785,
+   "reverse_conduction": 0.0,
+   "total": 35.16611430016201
+  },
+  "efficiency_pct": {
+   "middle": 87.66820020447919,
+   "middle_ideal_inductor": 88.52632230181176,
+   "best": 89.12851444061222
+  }
+ },
+ "5MHz_n7p5": {
+  "i_neg_a": 9.375,
+  "hs_on_vds_v_phase1": 8.014358741592076,
+  "t_valley_ns_phase1": 8.662886539344404,
+  "hs_on_vds_v_phase4": 7.477693588868357,
+  "t_valley_ns_phase4": 7.511839339965498,
+  "peak_a": 139.6878533613108,
+  "ton_ns": 18.689200724262097,
+  "period_ns": 239.91334427939984,
+  "f_mhz": 4.168171649657859,
+  "ripple_pp_a": 149.0628533613108,
+  "budget_middle_w": {
+   "switch_conduction": 13.091263135743308,
+   "inductor_copper": 2.8114507599428875,
+   "series_caps": 2.8497324437621367,
+   "hard_turn_on": 6.672468321888697,
+   "turn_off_overlap": 0.5648074155951761,
+   "gate_drive": 7.1275735209149405,
+   "reverse_conduction": 0.0,
+   "total": 33.117295597847146
+  },
+  "efficiency_pct": {
+   "middle": 88.30262364299762,
+   "middle_ideal_inductor": 89.1882936456678,
+   "best": 89.78804018035753
+  }
+ },
+ "5MHz_n10": {
+  "i_neg_a": 12.5,
+  "hs_on_vds_v_phase1": 7.023382585230988,
+  "t_valley_ns_phase1": 8.281455548535888,
+  "hs_on_vds_v_phase4": 6.3866815683487,
+  "t_valley_ns_phase4": 7.239244324146432,
+  "peak_a": 142.4547089961902,
+  "ton_ns": 19.060687481591533,
+  "period_ns": 248.2847674271344,
+  "f_mhz": 4.027633311389012,
+  "ripple_pp_a": 154.9547089961902,
+  "budget_middle_w": {
+   "switch_conduction": 13.354463361133725,
+   "inductor_copper": 2.8695360304640656,
+   "series_caps": 2.8664043117645406,
+   "hard_turn_on": 4.868817725436519,
+   "turn_off_overlap": 0.5675982552626133,
+   "gate_drive": 6.887252962475211,
+   "reverse_conduction": 0.0,
+   "total": 31.414072646536674
+  },
+  "efficiency_pct": {
+   "middle": 88.83706406324833,
+   "middle_ideal_inductor": 89.75225399756575,
+   "best": 90.3485795703494
+  }
+ },
+ "5MHz_n12p5": {
+  "i_neg_a": 15.625,
+  "hs_on_vds_v_phase1": 6.009699107215578,
+  "t_valley_ns_phase1": 8.037104181688521,
+  "hs_on_vds_v_phase4": 5.278712131534653,
+  "t_valley_ns_phase4": 7.0706010803163215,
+  "peak_a": 145.32066303099873,
+  "ton_ns": 19.445533082210552,
+  "period_ns": 256.9440129585101,
+  "f_mhz": 3.8918984275437256,
+  "ripple_pp_a": 160.94566303099873,
+  "budget_middle_w": {
+   "switch_conduction": 13.649662979086433,
+   "inductor_copper": 2.9345063207305424,
+   "series_caps": 2.88970614486296,
+   "hard_turn_on": 3.376658824141297,
+   "turn_off_overlap": 0.5707602856047065,
+   "gate_drive": 6.655146311099772,
+   "reverse_conduction": 0.0,
+   "total": 30.07644086552571
+  },
+  "efficiency_pct": {
+   "middle": 89.26134566242706,
+   "middle_ideal_inductor": 90.20648586098105,
+   "best": 90.7986267805883
+  }
+ },
+ "1MHz_n5": {
+  "i_neg_a": 6.25,
+  "hs_on_vds_v_phase1": 6.542457862596861,
+  "t_valley_ns_phase1": 18.237409714288514,
+  "hs_on_vds_v_phase4": 5.861168737327434,
+  "t_valley_ns_phase4": 15.993275049580847,
+  "peak_a": 134.36347539869962,
+  "ton_ns": 89.87237701147733,
+  "period_ns": 1106.5068954176081,
+  "f_mhz": 0.9037449329428614,
+  "ripple_pp_a": 140.61347539869962,
+  "budget_middle_w": {
+   "switch_conduction": 12.367957443707727,
+   "inductor_copper": 13.259378193737614,
+   "series_caps": 2.802609247434852,
+   "hard_turn_on": 0.9395629280668695,
+   "turn_off_overlap": 0.11330415610391147,
+   "gate_drive": 1.5454038353322932,
+   "reverse_conduction": 0.0,
+   "total": 31.02821580438327
+  },
+  "efficiency_pct": {
+   "middle": 88.95903896497667,
+   "middle_ideal_inductor": 93.36411295309772,
+   "best": 90.12634082221611
+  }
+ },
+ "1MHz_n7p5": {
+  "i_neg_a": 9.375,
+  "hs_on_vds_v_phase1": 4.240588948482937,
+  "t_valley_ns_phase1": 17.382790015338493,
+  "hs_on_vds_v_phase4": 3.349069651649179,
+  "t_valley_ns_phase4": 15.413226564860894,
+  "peak_a": 137.25812599152528,
+  "ton_ns": 91.81509632454527,
+  "period_ns": 1150.3857927428903,
+  "f_mhz": 0.8692736004811723,
+  "ripple_pp_a": 146.63312599152528,
+  "budget_middle_w": {
+   "switch_conduction": 12.637577131860661,
+   "inductor_copper": 13.5576110450277,
+   "series_caps": 2.8159247423417484,
+   "hard_turn_on": 0.35742141971782004,
+   "turn_off_overlap": 0.1137287140585711,
+   "gate_drive": 1.4864578568228048,
+   "reverse_conduction": 0.0,
+   "total": 30.968720909829308
+  },
+  "efficiency_pct": {
+   "middle": 88.97787596799147,
+   "middle_ideal_inductor": 93.48901028322855,
+   "best": 90.15981292907877
+  }
+ },
+ "1MHz_n10": {
+  "i_neg_a": 12.5,
+  "hs_on_vds_v_phase1": 1.8748908748048159,
+  "t_valley_ns_phase1": 16.904019924522952,
+  "hs_on_vds_v_phase4": 0.7518042097648454,
+  "t_valley_ns_phase4": 15.082362696854977,
+  "peak_a": 140.21652794404818,
+  "ton_ns": 93.80088900809635,
+  "period_ns": 1195.1285300337584,
+  "f_mhz": 0.8367300879109238,
+  "ripple_pp_a": 152.71652794404818,
+  "budget_middle_w": {
+   "switch_conduction": 12.932588581103811,
+   "inductor_copper": 13.882953694560484,
+   "series_caps": 2.8355773882302984,
+   "hard_turn_on": 0.05835188033831005,
+   "turn_off_overlap": 0.11424081998184221,
+   "gate_drive": 1.4308084503276801,
+   "reverse_conduction": 0.0,
+   "total": 31.254520814542428
+  },
+  "efficiency_pct": {
+   "middle": 88.88746011120956,
+   "middle_ideal_inductor": 93.5028367798785,
+   "best": 90.08359186666371
+  }
+ },
+ "1MHz_n12p5": {
+  "i_neg_a": 15.625,
+  "hs_on_vds_v_phase1": -0.5772869773919105,
+  "t_valley_ns_phase1": 16.566106952367555,
+  "hs_on_vds_v_phase4": -2.0011813240006404,
+  "t_valley_ns_phase4": 14.822479413345086,
+  "peak_a": 143.2081796200701,
+  "ton_ns": 95.80929551216755,
+  "period_ns": 1240.2703170546456,
+  "f_mhz": 0.8062758466837844,
+  "ripple_pp_a": 158.8331796200701,
+  "budget_middle_w": {
+   "switch_conduction": 13.247491262222681,
+   "inductor_copper": 14.229468018847363,
+   "series_caps": 2.8605348923316187,
+   "hard_turn_on": 0.0,
+   "turn_off_overlap": 0.11483038117267827,
+   "gate_drive": 1.3787316978292714,
+   "reverse_conduction": 0.0,
+   "total": 31.83105625240361
+  },
+  "efficiency_pct": {
+   "middle": 88.70562503803832,
+   "middle_ideal_inductor": 93.42246496003827,
+   "best": 89.91542836873658
+  }
+ },
+ "loop_1MHz_n5": {
+  "fc_target_hz": 60000.0,
+  "kp_ns_per_v": 574.4596879099876,
+  "ki_ns_per_v": 47.926398775675914,
+  "fc_hz": 60537.45257690599,
+  "pm_deg": 68.8661336862542,
+  "ki_register": 50254,
+  "ladder_hz_cs15uF": [
+   29830.844621517983,
+   55120.21356668973,
+   72018.0296623132
+  ],
+  "fc100": {
+   "pm_deg": 53.41315333757174,
+   "ki_register": 139596
+  },
+  "s_p62": {
+   "extreme_mv": -28.258809460960045,
+   "t_extreme_us": 3.9899999999914355,
+   "back_within_1pct_us": 22.594999999981802,
+   "ton_final_lsb": 3528.0,
+   "ton_pp_late_lsb": 0.0,
+   "vo_pp_late_mv": 4.083129390153317e-07
+  },
+  "s_m62": {
+   "extreme_mv": 27.010570174389017,
+   "t_extreme_us": 3.7049999999915832,
+   "back_within_1pct_us": 14.689999999985895,
+   "ton_final_lsb": 2224.0,
+   "ton_pp_late_lsb": 0.0,
+   "vo_pp_late_mv": 2.0231816222349153e-08
+  }
+ },
+ "loop_1MHz_n10": {
+  "fc_target_hz": 60000.0,
+  "kp_ns_per_v": 543.4267967536853,
+  "ki_ns_per_v": 48.96849745296477,
+  "fc_hz": 60537.45257690599,
+  "pm_deg": 67.42652835574037,
+  "ki_register": 51347,
+  "ladder_hz_cs15uF": [
+   28826.093222851734,
+   53263.67506171006,
+   69592.34520883982
+  ],
+  "fc100": {
+   "pm_deg": 50.98920199200339,
+   "ki_register": 142631
+  },
+  "s_p62": {
+   "extreme_mv": -28.811969193246135,
+   "t_extreme_us": 4.1849999999913345,
+   "back_within_1pct_us": 21.89999999998216,
+   "ton_final_lsb": 3619.0,
+   "ton_pp_late_lsb": 0.0,
+   "vo_pp_late_mv": 5.992831852985603e-05
+  },
+  "s_m62": {
+   "extreme_mv": 27.64152014887289,
+   "t_extreme_us": 3.7049999999915832,
+   "back_within_1pct_us": 15.014999999985728,
+   "ton_final_lsb": 2385.0,
+   "ton_pp_late_lsb": 0.0,
+   "vo_pp_late_mv": 4.4585224401316736e-08
+  }
+ }
+}

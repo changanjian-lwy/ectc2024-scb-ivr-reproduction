@@ -15,9 +15,9 @@ Time base. Each 4 ns clock cycle n covers the plant window [n*T_clk, (n+1)*T_clk
    them back; measurements taken at plant edges return as one-cycle pulses in the next window.
 
 Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase
-1 HIGH and phases 2..N LOW, input ramp, load connection at t_load and handover request at t_hand (cfg "t_load_us" /
-"t_hand_us" override them, A103); "nonlinear_coss" (datasheet Coss(V), A86) and "rev_drop" (Fig. 8 reverse
-conduction Vf + R per device, A87; reverse energy and time recorded per section).
+1 HIGH and phases 2..N LOW, input ramp over t_ramp, load connection at t_load and handover request at t_hand (cfg
+"t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115); "nonlinear_coss" (datasheet Coss(V),
+A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
 
 Controller-side analog functions modelled here:
 - phase 1's asynchronous front end ("async"): while arm1 is high, a latch fires at the plant step where
@@ -211,7 +211,7 @@ def make_params(cfg, ref):
     if cfg.get("rev_drop", 0):
         vf, rr, _ = fit_fig8(10.0, 100.0)
         extra.update(rev_drop=True, rev_vf=vf, rev_r=rr)
-    for key, name in (("t_load_us", "t_load"), ("t_hand_us", "t_hand")):  # A103: start-up sequence timing
+    for key, name in (("t_load_us", "t_load"), ("t_hand_us", "t_hand"), ("t_ramp_us", "t_ramp")):  # A103, A115: start-up
         if key in cfg:
             extra[name] = float(cfg[key]) * 1e-6
     if cfg.get("line_step"):                                          # A106: an input step
