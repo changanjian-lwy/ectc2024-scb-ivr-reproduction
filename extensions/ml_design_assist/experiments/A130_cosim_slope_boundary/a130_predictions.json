@@ -1,0 +1,113 @@
+{
+ "gth_codes": 100,
+ "l_m80_6us": {
+  "gated": {
+   "peak_a": 178.16726734776603,
+   "extreme_mv": 51.71797311710557,
+   "diverged": false,
+   "gmax_codes": 71.52734375,
+   "opened_period": null
+  },
+  "none": {
+   "peak_a": 178.16726734776603,
+   "extreme_mv": 51.71797311710557,
+   "diverged": false
+  },
+  "band_peak_M80": [
+   155.25921905221898,
+   201.07531564331308
+  ],
+  "band_peak_G80": [
+   175.77683412879816,
+   210.8746888113402
+  ]
+ },
+ "l_m80_7p5us": {
+  "gated": {
+   "peak_a": 171.32718401983584,
+   "extreme_mv": 42.29360449389286,
+   "diverged": false,
+   "gmax_codes": 60.43359375,
+   "opened_period": null
+  },
+  "none": {
+   "peak_a": 171.32718401983584,
+   "extreme_mv": 42.29360449389286,
+   "diverged": false
+  },
+  "band_peak_M80": [
+   149.29860680533727,
+   193.3557612343344
+  ],
+  "band_peak_G80": [
+   169.0285227781284,
+   202.77892315981072
+  ]
+ },
+ "l_p48_2us": {
+  "gated": {
+   "peak_a": 180.79541657317895,
+   "extreme_mv": 6.718153057765575,
+   "diverged": false,
+   "gmax_codes": 0.0,
+   "opened_period": null
+  },
+  "none": {
+   "peak_a": 204.45285466153655,
+   "extreme_mv": 11.538905044990777,
+   "diverged": false
+  },
+  "band_peak_M80": [
+   158.1365970007569,
+   203.45423614560102
+  ],
+  "band_peak_G80": [
+   178.36972202194534,
+   213.98530592024466
+  ]
+ },
+ "l_p48_3us": {
+  "gated": {
+   "peak_a": 180.01189767284814,
+   "extreme_mv": 7.034915921450446,
+   "diverged": false,
+   "gmax_codes": 0.0,
+   "opened_period": null
+  },
+  "none": {
+   "peak_a": 197.58283799799756,
+   "extreme_mv": 9.756622865287223,
+   "diverged": false
+  },
+  "band_peak_M80": [
+   157.45127535415452,
+   202.57251999154175
+  ],
+  "band_peak_G80": [
+   177.59671543195591,
+   213.05795093105598
+  ]
+ },
+ "l_p80_10us": {
+  "gated": {
+   "peak_a": 196.05595068760522,
+   "extreme_mv": 7.257968671047221,
+   "diverged": false,
+   "gmax_codes": 0.0,
+   "opened_period": null
+  },
+  "none": {
+   "peak_a": 218.37583580452338,
+   "extreme_mv": 7.758537187561476,
+   "diverged": false
+  },
+  "band_peak_M80": [
+   171.4845511635912,
+   220.62735021161924
+  ],
+  "band_peak_G80": [
+   193.4255087199165,
+   232.0473238788696
+  ]
+ }
+}
