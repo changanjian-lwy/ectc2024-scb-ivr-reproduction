@@ -106,9 +106,12 @@ class ValleyMap:
         return {"vo": d.vref, "vc": [d.vin * (n - j) / n for j in range(1, n)], "acc": ton, "ton_ph1": ton,
                 "valley": [d.i_tgt] * n, "dlo": None, "step": 1, "last_up": None, "t_hist": [None, None], "t": 0.0}
 
-    def period(self, s, vin, i_step):
-        """One phase-1 period from state s (updated in place). Returns the record."""
+    def period(self, s, vin, i_step, rule=None):
+        """One phase-1 period from state s (updated in place). Returns the record. rule ("cmp", "timed", "floor")
+        overrides the design's turn-off rule for this period (A122's agent); after a comparator period dlo takes its
+        on-low interval, as the RTL's learning does."""
         d, n = self.d, self.d.n
+        mode = rule or d.mode
         code = round(s["vo"] / d.adc_lsb)
         e = d.vref - code * d.adc_lsb
         s["acc"] = min(max(s["acc"] + d.ki_ns * 1e-9 * e, self.ton_min), self.ton_max)
@@ -132,17 +135,19 @@ class ValleyMap:
             pk[k], q_on[k] = seg_end(rails[k] - vo, d.r, d.lf, i0, tons[k])
             q_tot[k] = q_on[k] + 0.5 * (v + i0) * d.t_tr[k] + pk[k] * d.t_dn
         # phase 1's low side
-        if d.mode == "cmp":
+        if mode == "cmp":
             t_ls1 = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             t_ls1 = min(t_ls1, d.rs_low_ns * 1e-9)
+            if rule is not None:
+                s["dlo"] = t_ls1
         else:
             if s["dlo"] is None:
                 s["dlo"] = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             t_ls1 = s["dlo"]
-            if d.mode == "floor":
+            if mode == "floor":
                 t_ls1 = min(t_ls1, seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt - d.floor_a))
         v1, q_ls1 = seg_end(-vo, d.r, d.lf, pk[0], t_ls1)
-        if d.mode in ("timed", "floor"):           # the crossing report steps dlo (A100's adaptive step)
+        if mode in ("timed", "floor"):             # the crossing report steps dlo (A100's adaptive step)
             t_cross = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             up = (v1 > d.i_tgt) or (t_ls1 - t_cross < d.lo_tgt_ps * 1e-12)
             s["step"] = min(2 * s["step"], d.smax) if (s["last_up"] is not None and up == s["last_up"]) else 1
