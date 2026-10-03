@@ -1196,6 +1196,19 @@ each question:
          - **Open:** rising line steps (+4.8 V / 5 µs 210 A), a limit
            common to every frequency.
          - **Recommended design:** 2.5 MHz / 12.5%.
+     49. Conformal bands for registered predictions:
+         [A125](../extensions/ml_design_assist/experiments/A125_conformal_registration/RESULTS.md)
+         (extension `ml_design_assist`).
+         - Tested in run order on the 43 bounded registered D63 rows of
+           A117-A124. Peak coverage at nominal 80%: 74% (S), **82%
+           (signed, band −1.3% to +18.4% of D63)**; the hand ±10% band
+           was in effect a 76% band.
+         - **Found:** D63's second weak domain (−8 V / 10 µs at 1 MHz,
+           +18-22%); the Vo extreme's sign flips in 9 of 43 rows; the
+           recovery time is good only to ×3.
+         - **From now on** each boundary registers the conformal band
+           (Mondrian and signed, 80%) next to D63's point; the hand
+           ±10% is retired.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

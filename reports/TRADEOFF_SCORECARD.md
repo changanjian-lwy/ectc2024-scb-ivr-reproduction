@@ -1,4 +1,4 @@
-# Trade-off map - the P24 module and system, through A124, D63, D64 and A120-A122
+# Trade-off map - the P24 module and system, through A124, D63, D64 and A120-A122, A125
 
 2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
@@ -243,6 +243,11 @@ transients.
    D58, D59, D62). One point is then chosen, with the weights.
 6. **The acceptance gate** (`scripts/acceptance.py`) holds every
    registered criterion. Each miss is documented in its RESULTS.
+7. **Registered bands are conformal** (A125, from the next experiment
+   on): D63's point prediction with the Mondrian and signed 80% bands
+   calibrated on every registered row so far (`register_band`). The
+   recovery time gets a log band (D63 is good to ×3), the Vo extreme
+   both excursions.
 
 ## 6. Decisions needed (priorities)
 

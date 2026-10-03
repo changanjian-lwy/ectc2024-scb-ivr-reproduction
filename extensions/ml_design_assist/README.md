@@ -31,6 +31,7 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
 | [A120](experiments/A120_d63_surrogate_mlp/RESULTS.md) | deep learning: a multilayer perceptron | a surrogate of D63 (design + disturbance → peak, Vo extreme, phase 1's crossing, recovery), for fast design-space queries | **done:** all targets met (test peak MAE 2.0 A, 11 000× faster, co-simulation error 8.7 against D63's 9.2 A); the search finds the floor rule with Cs ≲ 8 µF feasible once the bus slew is ≥ 5 µs |
 | [A121](experiments/A121_gp_residual_active/RESULTS.md) | Gaussian process | the residual co-simulation − D63 with its uncertainty; choosing the next co-simulation runs (active learning) | **done:** all criteria met; registered before A118 ran, it predicted A118 with MAE 9.7 A (D63 10.5) and 92% coverage. With 37 points, active learning reduces to space-filling |
 | [A122](experiments/A122_rl_turn_off_policy/RESULTS.md) | reinforcement learning (policy gradient) | phase 1's turn-off decided per period in the D63 environment, against the hand rules (comparator, timed, floor) | **done:** REINFORCE rediscovers the floor (return −30.5 = always-floor; timed −54.5, comparator −152.8) |
+| [A125](experiments/A125_conformal_registration/RESULTS.md) | conformal prediction (split, signed, Mondrian, adaptive) | distribution-free bands around D63's registered predictions, tested in run order on 43 registered rows | **done:** peak coverage 74% (S) / 82% (signed) at nominal 80%; the hand ±10% was a 76% band; finds D63's second weak domain (−8 V / 10 µs at 1 MHz, +18-22%). Bands are registered from the next experiment on |
 
 ## Code
 
@@ -41,6 +42,10 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
   `tests/extensions/test_ml_gp.py` against brute-force leave-one-out.
 - `src/scb_ivr/extensions/ml_rl.py`: the D63 environment, the softmax
   policy, REINFORCE.
+- `src/scb_ivr/extensions/ml_conformal.py`: conformal bands (split,
+  signed, Mondrian, adaptive); tested in
+  `tests/extensions/test_ml_conformal.py` against the finite-sample
+  guarantee.
 
 ## What the three found together
 
