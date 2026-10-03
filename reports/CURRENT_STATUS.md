@@ -1060,6 +1060,30 @@ each question:
          - **Remedy:** a controller architecture change (each phase on its
            own boundary) or an input slew limit.
 
+     41. P24's 1 MHz design point:
+         [A115](../experiments/track_A_periodic_steady_state/A115_p24_one_mhz_design_point/RESULTS.md).
+         - **Why:** 25% (A110) was too much ripple. The papers keep the
+           negative current within 5-10%.
+         - **Design:** Eq. (4)'s 7.333 nH, Cs 15 µF, controller times ×5
+           (period) or ×√5 (node), D59 loop at 60 kHz.
+         - **Results:**
+           - at 10% the high side turns on at 0.9-1.9 V (0.05 W of hard
+             turn-on);
+           - at 12.5%, zero voltage;
+           - ripple +8.6% over the 5 MHz 5% design;
+           - D57 within 0.23 V.
+         - **Efficiency (D62 middle):** 89.0%. The switching losses fall
+           16.8 → 1.6 W, but the inductor copper rises 2.6 → 13.8 W. With
+           an ideal inductor, 93.6%.
+         - **Open:**
+           - the −62.5 A load step at 10% runs away: phase 1's timed
+             turn-off lags Ton, and the loop is 3× faster per period than
+             at 5 MHz;
+           - 12.5% oscillates until the turn-off is timed (A110's
+             flat-valley mechanism).
+           - **Next, A116:** a slower loop, or A113's remedies, at 1 MHz
+             10%.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

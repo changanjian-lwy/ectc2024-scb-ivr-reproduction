@@ -36,6 +36,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A112": (TA / "A112_p24_zvs_designs_matrix", "a112_analyze.py", "a112_summary.json"),
     "A113": (TA / "A113_p24_zvs_turn_off_following", "a113_analyze.py", "a113_summary.json"),
     "A114": (TA / "A114_p24_zvs_comparator_matrix", "a114_analyze.py", "a114_summary.json"),
+    "A115": (TA / "A115_p24_one_mhz_design_point", "a115_analyze.py", "a115_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -105,6 +106,10 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
              **{(r, c): "rising line steps run away with the comparator: phase 1 stretches, the slots follow (RESULTS 0.3)"
                 for r, c in (("c20_l_p48_10us", "back_20us"), ("c20_l_p48_10us", "peak_a112_5A"), ("c20_l_p48_1us", "peak_a112_5A"),
                              ("c25_l_p48_10us", "back_20us"), ("c25_l_p48_10us", "peak_a112_5A"), ("c25_l_p48_1us", "peak_a112_5A"))}},
+    "A115": {**{(r, "step_30pct"): "D59 over-predicts the load-step extreme by ~30% at 1 MHz; the measured dip is smaller (RESULTS 1)"
+                for r in ("n5_s_p62", "n10_s_p62")},
+             **{("n10_s_m62", c): "the load decrease runs away: phase 1's timed turn-off lags Ton, the 60 kHz loop is ~3x "
+                "faster per period than at 5 MHz (RESULTS 0.3, 3.1)" for c in ("peak_200a", "step_30pct", "back_60us")}},
 }
 
 
