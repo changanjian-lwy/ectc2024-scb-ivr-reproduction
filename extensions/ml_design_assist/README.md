@@ -36,6 +36,7 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
 | [A127](experiments/A127_ppo_anchored_feedforward/RESULTS.md) | PPO, anchored pure feed-forward (asymmetric critic) | the same task with the steady state anchored; distilled to a 6-parameter falling-step rule | **done:** 3/3 pass steady and long checks |
 | [A128](experiments/A128_cosim_vin_feedforward/RESULTS.md) | co-simulation of the distilled rule (RTL `scb_vff.v`, cfg "vff") | 2.5 MHz, the A124 rows | **done:** every row <= 200 A (worst 188 A); cost: -8 V/10 us peak 168.5 -> 188.2 A, Vo -28 -> +38 mV |
 | [A129](experiments/A129_cosim_vff_slope_gate/RESULTS.md) | slope gate on the falling term (cfg vff "gth") + the 2.5 MHz standard matrix | 2.5 MHz, the A124 rows, matrix m/j/±25 A | **done:** −8 V/10 us back to 170.9 A / 28.6 mV, −4.8 V/1 us 173.6 A, worst row 181.5 A; matrix passes in both arms; adopted as the line-step closure for steps ≤ 4.8 V at ≥ 1 us; −8 V/5 us 208 A (gate closed): 8 V falls need ≥ 10 us |
+| [A130](experiments/A130_cosim_slope_boundary/RESULTS.md) | bus-slew boundary of vff + gth 100 | 2.5 MHz, −8 V 6/7.5 us, +4.8 V 2/3 us, +8 V 10 us, two step phases | **done:** all <= 200 A; spec: <= 4.8 V >= 1 us, −8 V >= 6 us (192.2 A), +8 V >= 10 us (198.3 A, marginal) |
 
 ## Code
 

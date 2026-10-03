@@ -1234,6 +1234,11 @@ each question:
            with and without it. **Adopted** as the line-step closure:
            steps ≤ 4.8 V at any tested slew ≥ 1 µs; −8 V / 5 µs is 208 A
            with the gate closed, so 8 V falls still need ≥ 10 µs.
+         - **A130** ([RESULTS](../extensions/ml_design_assist/experiments/A130_cosim_slope_boundary/RESULTS.md)):
+           bus-slew spec of the adopted design (cosim, two step phases):
+           steps ≤ 4.8 V ≥ 1 µs (4.8 V/µs, rise and fall); −8 V ≥ 6 µs
+           (1.33 V/µs; 192.2 A); +8 V ≥ 10 µs (0.8 V/µs; 198.3 A,
+           marginal). **Line closed.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
