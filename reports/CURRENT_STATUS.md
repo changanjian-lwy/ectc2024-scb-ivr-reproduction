@@ -1041,6 +1041,25 @@ each question:
          - **Next (A113):** A100's Ton feed-forward, or the comparator
            turn-off, at 25%.
 
+     40. Phase 1's turn-off at 25% and 20%:
+         [A113](../experiments/track_A_periodic_steady_state/A113_p24_zvs_turn_off_following/RESULTS.md),
+         [A114](../experiments/track_A_periodic_steady_state/A114_p24_zvs_comparator_matrix/RESULTS.md).
+         - **The dlo feed-forward** fixes the load step but wrecks line
+           steps. Falsified.
+         - **The comparator turn-off (I1)** keeps the steady state (90.15-
+           90.18%) and fixes load steps and falling line steps (≤ 11 µs).
+           But rising line steps run away (246-290 A): phase 1 stretches
+           at its boundary and the slotted phases follow its period with
+           unchanged rails.
+         - **Established (A110-A114):**
+           - practical high-side zero voltage at 25% and the efficiency
+             optimum at 20% (+2.2 points), robust in steady state;
+           - the limit is fast line transients, a property of "phase 1 at
+             its boundary, phases 2-4 on slots" magnified by the large
+             negative current.
+         - **Remedy:** a controller architecture change (each phase on its
+           own boundary) or an input slew limit.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

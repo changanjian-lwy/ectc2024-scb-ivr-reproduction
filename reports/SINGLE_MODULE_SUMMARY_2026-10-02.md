@@ -85,3 +85,31 @@ voltage.
 - **Derivations:** `symbolic_derivations/03_P24_native/` (D43-D59).
 - **Running status:** `reports/CURRENT_STATUS.md`.
 - **Trade-offs:** `reports/TRADEOFF_SCORECARD.md`.
+
+## 8. Addendum 2026-10-03: high-side zero voltage by the negative current (A110-A114)
+
+The negative-current target (Section 4's first choice) was raised from
+5% to 10-30% of the peak. Physical model and D62 middle-case loss model
+as above.
+
+| target | high-side turn-on | efficiency | steady state | fast line steps |
+|---|---|---|---|---|
+| 5% (Section 1) | 8.9-9.1 V | 87.9% | robust | 207 A at +4.8 V / 1 µs |
+| **20%** | 2.2-3.0 V | **90.2%** | robust (A112) | timed turn-off: 199-204 A, −4.8 V / 1 µs settles in 75 µs |
+| **25%** | **−0.16 to +0.88 V (practical zero voltage)** | **90.1%** | robust (A112) | timed: falling steps oscillate 160-180 µs; comparator (A114): rising steps run away to 246-290 A |
+| 30% | partly zero voltage | 89.4% | the valley-based turn-on timing breaks down (A110, A111) | - |
+
+- **Why 1-2% (P24) and 5% (this design) do not give zero voltage:**
+  the node's capacitance needs ~27% at 1.47 nH (D57). Measured, zero
+  voltage first appears at 25%.
+- **The gain:** the high side's hard-turn-on loss (8.9 W) and part of the
+  gate drive (lower frequency) outweigh the extra conduction.
+- **The open limit:** fast input changes. The controller structure (phase
+  1 at its boundary, phases 2-4 on slots) cannot follow a fast rail
+  change with a large negative current. A per-phase boundary, or an
+  input slew limit, is needed.
+- **For evaluation:** whether the bus slew allows 20-25%.
+  - **20%** is the robust choice today: load steps and slow inputs fine;
+    line-step peaks at the limit.
+  - **25%** needs either a slow bus or the controller change.
+
