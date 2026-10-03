@@ -37,6 +37,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A113": (TA / "A113_p24_zvs_turn_off_following", "a113_analyze.py", "a113_summary.json"),
     "A114": (TA / "A114_p24_zvs_comparator_matrix", "a114_analyze.py", "a114_summary.json"),
     "A115": (TA / "A115_p24_one_mhz_design_point", "a115_analyze.py", "a115_summary.json"),
+    "A116": (TA / "A116_p24_one_mhz_transients", "a116_analyze.py", "a116_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -110,6 +111,17 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
                 for r in ("n5_s_p62", "n10_s_p62")},
              **{("n10_s_m62", c): "the load decrease runs away: phase 1's timed turn-off lags Ton, the 60 kHz loop is ~3x "
                 "faster per period than at 5 MHz (RESULTS 0.3, 3.1)" for c in ("peak_200a", "step_30pct", "back_60us")}},
+    "A116": {**{(r, "extreme_band"): "the bands scaled D59 by A115's timed 0.7; with the comparator D59 is exact, within 4% "
+                "(RESULTS 0.3)" for r in ("c60_s_m62", "c30_s_m62", "c60_s_p62", "c30_s_p62")},
+             ("t30_s_m62", "extreme_band"): "H1: the valleys still pass the threshold (-54 A); a slow oscillation, a dip "
+                                            "(RESULTS 0.1)",
+             ("t30_s_m62", "back_60us"): "H1: 200 us, as A112's 25% at 5 MHz (RESULTS 0.1)",
+             **{(r, c): "1 MHz line steps over 1 us: the ladder lags (Cs x5) and the slotted valleys pass the threshold "
+                "(RESULTS 0.4)" for r, c in (("t60_l_m48_1us", "peak_200a"), ("t60_l_m48_1us", "back_60us"),
+                                             ("t30_l_m48_1us", "peak_200a"), ("c60_l_m48_1us", "peak_200a"),
+                                             ("c30_l_m48_1us", "peak_200a"), ("c30_l_m48_1us", "back_60us"))},
+             ("t30_l_m48_1us", "back_60us"): "at 43.2 V the margin is 0.95 A: the timed design's +-18 mV limit cycle "
+                                             "(RESULTS 0.5)"},
 }
 
 

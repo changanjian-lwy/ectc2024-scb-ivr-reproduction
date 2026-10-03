@@ -1,86 +1,343 @@
-# Trade-off scorecard - the P24 module's controller, A92 to A100
+# Trade-off map - the P24 module and system, through A116
 
-2026-10-01. **One table for every design on the adopted line, with the same
-metrics.** The purpose is to tell real improvements from moves along a
-trade-off curve, and to stop the project from cycling between them. Every
-future design change is scored on this table (Section 5).
+2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
+kept as Appendix A.
 
-**Conditions for every number:**
-- P24 single module, 4 phases, Verilog RTL co-simulated with A88's plant:
-  datasheet Coss(V), reverse drop, 25 C;
-- ZVS target -6.25 A (the "5%" case), resistive load of about 250 A;
-- statistics over the last 200 cycles.
+**Purpose:**
+- record every trade-off found so far;
+- show how they connect into one loop, and which links are measured;
+- say which way to move when a requirement or an assumed value
+  changes.
 
-**Sources:**
-- each experiment's RESULTS;
-- `experiments/track_A_periodic_steady_state/A98_jitter_amplification/a98_summary.json`,
-  `A99_.../a99_summary.json`, `A100_.../a100_summary.json`;
-- the mathematical models D52-D55.
+**Every number comes from a registered experiment.**
+- **Conditions,** unless a row says otherwise:
+  - one P24 module (4 phases, 250 W, 48 V → 1 V);
+  - Verilog RTL co-simulated with A88's plant (datasheet Coss(V),
+    reverse conduction), 25 C;
+  - statistics over the last 200 periods.
+- **Losses:** D62's middle case on each run's measured waveforms.
 
-## 0. Correction (2026-10-01): the largest switching loss was missing
+**Words used here:**
+- **lever:** a design value we choose;
+- **constraint:** pass/fail;
+- **objective:** better/worse;
+- **the valley margin:** I_th − i_neg, the distance from the
+  negative-current target to D57's zero-voltage threshold (phase 1's
+  node).
 
-**The high side does not turn on at zero voltage in any design here.** It
-turns on at the resonance valley.
-- High-side V_DS at turn-on is about 9 V of the ~12 V it blocks. The low
-  side does turn on at zero voltage (−0.01 V).
-- The orbit's turn-on V_DS against the negative-current target (D47):
+## 0. In one paragraph
 
-  | target | high-side turn-on V_DS |
-  |---|---:|
-  | 2% | 9.9 V |
-  | 3% | 9.7 V |
-  | **5% (used)** | **9.0 V** |
-  | 7.5% | 8.0 V |
+The design is pulled between switching loss and robustness by one
+quantity, **the valley margin**:
+- **Efficiency pushes i_neg up toward I_th.** The high side's hard
+  turn-on loss falls to zero at I_th.
+- **Transients push it down.** When a transient deepens a valley past
+  I_th, the node clamps at the rail. The predictive turn-on then loses
+  its target and the timing breaks down (A110 30%, A112 25%, A115).
+- **The switching frequency sets I_th itself** (∝ V_rail √(C_node / L),
+  L ∝ 1/f by Eq. (4)): 33.4 A at 5 MHz, 14.9 A at 1 MHz.
+  - Lower f: zero voltage is cheap in ripple.
+  - But the inductor's copper (∝ L) and the loop's sample delay (∝ 1/f)
+    grow.
+- **That closes the loop:**
+  - the inductor technology decides whether a lower f pays;
+  - the transient specification decides how much margin to keep;
+  - the margin decides how close to I_th, and so how efficient, the
+    design can run.
 
-- The co-simulation agrees: 8.9-9.0 V.
+## 1. The levers
 
-**The scorecard's "hard-on loss (A91's estimate)" row counts only early
-low-side turn-ons.** It is renamed below.
-
-**The high-side valley turn-on loss** is estimated with A91's method from
-the datasheet Coss: a lower bound Eoss(V) of the 2 high-side devices, an
-upper bound Qoss(V)·V of the 5 devices on the node.
-
-| target | 2% | 3% | **5%** | 7.5% |
+| # | lever | tried | current choice | evidence |
 |---|---|---|---|---|
-| loss, all phases | 3.9-20 W | 3.7-19 W | **3.1-16 W** | 2.4-12 W |
+| L1 | **switching frequency / filter L** (Eq. (4), L ∝ 1/f) | 5 MHz, 1.4667 nH; 1 MHz, 7.333 nH | 5 MHz adopted; 1 MHz under test | A110, A115 |
+| L2 | **negative-current target i_neg** (% of the 125 A peak) | 2-30% at 5 MHz; 5-12.5% at 1 MHz | 5% in the adopted design; best measured 20% (5 MHz), 10% (1 MHz) | D47, A110-A115 |
+| L3 | **series capacitor Cs** | 0.6-8.7 µF (5 MHz); 15 µF (1 MHz) | 3 µF (5 MHz) | A107, A115 |
+| L4 | **voltage-loop bandwidth** | I-only 7.5 kHz; PI 30-150 kHz | 100 kHz (5 MHz); 60 kHz (1 MHz) | A104, A115, A116 |
+| L5 | **phase 1's low-side turn-off** | comparator (I1); timed dlo ±1 / ADM32 (I2); dlo feed-forward | I2 (ADM32) at 5 MHz; comparator (I1) at 1 MHz | A99, A100, A105, A113, A114, A116 |
+| L6 | **slot rule, phases 2-4** | fixed; follow; 2-period average; `slot_lo`; valley trim | average + `slot_lo` | A92-A97, C02, A109 |
+| L7 | **start-up sequence** | load at t = 0, handover, mode S Ton; input ramp ∝ √(L Cs) | A103's c1d | A103, A107, A115 |
+| L8 | **modules and interleave** | 1-4 modules; T/16 grid | 4 modules, `slot_lo` (uniform T/16) | C01-C04 |
+| L9 | **node devices** (high + low side per phase) | 2 + 3 EPC2067 (P24 Table 3) | 2 + 3; P24 Sec. IV's 1 + 2 not run | D57 only |
+| L10 | **auxiliary commutation branch** (extension) | Lr 0.75-1.25 nH | not adopted (extension) | A101, A102 |
 
-At 5% that is 1-6% of the ~250 W output. **It is 30-100 times larger than
-every loss the A92-A100 changes moved** (P_rev ≤ 0.17 W, early low-side
-turn-ons ≤ 0.1 W). It is the same in every design on this table, because
-none of them changes the orbit's turn-on voltage.
+**Environment, not levers:**
+- the input slew (bus), A106 / A108;
+- the load-step size;
+- the inductor technology's R/L.
 
-**Why (estimate, not yet a computed orbit).**
-- The node carries 5 EPC2067 (about 2 nF each at 9 V, about 10 nF in
-  total) against L = 1.47 nH, so Z ≈ 0.38 Ω.
-- A full 12 V swing would need roughly 30 A of negative current, about
-  25% of the peak.
-- Extrapolating the 2-7.5% trend gives the same order.
-- P24 states that 1-2% is enough. That discrepancy is the most important
-  open question for Mihai: the snubber or node capacitance, and the
-  devices on the node.
+## 2. The design points, scored on one table
 
-**Consequence for priorities.** The jitter and tracking work (A98-A100)
-moves second-order losses. The first-order item is the high-side turn-on:
-- the trade-off between the negative-current target (conduction loss of
-  the circulating current) and the turn-on voltage;
-- and the paper's ZVS claim.
+| metric | **5 MHz, 5%, I2** (adopted: A105/C02) | 5 MHz, 20%, I2 (A110/A112) | 5 MHz, 25%, comparator (A114 c25) | 1 MHz, 10%, I2, 60 kHz (A115) | **1 MHz, 10%, comparator, 60 kHz** (A116 c60) |
+|---|---|---|---|---|---|
+| **valley margin** I_th − i_neg (at 43.2 / 48 V) | 27.1 A | 8.4 A | 2.1 A | 0.95 / **2.4 A** | 0.95 / 2.4 A |
+| high-side turn-on V_DS | 8.9-9.1 V | 2.2-3.0 V | −0.13-+0.88 V | 0.9-1.9 V | 0.85-1.86 V |
+| hard turn-on loss | 8.93 W | 0.66 W | ~0 | 0.05 W | 0.04 W |
+| **efficiency, D62 middle / ideal inductor** | 87.92 / 88.74% | **90.17 / 91.18%** | 90.15 / ~91.2% | 88.98 / **93.57%** | 88.97 / 93.57% |
+| inductor copper (middle R/L) | 2.64 W | 3.05 W | 3.23 W | **13.78 W** | 13.8 W |
+| **ripple per phase, peak − valley** | 140.6 A | 177.3 A | 190.0 A | 152.7 A | 152.9 A |
+| output current pk-pk (one module) | 100.9 A | 122.6 A | 133.7 A | 107.8 A | 108.2 A |
+| Vo ripple (Co 4.672 mF) | 0.19 mV | 0.27 mV | 0.31 mV | 1.00 mV | 1.00 mV |
+| ±62.5 A load step | +11.6 / −14.7 mV, ≤ 10 µs | within the 5% design's | ≤ 11 µs | −19.9 mV / 13.7 µs; **−62.5 A runs away** | +28.0 / −28.6 mV, 16 / 22 µs |
+| −4.8 V / 1 µs | −18.5 mV | −25.7 mV, 75 µs | +15.8 mV, 2.8 µs | **runs away (495 A)** ✗ | +94 mV, 44 µs, **206 A** ✗ |
+| +4.8 V / 1 µs, peak | 207 A ✗ | 199 A | **287 A ✗** | **runs away (546 A)** ✗ | **341 A** ✗, back in 52 µs |
+| turn-off sd, 30 ps jitter (0 ps) | 0.49-0.53 A | 0.36-0.48 A | 0.59-0.68 A | 0.13-0.16 A (0.00) | not run (0.11-0.12) |
+| start-up peak | 170 A | 170 A | 204 A ✗ | 158 A | 158 A |
 
-## 1. The designs
+**Notes:**
+- **"I2":** A105's timed phase-1 turn-off; **"comparator":** A105's I1.
+- **The 20% and 25% rows use the 100 kHz loop.**
+- **The 5 MHz 5% row** is the reference for every "within" entry.
+- **✗** marks a hard-constraint miss (peak > 200 A).
+
+**Reading the table:**
+1. **No column dominates.**
+   - 5 MHz 20% is the best efficiency with today's inductor
+     assumption, at a margin of 8.4 A.
+   - 1 MHz 10% is the best with a low-R/L inductor and the lowest
+     ripple for its turn-on voltage, but it has the smallest margin.
+2. **Every column with margin ≤ 2.5 A fails a transient.**
+   - With the timed turn-off: load decrease, falling line.
+   - With the comparator: rising line.
+   - At 1 MHz both directions of the 1 µs line step fail, because the
+     ladder is also 5× slower (Cs 15 µF).
+3. **The column with 8.4 A passes everything but the line-step edges
+   (199-204 A).**
+4. **At 1 MHz the comparator turn-off (A116 c60) fixes the load steps
+   at no steady-state cost.** It is the provisional 1 MHz controller.
+   Its open limit is the fast line step.
+
+## 3. The trade-offs
+
+Status:
+- **resolved:** a choice was made with data;
+- **open:** measured, no choice yet;
+- **estimate:** not yet measured.
+
+Loop risk: whether fixing it tends to undo another.
+
+| # | trade-off (lever) | gain ↔ cost, with evidence | status | loop risk |
+|---|---|---|---|---|
+| T1 | **Start-up starvation ↔ mid-band jitter** (L6) | A92 starves at m3n (827 A). A93 fixes it but doubles the two-cycle dither (×1.93). A97 removes the peak at 1.2-1.4× A92's mid-band jitter. | resolved: A97 (+ C02 `slot_lo`) | high if reopened (Appendix A) |
+| T2 | **Early high-side turn-ons ↔ reverse conduction** (corrector gain) | A98 g/4: half the early turn-ons, P_rev 89 → 172 mW at 100 ps | resolved: gain 1/2 | medium |
+| T3 | **Early-step size ↔ protection** | D53: smaller steps, more early turn-ons | resolved: 0.2 ns (×√5 at 1 MHz) | low |
+| T4 | **Phases 2-4 period jitter ↔ phase 1's turn-off current** (L5) | A99/A100: phases 2-4 −24 to −38%; phase 1's spread 0.17 → 0.4-1.2 A | resolved for 5%: I2 (A105) | medium; see T13 |
+| T5 | **Load-step tracking ↔ jitter** (dlo rule) | ADM32: tracking 19-23 → 1.4-1.7 A for +7-13% spread at 30 ps | resolved: ADM32 | coupled to T6, T13 |
+| T6 | **Loop speed ↔ droop ↔ Ton dither ↔ stability** (L4) | A104: ±62.5 A from ±12% (I-only) to ±1.7% (100 kHz), dither 1-9 LSB, +6-15% spread. **At 1 MHz the ADC samples once per period:** 100 kHz gives a 53° margin and overflows the 16-bit ki, so 60 kHz is the ceiling (A115). | resolved at 5 MHz (100 kHz). **At 1 MHz: 60 kHz with the comparator** (A116). 30 kHz only turns the timed design's runaway into a 200 µs oscillation (H1), and costs ±48 mV against ±28 mV. | resolved; the loop is not the trigger |
+| T7 | **Prediction ↔ reaction** (a pattern) | each predicted edge removes a comparator's noise, needs learning, and moves the error elsewhere | structural | - |
+| **T8** | **High-side turn-on voltage ↔ circulating current ↔ ripple** (L2) | 5 MHz (A110): 5% → 20% saves 8.3 W of hard turn-on, costs +1.9 W of conduction and +26% ripple (140.6 → 177.3 A). The optimum is 20%: 90.17%. Zero voltage at 25%, +35% ripple. 1 MHz (A115): 10% gives 0.05 W at +8.6% ripple. | open: 20% robust at 5 MHz; 1 MHz pending A116 | feeds T12 |
+| T9-T11 | **Auxiliary commutation branch** (extension) | saves 2.6-3.4 W net at 5% (A102); +10-12% switch area | open, outside the reproduction | `extensions/aux_commutation_branch/README.md` |
+| **T12** | **Valley margin ↔ timing robustness** (L2 with L1) | **The unifying limit.** Margin ≤ 2.5 A fails transients: A112 p25 (2.1 A: −62.5 A step 183 µs, falling line 182 µs); A115 n10 (2.4 A: −62.5 A runaway, 554 A); A115 n12p5 (−0.6 A: ±45 mV oscillation until the turn-off is timed). Margin 8.4 A (A112 p20) passes except the line-step edges. Margin 27 A (5%) passes everything but +4.8 V / 1 µs. A111's zero-voltage valley measurement, a fix by measurement, is falsified. **A116 confirms the trigger (H1):** with a 30 kHz loop the timed design's valleys still reach −54 A; the loop's speed decides only between a runaway and a slow oscillation. A short ~3 A crossing (c60, +62.5 A) is tolerated. **The margin moves with the input** (D57: I_th 13.45 / 14.90 / 16.32 A at 43.2 / 48 / 52.8 V). The timed design needs more than ~1 A at the lowest input (t30 at 43.2 V: ±18 mV limit cycle); the comparator design does not. | **open: the binding constraint** | **the loop closes here** (Section 4) |
+| **T13** | **Timed ↔ comparator phase-1 turn-off in transients** (L5) | Mirror failures at large i_neg. Timed: phase 1's valley rises on falling steps and deepens on load decreases (A112, A115). Comparator: phase 1 stays at its boundary, stretches on rising steps, and the slotted phases follow its period (A114: 246-290 A). dlo feed-forward k = 11 fixes load steps but wrecks line steps (A113). | **1 MHz: comparator** (A116: the load steps need it; timed runs away). Both fail the 1 µs line steps at 1 MHz. | **high:** fixing one direction breaks the other; needs an architecture change (each phase on its own boundary) or a slew limit |
+| **T14** | **Switching frequency ↔ inductor ↔ loop** (L1) | 5 → 1 MHz (A115): switching losses 16.84 → 1.59 W; I_th 33.4 → 14.9 A; inductor copper 2.64 → 13.78 W (middle R/L); Vo ripple ×5 (Co unchanged); loop ceiling 100 → 60 kHz. **Break-even (D62, measured waveforms):** 1 MHz 10% beats 5 MHz 5% below 103 µΩ/nH (0.75 mΩ per phase at 7.33 nH), and 5 MHz 20% below 51 µΩ/nH (0.38 mΩ). | open: rests on the inductor's R/L | medium |
+| **T15** | **Cs: switching quality ↔ ladder speed** (L3) | A107 at 5 MHz: 0.6 µF costs ~1 V of high-side turn-on (Q/Cs 1.8 V); 8.7 µF raises the start-up to 215 A and fast line steps to 244 A. The fix is a parameter: the input ramp ∝ √(L Cs). At 1 MHz, Cs ×5 keeps Q/Cs, but the ladder relaxes 5× slower (τ ∝ Cs). | resolved at 5 MHz: Q/Cs ≈ 3% of the rail, ramp ∝ √(L Cs). **Reopened at 1 MHz:** A116's 1 µs line steps fail in both directions while V_Cs1 takes ~15 µs to follow. A smaller Cs trades ~1 V of turn-on for a 5× faster ladder (next, after A117). | **medium at 1 MHz:** couples the steady-state turn-on loss (T8) to line robustness (T18) |
+| **T16** | **Slotted phases ↔ their own valley** (L6) | Phases 2-4 have no correction from their own current. Input drift costs phases 3-4 zero voltage (A108: falling ≥ 0.1 V/µs), and slaves' valleys float with R spread (C04: ±2.2 A). The per-phase valley trim of the slot is falsified (A109: the slot does not control the valley; it winds up). | open | high: the same gap behind T13's comparator failure |
+| **T17** | **Interleave ↔ slave valleys** (L8) | Uniform T/16 (C02) cuts the 16-phase output ripple ×5 pk-pk and ×7 rms. Slaves run at the master's timing, so ±10% L in a slave costs ±9% sharing and +0.5 V of turn-on, and stays soft-switched (C03). | resolved: `slot_lo`, ±10% L tolerated | low |
+| **T18** | **Input slew ↔ peak and soft switching** (environment) | The 200 A limit holds from 2.4 V/µs rising; zero-voltage valleys need ≤ 0.24 V/µs rising, and falling fails even at 0.096 V/µs (A108). | open: needs the bus specification. At 1 MHz 4.8 V/µs fails every variant (A116); the tolerated slew is A117's question. | coupled to T13, T15 and T16 |
+
+## 4. The loop
+
+```mermaid
+flowchart LR
+  F["L1 frequency ↓<br/>(L ↑, Eq. 4)"] -->|"I_th ∝ V√(C/L) ↓ (D57, measured)"| TH["zero-voltage threshold I_th"]
+  F -->|"∝ f (A115, measured)"| SW["switching loss ↓"]
+  F -->|"∝ L × R/L (D62; R/L assumed)"| CU["inductor copper ↑"]
+  F -->|"one ADC sample per period (A115)"| LP["loop ceiling ↓ (60 kHz at 1 MHz)"]
+  N["L2 i_neg ↑"] -->|"D57 (measured, ±0.23 V)"| HS["high-side turn-on V ↓"]
+  HS --> SW
+  N -->|"ΔI = 2(I + i_neg) (D58, measured)"| RP["ripple, conduction ↑"]
+  TH --> M["valley margin<br/>I_th − i_neg"]
+  N --> M
+  M -->|"margin ≤ 2.5 A fails (A112, A115)"| TR["transient robustness"]
+  LP -->|"droop ∝ 1/(fc·Co) (D59)"| DR["load-step droop ↑"]
+  LP -->|"decides runaway vs slow oscillation, not the trigger (A116)"| TR
+  CS["L3 Cs ↑"] -->|"ladder τ ∝ Cs (D60, A107, A116)"| TR
+  CS -->|"Q/Cs ↓: turn-on V ↓ (A107)"| HS
+  T13["L5 phase-1 turn-off<br/>timed ↔ comparator (T13)"] --> TR
+  SL["bus slew (T18)"] --> TR
+  TR -->|"keep margin: limits i_neg"| N
+  SW --> EF["efficiency"]
+  CU --> EF
+  RP --> EF
+  EF -->|"push i_neg toward I_th"| N
+  CU -->|"R/L decides if lower f pays"| F
+```
+
+**The two feedbacks that close it:**
+1. **Efficiency ↔ robustness through i_neg:**
+   - efficiency pushes i_neg toward I_th;
+   - robustness keeps a margin below it.
+   - The two meet at i_neg = I_th − (worst transient valley excursion).
+2. **Frequency through the inductor and the loop:**
+   - a lower f lowers I_th (zero voltage at low ripple) and the
+     switching loss;
+   - it raises the copper and lowers the loop's ceiling, which raises
+     the droop and changes the transient excursion that sets the
+     margin.
+
+**What closes the loop numerically, and what does not yet:**
+
+| link | status |
+|---|---|
+| f → I_th | **measured.** D57 against the co-simulation: phases 1-3 within 0.2 V at 5 MHz (A110); every phase within 0.23 V of its own node at 1 MHz (A115). |
+| i_neg → turn-on V, ripple, conduction | **measured** (A110, A115) |
+| f → switching loss | **measured** (A115) |
+| f → copper | **modelled.** D62 with an assumed R/L; the R/L itself is open. |
+| f → loop ceiling → droop | **measured.** With the comparator, D59 is exact within 4% at 1 MHz (A116). With the timed turn-off the extremes are ~30% smaller: its frozen interval adds gain (A115). |
+| margin → transient robustness | **measured as a threshold, the trigger confirmed** (A116 H1). Fail at 2.1-2.4 A, pass at 8.4 A; a ~3 A crossing for a few periods is tolerated. **The worst excursion as a function of the turn-off mode, the loop and the ladder is not modelled.** |
+| Cs → ladder → line-step excursion | measured at 5 MHz (A107, A108); at 1 MHz only at 1 µs (A116: fails) |
+| bus slew → robustness | measured at 5 MHz (A108); at 1 MHz only the 1 µs point (A116); A117 next |
+
+**So the loop is closed in structure, and in every link but one:** the
+transient valley excursion. That one needs a small model: the valley's
+deviation per period after a Ton change, with dlo frozen, against the
+loop's Ton trajectory. That model, plus A116, would give the margin
+each design needs, in amps.
+
+## 5. How every change is scored from now on
+
+1. **The standard matrix** (`scb_ivr.cosim.matrix.ROWS`), the same for
+   every candidate:
+   - n0;
+   - driver mismatch m ±1 and ±3.4 ns;
+   - jitter 30 and 100 ps;
+   - load steps ±25 and ±62.5 A;
+   - line steps ±4.8 V over 1 and 10 µs, and −8 V over 10 µs.
+   - **At 1 MHz:** the step times ×5; the line-step slews stay physical
+     (the bus does not change with the converter).
+2. **Hard constraints** (pass/fail):
+   - no cross-conduction;
+   - peaks ≤ 200 A, the start-up included;
+   - the low side at zero voltage in steady state;
+   - every step recovers (`step_stats` finite).
+3. **Objectives,** scored on Section 2's rows:
+   - efficiency (D62 middle and ideal inductor);
+   - ripple (per phase, output current, Vo);
+   - load-step and line-step extremes and recovery;
+   - jitter spread;
+   - start-up;
+   - RTL size.
+4. **Report the valley margin** (I_th − i_neg, D57) with every design.
+   A margin below ~2.5 A is a known failure region (T12).
+5. **The mathematical model maps the curve before a choice** (D57,
+   D58, D59, D62). One point is then chosen, with the weights.
+6. **The acceptance gate** (`scripts/acceptance.py`) holds every
+   registered criterion. Each miss is documented in its RESULTS.
+
+## 6. Decisions needed (priorities)
+
+For the user and Mihai. Each one moves the design along a different
+trade-off.
+1. **The inductor technology (T14).** It decides the frequency.
+   - **Below ~51 µΩ/nH** (0.38 mΩ per phase at 7.33 nH): 1 MHz wins
+     outright.
+   - **Above ~103 µΩ/nH:** stay at 5 MHz.
+   - In between: 1 MHz beats the 5% design but not 20%.
+   - **For scale:** D62's middle case is 79 µΩ/nH (an MPC core).
+     P24 Table 2's embedded inductors are 4000-5800 µΩ/nH, far worse at
+     both frequencies.
+2. **The transient specification (T12, T18).**
+   - The largest load step and its slew; the bus slew rate.
+   - These fix the valley margin to keep, and so how close to zero
+     voltage the design may run.
+3. **The voltage-loop bandwidth (T6).**
+   - 5 MHz: 60 kHz (no spread cost), 100 kHz (adopted) or 150 kHz.
+   - 1 MHz: 60 kHz, the ceiling. A116: 30 kHz does not fix the
+     transients and doubles the droop.
+4. **Phase 1's turn-off (T13).**
+   - Timed: robust to rising steps (5 MHz).
+   - Comparator: robust to falling steps and load decreases. Needed at
+     1 MHz (A116).
+   - Or the architecture change.
+5. **The complexity budget.**
+   - A100 is +9% cells over A97; the PI +5.8%.
+6. **The auxiliary branch.** An extension: its own README, Section 3.
+
+## 7. Which way to move (rules for later adjustment)
+
+| if this changes | move | because |
+|---|---|---|
+| a lower-R/L inductor becomes available | toward 1 MHz, i_neg 10% | T14 break-even |
+| only high-R/L inductors | 5 MHz, i_neg 15-20% | T8 optimum; margin 8-14 A |
+| the transient specification tightens | lower i_neg (more margin), or the comparator turn-off plus a bus slew limit | T12, T13 |
+| the timed turn-off is kept | keep the margin above ~1 A at the lowest input voltage (I_th ∝ the rail) | T12 (A116 t30 at 43.2 V) |
+| fast line steps must be met at 1 MHz | a bus slew limit (A117 finds it), or a smaller Cs for a faster ladder, at ~1 V more turn-on | T15, T18 |
+| the bus slew is limited to ≲ 2.4 V/µs | the +4.8 V / 1 µs peak stops binding | T18 |
+| Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |
+| a smaller node (P24 Sec. IV's 1 + 2 devices) | I_th falls (D57: 9.5-12.8% at 1 MHz), so the margin grows at the same i_neg | T12; not yet run |
+| a hotter junction (125 C) | R_on ×1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
+| more modules | interleave per C02; slaves tolerate ±10% L | T17 |
+
+## 8. Not yet known
+
+- **The transient valley-excursion model** (Section 4's open link).
+- **At 1 MHz:**
+  - the line-slew tolerance of the comparator design (A117);
+  - Cs below 15 µF;
+  - the standard matrix beyond A116's rows (m, j30 / j100 for c60,
+    ±25 A, the 10 µs and −8 V line steps);
+  - temperature;
+  - multi-module.
+- **The 13.44 nH (Table I) point**, which runs at ~0.5 MHz.
+- **P24 Sec. IV's node** (1 + 2 devices).
+- **Coss spread and per-module driver delay** (C04 Section 3).
+- **Losses not modelled:** Coss hysteresis, AC resistance, core loss,
+  driver quiescent power, output-capacitor ESR.
+
+## 中文摘要
+
+**一句话：** 所有 trade-off 最后都汇到一个量上，就是**谷底裕量**（I_th − i_neg）：负电流目标离 ZVS 门槛还差多少安培。
+
+**闭环怎么形成：**
+1. **效率往上推 i_neg：** 越接近门槛，高侧硬开通损耗越小。
+2. **瞬态往下压 i_neg：** 瞬态一旦把谷底推过门槛，节点被钳在轨电压上，预测开通失去目标，时序就会崩。
+   - 实测：裕量 ≤2.5 A 的设计都在某个瞬态上失败（A112 25%、A115 10%）。
+   - 裕量 8.4 A（5 MHz 20%）只在线电压阶跃的边缘出问题。
+3. **频率决定门槛本身：** 5 MHz 时 33.4 A，1 MHz 时 14.9 A。
+   - 降频：ZVS 更便宜，纹波小。
+   - 代价：电感铜损按 L 增长，电压环的采样延迟变长。
+   - 所以降频值不值，看电感的 R/L：
+     - < 51 µΩ/nH：1 MHz 全面胜出；
+     - > 103 µΩ/nH：留在 5 MHz。
+
+**A116 证实了这个机理：**
+- 把电压环降到 30 kHz，定时关断的谷底仍被推到 −54 A，只是从失控变成 200 µs 的慢振荡。所以根源是越过门槛，环路快慢不是触发点。
+- 比较器关断（c60）在 1 MHz 下修好了负载阶跃（+28/−28.6 mV，16/22 µs），稳态零代价。它是 1 MHz 的暂定控制器。
+- **但 1 µs 的 ±4.8 V 线电压阶跃，所有变体都过不了 200 A**（c60 是 341/206 A，不过都能在约 50 µs 内恢复）。原因是 Cs 放大到 15 µF 后，阶梯分压慢了 5 倍。
+- 裕量还随输入电压变化：43.2 V 时只剩 0.95 A，定时关断会持续振荡，比较器关断不会。
+
+**闭环里还没量化的一环：** 瞬态时谷底会偏多少（取决于关断方式、电压环、阶梯速度），还需要一个小模型。
+
+**下一步：** A117 测 1 MHz 下能承受多快的母线压摆；之后试较小的 Cs，用约 1 V 的开通电压换 5 倍快的阶梯。
+
+**以后怎么调：** 先定两件事，其余跟着走。
+1. **电感工艺：** 决定选哪个频率。
+2. **瞬态指标：** 负载阶跃大小，母线压摆率。决定要留多少裕量。
+
+## Appendix A. The A92-A100 controller scorecard (2026-10-01)
+
+Kept as the record of T1-T5. Conditions: 5 MHz, 5% (−6.25 A), ~250 A
+resistive load, last 200 cycles; I-only voltage loop (before A104).
+
+**Its Section 0 found** that the high side turns on at its resonance
+valley (~9 V of 12 V), not at zero voltage. That loss was larger than
+every loss the A92-A100 changes moved, which led to T8 and
+A110-A116.
+
+### A.1 The designs
 
 | design | what it changed | status |
 |---|---|---|
 | **A92** | error-based correctors (94 ps targets, gain 1/2), fixed slots | was adopted |
 | **A93** | slots follow the last period (T/nP) | not adopted |
-| **A97** | slots from the two-period average, with the missed-slot guard | **adopted (current preset)** |
+| **A97** | slots from the two-period average, with the missed-slot guard | adopted (the slot rule today) |
 | A98 g4 | A97 with corrector gain 1/4 | not adopted |
 | A99 | A97 with phase 1's turn-off timed, dlo ±1 LSB | not adopted |
-| **A100** | A99 with an adaptive dlo step (cap 32 LSB) | **recommended, pending this review** |
+| **A100** | A99 with an adaptive dlo step (cap 32 LSB) | adopted as A105's I2 |
 
-## 2. The scorecard
+### A.2 The scorecard
 
-**Hard constraints:** no cross-conduction, peaks ≤ 200 A. **Every design
-listed meets them in every run made.**
+**Hard constraints:** no cross-conduction, peaks ≤ 200 A. Every design
+listed meets them in every run made.
 
 | metric | A92 | A93 | **A97** | A98 g4 | A99 | **A100** |
 |---|---|---|---|---|---|---|
@@ -92,29 +349,25 @@ listed meets them in every run made.**
 | 30 ps: high-side turn-ons before the valley, phases 2-4 | 21-27% | 29-37% | 22-26% | **12-16%** | 16-18% | 17-18% |
 | **100 ps jitter:** spread, phases 2-4 | 1.39-1.61 A | 1.95-2.69 A | 1.59-1.79 A | 1.65-1.88 A | **1.02-1.16 A** | 1.03-1.20 A |
 | 100 ps: reverse-conduction loss P_rev | 91 mW | 89 mW | 89 mW | **172 mW** | 74 mW | 74 mW |
-| 100 ps: early low-side turn-on loss (A91's estimate; low side only) | 31-102 mW | 30-102 mW | 31-102 mW | **12-39 mW** | 30-99 mW | 30-99 mW |
-| **high-side valley turn-on loss** (turn-on at about 9 V; Section 0) | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W | 3.1-16 W |
-| **phase 1's own turn-off current spread** (its ZVS margin), 30 / 100 ps | **0.17 / 0.19 A** | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.39 / 1.13 A | 0.43 / 1.16 A |
-| **load steps ±25 A / ±62.5 A:** phase 1's largest turn-off current deviation | (comparator: 0.37 A, the trim) | - | 0.37 A | - | **19-23 A** (±62.5 A) | 0.6-0.7 / 1.4-1.7 A |
-| load steps: Vo excursion ±25 A / ±62.5 A | - | - | 50 / 122-127 mV | - | 83-103 mV³ | 49-50 / 120-126 mV |
+| 100 ps: early low-side turn-on loss (A91's estimate) | 31-102 mW | 30-102 mW | 31-102 mW | **12-39 mW** | 30-99 mW | 30-99 mW |
+| **phase 1's own turn-off current spread**, 30 / 100 ps | **0.17 / 0.19 A** | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.17 / 0.19 A | 0.39 / 1.13 A | 0.43 / 1.16 A |
+| **load steps ±25 A / ±62.5 A:** phase 1's largest turn-off current deviation | (comparator: 0.37 A) | - | 0.37 A | - | **19-23 A** (±62.5 A) | 0.6-0.7 / 1.4-1.7 A |
+| load steps: Vo excursion ±25 A / ±62.5 A (I-only loop) | - | - | 50 / 122-127 mV | - | 83-103 mV³ | 49-50 / 120-126 mV |
 | **driver mismatch m = ±1, +3.4 ns** | tolerated | tolerated | tolerated | - | not tested | not tested |
 | **RTL size** (cells) | 38 456 | 39 571 | 40 296 | 40 296 | 41 605 | 43 924 |
 
 **Notes:**
 1. Bit-identical to A97 before phase 1's switch to timed mode (A99's
-   gate); the handover is still comparator-decided.
-2. From the 300-400 us interval of A100's step runs, before the step and
+   gate).
+2. From the 300-400 µs interval of A100's step runs, before the step and
    without jitter.
-3. Smaller only because phase 1 runs far from its operating point (turn-off
-   current +16.9 / -24.9 A).
+3. Smaller only because phase 1 runs far from its operating point
+   (turn-off current +16.9 / −24.9 A).
 
-"-": not run for that design.
+### A.3 Real improvements and trades (D53/D54)
 
-## 3. Real improvements and trades
-
-**The frequency-resolved jitter response** shows the difference (D53/D54,
-average-slot orbit, phase 4's turn-off current per unit edge jitter, ratio
-to A97):
+**Phase 4's turn-off current per unit edge jitter, ratio to A97,
+against frequency:**
 
 | ω/π | 0.12 | 0.25 | 0.33 | 0.5 | 0.67 | 0.75 | 1 |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -122,70 +375,8 @@ to A97):
 | A93 follow slots | 0.98 | 0.96 | 0.97 | 1.07 | 1.29 | 1.45 | **1.93** |
 | A99 timed phase 1 | 0.74 | 0.63 | 0.58 | **0.54** | 0.57 | 0.61 | 0.74 |
 
-**A move along the curve** shifts gain between frequency bands or between
-metrics:
-- A92 → A93 → A97, the slot rule. Bode's sensitivity integral (the
-  "waterbed") limits loop shaping.
-
-**A structural change lowers the whole curve:**
-- A99's timed turn-off is lower at every frequency. It removes a source of
-  amplification (phase 1's comparator, ×10.5) rather than reshaping a loop.
-- Its costs then appear in other metrics.
-
-## 4. The trade-offs found, and where a loop could form
-
-| # | trade-off | evidence | resolution so far | loop risk |
-|---|---|---|---|---|
-| T1 | **Start-up starvation ↔ mid-band jitter** (slot rule) | A92 starves at m3n (827 A); A93 fixes it but raises the two-cycle dither (×1.93); A97 removes that peak but stays 1.2-1.4× above A92 at mid frequencies | A97: the start-up won | **High.** Going back to fixed slots for jitter brings the starvation back. Lower jitter has to come from elsewhere: A99/A100. |
-| T2 | **Turn-ons before the valley ↔ reverse conduction** (corrector gain) | A98: gain 1/4 halves early turn-ons; P_rev 89 → 172 mW at 100 ps, hard-on saved 19-63 mW | rejected on loss | Medium. Early turn-ons are not a loss by themselves: score losses, not proxies. |
-| T3 | **Early-step size ↔ protection** | D53: a smaller early step makes early turn-ons more frequent (25 → 32-36%) | kept at 0.2 ns | Low. |
-| T4 | **Period jitter of phases 2-4 ↔ phase 1's turn-off current** (comparator vs timed turn-off) | A99/A100: phases 2-4 −24 to −38%, period −37 to −82%; phase 1's spread 0.17 → 0.4-1.2 A | structural; the cost is moved onto phase 1's ZVS margin | Medium. If phase 1's ZVS margin becomes the binding constraint, the next fix would push the jitter back. **Phase 1's margin needs a hard limit before adoption.** |
-| T5 | **Load-step tracking ↔ jitter** (dlo rule) | D55/A100: ±1 → ADM32 costs +7-13% spread at 30 ps, buys tracking (19-23 A → 1.4-1.7 A) | ADM32 | **High, and coupled to T6.** |
-| T6 | **Voltage-loop speed ↔ ZVS spread; ↔ the dlo rule's tracking burden** | A104 (comparator design): PI at 30-150 kHz cuts ±62.5 A steps from ±12% to ±4.6-1.1%. The cost is Ton dither (1-9 LSB): phases 2-4's turn-off sd at light load 0.24 → 0.27-0.36 A (100-150 kHz), +6-9% under 30 ps jitter. | **measured for the comparator design** (A104; 100 kHz recommended). With the timed turn-off (A100) the faster Ton would also move dlo faster: **not yet tested.** | Low for the comparator design. **Still the likely loop for the timed design:** a faster loop → a larger dlo step → more jitter. |
-| **T8** | **High-side turn-on voltage ↔ circulating current** (the negative-current target) | D47: 2% → 9.9 V, 7.5% → 8.0 V. ZVS would need about 25% (estimate). | **P24's own inductor values need ≥ 5.3% for zero voltage without a branch (D57).** Without a branch, 2% loses ~2.4 W against 5% (A102's runs). The branch (an extension, `extensions/aux_commutation_branch/`) changes this trade. D56 (2026-10-02): without a source above half the rail, raising the target is the only way to zero voltage, because the 1.47 nH filter inductor needs ~33 A at the turn-off for any branch to 0 V or Vo | Not a loop yet. It is the first-order trade-off and must be mapped (loss against target) before further second-order work. |
-| **T9-T11** | **The auxiliary commutation branch** (an extension, not the reproduction) | - | moved to `extensions/aux_commutation_branch/README.md` | - |
-| T7 | **Prediction ↔ reaction** (a recurring pattern: A89 low-side turn-on, A92 correctors, A99/A100 turn-off) | Each predicted edge removes a comparator's noise but needs learning and tracking, and moves the error elsewhere | design by design | Structural: each step is a new trade-off, not a reversal. |
-
-## 5. How every change is scored from now on
-
-1. **The standard matrix**, the same for every candidate:
-   - n0 (0 ps);
-   - m3n (start-up), m ±1 ns, m3p;
-   - j30, j100;
-   - load steps ±25 A and ±62.5 A.
-   Every row of Section 2 is measured; "-" is not allowed for a candidate.
-2. **Hard constraints** (pass/fail):
-   - no cross-conduction;
-   - peaks ≤ 200 A;
-   - phase 1's turn-off current within a limit to be set (Section 6).
-3. **Objectives** are scored with explicit weights (Section 6). A candidate
-   is adopted only if it meets the constraints and improves the weighted
-   score, or is Pareto-better.
-4. **The mathematical model maps the trade-off curve before any choice.**
-   - Frequency response for loop-shaping changes;
-   - tracking against noise for adaptive rules.
-   - One point is chosen, with the weights, instead of correcting one
-     metric at a time.
-
-## 6. Decisions needed (priorities)
-
-These are design priorities, for the user and Mihai:
-- **Phase 1's ZVS margin.** What is the acceptable range of its turn-off
-  current? At 100 ps, A100 goes from -8.7 to -3.3 A; the comparator design
-  stays at -6.7 to -5.8 A.
-- **Jitter against tracking.** How much spread at 30 ps is acceptable for
-  how fast a load step?
-- **The voltage loop (A104).** Which bandwidth: 60 kHz (no spread cost, ±2.6%), 100 kHz (±1.7%, +15% spread at light load) or 150 kHz (±1.1%, +40%)?
-- **The complexity budget.** A100 is +9% cells over A97.
-- **The auxiliary branch** is an extension; its open decisions are in
-  `extensions/aux_commutation_branch/README.md` Section 3.
-
-## 7. Not yet known
-
-- **For the timed designs (A99/A100):** m ≠ 0, other loads and ZVS
-  targets, temperature, line steps.
-- **The learning length:** 1024 cycles, chosen for this start-up.
-- **Losses:** only P_rev and A91's hard-on estimate are scored. Gate
-  charge, conduction and overlap losses are not modelled yet, except in
-  D56's bookkeeping for the auxiliary branch (an extension), which also gives a
-  central hard turn-on estimate: 540 nJ per cycle per phase, 9.3 W at 5%.
+- **A move along the curve** (the slot rule, A92 → A93 → A97) shifts
+  gain between bands. Bode's sensitivity integral limits it.
+- **A structural change lowers the whole curve.** A99's timed turn-off
+  removes phase 1's comparator amplification (×10.5); its costs appear
+  in other metrics (T4, T13).

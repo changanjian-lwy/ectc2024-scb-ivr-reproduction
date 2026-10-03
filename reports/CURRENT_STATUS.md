@@ -1084,6 +1084,23 @@ each question:
            - **Next, A116:** a slower loop, or A113's remedies, at 1 MHz
              10%.
 
+     42. The 1 MHz design's transients:
+         [A116](../experiments/track_A_periodic_steady_state/A116_p24_one_mhz_transients/RESULTS.md).
+         - **The trigger is the valley crossing the zero-voltage threshold
+           (H1).** A 30 kHz loop only turns the runaway into a 200 µs
+           oscillation.
+         - **The comparator turn-off (c60) fixes the load steps:**
+           +28.0 / −28.6 mV, 16 / 22 µs. D59 is exact. The steady state
+           is unchanged. It is the provisional 1 MHz controller.
+         - **The ±4.8 V / 1 µs line steps fail in every variant** (c60:
+           341 / 206 A, back in ≤ 52 µs). The ladder is 5× slower with
+           Cs 15 µF.
+         - **The trade-off map** is rewritten through A116, with the loop
+           and which links are measured:
+           [TRADEOFF_SCORECARD](TRADEOFF_SCORECARD.md).
+         - **Next:** A117, the 1 MHz line-slew tolerance; then a smaller
+           Cs.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
