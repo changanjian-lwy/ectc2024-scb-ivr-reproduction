@@ -38,6 +38,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A114": (TA / "A114_p24_zvs_comparator_matrix", "a114_analyze.py", "a114_summary.json"),
     "A115": (TA / "A115_p24_one_mhz_design_point", "a115_analyze.py", "a115_summary.json"),
     "A116": (TA / "A116_p24_one_mhz_transients", "a116_analyze.py", "a116_summary.json"),
+    "A117": (TA / "A117_p24_one_mhz_line_slew_cs", "a117_analyze.py", "a117_summary.json"),
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -122,6 +123,13 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
                                              ("c30_l_m48_1us", "peak_200a"), ("c30_l_m48_1us", "back_60us"))},
              ("t30_l_m48_1us", "back_60us"): "at 43.2 V the margin is 0.95 A: the timed design's +-18 mV limit cycle "
                                              "(RESULTS 0.5)"},
+    "A117": {**{(r, "outcome_as_d63"): "D63's registered outcome rule is falsified (8 A too low; class edges at 60 us / "
+                "200 A); its peaks hold (RESULTS 0.1)" for r in ("c3_cmp_l_m48_1us", "c3_tim_l_m48_10us", "c15_tim_l_m48_50us",
+                                                                 "c15_cmp_l_p48_20us", "c15_cmp_l_p48_50us", "c15_cmp_l_m48_5us")},
+             ("c3_cmp_s_m62", "extreme_10pct"): "+25.4 against +28.9 mV (-12%) (RESULTS 1)",
+             **{(r, "peak_200a"): "the 3 uF handover oscillates ~1.1 ms to 517 A (RESULTS 0.2)" for r in ("c3_tim_n0", "c3_cmp_n0")},
+             **{(r, "hs_up_0p5_1p5V"): "the in-cycle Cs ripple moves phases 1/4 +1.1 V and phases 2/3 -0.8 V (RESULTS 0.2)"
+                for r in ("c3_tim_n0", "c3_cmp_n0")}},
 }
 
 

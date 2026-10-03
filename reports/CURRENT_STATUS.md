@@ -1101,6 +1101,25 @@ each question:
          - **Next:** A117, the 1 MHz line-slew tolerance; then a smaller
            Cs.
 
+     43. The missing link modelled, and tested:
+         [D63](../symbolic_derivations/03_P24_native/D63_P24_VALLEY_MAP.md),
+         [A117](../experiments/track_A_periodic_steady_state/A117_p24_one_mhz_line_slew_cs/RESULTS.md).
+         - **D63 is a self-built, cycle-by-cycle valley map:** each
+           phase's valley against D57's threshold, the reverse-conduction
+           ramps, the slots, the ladder and the loop.
+           - It reproduces every comparator load step within 10%, and
+             line-step peaks within 1-9%.
+           - It found a candidate rule: the timed turn-off with a
+             comparator floor.
+         - **A117 (14 runs, registered from D63):**
+           - D63's peaks hold (within 10%); its outcome rule is falsified
+             and refitted (> ~12 A for ≥ ~25 periods);
+           - Cs 3 µF passes the fast line steps but its handover
+             oscillates to 517 A, so Cs has a window;
+           - the comparator's rising-step failure is not slew-limited.
+         - **Next:** a Cs window and a softer handover in D63; A118, the
+           floor turn-off.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

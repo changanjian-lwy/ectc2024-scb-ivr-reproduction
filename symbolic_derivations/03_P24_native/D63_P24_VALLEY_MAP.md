@@ -158,3 +158,32 @@ away on +4.8 V / 1 µs (A116 t60: 546 A).
 - Breakdown after a crossing is not modelled. The map reports the
   trigger (depth, duration) and stays physical only while the memory is
   bounded; it stops at 1000 A.
+
+## 7. Tested by A117 (14 co-simulations, registered before the runs)
+
+**Peaks hold:** within 10% in all 5 bounded rows (286 / 286, 225 / 208,
+201 / 194, 174 / 175, 143 / 140 A).
+
+**The outcome rule of Section 3, as registered, is falsified.** 6 of the
+10 reliable rows miss.
+- **Three sit on the class edges:** 61.6 µs against 60; 201 A against
+  200.
+- **Three are real:** the 8 A threshold is too low (9.5 A × 50 and
+  23.5 A × 12 did no harm), and the 3 µF comparator's falling 1 µs step
+  does not diverge (208 A, 32 µs).
+
+**Refit on all 10 phase-1 crossings co-simulated:** "deeper than ~12 A
+for ~25 periods or more" separates the slow and runaway outcomes from
+the others. The exception is the timed 60 kHz design on 1 µs steps.
+**It is fitted after the runs; the next test must register it.**
+
+**Confirmed:**
+- Cs 3 µF couples the faster ladder with the loop in large fast
+  transients. The handover oscillates for ~1.1 ms to 517 A, and a
+  +4.8 V / 5 µs step runs away with the comparator.
+- The comparator's rising-step failure at 15 µF does not end with
+  slower slews (225 A at 50 µs).
+
+**Not modelled, now measured:** the in-cycle Cs ripple at 3 µF shifts
+the turn-ons (phases 1/4 +1.1 V, phases 2/3 −0.8 V) at no efficiency
+cost.
