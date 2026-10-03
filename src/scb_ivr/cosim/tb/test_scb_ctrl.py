@@ -28,7 +28,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
             lo_floor=0,                                                          # A118
-            vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50)  # A128
+            vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
+            vff_gth=0)                                                           # A129
 
 
 def pack(values, width):
@@ -119,6 +120,7 @@ class Ctrl:
         d.cfg_vff_c.value = pack([x & 0xFFF for x in cfg["vff_c"]], 12)
         d.cfg_vff_k.value = cfg["vff_k"]; d.cfg_vff_sh2.value = cfg["vff_sh2"]; d.cfg_vff_sh20.value = cfg["vff_sh20"]
         d.cfg_vff_vo.value = cfg["vff_vo"]; d.vin_valid.value = 0; d.vin_code.value = 0
+        d.cfg_vff_gth.value = cfg["vff_gth"]                     # A129
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1130,3 +1132,36 @@ async def vff_rising_step_caps_phase_1(dut):
     rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
     assert [_ton_ph(dut, k) for k in range(4)] == [(100000 << 8) // rail, 133, 133, 133]
 
+
+@cocotb.test()
+async def vff_gate_by_fall_rate(dut):
+    """A129, gth 100 codes: a 10-code drop (g 7.5) leaves every phase at ton; a 240-code drop (g 186) opens the gate and
+    scales as A128; the gate stays open while g decays below gth (latched) and closes when g is back to 0; a small
+    drop after that does nothing."""
+    c = Ctrl(dut)
+    cs = (64, -47, -47, -139)
+    await c.start(vff=1, vff_c=cs, vff_k=0, vff_gth=100)
+    lp2 = [2400 * 256]
+
+    def want(code):
+        v8 = code * 256
+        lp2[0] += (v8 - lp2[0]) >> 2
+        g = max(lp2[0] - v8, 0)
+        return g, [133 + ((133 * max(min(ck * g, 4194304), -8388608) + 8388608) >> 24) for ck in cs]
+
+    await _vin(dut, 2400, 4)
+    for code, gate in ((2390, False), (2150, True), (2150, True), (2150, True), (2150, True)):
+        await RisingEdge(dut.clk)
+        await _vin(dut, code)
+        await ReadOnly()
+        g, w = want(code)
+        assert [_ton_ph(dut, k) for k in range(4)] == (w if gate else [133] * 4), (code, g, gate)
+    assert g < 100 * 256                                                           # latched below the threshold
+    while g > 0:
+        await RisingEdge(dut.clk)
+        await _vin(dut, 2150)
+        g, _ = want(2150)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2140)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4

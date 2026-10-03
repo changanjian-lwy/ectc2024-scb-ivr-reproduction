@@ -325,6 +325,7 @@ class ModuleSim:
         c.set("cfg_vff_c", pack([int(x) & 0xFFF for x in vff.get("c", [0] * N)], 12))
         c.set("cfg_vff_k", int(vff.get("k", 0))); c.set("cfg_vff_sh2", int(vff.get("sh2", 2)))
         c.set("cfg_vff_sh20", int(vff.get("sh20", 6))); c.set("cfg_vff_vo", int(round(cfg["vref_v"] / self.vin_lsb)))
+        c.set("cfg_vff_gth", int(vff.get("gth", 0)))                    # A129: falling-term gate, Vin codes
         c.set("vin_valid", 0); c.set("vin_code", 0)
         c.set("cfg_blank", to_lsb(cfg.get("blank_ns", 0.0) * 1e-9))     # A89 amendment: comparator blanking
         c.set("cfg_async", int(cfg.get("async", 0)))

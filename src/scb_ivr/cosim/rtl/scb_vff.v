@@ -5,6 +5,8 @@
 // - low-passes lp2 += (vin - lp2) >> sh2, lp20 += (vin - lp20) >> sh20 (both start at the first sample);
 // - the falling term g = max(lp2 - vin, 0); each phase's scale m_k = c_k g (Q24 of the Ton change, c_k signed, Q16
 //   per Vin code), clamped to [-1/2, +1/4]: ton_k = ton + round(ton m_k / 2^24) (A127's learned falling-step rule);
+// - the falling term is gated by Vin's fall rate (A129): it acts from the sample where g >= gth codes until g is back to
+//   0; gth = 0 keeps it always on;
 // - phase 1's cap = k / rail, rail = (2 vin - vin_prev) - 3/4 lp20 - vo (a one-step prediction against the lag),
 //   by a restoring divider started at the sample (32 clocks), so it applies from the next phase-1 turn-on;
 //   rail <= 0 or k = 0: no cap (A127's cap_vin). ton_ph[0] = min(ton_0, cap).
@@ -22,6 +24,7 @@ module scb_vff #(
     input  wire [23:0]     k,
     input  wire [3:0]      sh2,
     input  wire [3:0]      sh20,
+    input  wire [AW-1:0]   gth,
     input  wire [AW-1:0]   vo_code,
     input  wire [TW-1:0]   ton,
     output wire [N*TW-1:0] ton_ph
@@ -31,6 +34,7 @@ module scb_vff #(
     reg  signed [LW-1:0] lp2, lp20;
     reg  [AW-1:0]     vprev;
     reg  signed [LW-1:0] g;
+    reg               gate;
     reg  signed [31:0]   m [0:N-1];
     reg  [TW-1:0]     cap;
     reg               cap_on;
@@ -39,6 +43,7 @@ module scb_vff #(
     wire signed [LW-1:0] lp2n  = init ? lp2 + ((v8 - lp2) >>> sh2) : v8;
     wire signed [LW-1:0] lp20n = init ? lp20 + ((v8 - lp20) >>> sh20) : v8;
     wire signed [LW-1:0] gn    = (lp2n > v8) ? lp2n - v8 : {LW{1'b0}};
+    wire                 gaten = (gn >= $signed({2'b00, gth, 8'd0})) ? 1'b1 : ((gn == 0) ? 1'b0 : gate);
     wire signed [LW+1:0] vpred = init ? $signed({v8, 1'b0}) - $signed({2'b00, vprev, 8'd0}) : v8;
     wire signed [LW+1:0] rail  = vpred - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
 
@@ -52,11 +57,11 @@ module scb_vff #(
     integer j;
     always @(posedge clk) begin
         if (rst) begin
-            init <= 1'b0; lp2 <= 0; lp20 <= 0; vprev <= 0; g <= 0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
+            init <= 1'b0; lp2 <= 0; lp20 <= 0; vprev <= 0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
             for (j = 0; j < N; j = j + 1) m[j] <= 0;
         end else begin
             if (vin_valid) begin
-                init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; vprev <= vin_code; g <= gn;
+                init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; vprev <= vin_code; gate <= gaten; g <= gaten ? gn : {LW{1'b0}};
                 if (rail > 0 && k != 0) begin
                     dnum <= {k, 8'd0}; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;
                 end else begin

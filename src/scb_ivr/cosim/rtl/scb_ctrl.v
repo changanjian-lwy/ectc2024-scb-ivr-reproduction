@@ -122,6 +122,7 @@ module scb_ctrl #(
     input  wire [23:0]         cfg_vff_k,      // A128: phase-1 cap constant, LSB x Vin code
     input  wire [3:0]          cfg_vff_sh2,    // A128
     input  wire [3:0]          cfg_vff_sh20,   // A128
+    input  wire [AW-1:0]       cfg_vff_gth,    // A129: falling-term gate, Vin codes (0: always on)
     input  wire [AW-1:0]       cfg_vff_vo,     // A128: Vo in Vin codes
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
@@ -172,7 +173,8 @@ module scb_ctrl #(
     wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
-        .k(cfg_vff_k), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .vo_code(cfg_vff_vo), .ton(ton_now), .ton_ph(ton_ph)
+        .k(cfg_vff_k), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
+        .ton_ph(ton_ph)
     );
 
     wire [4*N-1:0] cmp_s;
