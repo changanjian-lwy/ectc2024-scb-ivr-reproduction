@@ -120,6 +120,7 @@ Sections 1-7 describe the earlier A105 module (the 5 MHz design: period
 - The modules stay locked and interleaved. Mean spacing is within
   0.05 ns, each cycle within 0.6 ns in steady state and 2 ns through
   load and line steps.
+- This holds under C04's component spread (C07), with the floor on.
 - The low sides switch at zero voltage. The high sides turn on at their
   valleys, ~9 V, as in the single module, and hard during fast line
   transients.
@@ -182,6 +183,14 @@ the module spacing is wider now, not narrower).
 - The floor enlarges this in line steps: up to 65 ns in l_p48_1us.
 - Every row is back below 0.5 ns within 100-150 µs. No overlap or peak
   limit is touched.
+
+**Module component spread (C07, floor on):**
+- Cs ±20%, R ±30%, L +5% (module 1 one way, module 3 the other): no
+  overlap, peak ≤ 193 A, locked, gaps T/16 ± 0.1 ns. R ±30% moves slave
+  valleys −1.6 / +1.7 A and sharing ∓1.3% (the C04 mechanism).
+- In steady state the floor stays out of the way (floor on / off
+  valleys within 0.03-0.053 A, gaps 0.016 ns); with it off the same rows
+  peak at 263-265 A, so it must stay on.
 
 **What may be said (final design):**
 - Four modules of the final design run in co-simulation, locked and

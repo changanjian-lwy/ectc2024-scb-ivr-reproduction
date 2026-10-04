@@ -31,6 +31,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "C04": (TC / "C04_module_spread", "c04_analyze.py", "c04_summary.json"),
     "C05": (TC / "C05_four_module_final_design", "c05_analyze.py", "c05_summary.json"),
     "C06": (TC / "C06_slave_floor", "c06_analyze.py", "c06_summary.json"),
+    "C07": (TC / "C07_module_spread_final", "c07_analyze.py", "c07_summary.json"),
     "A108": (TA / "A108_p24_line_slew_tolerance", "a108_analyze.py", "a108_summary.json"),
     "A109": (TA / "A109_p24_slot_valley_trim", "a109_analyze.py", "a109_summary.json"),
     "A110": (TA / "A110_p24_high_side_zvs", "a110_analyze.py", "a110_summary.json"),
@@ -81,6 +82,13 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
             ("l_m80_10us", "step_10pct"): "Vo extreme sign flip, equal magnitude (RESULTS 1)",
             ("l_m48_1us", "step_10pct"): "+17.9 vs +15.7 mV: the floor fired in the step (RESULTS 0)",
             ("l_m48_1us", "back_2us"): "11.1 vs 5.9 us: the floor fired in the step (RESULTS 0)"},
+    "C07": {("cs20_n0", "currents_0p5pct"): "251.3 A = +0.52% against 0.5% (RESULTS 1)",
+            ("cs20_n0", "valleys_0p35A"): "0.48 A against 0.35 A (RESULTS 1)",
+            **{(r, "join"): "106-118 uV against 100 uV; C06 n0 83 uV (RESULTS 1)"
+               for r in ("r30_n0", "all_n0", "all_s_p62", "r30_n0_nf", "all_n0_nf")},
+            ("all_n0", "floor_inactive_steady"): "0.0526 A against 0.05 A, valley gap 0.011 ns ok (RESULTS 1)",
+            **{(r, "peak_200a"): "control with slave_floor 0: 263-265 A, the finding that the floor is needed (RESULTS 0)"
+               for r in ("r30_n0_nf", "all_n0_nf")}},
     "A108": {("criteria_p", "peak_monotone"): "run peaks tie at the start-up's 170.2 A (RESULTS 2)",
              ("criteria_p", "valley_min_monotone"): "phases 3-4 deepen at slower rising slews, the harmless side (RESULTS 2)",
              ("criteria_p", "vo_monotone"): "5 us 3.51 vs 10 us 4.07 mV (RESULTS 2)",

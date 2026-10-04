@@ -1256,6 +1256,9 @@ each question:
            transient (m1n 19, m3n 68), l_m48_1us +14% Vo / 11.1 µs
            recovery, per-cycle spacing up to 65 ns through line steps
            (35 ns without the floor), back < 0.5 ns within 100-150 µs.
+         - **C07:** C04's module spread on the final design: floor on, no
+           overlap, ≤ 193 A, locked; R ±30% moves valleys ±1.7 A, steady
+           state unchanged by the floor (≤ 0.053 A); floor off 265 A.
          - **Erratum:** A105's period was 232 ns (T/16 14.5 ns), not
            1 µs; the final design's 31.6 ns spacing is wider.
 
