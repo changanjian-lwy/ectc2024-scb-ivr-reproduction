@@ -1239,6 +1239,17 @@ each question:
            steps ≤ 4.8 V ≥ 1 µs (4.8 V/µs, rise and fall); −8 V ≥ 6 µs
            (1.33 V/µs; 192.2 A); +8 V ≥ 10 µs (0.8 V/µs; 198.3 A,
            marginal). **Line closed.**
+         - **A138-A139 (2026-10-05, GP level-set map, L / Cs x 0.7-1.3):**
+           [A139](../extensions/ml_design_assist/experiments/A139_gp_boundary_noise_floor/RESULTS.md)
+           corrects A130's spec: the peak is not monotone in slew, so a
+           minimum slew is not a spec. Falling -4.8 V at nominal L / Cs:
+           173.5 A at 1 us, 192.2 A at 2.3 us, 172.2 A at 5.1 us (A130
+           tested 1 and 5 us); rising at L x 0.7: +4.8 V 185.2 / 188.6 /
+           205.9 A at 1 / 5 / 20 us; nominal +8 V 197-209 A at every slew.
+           A139's certified table (95 % bound) is the spec under tolerance.
+           A138's own bands failed (GP noise collapse, budget to one
+           direction); A139 measured the scatter (heavy-tailed: one step
+           position in six adds +14 A) and passed 3/3.
      51. The final design on four modules:
          [C05](../experiments/track_C_multi_module/C05_four_module_final_design/RESULTS.md),
          [C06](../experiments/track_C_multi_module/C06_slave_floor/RESULTS.md);

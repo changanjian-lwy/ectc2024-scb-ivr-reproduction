@@ -56,6 +56,8 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
   (sensors rtl | vin | rails) and its fixed laws.
 - `src/scb_ivr/cosim/rtl/scb_vff.v`: the Vin feed-forward (opt-in, off =
   bit-identical).
+| [A138](experiments/A138_gp_boundary_map/RESULTS.md) | Gaussian-process level-set active learning (D63 prior, residual GP, straddle) | the adopted design's 200 A line-step boundary over L / Cs x 0.7-1.3, 4.8-8 V, 1-20 us; 400 cosim runs | **bands failed:** the rising GP's noise collapsed (0.005 A on 34 points) and one shared straddle sent 302/310 runs to falling steps; verification 20/20 |
+| [A139](experiments/A139_gp_boundary_noise_floor/RESULTS.md) | A138 with the noise floor measured (step moved through a period) and the budget split per direction | the same map, fresh test set, 254 runs | **done, 3/3:** cover90 1.00 / 0.85, classification 0.90 / 0.90 (D63 0.85 / 0.55), verification 20/20; finds the peak non-monotone in slew (falling worst at 2-4 us, rising at low L worst when slow) |
 
 ## What the three found together
 
