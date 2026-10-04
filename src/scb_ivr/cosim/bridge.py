@@ -36,6 +36,9 @@ Controller-side analog functions modelled here:
   reports no residual (the trim holds), and the crossing measurement of i_target is taken first;
 - the slave floor (cfg "slave_floor" 1, C06, multi-module): a slave's slotted phase 1 has the same front end armed in
   LOW (mode P) at i_target + trim - "lo_floor_a"; if the current reaches it before the slot it makes the turn-off.
+- the depth loop (cfg "dep" {von_set_v, wsh, smax, dmin, dmax, ehold}, A132): at phase 1's predictive turn-on a
+  V_DS comparator reports V_DS > von_set_v (v_valid, v_high); scb_dep's code moves every use of the target:
+  i_target - dep x trim_lsb_a ("dep_log" records its changes);
 
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
@@ -89,7 +92,8 @@ sys.path.insert(0, str(HERE.parents[1]))                              # src/, fo
 from scb_ivr.cosim.circuit import PROJECT, fit_fig8  # noqa: E402
 from scb_ivr.cosim.circuit import CircuitParams as Params  # noqa: E402
 from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant, join_nodes  # noqa: E402
-CIRCUIT_KEYS = ("vin", "L", "R", "c_high", "c_low", "cs", "co", "r_load", "i_load", "g_on")   # A107: cfg "circuit"
+CIRCUIT_KEYS = ("vin", "L", "R", "c_high", "c_low", "cs", "co", "r_load", "i_load", "g_on",
+                "coss_scale")   # A107: cfg "circuit"; A132: coss_scale
 PLANTS = {"kernel": KernelPlant, "kernel2": KernelPlant2, "fast": FastPlant, "reference": ReferencePlant}
 
 N, TW, CW = 4, 32, 8
@@ -331,6 +335,12 @@ class ModuleSim:
         c.set("cfg_vff_sh20", int(vff.get("sh20", 6))); c.set("cfg_vff_vo", int(round(cfg["vref_v"] / self.vin_lsb)))
         c.set("cfg_vff_gth", int(vff.get("gth", 0)))                    # A129: falling-term gate, Vin codes
         c.set("vin_valid", 0); c.set("vin_code", 0)
+        dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
+        self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt
+        c.set("cfg_dep", int(self.dep_on)); c.set("cfg_dep_wsh", int(dep.get("wsh", 0)))
+        c.set("cfg_dep_smax", int(dep.get("smax", 1))); c.set("cfg_dep_ehold", int(dep.get("ehold", 0)))
+        c.set("cfg_dep_min", int(dep.get("dmin", 0)) & 0xFF); c.set("cfg_dep_max", int(dep.get("dmax", 0)) & 0xFF)
+        c.set("v_valid", 0); c.set("v_high", 0)
         c.set("cfg_blank", to_lsb(cfg.get("blank_ns", 0.0) * 1e-9))     # A89 amendment: comparator blanking
         c.set("cfg_async", int(cfg.get("async", 0)))
         c.set("a_valid", 0)
@@ -354,6 +364,7 @@ class ModuleSim:
         self.pend = []                              # heap of (t_apply, seq, j, level, meta)
         self.seq = [0]
         self.meas_m = {}; self.meas_r = {}          # phase -> measurement to deliver
+        self.meas_v = None; self.dep_log = []       # A132: phase 1's V_DS > V_set at its predictive turn-on; (t, dep)
         self.adc = []                               # pending ADC sample of Vo (taken at phase 1's turn-on)
         self.adc_vin = []                           # A128: pending Vin sample (same instant)
         self.st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
@@ -465,6 +476,8 @@ class ModuleSim:
                 err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
                 self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err)
                 rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
+            if self.dep_on and k == 0 and meta["how"] == 0:              # A132: the V_DS comparator at the edge
+                self.meas_v = bool(v > self.v_set)
             mon.vmin_set[k] = 0
             if k == 0:
                 vo, vin = float(plant.y[self.i_out]), p.vin_at(plant.t)
@@ -519,6 +532,11 @@ class ModuleSim:
         w = c.get("win_q")
         how = c.get("on_how"); bind = c.get("lo_bind_cur")
         self.trim_now = [signed(field(c.get("trim"), k, CW), CW) for k in range(N)]
+        if self.dep_on:                                                  # A132: the target follows dep
+            d = signed(c.get("dep"), 8)
+            self.i_tgt = self.i_tgt0 - d * self.lsb_a
+            if not self.dep_log or self.dep_log[-1][1] != d:
+                self.dep_log.append((w * lsb, d))
         st["ton"] = c.get("ton_now")
         if c.get("mode_p") and not st["mode_p"]:
             st["t_mode_p"] = w * lsb
@@ -567,6 +585,9 @@ class ModuleSim:
         self.meas_m.clear(); self.meas_r.clear()
         c.set("m_valid", mv); c.set("m_early", me); c.set("m_flat", mf); c.set("m_tv", pack(mtv, TW))
         c.set("r_valid", rv); c.set("r_below", rb)
+        if self.dep_on:                                              # A132: one-cycle V_DS comparator report
+            c.set("v_valid", int(self.meas_v is not None)); c.set("v_high", int(bool(self.meas_v)))
+            self.meas_v = None
         c.set("a_valid", int(lat["report"] is not None))
         c.set("a_tlo", lat["report"] or 0)
         lat["report"] = None
@@ -623,6 +644,8 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if self.dep_on:                                              # A132
+            out["dep_log"] = self.dep_log
         if cfg.get("slot_trim", 0):                                  # A109
             out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
         if na:

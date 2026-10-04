@@ -8,6 +8,7 @@ Circuit (N phases):
   n (V_SD - Vf) / R per device (EPC2067 datasheet Fig. 8 fit, A57 data);
 - switch capacitances are linear (c_high, c_low) or, with nonlinear_coss, the EPC2067 datasheet Fig. 5a Coss(V)
   (A59 data): the charge change n (q(v1) - q(v0)) solved by chord iteration on the cached LU, full Newton as fallback;
+  coss_scale (A132) multiplies that curve (a component spread; c_high / c_low, the chord's linear part, alike in cfg);
 - one step: trapezoid, or backward Euler after a topology change; LU factors cached per topology.
 - optional auxiliary branches (aux_phases, A101): per listed phase k a node m_k with aux_c to ground (after "out" in
   v) and a branch current (after the phase currents in i) through aux_l and aux_r from m_k into x_k while its
@@ -52,7 +53,7 @@ class EPC2067Coss:
     PCHIP on a 0.1 V grid, tabulated at 1 mV for linear-interpolation lookup; q = antiderivative, C even and q odd
     in V; beyond v_max the v_max slope is extended (never reached here)."""
 
-    def __init__(self, path=COSS_CSV, v_max=40.0, dv=1e-3):
+    def __init__(self, path=COSS_CSV, v_max=40.0, dv=1e-3, scale=1.0):
         from scipy.interpolate import PchipInterpolator
         pts = {}
         with open(path) as fh:
@@ -66,6 +67,8 @@ class EPC2067Coss:
         qi = ci.antiderivative()
         self.vt = np.arange(0.0, v_max + 1e-9, dv)
         self.ct, self.qt = ci(self.vt), qi(self.vt)
+        if scale != 1.0:                                       # A132: Coss spread
+            self.ct, self.qt = self.ct * scale, self.qt * scale
         self.v_max, self.c_end, self.q_end = v_max, float(self.ct[-1]), float(self.qt[-1])
 
     def q(self, v):
@@ -98,6 +101,7 @@ class CircuitParams:
     t_hand: float = 88.61e-6
     diode_check: bool = False
     nonlinear_coss: bool = False
+    coss_scale: float = 1.0      # A132: the datasheet Coss(V) times this (nonlinear_coss only)
     n_high: int = 2              # parallel devices per high-side switch (P24 Table 3)
     n_low: int = 3               # parallel devices per low-side switch
     rev_drop: bool = False
@@ -182,7 +186,7 @@ class Sim:
                     rsw[j, self.idx[s_]] -= 1.0
             nper = np.array([p.n_high] * p.n + [p.n_low] * p.n, float)
             clin = np.array([p.c_high] * p.n + [p.c_low] * p.n)
-            self.nl = dict(r=rsw, vin=vin_flag, n=nper, clin=clin, model=EPC2067Coss(),
+            self.nl = dict(r=rsw, vin=vin_flag, n=nper, clin=clin, model=EPC2067Coss(scale=p.coss_scale),
                            stats={"steps": 0, "iters": 0, "max_iters": 0, "newton": 0})
 
     def system(self, conducting, load_on, donly=None):

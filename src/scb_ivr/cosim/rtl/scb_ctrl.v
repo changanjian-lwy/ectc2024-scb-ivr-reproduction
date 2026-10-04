@@ -28,6 +28,7 @@
 // - A109: cfg_slot_trim gives every slotted phase (phases 2..N, and a slave's phase 1) a valley trim of its slot
 //   from its residual-current reports (scb_phase); slot_ofs reports the offsets.
 // - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
+// - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -126,6 +127,15 @@ module scb_ctrl #(
     input  wire [3:0]          cfg_vff_sh20,   // A128
     input  wire [AW-1:0]       cfg_vff_gth,    // A129: falling-term gate, Vin codes (0: always on)
     input  wire [AW-1:0]       cfg_vff_vo,     // A128: Vo in Vin codes
+    input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
+    input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
+    input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
+    input  wire [7:0]          cfg_dep_min,    // A132: dep range, codes (signed)
+    input  wire [7:0]          cfg_dep_max,    // A132
+    input  wire [AW-1:0]       cfg_dep_ehold,  // A132: |vref - Vo code| above which a window is spoiled
+    input  wire                v_valid,        // A132: phase 1's V_DS comparator report at its predictive turn-on
+    input  wire                v_high,         // A132: V_DS > V_set at the edge
+    output wire [7:0]          dep,            // A132: depth code, signed: the target is i_target - dep x trim LSB
     output wire [TW-1:0]       dlo1,           // A99: phase 1's dlo
     output wire                lo_timed1,      // A99: phase 1's turn-off is timed
     output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
@@ -177,6 +187,12 @@ module scb_ctrl #(
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
         .k(cfg_vff_k), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
         .ton_ph(ton_ph)
+    );
+
+    scb_dep #(.AW(AW), .DW(8)) u_dep (                                // A132
+        .clk(clk), .rst(rst), .en(cfg_dep && mode_p), .v_valid(v_valid), .v_high(v_high), .adc_valid(adc_valid),
+        .err(err), .wsh(cfg_dep_wsh), .smax(cfg_dep_smax), .dmin(cfg_dep_min), .dmax(cfg_dep_max), .ehold(cfg_dep_ehold),
+        .dep(dep)
     );
 
     wire [4*N-1:0] cmp_s;
