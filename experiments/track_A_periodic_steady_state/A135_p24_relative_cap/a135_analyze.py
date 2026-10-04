@@ -86,23 +86,23 @@ def main():
         ra, rb = A134.lock(load(A129 / f"run_g125_{row}.json"))["rails_end_v"], R[f"r100_{row}"]["rails_end_v"]
         ok2 &= max(abs(p - q) for p, q in zip(a["valley_mean_a"] + a["peak_a"], b["valley_mean_a"] + b["peak_a"])) <= 0.2
         ok2 &= max(abs(p - q) for p, q in zip(ra, rb)) <= 0.02
-    d2 = {row: R[f"r100_{row}"]["peak_after_a"] - R[f"f100_{row}"]["peak_after_a"] for row in A124_ROWS[:-1]}
+    d2 = {row: R[f"r100_{row}"]["peak_after_a"] - R[f"f100_{row}"]["peak_after_a"] for row in A124_ROWS}
     c["2_l0_unchanged"] = bool(ok2 and all(abs(v) <= 7.0 for v in d2.values()))
     rr = {k: v for k, v in R.items() if k.startswith("r")}
     c["3_no_lock"] = all(not v.get("locked_ph", False) for v in rr.values())
-    c["4_peaks"] = all(R[f"r{round(m * 100):03d}_{row}"]["peak_after_a"] <= 200.0 for m in MS for row in A124_ROWS[:-1]) and \
+    c["4_peaks"] = all(R[f"r{round(m * 100):03d}_{row}"]["peak_after_a"] <= 200.0 for m in MS for row in A124_ROWS) and \
         all(R[f"r{round(m * 100):03d}_{row}"]["matrix_ok"] for m in MS for row in MATRIX_ROWS)
     c["5_recovery"] = all(np.isfinite(R[f"r{round(m * 100):03d}_{row}"]["back_us"]) and R[f"r{round(m * 100):03d}_{row}"]["late"] <= 100
-                          and R[f"r{round(m * 100):03d}_{row}"]["overlaps"] == 0 for m in MS for row in A124_ROWS[:-1])
+                          and R[f"r{round(m * 100):03d}_{row}"]["overlaps"] == 0 for m in MS for row in A124_ROWS)
     per_l = {}
     for m in MS:
         tag = f"r{round(m * 100):03d}"
-        rows = {row: R[f"{tag}_{row}"] for row in A124_ROWS + MATRIX_ROWS}
-        per_l[m] = {"a124_pk_max_a": max(rows[r]["peak_after_a"] for r in A124_ROWS[:-1]),
-                    "fail_peak": [r for r in A124_ROWS[:-1] if rows[r]["peak_after_a"] > 200.0],
+        rows = {row: R[f"{tag}_{row}"] for row in A124_ROWS + ("n0",) + MATRIX_ROWS}
+        per_l[m] = {"a124_pk_max_a": max(rows[r]["peak_after_a"] for r in A124_ROWS),
+                    "fail_peak": [r for r in A124_ROWS if rows[r]["peak_after_a"] > 200.0],
                     "fail_matrix": [r for r in MATRIX_ROWS if not rows[r]["matrix_ok"]],
                     "locked": [r for r, x in rows.items() if x.get("locked_ph")],
-                    "back_max_us": max(rows[r]["back_us"] for r in A124_ROWS[:-1]),
+                    "back_max_us": max(rows[r]["back_us"] for r in A124_ROWS),
                     "late_max": max(x["late"] for x in rows.values()),
                     "startup_max_a": max((x["startup_peak_a"] or 0) for x in rows.values()),
                     "ton_n0_ns": rows["n0"]["ton_end_ns"]}
