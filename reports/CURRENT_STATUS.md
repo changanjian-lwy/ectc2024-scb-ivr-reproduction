@@ -1298,6 +1298,18 @@ each question:
            C06's rows keep the hard constraints, but the handover late fires,
            m3n's end-window sd (0.11 A) and s_m25 (+7.3 A) are new: rerun
            with A137 (C09) before adoption.
+         - **C09:** the restart does not carry over to four modules. The
+           slaves enter mode P 30-80 ns after the master, when the master's
+           first ADC sample has already kicked the broadcast Ton 1136 -> 683,
+           so they seed Ton's low-pass there; their phase-1 cap is ~0.7 of
+           need and they lock for ~35 us (rail 1 13.8-15.4 V): peaks
+           192.5-203.5 A, handover late fires (C08 locked all four modules).
+           After 242 us the design is C06's. C08's s_m25 +7.3 A was the step
+           offset (C06 at C08's offset: 152.7 A); C08's m3n sd is the voltage
+           loop's ADC limit cycle (one code = 5.69 Ton LSB), history-
+           dependent, also in C06's ls_p10. Not adopted: the four-module
+           final design stays C06 (absolute cap) until C10 seeds every
+           module from a value independent of its entry time.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
