@@ -17,6 +17,8 @@
 //   lp20) instead of ton, so a loop that raises ton during a transient does not raise the cap with it.
 // - A137: with seed, the first Vin sample after en rises (mode P's entry) restarts lp2, lp20, tlp and the prediction from
 //   that sample, as the very first sample does: the low-passes do not carry the start-up ramp's lag into mode P.
+//   C10: seed 2 restarts tlp from ton's value in the clock before en rose (mode S's Ton) instead of the sample's ton, so
+//   the seed does not depend on when a module enters mode P (a slave that enters after the master's loop has moved ton).
 module scb_vff #(
     parameter N  = 4,
     parameter TW = 32,
@@ -31,7 +33,7 @@ module scb_vff #(
     input  wire [23:0]     k,
     input  wire [9:0]      rel,
     input  wire            rel_lp,
-    input  wire            seed,
+    input  wire [1:0]      seed,                // A137: 1 restart at en's rise; C10: 2 ... with tlp from tpre
     input  wire [3:0]      sh2,
     input  wire [3:0]      sh20,
     input  wire [AW-1:0]   gth,
@@ -50,8 +52,10 @@ module scb_vff #(
     reg               cap_on;
     reg  signed [TW+9:0] tlp;                  // A136: ton's low-pass, Q8
     reg               en_q, rpend;             // A137: en's last value, a restart waiting for its sample
-    wire              rise = seed && en && !en_q;
-    wire              ini  = init && !(rise || rpend);
+    reg  [TW-1:0]     tpre;                    // C10: ton while en is low
+    wire              rise = (seed != 2'd0) && en && !en_q;
+    wire              rs   = rise || rpend;
+    wire              ini  = init && !rs;
 
     wire signed [LW-1:0] v8    = $signed({2'b00, vin_code, 8'd0});
     wire signed [LW-1:0] lp2n  = ini ? lp2 + ((v8 - lp2) >>> sh2) : v8;
@@ -63,7 +67,7 @@ module scb_vff #(
     wire signed [LW+1:0] rss   = $signed({{2{lp20n[LW-1]}}, lp20n}) - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
     wire signed [LW+12:0] rssk = (rss * $signed({1'b0, rel})) >>> 8;            // A135: Q8
     wire signed [TW+9:0] ton8  = $signed({2'b00, ton, 8'd0});                    // A136
-    wire signed [TW+9:0] tlpn  = ini ? tlp + ((ton8 - tlp) >>> sh20) : ton8;
+    wire signed [TW+9:0] tlpn  = ini ? tlp + ((ton8 - tlp) >>> sh20) : (seed[1] && rs) ? $signed({2'b00, tpre, 8'd0}) : ton8;
     wire [TW-1:0]        tnum  = rel_lp ? tlpn[TW+7:8] : ton;
     wire [TW+LW+12:0]    rnum = tnum * rssk[LW+11:0];
     wire [31:0]          rnum32 = (|rnum[TW+LW+12:32]) ? 32'hFFFFFFFF : rnum[31:0];
@@ -79,9 +83,11 @@ module scb_vff #(
     always @(posedge clk) begin
         if (rst) begin
             init <= 1'b0; lp2 <= 0; lp20 <= 0; tlp <= 0; vprev <= 0; en_q <= 1'b0; rpend <= 1'b0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
+            tpre <= ton;
             for (j = 0; j < N; j = j + 1) m[j] <= 0;
         end else begin
             en_q <= en;                                                       // A137
+            if (!en) tpre <= ton;                                             // C10
             if (rise && !vin_valid) rpend <= 1'b1;
             if (vin_valid) begin
                 rpend <= 1'b0;

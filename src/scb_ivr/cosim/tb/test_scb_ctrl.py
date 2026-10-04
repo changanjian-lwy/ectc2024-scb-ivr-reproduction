@@ -1228,15 +1228,16 @@ async def vff_rel_lp_uses_lowpassed_ton(dut):
     assert [_ton_ph(dut, k) for k in range(4)] == [200] * 4
 
 
-async def _ramp_then_enable(dut, seed):
+async def _ramp_then_enable(dut, seed, ton_en=None):
     """Vin ramps 1200 -> 2400 codes with the feed-forward disabled (lp20 trails), then cfg_vff rises (en's rise, as at
-    mode P's entry) and one sample at 2400 follows; returns each phase's Ton."""
+    mode P's entry; with ton_en cfg_ton moves to it in the same clock) and one sample at 2400 follows; returns each
+    phase's Ton."""
     c = Ctrl(dut)
     await c.start(vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=320, vff_rel_lp=1, vff_seed=seed)
     for code in range(1200, 2401, 60):
         await _vin(dut, code)
         await RisingEdge(dut.clk)
-    await c.set(cfg_vff=1)
+    await c.set(cfg_vff=1, **({} if ton_en is None else {"cfg_ton": ton_en}))
     await RisingEdge(dut.clk)
     await _vin(dut, 2400)
     await ReadOnly()
@@ -1248,6 +1249,19 @@ async def vff_seed_restarts_at_enable(dut):
     """A137, seed 1: after the ramp the low-passes restart from the first sample at en's rise, rail = rss, the relative
     cap is 1.25 ton and every phase keeps 133."""
     assert await _ramp_then_enable(dut, 1) == [133] * 4
+
+
+@cocotb.test()
+async def vff_seed2_seeds_from_before_enable(dut):
+    """C10, seed 2: Ton moves 133 -> 200 as en rises; ton's low-pass restarts from 133 (the Ton before en), so phase 1's
+    relative cap is 1.25 x 133 = 166 and phases 2-4 take 200."""
+    assert await _ramp_then_enable(dut, 2, ton_en=200) == [166, 200, 200, 200]
+
+
+@cocotb.test()
+async def vff_seed1_seeds_from_the_sample(dut):
+    """C10's control, seed 1: the same sequence seeds ton's low-pass from the sample's Ton, 200: no cap."""
+    assert await _ramp_then_enable(dut, 1, ton_en=200) == [200] * 4
 
 
 @cocotb.test()

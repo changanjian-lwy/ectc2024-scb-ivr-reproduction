@@ -1,0 +1,15 @@
+m1p
+m3p
+j30
+j100
+s_m25
+s_p25
+s_m62
+s_p62
+l_p48_1us
+l_p48_5us
+l_m48_1us
+l_m48_5us
+l_m80_10us
+ls_p5
+ls_p10
