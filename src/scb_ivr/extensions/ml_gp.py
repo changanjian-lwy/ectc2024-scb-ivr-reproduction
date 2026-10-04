@@ -17,9 +17,11 @@ from scipy.optimize import minimize
 
 
 class GP:
-    def __init__(self, fixed_l=None):
-        """fixed_l: {input index: length scale} held fixed (inputs without variation in the training data)."""
+    def __init__(self, fixed_l=None, noise_min=0.0):
+        """fixed_l: {input index: length scale} held fixed (inputs without variation in the training data);
+        noise_min: a lower bound on the noise sd n, in the targets' units (A139: a measured repeatability scatter)."""
         self.fixed_l = dict(fixed_l or {})
+        self.noise_min = float(noise_min)
 
     def _kernel(self, a, b, s, l):
         d = (a[:, None, :] - b[None, :, :]) / l
@@ -50,9 +52,10 @@ class GP:
         sy = max(float(np.std(self.y)), 1e-6)
         best = None
         for r in range(restarts):
-            th0 = np.concatenate([[np.log(sy), np.log(0.3 * sy)], rng.normal(0.0, 0.5, dim)])
+            n_lo = max(1e-3 * sy, self.noise_min)
+            th0 = np.concatenate([[np.log(sy), np.log(max(0.3 * sy, 1.01 * n_lo))], rng.normal(0.0, 0.5, dim)])
             res = minimize(self._nlml, th0, args=(self.x, self.y), method="L-BFGS-B",
-                           bounds=[(np.log(1e-3 * sy), np.log(1e2 * sy)), (np.log(1e-3 * sy), np.log(10 * sy))] + [(-3.0, 4.0)] * dim)
+                           bounds=[(np.log(1e-3 * sy), np.log(1e2 * sy)), (np.log(n_lo), np.log(max(10 * sy, 2 * n_lo)))] + [(-3.0, 4.0)] * dim)
             if best is None or res.fun < best.fun:
                 best = res
         self.theta = best.x
