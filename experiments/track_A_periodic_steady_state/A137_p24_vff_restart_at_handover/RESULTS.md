@@ -2,8 +2,9 @@
 Boundary: e79d2d0. Records: cosim/run_*.json (18), identity rerun in tmp/identity_a137/; a137_summary.json.
 
 ## 0. Verdict
-- **Not adopted by the registered rule (criterion 2 fails at L x 0.7); the evidence favours adopting it - a decision
-  for the user after a handover trace at L x 0.7.**
+- **Adopted by the user's decision (2026-10-04), against registered criterion 2** (fails at L x 0.7, where the counts
+  are mode S's, see below). Adopted setting: A129's g125 + vff {rel_q8 320, rel_lp 1, seed 1}. The handover trace at
+  L x 0.7 that the rule asked for is not done.
 - At L0 and L x 1.3 the restart removes A136's handover regression and beats the original design: L0 m3n late fires
   11 (A136 107, A129's g125 5), m1n 1, start-up peaks 163-182 A (A136 191.5, g125 184); L x 1.3 m3n 0 (A136 173),
   m1n 0 (53), start-up 152-188 A (A136 200-206).

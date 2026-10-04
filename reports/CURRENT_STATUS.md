@@ -1291,7 +1291,8 @@ each question:
            late fires 11 / 0, start-up peaks 163 / 152 A, below the original
            184 A), operating mode unchanged; at L x 0.7 the handover stays as
            with the old cap (mode S's fixed Ton), so the registered criterion
-           fails. **Adoption of seed: open (user decision).**
+           fails. **Adopted by user decision (2026-10-04):** the design's
+           setting is g125 + vff {rel_q8 320, rel_lp 1, seed 1}.
          - **C08:** four modules at L x 1.2 lock with the absolute cap
            (10.5 %, Vo 0.917 V) and hold with A136's (1.12 %, Vo 1.000 V);
            C06's rows keep the hard constraints, but the handover late fires,
