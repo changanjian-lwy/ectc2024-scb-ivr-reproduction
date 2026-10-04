@@ -202,8 +202,9 @@ int pk_abi(void) { return 1; }
  *   RUN_NEED 2: no topology entry for need_key (Python builds it and calls again; nothing was changed);
  *   RUN_PY 3: this step is Python's (a partial step, h != p.h, or a chord that did not converge);
  *   RUN_ERR 4: a non-finite right-hand side; RUN_NOCONV 5 / RUN_SINGULAR 6: the full-Newton fallback failed
- *   (Python raises as before).  Every operation follows the Python code it replaces. */
-enum { RUN_DONE = 0, RUN_LATCH = 1, RUN_NEED = 2, RUN_PY = 3, RUN_ERR = 4, RUN_NOCONV = 5, RUN_SINGULAR = 6 };
+ *   (Python raises as before);  RUN_XLATCH 7 (A133): extra latch xl_hit (y[xl_idx] <= xl_thr) held after a step,
+ *   checked after the phase-1 latch.  Every operation follows the Python code it replaces. */
+enum { RUN_DONE = 0, RUN_LATCH = 1, RUN_NEED = 2, RUN_PY = 3, RUN_ERR = 4, RUN_NOCONV = 5, RUN_SINGULAR = 6, RUN_XLATCH = 7 };
 
 typedef struct {
     int n, m, N, nv;
@@ -225,6 +226,9 @@ typedef struct {
     const int32_t *aux_idx;                           /* A101: state index of each branch current */
     double *aux_e2, *aux_imax, *aux_imin;             /* A101: int i^2 dt and extremes since the bridge's reset */
     double vin_step, t_vstep, t_vslew;                /* A106: input step (0, inf, 0 without one) */
+    int32_t n_xl, xl_hit;                             /* A133: extra latches (phases 2..N floors), the one that held */
+    int32_t xl_idx[4];                                /* A133: state index of each latch's current */
+    double xl_thr[4];                                 /* A133: its threshold */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
@@ -372,6 +376,8 @@ int pk_run(const ctx_t *c, run_t *r, double t_target, int latch_armed, double la
         if (rc != RUN_DONE) return rc;
         monitors(r);
         if (latch_armed && r->y[r->nv] <= latch_thr) return RUN_LATCH;
+        for (int k = 0; k < r->n_xl; k++)                  /* A133 */
+            if (r->y[r->xl_idx[k]] <= r->xl_thr[k]) { r->xl_hit = k; return RUN_XLATCH; }
     }
     return RUN_DONE;
 }

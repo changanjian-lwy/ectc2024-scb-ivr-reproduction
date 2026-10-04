@@ -29,6 +29,8 @@
 //   from its residual-current reports (scb_phase); slot_ofs reports the offsets.
 // - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
+// - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
+//   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -84,6 +86,8 @@ module scb_ctrl #(
     input  wire                cfg_async,
     input  wire                a_valid,
     input  wire [TW-1:0]       a_tlo,
+    input  wire [N-1:0]        fa_valid,       // A133: phases 2..N's front-end reports (bit k: phase k + 1)
+    input  wire [N*TW-1:0]     fa_tlo,
     input  wire                cfg_low_pred,   // A89
     input  wire [N*TW-1:0]     dtl_init,       // A89
     input  wire [TW-1:0]       cfg_dtl_step,   // A89
@@ -118,6 +122,7 @@ module scb_ctrl #(
     input  wire [7:0]          cfg_lo_kff,     // A100
     input  wire                cfg_lo_floor,   // A118: phase 1's front end as a floor in timed mode
     input  wire                cfg_slave_floor,// C06 (SLAVE): phase 1's front end as a floor before its slot
+    input  wire                cfg_ph_floor,   // A133: phases 2..N's front ends as floors before their slots
     input  wire                cfg_vff,        // A128: Vin feed-forward on each phase's Ton (scb_vff), mode P
     input  wire                vin_valid,      // A128: Vin ADC sample (with Vo's)
     input  wire [AW-1:0]       vin_code,       // A128
@@ -141,6 +146,7 @@ module scb_ctrl #(
     output wire [TW-1:0]       t_lo1,          // C02: phase 1's last low-side turn-off
     output wire [N*TW-1:0]     slot_ofs,       // A109: each phase's slot valley-trim offset, LSB (signed)
     output wire                arm1,
+    output wire [N-1:0]        arm_n,          // A133: every phase's front end armed
     output wire [N-1:0]        gh_ev,
     output wire [N-1:0]        gh_lvl,
     output wire [N*FB-1:0]     gh_fine,
@@ -165,6 +171,7 @@ module scb_ctrl #(
     wire [N*TW-1:0]  t_on_all;
     wire [N-1:0]     arm_all;
     assign arm1 = arm_all[0];
+    assign arm_n = arm_all;
 
     // ---- voltage loop ----
     localparam AW1 = TW + FRAC;
@@ -279,7 +286,8 @@ module scb_ctrl #(
                 .c_i(cmp_s[k]), .c_zl(cmp_s[N + k]), .c_zh(cmp_s[2 * N + k]), .c_valley(cmp_s[3 * N + k]),
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
-                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : 1'b0), .a_tlo(a_tlo),
+                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && cfg_ph_floor) ? fa_valid[k] : 1'b0),
+                .a_tlo((k > 0 && cfg_ph_floor) ? fa_tlo[k * TW +: TW] : a_tlo),                  // A133
                 .arm(arm_all[k]),
                 .gh_ev(gh_ev[k]), .gh_lvl(gh_lvl[k]), .gh_fine(gh_fine[k * FB +: FB]),
                 .gl_ev(gl_ev[k]), .gl_lvl(gl_lvl[k]), .gl_fine(gl_fine[k * FB +: FB]),
@@ -303,7 +311,7 @@ module scb_ctrl #(
                 .t_lo_q(t_lo_all[k * TW +: TW]),                                                // C02
                 .cfg_slot_trim(cfg_slot_trim), .cfg_st_smax(cfg_st_smax),                       // A109
                 .cfg_lo_floor(IS_FIRST ? cfg_lo_floor : 1'b0),                                  // A118
-                .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : 1'b0),                    // C06
+                .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : (k > 0) ? cfg_ph_floor : 1'b0),   // C06; A133
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end

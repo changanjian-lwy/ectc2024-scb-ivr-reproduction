@@ -36,6 +36,8 @@ Controller-side analog functions modelled here:
   reports no residual (the trim holds), and the crossing measurement of i_target is taken first;
 - the slave floor (cfg "slave_floor" 1, C06, multi-module): a slave's slotted phase 1 has the same front end armed in
   LOW (mode P) at i_target + trim - "lo_floor_a"; if the current reaches it before the slot it makes the turn-off.
+- the phase floors (cfg "ph_floor" 1, A133): phases 2..N each get that front end (arm_n, fa_valid / fa_tlo), armed in
+  LOW in mode P at the same threshold (phase 1's trim: the same slope -Vo / L and delays); the plant's extra latches.
 - the depth loop (cfg "dep" {von_set_v, wsh, smax, dmin, dmax, ehold}, A132): at phase 1's predictive turn-on a
   V_DS comparator reports V_DS > von_set_v (v_valid, v_high); scb_dep's code moves every use of the target:
   i_target - dep x trim_lsb_a ("dep_log" records its changes);
@@ -327,6 +329,8 @@ class ModuleSim:
         c.set("cfg_lo_kff", int(cfg.get("lo_kff", 0)))
         c.set("cfg_lo_floor", int(cfg.get("lo_floor", 0)))              # A118: the front end as a floor when timed
         c.set("cfg_slave_floor", int(cfg.get("slave_floor", 0)))        # C06: a slave's phase 1, floor before its slot
+        c.set("cfg_ph_floor", int(cfg.get("ph_floor", 0)))              # A133: phases 2..N, floors before their slots
+        c.set("fa_valid", 0); c.set("fa_tlo", 0)
         vff = cfg.get("vff") or {}                                       # A128: Vin feed-forward (extension)
         self.vin_lsb = float(vff.get("vin_lsb_v", 0.02))
         c.set("cfg_vff", int(bool(vff)))
@@ -369,6 +373,9 @@ class ModuleSim:
         self.adc_vin = []                           # A128: pending Vin sample (same instant)
         self.st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
         self.lat = {"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0}   # A81 front end of phase 1
+        self.ph_floor = bool(cfg.get("ph_floor", 0))                                      # A133: phases 2..N's floors
+        self.flat = [{"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0} for _ in range(N)]
+        self.ph_log = []                                                                 # A133: (t, phase) of each fire
         self.sections, self.turnons, self.lowoffs = [], [], []
         self.highoffs = []                                       # A101: phase (and branch) currents at high-side turn-offs
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
@@ -417,6 +424,22 @@ class ModuleSim:
         heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
+    def ph_fire(self, k):                                        # A133: phase k's floor fires (as latch_fire's floor)
+        f, lsb = self.flat[k], self.lsb
+        f["fired"] = True; f["fires"] += 1; self.ph_log.append((self.plant.t, k + 1))
+        t_cmd = self.plant.t + self.t_async
+        heapq.heappush(self.pend, (self.t_apply(t_cmd, N + k), self.seq[0], N + k, 0, {"how": None, "bind": False})); self.seq[0] += 1
+        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        f["report"] = int(round(t_cmd / lsb))
+
+    def ph_latches(self):
+        """A133: (state index, threshold, callback) of each armed, unfired phase floor."""
+        if not self.ph_floor:
+            return []
+        thr = self.i_tgt + self.trim_now[0] * self.lsb_a - float(self.cfg.get("lo_floor_a", 2.0))
+        return [(self.nv + k, thr, lambda k=k: self.ph_fire(k)) for k in range(1, N)
+                if self.flat[k]["armed"] and not self.flat[k]["fired"]]
+
     def mlo_fire(self):                                          # A99: phase 1's current reaches the target
         self.mlo["t"] = self.plant.t
 
@@ -426,6 +449,9 @@ class ModuleSim:
             self.latch_fire()
         if mlo["armed"] and mlo["t"] is None and plant.y[nv] <= self.i_tgt:
             self.mlo_fire()
+        for k1, thr, fire in self.ph_latches():                  # A133
+            if plant.y[k1] <= thr:
+                fire()
         self.mon.py_step(plant)                                  # A89 zero-crossing TDC, valley tracking
 
     def integrate_to(self, t_target):
@@ -438,7 +464,8 @@ class ModuleSim:
                         [(True, self.latch_thr(), self.latch_fire)]     # A118: the crossing, then the floor
             else:
                 latch = (lat["armed"] and not lat["fired"], self.i_tgt + self.trim_now[0] * self.lsb_a, self.latch_fire)
-            plant.integrate_to(t_target, None, monitors=self.mon, latch=latch)
+            xl = self.ph_latches()                                       # A133
+            plant.integrate_to(t_target, None, monitors=self.mon, latch=latch, **({"xlatch": xl} if xl else {}))
         else:
             plant.integrate_to(t_target, self.on_step)
         trace = self.trace
@@ -550,6 +577,15 @@ class ModuleSim:
         else:
             lat["armed"] = False; lat["fired"] = False
         lat["dt0"] = field(c.get("dt_pred"), 0, TW)
+        if self.ph_floor:                                        # A133
+            arm, dts = c.get("arm_n"), c.get("dt_pred")
+            for k in range(1, N):
+                f = self.flat[k]
+                if field(arm, k, 1):
+                    f["armed"] = True
+                else:
+                    f["armed"] = False; f["fired"] = False
+                f["dt0"] = field(dts, k, TW)
         gh_ev, gh_lvl, gh_fine = c.get("gh_ev"), c.get("gh_lvl"), c.get("gh_fine")
         gl_ev, gl_lvl, gl_fine = c.get("gl_ev"), c.get("gl_lvl"), c.get("gl_fine")
         for k in range(N):
@@ -591,6 +627,12 @@ class ModuleSim:
         c.set("a_valid", int(lat["report"] is not None))
         c.set("a_tlo", lat["report"] or 0)
         lat["report"] = None
+        if self.ph_floor:                                        # A133
+            fl = self.flat
+            c.set("fa_valid", sum(int(fl[k]["report"] is not None) << k for k in range(N)))
+            c.set("fa_tlo", pack([fl[k]["report"] or 0 for k in range(N)], TW))
+            for f in fl:
+                f["report"] = None
         c.set("adc_valid", int(bool(self.adc)))
         c.set("adc_code", self.adc[-1] if self.adc else 0)
         self.adc.clear()
@@ -646,6 +688,9 @@ class ModuleSim:
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
         if self.dep_on:                                              # A132
             out["dep_log"] = self.dep_log
+        if self.ph_floor:                                            # A133
+            out["ph_floor_fires"] = [f["fires"] for f in self.flat]
+            out["ph_floor_log"] = self.ph_log
         if cfg.get("slot_trim", 0):                                  # A109
             out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
         if na:

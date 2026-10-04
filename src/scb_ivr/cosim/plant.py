@@ -575,7 +575,9 @@ class _Run(ctypes.Structure):
                [("i_step", ctypes.c_double), ("t_step", ctypes.c_double)] + \
                [("na", ctypes.c_int32), ("vmin_zero", ctypes.c_int32)] + \
                [(nm, ctypes.c_void_p) for nm in ("aux_cmd", "aux_on", "aux_idx", "aux_e2", "aux_imax", "aux_imin")] + \
-               [(nm, ctypes.c_double) for nm in ("vin_step", "t_vstep", "t_vslew")]   # A101; A106
+               [(nm, ctypes.c_double) for nm in ("vin_step", "t_vstep", "t_vslew")] + \
+               [("n_xl", ctypes.c_int32), ("xl_hit", ctypes.c_int32), ("xl_idx", ctypes.c_int32 * 4),
+                ("xl_thr", ctypes.c_double * 4)]                                   # A101; A106; A133
 
 
 class KernelPlant2(KernelPlant):
@@ -585,7 +587,8 @@ class KernelPlant2(KernelPlant):
     FastPlant use (y, t, diode, euler_left, steps, rev_e, rev_t, ipk, last_donly, load_on) are views of them.
     integrate_to(t_target, on_step, monitors=None, latch=None): with monitors (a Monitors) the loop updates them;
     latch = (armed, threshold, callback) stops after the step at which i1 <= threshold and calls callback(); a list
-    of them (A118) is taken in order, each armed after the one before it has fired."""
+    of them (A118) is taken in order, each armed after the one before it has fired. xlatch (A133): up to 4 more
+    (state index, threshold, callback), armed together and checked after the latch, each firing once."""
 
     def __init__(self, p, y0, gh, gl):
         n2, N = 2 * p.n, p.n
@@ -716,7 +719,20 @@ class KernelPlant2(KernelPlant):
         self._table[key] = kent[2]
         self._table_keep[key] = kent
 
-    def integrate_to(self, t_target, on_step, monitors=None, latch=None):
+    def _xl_now(self, xl):
+        """A133: fire the extra latches whose condition holds now; arm the rest in the kernel."""
+        rest = []
+        for idx, thr, fire in xl:
+            if self.y[idx] <= thr:
+                fire()
+            else:
+                rest.append((idx, thr, fire))
+        self._run.n_xl = len(rest)
+        for k, (idx, thr, _) in enumerate(rest):
+            self._run.xl_idx[k], self._run.xl_thr[k] = idx, thr
+        return rest
+
+    def integrate_to(self, t_target, on_step, monitors=None, latch=None, xlatch=None):
         if monitors is None or monitors is not self._mon:            # no shared monitors: KernelPlant's loop
             while self.t < t_target - 1e-18:
                 self._advance(min(self.p.h, t_target - self.t))
@@ -724,6 +740,11 @@ class KernelPlant2(KernelPlant):
             return
         chain = list(latch) if isinstance(latch, list) else [latch if latch is not None else (False, 0.0, None)]
         armed, thr, fire = chain.pop(0)
+        xl, self._run.n_xl = list(xlatch or []), 0
+        if xl:
+            for k, (idx, thr_k, _) in enumerate(xl):
+                self._run.xl_idx[k], self._run.xl_thr[k] = idx, thr_k
+            self._run.n_xl = len(xl)
         while True:
             rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
             self._vd, self._vd_t = self._buf["vd"], self.t
@@ -734,6 +755,12 @@ class KernelPlant2(KernelPlant):
                 fire()
                 if chain:                                             # A118: the next latch of a chain
                     armed, thr, fire = chain.pop(0)
+                if xl:
+                    xl = self._xl_now(xl)
+                continue
+            if rc == 7:                                               # A133: an extra latch
+                xl.pop(self._run.xl_hit)[2]()
+                xl = self._xl_now(xl)
                 continue
             if rc == 2:
                 self._register(int(self._run.need_key))
@@ -754,3 +781,5 @@ class KernelPlant2(KernelPlant):
                 fire()
                 if chain:
                     armed, thr, fire = chain.pop(0)
+            if xl:
+                xl = self._xl_now(xl)

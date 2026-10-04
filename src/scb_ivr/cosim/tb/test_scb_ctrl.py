@@ -5,7 +5,7 @@ drives every input; option bits default to 0. Groups: phase timing, comparators 
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
-step and Ton feedforward, and its floor (A118). From A93's tests (history: ../CHANGELOG.md).
+step and Ton feedforward, and its floor (A118); phases 2-4's floors (A133). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -29,6 +29,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_trim=0, st_smax=1,                                              # A109
             lo_floor=0,                                                          # A118
             slave_floor=0,                                                       # C06
+            ph_floor=0,                                                          # A133
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0)                                                           # A129
 
@@ -118,6 +119,7 @@ class Ctrl:
         d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
         d.cfg_lo_floor.value = cfg["lo_floor"]                   # A118
         d.cfg_slave_floor.value = cfg["slave_floor"]             # C06
+        d.cfg_ph_floor.value = cfg["ph_floor"]; d.fa_valid.value = 0; d.fa_tlo.value = 0   # A133
         d.cfg_vff.value = cfg["vff"]                             # A128
         d.cfg_vff_c.value = pack([x & 0xFFF for x in cfg["vff_c"]], 12)
         d.cfg_vff_k.value = cfg["vff_k"]; d.cfg_vff_sh2.value = cfg["vff_sh2"]; d.cfg_vff_sh20.value = cfg["vff_sh20"]
@@ -1167,3 +1169,52 @@ async def vff_gate_by_fall_rate(dut):
     await _vin(dut, 2140)
     await ReadOnly()
     assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4
+
+
+async def _win(dut):
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    return int(dut.win_q.value)
+
+
+@cocotb.test()
+async def ph_floor_off_never_arms(dut):
+    """Without cfg_ph_floor phases 2-4 in LOW (mode P) are not armed (arm_n = 0)."""
+    c = Ctrl(dut)
+    await c.start()
+    await ClockCycles(dut.clk, 5)
+    await ReadOnly()
+    assert field(dut.state.value, 1, 2) == 2 and int(dut.arm_n.value) == 0
+
+
+@cocotb.test()
+async def ph_floor_arms_in_low(dut):
+    """cfg_ph_floor: phases 2-4 in LOW (mode P) are armed until their slots; phase 1 (HIGH, async off) is not."""
+    c = Ctrl(dut)
+    await c.start(ph_floor=1)
+    await ClockCycles(dut.clk, 5)
+    await ReadOnly()
+    assert int(dut.arm_n.value) == 0b1110
+
+
+@cocotb.test()
+async def ph_floor_report_is_the_slot(dut):
+    """Phase 2's floor report at t (slot at 2000): no gate event, HIGH with t_on = t + dt_pred (its high side turns
+    off at t + 80 + 133), no trim binding, disarmed; back in LOW, the consumed slot 2000 never fires, no late fire."""
+    c = Ctrl(dut)
+    await c.start(ph_floor=1, slot=(2000, 2400, 2800))
+    t = await _win(dut)
+    await c.set(fa_valid=0b0010, fa_tlo=pack([0, t, 0, 0], TW))
+    await c.set(fa_valid=0)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert field(dut.state.value, 1, 2) == 0 and field(dut.arm_n.value, 1, 1) == 0
+    assert field(dut.lo_bind_cur.value, 1, 1) == 0 and c.find("L", 0, 2) is None
+    off = await c.until("H", 0, 2)
+    assert off[0] + off[1] == t + 80 + 133, (off, t)
+    await c.set(cmp_zl=0b0010)
+    await c.until("L", 1, 2, after=off[0] + off[1])
+    await c.set(cmp_zl=0)
+    while await _win(dut) < 2200:
+        pass
+    assert c.find("L", 0, 2) is None and field(dut.late_fires.value, 1, 16) == 0
