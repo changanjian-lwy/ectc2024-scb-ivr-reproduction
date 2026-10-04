@@ -1267,7 +1267,9 @@ each question:
          [A135](../experiments/track_A_periodic_steady_state/A135_p24_relative_cap/RESULTS.md),
          [A136](../experiments/track_A_periodic_steady_state/A136_p24_relative_cap_lowpass/RESULTS.md),
          [A137](../experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/RESULTS.md),
-         [C08](../experiments/track_C_multi_module/C08_relative_cap_four_modules/RESULTS.md).
+         [C08](../experiments/track_C_multi_module/C08_relative_cap_four_modules/RESULTS.md),
+         [C09](../experiments/track_C_multi_module/C09_seed_four_modules/RESULTS.md),
+         [C10](../experiments/track_C_multi_module/C10_seed_before_entry/RESULTS.md).
          - **A134:** A132/A133's "ladder limit cycle" is a lock made by
            scb_vff's absolute phase-1 cap (A128: k / rail, k = L0 x 180 A).
            When the steady Ton a load needs crosses it (s_p62 at L x 1.1,
@@ -1310,6 +1312,18 @@ each question:
            dependent, also in C06's ls_p10. Not adopted: the four-module
            final design stays C06 (absolute cap) until C10 seeds every
            module from a value independent of its entry time.
+         - **C10:** seed 2 (cfg vff seed 2) restarts Ton's low-pass from
+           the Ton of the clock before mode P (mode S's 1136) in every
+           module. Four modules: slave rail 1 <= 12.36 V on all 18 rows,
+           no lock, steady-row peaks 163-180 A, post-step peaks within
+           -2.2..+4.2 A of C06 (max 188.7 A); handover late fires m1n 25 /
+           m3n 90 (C06 19 / 68). Single module: 18/18 records identical to
+           seed 1. One registered item fails: one late fire on s_m62 after
+           the step (C06 at the same step offset 0, C10 at C06's offset 0).
+           **Adopted by user decision (2026-10-05):** the four-module final
+           design is C06 + vff {rel_q8 320, rel_lp 1, seed 2}; the single
+           module's adopted setting is g125 + the same vff (one scb_vff for
+           both levels).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

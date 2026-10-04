@@ -3,9 +3,10 @@ Boundary: 8e20d1e (trace cfgs c9b6b13). Records: cosim/run_*.json (18 four-modul
 c06al10_s_m62, c10al6_s_m62); c10_summary.json.
 
 ## 0. Verdict
-- **The lock is gone. Every criterion passes except one registered no-new-failure item (one late fire on s_m62),
-  which the trace shows is not only the step offset. Under the decision rule C10 is therefore not adopted
-  automatically; adoption is the user's call.**
+- **Adopted by the user's decision (2026-10-05), against one registered item:** the four-module final design is
+  C06 + vff {rel_q8 320, rel_lp 1, seed 2}, and the single module's adopted setting takes seed 2 (identical records).
+  The lock is gone; every criterion passes except no-new-failure (one late fire on s_m62), which the trace shows is
+  not only the step offset, so the decision rule alone did not adopt it.
 - Seed 2 (tlp restarts from the Ton the clock before en rises = cfg_ton 1136) puts every slave on the master's footing:
   slave rail 1 12.27-12.36 V on all 18 rows, never above 13.3 V (C09 13.8-15.4 V for 19-30 us; C06 12.8-13.2 V);
   master <= 12.56 V. Rows without a step peak 163.3-180.1 A (C09 192.5-203.5; C06 163.3-184.3).

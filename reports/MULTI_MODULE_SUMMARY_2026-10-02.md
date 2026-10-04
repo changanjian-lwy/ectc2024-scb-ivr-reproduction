@@ -22,6 +22,8 @@ with the value it rests on, for evaluation.
 
 **Updated 2026-10-04 (Section 8):** the level restated for the final
 single-module design (2.5 MHz with the Vin feed-forward), C05-C06.
+**Updated 2026-10-05 (Section 8, C08-C10):** the four modules take the
+single module's phase-1 cap setting (vff seed 2); one scb_vff for both.
 Sections 1-7 describe the earlier A105 module (the 5 MHz design: period
 232 ns at full load, 5% target) and stay as the record.
 - **Soft switching:** the high side turns on at its valley (~9 V of the
@@ -103,7 +105,7 @@ Sections 1-7 describe the earlier A105 module (the 5 MHz design: period
   DOIs) and `experiments/track_A_periodic_steady_state/` (A108, A109).
 - **Derivations:** `symbolic_derivations/03_P24_native/` (D58-D62).
 - **Running status:** `reports/CURRENT_STATUS.md` (items 30-35; the
-  final design: item 51, C05-C06).
+  final design: item 51, C05-C06; its vff setting: item 52, C08-C10).
 
 ## 7. Corrections after the external review (2026-10-03)
 
@@ -129,7 +131,7 @@ Sections 1-7 describe the earlier A105 module (the 5 MHz design: period
 - "All switches ZVS";
 - "±0.05 ns throughout".
 
-## 8. The final design on four modules (2026-10-04, C05-C06)
+## 8. The final design on four modules (2026-10-04, C05-C06; C08-C10 2026-10-05)
 
 **The module:** A124's 2.5 MHz design (L 2.933 nH, Cs 6 µF, target
 −15.6 A = 12.5%, floor 2 A, loop fc 100 kHz) with A129's gated Vin
@@ -183,6 +185,29 @@ the module spacing is wider now, not narrower).
 - The floor enlarges this in line steps: up to 65 ns in l_p48_1us.
 - Every row is back below 0.5 ns within 100-150 µs. No overlap or peak
   limit is touched.
+
+**C08-C10: the single module's phase-1 cap on four modules (2026-10-05).**
+- The single module's absolute phase-1 cap (A128, k = L0 × 180 A) locks
+  the ladder when L rises (A134); the relative cap on Ton's low-pass
+  (A136) holds four modules at L × 1.2, where the absolute cap locks (C08).
+- Restarting the cap's low-passes at mode P with the Ton of that moment
+  (A137, seed 1) fixed the single module's handover but not four
+  modules: the slaves enter mode P 30-80 ns after the master, when its
+  first ADC sample has already moved the broadcast Ton (1136 → 683),
+  and lock for ~35 µs (rail 1 13.8-15.4 V, peaks to 203.5 A; C09).
+- **C10 (seed 2):** every module seeds the low-pass with the Ton of the
+  clock before it enters mode P (mode S's 1136), whatever its entry
+  time. Slave rail 1 ≤ 12.36 V on all 18 rows, steady-row peaks
+  163-180 A, post-step peaks within −2.2..+4.2 A of C06 (max 188.7 A,
+  l_m48_1us). The single module's records are unchanged bit for bit.
+- **The four-module final design is C06 + vff {rel_q8 320, rel_lp 1,
+  seed 2}** (user decision, 2026-10-05, against one registered item).
+  Residuals against C06: handover late fires m1n 25 / m3n 90 (C06 19 /
+  68) and handover peaks 172-180 A (the relative cap starts looser than
+  the absolute one); one late fire on s_m62 after the step, which needs
+  both this design and that step offset; the one-period spike after
+  +4.8 V / 5 µs (179.3 A), seen with every design. Peaks ≤ 189 A on the
+  18 rows (C06 ≤ 185 A).
 
 **Module component spread (C07, floor on):**
 - Cs ±20%, R ±30%, L +5% (module 1 one way, module 3 the other): no
