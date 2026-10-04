@@ -1,0 +1,3 @@
+cosim/run_*.json
+cosim/log_*.txt
+a138_prior_grid.npz
