@@ -339,6 +339,7 @@ class ModuleSim:
         c.set("cfg_vff_sh20", int(vff.get("sh20", 6))); c.set("cfg_vff_vo", int(round(cfg["vref_v"] / self.vin_lsb)))
         c.set("cfg_vff_gth", int(vff.get("gth", 0)))                    # A129: falling-term gate, Vin codes
         c.set("cfg_vff_rel", int(vff.get("rel_q8", 0)))                 # A135: relative phase-1 cap, 1 + mu in Q8 (0: k)
+        c.set("cfg_vff_rel_lp", int(vff.get("rel_lp", 0)))              # A136: ... on ton's low-pass
         c.set("vin_valid", 0); c.set("vin_code", 0)
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
         self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt

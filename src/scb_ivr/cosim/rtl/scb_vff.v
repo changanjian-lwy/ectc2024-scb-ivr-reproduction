@@ -13,6 +13,8 @@
 // - A135: with rel != 0 the cap is relative instead: cap = ton x ((rss x rel) >> 8) / rail, rss = lp20 - 3/4 lp20 - vo
 //   (the rail with Vin at its low-pass), rel = 1 + mu in Q8; in steady state rail = rss, so the cap is (1 + mu) ton and
 //   never binds, whatever L or the load. k is then unused. rss <= 0: no cap.
+// - A136: with rel_lp the relative cap uses ton's low-pass tlp += (ton - tlp) >> sh20 (Q8, updated at each sample, as
+//   lp20) instead of ton, so a loop that raises ton during a transient does not raise the cap with it.
 module scb_vff #(
     parameter N  = 4,
     parameter TW = 32,
@@ -26,6 +28,7 @@ module scb_vff #(
     input  wire [N*12-1:0] c,
     input  wire [23:0]     k,
     input  wire [9:0]      rel,
+    input  wire            rel_lp,
     input  wire [3:0]      sh2,
     input  wire [3:0]      sh20,
     input  wire [AW-1:0]   gth,
@@ -42,6 +45,7 @@ module scb_vff #(
     reg  signed [31:0]   m [0:N-1];
     reg  [TW-1:0]     cap;
     reg               cap_on;
+    reg  signed [TW+9:0] tlp;                  // A136: ton's low-pass, Q8
 
     wire signed [LW-1:0] v8    = $signed({2'b00, vin_code, 8'd0});
     wire signed [LW-1:0] lp2n  = init ? lp2 + ((v8 - lp2) >>> sh2) : v8;
@@ -52,7 +56,10 @@ module scb_vff #(
     wire signed [LW+1:0] rail  = vpred - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
     wire signed [LW+1:0] rss   = $signed({{2{lp20n[LW-1]}}, lp20n}) - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
     wire signed [LW+12:0] rssk = (rss * $signed({1'b0, rel})) >>> 8;            // A135: Q8
-    wire [TW+LW+12:0]    rnum = ton * rssk[LW+11:0];
+    wire signed [TW+9:0] ton8  = $signed({2'b00, ton, 8'd0});                    // A136
+    wire signed [TW+9:0] tlpn  = init ? tlp + ((ton8 - tlp) >>> sh20) : ton8;
+    wire [TW-1:0]        tnum  = rel_lp ? tlpn[TW+7:8] : ton;
+    wire [TW+LW+12:0]    rnum = tnum * rssk[LW+11:0];
     wire [31:0]          rnum32 = (|rnum[TW+LW+12:32]) ? 32'hFFFFFFFF : rnum[31:0];
 
     // restoring divider: q = (k << 8) / rail, or with rel (A135) q = ton x rssk / rail
@@ -65,11 +72,11 @@ module scb_vff #(
     integer j;
     always @(posedge clk) begin
         if (rst) begin
-            init <= 1'b0; lp2 <= 0; lp20 <= 0; vprev <= 0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
+            init <= 1'b0; lp2 <= 0; lp20 <= 0; tlp <= 0; vprev <= 0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
             for (j = 0; j < N; j = j + 1) m[j] <= 0;
         end else begin
             if (vin_valid) begin
-                init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; vprev <= vin_code; gate <= gaten; g <= gaten ? gn : {LW{1'b0}};
+                init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; tlp <= tlpn; vprev <= vin_code; gate <= gaten; g <= gaten ? gn : {LW{1'b0}};
                 if (rail > 0 && rel != 0 && rss > 0) begin                      // A135
                     dnum <= rnum32; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;
                 end else if (rail > 0 && rel == 0 && k != 0) begin

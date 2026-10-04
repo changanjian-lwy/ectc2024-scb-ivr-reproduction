@@ -32,7 +32,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             ph_floor=0,                                                          # A133
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0,                                                           # A129
-            vff_rel=0)                                                           # A135
+            vff_rel=0, vff_rel_lp=0)                                             # A135, A136
 
 
 def pack(values, width):
@@ -127,6 +127,7 @@ class Ctrl:
         d.cfg_vff_vo.value = cfg["vff_vo"]; d.vin_valid.value = 0; d.vin_code.value = 0
         d.cfg_vff_gth.value = cfg["vff_gth"]                     # A129
         d.cfg_vff_rel.value = cfg["vff_rel"]                     # A135
+        d.cfg_vff_rel_lp.value = cfg["vff_rel_lp"]               # A136
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1200,6 +1201,30 @@ async def vff_rel_rising_step_caps_phase_1(dut):
     cap = (133 * ((rss * 333) >> 8)) // rail
     assert cap == 92
     assert [_ton_ph(dut, k) for k in range(4)] == [cap, 133, 133, 133]
+
+
+@cocotb.test()
+async def vff_rel_lp_uses_lowpassed_ton(dut):
+    """A136, rel 307 with rel_lp: ton steps 133 -> 200 LSB just before a Vin rise 2400 -> 2640 codes; the cap takes
+    tlp = 133 x 256 + ((200 - 133) x 256 >> 6) (>> 8: 134), not 200: cap = 134 x ((rss x 307) >> 8) / rail on phase 1;
+    a steady Vin with the raised ton then leaves every phase at 200 once tlp has followed."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=307, vff_rel_lp=1)
+    await _vin(dut, 2400, 4)
+    await c.set(cfg_ton=200)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2640)
+    await ReadOnly()
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    rss = lp20 - ((lp20 * 3) >> 2) - 50 * 256
+    tlp = 133 * 256 + (((200 - 133) * 256) >> 6)
+    cap = ((tlp >> 8) * ((rss * 307) >> 8)) // rail
+    assert [_ton_ph(dut, k) for k in range(4)] == [cap, 200, 200, 200], ([_ton_ph(dut, k) for k in range(4)], cap)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2400, 400)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [200] * 4
 
 
 async def _win(dut):
