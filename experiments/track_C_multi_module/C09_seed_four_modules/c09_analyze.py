@@ -33,6 +33,10 @@ def step_offset(d, t_step):
     return t_step - max(q["t_s"] for q in d["turnons_last"] if q["phase"] == 1 and q["t_s"] <= t_step)
 
 
+def t_step(d):
+    return (d["cfg"].get("load_step") or d["cfg"]["line_step"])["t_us"] * 1e-6
+
+
 def peak_after(d, t_step):
     return max(max(q["i_a"] for q in r["highoffs_last"] if q["t_s"] >= t_step) for r in [d] + d["modules_rest"])
 
@@ -55,7 +59,7 @@ def main():
             ref, rr = max(x["c06_peak_after_a"]), HERE / "cosim" / f"run_c06al9_{row}.json"
             if rr.exists():                                                     # criterion 3's contingency rerun
                 r = C6.load(rr)
-                ref = x["c06al9_peak_after_a"] = peak_after(r, r["cfg"]["load_step"]["t_us"] * 1e-6)
+                ref = x["c06al9_peak_after_a"] = peak_after(r, t_step(r))
             c["c06_within_7a"] = max(x["peak_after_a"]) <= ref + 7.0
         res[row] = x
     for r in rows:
@@ -70,7 +74,7 @@ def main():
     crit["2_late_c06"] = all(res[r]["criteria"]["late_c06"] for r in rows)
     crit["3_c06_within_7a"] = all(res[r]["criteria"].get("c06_within_7a", True) for r in rows)
     d = C6.load(HERE / "cosim" / "run_c06al_s_m25.json")
-    t_al = d["cfg"]["load_step"]["t_us"] * 1e-6
+    t_al = t_step(d)
     al = {"peak_after_a": peak_after(d, t_al), "step_offset_ns": step_offset(d, t_al) * 1e9,
           "c08_peak_after_a": max(C08_SUM["s_m25"]["peak_after_a"])}
     crit["4_c06al_2a"] = abs(al["peak_after_a"] - al["c08_peak_after_a"]) <= 2.0

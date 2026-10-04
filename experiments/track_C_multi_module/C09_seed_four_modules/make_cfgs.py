@@ -34,5 +34,31 @@ def main():
     print(len(order), "cfgs")
 
 
+def ph1_on(d, t1, t2):
+    return [q["t_s"] for q in d["turnons_last"] if q["phase"] == 1 and t1 <= q["t_s"] <= t2]
+
+
+def contingency(rows):
+    """BOUNDARY criterion 3: C06's row with its step moved to C09's offset after the master's phase-1 turn-on
+    (cosim/cfg_c06al9_<row>.json, ORDER_c06al9.txt)."""
+    names = []
+    for row in rows:
+        c = json.loads((C06 / f"cfg_{row}.json").read_text())
+        key = "load_step" if c.get("load_step") else "line_step"
+        t0 = c[key]["t_us"] * 1e-6
+        r9 = json.loads((HERE / "cosim" / f"run_{row}.json").read_text())
+        r6 = json.loads((C06 / f"run_{row}.json").read_text())
+        off = t0 - max(ph1_on(r9, 0.0, t0))
+        t_al = min(ph1_on(r6, t0 - 1e-6, t0 + 1e-6), key=lambda t: abs(t + off - t0)) + off
+        c[key] = dict(c[key], t_us=round(t_al * 1e6, 4))
+        c["note"] = f"C09 c06al9_{row}: C06's {row} (no change to the design) with the step at C09's offset ({off * 1e9:.1f} ns)."
+        c["out"] = f"run_c06al9_{row}.json"
+        (HERE / "cosim" / f"cfg_c06al9_{row}.json").write_text(json.dumps(c, indent=1) + "\n")
+        names.append(f"c06al9_{row}")
+        print(names[-1], c[key]["t_us"], "us")
+    (HERE / "cosim" / "ORDER_c06al9.txt").write_text("\n".join(names) + "\n")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    contingency(sys.argv[2:]) if sys.argv[1:2] == ["--contingency"] else main()
