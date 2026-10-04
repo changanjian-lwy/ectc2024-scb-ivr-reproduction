@@ -8,6 +8,12 @@ Boundary: ac7f444 (code 7b6dad7). Records: cosim/run_*.json (18), c06_summary.js
 - **The registered adoption rule is not met:** criterion 6 (late fires <= single) misses in m1n (19 vs 1), m3n (68 vs 5) and four line rows (1-2 vs 0).
 - **One soft regression from the floor:** l_m48_1us Vo extreme +17.9 mV (single +15.7, +14%), back within 1% at 11.1 us (single 5.9 us), peak 185 A (C05 177 A); the floor fired 1/2/4 times there.
 
+## 0b. Post hoc: per-cycle interleave through steps (`matrix.gaps_per_cycle`, 10 us windows)
+- Steady state: n0 / m1n max 0.05 ns, j30 0.57 ns, j100 2.2 ns per cycle.
+- Steps disturb the per-cycle spacing in the final design already without the floor (C05: up to 35 ns ~ one slot, s_m62 27 ns, l_p48_1us 35 ns), unlike A105's design (C03 <= 2 ns): Ton moves per phase (vff) and the period changes fast.
+- The floor enlarges it in line steps: l_p48_1us 65 ns (C05 35), l_m80_10us 56 ns (C05 30), l_m48_1us 27 ns (C05 21); back below 0.5 ns by 950 us (C05 900 us); after 1100 us identical spacing (<= 0.12 ns), valleys -15.65 A, no floor fires.
+- **Decision (2026-10-04, by the user, against the registered rule's criterion 6):** slave_floor adopted for the four-module final design with three stated residuals: transient late fires (m1n 19, m3n 68), l_m48_1us +14% Vo / 11.1 us recovery, and the larger transient interleave disturbance in line steps.
+
 ## 1. Criteria
 | # | criterion | result |
 |---|---|---|
@@ -21,4 +27,4 @@ Boundary: ac7f444 (code 7b6dad7). Records: cosim/run_*.json (18), c06_summary.js
 
 ## 2. Limits
 - One seed; same mismatch on every module; no module spread; phases 2..N stay unfloored.
-- The adoption is a decision against the registered rule (criterion 6 missed); see the report.
+- The adoption is a decision against the registered rule (criterion 6 missed); see 0b.

@@ -19,6 +19,11 @@ This closes the multi-module level. Each open point is given as cases,
 with the value it rests on, for evaluation.
 
 **Corrected 2026-10-03** after an external review (Section 7).
+
+**Updated 2026-10-04 (Section 8):** the level restated for the final
+single-module design (2.5 MHz with the Vin feed-forward), C05-C06.
+Sections 1-7 describe the earlier A105 module (the 5 MHz design: period
+232 ns at full load, 5% target) and stay as the record.
 - **Soft switching:** the high side turns on at its valley (~9 V of the
   12 V rail), not at zero voltage. Only the low side switches at zero
   voltage.
@@ -97,7 +102,8 @@ with the value it rests on, for evaluation.
   with the P24 consistency table; LITERATURE.md with the sources and
   DOIs) and `experiments/track_A_periodic_steady_state/` (A108, A109).
 - **Derivations:** `symbolic_derivations/03_P24_native/` (D58-D62).
-- **Running status:** `reports/CURRENT_STATUS.md` (items 30-35).
+- **Running status:** `reports/CURRENT_STATUS.md` (items 30-35; the
+  final design: item 51, C05-C06).
 
 ## 7. Corrections after the external review (2026-10-03)
 
@@ -121,4 +127,73 @@ with the value it rests on, for evaluation.
 **What may not be said:**
 - "All switches ZVS";
 - "±0.05 ns throughout".
+
+## 8. The final design on four modules (2026-10-04, C05-C06)
+
+**The module:** A124's 2.5 MHz design (L 2.933 nH, Cs 6 µF, target
+−15.6 A = 12.5%, floor 2 A, loop fc 100 kHz) with A129's gated Vin
+feed-forward. Four of them, 16 phases, 1 kW. Each configuration is the
+single module's plus `"modules": 4`; T/16 is 31.6 ns (A105's: 14.5 ns, so
+the module spacing is wider now, not narrower).
+
+**C05: "×4" held except in the start-up transient.**
+- Steady state, all load steps, all line steps and the larger-L slave
+  rows passed as the single module does.
+- m1n, m3n (driver mismatch −1 / −3.4 ns) and j100 (100 ps jitter)
+  failed: 203-250 A, 100-339 late fires per module, and an overlap in
+  j100.
+- **Cause:** a slave's phase 1 is slot-timed from the master and has no
+  current-decided turn-off, so its valley is not regulated. After the
+  handover (144 µs) a slave's valley ran to −96 A (m1n) and −130 A (j100).
+  The slave then sank current, the master's loop raised Ton to its cap,
+  the period grew, and the valley went deeper: positive feedback. Two
+  modules recover on their own. All failures ended by ~260 µs.
+
+**C06: the slave floor (one RTL addition, cfg `slave_floor`).**
+- A118's floor on a slave's phase 1: its front end is armed in LOW at
+  the target − 2 A; a crossing before the slot is the turn-off. Off, the
+  code reproduces C05 bit for bit (unit tests 64/64).
+- **All 18 rows:** no overlap, peak ≤ 185 A, locked, mean gaps T/16
+  ± 0.05 ns. m1n 166-184 A, m3n 164-166 A, j100 163-164 A.
+- **Steady state (n0):**
+  - valleys −15.7 to −16.4 A;
+  - low-side turn-on V_DS ≤ −1.0 V (zero voltage);
+  - high-side turn-on at 3.3-3.9 V. At 12.5% this is much softer than
+    A105's 5% design's ~9 V, but it is not zero.
+  - output ripple 6.9 A rms (27.7 A pk-pk on 1002 A);
+  - each cycle's spacing within 0.05 ns (j30 0.57, j100 2.2 ns).
+- **Larger-L slave:**
+  - at +10% L: −8.8% current, valley −13.6 A, low side −0.74 V,
+    high side +0.6-0.7 V;
+  - at +5% L: −4.6% current.
+- **Adopted with three residuals** (decided against the registered rule
+  that required criterion 6):
+  1. late fires in the post-handover transient only: m1n 19, m3n 68 in
+     total (the single module 1 / 5);
+  2. l_m48_1us (−4.8 V / 1 µs): Vo +17.9 mV (single +15.7), back within
+     1% at 11.1 µs (single 5.9 µs);
+  3. the per-cycle spacing through steps (see below).
+
+**Per-cycle spacing through steps is a property of the final design.**
+- Even without the floor (C05), load and line steps move single cycles
+  by up to ~35 ns (about one slot): Ton moves per phase with the
+  feed-forward, and the period changes fast. A105's design (C03)
+  stayed within 2 ns.
+- The floor enlarges this in line steps: up to 65 ns in l_p48_1us.
+- Every row is back below 0.5 ns within 100-150 µs. No overlap or peak
+  limit is touched.
+
+**What may be said (final design):**
+- Four modules of the final design run in co-simulation, locked and
+  uniformly interleaved in steady state, with the standard matrix's
+  hard limits met. This needs one RTL addition: the slave floor.
+- The low sides switch at zero voltage. The high sides turn on at
+  3-4 V.
+
+**What may not be said:**
+- "each cycle within 2 ns through steps" (true only for A105's
+  design);
+- "identical to the single module in transients" (late fires and
+  l_m48_1us differ, see the residuals);
+- "all switches ZVS".
 

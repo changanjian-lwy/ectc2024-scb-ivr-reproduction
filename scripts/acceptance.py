@@ -29,6 +29,8 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "C02": (TC / "C02_uniform_interleave", "c02_analyze.py", "c02_summary.json"),
     "C03": (TC / "C03_four_module_standard_matrix", "c03_analyze.py", "c03_summary.json"),
     "C04": (TC / "C04_module_spread", "c04_analyze.py", "c04_summary.json"),
+    "C05": (TC / "C05_four_module_final_design", "c05_analyze.py", "c05_summary.json"),
+    "C06": (TC / "C06_slave_floor", "c06_analyze.py", "c06_summary.json"),
     "A108": (TA / "A108_p24_line_slew_tolerance", "a108_analyze.py", "a108_summary.json"),
     "A109": (TA / "A109_p24_slot_valley_trim", "a109_analyze.py", "a109_summary.json"),
     "A110": (TA / "A110_p24_high_side_zvs", "a110_analyze.py", "a110_summary.json"),
@@ -60,6 +62,25 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
     "C04": {("cs20_n0", "valleys_0p3A"): "0.35 A against 0.3 A, marginal (RESULTS 2)",
             ("r30_n0", "currents_0p5pct"): "R shifts sharing +/-1.3%: slaves act as ~3.3 mOhm sources (RESULTS 0.3)",
             ("r30_n0", "valleys_0p3A"): "the same mechanism moves the valleys +/-2.2 A (RESULTS 0.3)"},
+    "C05": {**{(r, c): "slave phase-1 valley runaway after the handover, the finding; fixed in C06 (RESULTS 0, 0b)"
+               for r, cs in (("m1n", ("peak_200a", "late_fires")), ("m3n", ("peak_200a", "late_fires", "sd_band")),
+                             ("j100", ("peak_200a", "late_fires", "sd_band", "no_overlap", "locked", "valleys_0p5A",
+                                       "hs_on_0p2V", "ls_on_ref_0p3V"))) for c in cs},
+            ("j30", "ls_on_ref_0p3V"): "one phase's LS turn-on V_DS above single + 0.3 V; module maxima agree (RESULTS 0)",
+            **{(r, "late_fires"): "1 late fire in a line step where the single module has 0 (RESULTS 0)"
+               for r in ("l_p48_1us", "l_p48_5us", "l_m48_1us", "l_m80_10us")},
+            ("l_p48_5us", "step_10pct"): "Vo extreme 12.04 vs 10.85 mV, +11% (RESULTS 0)",
+            ("l_m80_10us", "step_10pct"): "Vo extreme sign flip, equal magnitude (RESULTS 0)"},
+    "C06": {**{(r, "late_fires"): "late fires in the post-handover transient only (all before 260 us); adopted with "
+               "this residual (RESULTS 0, 0b)" for r in ("m1n", "m3n")},
+            **{(r, "late_fires"): "1-2 late fires in a line step where the single module has 0 (RESULTS 1)"
+               for r in ("l_p48_1us", "l_p48_5us", "l_m48_1us", "l_m80_10us")},
+            **{(r, "ls_on_ref_0p3V"): "phase-by-phase maxima; module maxima at the single module's (RESULTS 1)"
+               for r in ("j30", "j100")},
+            ("l_p48_5us", "step_10pct"): "Vo extreme sign flip, equal magnitude (RESULTS 1)",
+            ("l_m80_10us", "step_10pct"): "Vo extreme sign flip, equal magnitude (RESULTS 1)",
+            ("l_m48_1us", "step_10pct"): "+17.9 vs +15.7 mV: the floor fired in the step (RESULTS 0)",
+            ("l_m48_1us", "back_2us"): "11.1 vs 5.9 us: the floor fired in the step (RESULTS 0)"},
     "A108": {("criteria_p", "peak_monotone"): "run peaks tie at the start-up's 170.2 A (RESULTS 2)",
              ("criteria_p", "valley_min_monotone"): "phases 3-4 deepen at slower rising slews, the harmless side (RESULTS 2)",
              ("criteria_p", "vo_monotone"): "5 us 3.51 vs 10 us 4.07 mV (RESULTS 2)",

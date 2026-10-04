@@ -1239,6 +1239,25 @@ each question:
            steps ≤ 4.8 V ≥ 1 µs (4.8 V/µs, rise and fall); −8 V ≥ 6 µs
            (1.33 V/µs; 192.2 A); +8 V ≥ 10 µs (0.8 V/µs; 198.3 A,
            marginal). **Line closed.**
+     51. The final design on four modules:
+         [C05](../experiments/track_C_multi_module/C05_four_module_final_design/RESULTS.md),
+         [C06](../experiments/track_C_multi_module/C06_slave_floor/RESULTS.md);
+         [summary Section 8](MULTI_MODULE_SUMMARY_2026-10-02.md).
+         - **C05:** four modules of A124 + A129's feed-forward pass the
+           steady state, load and line steps and ±10% slave L, but m1n,
+           m3n, j100 fail after the handover: a slave's slotted phase 1
+           has no current-decided turn-off, its valley runs to −96 /
+           −130 A, the master's Ton rises to its cap (positive feedback).
+         - **C06:** A118's floor on a slave's phase 1 (cfg `slave_floor`,
+           RTL + bridge, off bit-identical, unit tests 64/64): 18/18 rows
+           without overlap, peak ≤ 185 A, locked.
+         - **Adopted (user decision, against the registered criterion
+           6)** with residuals: late fires in the post-handover
+           transient (m1n 19, m3n 68), l_m48_1us +14% Vo / 11.1 µs
+           recovery, per-cycle spacing up to 65 ns through line steps
+           (35 ns without the floor), back < 0.5 ns within 100-150 µs.
+         - **Erratum:** A105's period was 232 ns (T/16 14.5 ns), not
+           1 µs; the final design's 31.6 ns spacing is wider.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
