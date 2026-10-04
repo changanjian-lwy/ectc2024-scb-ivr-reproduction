@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -46,6 +47,20 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A119": (TA / "A119_p24_one_mhz_candidate_matrix", "a119_analyze.py", "a119_summary.json"),
     "A123": (TA / "A123_p24_candidate_last_amps", "a123_analyze.py", "a123_summary.json"),
     "A124": (TA / "A124_p24_two_point_five_mhz", "a124_analyze.py", "a124_summary.json"),
+    "A132": (TA / "A132_p24_neg_current_autotune", "a132_analyze.py", "a132_summary.json"),
+    "A133": (TA / "A133_p24_inductance_tolerance", "a133_analyze.py", "a133_summary.json"),
+    "A134": (TA / "A134_p24_inductance_cap_lock", "a134_analyze.py", "a134_summary.json"),
+    "A135": (TA / "A135_p24_relative_cap", "a135_analyze.py", "a135_summary.json"),
+    "A136": (TA / "A136_p24_relative_cap_lowpass", "a136_analyze.py", "a136_summary.json"),
+    "A137": (TA / "A137_p24_vff_restart_at_handover", "a137_analyze.py", "a137_summary.json"),
+    "C08": (TC / "C08_relative_cap_four_modules", "c08_analyze.py", "c08_summary.json"),
+    "C09": (TC / "C09_seed_four_modules", "c09_analyze.py", "c09_summary.json"),
+    "C10": (TC / "C10_seed_before_entry", "c10_analyze.py", "c10_summary.json"),
+}
+ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
+NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
+    "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
+    "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
@@ -176,16 +191,90 @@ EXCEPTIONS = {    # experiment: {(row, criterion): why, where}
 }
 
 
+def _ex(rows, crit, why):
+    return {(r, crit): why for r in rows}
+
+
+_STEP_FREE = ("n0", "m1n", "m1p", "m3n", "m3p", "j30", "j100", "s_m25", "s_p25", "s_m62", "s_p62", "l_p48_1us", "l_p48_5us",
+              "l_m48_1us", "l_m48_5us", "l_m80_10us", "ls_p5", "ls_p10")
+_ROW = lambda rows: [f"rows/{r}" for r in rows]
+_ADC = "m3n's end-window sd is the voltage loop's ADC limit cycle (one code = 5.69 Ton LSB, Vo at a +-0.25 mV level; C09 RESULTS 0)"
+_JIT = "phase-by-phase maxima; module maxima at the single module's (C06 RESULTS 1)"
+EXCEPTIONS.update({   # A132-A137, C08-C10 (2026-10-05): each reason is the one the experiment's RESULTS gives
+    "A132": {("criteria", k): "A132 not adopted: the depth loop misses at the L / C corners (c1.3_l0.7 start-up peaks, c0.7_l1.3 "
+                             "never quasi-steady, late fires > 100) and re-tunes the line-step operating point (RESULTS 0, 1)"
+             for k in ("2_convergence", "3_valley_kept", "4_matrix_on", "5_step_rows_on", "6_inert_nominal")},
+    "A133": {("criteria", k): "L x 0.7-1.3 corners fail as registered; the 'limit cycle' read here is the absolute cap's lock "
+                              "(A134), A133's floor on phases 2-4 invalid (RESULTS 0, 1)"
+             for k in ("3_nominal_disturbances", "4_l13_balanced", "5_other_corners_balanced", "6_corners", "7_c07l13")},
+    "A134": {("criteria", "1_mechanism"): "fails as registered on the threshold (s_p62 1.04-1.22 % vs 1 %, L0's own 0.93 %); passes "
+                                          "post hoc at +0.5 points (RESULTS 1 row 1)",
+             **{("criteria", f"3_tolerance/{m}/{k}"): "absolute cap: functional L x 0.7-1.0, 200 A spec only at L0, cap-bound at "
+                "1.05 and locked above; the L x 1.2 / 1.3 arms are partial (RESULTS 0, 1 row 3)"
+                for m, ks in {"0.7": ("spec", "spec_ph"), "0.85": ("spec", "spec_ph"), "0.9": ("spec", "spec_ph"),
+                              "1.05": ("func", "spec", "func_ph", "spec_ph"), "1.1": ("func", "spec", "func_ph", "spec_ph"),
+                              "1.2": ("complete", "func", "spec", "func_ph", "spec_ph"),
+                              "1.3": ("complete", "func", "spec", "func_ph", "spec_ph")}.items() for k in ks}},
+    "A135": {("criteria", "2_l0_unchanged"): "relative cap on ton follows the loop's transient rise: rising rows +20 A (RESULTS 1 row 2)",
+             ("criteria", "4_peaks"): "rising rows 201-212 A: A135 not adopted (RESULTS 1 row 4)"},
+    "A136": {("criteria", "3c_peaks"): "A124 rows pass (<= 189 A); the matrix's m3n misses on start-up late fires (RESULTS 1 row 3c)"},
+    "A137": {("criteria", "2_handover"): "fails at L x 0.7 only, where the handover is mode S's fixed Ton; adopted by user "
+                                         "decision 2026-10-04 (RESULTS 0)"},
+    "C08": {**_ex(_ROW(_STEP_FREE), "late_fires", "handover late fires from A136's start-up regression, equal across rows (RESULTS 0)"),
+            ("rows/m3n", "sd_band"): "m3n end-window sd 0.11-0.12 A (RESULTS 0); traced to the ADC limit cycle in C09 (RESULTS 0)",
+            **_ex(("rows/j30", "rows/j100"), "ls_on_ref_0p3V", _JIT),
+            **_ex(("rows/s_m25", "rows/l_m48_1us"), "step_10pct", "s_m25: step offset +7.3 A (C09 RESULTS 0); l_m48_1us: C06's residual (C06 RESULTS 0)"),
+            ("rows/s_m25", "c06_within_7a"): "+7.3 A is the step's offset: C06's design at that offset gives 152.7 A (C09 RESULTS 0)",
+            ("rows/l_m48_1us", "back_2us"): "C06's residual: the floor fired in the step (C06 RESULTS 0)",
+            ("criteria", "1_no_new_fail"): "late fires, m3n sd, s_m25 (RESULTS 0, 1 row 1)",
+            ("criteria", "2_c06_within_7a"): "s_m25 +7.3 A, the step offset (RESULTS 1 row 2; C09 RESULTS 0)"},
+    "C09": {**_ex(_ROW([r for r in _STEP_FREE if r != "m3p"]), "late_fires", "slaves seed after the master's first ADC sample: handover lock, not adopted (RESULTS 0)"),
+            **_ex(_ROW([r for r in _STEP_FREE if r not in ("m1p", "m3p")]), "late_c06", "handover lock: late fires above 1.5 x C06 + 6 (RESULTS 1 row 2)"),
+            **_ex(("rows/m1n", "rows/m3n"), "peak_200a", "handover lock: whole-run peaks 201.8 / 203.5 A (RESULTS 0, 1 row 1)"),
+            ("rows/m3n", "sd_band"): _ADC,
+            **_ex(("rows/j30", "rows/j100"), "ls_on_ref_0p3V", _JIT),
+            ("rows/l_p48_5us", "c06_within_7a"): "one period on slave 1's phase 1: 184.6 A, not traced (RESULTS 0, 1 row 3)",
+            **_ex(("rows/l_m48_1us", "rows/l_m80_10us"), "step_10pct", "C06's residuals (C06 RESULTS 0, 1)"),
+            **{("criteria", k): "C09 not adopted: the restart fixes the master only (RESULTS 0, 1)"
+               for k in ("1_hard", "1_no_new_fail", "2_late_c06", "3_c06_within_7a")}},
+    "C10": {**_ex(_ROW(("m1n", "m3n", "l_p48_1us", "l_p48_5us")), "late_fires", "handover and line-step late fires, 25 / 90 vs C06's 19 / 68 "
+                  "and 1-2 in line steps (RESULTS 0; C06 RESULTS 1)"),
+            ("rows/s_m62", "late_fires"): "one late fire after the step (slave 3, phase 4); 0 in C06 at C10's offset and in C10 at C06's: "
+                                          "adopted by user decision 2026-10-05 (RESULTS 0)",
+            ("rows/m3n", "sd_band"): _ADC,
+            **_ex(("rows/j30", "rows/j100"), "ls_on_ref_0p3V", _JIT),
+            ("rows/l_m48_1us", "step_10pct"): "C06's residual (+17.9 vs +15.7 mV, C06 RESULTS 0)",
+            ("criteria", "1_no_new_fail"): "s_m62's late fire; adopted by user decision 2026-10-05 (RESULTS 0, 1)"},
+})
+NOT_ROWS["A134"] = ".*"     # its summary is per arm (f / z / c) and L, not per run
+
+
+def flat(c, prefix=""):
+    """{criterion: bool}: a criterion that is {"pass": bool, ...} counts as its pass; one that is a dict of corners
+    contributes its boolean entries as <criterion>/<corner>/<entry>."""
+    out = {}
+    for k, v in c.items():
+        if isinstance(v, bool):
+            out[prefix + k] = v
+        elif isinstance(v, dict) and isinstance(v.get("pass"), bool):
+            out[prefix + k] = v["pass"]
+        elif isinstance(v, dict):
+            out.update(flat(v, prefix + k + "/"))
+    return out
+
+
 def criteria_sets(d, prefix=""):
     """(row, {criterion: bool}) for every criteria block of a summary."""
     for k, v in d.items():
         if not isinstance(v, dict):
             continue
         if isinstance(v.get("criteria"), dict):
-            yield prefix + k, v["criteria"]
+            yield prefix + k, flat(v["criteria"])
         elif k.startswith("criteria"):
-            yield prefix + k, v
+            yield prefix + k, flat(v)
         elif k in ("part_a", "part_b"):
+            yield from criteria_sets(v, prefix + k + "/")
+        elif k in ("runs", "rows"):                                  # one entry per run, each possibly with its criteria
             yield from criteria_sets(v, prefix + k + "/")
 
 
@@ -193,6 +282,8 @@ def summary_rows(d):
     rows = set()
     for k, v in d.items():
         if k in ("part_a", "part_b") and isinstance(v, dict):
+            rows |= set(v)
+        elif k in ("runs", "rows") and isinstance(v, dict):
             rows |= set(v)
         elif not k.startswith("criteria"):
             rows.add(k)
@@ -218,7 +309,9 @@ def check(name, reanalyse):
         return out
     d = json.loads(path.read_text())
     have = summary_rows(d)
-    out["MISSING"] += [f"row {r} not in {summary}" for r in runs if r not in have]
+    pre, skip = ROW_PREFIX.get(name, ""), re.compile(NOT_ROWS.get(name, "(?!)"))
+    out["MISSING"] += [f"row {r} not in {summary}" for r in runs
+                       if r.removeprefix(pre) not in have and not skip.match(r)]
     exc = EXCEPTIONS.get(name, {})
     seen = set()
     for row, crit in criteria_sets(d):
