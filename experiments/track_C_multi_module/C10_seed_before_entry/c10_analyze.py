@@ -4,6 +4,7 @@
   most 5 us; G2 whole-run peak <= max(185 A, C06's row + 3 A) on rows without a step; G3 late fires <= 1.5 x C06 + 6;
 - C09's criteria 1-3 (c09_analyze's rules: hard limits / no new failure with the limit-cycle reading of sd_band, late
   fires, post-step peak within 7 A of C06 or of cosim/run_c06al10_<row>.json when present);
+- trace reruns of a stepped row (run_c06al10_<row>: C06 at C10's offset; run_c10al6_<row>: C10 at C06's): late fires;
 - each stepped row's post-step peak period: module, phase, and whether that phase turned off low twice within 20 ns
   before it (the double low-off seen in C09's and C06's l_p48_5us peaks).
 Writes c10_summary.json."""
@@ -81,6 +82,12 @@ def main():
                 ref = x["c06al10_peak_after_a"] = C9.peak_after(r, C9.t_step(r))
                 x["c06al10_peak_period"] = peak_period(r, C9.t_step(r))
             c["c06_within_7a"] = max(x["peak_after_a"]) <= ref + 7.0
+            for tag in ("c06al10", "c10al6"):                                   # trace reruns: late fires at the other offset
+                rr = HERE / "cosim" / f"run_{tag}_{row}.json"
+                if rr.exists():
+                    r = C6.load(rr)
+                    x[f"{tag}_late_fires"] = [m["late_fires"] for m in [r] + r["modules_rest"]]
+                    x[f"{tag}_step_offset_ns"] = C9.step_offset(r, C9.t_step(r)) * 1e9
         else:
             c["G2_peak"] = max(x["ipk_a"]) <= max(185.0, max(C06_SUM[row]["ipk_a"]) + 3.0)
         x["c06_failed"] = [k for k, v in C06_SUM[row]["criteria"].items() if not v]
