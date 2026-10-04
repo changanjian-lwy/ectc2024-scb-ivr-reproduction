@@ -1262,6 +1262,42 @@ each question:
          - **Erratum:** A105's period was 232 ns (T/16 14.5 ns), not
            1 µs; the final design's 31.6 ns spacing is wider.
 
+     52. L tolerance and the feed-forward's phase-1 cap (2026-10-04):
+         [A134](../experiments/track_A_periodic_steady_state/A134_p24_inductance_cap_lock/RESULTS.md),
+         [A135](../experiments/track_A_periodic_steady_state/A135_p24_relative_cap/RESULTS.md),
+         [A136](../experiments/track_A_periodic_steady_state/A136_p24_relative_cap_lowpass/RESULTS.md),
+         [A137](../experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/RESULTS.md),
+         [C08](../experiments/track_C_multi_module/C08_relative_cap_four_modules/RESULTS.md).
+         - **A134:** A132/A133's "ladder limit cycle" is a lock made by
+           scb_vff's absolute phase-1 cap (A128: k / rail, k = L0 x 180 A).
+           When the steady Ton a load needs crosses it (s_p62 at L x 1.1,
+           n0 at L x 1.3), phase 1 sits at the cap, rail 1 rises to 16.5 V,
+           the slotted phases saturate the loop and Vo falls 90 mV. D63 with
+           the RTL-exact cap reproduces it; k = 0 or k x L/L0 removes it.
+           The adopted design was within 200 A only at L0 (rising rows
+           206-214 A at L x 0.7-0.9, cap-bound at 1.05, locked at 1.1).
+           A133's L x 1.3 step rows fell in phase 1's learning phase
+           (timed at 818 us, after the 800 us step).
+         - **A135:** a relative cap (ton x 1.3 x rss / rail) never locks but
+           follows the loop's transient ton rise: L0 +4.8 V / 1 us 203 vs
+           183 A. Not adopted.
+         - **A136:** the relative cap on Ton's low-pass (cfg vff rel_q8 320,
+           rel_lp 1) equals the absolute cap at L0 (step rows within 2.8 A)
+           and is idle in steady state. **Adopted for the operating mode:**
+           L x 0.7-1.3, every A124 row <= 189 A, no lock. Open: handover
+           late fires (m3n 107-173) and start-up peaks 185-218 A.
+         - **A137:** restarting the feed-forward's low-passes at mode P
+           (cfg vff seed 1) removes that regression at L0 and L x 1.3 (m3n
+           late fires 11 / 0, start-up peaks 163 / 152 A, below the original
+           184 A), operating mode unchanged; at L x 0.7 the handover stays as
+           with the old cap (mode S's fixed Ton), so the registered criterion
+           fails. **Adoption of seed: open (user decision).**
+         - **C08:** four modules at L x 1.2 lock with the absolute cap
+           (10.5 %, Vo 0.917 V) and hold with A136's (1.12 %, Vo 1.000 V);
+           C06's rows keep the hard constraints, but the handover late fires,
+           m3n's end-window sd (0.11 A) and s_m25 (+7.3 A) are new: rerun
+           with A137 (C09) before adoption.
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
