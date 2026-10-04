@@ -29,7 +29,7 @@
 //   from its residual-current reports (scb_phase); slot_ofs reports the offsets.
 // - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
 //   A135: cfg_vff_rel != 0 makes phase 1's cap relative to ton (scb_vff), so it cannot bind in steady state;
-//   A136: cfg_vff_rel_lp takes ton's low-pass for it.
+//   A136: cfg_vff_rel_lp takes ton's low-pass for it; A137: cfg_vff_seed restarts scb_vff's low-passes at mode P's entry.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -132,6 +132,7 @@ module scb_ctrl #(
     input  wire [23:0]         cfg_vff_k,      // A128: phase-1 cap constant, LSB x Vin code
     input  wire [9:0]          cfg_vff_rel,    // A135: relative phase-1 cap, 1 + mu in Q8 (0: the absolute cap, k)
     input  wire                cfg_vff_rel_lp, // A136: the relative cap on ton's low-pass
+    input  wire                cfg_vff_seed,   // A137: restart the feed-forward's low-passes at mode P's entry
     input  wire [3:0]          cfg_vff_sh2,    // A128
     input  wire [3:0]          cfg_vff_sh20,   // A128
     input  wire [AW-1:0]       cfg_vff_gth,    // A129: falling-term gate, Vin codes (0: always on)
@@ -196,7 +197,7 @@ module scb_ctrl #(
     wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
-        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
+        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
         .ton_ph(ton_ph)
     );
 
