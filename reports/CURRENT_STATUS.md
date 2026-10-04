@@ -1324,6 +1324,11 @@ each question:
            design is C06 + vff {rel_q8 320, rel_lp 1, seed 2}; the single
            module's adopted setting is g125 + the same vff (one scb_vff for
            both levels).
+         - **C11:** that design at L x 1.2 (s_p62, m3n, l_p48_1us) and
+           L x 1.3 (s_p62): handover clean (rail 1 <= 12.87 V; C08 without
+           the restart 17.2 V for 52 us, 212.8 A), peaks <= 188.0 A, no
+           lock (ladder <= 1.22 %), late fires 0-5. Four modules hold
+           L x 1.0-1.3 handover included; L x 0.7-0.9 not run.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

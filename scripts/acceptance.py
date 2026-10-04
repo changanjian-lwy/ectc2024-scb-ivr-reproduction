@@ -56,6 +56,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "C08": (TC / "C08_relative_cap_four_modules", "c08_analyze.py", "c08_summary.json"),
     "C09": (TC / "C09_seed_four_modules", "c09_analyze.py", "c09_summary.json"),
     "C10": (TC / "C10_seed_before_entry", "c10_analyze.py", "c10_summary.json"),
+    "C11": (TC / "C11_seed2_inductance", "c11_analyze.py", "c11_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)

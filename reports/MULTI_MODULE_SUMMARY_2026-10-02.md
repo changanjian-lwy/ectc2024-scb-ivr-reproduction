@@ -208,6 +208,10 @@ the module spacing is wider now, not narrower).
   both this design and that step offset; the one-period spike after
   +4.8 V / 5 µs (179.3 A), seen with every design. Peaks ≤ 189 A on the
   18 rows (C06 ≤ 185 A).
+- **C11:** with every module's L × 1.2 (s_p62, m3n, l_p48_1us) and × 1.3
+  (s_p62) the design hands over cleanly (rail 1 ≤ 12.87 V; without the
+  restart, C08, 17.2 V and 212.8 A) and holds (≤ 188.0 A, no lock).
+  L × 0.7-0.9 is not run: there the handover is mode S's fixed Ton.
 
 **Module component spread (C07, floor on):**
 - Cs ±20%, R ±30%, L +5% (module 1 one way, module 3 the other): no
