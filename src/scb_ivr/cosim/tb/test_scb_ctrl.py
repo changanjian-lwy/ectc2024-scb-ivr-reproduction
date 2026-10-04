@@ -31,7 +31,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slave_floor=0,                                                       # C06
             ph_floor=0,                                                          # A133
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
-            vff_gth=0)                                                           # A129
+            vff_gth=0,                                                           # A129
+            vff_rel=0)                                                           # A135
 
 
 def pack(values, width):
@@ -125,6 +126,7 @@ class Ctrl:
         d.cfg_vff_k.value = cfg["vff_k"]; d.cfg_vff_sh2.value = cfg["vff_sh2"]; d.cfg_vff_sh20.value = cfg["vff_sh20"]
         d.cfg_vff_vo.value = cfg["vff_vo"]; d.vin_valid.value = 0; d.vin_code.value = 0
         d.cfg_vff_gth.value = cfg["vff_gth"]                     # A129
+        d.cfg_vff_rel.value = cfg["vff_rel"]                     # A135
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1169,6 +1171,35 @@ async def vff_gate_by_fall_rate(dut):
     await _vin(dut, 2140)
     await ReadOnly()
     assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4
+
+
+@cocotb.test()
+async def vff_rel_steady_never_caps(dut):
+    """A135, rel 333 (1 + mu = 1.30): at a steady Vin the relative cap is ~1.3 ton, so every phase keeps ton - even with
+    a k (50 000: absolute cap 90 LSB < ton) that the relative cap replaces."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=50000, vff_rel=333)
+    await _vin(dut, 2400, 6)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [133] * 4
+
+
+@cocotb.test()
+async def vff_rel_rising_step_caps_phase_1(dut):
+    """A135, rel 333: a Vin rise 2400 -> 2640 codes gives cap = ton x ((rss x 333) >> 8) / rail with rss = lp20 - 3/4 lp20
+    - 50 (Q8) and A128's rail: 92 LSB on phase 1 only (ratio 0.70), after the divider."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=333)
+    await _vin(dut, 2400, 4)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2640)
+    await ReadOnly()
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    rss = lp20 - ((lp20 * 3) >> 2) - 50 * 256
+    cap = (133 * ((rss * 333) >> 8)) // rail
+    assert cap == 92
+    assert [_ton_ph(dut, k) for k in range(4)] == [cap, 133, 133, 133]
 
 
 async def _win(dut):

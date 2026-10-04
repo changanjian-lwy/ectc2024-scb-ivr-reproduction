@@ -10,6 +10,9 @@
 // - phase 1's cap = k / rail, rail = (2 vin - vin_prev) - 3/4 lp20 - vo (a one-step prediction against the lag),
 //   by a restoring divider started at the sample (32 clocks), so it applies from the next phase-1 turn-on;
 //   rail <= 0 or k = 0: no cap (A127's cap_vin). ton_ph[0] = min(ton_0, cap).
+// - A135: with rel != 0 the cap is relative instead: cap = ton x ((rss x rel) >> 8) / rail, rss = lp20 - 3/4 lp20 - vo
+//   (the rail with Vin at its low-pass), rel = 1 + mu in Q8; in steady state rail = rss, so the cap is (1 + mu) ton and
+//   never binds, whatever L or the load. k is then unused. rss <= 0: no cap.
 module scb_vff #(
     parameter N  = 4,
     parameter TW = 32,
@@ -22,6 +25,7 @@ module scb_vff #(
     input  wire [AW-1:0]   vin_code,
     input  wire [N*12-1:0] c,
     input  wire [23:0]     k,
+    input  wire [9:0]      rel,
     input  wire [3:0]      sh2,
     input  wire [3:0]      sh20,
     input  wire [AW-1:0]   gth,
@@ -46,8 +50,12 @@ module scb_vff #(
     wire                 gaten = (gn >= $signed({2'b00, gth, 8'd0})) ? 1'b1 : ((gn == 0) ? 1'b0 : gate);
     wire signed [LW+1:0] vpred = init ? $signed({v8, 1'b0}) - $signed({2'b00, vprev, 8'd0}) : v8;
     wire signed [LW+1:0] rail  = vpred - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
+    wire signed [LW+1:0] rss   = $signed({{2{lp20n[LW-1]}}, lp20n}) - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
+    wire signed [LW+12:0] rssk = (rss * $signed({1'b0, rel})) >>> 8;            // A135: Q8
+    wire [TW+LW+12:0]    rnum = ton * rssk[LW+11:0];
+    wire [31:0]          rnum32 = (|rnum[TW+LW+12:32]) ? 32'hFFFFFFFF : rnum[31:0];
 
-    // restoring divider: q = (k << 8) / rail
+    // restoring divider: q = (k << 8) / rail, or with rel (A135) q = ton x rssk / rail
     reg  [5:0]  dcnt;
     reg  [31:0] dnum, dq;
     reg  [32:0] drem;
@@ -62,7 +70,9 @@ module scb_vff #(
         end else begin
             if (vin_valid) begin
                 init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; vprev <= vin_code; gate <= gaten; g <= gaten ? gn : {LW{1'b0}};
-                if (rail > 0 && k != 0) begin
+                if (rail > 0 && rel != 0 && rss > 0) begin                      // A135
+                    dnum <= rnum32; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;
+                end else if (rail > 0 && rel == 0 && k != 0) begin
                     dnum <= {k, 8'd0}; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;
                 end else begin
                     cap_on <= 1'b0; dcnt <= 0;
