@@ -227,6 +227,8 @@ class Sequential:
                 wait += 1
                 if wait >= patience:
                     break
+        if best_par is None:
+            raise FloatingPointError("Sequential.fit: no finite validation loss (non-finite inputs or divergence)")
         for p, b in zip(par, best_par):
             p[...] = b
         return hist

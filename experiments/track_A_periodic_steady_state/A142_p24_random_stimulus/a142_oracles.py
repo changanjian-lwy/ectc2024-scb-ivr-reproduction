@@ -78,7 +78,11 @@ def classify(e, cfg, dups):
 
 
 def check(path):
-    d = json.loads(Path(path).read_text())
+    return check_dict(json.loads(Path(path).read_text()), Path(path).name)
+
+
+def check_dict(d, name):
+    """check() on a loaded record (A147 reads each record once)."""
     cfg = d["cfg"]
     mods = [d] + d.get("modules_rest", [])
     t0 = max(max(md[k][0]["t_s"] for md in mods for k in ("turnons_last", "highoffs_last") if md[k]),
@@ -97,7 +101,7 @@ def check(path):
     post = [q["i_a"] for md in mods for q in md["highoffs_last"] if t_dist is not None and q["t_s"] >= t_dist]
     tail = d["sections"][-100:]
     late = [sum(d["late_fires"])] + [sum(m["late_fires"]) for m in d.get("modules_rest", [])]
-    return {"file": Path(path).name, "status": d["status"], "src_modified": d["provenance"].get("cosim_sources_modified"),
+    return {"file": name, "status": d["status"], "src_modified": d["provenance"].get("cosim_sources_modified"),
             "t0_us": t0 * 1e6, "t_dist_us": t_dist and t_dist * 1e6, "t_lo_timed_us": (d.get("t_lo_timed_s") or 0) * 1e6,
             "n_on": n_on, "overlaps": d["overlaps"], "late": int(sum(late)),
             "peak_post": max(post) if post else None, "peak_window": max(pk),
