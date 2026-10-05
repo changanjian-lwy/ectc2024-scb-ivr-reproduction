@@ -1400,6 +1400,20 @@ each question:
          floor sits 2-4.5 A deeper. **Adopted on one and four modules: the
          single-module controller is frozen; C13 runs with lo_learn 4.**
 
+     55. Four-module random-stimulus test (2026-10-05):
+         [C13](../experiments/track_C_multi_module/C13_random_stimulus_four_modules/RESULTS.md).
+         30 random draws (L / Cs x 0.7-1.3, driver mismatch, line + load
+         steps, steps from 145 us) on C12 + lo_learn 4. As registered 5/6:
+         one floor-first duplicate (y08), traced to a rounding tie - floor
+         and clocked turn-off 0.36 LSB (11 ps) apart, the floor's report
+         rounds to t_lo, so floor_late cannot order them; second turn-on
+         on a gate already on, peak normal. 279 records hold 17 K1 races
+         (0.04-26.7 LSB, the mirror order) and this one: known class K5.
+         No NEW events, all settle, rail 1 <= 12.53 V. Peaks > 200 A only
+         on falling ramps outside A139's table; one module gives the same
+         within 1-11 A. **Four-module design frozen; the multi-module level
+         is closed.**
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

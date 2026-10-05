@@ -1,0 +1,202 @@
+{
+ "tie_y08": {
+  "lowoff_cmd_lsb": [
+   32384408.648,
+   32384409.003
+  ],
+  "turnon_cmd_lsb": [
+   32384720.64,
+   32384721.0
+  ],
+  "a_tlo_round": 32384409,
+  "t_lo": 32384409
+ },
+ "records_scanned": 279,
+ "duplicates": [
+  {
+   "file": "A14/run_z033.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1028.8285,
+   "dt_lsb": 15.36
+  },
+  {
+   "file": "A14/run_z056.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1030.6568,
+   "dt_lsb": 10.08
+  },
+  {
+   "file": "A14/run_z061.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1046.5312,
+   "dt_lsb": 5.96
+  },
+  {
+   "file": "A14/run_z102.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 847.4684,
+   "dt_lsb": 6.28
+  },
+  {
+   "file": "A14/run_g1_R_dv4.8_s4_L100_k64.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 343.7891,
+   "dt_lsb": 17.04
+  },
+  {
+   "file": "A14/run_g1_z104_k4.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 356.2152,
+   "dt_lsb": 10.56
+  },
+  {
+   "file": "A14/run_g2_t160_dv4.8_k64.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 192.9088,
+   "dt_lsb": 12.92
+  },
+  {
+   "file": "A14/run_g4_s130_l_p48_5us_k4.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1033.3345,
+   "dt_lsb": 16.76
+  },
+  {
+   "file": "A14/run_g5_l_p48_1us_k4.json",
+   "cls": "K1",
+   "module": 4,
+   "t_us": 823.4009,
+   "dt_lsb": 22.72
+  },
+  {
+   "file": "C12/run_l120_l_p48_1us.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1030.0058,
+   "dt_lsb": 1.8
+  },
+  {
+   "file": "C12/run_s_m25.json",
+   "cls": "K1",
+   "module": 3,
+   "t_us": 805.4892,
+   "dt_lsb": 15.6
+  },
+  {
+   "file": "C13/run_I0.json",
+   "cls": "K1",
+   "module": 4,
+   "t_us": 823.4009,
+   "dt_lsb": 22.72
+  },
+  {
+   "file": "C13/run_y06.json",
+   "cls": "K1",
+   "module": 3,
+   "t_us": 1008.6752,
+   "dt_lsb": 6.12
+  },
+  {
+   "file": "C13/run_y08.json",
+   "cls": "K5",
+   "module": 2,
+   "t_us": 1012.0325,
+   "dt_lsb": 0.36
+  },
+  {
+   "file": "C13/run_y10.json",
+   "cls": "K1",
+   "module": 1,
+   "t_us": 1017.6876,
+   "dt_lsb": 26.72
+  },
+  {
+   "file": "C13/run_y19.json",
+   "cls": "K1",
+   "module": 2,
+   "t_us": 1011.998,
+   "dt_lsb": 10.76
+  },
+  {
+   "file": "C13/run_y30.json",
+   "cls": "K1",
+   "module": 2,
+   "t_us": 541.8745,
+   "dt_lsb": 11.92
+  },
+  {
+   "file": "C13/run_y30.json",
+   "cls": "K1",
+   "module": 3,
+   "t_us": 543.8511,
+   "dt_lsb": 0.04
+  }
+ ],
+ "single_vs_four": {
+  "y02": {
+   "cfg": {
+    "t_us": 1004.3828,
+    "dv": -6.7239,
+    "slew_us": 4.948
+   },
+   "four": {
+    "peak_a": 229.0,
+    "module": 1,
+    "phase": 4,
+    "t_after_us": 5.33
+   },
+   "one": {
+    "peak_a": 227.8,
+    "module": 1,
+    "phase": 4,
+    "t_after_us": 5.14
+   }
+  },
+  "y08": {
+   "cfg": {
+    "t_us": 1003.999,
+    "dv": -7.7437,
+    "slew_us": 1.2377
+   },
+   "four": {
+    "peak_a": 259.6,
+    "module": 3,
+    "phase": 4,
+    "t_after_us": 2.85
+   },
+   "one": {
+    "peak_a": 248.6,
+    "module": 1,
+    "phase": 4,
+    "t_after_us": 2.83
+   }
+  },
+  "y10": {
+   "cfg": {
+    "t_us": 1008.2662,
+    "dv": -6.8111,
+    "slew_us": 1.3732
+   },
+   "four": {
+    "peak_a": 218.2,
+    "module": 3,
+    "phase": 4,
+    "t_after_us": 2.93
+   },
+   "one": {
+    "peak_a": 214.2,
+    "module": 1,
+    "phase": 4,
+    "t_after_us": 3.12
+   }
+  }
+ }
+}

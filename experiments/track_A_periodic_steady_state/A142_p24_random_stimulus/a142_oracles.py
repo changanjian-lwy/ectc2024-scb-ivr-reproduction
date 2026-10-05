@@ -5,7 +5,8 @@ off-grid < 1 ns, other), order (turn-ons not in the interleave order 1..N, the s
 (two turn-ons or two high-offs of one phase in a row), spike (a high-off current > 10 A above both adjacent periods of
 its phase), how (a turn-on not predictive, how != 0). Known classes (not defects; Section 2): K1 race duplicates; K2
 order hits within a falling line ramp + 2 us with dv < -5.5 V and |dv| / slew >= 4 V/us; K3 restarts (how 3) whose
-phase's previous low-off current was positive; K4 spikes inside a line ramp + 1 us or a load step + 1 us. Every other
+phase's previous low-off current was positive; K4 spikes inside a line ramp + 1 us or a load step + 1 us; K5 (C13)
+floor-first duplicates < 0.5 LSB apart (the floor's report rounds to t_lo, so floor_late cannot order them). Every other
 hit is NEW; spikes within 60 ns after a floor-first duplicate count with it."""
 from __future__ import annotations
 
@@ -71,8 +72,8 @@ def classify(e, cfg, dups):
             return "K4"
         if ld and ld["t_us"] * 1e-6 <= t <= (ld["t_us"] + 1.0) * 1e-6:
             return "K4"
-    if k == "dup_floor_first":
-        return "FF"
+    if k == "dup_floor_first":                    # C13: K5 = tie, both commands in one LSB (a_tlo == t_lo)
+        return "K5" if e["dt_ns"] < 0.5 * cfg["t_clk_ns"] / 2 ** cfg["fb"] else "FF"
     return "NEW"
 
 
