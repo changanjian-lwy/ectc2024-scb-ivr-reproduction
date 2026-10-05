@@ -1,6 +1,7 @@
 """A143 analysis against BOUNDARY Section 2 -> a143_summary_<stage>.json. Per run: A142's oracle classes, peaks, end
 state; the handover window [144, 244] us (peak from the event lists, max |Vo - 1|, rail 1); the 60 us after a step
-(phase 2-4 low-offs >= 0 A, time outside 2 %); four modules: C10's rail-1 gate. Usage: a143_analyze.py 1 | 2 K"""
+(phase 2-4 low-offs >= 0 A, time outside 2 %); four modules: C10's rail-1 gate. Usage: a143_analyze.py 1 | 2 K; no
+argument: both stages at the chosen K, merged into a143_summary.json (runs + criteria, for scripts/acceptance.py)."""
 from __future__ import annotations
 
 import importlib.util
@@ -70,6 +71,11 @@ def run_all(paths):
         return {Path(f).stem[4:]: s for f, s in zip(paths, p.map(stats, paths, chunksize=2))}
 
 
+def pk(s):
+    """Post-step peak, or the whole-run peak for a row without a step."""
+    return s["peak_post"] if s["peak_post"] is not None else s["ipk"]
+
+
 def ok3(s):
     return (s["status"] == "COMPLETED" and s["overlaps"] == 0 and s["ff"] == 0 and s["new"] == 0
             and abs(s["vo_end"] - 1) <= 0.01 and s["ladder_end"] <= 0.03)
@@ -121,12 +127,11 @@ def stage2(k):
     for m, row in MK.G4:
         n = f"g4_s{round(m * 100):03d}_{row}"
         s, b = st[f"{n}_k{k}"], st[f"{n}_k1024"]
-        c5[n] = (s["peak_post"] <= b["peak_post"] + NOISE_A and (s["peak_post"] <= 200.0 or b["peak_post"] > 200.0)
-                 and s["late"] <= b["late"] + 5)
+        ps, pb = pk(s), pk(b)
+        c5[n] = ps <= pb + NOISE_A and (ps <= 200.0 or pb > 200.0) and s["late"] <= b["late"] + 5
     for row in MK.G5_ROWS:
         s, b = st[f"g5_{row}_k{k}"], st[f"c12_{row}"]
-        pk = (s["peak_post"] or s["ipk"]), (b["peak_post"] or b["ipk"])
-        c6[row] = (pk[0] <= pk[1] + NOISE_A and s["late"] <= b["late"] + 5 and s["ff"] == 0
+        c6[row] = (pk(s) <= pk(b) + NOISE_A and s["late"] <= b["late"] + 5 and s["ff"] == 0
                    and all(q["max_v"] <= C10.RAIL_MAX and q["hi_us"] <= C10.RAIL_HI_US for q in s["rails"]))
     c3 = {n: ok3(st[n]) for n in names}
     ident = same(COS / "run_g4_s100_l_p48_1us_k1024.json", A141C / "run_F_s100_l_p48_1us.json")
@@ -135,18 +140,31 @@ def stage2(k):
     (HERE / f"a143_summary_2_k{k}.json").write_text(json.dumps({"stats": st, "criteria": crit, "identity_lp48": ident},
                                                                 indent=1) + "\n")
     print(f"K {k}: c3 {crit['3']} c4 {crit['4']} {ident['differs']} c5 {crit['5']} c6 {crit['6']} fails {crit['fails'][:8]}")
-    d5 = [st[f"g4_s{round(m * 100):03d}_{r}_k{k}"]["peak_post"] - st[f"g4_s{round(m * 100):03d}_{r}_k1024"]["peak_post"]
-          for m, r in MK.G4]
+    d5 = [pk(st[f"g4_s{round(m * 100):03d}_{r}_k{k}"]) - pk(st[f"g4_s{round(m * 100):03d}_{r}_k1024"]) for m, r in MK.G4]
     print(f"g4 peak K - 1024: min {min(d5):+.1f} max {max(d5):+.1f} A; max peak at K "
-          f"{max(st[f'g4_s{round(m * 100):03d}_{r}_k{k}']['peak_post'] for m, r in MK.G4):.1f} A")
+          f"{max(pk(st[f'g4_s{round(m * 100):03d}_{r}_k{k}']) for m, r in MK.G4):.1f} A")
     for row in MK.G5_ROWS:
         s, b = st[f"g5_{row}_k{k}"], st[f"c12_{row}"]
-        print(f"g5 {row:10s} peak {s['peak_post'] or s['ipk']:6.1f} (C12 {b['peak_post'] or b['ipk']:6.1f}) late {s['late']} "
+        print(f"g5 {row:10s} peak {pk(s):6.1f} (C12 {pk(b):6.1f}) late {s['late']} "
               f"({b['late']}) ff {s['ff']} rail1 max {max(q['max_v'] for q in s['rails']):.2f} V")
 
 
+def merged():
+    stage1()
+    s1 = json.loads((HERE / "a143_summary_1.json").read_text())
+    k = s1["chosen_K"]
+    stage2(k)
+    s2 = json.loads((HERE / f"a143_summary_2_k{k}.json").read_text())
+    out = {"chosen_K": k, "runs": s1["stats"] | s2["stats"],
+           "criteria_stage1": {f"K{kk}": {c: v for c, v in cr.items() if c != "fails"} for kk, cr in s1["criteria"].items()},
+           "criteria_stage2": {c: v for c, v in s2["criteria"].items() if c != "fails"} | {"4_n0": s1["identity_n0"]["identical"]}}
+    (HERE / "a143_summary.json").write_text(json.dumps(out, indent=1) + "\n")
+
+
 if __name__ == "__main__":
-    if sys.argv[1] == "1":
+    if len(sys.argv) == 1:
+        merged()
+    elif sys.argv[1] == "1":
         stage1()
     else:
         stage2(int(sys.argv[2]))

@@ -54,6 +54,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A136": (TA / "A136_p24_relative_cap_lowpass", "a136_analyze.py", "a136_summary.json"),
     "A137": (TA / "A137_p24_vff_restart_at_handover", "a137_analyze.py", "a137_summary.json"),
     "A141": (TA / "A141_p24_floor_late_report", "a141_analyze.py", "a141_summary.json"),
+    "A143": (TA / "A143_p24_short_comparator_phase", "a143_analyze.py", "a143_summary.json"),
     "C08": (TC / "C08_relative_cap_four_modules", "c08_analyze.py", "c08_summary.json"),
     "C09": (TC / "C09_seed_four_modules", "c09_analyze.py", "c09_summary.json"),
     "C10": (TC / "C10_seed_before_entry", "c10_analyze.py", "c10_summary.json"),
