@@ -1242,14 +1242,25 @@ each question:
          - **A138-A139 (2026-10-05, GP level-set map, L / Cs x 0.7-1.3):**
            [A139](../extensions/ml_design_assist/experiments/A139_gp_boundary_noise_floor/RESULTS.md)
            corrects A130's spec: the peak is not monotone in slew, so a
-           minimum slew is not a spec. Falling -4.8 V at nominal L / Cs:
-           173.5 A at 1 us, 192.2 A at 2.3 us, 172.2 A at 5.1 us (A130
-           tested 1 and 5 us); rising at L x 0.7: +4.8 V 185.2 / 188.6 /
+           minimum slew is not a spec. Falling -4.8 V: 173.5 A at 1 us and
+           172.2 A at 5.1 us (nominal), 192.2 A at 2.3 us (L x 0.9, Cs x
+           1.05; corrected in A140); rising at L x 0.7: +4.8 V 185.2 / 188.6 /
            205.9 A at 1 / 5 / 20 us; nominal +8 V 197-209 A at every slew.
            A139's certified table (95 % bound) is the spec under tolerance.
            A138's own bands failed (GP noise collapse, budget to one
            direction); A139 measured the scatter (heavy-tailed: one step
            position in six adds +14 A) and passed 3/3.
+         - **A140 (2026-10-05, why):**
+           [RESULTS](../experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/RESULTS.md).
+           Falling: the vff slope gate (gth 100) stays shut on -4.8 V
+           slower than ~2.3 us, and phase 4's turn-on current rises
+           (191.6 A at 2.5 us vs 162.2 A at 2 us with the gate open).
+           gth 50 flattens -4.8 V but costs -6.4 V (214 A) and L x 1.3
+           -8 V / 10 us (198 A): gth stays 100, falling spec = windows.
+           Rising: the high slow-ramp peaks follow a duplicate phase-1
+           turn-on (two turn-ons ~6 ns apart restart the Ton timer, +20-38
+           A); without it L x 0.7 +4.8 V stays <= 194 A at 1-40 us. Next:
+           A141, the duplicate turn-on in the RTL.
      51. The final design on four modules:
          [C05](../experiments/track_C_multi_module/C05_four_module_final_design/RESULTS.md),
          [C06](../experiments/track_C_multi_module/C06_slave_floor/RESULTS.md);

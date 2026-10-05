@@ -29,11 +29,11 @@ RUNS = [("B", 1.0, -4.8, (2.0, 2.5, 3.0, 4.0), (0,)), ("G", 1.0, -4.8, (1.0, 2.0
         ("B", 0.7, 4.8, (10.0, 40.0), (0,)), ("B", 0.7, 4.8, (20.0,), (1, 2, 3)),
         ("O", 0.7, 4.8, (5.0, 20.0), (0,)), ("B", 0.7, 8.0, (20.0, 50.0), (0,)),
         ("G", 0.7, 4.8, (20.0,), (0,))]                       # identity: rising, gate never opens -> = A139 ur01
-# runs of the adopted design already on record (A138 / A139 cosim, same RTL): name -> (arm, m, dv, slew, pos, path)
+# runs of the adopted design already on record (A137 seed 1 = seed 2 on one module, A138, A139; same RTL): name -> (arm, m, dv, slew, pos, path)
 REUSED = {"B_L100_m4.8_s1.0": "extensions/ml_design_assist/experiments/A138_gp_boundary_map/cosim/run_vf05.json",
           "B_L100_m4.8_s5.125": "extensions/ml_design_assist/experiments/A139_gp_boundary_noise_floor/cosim/run_vf04.json",
-          "B_L070_p4.8_s1.0": "extensions/ml_design_assist/experiments/A138_gp_boundary_map/cosim/run_xs070_l_p48_1us.json",
-          "B_L070_p4.8_s5.0": "extensions/ml_design_assist/experiments/A138_gp_boundary_map/cosim/run_xs070_l_p48_5us.json",
+          "B_L070_p4.8_s1.0": "experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/cosim/run_s070_l_p48_1us.json",
+          "B_L070_p4.8_s5.0": "experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/cosim/run_s070_l_p48_5us.json",
           "B_L070_p4.8_s20.0": "extensions/ml_design_assist/experiments/A139_gp_boundary_noise_floor/cosim/run_ur01.json"}
 
 
