@@ -57,6 +57,12 @@ Geometry: `paper_locked/02_ectc2024_main/P24_FIG5_FIG6_PACKAGE_TRANSCRIPTION.md`
 - For Mihai (real values decide these numbers): the copper thickness and layer count of the ABF build-ups; whether
   Vo / GND leave each module laterally (Fig. 5) or vertically; the placement of a module's QH and QL dies and the
   expected loop inductance in the glass stack; the series-capacitor technology and its ESR.
+- Checked by A144 (plant, instantaneous edges): the single-edge bound holds within -1.0..+1.5 V. The closed loop adds
+  a second limit the bound does not have: a hard turn-on of phase k-1 rings SH_k (blocking 2 rails) to ~24 + 1.7 dV,
+  independent of L (47 V at start-up, 58.5 V after a +4.8 V / 1 us step), and the loop energy 0.5 L I^2 per
+  turn-off costs 7.7 W per 100 pH per module. Added for Mihai: the loop's damping (ring decay, Q) and the switching
+  edge times, which decide whether the valley detection survives (Q 7 yes, undamped no) and how much of the
+  overshoot is real.
 
 ## 5. Limits
 - Lateral copper: DC resistance; the ripple share is included in the rms but skin / proximity effects (skin depth
