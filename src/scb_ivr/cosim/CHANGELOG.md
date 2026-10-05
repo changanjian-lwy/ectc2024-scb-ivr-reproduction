@@ -4,6 +4,28 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-05 (A141) - the floor's late report
+
+**Source:** A140's duplicate phase-1 turn-on, traced to the RTL. A floor
+(A118, or C06's slave floor) that fires in the window before the clocked
+turn-off (timed edge or slot) reports two windows later (synchroniser),
+after that turn-off was committed. scb_phase took the report only in LOW,
+so it was ignored: the front end's turn-on reached the power stage first,
+while Ton counted from the later clocked turn-on (+0-6 ns on, +20-38 A).
+
+**Changes:**
+- **`rtl/scb_phase.v`:** input `cfg_floor_late`. With it, a floor report
+  in UP earlier than t_lo is the turn-off (t_lo = a_tlo, t_on = a_tlo +
+  dt_pred, HIGH, the pending turn-on dropped); in HIGH, a floor turn-on
+  earlier than t_on moves t_on (and t_lo) to it.
+- **`rtl/scb_ctrl.v`:** the input, passed to every phase.
+- **`rtl/scb_multi.v`:** regenerated.
+- **`bridge.py`:** cfg `floor_late` (default 0).
+- **`tb/`:** 5 tests (4 in test_scb_ctrl, 1 in test_scb_slave); 85 pass.
+
+**Gate:** off by default; A141 criterion 1 (an A140 record and a C10
+record replayed bit for bit).
+
 ## 2026-10-03 (A118) - the floor: phase 1's front end armed in timed mode
 
 **Source:** D63's design map and A120's search. The timed turn-off fails

@@ -36,6 +36,9 @@ Controller-side analog functions modelled here:
   reports no residual (the trim holds), and the crossing measurement of i_target is taken first;
 - the slave floor (cfg "slave_floor" 1, C06, multi-module): a slave's slotted phase 1 has the same front end armed in
   LOW (mode P) at i_target + trim - "lo_floor_a"; if the current reaches it before the slot it makes the turn-off.
+- a late floor report (cfg "floor_late" 1, A141): a floor that fires in the window before the clocked turn-off
+  reports after that turn-off was committed; the RTL then takes the floor's earlier edges (t_lo, t_on) instead of
+  ignoring the report, so Ton counts from the turn-on the plant saw (scb_phase).
 - the phase floors (cfg "ph_floor" 1, A133): phases 2..N each get that front end (arm_n, fa_valid / fa_tlo), armed in
   LOW in mode P at the same threshold (phase 1's trim: the same slope -Vo / L and delays); the plant's extra latches.
 - the depth loop (cfg "dep" {von_set_v, wsh, smax, dmin, dmax, ehold}, A132): at phase 1's predictive turn-on a
@@ -330,6 +333,7 @@ class ModuleSim:
         c.set("cfg_lo_floor", int(cfg.get("lo_floor", 0)))              # A118: the front end as a floor when timed
         c.set("cfg_slave_floor", int(cfg.get("slave_floor", 0)))        # C06: a slave's phase 1, floor before its slot
         c.set("cfg_ph_floor", int(cfg.get("ph_floor", 0)))              # A133: phases 2..N, floors before their slots
+        c.set("cfg_floor_late", int(cfg.get("floor_late", 0)))          # A141: a late floor report moves t_lo / t_on
         c.set("fa_valid", 0); c.set("fa_tlo", 0)
         vff = cfg.get("vff") or {}                                       # A128: Vin feed-forward (extension)
         self.vin_lsb = float(vff.get("vin_lsb_v", 0.02))

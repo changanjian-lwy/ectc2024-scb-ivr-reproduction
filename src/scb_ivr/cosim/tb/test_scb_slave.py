@@ -1,5 +1,5 @@
 """cocotb unit tests of a slave module's controller (scb_ctrl with SLAVE = 1): phase 1 slotted at ext_slot once per
-ext_ref, and C06's slot floor (cfg_slave_floor). The fixture and LSB units are test_scb_ctrl's (start_s 0: mode P
+ext_ref, and C06's slot floor (cfg_slave_floor) with A141's late report. The fixture and LSB units are test_scb_ctrl's (start_s 0: mode P
 from reset; a slave's phase 1 resets LOW; dt_init of phase 1 85, Ton 133)."""
 import cocotb
 from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge
@@ -90,3 +90,17 @@ async def slave_floor_before_reference_consumes_the_next(dut):
     await c.set(ext_ref=11, ext_slot=t2 + 300)
     e = await c.until("L", 0, 1, after=t2)
     assert e[0] + e[1] == t2 + 300
+
+
+@cocotb.test()
+async def slave_floor_late_report_after_the_slot_moves_t_on(dut):
+    """cfg_floor_late: reference 7's slot fires at 300 (UP); a floor report at 290 arriving after it is the turn-off:
+    t_on = 290 + dt_pred = 375, HIGH without a gate event, the turn-off at 375 + Ton = 508."""
+    c = Ctrl(dut)
+    await c.start(slave_floor=1, floor_late=1, ext_ref=7, ext_slot=300)
+    e = await c.until("L", 0, 1)
+    assert e[0] + e[1] == 300 and field(dut.state.value, 0, 2) == 3
+    await _floor_report(c, 290)
+    assert field(dut.state.value, 0, 2) == 0 and int(dut.t_ref.value) == 375
+    off = await c.until("H", 0, 1, after=300)
+    assert off[0] + off[1] == 508 and c.find("H", 1, 1) is None

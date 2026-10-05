@@ -5,7 +5,7 @@ drives every input; option bits default to 0. Groups: phase timing, comparators 
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
-step and Ton feedforward, and its floor (A118); phases 2-4's floors (A133). From A93's tests (history: ../CHANGELOG.md).
+step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -28,6 +28,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
             lo_floor=0,                                                          # A118
+            floor_late=0,                                                        # A141
             slave_floor=0,                                                       # C06
             ph_floor=0,                                                          # A133
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
@@ -119,6 +120,7 @@ class Ctrl:
         d.cfg_lo_adm.value = cfg["lo_adm"]; d.cfg_lo_smax.value = cfg["lo_smax"]   # A100
         d.cfg_lo_ff.value = cfg["lo_ff"]; d.cfg_lo_kff.value = cfg["lo_kff"]
         d.cfg_lo_floor.value = cfg["lo_floor"]                   # A118
+        d.cfg_floor_late.value = cfg["floor_late"]               # A141
         d.cfg_slave_floor.value = cfg["slave_floor"]             # C06
         d.cfg_ph_floor.value = cfg["ph_floor"]; d.fa_valid.value = 0; d.fa_tlo.value = 0   # A133
         d.cfg_vff.value = cfg["vff"]                             # A128
@@ -1080,6 +1082,74 @@ async def lo_floor_timed_edge_first(dut):
     t_lon = await _floor_to_timed_low(c)
     lo = await c.until("L", 0, 1, after=t_lon, limit=60)
     assert lo[0] + lo[1] == t_lon + 600, (t_lon, lo)
+
+
+# ---------------- A141: the floor's report after the timed edge ----------------
+
+async def _late_report(c, a_tlo_rel, **over):
+    """Timed phase 1 (dlo 600): the timed edge at t_lon + 600 is committed (UP), then a floor report at
+    t_lon + a_tlo_rel arrives; returns t_lon."""
+    await c.start(async_=1, lo_pred=1, lo_learn=1, lo_floor=1, **over)
+    t_lon = await _floor_to_timed_low(c)
+    lo = await c.until("L", 0, 1, after=t_lon, limit=60)
+    assert lo[0] + lo[1] == t_lon + 600 and field(c.dut.state.value, 0, 2) == 3     # UP
+    await c.set(a_valid=1, a_tlo=t_lon + a_tlo_rel)
+    await c.set(a_valid=0)
+    await RisingEdge(c.dut.clk)
+    await ReadOnly()
+    return t_lon
+
+
+@cocotb.test()
+async def floor_late_off_ignores_the_report(dut):
+    """Without cfg_floor_late, a floor report at t_lon + 590 that arrives after the timed edge (UP) is ignored:
+    the predictive turn-on comes at t_lo + dt_pred = t_lon + 685 and t_ref follows it."""
+    c = Ctrl(dut)
+    t_lon = await _late_report(c, 590)
+    on = await c.until("H", 1, 1, after=t_lon, limit=60)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert on[0] + on[1] == t_lon + 685 and int(dut.t_ref.value) == t_lon + 685
+
+
+@cocotb.test()
+async def floor_late_report_in_up_is_the_turn_off(dut):
+    """cfg_floor_late: the report at t_lon + 590 (before the committed timed edge at 600) arriving in UP sets
+    t_lo = a_tlo and t_on = a_tlo + dt_pred (675), enters HIGH without a gate event (the pending turn-on is dropped),
+    and the turn-off follows at t_on + Ton (808)."""
+    c = Ctrl(dut)
+    t_lon = await _late_report(c, 590, floor_late=1)
+    assert field(dut.state.value, 0, 2) == 0 and int(dut.t_ref.value) == t_lon + 675
+    off = await c.until("H", 0, 1, after=t_lon, limit=60)
+    assert off[0] + off[1] == t_lon + 808, (t_lon, off)
+    assert c.find("H", 1, 1, after=t_lon) is None
+
+
+@cocotb.test()
+async def floor_late_report_after_the_timed_edge_keeps_it(dut):
+    """cfg_floor_late: a report at t_lon + 610, after the timed edge at 600 (the clocked turn-off came first), changes
+    nothing: the turn-on at t_lon + 685, Ton from it."""
+    c = Ctrl(dut)
+    t_lon = await _late_report(c, 610, floor_late=1)
+    on = await c.until("H", 1, 1, after=t_lon, limit=60)
+    assert on[0] + on[1] == t_lon + 685
+    off = await c.until("H", 0, 1, after=t_lon, limit=60)
+    assert off[0] + off[1] == t_lon + 818, (t_lon, off)
+
+
+@cocotb.test()
+async def floor_late_report_in_high_moves_t_on(dut):
+    """cfg_floor_late: the report at t_lon + 590 arrives after the clocked turn-on (t_lon + 685, HIGH): t_on moves
+    to the floor's earlier turn-on (675), so the turn-off comes at 675 + Ton = 808 instead of 818."""
+    c = Ctrl(dut)
+    await c.start(async_=1, lo_pred=1, lo_learn=1, lo_floor=1, floor_late=1)
+    t_lon = await _floor_to_timed_low(c)
+    on = await c.until("H", 1, 1, after=t_lon, limit=60)
+    assert on[0] + on[1] == t_lon + 685
+    await c.set(a_valid=1, a_tlo=t_lon + 590)
+    await c.set(a_valid=0)
+    off = await c.until("H", 0, 1, after=t_lon, limit=60)
+    assert off[0] + off[1] == t_lon + 808, (t_lon, off)
 
 
 # ---- A128: Vin feed-forward (scb_vff) ----
