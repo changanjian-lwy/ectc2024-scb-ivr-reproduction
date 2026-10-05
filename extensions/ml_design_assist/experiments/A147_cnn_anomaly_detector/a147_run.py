@@ -14,7 +14,8 @@ Scores per window (stride 16), all the max |residual| over channels and periods 
 2048 values - vanishes in a mean): AE = |reconstruction - input|; zmax = |z| (the "model" is the median); PCA = 128
 components (the AE's bottleneck size); the AE's mean square is kept as a secondary score (ae_ms). Threshold per method: the 99th percentile
 of the validation windows. Window labels: defect = a NEW / FF oracle event inside the window; known = only K-class
-events; none. Run labels: storm (late > 100), runaway (peak > 400 A), regulation (|Vo_end - 1| > 1 % or ladder
+events; none (registered: events in [first period, period after the window); --guard g widens that by g periods, a
+post-hoc correction: an "order" event is stamped at the later turn-on, which starts the next period). Run labels: storm (late > 100), runaway (peak > 400 A), regulation (|Vo_end - 1| > 1 % or ladder
 deviation > 0.03), defect (NEW / FF events), stress (peak > 200 A, none of these), clean."""
 from __future__ import annotations
 
@@ -77,6 +78,7 @@ def auroc(pos, neg):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--guard", type=int, default=0, help="post hoc: widen each window's label span by this many periods")
     a = ap.parse_args()
     ix = json.loads((OUT / "index.json").read_text())["records"]
     rng = np.random.default_rng(147)
@@ -130,12 +132,12 @@ def main():
         if not len(w):
             continue
         sc = scores(w)
-        t_lo, t_hi = t[st], t[np.minimum(st + W, len(t) - 1)]
+        t_lo, t_hi = t[np.maximum(st - a.guard, 0)], t[np.minimum(st + W + a.guard, len(t) - 1)]
         for m in range(len(st)):
             inside = (ev_t >= t_lo[m]) & (ev_t < t_hi[m])
             defect = bool(np.any(inside & (ev_c <= 1)))
             kinds = sorted(set(ev_k[inside & (ev_c <= 1)].tolist()))
-            allw.append({"id": r["id"], "exp": r["exp"][:4], "t_us": float(t_lo[m] * 1e6), "run": run_label(r),
+            allw.append({"id": r["id"], "exp": r["exp"][:4], "t_us": float(t[st[m]] * 1e6), "run": run_label(r),
                          "clean_rec": is_clean(r), "split": split, "defect": defect, "kinds": kinds,
                          "known": bool(np.any(inside & (ev_c > 1))), **{k: float(v[m]) for k, v in sc.items()}})
     meth = ("ae", "zmax", "pca", "ae_ms")
@@ -170,8 +172,9 @@ def main():
             break
     res["unexplained"] = {"n_windows": len(un), "n_records": len({w["id"] for w in un}), "top20": top,
                           "by_run": {lab: sum(w["run"] == lab for w in un) for lab in ("clean", "stress", "defect")}}
-    (HERE / ("a147_smoke.json" if a.smoke else "a147_summary.json")).write_text(json.dumps(res, indent=1) + "\n")
-    if not a.smoke:
+    name = "a147_smoke.json" if a.smoke else ("a147_summary.json" if not a.guard else f"a147_summary_guard{a.guard}.json")
+    (HERE / name).write_text(json.dumps(res, indent=1) + "\n")
+    if not a.smoke and not a.guard:
         ae.save(HERE / "a147_ae.npz", med=med, sd=sd, thr=np.array([thr[k] for k in meth]), pca_mu=mu, pca_p=P)
     print(f"{len(tr_rec)} train / {len(va_rec)} val records, {len(wtr)} windows, {len(hist)} epochs, {t_train:.0f} s; "
           f"{len(allw)} windows scored, {len(ct)} clean test, {len(dw)} defect")
