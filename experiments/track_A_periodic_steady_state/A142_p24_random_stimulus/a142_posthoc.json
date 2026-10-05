@@ -1,0 +1,608 @@
+{
+ "z104": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 350.9429324483189,
+  "hits": {
+   "spike:NEW": 27,
+   "order:NEW": 8
+  },
+  "dvo_max_pct": 7.810653094110687,
+  "t_out2pct_us": 34.292214182692305,
+  "rail1_max_v": 20.59121782434493,
+  "late": 229,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 818.5112499974468,
+  "lo_min_a": -188.60654439289206,
+  "lo_max_a": 95.85800386124353,
+  "lo_pos_60us": 55
+ },
+ "P1_novff": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": false,
+  "peak": 377.30435231857234,
+  "hits": {
+   "spike:NEW": 3
+  },
+  "dvo_max_pct": 6.951324496647193,
+  "t_out2pct_us": 6.04829115591413,
+  "rail1_max_v": 18.16517268841684,
+  "late": 35,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 882.124999999998,
+  "lo_min_a": -192.0911583619301,
+  "lo_max_a": 111.03520795971829,
+  "lo_pos_60us": 11
+ },
+ "P2_t1000": {
+  "line_step": {
+   "t_us": 1000.0,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 195.74451816738502,
+  "hits": {},
+  "dvo_max_pct": 1.2831879158650583,
+  "t_out2pct_us": 0.0,
+  "rail1_max_v": 19.555909759245758,
+  "late": 30,
+  "t_lo_timed_us": 711.9920000000001,
+  "period1_max_ns": 652.5937499999787,
+  "lo_min_a": -56.68753835876139,
+  "lo_max_a": 25.22804464461203,
+  "lo_pos_60us": 29
+ },
+ "P3_t600": {
+  "line_step": {
+   "t_us": 600.0,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 350.10263360420834,
+  "hits": {
+   "spike:NEW": 22,
+   "order:NEW": 8
+  },
+  "dvo_max_pct": 6.897802775705486,
+  "t_out2pct_us": 34.26389930769494,
+  "rail1_max_v": 20.62241326901495,
+  "late": 215,
+  "t_lo_timed_us": 721.676,
+  "period1_max_ns": 813.7812499930909,
+  "lo_min_a": -210.27129971539168,
+  "lo_max_a": 87.90532657300538,
+  "lo_pos_60us": 49
+ },
+ "P4_drv0": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 361.26925245539445,
+  "hits": {
+   "spike:NEW": 27,
+   "order:NEW": 4
+  },
+  "dvo_max_pct": 7.8245432201443865,
+  "t_out2pct_us": 32.381226556513376,
+  "rail1_max_v": 20.56177157117648,
+  "late": 139,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 822.6287500038165,
+  "lo_min_a": -191.9146969737296,
+  "lo_max_a": 105.38540091903866,
+  "lo_pos_60us": 59
+ },
+ "P5_lc0": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 7.8894,
+   "slew_us": 3.9536
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 382.34587438614045,
+  "hits": {
+   "spike:NEW": 35,
+   "order:NEW": 20
+  },
+  "dvo_max_pct": 10.279634055195396,
+  "t_out2pct_us": 35.30856039450389,
+  "rail1_max_v": 20.446667273460484,
+  "late": 251,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 798.5474999980171,
+  "lo_min_a": -237.816918190852,
+  "lo_max_a": 110.45492021353772,
+  "lo_pos_60us": 63
+ },
+ "P6_dv48": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 2.4054
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 191.66828642468033,
+  "hits": {},
+  "dvo_max_pct": 3.4575741080729028,
+  "t_out2pct_us": 3.9697345102612056,
+  "rail1_max_v": 17.06556664081105,
+  "late": 61,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 701.6800000023571,
+  "lo_min_a": -80.99658094960022,
+  "lo_max_a": -7.411098215482038,
+  "lo_pos_60us": 0
+ },
+ "P7_s10": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 7.8894,
+   "slew_us": 10.0
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 279.6248192944441,
+  "hits": {
+   "spike:K4": 1,
+   "spike:NEW": 15
+  },
+  "dvo_max_pct": 4.759614913392096,
+  "t_out2pct_us": 23.295177189781036,
+  "rail1_max_v": 19.87021978991354,
+  "late": 180,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 771.3374999991901,
+  "lo_min_a": -135.3888013148518,
+  "lo_max_a": 42.961690304658816,
+  "lo_pos_60us": 17
+ },
+ "P8_dv48_s1": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 1.0
+  },
+  "L_nH": 3.2284266519919997,
+  "cs_uF": 5.326200000000001,
+  "driver": {
+   "m_ns": -2.0861,
+   "sigma_ps": 61.96,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 192.00950288495537,
+  "hits": {
+   "spike:K4": 1
+  },
+  "dvo_max_pct": 2.697734329444179,
+  "t_out2pct_us": 4.536542528301937,
+  "rail1_max_v": 16.963517917057835,
+  "late": 61,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 703.2287500046797,
+  "lo_min_a": -76.61832871674719,
+  "lo_max_a": -6.731608905421151,
+  "lo_pos_60us": 0
+ },
+ "Q_dv5.6_s4": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 5.6,
+   "slew_us": 4.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 385.56222099605526,
+  "hits": {
+   "spike:NEW": 32,
+   "order:NEW": 20
+  },
+  "dvo_max_pct": 7.982749918961785,
+  "t_out2pct_us": 36.859323281787525,
+  "rail1_max_v": 18.000456580679476,
+  "late": 162,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 716.1212499997845,
+  "lo_min_a": -199.75004875993835,
+  "lo_max_a": 130.4323218764418,
+  "lo_pos_60us": 73
+ },
+ "Q_dv6.4_s1": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 6.4,
+   "slew_us": 1.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 209.41848856311236,
+  "hits": {
+   "spike:K4": 1
+  },
+  "dvo_max_pct": 2.9683093215703393,
+  "t_out2pct_us": 11.554028557692595,
+  "rail1_max_v": 18.6611145116375,
+  "late": 9,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 688.3200000004467,
+  "lo_min_a": -95.87813465272788,
+  "lo_max_a": -9.158098377662196,
+  "lo_pos_60us": 0
+ },
+ "Q_dv6.4_s10": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 6.4,
+   "slew_us": 10.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 228.2348280963154,
+  "hits": {
+   "spike:NEW": 5
+  },
+  "dvo_max_pct": 3.25207286786674,
+  "t_out2pct_us": 13.58691984426245,
+  "rail1_max_v": 17.978185344145892,
+  "late": 15,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 672.7400000010645,
+  "lo_min_a": -91.74965371863671,
+  "lo_max_a": 19.87735941647179,
+  "lo_pos_60us": 7
+ },
+ "Q_dv6.4_s20": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 6.4,
+   "slew_us": 20.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 194.71678661384678,
+  "hits": {},
+  "dvo_max_pct": 2.888744042452962,
+  "t_out2pct_us": 4.685772773076951,
+  "rail1_max_v": 17.17424519660645,
+  "late": 3,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 643.3900000048253,
+  "lo_min_a": -78.52366255265612,
+  "lo_max_a": -8.8235906285002,
+  "lo_pos_60us": 0
+ },
+ "Q_dv6.4_s4": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 6.4,
+   "slew_us": 4.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 387.5956382398362,
+  "hits": {
+   "spike:NEW": 39,
+   "order:NEW": 24
+  },
+  "dvo_max_pct": 10.002083878980573,
+  "t_out2pct_us": 40.60221120209023,
+  "rail1_max_v": 18.871554460775265,
+  "late": 214,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 770.221250002783,
+  "lo_min_a": -220.36811546290426,
+  "lo_max_a": 119.29253445291461,
+  "lo_pos_60us": 75
+ },
+ "R_dv4.0_s4_L100": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.0,
+   "slew_us": 4.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 194.5221090366123,
+  "hits": {},
+  "dvo_max_pct": 3.4320360898919544,
+  "t_out2pct_us": 3.599582369966428,
+  "rail1_max_v": 16.210820498710824,
+  "late": 2,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 629.8400000025899,
+  "lo_min_a": -84.0731884889698,
+  "lo_max_a": -4.976035089377386,
+  "lo_pos_60us": 0
+ },
+ "R_dv4.8_s3_L100": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 3.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 196.42076897991248,
+  "hits": {
+   "spike:NEW": 1
+  },
+  "dvo_max_pct": 3.539120130139173,
+  "t_out2pct_us": 3.621599076271211,
+  "rail1_max_v": 17.04820341815533,
+  "late": 6,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 649.5212500021186,
+  "lo_min_a": -84.25408718234287,
+  "lo_max_a": -6.908735575018171,
+  "lo_pos_60us": 0
+ },
+ "R_dv4.8_s4_L070": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 4.0
+  },
+  "L_nH": 2.0533333239999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 202.19125436454075,
+  "hits": {},
+  "dvo_max_pct": 2.0709911066189024,
+  "t_out2pct_us": 0.7285403503562802,
+  "rail1_max_v": 16.960163859887317,
+  "late": 12,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 471.55999999937785,
+  "lo_min_a": -77.45622392906633,
+  "lo_max_a": -11.890641568052782,
+  "lo_pos_60us": 0
+ },
+ "R_dv4.8_s4_L100": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 4.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 254.24794884817712,
+  "hits": {
+   "spike:NEW": 13
+  },
+  "dvo_max_pct": 3.7529248602848675,
+  "t_out2pct_us": 14.508429155405276,
+  "rail1_max_v": 17.092753252964286,
+  "late": 30,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 653.1200000015622,
+  "lo_min_a": -103.5323344149215,
+  "lo_max_a": 49.8461006987669,
+  "lo_pos_60us": 21
+ },
+ "R_dv4.8_s4_L130": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 4.0
+  },
+  "L_nH": 3.8133333159999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 244.6562000775858,
+  "hits": {
+   "spike:NEW": 14
+  },
+  "dvo_max_pct": 4.701905878826351,
+  "t_out2pct_us": 20.785616757642227,
+  "rail1_max_v": 17.236042749877647,
+  "late": 30,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 837.2600000017857,
+  "lo_min_a": -105.7747493882207,
+  "lo_max_a": 45.8561700838236,
+  "lo_pos_60us": 29
+ },
+ "R_dv4.8_s5_L100": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 5.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 247.16826208938912,
+  "hits": {
+   "spike:NEW": 13
+  },
+  "dvo_max_pct": 3.541185122138013,
+  "t_out2pct_us": 13.453956728187825,
+  "rail1_max_v": 17.077322071236743,
+  "late": 21,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 649.0600000015221,
+  "lo_min_a": -100.29753150234791,
+  "lo_max_a": 44.47001804096625,
+  "lo_pos_60us": 21
+ },
+ "R_dv4.8_s7_L100": {
+  "line_step": {
+   "t_us": 295.2292,
+   "dv": 4.8,
+   "slew_us": 7.0
+  },
+  "L_nH": 2.9333333199999996,
+  "cs_uF": 6.0,
+  "driver": {
+   "m_ns": 0.0,
+   "sigma_ps": 0.0,
+   "seed": 1912104781,
+   "jitter_edges": "low"
+  },
+  "vff": true,
+  "peak": 194.69705604258473,
+  "hits": {
+   "spike:NEW": 1
+  },
+  "dvo_max_pct": 3.2540055597933826,
+  "t_out2pct_us": 3.6160861633663717,
+  "rail1_max_v": 16.92945935701696,
+  "late": 2,
+  "t_lo_timed_us": 0.0,
+  "period1_max_ns": 642.0399999972092,
+  "lo_min_a": -81.5021165846126,
+  "lo_max_a": -7.496955263464307,
+  "lo_pos_60us": 0
+ }
+}

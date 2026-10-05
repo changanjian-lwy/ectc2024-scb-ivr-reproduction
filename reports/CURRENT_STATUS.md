@@ -1370,6 +1370,20 @@ each question:
            fires <= 5 (m3n 108 vs 90), no lock. **Final four-module
            design = C10 + floor_late 1.**
 
+     53. Random-stimulus test of the adopted single-module RTL (2026-10-05):
+         [A142](../experiments/track_A_periodic_steady_state/A142_p24_random_stimulus/RESULTS.md).
+         120 seeded draws (L / Cs x 0.7-1.3, driver, line + load steps,
+         step instant incl. the mode-P comparator phase) with event-level
+         oracles: 0 floor-first duplicates, 0 overlaps, every run settles;
+         criterion 3 fails on one draw. A rising line step during the
+         comparator phase (144 us to the timed switch, 520-810 us)
+         oscillates: phase 1's comparator holds its valley by stretching
+         the period, phases 2-4 lose theirs, peaks 245-388 A, Vo up to
+         +-10 %. It reaches inside A139's certified envelope (+4.8 V at
+         4-5 us, nominal L / Cs: 254 / 247 A); timed mode is clean (same
+         step 196 A). **The single-module controller is not frozen; A143 =
+         a comparator-phase fix, C13 waits.**
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):

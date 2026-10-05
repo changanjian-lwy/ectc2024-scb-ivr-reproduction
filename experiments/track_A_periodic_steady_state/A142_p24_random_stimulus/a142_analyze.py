@@ -80,8 +80,42 @@ def main():
     print(f"LBD peak <= 200 A: {pk200:.2f}; max {out['peak_max'][0]:.1f} A ({out['peak_max'][1]})")
 
 
+def episode(path):
+    """Post hoc (RESULTS 3): oracle classes plus the large-signal episode after the disturbance - Vo excursion, time
+    outside 2 %, rail 1 max, late fires, phase-1 period and valley currents (positive low-offs)."""
+    r = O.check(path)
+    d = json.loads(Path(path).read_text())
+    ts = r["t_dist_us"] * 1e-6
+    post = [q for q in d["sections"] if q["t_s"] >= ts]
+    dt = (post[-1]["t_s"] - post[0]["t_s"]) / (len(post) - 1)
+    t1 = sorted(x["t_s"] for x in d["turnons_last"] if x["phase"] == 1 and ts <= x["t_s"] < ts + 60e-6)
+    lo = [x["i_a"] for x in d["lowoffs_last"] if ts <= x["t_s"] < ts + 60e-6]
+    c = d["cfg"]
+    return {"line_step": c["line_step"], "L_nH": c["circuit"]["L"] * 1e9, "cs_uF": c["circuit"]["cs"] * 1e6,
+            "driver": c["driver"], "vff": "vff" in c, "peak": r["peak_post"], "hits": counts(r),
+            "dvo_max_pct": max(abs(q["vo"] - 1) for q in post) * 100,
+            "t_out2pct_us": sum(abs(q["vo"] - 1) > 0.02 for q in post) * dt * 1e6,
+            "rail1_max_v": max(q["vin_v"] - q["vcs_v"][0] for q in post), "late": r["late"],
+            "t_lo_timed_us": r["t_lo_timed_us"], "period1_max_ns": max(b - a for a, b in zip(t1, t1[1:])) * 1e9,
+            "lo_min_a": min(lo), "lo_max_a": max(lo), "lo_pos_60us": sum(v > 0 for v in lo)}
+
+
+def posthoc():
+    files = [COS / "run_z104.json"] + sorted(COS.glob("run_[PQR]*.json"))
+    with Pool(10) as p:
+        res = p.map(episode, files)
+    out = {f.name[4:-5]: r for f, r in zip(files, res)}
+    (HERE / "a142_posthoc.json").write_text(json.dumps(out, indent=1, default=float) + "\n")
+    for n, r in out.items():
+        ls = r["line_step"]
+        print(f"{n:18s} {ls['t_us']:6.0f} us {ls['dv']:+.2f} V / {ls['slew_us']:5.2f} us  pk {r['peak']:4.0f}  dVo "
+              f"{r['dvo_max_pct']:4.1f} %  out2% {r['t_out2pct_us']:4.1f} us  T1 {r['period1_max_ns']:4.0f} ns  lo+ {r['lo_pos_60us']}")
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[1] == "--files":
         validate(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] == "--posthoc":
+        posthoc()
     else:
         main()
