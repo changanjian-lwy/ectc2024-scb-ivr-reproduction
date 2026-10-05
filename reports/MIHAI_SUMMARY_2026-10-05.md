@@ -58,10 +58,14 @@ Results (co-simulation, 25 °C):
    steps. The chosen 12.5 % keeps 7.9 A.
 3. **The inductor sets the frequency, not the switching loss.** From 5 to
    1 MHz the switching loss falls from 16.8 to 1.6 W, but the inductor's
-   copper loss rises from 2.6 to 13.8 W (L ∝ 1/f). A first-principles
-   stripline inductor in P24's in-package footprint (≤ 2 cm² per phase)
-   puts the optimum at 2-5 MHz, never 1 MHz; hence 2.5 MHz (90.6 % against
-   90.2 % for the best 5 MHz design). P24's Table I (2.68 nH at 5 MHz) and
+   copper loss rises from 2.6 to 13.8 W (L ∝ 1/f). With an MPC-class
+   inductor resistance (79 µΩ/nH, the core family of P24's package),
+   2.5 MHz is best: 90.6 % against 90.2 % at 5 MHz and 89.0 % at 1 MHz,
+   with three times the 1 MHz valley margin. With an air-core stripline
+   inside Fig. 5's footprint (0.25-0.63 cm² per phase) the optimum moves to
+   5 MHz, 2-9 points above 2.5 MHz. The 2.5 MHz design therefore assumes a
+   magnetic inductor; at 144 A per phase that is about 29 HBS1-class units
+   in parallel (P24: 12 at 62.5 A). P24's Table I (2.68 nH at 5 MHz) and
    Eq. (4) (1.47 nH) disagree; this work follows Eq. (4).
 4. **Interleave errors grow with the phase count.** A 9.4 ns slot offset,
    invisible on one module (N·D = 0.31), gave 45.9 A rms of 16-phase output
@@ -96,14 +100,20 @@ are budgets over plausible ranges:
   per 250 W module (12.3 %), more than the converter's own 25.9 W. 5 % needs
   86 µm of copper per stack, 1 % needs 429 µm. Vias, the strip and the
   series-capacitor ESR (≤ 0.5 mΩ) together stay below ~1 %.
-- **The commutation loop limits the device voltage.** For the 40 V EPC2067,
-  a high-side turn-off at 143 A allows at most 141 pH of loop inductance
-  (energy bound); at 200 A, 72 pH. Published embedded-GaN loops are
+- **The commutation loop limits the device voltage and costs loss.** For
+  the 40 V EPC2067 an energy bound allows 141 pH at a 143 A turn-off; with
+  the loop inductance in the circuit model a single edge reproduces it
+  within 1.5 V. In closed loop (50-300 pH, instantaneous switching, an
+  assumed ring Q of 7) the controller keeps working, but a second limit
+  appears: a hard turn-on of phase k−1 rings the next high side, which
+  already blocks two rails (24 V), to about 24 V + 1.7 × the turn-on
+  voltage, whatever the inductance: 47 V at start-up, 58 V after a
+  4.8 V / 1 µs line step. The loop energy ½LI² per turn-off costs 7.7 W
+  per 100 pH per module, so 1 % allows about 30 pH. Undamped, the ring
+  defeats the valley detection. Published embedded-GaN loops are
   230-320 pH.
-- **In progress:** the loop inductance is now in the circuit model; a
-  single-edge check agrees with the bound within 1.5 V. Next: a 50-300 pH
-  sweep on the frozen design, measuring the overshoot and whether the
-  controller's V_DS valley detection survives the ringing.
+- **Next:** finite switching speed, which bounds how much of these
+  overshoots is real.
 
 ## 4. Open values, with the cases run
 
@@ -112,7 +122,9 @@ are budgets over plausible ranges:
 | input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising. Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; 200 A limit at about ±5 % | whether passive sharing suffices |
-| QH / QL placement, loop inductance | 50-300 pH (next experiment) | turn-off overshoot on 40 V devices; valley detection |
+| inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz | the switching frequency |
+| QH / QL placement, loop inductance | 50-300 pH: steady high-side peak 17-52 V; hard-turn-on ring 47-58 V at any L; 3.9-24.5 W per module | device voltage and loss |
+| loop damping, switching edge times | ring Q 7 vs undamped; instantaneous edges so far | whether the valley detection survives; how much overshoot is real |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 
 If you know which of these cases is closest to the intended build, it

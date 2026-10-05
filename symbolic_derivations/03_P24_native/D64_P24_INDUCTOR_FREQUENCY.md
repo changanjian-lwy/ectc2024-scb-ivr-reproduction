@@ -76,6 +76,11 @@ gap, so the copper loss falls ~1/f².
 
 ## 4. What it means
 
+**Scope note (D67, 2026-10-05).** These conclusions are for an air-core stripline. P24's package itself uses MPC
+magnetic cores at 1 MHz (8 modules); its 5 MHz is the electrical analysis. Fig. 5 gives 0.25-0.63 cm² per phase,
+where this model picks 5 MHz, so the 2-3 MHz sweet spot below needs >= 1-2 cm² per phase. The project's 2.5 MHz
+rests on A124 with an MPC-class R/L (D62 middle); see D67.
+
 1. **At P24's in-package scale, 1 MHz does not pay.** With a stripline
    inductor of ≤ 2 cm² per phase, the best frequency is 2-5 MHz.
    - **1 MHz needs a bulky, off-package inductor:** ~6 cm² × 4 mm per

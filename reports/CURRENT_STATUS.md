@@ -1452,6 +1452,18 @@ each question:
          (8000+ late fires, 225 A). D65's single-edge bound holds within
          1.5 V. **Next: finite switching speed (both edges); loop Q is a
          question for Mihai.**
+     59. The premise behind 2.5 MHz (2026-10-05, math):
+         [D67](../symbolic_derivations/03_P24_native/D67_P24_FREQUENCY_PREMISE.md).
+         The repo cited D64 (air-core stripline) for 2.5 MHz, but A124's
+         90.61 % uses D62's MPC-class R/L (79 µΩ/nH), the core family of
+         P24's package (12 parallel HBS1 per phase at 1 MHz, 8 modules).
+         In Fig. 5's 0.25-0.63 cm² per phase an air-core picks 5 MHz (2-9
+         points above 2.5 MHz). 2.5 MHz therefore assumes a magnetic
+         inductor (~29 HBS1-class units per phase at 144 A); the inductor
+         technology joins the questions for Mihai. Corrected: D64 scope
+         note, A124 erratum, P24 Fig. 5 transcription, scorecard T14, the
+         Mihai summary; track_C README's P24 table now lists every final
+         design choice with its reason.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

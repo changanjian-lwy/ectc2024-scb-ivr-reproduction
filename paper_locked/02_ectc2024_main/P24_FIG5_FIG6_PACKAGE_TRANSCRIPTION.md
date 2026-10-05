@@ -28,6 +28,7 @@ the figures print or show is LOCKED; everything else is MISSING and enters a mod
 - series / output / input capacitor technology, ESR and ESL; the processor-side connection of Vo / GND.
 
 ## This reproduction vs Fig. 5 (deviations, already in force)
-- 4 modules x 250 W at 2.5 MHz (A124 / C05-C13; D64: 1 MHz does not pay in-package) instead of 8 x 125 W at 1 MHz;
+- 4 modules x 250 W at 2.5 MHz (A124 / C05-C13) instead of 8 x 125 W at 1 MHz. Reason and premise in D67: 2.5 MHz
+  assumes an MPC-class inductor R/L (P24's own package inductor family); an air-core in Fig. 5's footprint favours 5 MHz;
   per phase QH 2 x / QL 3 x EPC2067 (Table 3, nM = 4). The package layer keeps Fig. 5's per-module layout (10 mm
   module, central Vo / GND / Vin strip, phase order L1 inner to L4 outer) and flags each geometric scenario.

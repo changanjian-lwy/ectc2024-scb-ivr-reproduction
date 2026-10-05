@@ -60,6 +60,8 @@ loop at 100 kHz, 2 A floor.
 - **2.5 MHz, 12.5% negative current, floor 2 A (optional at this
   margin), Cs 6 µF, 100 kHz loop.** It is the efficient and robust
   design for P24's in-package inductor scale (D64).
+  - **Erratum (D67, 2026-10-05):** the comparison holds for D62's middle R/L (an MPC-class magnetic core, as in
+    P24's package). With an air-core stripline in Fig. 5's 0.25-0.63 cm² per phase, D64 picks 5 MHz instead.
 - **Open:** rising line steps faster than ~10 µs per 4.8 V. That is a
   bus specification, or a smaller Cs, or an input feed-forward.
 
