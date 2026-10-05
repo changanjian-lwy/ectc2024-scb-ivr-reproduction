@@ -82,7 +82,8 @@ I_th − |valley| (nominal: 8.1 A phase 1, 5.3 A phase 4; scorecard T12: every d
 ## 6. Limits
 
 - Steady state at 25 C, D62 middle; the +45 A transient increment is the nominal modules' (C07 measured 193 A on its
-  rows with one module at −5 %, the model 195 A). One four-module co-simulation with one module at −10 % and three at
-  +10 % would check the peak claim directly (not run: CPU in use by A144).
+  rows with one module at −5 %, the model 195 A). Checked by C14 (co-simulation, frozen design, module 2
+  heavy): shares and steady peaks inside this table; transient peaks 2-7 A below it (194.4 / 195.4 / 207.9 A for
+  ±5 % worst / −10 % one low / ±10 % worst), because the frozen design's nominal increment is 40.7 A, not 45 A.
 - If the heavy module is the master, its phase 1 valley is regulated (bound (a) for that phase).
 - Rth is assumed; ΔT scales with it.

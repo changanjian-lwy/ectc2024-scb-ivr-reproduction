@@ -1464,6 +1464,16 @@ each question:
          note, A124 erratum, P24 Fig. 5 transcription, scorecard T14, the
          Mihai summary; track_C README's P24 table now lists every final
          design choice with its reason.
+     60. Sharing cost checked in co-simulation (2026-10-05, RTL cfg only):
+         [C14](../experiments/track_C_multi_module/C14_sharing_spread_check/RESULTS.md).
+         Frozen four-module design, module 2 heavy. D66 holds in steady
+         state (share +7.3 / +7.7 / +14.9 %, peaks 155.8 / 156.4 / 168.4 A);
+         its transient is 2-7 A pessimistic (194.4 / 195.4 / 207.9 A for
+         ±5 % worst / −10 % one low / ±10 % worst; nominal increment 40.7 A,
+         not 45 A). The 200 A crossing is near ±7 % worst-case spread, so
+         the summary's ±5 % holds with 5.6 A margin. A +4.8 V step's second
+         Vo bump (~35 us, the ladder rebalancing) grows with the spread:
+         +6.1 mV nominal, +12.9 mV (over 1 %) with one module at −10 %.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

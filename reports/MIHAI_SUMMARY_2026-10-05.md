@@ -75,9 +75,10 @@ Results (co-simulation, 25 °C):
    method. In boundary mode the period does not depend on L, so trimming a
    module's on-time to equalise its current pulls it out of interleave. The
    design keeps one common on-time and the modules share by their
-   inductance. The module with the smaller L binds: through transients it
-   reaches the 200 A limit at about ±5 % inductor spread, carrying 12-16 %
-   more loss. Trimming each module's negative current cannot fix this,
+   inductance. The module with the smaller L binds: in co-simulation it
+   stays at 194 A through transients with ±5 % worst-case inductor spread
+   and reaches 208 A at ±10 % (the limit is near ±7 %), carrying 12-16 %
+   more loss at ±5 %. Trimming each module's negative current cannot fix this,
    because it uses up that module's ZVS and transient margin. In this
    architecture, current sharing is an inductor-matching specification.
 6. **Fast input steps need a feed-forward.** ±4.8 V steps over 1 µs peaked
@@ -121,7 +122,7 @@ are budgets over plausible ranges:
 |---|---|---|
 | input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising. Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
-| inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; 200 A limit at about ±5 % | whether passive sharing suffices |
+| inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
 | inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz | the switching frequency |
 | QH / QL placement, loop inductance | 50-300 pH: steady high-side peak 17-52 V; hard-turn-on ring 47-58 V at any L; 3.9-24.5 W per module | device voltage and loss |
 | loop damping, switching edge times | ring Q 7 vs undamped; instantaneous edges so far | whether the valley detection survives; how much overshoot is real |
