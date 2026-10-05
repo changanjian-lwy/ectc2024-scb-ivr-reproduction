@@ -68,9 +68,13 @@ Results (co-simulation, 25 °C):
    ripple instead of 6.75 A rms (N·D = 1.22). Referencing every slot to
    phase 1's low-side turn-off removed it.
 5. **Current sharing,** which P24 names as the primary challenge without a
-   method: with one common on-time the modules share by their inductance
-   (+5 % L: −4.6 % current; +10 %: −8.8 %, still soft-switched), with no
-   per-module current sensing.
+   method. In boundary mode the period does not depend on L, so trimming a
+   module's on-time to equalise its current pulls it out of interleave. The
+   design therefore keeps one common on-time and lets the modules share by
+   their inductance (+5 % L: −4.6 % current; +10 %: −8.8 %, still
+   soft-switched), with no per-module current sensing. Trimming each
+   module's negative current instead would equalise the currents at the
+   cost of its ZVS margin; this is analysed, not built.
 6. **Fast input steps need a feed-forward.** ±4.8 V steps over 1 µs peaked
    at 216-218 A. A Vin feed-forward found with reinforcement learning, then
    reduced to a six-parameter rule and built in Verilog, brings them to
