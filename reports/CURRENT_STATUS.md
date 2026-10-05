@@ -1414,6 +1414,19 @@ each question:
          within 1-11 A. **Four-module design frozen; the multi-module level
          is closed.**
 
+     56. Package layer opened (2026-10-05, user decision):
+         [D65](../symbolic_derivations/03_P24_native/D65_P24_PACKAGE_PARASITICS.md),
+         P24 Figs. 5-6 transcribed (paper_locked, coverage LOCKED). From
+         first principles with the steady waveforms: Fig. 5's lateral
+         output / ground copper to the central strip dominates - 30.7 W per
+         250 W module with one 35 um layer each, 429 um of copper per stack
+         for 1 %; vias, strip and Cs ESR (<= 0.5 mOhm) < ~1 % together. The
+         commutation loop bounds the high-side voltage: <= 141 pH at the
+         steady 143 A for 40 V, 72 pH at 200 A, 37 pH at C13's 260 A
+         (published embedded-GaN loops 230-320 pH). **Next: the loop
+         inductance in the co-simulation plant (one parasitic, swept
+         25-300 pH on the frozen design).**
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
