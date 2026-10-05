@@ -1,0 +1,13 @@
+w10_l_m48_1us
+w10_l_p48_1us
+w10_s_p62
+w10_n0
+o10_l_m48_1us
+o10_l_p48_1us
+o10_s_p62
+o10_n0
+w5_l_m48_1us
+w5_l_p48_1us
+w5_s_p62
+w5_n0
+nom_l_m48_1us
