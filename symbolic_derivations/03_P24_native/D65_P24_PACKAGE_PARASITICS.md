@@ -63,6 +63,10 @@ Geometry: `paper_locked/02_ectc2024_main/P24_FIG5_FIG6_PACKAGE_TRANSCRIPTION.md`
   turn-off costs 7.7 W per 100 pH per module. Added for Mihai: the loop's damping (ring decay, Q) and the switching
   edge times, which decide whether the valley detection survives (Q 7 yes, undamped no) and how much of the
   overshoot is real.
+- Checked by A145 (plant with finite edges, 72 / 144 A/ns): the edges do not remove either overshoot (a ramp turns
+  L di/dt into channel loss; the bound's single edge falls 6 / 27 % at 100 pH for 1 / 2 ns); best case 50 pH / 2 ns
+  41.8 V. The measured loop loss is half of 0.5 L I^2 (1 % at ~70 pH, not ~30 pH); the edges alone cost 1.2 / 2.7 W.
+  Loop spec: ~70 pH (loss), 150 pH (steady voltage); the hard-turn-on overshoot needs a control fix.
 
 ## 5. Limits
 - Lateral copper: DC resistance; the ripple share is included in the rms but skin / proximity effects (skin depth

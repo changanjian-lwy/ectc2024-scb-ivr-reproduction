@@ -1474,6 +1474,20 @@ each question:
          the summary's ±5 % holds with 5.6 A margin. A +4.8 V step's second
          Vo bump (~35 us, the ladder rebalancing) grows with the spread:
          +6.1 mV nominal, +12.9 mV (over 1 %) with one module at −10 %.
+     61. Finite switching edges in the plant (2026-10-06, mixed):
+         [A145](../experiments/track_A_periodic_steady_state/A145_p24_finite_switching_edges/RESULTS.md).
+         cfg "edge": the channel current is a right-hand-side source during
+         an edge (turn-off ramp, hard turn-on ramp until V_DS <= 0; off
+         bit-identical). 72 / 144 A/ns (143 A in 2 / 1 ns), 50-150 pH, Q 7:
+         the controller holds everywhere, but V_DS <= 40 V fails at every
+         point (best 50 pH / 2 ns: 37.3 V start-up, 41.8 V after +4.8 V /
+         1 us). A ramp turns L di/dt into channel loss rather than removing
+         the overshoot (-6 / -27 % at 100 pH, not a ring's sinc -13 / -47 %).
+         Steady state <= 33.9 V up to 150 pH. Loop-dependent loss 1.4-1.7 /
+         3.8 / 6.3-6.4 W at 50 / 100 / 150 pH: 1 % at ~70 pH (A144's
+         0.5 L I^2 was twice the damper's energy). Edges alone 1.2 / 2.7 W;
+         D62's turn-off formula ~30 % low. **The hard-turn-on overshoot is a
+         control problem (next: A148 in the ML block); loop spec ~70 pH.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
