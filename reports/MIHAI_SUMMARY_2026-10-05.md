@@ -70,11 +70,12 @@ Results (co-simulation, 25 °C):
 5. **Current sharing,** which P24 names as the primary challenge without a
    method. In boundary mode the period does not depend on L, so trimming a
    module's on-time to equalise its current pulls it out of interleave. The
-   design therefore keeps one common on-time and lets the modules share by
-   their inductance (+5 % L: −4.6 % current; +10 %: −8.8 %, still
-   soft-switched), with no per-module current sensing. Trimming each
-   module's negative current instead would equalise the currents at the
-   cost of its ZVS margin; this is analysed, not built.
+   design keeps one common on-time and the modules share by their
+   inductance. The module with the smaller L binds: through transients it
+   reaches the 200 A limit at about ±5 % inductor spread, carrying 12-16 %
+   more loss. Trimming each module's negative current cannot fix this,
+   because it uses up that module's ZVS and transient margin. In this
+   architecture, current sharing is an inductor-matching specification.
 6. **Fast input steps need a feed-forward.** ±4.8 V steps over 1 µs peaked
    at 216-218 A. A Vin feed-forward found with reinforcement learning, then
    reduced to a six-parameter rule and built in Verilog, brings them to
@@ -110,6 +111,7 @@ are budgets over plausible ranges:
 |---|---|---|
 | input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising. Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
+| inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; 200 A limit at about ±5 % | whether passive sharing suffices |
 | QH / QL placement, loop inductance | 50-300 pH (next experiment) | turn-off overshoot on 40 V devices; valley detection |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 

@@ -176,3 +176,9 @@ single module's (e.g. l_m48_1us 0.0700 against 0.0697).
 3. **This analysis script prints MISS but exits 0.**
    `scripts/acceptance.py` is the gate. It lists all 16 misses here as
    documented, with their sections.
+
+## Erratum (2026-10-05, D66)
+
+- Section 2's "D61 scheme A sufficient up to ±10% L" holds only for a slave with larger L (less current). A module
+  with 10 % smaller L reaches 201-202 A through transients (D66, math calibrated on C12 / C07); passive sharing holds
+  the 200 A limit for about ±5 % worst-case spread.

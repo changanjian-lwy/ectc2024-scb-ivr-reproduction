@@ -1426,6 +1426,18 @@ each question:
          (published embedded-GaN loops 230-320 pH). **Next: the loop
          inductance in the co-simulation plant (one parasitic, swept
          25-300 pH on the frozen design).**
+     57. The cost of passive current sharing (2026-10-05, math):
+         [D66](../symbolic_derivations/03_P24_native/D66_P24_SHARING_COST.md).
+         Calibrated on C12 ls_p5 / ls_p10 and C07 all_n0 (the measured −5 %
+         module lies between the two valley bounds). The heavy (smaller-L)
+         module binds the peak, not the temperature: through transients it
+         reaches 200 A at about ±5 % worst-case L spread or −9 % on one
+         module (+12-18 % loss there, 2-5 K at an assumed 1 K/W); ±10 %
+         worst case 210-214 A, +25-34 % loss. An i_neg trim (D61 scheme B)
+         cannot fix it: the heavy module's valley margin falls to 2.7 A at
+         one −5 % module (0.5 A at 43.2 V) and below zero beyond. Sharing is
+         an inductor-matching specification; C03's "±10 % sufficient" holds
+         only for larger L (erratum in C03).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
