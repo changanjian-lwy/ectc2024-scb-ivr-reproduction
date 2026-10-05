@@ -77,6 +77,11 @@ side's valley measurement stops at its first V_DS <= 0 (in A101 this made the tu
 unstable; the plain valley measurement is stable). Sections add Cm's voltages and each branch's int i^2 dt and
 extremes since the last section. Every run records the phase current (and
 the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
+Commutation-loop inductance (cfg "loop" {"l_ph", "rp_ohm" 0, "phases" 1..N}, A144): l_ph pH in series with each listed
+high-side switch (upstream of its drain) with rp_ohm across it (0: undamped); the switch's V_DS is its own (drain node
+behind the inductance). Adds "loop_params" and each turn-off's loop current ("i_loop_a" in highoffs_last).
+Windowed V_DS peaks (cfg "vds_win" 1, A144): every section adds "vds_win_v", the 2N switches' peak V_DS since the
+previous section; "vds_max_v" stays the whole run's peak.
 """
 import gzip
 import heapq
@@ -240,6 +245,10 @@ def make_params(cfg, ref):
         extra.update(aux_phases=tuple(aux.get("phases", range(1, N + 1))), aux_l=aux["lr_nh"] * 1e-9,
                      aux_r=r_bds + aux.get("r_lr_mohm", 0.2) * 1e-3, aux_c=aux.get("cm_uf", 1.0) * 1e-6,
                      aux_vm0=tuple(aux["vm0_v"]) if isinstance(aux.get("vm0_v"), list) else aux.get("vm0_v", 0.0))
+    loop = cfg.get("loop")                                            # A144: commutation-loop inductance
+    if loop:
+        extra.update(loop_phases=tuple(loop.get("phases", range(1, N + 1))), loop_l=float(loop["l_ph"]) * 1e-12,
+                     loop_rp=float(loop.get("rp_ohm", 0.0)))
     return Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
 
 
@@ -258,12 +267,18 @@ class ModuleSim:
         self.i_tgt, self.lsb_a, self.v_hys = cfg["i_target"], cfg["trim_lsb_a"], cfg["v_hys"]
         self.na = na = len(p.aux_phases)
         self.vm0 = list(p.aux_vm0) if isinstance(p.aux_vm0, (list, tuple)) else [p.aux_vm0] * na   # A102: per branch
-        y0 = [0.0] * (2 * N) + self.vm0 + [0.0] * N + [0.0] * na   # 2N node voltages (+ Cm nodes), N currents (+ branches)
+        nlp = len(p.loop_phases)                                       # A144: + h_k nodes and loop currents
+        y0 = [0.0] * (2 * N) + self.vm0 + [0.0] * nlp + [0.0] * N + [0.0] * na + [0.0] * nlp   # 2N node voltages (+ Cm, h
+        # nodes), N currents (+ branches, loops)
         g1 = bool(first_high)                                          # C3: a slave resets with phase 1 LOW
         self.slave_floor = (not g1) and bool(cfg.get("slave_floor", 0))  # C06
         self.plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[g1] + [False] * (N - 1), gl=[not g1] + [True] * (N - 1))
         self.nv = self.plant.nv
         self.i_out = self.plant.sim.idx["out"]
+        c0 = self.plant.sim.ns - nlp                                   # A144: each phase's loop-current column
+        self.loop_col = [c0 + p.loop_phases.index(k + 1) if (k + 1) in p.loop_phases else None for k in range(N)]
+        self.vds_win = bool(cfg.get("vds_win", 0))
+        self.vmax_all = np.full(2 * N, -np.inf)
         self.adc_lsb, self.adc_max = cfg["adc_lsb_v"], (1 << 12) - 1
         # Controller initial registers: the predictive delay starts at half the node resonance period, as in
         # the Python rule; the trim codes start at 0 (threshold = target).
@@ -522,6 +537,11 @@ class ModuleSim:
                                       "vcs_v": [float(plant.y[a] - plant.y[x]) for a, x in zip(ia, ix)],
                                       "rev_energy_j": list(plant.rev_e), "rev_time_s": list(plant.rev_t)})   # A89
                 plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
+                if self.vds_win:                                # A144: peak V_DS since the last section, then restart
+                    vw = plant._vmax
+                    self.sections[-1]["vds_win_v"] = vw.tolist()
+                    np.maximum(self.vmax_all, vw, out=self.vmax_all)
+                    vw[:] = [plant.vds(q) for q in range(2 * N)]
                 if na:                                          # A101: Cm voltages, branch int i^2 dt and extremes
                     self.sections[-1].update(vm_v=[float(plant.y[x]) for x in self.im], aux_i2s=[float(x) for x in plant.aux_e2],
                                              aux_imax_a=[float(x) for x in plant.aux_imax],
@@ -534,6 +554,8 @@ class ModuleSim:
             ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
             self.highoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k]),
                                   "i_aux_a": float(ib[0]) if ib else 0.0})
+            if self.loop_col[k] is not None:                            # A144: the switch's own current
+                self.highoffs[-1]["i_loop_a"] = float(plant.y[self.loop_col[k]])
         if j >= N and level and mon.hoff_set[k]:    # A89: low-side turn-on edge
             crossed = bool(mon.cross_set[k])
             th, tc = float(mon.t_hoff[k]), float(mon.t_cross[k])
@@ -685,7 +707,8 @@ class ModuleSim:
                "trim_final": [signed(field(c.get("trim"), k, CW), CW) for k in range(N)],
                "dt_pred_final_ns": [field(c.get("dt_pred"), k, TW) * lsb * 1e9 for k in range(N)],
                "t_mode_p_s": st["t_mode_p"], "ton_final_lsb": c.get("ton_now"), "lsb_s": lsb,
-               "vds_max_v": plant.vds_max, "ipk_a": plant.ipk, "async_fires": lat["fires"],
+               "vds_max_v": np.maximum(self.vmax_all, plant._vmax).tolist() if self.vds_win else plant.vds_max,
+               "ipk_a": plant.ipk, "async_fires": lat["fires"],
                "sections": self.sections, "turnons_last": self.turnons[-keep_n:], "lowoffs_last": self.lowoffs[-keep_n:],
                "dtl_final_ns": [field(c.get("dtl"), k, TW) * lsb * 1e9 for k in range(N)],     # A89
                "edges_log": self.edges_log, "driver": self.drv, "overlaps": ovl["count"], "first_overlap": ovl["first"],
@@ -701,6 +724,8 @@ class ModuleSim:
             out["ph_floor_log"] = self.ph_log
         if cfg.get("slot_trim", 0):                                  # A109
             out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
+        if p.loop_phases:                                            # A144
+            out["loop_params"] = {"phases": list(p.loop_phases), "l_h": p.loop_l, "rp_ohm": p.loop_rp}
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
                                  "vm0_v": self.vm0, "valley_zero": int(self.mon.vmin_zero), "t_en_us": self.t_en * 1e6,

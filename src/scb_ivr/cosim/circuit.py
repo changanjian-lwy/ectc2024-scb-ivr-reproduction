@@ -14,6 +14,10 @@ Circuit (N phases):
   v) and a branch current (after the phase currents in i) through aux_l and aux_r from m_k into x_k while its
   bidirectional switch conducts; the switch states follow the 2N switches in `conducting`; an open branch is
   uncoupled with di/dt = 0. Without aux_phases every matrix is as before.
+- optional commutation-loop inductance (loop_phases, A144): per listed phase k the high-side switch's drain moves to a
+  node h_k (after the m_k nodes in v; its Coss c_high now between h_k and a_k / x_N) and loop_l carries a current
+  (last in i) from the switch's upstream node (vin for k = 1, a(k-1) otherwise) into h_k, with loop_rp across it as
+  damping (0: none); it never switches. Without loop_phases every matrix is as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -117,6 +121,9 @@ class CircuitParams:
     vin_step: float = 0.0        # A106: the input changes by vin_step (V) from t_vstep, linearly over t_vslew (0: at once)
     t_vstep: float = float("inf")
     t_vslew: float = 0.0
+    loop_phases: tuple = ()      # A144: phases (1-based) whose high-side switch has a series loop inductance loop_l
+    loop_l: float = 0.0          #   (H) from its upstream node into a node h_k at the switch's drain
+    loop_rp: float = 0.0         #   Ohm across loop_l (damping; 0: none)
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
@@ -129,9 +136,10 @@ class CircuitParams:
         return a + (self.i_step if t >= self.t_step else 0.0)       # A100: + 0.0 without a step
 
 
-def topology(n):
+def topology(n, loop=()):
     nodes = tuple(f"a{k}" for k in range(1, n)) + tuple(f"x{k}" for k in range(1, n + 1)) + ("out",)
     highs = [("SH1", "vin", "a1")] + [(f"SH{k}", f"a{k - 1}", f"a{k}") for k in range(2, n)] + [(f"SH{n}", f"a{n - 1}", f"x{n}")]
+    highs = [(nm, f"h{k}" if k in loop else d, s) for k, (nm, d, s) in enumerate(highs, 1)]   # A144: drain behind loop_l
     lows = [(f"SL{k}", f"x{k}", None) for k in range(1, n + 1)]
     return nodes, tuple(highs + lows)
 
@@ -143,11 +151,15 @@ class Sim:
 
     def __post_init__(self):
         p = self.p
-        self.nodes, self.switches = topology(p.n)
+        self.lp = tuple(int(k) for k in p.loop_phases)            # A144: loop inductances; nodes h_k after the m_k
+        nlp = len(self.lp); self.nlp = nlp
+        self.nodes, self.switches = topology(p.n, self.lp)
         self.aux = tuple(int(k) for k in p.aux_phases)            # A101: the branches' phases; nodes m_k after "out"
         na = len(self.aux); self.na = na
         if na:
             self.nodes = self.nodes + tuple(f"m{k}" for k in self.aux)
+        if nlp:
+            self.nodes = self.nodes + tuple(f"h{k}" for k in self.lp)
         self.idx = {nm: k for k, nm in enumerate(self.nodes)}
         nv = len(self.nodes); self.nv = nv
         caps = ([(p.c_high, d, s) for _, d, s in self.switches[:p.n]] + [(p.c_low, d, s) for _, d, s in self.switches[p.n:]]
@@ -163,7 +175,7 @@ class Sim:
                 cm[ib, ib] += c
             if ia is not None and ib is not None:
                 cm[ia, ib] -= c; cm[ib, ia] -= c
-        ns = nv + p.n + na; self.ns = ns                         # state: node voltages, phase currents, branch currents
+        ns = nv + p.n + na + nlp; self.ns = ns                   # state: node voltages, phase, branch, loop currents
         self.M = np.zeros((ns, ns)); self.M[:nv, :nv] = cm; self.M[nv:nv + p.n, nv:nv + p.n] = p.L * np.eye(p.n)
         self.B = np.zeros((nv, p.n))
         for k in range(p.n):
@@ -173,6 +185,14 @@ class Sim:
             self.Baux = np.zeros((nv, na))
             for a, k in enumerate(self.aux):
                 self.Baux[self.idx[f"m{k}"], a] = 1.0; self.Baux[self.idx[f"x{k}"], a] = -1.0
+        if nlp:                                                # A144: loop current b from upstream u_k into h_k
+            c0 = nv + p.n + na
+            self.M[c0:, c0:] = p.loop_l * np.eye(nlp)
+            self.Bloop = np.zeros((nv, nlp))
+            for b, k in enumerate(self.lp):
+                if k > 1:
+                    self.Bloop[self.idx[f"a{k - 1}"], b] = 1.0
+                self.Bloop[self.idx[f"h{k}"], b] = -1.0
         self.nsw = [p.n_high] * p.n + [p.n_low] * p.n            # devices per switch position
         self.nl = None
         if p.nonlinear_coss:                                   # switch-branch incidence for the charge correction
@@ -214,6 +234,14 @@ class Sim:
                 G[idd, iss] -= g; G[iss, idd] -= g
         if load_on and p.load_kind == "r":
             G[self.idx["out"], self.idx["out"]] += 1.0 / p.r_load
+        if self.nlp and p.loop_rp > 0:                         # A144: damping resistors across the loop inductances
+            gd = 1.0 / p.loop_rp
+            for k in self.lp:
+                ih = self.idx[f"h{k}"]; G[ih, ih] += gd
+                if k == 1:
+                    gv[ih] += gd
+                else:
+                    iu = self.idx[f"a{k - 1}"]; G[iu, iu] += gd; G[iu, ih] -= gd; G[ih, iu] -= gd
         ns, n = self.ns, p.n
         A = np.zeros((ns, ns)); A[:nv, :nv] = -G; A[:nv, nv:nv + n] = -self.B; A[nv:nv + n, :nv] = self.B.T
         A[nv:nv + n, nv:nv + n] = -p.R * np.eye(n)
@@ -222,6 +250,11 @@ class Sim:
                 c = nv + n + a
                 A[:nv, c] = -self.Baux[:, a]; A[c, :nv] = self.Baux[:, a]; A[c, c] = -p.aux_r
         fv = np.zeros(ns); fv[:nv] = gv
+        for b in range(self.nlp):                              # A144: loop inductances (always in the circuit)
+            c = nv + n + self.na + b
+            A[:nv, c] = -self.Bloop[:, b]; A[c, :nv] = self.Bloop[:, b]
+            if self.lp[b] == 1:
+                fv[c] = 1.0                                    # L di/dt = vin - v(h1)
         fl = np.zeros(ns); fl[self.idx["out"]] = -1.0
         return A, fv, fl, frev
 
