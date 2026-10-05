@@ -58,6 +58,7 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
   bit-identical).
 | [A138](experiments/A138_gp_boundary_map/RESULTS.md) | Gaussian-process level-set active learning (D63 prior, residual GP, straddle) | the adopted design's 200 A line-step boundary over L / Cs x 0.7-1.3, 4.8-8 V, 1-20 us; 400 cosim runs | **bands failed:** the rising GP's noise collapsed (0.005 A on 34 points) and one shared straddle sent 302/310 runs to falling steps; verification 20/20 |
 | [A139](experiments/A139_gp_boundary_noise_floor/RESULTS.md) | A138 with the noise floor measured (step moved through a period) and the budget split per direction | the same map, fresh test set, 254 runs | **done, 3/3:** cover90 1.00 / 0.85, classification 0.90 / 0.90 (D63 0.85 / 0.55), verification 20/20; finds the peak non-monotone in slew (falling worst at 2-4 us, rising at low L worst when slow) |
+| [A146](experiments/A146_cnn_loop_identification/RESULTS.md) | deep learning: 1D CNN (new `ml_cnn`), simulation-based inference, split conformal; vs damped-sine fit, simulator least squares, Cramer-Rao bound | the commutation loop (L, Q, di/dt, Coss spread) from one double-pulse V_DS capture with an unknown probe, noise, jitter and current error | **done, 3/5:** L 2.2 / Q 4.0 / di/dt 5.9 %, coverage 0.90; sine fit 7.9 / 25 / 42 %; the simulator fit (1 %) fails on fast edges, the CNN start rescues 4 of 6 -> procedure CNN then fit; misses = measurement requirements (probe >= 0.7 GHz and > 1 / t_f, noise <= 0.4 V, I0 within 2 %) |
 
 ## What the three found together
 
