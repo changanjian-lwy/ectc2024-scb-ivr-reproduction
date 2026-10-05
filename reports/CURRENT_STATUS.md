@@ -1438,6 +1438,20 @@ each question:
          one −5 % module (0.5 A at 43.2 V) and below zero beyond. Sharing is
          an inductor-matching specification; C03's "±10 % sufficient" holds
          only for larger L (erratum in C03).
+     58. Commutation-loop inductance in the plant (2026-10-05, mixed):
+         [A144](../experiments/track_A_periodic_steady_state/A144_p24_commutation_loop_inductance/RESULTS.md).
+         cfg "loop" (l_ph in series with each high-side drain, parallel
+         damping; off bit-identical) on the frozen design, 50-300 pH, Q 7.
+         The controller survives (0 late, 0 new duplicates, peaks -6..+3 A).
+         Device voltage fails at every L: besides D65's own turn-off
+         (steady SH1 17 / 27 / 34 / 52 V), a hard turn-on of phase k-1
+         rings SH_k (already at 2 rails, 24 V) to ~24 + 1.7 dV,
+         independent of L: 46-47 V at start-up, 57-58.5 V after a +4.8 V /
+         1 us line step. Loop energy 3.9 / 7.7 / 11.3 / 24.5 W per module
+         (1 % needs ~30 pH). Undamped, the ring breaks the valley tracking
+         (8000+ late fires, 225 A). D65's single-edge bound holds within
+         1.5 V. **Next: finite switching speed (both edges); loop Q is a
+         question for Mihai.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
