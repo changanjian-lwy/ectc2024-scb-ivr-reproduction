@@ -1272,8 +1272,8 @@ each question:
            L x 0.7 rising: +4.8 V <= 191.6 A at 1-40 us; +8 V 210.1 A at
            20 us, 182.1 A at 50 us. **Adopted** (single module); four
            modules provisional (2 rows: 180.1 / 177.7 A; the handover's
-           slave duplicates at 145 us are removed too) - C12 reruns the
-           matrix.
+           slave duplicates at 145 us are removed too) - C12 reran the
+           matrix: adopted on four modules too.
      51. The final design on four modules:
          [C05](../experiments/track_C_multi_module/C05_four_module_final_design/RESULTS.md),
          [C06](../experiments/track_C_multi_module/C06_slave_floor/RESULTS.md);
@@ -1364,6 +1364,11 @@ each question:
            the restart 17.2 V for 52 us, 212.8 A), peaks <= 188.0 A, no
            lock (ladder <= 1.22 %), late fires 0-5. Four modules hold
            L x 1.0-1.3 handover included; L x 0.7-0.9 not run.
+         - **C12:** that design + cfg floor_late 1 (A141) on all 22 rows
+           (C10's 18 + C11's 4): 0 floor-first duplicates (44 before),
+           peaks <= 188.0 A (L0 <= 184.0 A), rail 1 <= 12.87 V, late
+           fires <= 5 (m3n 108 vs 90), no lock. **Final four-module
+           design = C10 + floor_late 1.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
