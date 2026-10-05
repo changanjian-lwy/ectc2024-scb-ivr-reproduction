@@ -1,6 +1,7 @@
 """A142 post hoc (not registered; RESULTS Section 3): one-factor variations of z104 (S stratum: +7.89 V over 3.95 us at
 295.2 us, in the mode-P comparator phase, L x 1.10, Cs x 0.89, driver -2.09 ns / 62 ps), to trace its 50 us
-oscillation (351 A, Vo 0.93-1.08 V). Writes cosim/cfg_P*.json."""
+oscillation (351 A, Vo 0.93-1.08 V); Q rows: nominal L / Cs / driver, +5.6 / +6.4 V in the same comparator phase
+(A139 certifies rising +6.4 V from 1.0 us at nominal). Writes cosim/cfg_P*.json and cfg_Q*.json."""
 from __future__ import annotations
 
 import json
@@ -37,6 +38,9 @@ def main():
     variant("P6_dv48", "dv +4.8 V at the same slope (2.4 us)", line_step=dict(ls, dv=4.8, slew_us=round(4.8 / 7.8894 * 3.9536, 4)))
     variant("P7_s10", "slew 10 us", line_step=dict(ls, slew_us=10.0))
     variant("P8_dv48_s1", "dv +4.8 V over 1 us (A130 spec corner)", line_step=dict(ls, dv=4.8, slew_us=1.0))
+    nom = dict(circuit=dict(c, L=L0, cs=cs0), driver=dict(drv, m_ns=0.0, sigma_ps=0.0))    # A139-certified rising cells
+    for dv, sl in ((6.4, 1.0), (6.4, 4.0), (6.4, 10.0), (6.4, 20.0), (5.6, 4.0)):
+        variant(f"Q_dv{dv:.1f}_s{sl:.0f}", f"nominal L / Cs / driver, dv +{dv} V over {sl} us", line_step=dict(ls, dv=dv, slew_us=sl), **nom)
 
 
 if __name__ == "__main__":
