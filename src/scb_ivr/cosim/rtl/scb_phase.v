@@ -28,10 +28,11 @@
 //   (cfg_zvs_react); restart timer cfg_rs_high.
 // - Late floor report (A141, cfg_floor_late, with A118's or C06's floor): a floor that fires in the window before
 //   the clocked turn-off (timed edge or slot) reports two windows later, after that turn-off was committed. In UP,
-//   a report earlier than t_lo is taken as the turn-off: t_lo = a_tlo, t_on = a_tlo + dt_pred, HIGH, no gate event
-//   (the front end made the turn-on, the pending one is dropped). In HIGH, a floor turn-on a_tlo + dt_pred earlier
-//   than t_on moves t_on (and t_lo) to it, so Ton counts from the turn-on the power stage saw. Without it the
-//   report is ignored and Ton counts from the later clocked turn-on.
+//   a report earlier than t_lo means the front end's turn-on comes first: t_on = a_tlo + dt_pred, HIGH, no gate
+//   event (the pending turn-on is dropped). In HIGH, a floor turn-on a_tlo + dt_pred earlier than t_on moves t_on to
+//   it. Ton then counts from the turn-on the power stage saw. t_lo keeps the clocked edge: it is the slots' reference
+//   (cfg_slot_lo) and the slaves' ext_ref, which must change once per cycle. Without the option the report is
+//   ignored and Ton counts from the later clocked turn-on.
 // - t_lo_q (C02): the last low-side turn-off time, for slots referenced to it (scb_ctrl cfg_slot_lo).
 // - Slot floor (C06, cfg_slot_floor, a slotted phase 1 of a slave module, mode P): the front end is armed in LOW at
 //   the floor threshold the bridge sets; a report (a_valid / a_tlo) before the slot is the turn-off, as A118's floor
@@ -119,7 +120,7 @@ module scb_phase #(
     input  wire [7:0]           cfg_st_smax,   // A109: its largest step, LSB
     input  wire                 cfg_lo_floor,  // A118: the front end stays armed in timed mode, as a floor
     input  wire                 cfg_slot_floor,// C06: a slotted phase's front end armed as a floor (slave phase 1)
-    input  wire                 cfg_floor_late,// A141: a floor report after the committed turn-off moves t_lo / t_on
+    input  wire                 cfg_floor_late,// A141: a floor report after the committed turn-off moves t_on
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -323,10 +324,8 @@ module scb_phase #(
 
             case (state)
                 HIGH: begin
-                    if (fl_late && $signed(t_on_fl - t_on) < 0) begin    // A141: the floor's turn-on came first
+                    if (fl_late && $signed(t_on_fl - t_on) < 0)          // A141: the floor's turn-on came first
                         t_on <= t_on_fl;
-                        if (fl_lo) t_lo <= a_tlo;
-                    end
                     if (due(d_off)) begin
                         gh_ev <= 1'b1; gh_lvl <= 1'b0; gh_fine <= f_off;
                         t_off <= now + f_off;
@@ -454,8 +453,7 @@ module scb_phase #(
                             t_on <= now + f_hon_s; on_how <= HOW_TIMED; on_pulse <= 1'b1;
                             state <= HIGH;
                         end
-                    end else if (fl_late && fl_lo) begin                 // A141: the floor's edges came first
-                        t_lo <= a_tlo;
+                    end else if (fl_late && fl_lo) begin                 // A141: the floor's turn-on comes first
                         t_on <= t_on_fl; on_how <= HOW_PRED; on_pulse <= 1'b1;
                         state <= HIGH;
                     end else if (cfg_zvs_react && c_zh) begin

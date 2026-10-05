@@ -47,3 +47,12 @@ of all 36 A140 records + C10 / A137 records, and the tb (the defect reproduced a
 - 1 fails: code defect - fix before any reading of 2-3.
 - 2 fails: inspect each remaining event (HIGH path, another source); not adopted until explained.
 - 3 fails: per-row explanation; not adopted as is.
+
+## 5. Amendment after the first batch (v1, code 5106106; criteria unchanged)
+- v1 also set t_lo = a_tlo on a late report. Single-module rows met criteria 1-2 (3: two misses of +2.1 / +2.5 A),
+  but four modules failed: l_p48_1us 357.5 A, l_p48_5us 189.6 A (`a141_summary_v1.json`, `cosim/run_v1_*`). Cause:
+  the master's t_lo1 is the slaves' ext_ref; it changed twice in a late-report cycle, so a slave whose floor had
+  already consumed that cycle's reference (skip_pend) took the second change as a new one and fired its slot a cycle
+  early (+90 A at turn-off, then phases 3-4 at once).
+- v2 (this commit): t_lo keeps the clocked edge; only t_on moves (tb asserts t_lo1). All 20 runs are repeated on the
+  v2 code; RESULTS reports v2 against Section 2 and v1 as a finding.

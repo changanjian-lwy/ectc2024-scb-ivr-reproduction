@@ -10,7 +10,7 @@
 //   (the configured slot until then). cfg_slot_guard is passed to phases 2..N.
 // - Phase 1's turn-off (cfg_lo_pred): timed after cfg_lo_learn comparator-decided turn-offs (scb_phase); its crossing
 //   reports mlo_* go to phase 1 only; cfg_lo_floor (A118) keeps its front end armed in timed mode, as a floor.
-//   cfg_floor_late (A141) goes to every phase: a floor report after the committed turn-off moves t_lo / t_on.
+//   cfg_floor_late (A141) goes to every phase: a floor report after the committed turn-off moves t_on.
 // - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on), e = vref - adc_code;
 //   ton_acc += ki * e (clamped) and the proportional term p_term = kp * e (A104), both with FRAC fractional bits;
 //   Ton is the rounded integer part of ton_acc + p_term, clamped to [cfg_ton_min, cfg_ton_max]; otherwise
@@ -127,7 +127,7 @@ module scb_ctrl #(
     input  wire                cfg_lo_floor,   // A118: phase 1's front end as a floor in timed mode
     input  wire                cfg_slave_floor,// C06 (SLAVE): phase 1's front end as a floor before its slot
     input  wire                cfg_ph_floor,   // A133: phases 2..N's front ends as floors before their slots
-    input  wire                cfg_floor_late, // A141: a late floor report moves t_lo / t_on (scb_phase)
+    input  wire                cfg_floor_late, // A141: a late floor report moves t_on (scb_phase)
     input  wire                cfg_vff,        // A128: Vin feed-forward on each phase's Ton (scb_vff), mode P
     input  wire                vin_valid,      // A128: Vin ADC sample (with Vo's)
     input  wire [AW-1:0]       vin_code,       // A128

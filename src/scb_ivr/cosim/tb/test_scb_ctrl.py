@@ -1115,11 +1115,12 @@ async def floor_late_off_ignores_the_report(dut):
 @cocotb.test()
 async def floor_late_report_in_up_is_the_turn_off(dut):
     """cfg_floor_late: the report at t_lon + 590 (before the committed timed edge at 600) arriving in UP sets
-    t_lo = a_tlo and t_on = a_tlo + dt_pred (675), enters HIGH without a gate event (the pending turn-on is dropped),
-    and the turn-off follows at t_on + Ton (808)."""
+    t_on = a_tlo + dt_pred (675) and enters HIGH without a gate event (the pending turn-on is dropped); t_lo1 keeps
+    the timed edge (600, one reference change per cycle); the turn-off follows at t_on + Ton (808)."""
     c = Ctrl(dut)
     t_lon = await _late_report(c, 590, floor_late=1)
     assert field(dut.state.value, 0, 2) == 0 and int(dut.t_ref.value) == t_lon + 675
+    assert int(dut.t_lo1.value) == t_lon + 600
     off = await c.until("H", 0, 1, after=t_lon, limit=60)
     assert off[0] + off[1] == t_lon + 808, (t_lon, off)
     assert c.find("H", 1, 1, after=t_lon) is None

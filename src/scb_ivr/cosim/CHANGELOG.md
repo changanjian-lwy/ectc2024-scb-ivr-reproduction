@@ -15,9 +15,12 @@ while Ton counted from the later clocked turn-on (+0-6 ns on, +20-38 A).
 
 **Changes:**
 - **`rtl/scb_phase.v`:** input `cfg_floor_late`. With it, a floor report
-  in UP earlier than t_lo is the turn-off (t_lo = a_tlo, t_on = a_tlo +
-  dt_pred, HIGH, the pending turn-on dropped); in HIGH, a floor turn-on
-  earlier than t_on moves t_on (and t_lo) to it.
+  in UP earlier than t_lo sets t_on = a_tlo + dt_pred and enters HIGH (the
+  pending turn-on dropped); in HIGH, a floor turn-on earlier than t_on
+  moves t_on to it. t_lo keeps the clocked edge: it is the slots' reference
+  and the slaves' ext_ref, and must change once per cycle (A141's first
+  version also moved t_lo; the slaves then saw two references in one
+  master cycle and fired their slots a cycle early, 357 A on four modules).
 - **`rtl/scb_ctrl.v`:** the input, passed to every phase.
 - **`rtl/scb_multi.v`:** regenerated.
 - **`bridge.py`:** cfg `floor_late` (default 0).
