@@ -1261,6 +1261,19 @@ each question:
            turn-on (two turn-ons ~6 ns apart restart the Ton timer, +20-38
            A); without it L x 0.7 +4.8 V stays <= 194 A at 1-40 us. Next:
            A141, the duplicate turn-on in the RTL.
+         - **A141 (2026-10-05, fix):**
+           [RESULTS](../experiments/track_A_periodic_steady_state/A141_p24_floor_late_report/RESULTS.md).
+           The duplicate is an RTL defect: the floor fires in the window
+           before the committed timed edge (or slave slot), its report
+           arrives two windows later in UP and was ignored, so Ton counted
+           from the later clocked turn-on. cfg `floor_late` 1 (late report
+           -> t_on = a_tlo + dt_pred; t_lo kept, it is the slaves'
+           ext_ref): 0 duplicates in 18 runs, peaks <= nodup + 1.9 A.
+           L x 0.7 rising: +4.8 V <= 191.6 A at 1-40 us; +8 V 210.1 A at
+           20 us, 182.1 A at 50 us. **Adopted** (single module); four
+           modules provisional (2 rows: 180.1 / 177.7 A; the handover's
+           slave duplicates at 145 us are removed too) - C12 reruns the
+           matrix.
      51. The final design on four modules:
          [C05](../experiments/track_C_multi_module/C05_four_module_final_design/RESULTS.md),
          [C06](../experiments/track_C_multi_module/C06_slave_floor/RESULTS.md);

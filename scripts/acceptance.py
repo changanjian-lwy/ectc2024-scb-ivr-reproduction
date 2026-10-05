@@ -53,6 +53,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A135": (TA / "A135_p24_relative_cap", "a135_analyze.py", "a135_summary.json"),
     "A136": (TA / "A136_p24_relative_cap_lowpass", "a136_analyze.py", "a136_summary.json"),
     "A137": (TA / "A137_p24_vff_restart_at_handover", "a137_analyze.py", "a137_summary.json"),
+    "A141": (TA / "A141_p24_floor_late_report", "a141_analyze.py", "a141_summary.json"),
     "C08": (TC / "C08_relative_cap_four_modules", "c08_analyze.py", "c08_summary.json"),
     "C09": (TC / "C09_seed_four_modules", "c09_analyze.py", "c09_summary.json"),
     "C10": (TC / "C10_seed_before_entry", "c10_analyze.py", "c10_summary.json"),
@@ -62,6 +63,7 @@ ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the ru
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
     "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
     "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
+    "A141": r"I\d_",                     # identity replays, read by criterion 1
 }
 
 LATE_C03 = "late fires: slave 1 by C02's reference latency, phase 1 with slot_lo in line steps; bounded (RESULTS 0.3)"
