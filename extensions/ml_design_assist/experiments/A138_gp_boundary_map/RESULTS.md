@@ -1,6 +1,6 @@
 # A138 - GP level-set active learning of the 200 A line-step boundary under L / Cs tolerance (RESULTS)
 Boundary: eaced63. Records: a138_state.json (all 406 points: inputs, D63 prior, cosim response, flags), a138_summary.json,
-cosim/cfg_*.json (400 runs; raw records local, BOUNDARY "Records"). Log: 00:55-03:58, 400 runs, 10 jobs.
+cosim/cfg_*.json (400 runs; raw records: GitHub release records-a138-a139). Log: 00:55-03:58, 400 runs, 10 jobs.
 
 ## 0. Verdict
 - **Criterion 2 fails: the GP's bands are not trusted** (decision rule); the 20 verification runs stand alone and all

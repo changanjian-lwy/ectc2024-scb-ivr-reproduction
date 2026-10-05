@@ -1,6 +1,6 @@
 # A139 - A138's boundary map with the noise floor measured and the budget split per direction (RESULTS)
 Boundary: 96a5027. Records: a139_state.json (254 runs: inputs, prior, response, flags; the spec table with mean / bound
-curves), a139_summary.json, cosim/cfg_*.json (raw records local). Log 04:04-06:01, 10 jobs. Supersedes A138's table.
+curves), a139_summary.json, cosim/cfg_*.json (raw records: GitHub release records-a138-a139). Log 04:04-06:01, 10 jobs. Supersedes A138's table.
 
 ## 0. Verdict
 - **Pass, 3/3. The GP's bands now hold on fresh data:** rising cover90 1.00, classification 0.90 (D63 0.85), MAE 2.8 A

@@ -1,6 +1,6 @@
 # A140 - why the post-step peak is not monotone in line-step slew (RESULTS)
 Boundary: f68b5f7. Records: `cosim/run_*.json` (36, committed in cc67b67); reused A137
-`run_s070_l_p48_{1,5}us` and A138 `vf05`, A139 `vf04`, `ur01` (local, as A138 / A139). `a140_predictions.json`, `a140_summary.json` (`a140_analyze.py`),
+`run_s070_l_p48_{1,5}us` and A138 `vf05`, A139 `vf04`, `ur01` (GitHub release records-a138-a139). `a140_predictions.json`, `a140_summary.json` (`a140_analyze.py`),
 D63 scans `a140_d63_s{1,2,3}.json` (`a140_d63.py`). Conditions: adopted single-module design (C10 template), Cs x 1.0,
 line step at 1000 us (+0.125 / 0.25 / 0.375 us for the position repeats), peak = max high-side turn-off current after it.
 
