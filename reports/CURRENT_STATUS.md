@@ -1384,6 +1384,22 @@ each question:
          step 196 A). **The single-module controller is not frozen; A143 =
          a comparator-phase fix, C13 waits.**
 
+     54. Shortened comparator phase (2026-10-05):
+         [A143](../experiments/track_A_periodic_steady_state/A143_p24_short_comparator_phase/RESULTS.md).
+         Mechanism (records): the stretched period deepens the phase 2-4
+         valleys; their error-based dt_pred then falls 11 -> 2-4 ns in one
+         or two reports (it rises 0.28 ns per report), the high side turns
+         on with the valley current still flowing, and phases 2-4 swing
+         with the series capacitors (~4.6 us). D63 has no dt_pred block and
+         stays damped. Fix: cfg lo_learn 1024 -> 4 (no RTL change; A99's
+         1024 served a 1-LSB dlo rule that A100 replaced). Pass 6/6: A142's
+         rows 351 / 254 / 247 / 388 -> 196 / 176 / 176 / 186 A; handover
+         better (L x 0.7 m3n 182 -> 146 A, L x 1.3 rail 1 12.81 -> 12.38 V);
+         A129 matrix + L corners -1.7 ... +4.8 A (max 191.4 A); four
+         modules m3n late fires 108 -> 4. The trim stays at +1 A, so the
+         floor sits 2-4.5 A deeper. **Adopted on one and four modules: the
+         single-module controller is frozen; C13 runs with lo_learn 4.**
+
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
         bit-identical gates, the fast plant):
