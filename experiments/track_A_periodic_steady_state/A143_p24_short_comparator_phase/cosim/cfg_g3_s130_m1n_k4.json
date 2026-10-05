@@ -49,7 +49,7 @@
  "slot_follow": 1,
  "slot_avg": 1,
  "slot_guard": 1,
- "records_last": 6000,
+ "records_last": 16000,
  "t_load_us": 0.0,
  "t_hand_us": 144.0,
  "kp_ns_per_v": 355.389,

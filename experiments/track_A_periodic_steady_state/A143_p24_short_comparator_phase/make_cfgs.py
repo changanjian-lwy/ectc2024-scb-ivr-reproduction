@@ -5,7 +5,7 @@ g1 = A142's regression rows z104, R_dv4.8_s4_L100, R_dv4.8_s5_L100, Q_dv6.4_s4 (
 146 / 160 us, +4.8 / +6.4 V over 4 us, end = step + 150 us, at K 1024 / 4 / 16 / 64; g3 = the handover rows n0, m1n,
 m3n at L x 0.7 / 1.0 / 1.3 (A137's rows) at K 1024 / 4 / 16 / 64. Stage 2 K (the chosen K): g4 = A129's other 13
 matrix rows at L x 1.0 plus s_p62, l_p48_1us, l_p48_5us at L x 0.7 / 1.3, at K 1024 and K; g5 = C12's four-module
-n0, m3n, s_p62, l_p48_1us at K (the K 1024 records are C12's). Writes cosim/cfg_*.json and cosim/ORDER_<stage>.txt.
+n0, m3n, s_p62, l_p48_1us at K (the K 1024 records are C12's). records_last 16000 everywhere. Writes cosim/cfg_*.json and cosim/ORDER_<stage>.txt.
 Usage: make_cfgs.py 1 | make_cfgs.py 2 K"""
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ G3_ROWS = ("n0", "m1n", "m3n")
 MATRIX = A136.A135.STEP_ROWS + A136.A135.MATRIX_ROWS
 G4 = [(1.0, r) for r in MATRIX if r not in G3_ROWS] + [(m, r) for m in (0.7, 1.3) for r in ("s_p62", "l_p48_1us", "l_p48_5us")]
 G5_ROWS = ("n0", "m3n", "s_p62", "l_p48_1us")
+RECORDS = 16000   # whole run on record (the bridge only slices its lists); 1400 us x 4 phases / 0.47 us < 12000
 
 
 def adopted(m, row):
@@ -38,7 +39,7 @@ def adopted(m, row):
 
 
 def put(c, name, note, k, order):
-    c = dict(c, lo_learn=k, out=f"run_{name}.json", note=f"A143 {name}: {note}, lo_learn {k}")
+    c = dict(c, lo_learn=k, records_last=RECORDS, out=f"run_{name}.json", note=f"A143 {name}: {note}, lo_learn {k}")
     (COS / f"cfg_{name}.json").write_text(json.dumps(c, indent=1) + "\n")
     order.append(name)
 

@@ -4,6 +4,7 @@ Track A. Written and committed before the runs. Looked at beforehand: A142's rec
 Q_dv6.4_s4, z104, P1, P2 (per-cycle tables) and a D63 probe (not stored; numbers below).
 Decision it changes: whether the single-module controller is frozen with a short comparator phase (and which
 lo_learn K), so that C13 can start. Cheaper check done first: D63 cmp vs floor mode with the RTL-exact vff (A140's Vff).
+records_last 16000 (amended before any result: 6000 left the handover out of 1200-1400 us records).
 Budget: stage 1 64 runs (~25 min, 10 jobs), stage 2 42 single + 4 four-module runs (~35 min).
 
 ## 1. What and why
@@ -36,7 +37,8 @@ Budget: stage 1 64 runs (~25 min, 10 jobs), stage 2 42 single + 4 four-module ru
    <= +5, max |Vo - 1| in [144, 244] us <= +0.2 points, rail 1 max in that window <= +0.3 V.
 3. g1, g3, g4, g5: status COMPLETED, 0 overlaps, 0 floor-first duplicates, 0 NEW hits (A142 oracles and classes),
    |Vo_end - 1| <= 1 %, ladder deviation <= 0.03. (g2 measures the residual window: no pass criterion.)
-4. Identity: g3_s100_n0_k1024 = A141 I1_s100_n0 and g4_s100_l_p48_1us_k1024 = A141 F_s100_l_p48_1us, every list equal.
+4. Identity: g3_s100_n0_k1024 = A141 I1_s100_n0 and g4_s100_l_p48_1us_k1024 = A141 F_s100_l_p48_1us: sections,
+   ipk, late fires and the last 6000 entries of every event list equal (A143 keeps records_last 16000, the whole run).
 5. g4 at K vs K 1024: post-step peak <= +7 A and <= 200 A (a row whose K 1024 run is already above 200 A: <= +7 A only),
    late fires <= +5.
 6. g5 at K vs C12's record of the row: peak <= +7 A, late fires <= +5, rail 1 (vin - vcs[0]) of every module in mode
