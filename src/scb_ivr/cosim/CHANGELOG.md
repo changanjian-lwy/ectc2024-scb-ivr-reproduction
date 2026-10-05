@@ -4,6 +4,20 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-05 (A145) - finite switching edges
+
+**Source:** A144's overshoot came from instantaneous edges. cfg "edge"
+{"didt_a_ns", "didt_on_a_ns"} -> CircuitParams edge_didt_off / edge_didt_on:
+a switch in an edge is open and its channel current is a right-hand-side
+source (Sim.edge_inc); turn-off with forward current ramps down, a hard
+turn-on (V_DS > 0) ramps up until V_DS <= 0. FastPlant holds the ramps
+(set_gate, _advance); KernelSim sends edge steps to FastSim.step;
+KernelPlant2 steps in Python while a ramp is active; ReferencePlant
+refuses edges. Sections add "edge_energy_j", the record "edge_params" and
+"edge_stats". plant_kernel.c unchanged.
+**Gate:** edges off = A144 bit for bit (A145 harness, id_ runs, regression);
+Fast / Kernel / Kernel2 identical with edges on.
+
 ## 2026-10-05 (A141) - the floor's late report
 
 **Source:** A140's duplicate phase-1 turn-on, traced to the RTL. A floor

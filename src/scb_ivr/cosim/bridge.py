@@ -82,6 +82,10 @@ high-side switch (upstream of its drain) with rp_ohm across it (0: undamped); th
 behind the inductance). Adds "loop_params" and each turn-off's loop current ("i_loop_a" in highoffs_last).
 Windowed V_DS peaks (cfg "vds_win" 1, A144): every section adds "vds_win_v", the 2N switches' peak V_DS since the
 previous section; "vds_max_v" stays the whole run's peak.
+Finite switching edges (cfg "edge" {"didt_a_ns", "didt_on_a_ns" = didt_a_ns}, A145): a turn-off's channel current falls
+at didt_a_ns, a hard turn-on's (V_DS > 0) rises at didt_on_a_ns until V_DS <= 0 (plant.py). Sections add
+"edge_energy_j" (each switch's channel int V_DS i dt during its edges since the previous section); the record adds
+"edge_params" and "edge_stats" (ramps per switch, Python edge steps, hard turn-on extremes, the whole run's energies).
 """
 import gzip
 import heapq
@@ -249,6 +253,10 @@ def make_params(cfg, ref):
     if loop:
         extra.update(loop_phases=tuple(loop.get("phases", range(1, N + 1))), loop_l=float(loop["l_ph"]) * 1e-12,
                      loop_rp=float(loop.get("rp_ohm", 0.0)))
+    edge = cfg.get("edge")                                            # A145: finite switching edges
+    if edge:
+        extra.update(edge_didt_off=float(edge["didt_a_ns"]) * 1e9,
+                     edge_didt_on=float(edge.get("didt_on_a_ns", edge["didt_a_ns"])) * 1e9)
     return Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
 
 
@@ -537,6 +545,9 @@ class ModuleSim:
                                       "vcs_v": [float(plant.y[a] - plant.y[x]) for a, x in zip(ia, ix)],
                                       "rev_energy_j": list(plant.rev_e), "rev_time_s": list(plant.rev_t)})   # A89
                 plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
+                if plant.edges:                                 # A145: channel energy in the edges since the last section
+                    self.sections[-1]["edge_energy_j"] = list(plant.edge_e)
+                    plant.edge_e = [0.0] * (2 * N)
                 if self.vds_win:                                # A144: peak V_DS since the last section, then restart
                     vw = plant._vmax
                     self.sections[-1]["vds_win_v"] = vw.tolist()
@@ -726,6 +737,9 @@ class ModuleSim:
             out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
         if p.loop_phases:                                            # A144
             out["loop_params"] = {"phases": list(p.loop_phases), "l_h": p.loop_l, "rp_ohm": p.loop_rp}
+        if plant.edges:                                              # A145
+            out["edge_params"] = {"didt_off_a_s": p.edge_didt_off, "didt_on_a_s": p.edge_didt_on}
+            out["edge_stats"] = plant.edge_stats
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
                                  "vm0_v": self.vm0, "valley_zero": int(self.mon.vmin_zero), "t_en_us": self.t_en * 1e6,

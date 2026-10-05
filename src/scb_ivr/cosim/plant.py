@@ -8,6 +8,13 @@ vds_max, ipk, steps, sim): the bridge selects one by cfg "plant_impl".
   Accelerate's dgemv/dgetrs with numpy's arguments, numpy's FMA in interp, no other contraction); a chord that does
   not converge in 8 iterations is redone by FastSim in Python (full-Newton fallback).
 All three give bit-identical results on this machine (gates: A94, A95, scripts/cosim_regression.py).
+Finite switching edges (A145, CircuitParams edge_didt_off / edge_didt_on > 0; FastPlant and the kernel plants, not
+ReferencePlant): a switch in an edge is open and its channel current is a source in the right-hand side (Sim.edge_inc):
+at a turn-off with forward channel current i0 > 0 it falls as i0 - didt_off (t - t0) to 0 (a turn-off with i0 <= 0 is
+instantaneous); a turn-on with V_DS > 0 is hard: the current rises as didt_on (t - t0) until V_DS <= 0, then the
+switch conducts (g_on, two Euler steps); a turn-on with V_DS <= 0 is instantaneous. Edge steps are solved in Python
+(KernelSim -> FastSim.step, KernelPlant2 -> its Python step); edge_e[j] is the channel's int V_DS i dt since the
+bridge's last reset. Without edges every step is as before.
 """
 from __future__ import annotations
 
@@ -97,6 +104,9 @@ class ReferencePlant:
         self.rev_e = [0.0] * (2 * self.n); self.rev_t = [0.0] * (2 * self.n)   # A89: since the last section
         self.last_donly = [False] * (2 * self.n)
         _aux_setup(self, p, gl)                                       # A101 (no branches: na = 0)
+        self.edges = False
+        if p.edge_didt_off > 0 or p.edge_didt_on > 0:
+            raise NotImplementedError("finite switching edges (A145): FastPlant or the kernel plants only")
 
     def gates(self):
         return self.gh + self.gl
@@ -204,7 +214,7 @@ class FastSim(Sim):
         return np.sign(v) * out
 
     # ---- A88 Sim.step with the same arithmetic ----
-    def step(self, y, conducting, h, euler, t, load_on, donly=None, vin0=None, vin1=None):
+    def step(self, y, conducting, h, euler, t, load_on, donly=None, vin0=None, vin1=None, src=None):
         key = (conducting, h, euler, load_on, donly)
         entry = self.cache.get(key)
         if entry is None:
@@ -248,6 +258,8 @@ class FastSim(Sim):
             if hf is None:
                 hf = self._hfrev[hk] = h * frev
             rhs = rhs + hf
+        if src is not None:                                    # A145: the edges' channel currents, integrated
+            rhs = rhs + src
         y1 = self._solve(entry[0], rhs)
         if self.nl is None:
             return y1
@@ -311,6 +323,14 @@ class FastPlant:
         self.last_donly = [False] * (2 * self.n)
         self._vd = None; self._vd_t = None
         _aux_setup(self, p, gl)                                       # A101 (no branches: na = 0)
+        self.edges = p.edge_didt_off > 0 or p.edge_didt_on > 0        # A145: finite switching edges
+        self.ramps = {}                                               # switch -> (t0, i0, slope A/s)
+        self.edge_e = [0.0] * (2 * self.n)
+        if self.edges:
+            self._einc = [self.sim.edge_inc(j) for j in range(2 * self.n)]
+            self.edge_stats = {"off": [0] * (2 * self.n), "on": [0] * (2 * self.n), "steps": 0, "off_neg_steps": 0,
+                               "on_vds_max_v": 0.0, "on_t_max_s": 0.0, "on_i_max_a": 0.0, "on_forced": 0,
+                               "e_total_j": [0.0] * (2 * self.n)}
 
     @property
     def vds_max(self):
@@ -330,16 +350,21 @@ class FastPlant:
     def _advance(self, h):
         """One step with A73's diode_check: a diode-only branch whose Vds ends > 0 is cut and the step redone."""
         n2, g = 2 * self.n, self.gh + self.gl
+        ramps, src = self.ramps, None
+        if ramps:                                                     # A145: a switch in an edge is open
+            g = [a and j not in ramps for j, a in enumerate(g)]
         d = list(self.diode)
         euler = self.euler_left > 0
         rev = self.p.rev_drop
         t0, t1 = self.t, self.t + h
         vin0, vin1 = self._vin(t0), self._vin(t1)
+        if ramps:
+            src, i0s, i1s, vd0 = self._edge_src(t0, t1, h, euler, vin0)
         aux = tuple(bool(x) for x in self.aux_on) if self.na else ()    # A101
         for _ in range(n2 + 1):
             cond = tuple([bool(a or b) for a, b in zip(g, d)]) + aux
             donly = tuple([bool(b and not a) for a, b in zip(g, d)]) if rev else None
-            y1 = self.sim.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1)
+            y1 = self.sim.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1, src)
             cand = [j for j in range(n2) if d[j] and not g[j]]
             if not cand:
                 break
@@ -361,6 +386,8 @@ class FastPlant:
             _aux_after(self, i_prev, h)
         vd = self.sim.vds_all(self.y, vin1)
         self._vd, self._vd_t = vd, self.t
+        if ramps:
+            g = self._edge_after(t1, h, vd0, vd, i0s, i1s)
         if rev:                                                       # A89: reverse-conduction energy (A87)
             for j in range(n2):
                 if self.last_donly[j]:
@@ -383,12 +410,70 @@ class FastPlant:
             on_step()
 
     def set_gate(self, j, level):
+        if self.edges:
+            self._edge_gate(j, bool(level))
         if j < self.n:
             self.gh[j] = bool(level)
         else:
             self.gl[j - self.n] = bool(level)
         self.euler_left = 2
         _aux_gate(self, j, level)
+
+    # ---- A145: finite switching edges ----
+    EDGE_T_MAX = 50e-9                  # a hard turn-on whose V_DS has not reached 0 by then conducts (counted)
+
+    @staticmethod
+    def _ramp_i(t0, i0, slope, t):
+        i = i0 + slope * (t - t0)
+        return (i if i > 0.0 else 0.0) if slope < 0 else i
+
+    def _edge_gate(self, j, level):
+        """A gate edge of switch j: start, replace or end its channel-current ramp (the gate state is set after)."""
+        if level == bool((self.gh + self.gl)[j]):
+            return
+        p, st = self.p, self.edge_stats
+        r = self.ramps.pop(j, None)
+        if not level:                                  # turn-off: the channel current now (ramp or g_on V_DS) falls
+            i0 = self._ramp_i(*r, self.t) if r else p.g_on * float(self.vds(j))
+            if p.edge_didt_off > 0 and i0 > 0.0:
+                self.ramps[j] = (self.t, i0, -p.edge_didt_off); st["off"][j] += 1
+        else:                                          # turn-on: hard if V_DS > 0, then the current rises
+            v = float(self.vds(j))
+            if p.edge_didt_on > 0 and v > 0.0:
+                i0 = self._ramp_i(*r, self.t) if r else 0.0
+                self.ramps[j] = (self.t, i0, p.edge_didt_on); st["on"][j] += 1
+                st["on_vds_max_v"] = max(st["on_vds_max_v"], v)
+
+    def _edge_src(self, t0, t1, h, euler, vin0):
+        """The step's integrated source (trapezoid, or the end value for Euler), the ramp currents at t0 / t1 and
+        V_DS at t0."""
+        s, i0s, i1s = np.zeros(self.sim.ns), {}, {}
+        for j, r in self.ramps.items():
+            a, b = self._ramp_i(*r, t0), self._ramp_i(*r, t1)
+            i0s[j], i1s[j] = a, b
+            s += (h * b if euler else 0.5 * h * (a + b)) * self._einc[j]
+        return s, i0s, i1s, self.sim.vds_all(self.y, vin0)
+
+    def _edge_after(self, t1, h, vd0, vd1, i0s, i1s):
+        """After a committed edge step: the channel energy (trapezoid of V_DS i), ended ramps (a turn-off at zero
+        current; a turn-on at V_DS <= 0, after which the switch conducts with two Euler steps). Returns the effective
+        gates."""
+        st = self.edge_stats; st["steps"] += 1
+        for j in list(self.ramps):
+            e = 0.5 * h * (vd0[j] * i0s[j] + vd1[j] * i1s[j])
+            self.edge_e[j] += e; st["e_total_j"][j] += e
+            t0, _, slope = self.ramps[j]
+            if slope < 0:
+                if vd1[j] < 0.0:
+                    st["off_neg_steps"] += 1
+                if i1s[j] <= 0.0:
+                    del self.ramps[j]
+            elif vd1[j] <= 0.0 or t1 - t0 >= self.EDGE_T_MAX:
+                st["on_forced"] += int(vd1[j] > 0.0)
+                st["on_t_max_s"] = max(st["on_t_max_s"], t1 - t0); st["on_i_max_a"] = max(st["on_i_max_a"], i1s[j])
+                del self.ramps[j]
+                self.euler_left = 2
+        return [a and j not in self.ramps for j, a in enumerate(self.gh + self.gl)]
 
 
 
@@ -476,7 +561,9 @@ class KernelSim(FastSim):
                 self._kent[key] = k
         return k
 
-    def step(self, y, conducting, h, euler, t, load_on, donly=None, vin0=None, vin1=None):
+    def step(self, y, conducting, h, euler, t, load_on, donly=None, vin0=None, vin1=None, src=None):
+        if src is not None:                                     # A145: an edge step, FastSim's arithmetic
+            return FastSim.step(self, y, conducting, h, euler, t, load_on, donly, vin0, vin1, src)
         key = (conducting, h, euler, load_on, donly)
         entry = self.cache.get(key)
         kent = None
@@ -746,8 +833,13 @@ class KernelPlant2(KernelPlant):
                 self._run.xl_idx[k], self._run.xl_thr[k] = idx, thr_k
             self._run.n_xl = len(xl)
         while True:
-            rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
-            self._vd, self._vd_t = self._buf["vd"], self.t
+            if self.ramps:                                            # A145: edge steps are Python's
+                if not self.t < t_target - 1e-18:
+                    return
+                rc = 3
+            else:
+                rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
+                self._vd, self._vd_t = self._buf["vd"], self.t
             if rc == 0:
                 return
             if rc == 1:                                               # latch condition after a C step

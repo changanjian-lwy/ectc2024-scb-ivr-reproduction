@@ -18,6 +18,9 @@ Circuit (N phases):
   node h_k (after the m_k nodes in v; its Coss c_high now between h_k and a_k / x_N) and loop_l carries a current
   (last in i) from the switch's upstream node (vin for k = 1, a(k-1) otherwise) into h_k, with loop_rp across it as
   damping (0: none); it never switches. Without loop_phases every matrix is as before.
+- optional finite switching edges (edge_didt_off / edge_didt_on, A145): the plants (plant.py, not Sim) model a switch
+  in an edge as open with its channel current as a source from drain to source in the right-hand side (edge_inc);
+  0 = instantaneous edges, every matrix and step as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -124,6 +127,8 @@ class CircuitParams:
     loop_phases: tuple = ()      # A144: phases (1-based) whose high-side switch has a series loop inductance loop_l
     loop_l: float = 0.0          #   (H) from its upstream node into a node h_k at the switch's drain
     loop_rp: float = 0.0         #   Ohm across loop_l (damping; 0: none)
+    edge_didt_off: float = 0.0   # A145: channel current fall rate at a turn-off, A/s (0: instantaneous)
+    edge_didt_on: float = 0.0    #   rise rate at a hard turn-on (V_DS > 0), A/s (0: instantaneous)
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
@@ -310,6 +315,17 @@ class Sim:
                 st["iters"] += 8 + it; st["max_iters"] = max(st["max_iters"], 8 + it)
                 return y1
         raise RuntimeError("nonlinear Coss step did not converge")
+
+    def edge_inc(self, j):
+        """A145: the right-hand-side pattern of a channel current from switch j's drain to its source (KCL rows:
+        -1 at the drain, +1 at the source; the vin source and ground have no row)."""
+        _, d, s = self.switches[j]
+        e = np.zeros(self.ns)
+        if d != "vin":
+            e[self.idx[d]] = -1.0
+        if s is not None:
+            e[self.idx[s]] = 1.0
+        return e
 
     def vds(self, y, j, vin):
         name, d, s = self.switches[j]
