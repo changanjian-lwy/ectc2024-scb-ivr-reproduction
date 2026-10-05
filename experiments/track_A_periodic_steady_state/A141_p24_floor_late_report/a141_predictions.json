@@ -1,0 +1,167 @@
+{
+ "note": "reference record of each F row: peak (with the duplicates), nodup (the periods ending within 60 ns after a floor-first duplicate turn-on taken out), env3 (median-of-3 envelope of the peaking phase); predicted F peak = nodup (A139 noise floor ~1 A, heavy tail removed)",
+ "runs": {
+  "F_L070_p4.8_s1.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/cosim/run_s070_l_p48_1us.json",
+   "peak": 185.20318751240097,
+   "nodup": 185.20318751240097,
+   "env3": 184.84554409838583,
+   "ff_all": 1,
+   "ff_post": 1,
+   "module": 1
+  },
+  "F_L070_p4.8_s5.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A137_p24_vff_restart_at_handover/cosim/run_s070_l_p48_5us.json",
+   "peak": 188.55091242257768,
+   "nodup": 188.55091242257768,
+   "env3": 188.02437725371078,
+   "ff_all": 18,
+   "ff_post": 18,
+   "module": 1
+  },
+  "F_L070_p4.8_s10.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p4.8_s10.0.json",
+   "peak": 213.4292323948396,
+   "nodup": 194.07946137417537,
+   "env3": 205.6363218953418,
+   "ff_all": 14,
+   "ff_post": 14,
+   "module": 1
+  },
+  "F_L070_p4.8_s20.0": {
+   "ref": "extensions/ml_design_assist/experiments/A139_gp_boundary_noise_floor/cosim/run_ur01.json",
+   "peak": 205.92788893819176,
+   "nodup": 191.08549191494618,
+   "env3": 185.9430395511019,
+   "ff_all": 21,
+   "ff_post": 21,
+   "module": 1
+  },
+  "F_L070_p4.8_s20.0_q1": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p4.8_s20.0_q1.json",
+   "peak": 192.0702402536224,
+   "nodup": 188.35604669882002,
+   "env3": 185.98534196026174,
+   "ff_all": 5,
+   "ff_post": 5,
+   "module": 1
+  },
+  "F_L070_p4.8_s20.0_q2": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p4.8_s20.0_q2.json",
+   "peak": 199.34114518766546,
+   "nodup": 188.14875140104047,
+   "env3": 185.87499606761742,
+   "ff_all": 20,
+   "ff_post": 20,
+   "module": 1
+  },
+  "F_L070_p4.8_s20.0_q3": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p4.8_s20.0_q3.json",
+   "peak": 208.9102967012281,
+   "nodup": 185.61024947867233,
+   "env3": 185.59751562349672,
+   "ff_all": 15,
+   "ff_post": 15,
+   "module": 1
+  },
+  "F_L070_p4.8_s40.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p4.8_s40.0.json",
+   "peak": 188.67617084257287,
+   "nodup": 179.29521693495994,
+   "env3": 178.70615348220605,
+   "ff_all": 2,
+   "ff_post": 2,
+   "module": 1
+  },
+  "F_L070_p8.0_s20.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p8.0_s20.0.json",
+   "peak": 230.77079474006544,
+   "nodup": 210.0807449862601,
+   "env3": 209.66195364121015,
+   "ff_all": 17,
+   "ff_post": 17,
+   "module": 1
+  },
+  "F_L070_p8.0_s50.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L070_p8.0_s50.0.json",
+   "peak": 203.66168998917388,
+   "nodup": 180.1735244718218,
+   "env3": 180.0958721094949,
+   "ff_all": 4,
+   "ff_post": 4,
+   "module": 1
+  },
+  "F_L100_m4.8_s1.0": {
+   "ref": "extensions/ml_design_assist/experiments/A138_gp_boundary_map/cosim/run_vf05.json",
+   "peak": 173.47746857947448,
+   "nodup": 173.47746857947448,
+   "env3": 173.34085436091266,
+   "ff_all": 0,
+   "ff_post": 0,
+   "module": 1
+  },
+  "F_L100_m8.0_s10.0": {
+   "ref": "experiments/track_A_periodic_steady_state/A140_p24_slew_nonmonotone/cosim/run_B_L100_m8.0_s10.0.json",
+   "peak": 168.52166295018742,
+   "nodup": 168.52166295018742,
+   "env3": 168.2285171265725,
+   "ff_all": 2,
+   "ff_post": 2,
+   "module": 1
+  },
+  "F_s100_l_p48_1us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_s100_l_p48_1us.json",
+   "peak": 179.21991295439346,
+   "nodup": 179.21991295439346,
+   "env3": 178.88627516051196,
+   "ff_all": 8,
+   "ff_post": 8,
+   "module": 1
+  },
+  "F_s100_l_p48_5us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_s100_l_p48_5us.json",
+   "peak": 176.60557872854665,
+   "nodup": 176.60557872854665,
+   "env3": 176.58335526804976,
+   "ff_all": 1,
+   "ff_post": 1,
+   "module": 1
+  },
+  "F_s130_l_p48_1us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_s130_l_p48_1us.json",
+   "peak": 186.59917575256088,
+   "nodup": 186.59917575256088,
+   "env3": 177.19808161292198,
+   "ff_all": 11,
+   "ff_post": 11,
+   "module": 1
+  },
+  "F_s130_l_p48_5us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_s130_l_p48_5us.json",
+   "peak": 175.17732922740598,
+   "nodup": 175.17732922740598,
+   "env3": 175.14957584222677,
+   "ff_all": 1,
+   "ff_post": 1,
+   "module": 1
+  },
+  "F_l_p48_1us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_l_p48_1us.json",
+   "peak": 180.55606223141962,
+   "nodup": 180.55606223141962,
+   "env3": 180.31180683617933,
+   "ff_all": 25,
+   "ff_post": 25,
+   "module": 1
+  },
+  "F_l_p48_5us": {
+   "ref": "experiments/track_C_multi_module/C10_seed_before_entry/cosim/run_l_p48_5us.json",
+   "peak": 179.26648963913175,
+   "nodup": 176.62809961090858,
+   "env3": 176.14555664935796,
+   "ff_all": 3,
+   "ff_post": 3,
+   "module": 4
+  }
+ }
+}
