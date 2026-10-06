@@ -60,6 +60,13 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "C10": (TC / "C10_seed_before_entry", "c10_analyze.py", "c10_summary.json"),
     "C11": (TC / "C11_seed2_inductance", "c11_analyze.py", "c11_summary.json"),
     "C12": (TC / "C12_floor_late_four_modules", "c12_analyze.py", "c12_summary.json"),
+    "A142": (TA / "A142_p24_random_stimulus", "a142_analyze.py", "a142_summary.json"),
+    "C13": (TC / "C13_random_stimulus_four_modules", "c13_analyze.py", "c13_summary.json"),
+    "C14": (TC / "C14_sharing_spread_check", "c14_analyze.py", "c14_summary.json"),
+    "A144": (TA / "A144_p24_commutation_loop_inductance", "a144_analyze.py", "a144_summary.json"),
+    "A145": (TA / "A145_p24_finite_switching_edges", "a145_analyze.py", "a145_summary.json"),
+    "A151": (TA / "A151_p24_slow_hard_turn_on", "a151_analyze.py", "a151_summary.json"),
+    "A152": (TA / "A152_p24_drive_spec_robustness", "a152_analyze.py", "a152_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -252,6 +259,39 @@ EXCEPTIONS.update({   # A132-A137, C08-C10 (2026-10-05): each reason is the one 
             ("criteria", "1_no_new_fail"): "s_m62's late fire; adopted by user decision 2026-10-05 (RESULTS 0, 1)"},
 })
 NOT_ROWS["A134"] = ".*"     # its summary is per arm (f / z / c) and L, not per run
+NOT_ROWS.update({
+    "A142": r"I0$|P\d|Q_|R_",            # identity replay (criterion 5) and the post hoc traces (RESULTS 3)
+    "C13": r"s1_",                        # single-module replays of three draws (RESULTS 2)
+    "A151": r"s5_",                       # 5 us bus-slew rows, read by the summary's slew5
+    "A152": r"m4_",                       # four-module rows, read by criterion 5
+})
+_PKG = "a hard turn-on of phase k-1 rings SH_k to 24 + 1.7 dV at every L; solved by the drive in A151 / A152 (RESULTS 0, 1 row 2)"
+EXCEPTIONS.update({   # A142, C13, C14, A144, A145, A151, A152 (added 2026-10-06 when the package line closed)
+    "A142": {("criteria", "3_new_0"): "z104: 27 spikes and 8 order events, the mode-P comparator-phase oscillation this test "
+                                      "found; fixed by A143 (RESULTS 0, 1 row 3)"},
+    "C13": {("criteria", "1_floor_first_0"): "y08: one floor-first duplicate, a 0.36 LSB rounding tie (oracle class K5), "
+                                             "peak normal (RESULTS 0, 1 row 1, 2)"},
+    "C14": {("criteria", "w10/all_rows_le_200"): "+-10 % worst case reaches 207.9 A: the 200 A crossing is near +-7 %, the "
+                                                 "spread limit this experiment measures (RESULTS 0, 1 row 5)"},
+    "A144": {("criteria", f"per_l/{l}/voltage"): _PKG for l in (50, 100, 150, 300)},
+    "A145": {**{("criteria", f"2_voltage/{d}"): "V_DS > 40 V at every L with 1-2 ns edges (best 50 pH / 2 ns 41.8 V after "
+                "+4.8 V / 1 us); solved by the slow turn-on in A151 (RESULTS 0, 1 row 2)" for d in ("72", "144")},
+             ("criteria", "5_cost"): "wall time x1.6-2.5 vs A144 (Python edge steps under 10 parallel jobs); edge steps "
+                                     "1.3 / 2.4 % pass (RESULTS 1 row 5)"},
+    "A151": {("criteria", "1_harness"): "the single-edge harness underpredicts the cosim reduction at 100 / 150 pH, as "
+                                        "predicted (RESULTS 1 row 1)"},
+    "A152": {("criteria", "S100/c3"): "l_m80_10us: 6 late fires (ref 2), no peak, V_DS or oracle consequence (RESULTS 0, 1 row 3)",
+             ("criteria", "6_300pH"): "300 pH fails at any turn-on rate: the 72 A/ns turn-off ring alone is 48.8 V steady "
+                                      "(RESULTS 0, 1 row 6)"},
+})
+ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
+    "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
+                       "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
+                       "5_edge_power_l100": d["c3"]["c5"]},
+    "A145": lambda d: {**d["criteria"], "2_voltage": {k: bool(v) for k, v in d["criteria"]["2_voltage"].items()}},
+    # (A145 lists the inductances that pass per di/dt; the criterion passes for a di/dt with any)
+    "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
+}
 
 
 def flat(c, prefix=""):
@@ -313,6 +353,8 @@ def check(name, reanalyse):
         out["MISSING"].append(f"summary {summary}")
         return out
     d = json.loads(path.read_text())
+    if name in ADAPT:
+        d["criteria"] = ADAPT[name](d)
     have = summary_rows(d)
     pre, skip = ROW_PREFIX.get(name, ""), re.compile(NOT_ROWS.get(name, "(?!)"))
     out["MISSING"] += [f"row {r} not in {summary}" for r in runs
