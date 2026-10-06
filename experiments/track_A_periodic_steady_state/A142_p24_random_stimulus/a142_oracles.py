@@ -7,13 +7,18 @@ its phase), how (a turn-on not predictive, how != 0). Known classes (not defects
 order hits within a falling line ramp + 2 us with dv < -5.5 V and |dv| / slew >= 4 V/us; K3 restarts (how 3) whose
 phase's previous low-off current was positive; K4 spikes inside a line ramp + 1 us or a load step + 1 us; K5 (C13)
 floor-first duplicates < 0.5 LSB apart (the floor's report rounds to t_lo, so floor_late cannot order them). Every other
-hit is NEW; spikes within 60 ns after a floor-first duplicate count with it."""
+hit is NEW; spikes within 60 ns after a floor-first duplicate count with it.
+A148 (zero-voltage turn-on, A147's unchecked class): every turn-on in the window with V_DS above V_HARD (6 V; steady
+3.2-4.2 V) is a hard turn-on, listed under "zvs" with its phase's previous low-side turn-off current (positive: the
+valley never reversed); it is reported apart from the events, so the classes above and old verdicts are unchanged."""
 from __future__ import annotations
 
+import bisect
 import json
 from pathlib import Path
 
 N = 4
+V_HARD = 6.0
 DUP_S, RACE_S, SPIKE_A, AFTER_S = 20e-9, 1e-9, 10.0, 60e-9
 
 
@@ -52,6 +57,18 @@ def module(md, t_lo, lsb, tdrv):
             ev.append({"t_s": x["t_s"], "phase": x["phase"], "kind": "how", "how": x["how"],
                        "lo_prev_a": prev[-1]["i_a"] if prev else None})
     return ev, len(keep), max((x["i_a"] for x in ho), default=float("nan"))
+
+
+def zvs(md, t_lo):
+    """A148: hard turn-ons (V_DS > V_HARD) from t_lo on, with the phase's previous low-side turn-off current."""
+    lo = {k: sorted((q["t_s"], q["i_a"]) for q in md["lowoffs_last"] if q["phase"] == k) for k in range(1, N + 1)}
+    hits = []
+    for x in md["turnons_last"]:
+        if x["t_s"] >= t_lo and (x.get("vds_v") or 0.0) > V_HARD:
+            q = lo.get(x["phase"], [])
+            j = bisect.bisect_left(q, (x["t_s"],)) - 1
+            hits.append({"t_s": x["t_s"], "phase": x["phase"], "vds_v": x["vds_v"], "lo_prev_a": q[j][1] if j >= 0 else None})
+    return hits
 
 
 def classify(e, cfg, dups):
@@ -93,6 +110,7 @@ def check_dict(d, name):
         ev += [dict(x, module=i + 1) for x in e]
         n_on += n
         pk.append(p)
+    zv = [dict(h, module=i + 1) for i, md in enumerate(mods) for h in zvs(md, t0)]
     ff = [e for e in ev if e["kind"] == "dup_floor_first"]
     for e in ev:
         e["cls"] = classify(e, cfg, ff)
@@ -107,4 +125,7 @@ def check_dict(d, name):
             "peak_post": max(post) if post else None, "peak_window": max(pk),
             "vo_end": sum(q["vo"] for q in tail) / len(tail),
             "ladder_dev_end": max(max(abs(v / q["vin_v"] - (3 - j) / 4) for j, v in enumerate(q["vcs_v"])) for q in tail),
-            "events": sorted(ev, key=lambda e: e["t_s"])}
+            "events": sorted(ev, key=lambda e: e["t_s"]),
+            "zvs": {"n": len(zv), "vds_max": max((h["vds_v"] for h in zv), default=0.0),
+                    "per_phase": [sum(1 for h in zv if h["phase"] == k) for k in range(1, N + 1)],
+                    "positive_valley": sum(1 for h in zv if (h["lo_prev_a"] or 0.0) > 0.0), "hits": zv[:200]}}
