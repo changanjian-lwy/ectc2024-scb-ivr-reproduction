@@ -52,6 +52,34 @@ def price(p):
     return out
 
 
+def conf_check(conf, cand):
+    """Criterion 3 on one confirmed point: its own rows (c<idx>_*) <= 200 A, e50 rows <= 40.0 V, all 0 NEW and Vo back
+    finite; the frozen slew references (c00_*) are reported, not judged."""
+    if not conf or (cand is not None and conf["idx"] != cand["idx"]):
+        return {"pass": False, "ran": False}
+    rows, ok, own = {}, True, f"c{conf['idx']:02d}_"
+    for name, rel in conf["rows"].items():
+        p = ROOT / rel
+        if not p.exists():
+            rows[name] = None
+            ok &= not name.startswith(own)
+            continue
+        r = A.load(p)
+        s = A.stats(r, name)
+        v = rows[name] = {"peak": s["peak_post"], "new": s["oracle_new"], "back_us": s["back_within_1pct_us"],
+                          "vo_mv": s["extreme_mv"], "vds": (s.get("vds") or {}).get("whole"), "status": s["status"],
+                          "late": sum(s["late"])}
+        if name.startswith(own):
+            good = (v["status"] == "COMPLETED" and s["src_modified"] is False and v["new"] == 0
+                    and bool(np.isfinite(v["back_us"])) and v["peak"] <= 200.0
+                    and (not name.endswith("_e50") or v["vds"] <= 40.0))
+            v["ok"] = bool(good)
+            ok &= bool(good)
+    fails = [k for k, v in rows.items() if v and v.get("ok") is False]
+    return {"pass": bool(ok), "ran": True, "idx": conf["idx"], "x": [round(conf["kr"] / KVS, 3), round(conf["kt"] / KVS, 3)],
+            "fails": fails, "rows": rows}
+
+
 def main():
     st = M.load_state()
     M.refresh(st, json.loads((B.HERE / "a149_sh_table.json").read_text())["L50_e72"])
@@ -77,28 +105,9 @@ def main():
     h = 0.05
     grad = {c: [float((models[c].predict(x + d)[0][0] - models[c].predict(x - d)[0][0]) / (2 * h))
                 for d in (np.array([h, 0]), np.array([0, h]))] for c in ("V50", "PK1", "PK5")}
-    # 3. confirmation
-    c3 = {"pass": False, "ran": False}
-    conf = st.get("confirm")
-    if conf and cand is not None and conf["idx"] == cand["idx"]:
-        rows, ok = {}, True
-        for name, rel in conf["rows"].items():
-            p = ROOT / rel
-            if not p.exists():
-                rows[name] = None
-                ok = False
-                continue
-            r = A.load(p)
-            s = A.stats(r, name)
-            rows[name] = {"peak": s["peak_post"], "new": s["oracle_new"], "back_us": s["back_within_1pct_us"],
-                          "vds": (s.get("vds") or {}).get("whole"), "status": s["status"], "late": sum(s["late"])}
-            v = rows[name]
-            good = (v["status"] == "COMPLETED" and s["src_modified"] is False and v["new"] == 0
-                    and np.isfinite(v["back_us"]))
-            if name.startswith(f"c{cand['idx']:02d}"):
-                good &= v["peak"] <= 200.0 and (v["vds"] is None or not name.endswith("_e50") or v["vds"] <= 40.0)
-            ok &= bool(good)
-        c3 = {"pass": ok, "ran": True, "rows": rows}
+    # 3. confirmation (registered candidate; the post hoc largest-margin point the same way)
+    c3 = conf_check(st.get("confirm"), cand)
+    c3_post = conf_check(st.get("confirm_posthoc"), None)
     # 4. steady state
     c4 = {"pass": False}
     if cand is not None:
@@ -115,7 +124,7 @@ def main():
     bias = [{"x": gxy(p), "bias": p["m"]["rows"]["l0"]["sh50_block"] - p["m"]["V50"]} for p in pts
             if "V50" in p["m"] and p["m"]["rows"].get("l0")]
     out = {"stop": st.get("stop"), "n_points": len(pts), "candidate": gxy(cand) if cand else None, "reference": gxy(ref),
-           "criteria": {"1": c1, "2": c2, "3": c3, "4": c4}, "price": price(ref),
+           "criteria": {"1": c1, "2": c2, "3": c3, "4": c4}, "posthoc_confirm": c3_post, "price": price(ref),
            "final_models": {c: m.info() for c, m in models.items()}, "grad_at_reference": grad,
            "map": {"max_pof": float(pof.max()), "argmax": M.GRID[int(np.argmax(pof))].tolist(),
                    "area_pof_gt_0.5": float(np.mean(pof > 0.5))},
@@ -126,6 +135,9 @@ def main():
     print(f"stop {out['stop']}; {len(pts)} points; feasible {c2['feasible']}; candidate {out['candidate']}")
     print(f"C1 {c1['within_2sd']}/{c1['n']} within 2 sd ({'PASS' if c1['pass'] else 'FAIL'}); C2 {'PASS' if c2['pass'] else 'FAIL'}; "
           f"C3 {'PASS' if c3['pass'] else ('FAIL' if c3['ran'] else 'not run')}; C4 {'PASS' if c4['pass'] else 'FAIL/none'}")
+    for lab, c in (("C3", c3), ("post hoc", c3_post)):
+        if c["ran"]:
+            print(f"{lab} {c['x']}: {'PASS' if c['pass'] else 'FAIL'}; fails {c['fails']}")
     print(f"map: max P(feasible) {out['map']['max_pof']:.3f} at {out['map']['argmax']}, area P>0.5 {out['map']['area_pof_gt_0.5']:.3f}")
     near = lambda p: min((M.LIM[c] - p["m"].get(c, 1e9)) / {"V50": 0.5, "PK1": 3.0, "PK5": 3.0}[c] for c in M.LIM)
     for p in sorted(sorted(pts, key=near, reverse=True)[:9], key=gxy):
