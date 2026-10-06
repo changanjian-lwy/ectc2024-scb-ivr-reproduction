@@ -18,11 +18,12 @@ device assumptions coexist in one physically consistent operating cycle?**
 > Research in progress—not a completed 1 kW reproduction or hardware validation.
 > A local ZVS event, a passing unit test and a full periodic solution are different evidence levels.
 
-**Status, 5 October 2026.** One P24 module and the four-module, 16-phase
+**Status, 6 October 2026.** One P24 module and the four-module, 16-phase
 1 kW system run closed-loop in co-simulation (Verilog controller, circuit
-plant with nonlinear Coss); both controller designs are frozen and the
-package level has started. Two-page summary:
-[reports/MIHAI_SUMMARY_2026-10-05.md](reports/MIHAI_SUMMARY_2026-10-05.md).
+plant with nonlinear Coss); both controller designs are frozen. At the
+package level the switch overshoot is solved by the gate drive (loop
+<= 50 pH, a separate 36 A/ns turn-on). Summary:
+[reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md).
 The workstream table below describes the earlier stages.
 
 ## Three workstreams, explicit boundaries

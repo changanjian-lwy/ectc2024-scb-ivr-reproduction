@@ -1,6 +1,6 @@
 # SCB-IVR reproduction: progress since 14 September
 
-Changan Jian · 5 October 2026 ·
+Changan Jian · 6 October 2026 ·
 [github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction)
 
 Since our meeting the work has moved from checking one module's switching
@@ -12,7 +12,9 @@ ECTC 2024 paper (P24):
   datasheet's nonlinear Coss and reverse conduction, cross-checked against
   analytical models;
 - both controller designs are frozen after randomised testing;
-- the package level (P24 Figs. 5-6) has started.
+- at the package level (P24 Figs. 5-6), the switch overshoot caused by the
+  commutation loop is solved by the gate drive, which gives a loop and
+  driver specification (Section 3).
 
 The sections below separate what agrees with P24, what does not, and which
 unpublished values the remaining conclusions rest on.
@@ -91,7 +93,7 @@ P24 does not describe the controller, start-up or module synchronisation;
 these are this work's choices, taken from the critical-mode PFC
 interleaving literature.
 
-## 3. Package level (started 5 October)
+## 3. Package level (5-6 October)
 
 P24 Figs. 5-6 give the layout but no copper, via or loop values, so these
 are budgets over plausible ranges:
@@ -101,20 +103,43 @@ are budgets over plausible ranges:
   per 250 W module (12.3 %), more than the converter's own 25.9 W. 5 % needs
   86 µm of copper per stack, 1 % needs 429 µm. Vias, the strip and the
   series-capacitor ESR (≤ 0.5 mΩ) together stay below ~1 %.
-- **The commutation loop limits the device voltage and costs loss.** For
-  the 40 V EPC2067 an energy bound allows 141 pH at a 143 A turn-off; with
-  the loop inductance in the circuit model a single edge reproduces it
-  within 1.5 V. In closed loop (50-300 pH, instantaneous switching, an
-  assumed ring Q of 7) the controller keeps working, but a second limit
-  appears: a hard turn-on of phase k−1 rings the next high side, which
-  already blocks two rails (24 V), to about 24 V + 1.7 × the turn-on
-  voltage, whatever the inductance: 47 V at start-up, 58 V after a
-  4.8 V / 1 µs line step. The loop energy ½LI² per turn-off costs 7.7 W
-  per 100 pH per module, so 1 % allows about 30 pH. Undamped, the ring
-  defeats the valley detection. Published embedded-GaN loops are
-  230-320 pH.
-- **Next:** finite switching speed, which bounds how much of these
-  overshoots is real.
+- **The loop inductance sets loss; hard turn-ons set the device voltage.**
+  With the loop in the circuit model (ring Q 7) and 1-2 ns switching edges,
+  the steady high-side peak stays ≤ 34 V up to 150 pH. The loop costs
+  1.4 / 3.8 / 6.4 W per module at 50 / 100 / 150 pH, so 1 % allows about
+  70 pH. The binding overshoot comes after transients: a rising line step
+  makes phase 1 lose ZVS (its valley sits 12-15 A above the floor for
+  ~13 µs), its high side turns on hard at 17-19 V, and the ring puts the
+  next high side, already blocking two rails (24 V), at 42-51 V
+  (50-100 pH).
+- **Control cannot remove it at an acceptable cost.** Rail 1 takes the
+  whole step, so phase 1 needs ~22 % more volt-seconds. Holding its valley
+  stretches the common period and stops the ladder until phases 2-4 dig
+  deeper valleys, which is an output-charge deficit: every law that kept
+  ZVS needed ~42 µs for Vo to return within 1 % (8 µs now). A constrained
+  Bayesian search over the law's two gains found a narrow band that holds
+  40 V at 50 pH, but there the loop oscillates on neighbouring line slews
+  (203-275 A). The same law does fix load steps.
+- **The gate drive removes it.** Slowing only the hard turn-on, with the
+  72 A/ns turn-off kept, holds every switch ≤ 40 V, start-up included, up
+  to 150 pH: 37.1 V at 50 pH with 36 A/ns, 36.4 / 38.0 V at 100 / 150 pH
+  with 18 A/ns. It costs 0.1-0.4 W and 1.9 µs on the load step, because
+  under ZVS the turn-on carries no voltage. Dymond et al. (2018) report the
+  same on a 40 V GaN bridge leg. One side effect: open-loop start-up then
+  loses on-time (Vo 0.958 V when the loop takes over, 224 A at 100 pH); a
+  start-up on-time of 35.5 ns + 36 A ÷ (turn-on di/dt) restores it (155 A).
+- **Resulting specification,** checked on 13 transient tests (line ramps
+  2-10 µs, falling steps, inductance × 0.7 / 1.3) and on four modules: loop
+  ≤ 50 pH, turn-on 36 A/ns, turn-off 72 A/ns, start-up on-time 36.5 ns →
+  switch ≤ 37.6 V, start-up ≤ 198 A, after steps ≤ 180 A. 100 pH works at
+  18 A/ns. Above ~150 pH the turn-off ring alone exceeds 40 V (300 pH:
+  48.8 V steady), so the turn-off must slow too, at a loss cost. Published
+  embedded-GaN loops are 230-320 pH.
+- **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
+  48 V transients, and EPC's Phase 16 reliability report allows repetitive
+  overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The
+  specification does not rely on that rule; without the slow turn-on,
+  50 pH would satisfy it and 100 pH would not.
 
 ## 4. Open values, with the cases run
 
@@ -124,12 +149,29 @@ are budgets over plausible ranges:
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
 | inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz | the switching frequency |
-| QH / QL placement, loop inductance | 50-300 pH: steady high-side peak 17-52 V; hard-turn-on ring 47-58 V at any L; 3.9-24.5 W per module | device voltage and loss |
-| loop damping, switching edge times | ring Q 7 vs undamped; instantaneous edges so far | whether the valley detection survives; how much overshoot is real |
+| QH / QL placement, loop inductance | 50-300 pH with 1-2 ns edges: loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; with the slow turn-on ≤ 38 V to 150 pH; 300 pH 48.8 V steady | loss; above ~150 pH the turn-off must slow too |
+| gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); turn-on 36 / 18 / 9 A/ns: ≤ 40 V to 50 / 150 / 150 pH, 9 A/ns too slow | whether a separate turn-on path is needed |
+| derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
+| loop damping | ring Q 7 assumed; undamped, the ring breaks the valley detection | whether the valley detection survives |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 
-If you know which of these cases is closest to the intended build, it
-would narrow the sweeps; otherwise I will continue across the ranges above.
+Four answers would narrow the package specification most:
+
+1. Can P24's gate driver give the turn-on its own, slower edge (18-36 A/ns,
+   e.g. separate source and sink resistors) while the turn-off stays near
+   72 A/ns?
+2. Which derating rule do you apply to repetitive ns-scale drain overshoot
+   on 40 V GaN: the continuous rating, or a transient allowance such as
+   EPC's 120 % for ≤ 1 % of life?
+3. What is the prototype's commutation-loop inductance? A double-pulse
+   V_DS capture would do: a CNN trained on simulated captures, followed by a
+   circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz,
+   noise ≤ 0.4 V rms, current known within 2 %). Above ~150 pH the turn-off
+   must slow as well.
+4. How was the start-up on-time set? A slow turn-on needs it raised by
+   ~36 A ÷ (turn-on di/dt).
+
+Otherwise I will continue across the ranges above.
 
 ## 5. How the results are checked
 
@@ -139,5 +181,9 @@ would narrow the sweeps; otherwise I will continue across the ranges above.
   averaged model, and the co-simulation.
 - Every controller option reproduces the previous design bit for bit when
   switched off; a regression suite runs on every push.
-- About 150 experiments and 65 derivation notes so far. Running status:
+- Learned models (surrogates, Gaussian processes, CNNs, reinforcement
+  learning) propose or flag; the co-simulation decides. An anomaly detector
+  trained on clean runs found the ZVS loss behind the package overshoot,
+  which no hand-written check covered.
+- About 180 experiments and over 60 derivation notes so far. Running status:
   `reports/CURRENT_STATUS.md`; trade-offs: `reports/TRADEOFF_SCORECARD.md`.
