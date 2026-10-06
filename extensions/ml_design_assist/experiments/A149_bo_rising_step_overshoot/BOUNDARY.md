@@ -70,3 +70,12 @@ BO points x 4 loop-free rows (4 min each) + <= 6 loop + edge runs (37 min each),
   points from D63's candidates, batches of 5, <= 6 rounds; constrained EI; GPs on cosim - D63 for SH (block on the
   loop-free cosim's B and V_DS), peak and Vo back). 3 passes -> candidate offered to the user (not adopted by default);
   3 fails -> same conclusion as above, with cosim evidence.
+
+## Addendum (post hoc; written after criterion 1 failed at 1.21 V and criterion 2 failed, before any cosim)
+- Criterion 2 failed only on the 200 A peak at L x 1.3 / 0.7 (best SH-feasible point 205.7 A). D63 ran 4.5 / 7.6 A high
+  at those corners against A148's g 0.75 cosim, so the margin sits inside D63's error. The verdict and the decision
+  rule stand; one cosim check of the nearest points the existing RTL runs is added: the rail term alone (vs_kt 0;
+  Vin features only, so no loop through the voltage loop), gr 1.0 and 0.75 (make_cfgs_posthoc.py, 11 runs).
+- Same conditions as criterion 3 (no s_p62 row: the rail term is zero on a load step).
+- Predictions: gr 1.0: 50 pH whole-run max V_DS 39-40 V, 100 pH 42-44 V; peaks L0 194-198 A, L x 1.3 199-203 A, no
+  break on l_p48_5us; Vo back >= 35 us (the stretch-end rebound), so criterion 3 fails on Vo. gr 0.75: 50 pH 40.5-41.5 V.
