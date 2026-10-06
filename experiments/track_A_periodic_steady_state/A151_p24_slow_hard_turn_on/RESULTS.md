@@ -51,3 +51,10 @@ wrong. Criterion 1 failing at 100 / 150 pH was predicted.
 - One module, L x 1.0, Q 7, rows l_p48_1us / n0 / s_p62 only. No falling steps, no L corners, no four modules, no
   loop above 150 pH (published embedded loops reach 230-320 pH).
 - The edge power is the channel's only; the damper's share falls (harness), so the net cost is lower than quoted.
+
+## 4. Post hoc correction (A152, 2026-10-06)
+- Criterion 4 checked post-step peaks only. **The whole-run peak at 18 A/ns is over 200 A at the start-up handover
+  (144.5 us):** 205 / 224 / 240 A at 50 / 100 / 150 pH, 276 / 288 A at 9 A/ns. 36 A/ns gives 154-163 A; 72 A/ns (A145) 141-147 A.
+- Cause: mode S runs open loop at ton_ns 35.5. Its turn-ons are hard, and a slow turn-on loses on-time, so Vo reaches
+  only 0.958 V by the handover (1.016 V at 72 A/ns). The loop's P term then adds ~15 ns to Ton (51 ns).
+- So "100 pH at 18 A/ns solves it" holds only with a start-up Ton compensation (ton_ns 37.5: 148 A). A152 tests that spec.
