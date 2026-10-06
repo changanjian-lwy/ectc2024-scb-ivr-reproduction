@@ -37,7 +37,10 @@ class EnvFF(M.Env):
         return M.Env.obs(self)[KEEP]
 
     def critic_obs(self, o=None):
-        return M.Env.critic_obs(self, M.Env.obs(self))
+        full = M.Env.obs(self)
+        if self.prev is None:
+            return np.concatenate([full, np.zeros(M.Env.N_CRITIC - M.Env.N_OBS)])
+        return M.Env.critic_obs(self, full)
 
 
 def _train(seed):
