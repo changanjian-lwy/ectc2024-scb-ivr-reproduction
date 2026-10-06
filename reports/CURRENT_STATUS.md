@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-72: D68, D69 and A153-A157). This is the current navigation
+package drive specification A151-A152; items 68-73: D68, D69 and A153-A158). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 46 co-simulated experiments, every registered
+the acceptance gate holds 47 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1655,6 +1655,14 @@ each question:
          edges: the slow turn-on does not remove the ring after every
          edge. **Spec adds ring Q <= 30; the loop's real damping is a
          question for Mihai.**
+     73. The damping boundary (2026-10-07, mixed):
+         [A158](../experiments/track_A_periodic_steady_state/A158_p24_damping_boundary/RESULTS.md).
+         Q 15 / 30 hold at 100 pH too (0 late fires, 36.7 / 36.9 V); Q 100
+         and 300 lose the tracking at 50 and 100 pH (2400-7200 late
+         fires). The boundary lies between Q 30 and 100 whatever L; the
+         harness's ring residual does not predict it (300 pH at Q 7 holds
+         with 7.5 V left). 0/2 as registered: both misses are the post-step
+         swing peak 0.05 us after the oracle's K4 window (A154's case).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

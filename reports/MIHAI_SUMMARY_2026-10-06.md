@@ -174,7 +174,7 @@ are budgets over plausible ranges:
 | QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
-| loop damping | ring Q 7, 15, 30: no change; undamped: valley detection lost from start-up (8600+ late edges, 58-69 V) even with the slow turn-on | a damping requirement, Q ≤ 30 |
+| loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 
 Four answers would narrow the package specification most:

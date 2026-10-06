@@ -72,6 +72,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A155": (TA / "A155_p24_startup_ton_law", "a155_analyze.py", "a155_summary.json"),
     "A156": (TA / "A156_p24_formula_spec_at_the_limit", "a156_analyze.py", "a156_summary.json"),
     "A157": (TA / "A157_p24_loop_damping", "a157_analyze.py", "a157_summary.json"),
+    "A158": (TA / "A158_p24_damping_boundary", "a158_analyze.py", "a158_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -305,6 +306,9 @@ NOT_ROWS["A156"] = r"m4_|s125_"                  # the summary lists rows by nam
 _UND = "undamped loop: valley tracking lost from start-up (8600-8960 late fires, 58-69 V); the spec adds ring Q <= 30 (RESULTS 0)"
 EXCEPTIONS["A157"] = {("criteria", f"{c}/{r}"): _UND for c, rows in (("1_vds_band", ("q0_s50", "q0_s100", "q0_s125")),
                        ("2_vds_40", ("q0_s50", "q0_s100")), ("3_controller", ("q0_s50", "q0_s100", "q0_s125"))) for r in rows}
+_K4T158 = "phase 1's post-step swing peak at 1002.05 us, 0.05 us after the oracle's K4 window (slow turn-on, as A154); 0 late fires (RESULTS 0)"
+EXCEPTIONS["A158"] = {("criteria", "1_h1_q_only/q15_s100"): _K4T158, ("criteria", "1_h1_q_only/q30_s100"): _K4T158,
+                      ("criteria", "2_q30_at_100ph/q30_s100"): _K4T158}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
