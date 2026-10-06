@@ -1,7 +1,7 @@
 # D68 - the slow hard turn-on, from the node charge
 
 2026-10-07. Code: `scripts/p24_slow_turn_on.py` → `diagnostics/D68_slow_turn_on.json` (A145's single-edge harness,
-plus the records of A145, A151 and A152). Tested prospectively by A153.
+plus the records of A145, A151 and A152). Tested prospectively by A153: PASS 5/5 (Section 6).
 
 ## 1. Why
 
@@ -86,3 +86,16 @@ l_p48_1us, turn-off 72 A/ns, Q 7):
   1.3) stayed ≤ 37.6 V at x = 1.8 V.
 - The overshoot rule covers the +4.8 V / 1 µs line step, the binding row; load steps and start-up were lower in
   every run so far (A151, A152).
+
+## 6. Tested by A153 (registered before the runs, points never run before)
+
+- **Overshoot rule:** 75 pH × 40 A/ns 39.8 V (predicted 39.2), 125 pH × 24 39.1 V (39.2), 125 pH × 32 42.5 V (42.5,
+  over 40 V as predicted), 75 pH × 24 37.0 V (36.8). The x-curve holds to −0.1..+0.6 V at L values outside its
+  calibration.
+- **Start-up law:** with ton_S(d) the four rows start at 152-155 A, Vo before the handover within 0.004 V of the
+  72 A/ns value. At 100 pH and ton 35.5 the lost on-time is 1.60 / 2.78 / 4.94 ns at 24 / 12 / 6 A/ns; the √ law fits
+  the six 100 pH points with K = 16.9 (residuals ≤ 0.15 ns) and beats A152's 36 A / d at 24 and 6 A/ns. The pooled
+  K 15.6 reads 0.1-0.4 ns low at 100 pH; K depends a little on L (14.6-16.9).
+- **Spec formulas (≤ 150 pH):** di/dt_on ≤ 3.2 V / L; ton_S = 35.5 ns + 16 (d^-½ − 72^-½) with ~0.3 ns margin.
+  Above 150 pH the turn-off side binds (A154).
+
