@@ -1,7 +1,7 @@
 # Current Work Status
 
-Updated: **2026-10-06** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152). This is the current navigation
+Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
+package drive specification A151-A152; items 68-70: D68 and A153-A155). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 41 co-simulated experiments, every registered
+the acceptance gate holds 44 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1603,6 +1603,37 @@ each question:
          continuous, 48 V transient (EPC Phase 16: <= 120 % for <= 1 % of
          life). Questions for Mihai: P24's turn-on di/dt, his derating
          rule, P24's actual loop L, how P24 sets the start-up Ton.**
+     68. The slow turn-on derived and tested (2026-10-07, mixed):
+         [D68](../symbolic_derivations/03_P24_native/D68_P24_SLOW_TURN_ON.md),
+         [A153](../experiments/track_A_periodic_steady_state/A153_p24_slow_turn_on_laws/RESULTS.md).
+         From the node charge (2 + 3 EPC2067 at 12 V, Q0 ~ 162 nC): the
+         turn-on ramp lasts sqrt(2 Q0 / di/dt) and ends when node swing +
+         L di/dt reaches the rail, so the line-step overshoot depends on
+         x = L * di/dt_on only (<= 40 V for x <= 3.2 V), and mode S loses
+         on-time ~ (di/dt)^-1/2 (A152's 36 A / d was a 1/d fit to it).
+         A153 (registered, points never run): 75 / 125 pH at 24-40 A/ns
+         within -0.1..+0.6 V of the x-curve, the 40 V side right on 4 / 4,
+         start-up 152-155 A; the sqrt law beats A152's rule at 24 / 6 A/ns.
+         PASS 5/5.
+     69. The turn-off side above 150 pH (2026-10-07, mixed):
+         [A154](../experiments/track_A_periodic_steady_state/A154_p24_turn_off_large_loops/RESULTS.md).
+         A slow turn-off peaks near V_rail + 2 L di/dt_off: x_off <= ~10 V
+         holds 40 V to 300 pH (200 x 48 A/ns 36.5 V, 300 x 32 37.7 V; the
+         control 300 x 48 48.4 V). Its V-I overlap costs channel loss:
+         10.1 / 14.2 / 22.6 / 31.1 W per module at 200 / 48, 250 / 40,
+         300 / 32, 300 / 24 against ~2.7 W at 72 A/ns. 2/4 as registered:
+         the misses are a band row on the safe side, two post-step swing
+         peaks 0.1 us outside the oracle's K4 window, and the control's
+         190 A start-up. **A loop above ~200 pH costs several percent by
+         drive alone: the package should bound the loop to ~150 pH.**
+     70. The start-up on-time as one formula (2026-10-07, mixed):
+         [A155](../experiments/track_A_periodic_steady_state/A155_p24_startup_ton_law/RESULTS.md).
+         A least-squares law over 27 package runs: Vo before the handover
+         loses 0.0283 V per ns, 15.8 (d_on)^-1/2 ns, 6.0 ns per nH of loop,
+         and gains 9.8 (d_off)^-1/2 ns from a slower turn-off (LOO 4.4 mV).
+         Registered at 175-300 pH drives never run: Vo 1.010-1.023 V,
+         start-up 151-152 A; without the L term 0.995 V and 162 A. PASS 4/4.
+         **The drive spec is now formulas in (L, di/dt) (D68 Section 9).**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

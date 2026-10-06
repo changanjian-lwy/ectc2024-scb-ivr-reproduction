@@ -30,7 +30,7 @@ package level the switch overshoot is solved by the gate drive (loop
 | Mathematical model | P24-native event maps and the cycle-by-cycle valley map ([D43-D67](symbolic_derivations/03_P24_native/)) | checked against the co-simulation: D63 (transients), D65 (package), D66 (sharing); not yet modelled: start-up handover, slow turn-on above 100 pH, RTL arbitration. The P25-native form (D39-D42) is closed |
 | Physical model, one module | Verilog controller + circuit plant ([Track A](experiments/track_A_periodic_steady_state/)) | design frozen (A143) |
 | Physical model, four modules | [Track C](experiments/track_C_multi_module/) | design frozen (C13) |
-| Package | loop inductance, finite edges, gate drive (A144-A152) | spec: loop <= 50 pH, separate 36 A/ns turn-on |
+| Package | loop inductance, finite edges, gate drive (A144-A155, [D68](symbolic_derivations/03_P24_native/D68_P24_SLOW_TURN_ON.md)) | drive spec as formulas in (L, di/dt), tested to 300 pH; above ~150 pH the turn-off costs several percent, so bound the loop |
 | Machine learning (extension) | [ml_design_assist](extensions/ml_design_assist/README.md) | A120-A150; assists, the co-simulation decides |
 | Zero-start | the co-simulated start-up sequence (A103); Track B's LTspice records kept | carried by the co-simulation |
 

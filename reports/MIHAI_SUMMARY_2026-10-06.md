@@ -129,14 +129,31 @@ are budgets over plausible ranges:
   under ZVS the turn-on carries no voltage. Dymond et al. (2018) report the
   same on a 40 V GaN bridge leg. One side effect: open-loop start-up then
   loses on-time (Vo 0.958 V when the loop takes over, 224 A at 100 pH); a
-  start-up on-time of 35.5 ns + 36 A ÷ (turn-on di/dt) restores it (155 A).
+  longer start-up on-time restores it (155 A).
+- **Both effects follow from the node charge** (2 + 3 EPC2067 swung by 12 V,
+  Q ≈ 162 nC). The turn-on ramp lasts √(2Q / (di/dt)) and ends when the node
+  swing plus L·di/dt reaches the rail; what it leaves undone, the LC ring
+  does. So the overshoot depends on **L × di/dt only**: ≤ 40 V for
+  L·di/dt_on ≤ 3.2 V (a quarter of the rail). The lost start-up on-time goes
+  as (di/dt)^-½ plus 6 ns per nH of loop. Both laws were registered and then
+  tested at loops and rates never run before (75-300 pH, 6-40 A/ns): peak
+  V_DS within −0.1..+0.6 V, the 40 V side right on every point, start-up
+  151-155 A.
+- **Above ~150 pH the turn-off binds and has a price.** The 72 A/ns turn-off
+  ring exceeds 40 V on its own; a slower turn-off peaks near
+  V_rail + 2 L·di/dt, so L·di/dt_off ≤ ~10 V is needed (300 pH: ~32 A/ns,
+  37.7 V). Its V-I overlap costs channel loss: about +7 W per 250 W module at
+  200 pH and +20-28 W (8-11 %) at 300 pH, against ≤ 0.4 W for the slow
+  turn-on below 150 pH.
 - **Resulting specification,** checked on 13 transient tests (line ramps
   2-10 µs, falling steps, inductance × 0.7 / 1.3) and on four modules: loop
   ≤ 50 pH, turn-on 36 A/ns, turn-off 72 A/ns, start-up on-time 36.5 ns →
   switch ≤ 37.6 V, start-up ≤ 198 A, after steps ≤ 180 A. 100 pH works at
-  18 A/ns. Above ~150 pH the turn-off ring alone exceeds 40 V (300 pH:
-  48.8 V steady), so the turn-off must slow too, at a loss cost. Published
-  embedded-GaN loops are 230-320 pH.
+  18 A/ns. In general: turn-on ≤ 3.2 V / L, turn-off 72 A/ns up to 150 pH and
+  ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
+  Published embedded-GaN loops are 230-320 pH, which this design can drive
+  only at several percent of efficiency: **the loop should be bounded to
+  ~150 pH by layout.**
 - **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
   48 V transients, and EPC's Phase 16 reliability report allows repetitive
   overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The
@@ -151,8 +168,8 @@ are budgets over plausible ranges:
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
 | inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the peak-current budget |
-| QH / QL placement, loop inductance | 50-300 pH with 1-2 ns edges: loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; with the slow turn-on ≤ 38 V to 150 pH; 300 pH 48.8 V steady | loss; above ~150 pH the turn-off must slow too |
-| gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); turn-on 36 / 18 / 9 A/ns: ≤ 40 V to 50 / 150 / 150 pH, 9 A/ns too slow | whether a separate turn-on path is needed |
+| QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
+| gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7 assumed; undamped, the ring breaks the valley detection | whether the valley detection survives |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
@@ -168,10 +185,11 @@ Four answers would narrow the package specification most:
 3. What is the prototype's commutation-loop inductance? A double-pulse
    V_DS capture would do: a CNN trained on simulated captures, followed by a
    circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz,
-   noise ≤ 0.4 V rms, current known within 2 %). Above ~150 pH the turn-off
-   must slow as well.
+   noise ≤ 0.4 V rms, current known within 2 %). With L known, the drive
+   spec follows from the formulas above; above ~150 pH the turn-off must
+   slow as well, at several percent of efficiency.
 4. How was the start-up on-time set? A slow turn-on needs it raised by
-   ~36 A ÷ (turn-on di/dt).
+   ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
 
 Otherwise I will continue across the ranges above.
 
