@@ -23,7 +23,10 @@ turn-on loses its target. D63 keeps the valleys as states. One step is one phase
 - phases 2-4 turn off on their slots, t_lo1 + (k - 1) T_avg / N (C02's slot_lo; T_avg the mean of phase 1's last two
   periods), so their period is phase 1's plus (k - 1)/N of the change of T_avg;
 - the output: Co with the resistive load (exact RC step) and an optional current step; the ladder: Cs dV_k =
-  Q_on,k - Q_on,k+1 per period; the input: a linear ramp (A106's line steps).
+  Q_on,k - Q_on,k+1 per period; the input: a linear ramp (A106's line steps);
+- (A148, optional) each turn-on's V_DS from D57's free node at t_tr after the low-side turn-off, tabulated against
+  the valley and the rail (von_table); a positive valley leaves V_DS near rail + v_rev (the low side's reverse
+  conduction), and phase 1's timed edge can take an offset lo_add that is not learned.
 The transitions take t_tr (high side, D57's valley time) and t_dn (low side). What the map does not model: the
 controller's timing after a crossing (it reports the crossing's depth and duration, the trigger), the comparator's
 delay and trim (phase 1 at the target), the driver.
@@ -63,6 +66,7 @@ class Design:
     t_dn: float = 1.26e-9
     v_rev: float = 2.0                # the high side's reverse drop at the clamp (A88 plant: -2.1 to -2.2 V at turn-on)
     ith: tuple = field(default=None)  # (rails, I_th phases 1-3, I_th phase 4): D57 on a grid, see thresholds()
+    von: tuple = field(default=None)  # A148: (currents, rails, V_DS phases 1-3, phase 4) at the turn-on, see von_table()
 
 
 def seg_end(v, r, lf, i0, t):
@@ -89,6 +93,49 @@ def thresholds(lf, rails=np.arange(8.0, 17.01, 0.5)):
     return tuple(float(x) for x in rails), tuple(t13), tuple(t4)
 
 
+def von_point(lf, rail, i_off, t_on, last=False):
+    """V_DS of the high side t_on after the low side's turn-off at i_off (A, + into the inductor): D57's free node
+    (EPC2067 Coss, the low side's and high side's reverse conduction) with no turn-on; rail - x(t_on)."""
+    from scipy.integrate import solve_ivp
+    from scb_ivr.extensions.p24_aux_commutation import EdgeCircuit
+    from scb_ivr.extensions.p24_aux_scenarios import node_model
+    e = EdgeCircuit()
+    k = e.dv_cs / e.v_rail
+    m = node_model(replace(e, lf=lf, v_rail=float(rail), dv_cs=0.0 if last else float(rail) * k, n_next=0 if last else e.n_next))
+    s = solve_ivp(m._rhs_free(None), (0.0, t_on), [0.0, float(i_off), 0.0], max_step=2e-12, rtol=1e-9, atol=1e-7)
+    return float(rail - s.y[0, -1])
+
+
+def _von_row(args):
+    lf, rail, t_on, last, cur = args
+    return [von_point(lf, rail, i, t_on, last) for i in cur]
+
+
+def von_table(lf, t_tr, currents=np.arange(-45.0, 30.01, 1.0), rails=np.arange(6.0, 22.01, 0.5), jobs=1):
+    """A148: Design.von, turn-on V_DS against (low-side turn-off current, rail) at the predictive turn-on t_tr[k] (D57's
+    valley time; the RTL learns dt_pred to it) for phases 1-3 (node as thresholds()) and phase 4 (no next phase)."""
+    cur = [float(x) for x in currents]
+    tasks = [(lf, float(v), t_tr[0], False, cur) for v in rails] + [(lf, float(v), t_tr[-1], True, cur) for v in rails]
+    if jobs > 1:
+        from multiprocessing import Pool
+        with Pool(jobs) as p:
+            rows = p.map(_von_row, tasks)
+    else:
+        rows = [_von_row(t) for t in tasks]
+    n = len(rails)
+    return tuple(cur), tuple(float(v) for v in rails), tuple(map(tuple, rows[:n])), tuple(map(tuple, rows[n:]))
+
+
+def _bilinear(xs, ys, tab, x, y):
+    """tab[j][i] at (xs[i], ys[j]), uniform grids, clamped at the edges."""
+    fx = min(max((x - xs[0]) / (xs[1] - xs[0]), 0.0), len(xs) - 1.000001)
+    fy = min(max((y - ys[0]) / (ys[1] - ys[0]), 0.0), len(ys) - 1.000001)
+    i, j = int(fx), int(fy)
+    a, b = fx - i, fy - j
+    return ((1 - a) * (1 - b) * tab[j][i] + a * (1 - b) * tab[j][i + 1] + (1 - a) * b * tab[j + 1][i]
+            + a * b * tab[j + 1][i + 1])
+
+
 class ValleyMap:
     def __init__(self, d: Design):
         self.d = d
@@ -106,12 +153,15 @@ class ValleyMap:
         return {"vo": d.vref, "vc": [d.vin * (n - j) / n for j in range(1, n)], "acc": ton, "ton_ph1": ton,
                 "valley": [d.i_tgt] * n, "dlo": None, "step": 1, "last_up": None, "t_hist": [None, None], "t": 0.0}
 
-    def period(self, s, vin, i_step, rule=None, ton_scale=None, ton_cap=None):
+    def period(self, s, vin, i_step, rule=None, ton_scale=None, ton_cap=None, lo_add=None):
         """One phase-1 period from state s (updated in place). Returns the record. rule ("cmp", "timed", "floor")
         overrides the design's turn-off rule for this period (A122's agent); after a comparator period dlo takes its
         on-low interval, as the RTL's learning does. ton_scale (one factor per phase) scales each phase's Ton after
         the loop, and ton_cap (one per phase, s) caps it, both quantised to the LSB (A126's feed-forward); None
-        leaves every phase on the loop's Ton."""
+        leaves every phase on the loop's Ton. lo_add (A148; s, or a function of phase 1's Ton in s) moves phase 1's
+        timed edge to dlo + lo_add without entering dlo: dlo then moves only by the report's step (a floor turn-off
+        does not overwrite it).
+        With d.von the record has "von", each phase's turn-on V_DS (D57 at its rail and previous valley)."""
         d, n = self.d, self.d.n
         mode = rule or d.mode
         code = round(s["vo"] / d.adc_lsb)
@@ -120,7 +170,7 @@ class ValleyMap:
         ton_new = min(max(s["acc"] + d.kp_ns * 1e-9 * e, self.ton_min), self.ton_max)
         ton_new = round(ton_new / LSB) * LSB
         rails = [vin - s["vc"][0]] + [s["vc"][j - 1] - s["vc"][j] for j in range(1, n - 1)] + [s["vc"][-1]]
-        vo = s["vo"]
+        vo, v_prev = s["vo"], s["valley"]
         pk, q_on, q_tot, i_on, depth = [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n
         tons = [ton_new] * n
         if ton_scale is not None or ton_cap is not None:
@@ -148,7 +198,10 @@ class ValleyMap:
         else:
             if s["dlo"] is None:
                 s["dlo"] = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
-            t_ls1 = s["dlo"]
+            t_ls1 = base = s["dlo"]
+            if lo_add is not None:
+                add = lo_add(tons[0]) if callable(lo_add) else lo_add
+                t_ls1 = max(t_ls1 + add, 0.0)
             if mode == "floor":
                 t_ls1 = min(t_ls1, seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt - d.floor_a))
         v1, q_ls1 = seg_end(-vo, d.r, d.lf, pk[0], t_ls1)
@@ -157,7 +210,7 @@ class ValleyMap:
             up = (v1 > d.i_tgt) or (t_ls1 - t_cross < d.lo_tgt_ps * 1e-12)
             s["step"] = min(2 * s["step"], d.smax) if (s["last_up"] is not None and up == s["last_up"]) else 1
             s["last_up"] = up
-            s["dlo"] = t_ls1 + (1 if up else -1) * s["step"] * LSB
+            s["dlo"] = (base if lo_add is not None else t_ls1) + (1 if up else -1) * s["step"] * LSB
         t1 = d.t_tr[0] + tons[0] + d.t_dn + t_ls1
         th_ = s["t_hist"]
         t_avg_prev = (th_[0] + th_[1]) / 2 if th_[1] is not None else t1
@@ -185,6 +238,10 @@ class ValleyMap:
         s["ton_ph1"] = ton_new
         rec = {"t": s["t"], "vo": vo, "ton": ton_new, "valley": list(valleys), "peak": list(pk), "i_on": list(i_on),
                "depth": list(depth), "rails": rails, "period": t1, "late": late}
+        if d.von is not None:
+            cur, rv, t13, t4 = d.von
+            rec["von"] = [_bilinear(cur, rv, t4 if k == n - 1 else t13, v_prev[k], rails[k]) for k in range(n)]
+            rec["tons"] = list(tons)
         s["t"] += t1
         return rec
 

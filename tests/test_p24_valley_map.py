@@ -65,5 +65,30 @@ class LoadSteps(unittest.TestCase):
         self.assertLess(max(x["depth"][0] for x in r if x["t"] >= 50e-6), 1.0)
 
 
+class EdgeOffsetAndVds(unittest.TestCase):      # A148
+    def test_zero_offset_is_identity_in_steady_state(self):
+        d = replace(D, mode="floor", floor_a=2.0)
+        m = ValleyMap(d)
+        a, b = m.init_state(steady_ton(d)), m.init_state(steady_ton(d))
+        for _ in range(300):
+            ra, rb = m.period(a, d.vin, 0.0), m.period(b, d.vin, 0.0, lo_add=0.0)
+            self.assertEqual(ra, rb)
+
+    def test_offset_moves_the_valley_down(self):
+        d = replace(D, mode="timed")
+        m = ValleyMap(d)
+        s = m.init_state(steady_ton(d))
+        for _ in range(300):
+            m.period(s, d.vin, 0.0)
+        v0 = m.period(dict(s, vc=list(s["vc"]), valley=list(s["valley"])), d.vin, 0.0)["valley"][0]
+        v1 = m.period(s, d.vin, 0.0, lo_add=lambda ton1: 20e-9)["valley"][0]
+        self.assertAlmostEqual(v1 - v0, -20e-9 * d.vref / d.lf, delta=0.3)
+
+    def test_von_block(self):
+        from scb_ivr.p24_valley_map import von_point
+        self.assertAlmostEqual(von_point(2.9333333e-9, 12.29, -15.6, 10.93e-9), 3.95, delta=0.1)   # cosim 3.9 V
+        self.assertAlmostEqual(von_point(2.9333333e-9, 16.9, 12.6, 10.93e-9), 18.95, delta=0.3)   # cosim 19.0 V
+
+
 if __name__ == "__main__":
     unittest.main()
