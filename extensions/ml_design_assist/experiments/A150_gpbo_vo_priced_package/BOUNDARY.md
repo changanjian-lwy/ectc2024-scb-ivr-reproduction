@@ -58,3 +58,11 @@ margin used per row vs frozen, late fires. Frozen reference runs on the five sle
   stays hardware-bound (< 50 pH or stronger damping); closest point's misses reported. If 1 also fails, the claim covers
   the points run only, not the map.
 - 2 passes, 3 fails: feasible only within step-position noise -> counted as no; the near miss's price reported.
+
+## 5. Addendum (after the BO stopped on budget, before any confirmation run)
+- BO: 16 new points, feasible (0.675, 0.25), (0.725, 0.35), (0.7, 0.175). The registered candidate (lowest OBJ) is
+  (0.675, 0.25), OBJ 6.6299 vs 6.6318 for (0.725, 0.35): a 0.2 % IAE tie under noise, but the margins differ (V50
+  0.15 vs 0.34 V; smallest margin in noise units 0.30 vs 0.69, V50 / 0.5 V, peaks / 3 A).
+- Post hoc, not part of the verdict: the same confirmation rows on the largest-margin feasible point (0.725, 0.35),
+  in the same cosim call (`a150_bo.py --confirm --posthoc`). The verdict stays on the registered candidate; the post
+  hoc point only tells whether a pass/fail there hinges on the tie-break.

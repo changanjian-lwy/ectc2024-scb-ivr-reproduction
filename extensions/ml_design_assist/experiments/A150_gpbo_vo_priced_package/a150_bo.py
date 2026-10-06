@@ -14,7 +14,7 @@ Eriksson & Poloczek 2021), P(feasible) alone until a feasible point is seen; bat
 0.075 exclusion. Stop: P(feasible) < 0.02 everywhere or max cEI < 0.02 after >= 2 new batches; at most 4 batches.
 
 python3 a150_bo.py [--dry]  BO loop (resumes from a150_bo.json; --dry proposes one batch, writes no cfg, runs nothing)
-python3 a150_bo.py --confirm  confirmation rows for the chosen candidate (and the frozen design's slew rows)."""
+python3 a150_bo.py --confirm [--posthoc]  confirmation rows for the chosen candidate (and the frozen design's slew rows);\n  --posthoc adds the largest-margin feasible point (BOUNDARY addendum)."""
 from __future__ import annotations
 
 import json
@@ -319,39 +319,54 @@ def candidate(st):
     return min(feas, key=lambda p: p["m"]["OBJ"]) if feas else None
 
 
-def confirm():
+def margin(p):
+    """Smallest constraint margin in noise units (V50 0.5 V, peaks 3 A): the robustness of a feasible point."""
+    return min((LIM[c] - p["m"][c]) / {"V50": 0.5, "PK1": 3.0, "PK5": 3.0}[c] for c in LIM)
+
+
+def confirm(posthoc=False):
+    """Registered: the candidate (lowest OBJ among feasible). posthoc (BOUNDARY addendum): also the feasible point with
+    the largest margin(), when it is a different point. One cosim call; the frozen slew references once."""
     st = load_state()
     p = candidate(st)
     if p is None:
         print("no feasible point: nothing to confirm")
         return
-    kr, kt, i = p["kr"], p["kt"], p["idx"]
-    cfgs, conf = [], {"idx": i, "kr": kr, "kt": kt, "rows": {}}
+    targets = [("confirm", p)]
+    if posthoc:
+        q = max((x for x in st["points"] if x.get("m", {}).get("feasible")), key=margin)
+        if q["idx"] != p["idx"]:
+            targets.append(("confirm_posthoc", q))
+    cfgs = []
+    for key, p in targets:
+        kr, kt, i = p["kr"], p["kt"], p["idx"]
+        conf = {"idx": i, "kr": kr, "kt": kt, "rows": {}}
 
-    def put(name, base, k_r, k_t, note, **over):
-        cfgs.append(write_cfg(name, base, k_r, k_t, note, **over))
-        conf["rows"][name] = str((COS / f"run_{name}.json").relative_to(ROOT))
-    for j, dt in enumerate(CONF_DT, 1):
-        for r in ROWS:
-            ls = dict(json.loads(BASE[r].read_text())["line_step"])
-            ls["t_us"] = round(ls["t_us"] + dt, 3)
-            put(f"c{i:02d}_ph{j}_{r}", BASE[r], kr, kt, f"confirm point {i}, step +{dt} us", line_step=ls)
-    for s in CONF_SLEWS:
-        ls = dict(json.loads(BASE["l0"].read_text())["line_step"], slew_us=s)
-        put(f"c{i:02d}_slew{s:g}", BASE["l0"], kr, kt, f"confirm point {i}, +4.8 V / {s:g} us", line_step=ls)
-        put(f"c00_slew{s:g}", BASE["l0"], 0, 0, f"frozen design reference, +4.8 V / {s:g} us", line_step=ls)
-    for name, f in (("l5_s070", "cfg_g4_s070_l_p48_5us_k4.json"), ("l5_s130", "cfg_g4_s130_l_p48_5us_k4.json"),
-                    ("s_p62", "cfg_g4_s100_s_p62_k4.json"), ("l_m48_1us", "cfg_g4_s100_l_m48_1us_k4.json")):
-        put(f"c{i:02d}_{name}", B.A143C / f, kr, kt, f"confirm point {i}, {name}")
-    st["confirm"] = conf
+        def put(name, base, k_r, k_t, note, **over):
+            cfgs.append(write_cfg(name, base, k_r, k_t, note, **over))
+            conf["rows"][name] = str((COS / f"run_{name}.json").relative_to(ROOT))
+        for j, dt in enumerate(CONF_DT, 1):
+            for r in ROWS:
+                ls = dict(json.loads(BASE[r].read_text())["line_step"])
+                ls["t_us"] = round(ls["t_us"] + dt, 3)
+                put(f"c{i:02d}_ph{j}_{r}", BASE[r], kr, kt, f"confirm point {i}, step +{dt} us", line_step=ls)
+        for sl in CONF_SLEWS:
+            ls = dict(json.loads(BASE["l0"].read_text())["line_step"], slew_us=sl)
+            put(f"c{i:02d}_slew{sl:g}", BASE["l0"], kr, kt, f"confirm point {i}, +4.8 V / {sl:g} us", line_step=ls)
+            put(f"c00_slew{sl:g}", BASE["l0"], 0, 0, f"frozen design reference, +4.8 V / {sl:g} us", line_step=ls)
+        for name, f in (("l5_s070", "cfg_g4_s070_l_p48_5us_k4.json"), ("l5_s130", "cfg_g4_s130_l_p48_5us_k4.json"),
+                        ("s_p62", "cfg_g4_s100_s_p62_k4.json"), ("l_m48_1us", "cfg_g4_s100_l_m48_1us_k4.json")):
+            put(f"c{i:02d}_{name}", B.A143C / f, kr, kt, f"confirm point {i}, {name}")
+        st[key] = conf
     save(st)
-    cfgs.sort(key=lambda c: 0 if c.stem.endswith("_e50") else 1)
+    cfgs = sorted(dict.fromkeys(cfgs), key=lambda c: 0 if c.stem.endswith("_e50") else 1)
     rc = run_cosim(cfgs)
-    print(f"confirm point {i} ({kr / KVS:.3f}, {kt / KVS:.3f}): {len(cfgs)} runs, rc {rc}")
+    print("; ".join(f"{k} point {p['idx']} ({p['kr'] / KVS:.3f}, {p['kt'] / KVS:.3f})" for k, p in targets)
+          + f": {len(cfgs)} runs, rc {rc}")
 
 
 if __name__ == "__main__":
     if "--confirm" in sys.argv:
-        confirm()
+        confirm(posthoc="--posthoc" in sys.argv)
     else:
         bo(dry="--dry" in sys.argv)
