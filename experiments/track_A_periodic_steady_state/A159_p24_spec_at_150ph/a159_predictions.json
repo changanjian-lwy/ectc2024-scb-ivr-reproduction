@@ -1,0 +1,23 @@
+{
+ "vds": {
+  "l_p48_1us": 37.0,
+  "s_p62": 33.68,
+  "l_m48_1us": 33.68,
+  "l_m80_10us": 33.68,
+  "L07_l_p48_1us": 36.58,
+  "L07_s_p62": 32.72,
+  "L13_l_p48_1us": 37.63,
+  "L13_s_p62": 33.56,
+  "slew2": 36.18,
+  "slew3": 35.93,
+  "slew4": 36.08,
+  "slew5": 35.81,
+  "slew10": 35.12,
+  "m4": 37.04
+ },
+ "late_l_m80_10us": [
+  20,
+  45
+ ],
+ "note": "nominal 37.0 V + A152 S100's row offsets; late fires on l_m80_10us extrapolated from 0 / 6 / 16 at 50 / 100 / 125 pH"
+}
