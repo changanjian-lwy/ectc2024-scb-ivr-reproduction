@@ -68,6 +68,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A151": (TA / "A151_p24_slow_hard_turn_on", "a151_analyze.py", "a151_summary.json"),
     "A152": (TA / "A152_p24_drive_spec_robustness", "a152_analyze.py", "a152_summary.json"),
     "A153": (TA / "A153_p24_slow_turn_on_laws", "a153_analyze.py", "a153_summary.json"),
+    "A154": (TA / "A154_p24_turn_off_large_loops", "a154_analyze.py", "a154_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -285,6 +286,15 @@ EXCEPTIONS.update({   # A142, C13, C14, A144, A145, A151, A152 (added 2026-10-06
              ("criteria", "6_300pH"): "300 pH fails at any turn-on rate: the 72 A/ns turn-off ring alone is 48.8 V steady "
                                       "(RESULTS 0, 1 row 6)"},
 })
+_K4T = ("the second peak of phase 1's post-step period swing, 0.09-0.16 us after the K4 window (ramp + 1 us): the slow "
+        "turn-on delays it; inside the window in f300_off32 (RESULTS 0)")
+EXCEPTIONS["A154"] = {
+    ("criteria", "1_vds_band/f300_off24"): "35.9 against 37.6 V: 0.2 V beyond the band on the safe side (RESULTS 1 row 1)",
+    ("criteria", "4_controller/f200_off48"): _K4T,
+    ("criteria", "4_controller/f300_off24"): _K4T,
+    ("criteria", "4_controller/f300_off48"): "control row: start-up 190 A (<= 200 A); D68's start-up ton has no L term above "
+                                             "150 pH (RESULTS 0; A155)",
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
