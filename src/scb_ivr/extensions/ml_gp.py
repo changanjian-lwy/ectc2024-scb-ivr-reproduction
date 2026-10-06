@@ -17,11 +17,13 @@ from scipy.optimize import minimize
 
 
 class GP:
-    def __init__(self, fixed_l=None, noise_min=0.0):
+    def __init__(self, fixed_l=None, noise_min=0.0, l_bounds=None):
         """fixed_l: {input index: length scale} held fixed (inputs without variation in the training data);
-        noise_min: a lower bound on the noise sd n, in the targets' units (A139: a measured repeatability scatter)."""
+        noise_min: a lower bound on the noise sd n, in the targets' units (A139: a measured repeatability scatter);
+        l_bounds: (lo, hi) for the fitted length scales, in the inputs' units (A150: few points; default e^-3..e^4)."""
         self.fixed_l = dict(fixed_l or {})
         self.noise_min = float(noise_min)
+        self.l_log = (-3.0, 4.0) if l_bounds is None else (float(np.log(l_bounds[0])), float(np.log(l_bounds[1])))
 
     def _kernel(self, a, b, s, l):
         d = (a[:, None, :] - b[None, :, :]) / l
@@ -53,9 +55,10 @@ class GP:
         best = None
         for r in range(restarts):
             n_lo = max(1e-3 * sy, self.noise_min)
-            th0 = np.concatenate([[np.log(sy), np.log(max(0.3 * sy, 1.01 * n_lo))], rng.normal(0.0, 0.5, dim)])
+            th0 = np.concatenate([[np.log(sy), np.log(max(0.3 * sy, 1.01 * n_lo))],
+                                  np.clip(rng.normal(0.0, 0.5, dim), *self.l_log)])
             res = minimize(self._nlml, th0, args=(self.x, self.y), method="L-BFGS-B",
-                           bounds=[(np.log(1e-3 * sy), np.log(1e2 * sy)), (np.log(n_lo), np.log(max(10 * sy, 2 * n_lo)))] + [(-3.0, 4.0)] * dim)
+                           bounds=[(np.log(1e-3 * sy), np.log(1e2 * sy)), (np.log(n_lo), np.log(max(10 * sy, 2 * n_lo)))] + [self.l_log] * dim)
             if best is None or res.fun < best.fun:
                 best = res
         self.theta = best.x
