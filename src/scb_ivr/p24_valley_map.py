@@ -27,7 +27,9 @@ turn-on loses its target. D63 keeps the valleys as states. One step is one phase
   Q_on,k - Q_on,k+1 per period; the input: a linear ramp (A106's line steps);
 - (A148, optional) each turn-on's V_DS from D57's free node at t_tr after the low-side turn-off, tabulated against
   the valley and the rail (von_table); a positive valley leaves V_DS near rail + v_rev (the low side's reverse
-  conduction), and phase 1's timed edge can take an offset lo_add that is not learned.
+  conduction), and phase 1's timed edge can take an offset lo_add that is not learned;
+- (A149, optional) each high side SH_k (k >= 2) rings to its blocking voltage rail_(k-1) + rail_k plus f(V_DS at phase
+  k-1's turn-on): A144's mechanism B, f tabulated per loop inductance and edge rate from the cosim (Design.sh).
 The transitions take t_tr (high side, D57's valley time) and t_dn (low side). What the map does not model: the
 controller's timing after a crossing (it reports the crossing's depth and duration, the trigger), the comparator's
 delay and trim (phase 1 at the target), the driver.
@@ -69,6 +71,7 @@ class Design:
     ith: tuple = field(default=None)  # (rails, I_th phases 1-3, I_th phase 4): D57 on a grid, see thresholds()
     von: tuple = field(default=None)  # A148: (currents, rails, V_DS phases 1-3, phase 4) at the turn-on, see von_table()
     floor_keeps_dlo: bool = False     # A148: a floor turn-off leaves dlo to the report's step (as scb_phase does)
+    sh: tuple = field(default=None)   # A149: (V_DS grid, excess) of the SH_k overshoot block; needs von
 
 
 def seg_end(v, r, lf, i0, t):
@@ -163,7 +166,8 @@ class ValleyMap:
         leaves every phase on the loop's Ton. lo_add (A148; s, or a function of phase 1's Ton in s) moves phase 1's
         timed edge to dlo + lo_add without entering dlo: dlo then moves only by the report's step (a floor turn-off
         does not overwrite it).
-        With d.von the record has "von", each phase's turn-on V_DS (D57 at its rail and previous valley)."""
+        With d.von the record has "von", each phase's turn-on V_DS (D57 at its rail and previous valley); with d.sh
+        too, "sh": SH_2..SH_N's peak V_DS, rail_(k-1) + rail_k + f(von of phase k-1), f interpolated in d.sh."""
         d, n = self.d, self.d.n
         mode = rule or d.mode
         code = round(s["vo"] / d.adc_lsb)
@@ -245,6 +249,9 @@ class ValleyMap:
             cur, rv, t13, t4 = d.von
             rec["von"] = [_bilinear(cur, rv, t4 if k == n - 1 else t13, v_prev[k], rails[k]) for k in range(n)]
             rec["tons"] = list(tons)
+            if d.sh is not None:
+                g, x = d.sh
+                rec["sh"] = [rails[k - 1] + rails[k] + float(np.interp(rec["von"][k - 1], g, x)) for k in range(1, n)]
         s["t"] += t1
         return rec
 

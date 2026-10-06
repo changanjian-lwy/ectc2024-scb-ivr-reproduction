@@ -89,6 +89,18 @@ class EdgeOffsetAndVds(unittest.TestCase):      # A148
         self.assertAlmostEqual(von_point(2.9333333e-9, 12.29, -15.6, 10.93e-9), 3.95, delta=0.1)   # cosim 3.9 V
         self.assertAlmostEqual(von_point(2.9333333e-9, 16.9, 12.6, 10.93e-9), 18.95, delta=0.3)   # cosim 19.0 V
 
+    def test_sh_block(self):
+        flat = ((-50.0, 50.0), (0.0, 30.0), ((5.0, 5.0), (5.0, 5.0)), ((5.0, 5.0), (5.0, 5.0)))   # V_DS 5 V everywhere
+        d = replace(D, von=flat)
+        m = ValleyMap(d)
+        r = m.period(m.init_state(steady_ton(d)), d.vin, 0.0)
+        self.assertNotIn("sh", r)
+        d = replace(d, sh=((0.0, 10.0), (2.0, 12.0)))                                            # f(5 V) = 7 V
+        m = ValleyMap(d)
+        r = m.period(m.init_state(steady_ton(d)), d.vin, 0.0)
+        for k in range(1, d.n):
+            self.assertAlmostEqual(r["sh"][k - 1], r["rails"][k - 1] + r["rails"][k] + 7.0, places=9)
+
 
 if __name__ == "__main__":
     unittest.main()
