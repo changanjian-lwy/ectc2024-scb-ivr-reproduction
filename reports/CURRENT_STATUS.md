@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-71: D68, D69 and A153-A156). This is the current navigation
+package drive specification A151-A152; items 68-72: D68, D69 and A153-A157). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 45 co-simulated experiments, every registered
+the acceptance gate holds 46 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1646,6 +1646,15 @@ each question:
          datasheet's gate charge): turn-on 36 / 18 A/ns ~ 4.5 / 10 Ohm,
          turn-off 72 A/ns ~ 1.2 Ohm per device; no sink resistor gives
          ~160 A/ns, which alone limits the loop to ~60 pH.
+     72. Loop damping is a spec item (2026-10-07, mixed):
+         [A157](../experiments/track_A_periodic_steady_state/A157_p24_loop_damping/RESULTS.md).
+         Every package run used ring Q 7. At S50 Q 15 / 30 change nothing
+         (37.3 / 37.2 V, 0 late fires); undamped, at S50, S100 and 125 pH,
+         the valley tracking is lost from start-up on (8600-8960 late
+         fires on all phases, 58-69 V), as A144 found with instantaneous
+         edges: the slow turn-on does not remove the ring after every
+         edge. **Spec adds ring Q <= 30; the loop's real damping is a
+         question for Mihai.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

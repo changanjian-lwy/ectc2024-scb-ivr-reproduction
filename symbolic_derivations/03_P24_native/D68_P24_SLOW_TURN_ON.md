@@ -134,7 +134,8 @@ D68's Section 3 has no L term, and above 150 pH its ton under-compensates (A154:
 | any L ≤ 150 pH | ≤ 3.2 V / L for 40 V (3.0 V checked on the matrix, A156); 1.8 V / L adopted | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
 | 150-300 pH | ≤ 3.2 V / L (2.4 V with margin) | ≤ ~10 V / L | Section 8 | +7 W (200 pH) to +20-28 W (300 pH) per module |
 
-Tested points: A151-A155 (50-300 pH). Not covered: L / Cs corners above 100 pH, four modules above 100 pH, a gate model.
+Plus **loop damping: ring Q ≤ 30** (A157: Q 15 / 30 pass at S50; undamped, the valley tracking is lost from
+start-up on whatever the drive). Tested points: A151-A157 (50-300 pH). Not covered: L / Cs corners above 100 pH, four modules above 100 pH, a gate model.
 ## 10. The spec at its limit on the robustness matrix (A156)
 
 At 125 pH × 24 A/ns (x_on 3.0 V) A152's 13 rows and four modules all stay ≤ 40 V (worst L × 1.3 39.5 V, predicted

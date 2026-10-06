@@ -174,7 +174,7 @@ are budgets over plausible ranges:
 | QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
-| loop damping | ring Q 7 assumed; undamped, the ring breaks the valley detection | whether the valley detection survives |
+| loop damping | ring Q 7, 15, 30: no change; undamped: valley detection lost from start-up (8600+ late edges, 58-69 V) even with the slow turn-on | a damping requirement, Q ≤ 30 |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 
 Four answers would narrow the package specification most:
@@ -190,8 +190,9 @@ Four answers would narrow the package specification most:
 3. What is the prototype's commutation-loop inductance? A double-pulse
    V_DS capture would do: a CNN trained on simulated captures, followed by a
    circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz,
-   noise ≤ 0.4 V rms, current known within 2 %). With L known, the drive
-   spec follows from the formulas above; above ~150 pH the turn-off must
+   noise ≤ 0.4 V rms, current known within 2 %). The same capture gives the
+   ring's Q, which must stay ≤ ~30. With L known, the drive spec follows
+   from the formulas above; above ~150 pH the turn-off must
    slow as well, at several percent of efficiency.
 4. How was the start-up on-time set? A slow turn-on needs it raised by
    ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
