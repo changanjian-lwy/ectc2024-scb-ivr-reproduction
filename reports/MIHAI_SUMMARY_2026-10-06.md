@@ -138,7 +138,10 @@ are budgets over plausible ranges:
   as (di/dt)^-½ plus 6 ns per nH of loop. Both laws were registered and then
   tested at loops and rates never run before (75-300 pH, 6-40 A/ns): peak
   V_DS within −0.1..+0.6 V, the 40 V side right on every point, start-up
-  151-155 A.
+  151-155 A. At L·di/dt 3.0 V the whole robustness matrix and four modules
+  stay ≤ 39.5 V, but timing misses on a falling −8 V ramp grow with the loop
+  (0 / 6 / 16 late edges at 50 / 100 / 125 pH, no consequence), so the
+  adopted value is 1.8 V.
 - **Above ~150 pH the turn-off binds and has a price.** The 72 A/ns turn-off
   ring exceeds 40 V on its own; a slower turn-off peaks near
   V_rail + 2 L·di/dt, so L·di/dt_off ≤ ~10 V is needed (300 pH: ~32 A/ns,

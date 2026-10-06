@@ -70,6 +70,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A153": (TA / "A153_p24_slow_turn_on_laws", "a153_analyze.py", "a153_summary.json"),
     "A154": (TA / "A154_p24_turn_off_large_loops", "a154_analyze.py", "a154_summary.json"),
     "A155": (TA / "A155_p24_startup_ton_law", "a155_analyze.py", "a155_summary.json"),
+    "A156": (TA / "A156_p24_formula_spec_at_the_limit", "a156_analyze.py", "a156_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -296,6 +297,10 @@ EXCEPTIONS["A154"] = {
     ("criteria", "4_controller/f300_off48"): "control row: start-up 190 A (<= 200 A); D68's start-up ton has no L term above "
                                              "150 pH (RESULTS 0; A155)",
 }
+EXCEPTIONS["A156"] = {("criteria", "c3"): "late fires l_m80_10us 16 (grow with the loop: 0 / 6 / 16 at 50 / 100 / 125 pH), "
+                                           "L07 rows 5, two dup_other ties at a clock-window boundary; no consequence; the "
+                                           "adopted drive stays at x_on <= 1.8 V by the registered rule (RESULTS 0)"}
+NOT_ROWS["A156"] = r"m4_|s125_"                  # the summary lists rows by name (run file stem s125_<row>, m4)
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

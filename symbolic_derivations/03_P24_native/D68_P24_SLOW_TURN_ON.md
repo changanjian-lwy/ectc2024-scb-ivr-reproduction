@@ -131,8 +131,13 @@ D68's Section 3 has no L term, and above 150 pH its ton under-compensates (A154:
 
 | loop L | turn-on di/dt | turn-off di/dt | start-up ton | drive loss over 72 / 72 A/ns |
 |---|---|---|---|---|
-| any L ≤ 150 pH | ≤ 3.2 V / L | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
+| any L ≤ 150 pH | ≤ 3.2 V / L for 40 V (3.0 V checked on the matrix, A156); 1.8 V / L adopted | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
 | 150-300 pH | ≤ 3.2 V / L (2.4 V with margin) | ≤ ~10 V / L | Section 8 | +7 W (200 pH) to +20-28 W (300 pH) per module |
 
 Tested points: A151-A155 (50-300 pH). Not covered: L / Cs corners above 100 pH, four modules above 100 pH, a gate model.
+## 10. The spec at its limit on the robustness matrix (A156)
 
+At 125 pH × 24 A/ns (x_on 3.0 V) A152's 13 rows and four modules all stay ≤ 40 V (worst L × 1.3 39.5 V, predicted
+39.7); the ramp rows read 0.5-0.9 V above the offset prediction, so 3.2 V on the matrix is extrapolated. Criterion 3
+failed (late fires on −8 V / 10 µs growing with the loop, 0 / 6 / 16 at 50 / 100 / 125 pH; two clock-boundary
+duplicate records), none with a consequence; by the registered rule the adopted turn-on stays at x_on ≤ 1.8 V.

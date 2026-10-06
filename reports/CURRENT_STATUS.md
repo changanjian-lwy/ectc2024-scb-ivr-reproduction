@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-70: D68 and A153-A155). This is the current navigation
+package drive specification A151-A152; items 68-71: D68, D69 and A153-A156). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 44 co-simulated experiments, every registered
+the acceptance gate holds 45 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1634,6 +1634,18 @@ each question:
          Registered at 175-300 pH drives never run: Vo 1.010-1.023 V,
          start-up 151-152 A; without the L term 0.995 V and 162 A. PASS 4/4.
          **The drive spec is now formulas in (L, di/dt) (D68 Section 9).**
+     71. The formula spec at its limit (2026-10-07, mixed):
+         [A156](../experiments/track_A_periodic_steady_state/A156_p24_formula_spec_at_the_limit/RESULTS.md),
+         [D69](../symbolic_derivations/03_P24_native/D69_P24_GATE_RESISTORS.md).
+         125 pH x 24 A/ns (x_on 3.0 V) on A152's 13 rows and four modules:
+         every switch <= 40 V (worst 39.5 V at L x 1.3). 4/5 as registered:
+         late fires on -8 V / 10 us grow with the loop (0 / 6 / 16 at 50 /
+         100 / 125 pH) and two clock-boundary duplicate records, without
+         consequence; the adopted turn-on stays at x_on <= 1.8 V, the
+         voltage limit is 3.0 V (checked) to 3.2 V. D69 (estimate from the
+         datasheet's gate charge): turn-on 36 / 18 A/ns ~ 4.5 / 10 Ohm,
+         turn-off 72 A/ns ~ 1.2 Ohm per device; no sink resistor gives
+         ~160 A/ns, which alone limits the loop to ~60 pH.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
