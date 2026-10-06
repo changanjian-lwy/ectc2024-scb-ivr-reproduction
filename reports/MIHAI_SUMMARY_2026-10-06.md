@@ -31,9 +31,11 @@ Results (co-simulation, 25 °C):
 
 - **Efficiency 90.6 %** per module (loss model applied to the simulated
   waveforms; 92.5 % with an ideal inductor).
-- **±62.5 A load step:** +15.9 / −12.0 mV, back within 1 % in 6.6 / 3.6 µs.
-- **Peak switch current ≤ 196 A** (limit 200 A) on every registered test of
-  one module: driver mismatch, 30-100 ps jitter, load steps, ±10 % line
+- **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
+- **Peak switch current ≤ 196 A** on every registered test of one module
+  (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
+  stands for the inductor's saturation current and the turn-off energy,
+  not the switch rating, 409 A pulsed per EPC2067): driver mismatch, 30-100 ps jitter, load steps, ±10 % line
   steps from 1 µs, inductance × 0.7-1.3. Four modules: ≤ 188 A on 22 tests.
 - **16-phase output ripple** 6.9 A rms on 1 kA.
 - **Randomised tests** (120 draws on one module, 30 on four) found one real
@@ -48,8 +50,8 @@ Results (co-simulation, 25 °C):
 1. **1-2 % negative current does not give high-side ZVS with P24's own
    values.** The current needed scales as V_rail·√(C_node / L). With
    Eq. (4)'s 1.47 nH and the 2 + 3 EPC2067 node it is ~27 % of the peak, and
-   at least 5.3 % for any inductance in P24 Table I. The co-simulation
-   agrees: zero voltage first appears at 25 %; at 2 % the high side turns on
+   at least 5.3 % for any inductance in P24 Table I. The circuit
+   simulations agree: zero voltage first appears at 25 %; at 2 % the high side turns on
    at ~9.9 V.
 2. **One quantity links efficiency and robustness: the valley margin**
    I_th − i_neg. Raising i_neg toward the ZVS threshold I_th removes the high
@@ -67,7 +69,7 @@ Results (co-simulation, 25 °C):
    inside Fig. 5's footprint (0.25-0.63 cm² per phase) the optimum moves to
    5 MHz, 2-9 points above 2.5 MHz. The 2.5 MHz design therefore assumes a
    magnetic inductor; at 144 A per phase that is about 29 HBS1-class units
-   in parallel (P24: 12 at 62.5 A). P24's Table I (2.68 nH at 5 MHz) and
+   in parallel (P24: 12 at 62.5 A), 40 for the 200 A transient budget. P24's Table I (2.68 nH at 5 MHz) and
    Eq. (4) (1.47 nH) disagree; this work follows Eq. (4).
 4. **Interleave errors grow with the phase count.** A 9.4 ns slot offset,
    invisible on one module (N·D = 0.31), gave 45.9 A rms of 16-phase output
@@ -108,8 +110,8 @@ are budgets over plausible ranges:
   the steady high-side peak stays ≤ 34 V up to 150 pH. The loop costs
   1.4 / 3.8 / 6.4 W per module at 50 / 100 / 150 pH, so 1 % allows about
   70 pH. The binding overshoot comes after transients: a rising line step
-  makes phase 1 lose ZVS (its valley sits 12-15 A above the floor for
-  ~13 µs), its high side turns on hard at 17-19 V, and the ring puts the
+  makes phase 1 lose ZVS (for ~13 µs its low side turns off at +12..+15 A
+  instead of −15.6 A), its high side turns on hard at 17-19 V, and the ring puts the
   next high side, already blocking two rails (24 V), at 42-51 V
   (50-100 pH).
 - **Control cannot remove it at an acceptable cost.** Rail 1 takes the
@@ -145,10 +147,10 @@ are budgets over plausible ranges:
 
 | value (not published) | cases | what it decides |
 |---|---|---|
-| input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising. Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
+| input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A, inductance × 0.7-1.3 included. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising (≥ 50 µs at inductance × 0.7). Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
-| inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz | the switching frequency |
+| inductor technology, footprint per phase | MPC-class R/L: 2.5 MHz best; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the peak-current budget |
 | QH / QL placement, loop inductance | 50-300 pH with 1-2 ns edges: loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; with the slow turn-on ≤ 38 V to 150 pH; 300 pH 48.8 V steady | loss; above ~150 pH the turn-off must slow too |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); turn-on 36 / 18 / 9 A/ns: ≤ 40 V to 50 / 150 / 150 pH, 9 A/ns too slow | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
