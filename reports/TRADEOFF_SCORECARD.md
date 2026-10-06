@@ -1,6 +1,6 @@
-# Trade-off map - the P24 module and system, through A130, C06, D63, D64 and A120-A130
+# Trade-off map - the P24 module and system, through A152, C14 and D67
 
-2026-10-03. Supersedes the 2026-10-01 scorecard (A92-A100), which is
+2026-10-03, updated 2026-10-06 (current state, Sections 5-8). Supersedes the 2026-10-01 scorecard (A92-A100), which is
 kept as Appendix A.
 
 **Purpose:**
@@ -25,6 +25,18 @@ kept as Appendix A.
   negative-current target to D57's zero-voltage threshold (phase 1's
   node).
 
+## Current state (2026-10-06)
+
+- **Adopted and frozen, one module:** 2.5 MHz, L 2.933 nH, Cs 6 µF, i_neg 12.5 % (margin 7.9 A), timed phase-1
+  turn-off with a 2 A floor, PI loop at 100 kHz, Vin feed-forward with slope gate and low-pass cap, floor_late,
+  lo_learn 4 (A124, A129, A136, A137, A141, A143). 90.61 % (D62 middle case, package copper not included).
+- **Four modules, frozen:** C12 + lo_learn 4 (C13); passive sharing needs inductor matching within about ±5 %
+  (D66, C14).
+- **Package (A151, A152):** loop ≤ 50 pH, a separate turn-on drive of 36 A/ns, turn-off 72 A/ns, start-up Ton
+  36.5 ns. Loss then limits the loop to ~70 pH for 1 % (A145); the lateral output copper is the largest loss (D65).
+- **Still a choice:** Section 6. **Still unknown:** Section 8. Sections 2 and 4 are the record of the comparisons
+  as they were made; the 1 and 5 MHz columns stay for that reason.
+
 ## 0. In one paragraph
 
 The design is pulled between switching loss and robustness by one
@@ -47,16 +59,16 @@ quantity, **the valley margin**:
 
 ## 1. The levers
 
-| # | lever | tried | current choice | evidence |
+| # | lever | tried | current choice (2026-10-06) | evidence |
 |---|---|---|---|---|
-| L1 | **switching frequency / filter L** (Eq. (4), L ∝ 1/f) | 5 MHz, 1.4667 nH; 1 MHz, 7.333 nH | 5 MHz adopted; 1 MHz under test | A110, A115 |
-| L2 | **negative-current target i_neg** (% of the 125 A peak) | 2-30% at 5 MHz; 5-12.5% at 1 MHz | 5% in the adopted design; best measured 20% (5 MHz), 10% (1 MHz) | D47, A110-A115 |
-| L3 | **series capacitor Cs** | 0.6-8.7 µF (5 MHz); 15 µF (1 MHz) | 3 µF (5 MHz) | A107, A115 |
-| L4 | **voltage-loop bandwidth** | I-only 7.5 kHz; PI 30-150 kHz | 100 kHz (5 MHz); 60 kHz (1 MHz) | A104, A115, A116 |
-| L5 | **phase 1's low-side turn-off** | comparator (I1); timed dlo ±1 / ADM32 (I2); dlo feed-forward | I2 (ADM32) at 5 MHz; comparator (I1) at 1 MHz | A99, A100, A105, A113, A114, A116 |
+| L1 | **switching frequency / filter L** (Eq. (4), L ∝ 1/f) | 5 MHz, 1.4667 nH; 1 MHz, 7.333 nH | 2.5 MHz, 2.933 nH (A124) | A110, A115, A124, D64, D67 |
+| L2 | **negative-current target i_neg** (% of the 125 A peak) | 2-30% at 5 MHz; 5-12.5% at 1 MHz | 12.5 % (margin 7.9 A, A124) | D47, A110-A115, A124 |
+| L3 | **series capacitor Cs** | 0.6-8.7 µF (5 MHz); 15 µF (1 MHz) | 6 µF (A117 window, A124) | A107, A115, A117, A124 |
+| L4 | **voltage-loop bandwidth** | I-only 7.5 kHz; PI 30-150 kHz | 100 kHz | A104, A115, A116, A124 |
+| L5 | **phase 1's low-side turn-off** | comparator (I1); timed dlo ±1 / ADM32 (I2); dlo feed-forward | timed (I2) + 2 A floor, floor_late, lo_learn 4 | A99, A100, A105, A113, A114, A116, A118, A141, A143 |
 | L6 | **slot rule, phases 2-4** | fixed; follow; 2-period average; `slot_lo`; valley trim | average + `slot_lo` | A92-A97, C02, A109 |
-| L7 | **start-up sequence** | load at t = 0, handover, mode S Ton; input ramp ∝ √(L Cs) | A103's c1d | A103, A107, A115 |
-| L8 | **modules and interleave** | 1-4 modules; T/16 grid | 4 modules, `slot_lo` (uniform T/16); final design: + `slave_floor` | C01-C06 |
+| L7 | **start-up sequence** | load at t = 0, handover, mode S Ton; input ramp ∝ √(L Cs) | A103's sequence; vff seed 2 at mode P; start-up Ton 35.5 ns + 36 A / turn-on di/dt with a slow turn-on | A103, A107, A115, A137, C10, A152 |
+| L8 | **modules and interleave** | 1-4 modules; T/16 grid | 4 modules, slot_lo (uniform T/16), slave_floor, vff seed 2, floor_late: C12 + lo_learn 4, frozen | C01-C13 |
 | L9 | **node devices** (high + low side per phase) | 2 + 3 EPC2067 (P24 Table 3) | 2 + 3; P24 Sec. IV's 1 + 2 not run | D57 only |
 | L10 | **auxiliary commutation branch** (extension) | Lr 0.75-1.25 nH | not adopted (extension) | A101, A102 |
 
@@ -229,7 +241,11 @@ transients.
      (the bus does not change with the converter).
 2. **Hard constraints** (pass/fail):
    - no cross-conduction;
-   - peaks ≤ 200 A, the start-up included;
+   - peaks ≤ 200 A, the start-up included. The limit is a project convention since A92 (1.6 × P24's 125 A
+     nominal phase peak), not the device's (EPC2067: 409 A pulsed per die). It stands for the inductor's
+     saturation current (≥ 40 HBS1-class units of > 5 A per phase, D67) and the turn-off energy (D65: 72 pH
+     for 40 V at 200 A);
+   - every switch's V_DS ≤ 40 V over the whole run (EPC2067 continuous rating; since A144);
    - the low side at zero voltage in steady state;
    - every step recovers (`step_stats` finite).
 3. **Objectives,** scored on Section 2's rows:
@@ -253,38 +269,26 @@ transients.
 
 ## 6. Decisions needed (priorities)
 
-For the user and Mihai. Each one moves the design along a different
-trade-off.
-1. **The inductor technology (T14).** It decides the frequency.
-   - **Below ~51 µΩ/nH** (0.38 mΩ per phase at 7.33 nH): 1 MHz wins
-     outright.
-   - **Above ~103 µΩ/nH:** stay at 5 MHz.
-   - In between: 1 MHz beats the 5% design but not 20%.
-   - **For scale:** D62's middle case is 79 µΩ/nH (an MPC core).
-     P24 Table 2's embedded inductors are 4000-5800 µΩ/nH, far worse at
-     both frequencies.
-2. **The transient specification (T12, T18).**
-   - The largest load step and its slew; the bus slew rate.
-   - These fix the valley margin to keep, and so how close to zero
-     voltage the design may run.
-3. **The voltage-loop bandwidth (T6).**
-   - 5 MHz: 60 kHz (no spread cost), 100 kHz (adopted) or 150 kHz.
-   - 1 MHz: 60 kHz, the ceiling. A116: 30 kHz does not fix the
-     transients and doubles the droop.
-4. **Phase 1's turn-off (T13).**
-   - Timed: robust to rising steps (5 MHz).
-   - Comparator: robust to falling steps and load decreases. Needed at
-     1 MHz (A116).
-   - Or the architecture change.
-5. **The complexity budget.**
-   - A100 is +9% cells over A97; the PI +5.8%.
+For the user and Mihai. Settled by experiment since the 2026-10-03 version: the frequency under an MPC-class
+inductor (2.5 MHz, A124), the loop bandwidth (100 kHz), phase 1's turn-off (timed + floor, A118 / A124), the
+four-module design (C13) and the package drive (A152). What is left rests on values P24 does not publish:
+1. **The inductor technology and footprint (T14, D67).** MPC-class R/L → 2.5 MHz; an air-core in Fig. 5's
+   0.25-0.63 cm² per phase → 5 MHz. Its saturation current must cover the 200 A transient peak.
+2. **The transient specification (T12, T18).** Load-step size and slew, and the bus slew window (A139's
+   certified table). They fix the valley margin to keep.
+3. **Inductor matching across modules (T17, D66).** About ±5 % worst case keeps 200 A; ±10 % does not.
+4. **The package (T19, T20):** copper thickness or a vertical output; the loop inductance; a gate driver with a
+   separate turn-on path; the derating rule for ns-scale overshoot (40 V continuous used, 48 V transient
+   available).
+5. **The complexity budget.** A100 is +9 % cells over A97; the PI +5.8 %; scb_vff and the floor add more.
 6. **The auxiliary branch.** An extension: its own README, Section 3.
 
 ## 7. Which way to move (rules for later adjustment)
 
 | if this changes | move | because |
 |---|---|---|
-| the inductor's footprint per phase is fixed (in-package) | D64: ≤ 0.5 cm² → 5 MHz; 1-2 cm² → 2-3 MHz with a 10-15% target; never 1 MHz below ~6 cm² | T14 (D64) |
+| a magnetic (MPC-class) inductor array | 2.5 MHz, 12.5 % (A124); saturation ≥ 200 A per phase | T14 (D67) |
+| the inductor's footprint per phase is fixed (in-package, air-core) | D64: ≤ 0.5 cm² → 5 MHz; 1-2 cm² → 2-3 MHz with a 10-15% target; never 1 MHz below ~6 cm² | T14 (D64) |
 | a bulky off-package inductor is allowed (h·t ≳ 0.5 mm², ~6 cm² per phase) | toward 1-1.5 MHz, i_neg 7.5-10% with the floor (A118) | T14 (D64) |
 | only high-R/L inductors | 5 MHz, i_neg 15-20% | T8 optimum; margin 8-14 A |
 | the transient specification tightens | lower i_neg (more margin), or the comparator turn-off plus a bus slew limit | T12, T13 |
@@ -296,28 +300,29 @@ trade-off.
 | a smaller node (P24 Sec. IV's 1 + 2 devices) | I_th falls (D57: 9.5-12.8% at 1 MHz), so the margin grows at the same i_neg | T12; not yet run |
 | a hotter junction (125 C) | R_on ×1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
 | the gate drivers' high-to-low mismatch can exceed the node's fall (~1-2 ns) | budget ~0.25 points per ns at 1 MHz: +3.4 ns cost 0.85 points (A119 m3p) | driver (A91, A119) |
-| more modules | interleave per C02; slaves tolerate ±10% L; the final design needs the slave floor (C06) | T16, T17 |
+| more modules | interleave per C02; inductor matching within about ±5 % worst case (the 200 A crossing is near ±7 %); the final design needs the slave floor (C06) | T16, T17 (D66, C14) |
 | the package loop is 50-150 pH with ~2 ns edges | driver: turn-on di/dt <= 36 A/ns at 50 pH (<= 18 A/ns to 150 pH), turn-off kept fast, start-up ton_ns 35.5 + 36 A / turn-on di/dt (A151, A152: <= 40 V and <= 200 A on 13 rows and four modules); above ~150 pH the turn-off ring alone passes 40 V (300 pH: 48.8 V steady), so the turn-off must slow too; not the controller (A148-A150: a narrow (gr, gt) band that excites the dt_pred oscillation and costs ~5x Vo recovery); the loop's own limit is then loss (~70 pH for 1 %) | T20 (A150-A152) |
 
 ## 8. Not yet known
 
-- **The transient valley-excursion model** (Section 4's open link).
-- **At 1 MHz:**
-  - the candidate's last misses (1 µs steps, −8 V / 10 µs: 1-6 A over 200 A): floor depth, fc up to ~68 kHz, a line-dependent target;
-  - four modules at 1 MHz with the candidate (superseded: the final 2.5 MHz design runs on four modules, C05-C06);
-  - the floor depth (2 A, not optimised) and the load-decrease recovery (32-47 µs, slower than D63's 18 µs);
-  - the neighbourhood of the candidate (A121's 8 proposed runs);
-  - D63's refitted outcome rule, registered and tested;
-  - the standard matrix beyond A116's rows (m, j30 / j100 for c60,
-    ±25 A, the 10 µs and −8 V line steps);
-  - temperature.
-- **The 13.44 nH (Table I) point**, which runs at ~0.5 MHz.
-- **P24 Sec. IV's node** (1 + 2 devices).
+- **Hardware.** Every number is simulated; the first measurements would be a double-pulse V_DS capture (loop L, Q,
+  di/dt by A146's CNN-then-fit procedure), steady efficiency and valley current, and V_DS through line steps.
+- **Gate dynamics.** Edges are linear current ramps (A145): no gate model, no Miller plateau; which gate
+  resistor gives 18-36 A/ns on EPC2067 is open (A151).
+- **Loop damping.** Ring Q 7 is assumed; undamped, the ring breaks the valley detection (A144).
+- **Temperature.** Everything at 25 °C; at 125 °C R_on × 1.59 (A90) moves the optimum i_neg down.
 - **Coss spread and per-module driver delay** (C04 Section 3).
-- **Losses not modelled:** Coss hysteresis, AC resistance, core loss,
-  driver quiescent power, output-capacitor ESR.
+- **Losses not modelled:** core loss and saturation, Coss hysteresis, AC resistance, driver quiescent power,
+  output-capacitor ESR; Cs ESL.
+- **P24 Sec. IV's node** (1 + 2 devices) and **Table I's 13.44 nH point** (~0.5 MHz): not run.
+- **Falling ramps outside A139's table** exceed 200 A (C13); the bus slew window is a specification, not a fix.
+
+The 1 MHz items of the 2026-10-03 list are superseded by the 2.5 MHz design (A124, D64, D67).
 
 ## 中文摘要
+
+**现状（2026-10-06）：** 单模块和四模块设计都已冻结（2.5 MHz、12.5 %、定时关断 + 地板、100 kHz、前馈；C13）。
+封装规格由 A152 定：回路 ≤ 50 pH，开通单独 36 A/ns，关断 72 A/ns，启动 Ton 36.5 ns。下面是比较各设计时的记录。
 
 **一句话：** 所有 trade-off 最后都汇到一个量上，就是**谷底裕量**（I_th − i_neg）：负电流目标离 ZVS 门槛还差多少安培。
 

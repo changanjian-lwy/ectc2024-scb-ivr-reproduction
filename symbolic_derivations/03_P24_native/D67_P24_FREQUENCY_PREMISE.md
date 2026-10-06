@@ -19,8 +19,9 @@
 
 ## 3. This work's point against it
 - Table 1's module (nM = 4, 250 W, 2 + 3 EPC2067) at 2.5 MHz, L = 2.933 nH (Eq. (4) scaled), 144 A steady peak.
-- With HBS1-class units (> 5 A each) that is >= 29 in parallel per phase (P24: 12 at 62.5 A). Core loss and
-  saturation are not modelled anywhere in this project.
+- With HBS1-class units (> 5 A each) that is >= 29 in parallel per phase (P24: 12 at 62.5 A). At the project's
+  200 A transient limit (scorecard Section 5) it is >= 40. Core loss and saturation are not modelled anywhere in
+  this project.
 
 ## 4. The frequency follows the inductor's R/L
 | premise | 1 MHz | 2.5 MHz | 5 MHz | best |
