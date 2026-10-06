@@ -24,7 +24,17 @@ plant with nonlinear Coss); both controller designs are frozen. At the
 package level the switch overshoot is solved by the gate drive (loop
 <= 50 pH, a separate 36 A/ns turn-on). Summary:
 [reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md).
-The workstream table below describes the earlier stages.
+
+| Line (2026-10-06) | Model | State |
+|---|---|---|
+| Mathematical model | P24-native event maps and the cycle-by-cycle valley map ([D43-D67](symbolic_derivations/03_P24_native/)) | registers a prediction before every co-simulated experiment; the P25-native form (D39-D42) is closed |
+| Physical model, one module | Verilog controller + circuit plant ([Track A](experiments/track_A_periodic_steady_state/)) | design frozen (A143) |
+| Physical model, four modules | [Track C](experiments/track_C_multi_module/) | design frozen (C13) |
+| Package | loop inductance, finite edges, gate drive (A144-A152) | spec: loop <= 50 pH, separate 36 A/ns turn-on |
+| Machine learning (extension) | [ml_design_assist](extensions/ml_design_assist/README.md) | A120-A150; assists, the co-simulation decides |
+| Zero-start | the co-simulated start-up sequence (A103); Track B's LTspice records kept | carried by the co-simulation |
+
+The workstream table below describes the earlier stages (to 2026-09-29).
 
 ## Three workstreams, explicit boundaries
 
