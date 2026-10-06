@@ -176,9 +176,11 @@ are budgets over plausible ranges:
 
 Four answers would narrow the package specification most:
 
-1. Can P24's gate driver give the turn-on its own, slower edge (18-36 A/ns,
-   e.g. separate source and sink resistors) while the turn-off stays near
-   72 A/ns?
+1. Can P24's gate driver give the turn-on its own, slower edge (18-36 A/ns)
+   while the turn-off stays near 72 A/ns? From the datasheet's gate charge
+   that is roughly 5-10 Ω source and ~1 Ω sink resistance per device; with
+   no sink resistor the turn-off would reach ~160 A/ns, which alone limits
+   the loop to ~60 pH.
 2. Which derating rule do you apply to repetitive ns-scale drain overshoot
    on 40 V GaN: the continuous rating, or a transient allowance such as
    EPC's 120 % for ≤ 1 % of life?
