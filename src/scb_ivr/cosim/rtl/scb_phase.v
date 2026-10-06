@@ -21,7 +21,8 @@
 //   the step doubles while consecutive decisions agree, up to cfg_lo_smax, and returns to 1 when they differ; with
 //   cfg_lo_ff, dlo also moves by cfg_lo_kff times every change of ton; A118: with cfg_lo_floor the front end stays
 //   armed in timed mode, at the floor threshold the bridge sets, and its report before the timed edge is the turn-off,
-//   as with cfg_async, without a trim update). Phases 2..N at their slot
+//   as with cfg_async, without a trim update and leaving dlo; A148: the timed edge is t_lon + dlo + lo_add, lo_add
+//   from scb_vff, not learned). Phases 2..N at their slot
 //   (slot_time from scb_ctrl); with cfg_slot_guard a slot not yet fired when the reference changes fires at once
 //   (fine 0, a late fire) and counts as the new reference's slot;
 // - high-side turn-on: predictive at t_lo + dt_pred (cfg_pred), else at the valley comparator, or reactive ZVS
@@ -121,6 +122,7 @@ module scb_phase #(
     input  wire                 cfg_lo_floor,  // A118: the front end stays armed in timed mode, as a floor
     input  wire                 cfg_slot_floor,// C06: a slotted phase's front end armed as a floor (slave phase 1)
     input  wire                 cfg_floor_late,// A141: a floor report after the committed turn-off moves t_on
+    input  wire signed [TW-1:0] lo_add,        // A148: offset of the timed turn-off (scb_vff), LSB; not learned
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -200,7 +202,7 @@ module scb_phase #(
     wire lo_open    = $signed(now - t_lon) >= $signed(cfg_blank);   // A89: blanking elapsed
     reg  [15:0] lo_n;                                               // A99: learned turn-offs (saturating)
     assign lo_timed = FIRST && cfg_lo_pred && mode_p && (lo_n >= cfg_lo_learn);
-    wire signed [TW-1:0] d_lo1t = t_lon + dlo - now;                // A99: timed turn-off
+    wire signed [TW-1:0] d_lo1t = t_lon + dlo + lo_add - now;       // A99: timed turn-off (A148: + lo_add)
     // A100: dlo's next value from the report (step 1, or adaptive) and the Ton feedforward, floored at 0
     reg  [TW-1:0] ton_q;
     reg  [7:0]    lo_step;

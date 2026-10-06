@@ -31,7 +31,8 @@
 // - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
 //   A135: cfg_vff_rel != 0 makes phase 1's cap relative to ton (scb_vff), so it cannot bind in steady state;
 //   A136: cfg_vff_rel_lp takes ton's low-pass for it; A137: cfg_vff_seed restarts scb_vff's low-passes at mode P's entry;
-//   C10: cfg_vff_seed 2 seeds ton's low-pass with mode S's Ton.
+//   C10: cfg_vff_seed 2 seeds ton's low-pass with mode S's Ton. A148: cfg_vff_vs_kr / kt give phase 1's timed low-side
+//   edge an offset from scb_vff (the volt-second law; lo_add, 0 when both are 0).
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -140,6 +141,8 @@ module scb_ctrl #(
     input  wire [3:0]          cfg_vff_sh20,   // A128
     input  wire [AW-1:0]       cfg_vff_gth,    // A129: falling-term gate, Vin codes (0: always on)
     input  wire [AW-1:0]       cfg_vff_vo,     // A128: Vo in Vin codes
+    input  wire signed [15:0]  cfg_vff_vs_kr,  // A148: phase 1's low-side edge offset, rail coefficient (scb_vff)
+    input  wire signed [15:0]  cfg_vff_vs_kt,  // A148: its Ton coefficient (0 and 0: no offset)
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
     input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
@@ -198,10 +201,11 @@ module scb_ctrl #(
     assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;   // C2
 
     wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
+    wire signed [TW-1:0] lo_add;               // A148: phase 1's low-side edge offset
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
         .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
-        .ton_ph(ton_ph)
+        .vs_kr(cfg_vff_vs_kr), .vs_kt(cfg_vff_vs_kt), .ton_ph(ton_ph), .lo_add(lo_add)
     );
 
     scb_dep #(.AW(AW), .DW(8)) u_dep (                                // A132
@@ -321,6 +325,7 @@ module scb_ctrl #(
                 .cfg_lo_floor(IS_FIRST ? cfg_lo_floor : 1'b0),                                  // A118
                 .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : (k > 0) ? cfg_ph_floor : 1'b0),   // C06; A133
                 .cfg_floor_late(cfg_floor_late),                                                // A141
+                .lo_add(IS_FIRST ? lo_add : {TW{1'b0}}),                                        // A148
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end

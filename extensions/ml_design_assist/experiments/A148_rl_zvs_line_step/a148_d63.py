@@ -45,7 +45,7 @@ def design(smax=64, cs=6e-6, m=1.0):
         r, t13, t4 = d.ith
         d = replace(d, lf=d.lf * m, t_tr=tuple(x * math.sqrt(m) for x in d.t_tr),
                     ith=(r, tuple(x / math.sqrt(m) for x in t13), tuple(x / math.sqrt(m) for x in t4)))
-    return replace(d, smax=smax, von=(tuple(t["currents"]), tuple(t["rails"]), tuple(map(tuple, t["v13"])),
+    return replace(d, smax=smax, floor_keeps_dlo=True, von=(tuple(t["currents"]), tuple(t["rails"]), tuple(map(tuple, t["v13"])),
                                       tuple(map(tuple, t["v4"]))))
 
 

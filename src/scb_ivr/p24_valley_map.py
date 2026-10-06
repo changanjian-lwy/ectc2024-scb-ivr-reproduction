@@ -19,7 +19,8 @@ turn-on loses its target. D63 keeps the valleys as states. One step is one phase
 - phase 1's low side turns off at the target (comparator, I1; the restart timer rs_low caps it), or after the learned
   interval dlo (timed, I2), which steps by the crossing report (+ when early, - when late) with A100's adaptive step
   (doubling while decisions agree, up to smax LSB); or (floor, a proposal) at the earlier of the timed edge and the
-  current reaching i_tgt - floor_a, so phase 1's valley cannot pass the floor;
+  current reaching i_tgt - floor_a, so phase 1's valley cannot pass the floor (dlo then takes the floor's interval;
+  scb_phase keeps dlo and only steps it, floor_keeps_dlo, A148);
 - phases 2-4 turn off on their slots, t_lo1 + (k - 1) T_avg / N (C02's slot_lo; T_avg the mean of phase 1's last two
   periods), so their period is phase 1's plus (k - 1)/N of the change of T_avg;
 - the output: Co with the resistive load (exact RC step) and an optional current step; the ladder: Cs dV_k =
@@ -67,6 +68,7 @@ class Design:
     v_rev: float = 2.0                # the high side's reverse drop at the clamp (A88 plant: -2.1 to -2.2 V at turn-on)
     ith: tuple = field(default=None)  # (rails, I_th phases 1-3, I_th phase 4): D57 on a grid, see thresholds()
     von: tuple = field(default=None)  # A148: (currents, rails, V_DS phases 1-3, phase 4) at the turn-on, see von_table()
+    floor_keeps_dlo: bool = False     # A148: a floor turn-off leaves dlo to the report's step (as scb_phase does)
 
 
 def seg_end(v, r, lf, i0, t):
@@ -210,7 +212,8 @@ class ValleyMap:
             up = (v1 > d.i_tgt) or (t_ls1 - t_cross < d.lo_tgt_ps * 1e-12)
             s["step"] = min(2 * s["step"], d.smax) if (s["last_up"] is not None and up == s["last_up"]) else 1
             s["last_up"] = up
-            s["dlo"] = (base if lo_add is not None else t_ls1) + (1 if up else -1) * s["step"] * LSB
+            keep = lo_add is not None or d.floor_keeps_dlo
+            s["dlo"] = (base if keep else t_ls1) + (1 if up else -1) * s["step"] * LSB
         t1 = d.t_tr[0] + tons[0] + d.t_dn + t_ls1
         th_ = s["t_hist"]
         t_avg_prev = (th_[0] + th_[1]) / 2 if th_[1] is not None else t1

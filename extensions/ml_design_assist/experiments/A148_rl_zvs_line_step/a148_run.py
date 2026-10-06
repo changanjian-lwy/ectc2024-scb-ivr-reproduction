@@ -171,7 +171,7 @@ def checks(a, b0):
 def evaluate(extra=False):
     best = json.loads((HERE / "a148_grid.json").read_text())["best"]
     arms = ([("distilled", w) for w in W_VO] if extra else
-            [(n, w) for w in W_VO for n in ["B0", best[f"{w:g}"]] + [f"rl_{tag(s, w)}" for s in SEEDS]])
+            [(n, w) for w in W_VO for n in ["B0", best[str(w)]] + [f"rl_{tag(s, w)}" for s in SEEDS]])
     with ProcessPoolExecutor(len(arms)) as ex:
         res = dict(ex.map(_arm, arms))
     path = HERE / "a148_eval.json"
@@ -220,7 +220,7 @@ def distill_one(w):
         while not done:
             F.append(features(env))
             _, a = ch(env, o)
-            a = float(np.clip(a, -2, 3))
+            a = float(np.clip(np.ravel(a)[0], -2, 3))
             A.append(M.Env.A_NS * a)
             o, _, done, _ = env.step(a)
     F, A = np.array(F), np.array(A)

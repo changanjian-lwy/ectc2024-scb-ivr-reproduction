@@ -33,7 +33,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             ph_floor=0,                                                          # A133
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0,                                                           # A129
-            vff_rel=0, vff_rel_lp=0, vff_seed=0)                                 # A135, A136, A137
+            vff_rel=0, vff_rel_lp=0, vff_seed=0,                                 # A135, A136, A137
+            vff_vs_kr=0, vff_vs_kt=0)                                            # A148
 
 
 def pack(values, width):
@@ -131,6 +132,7 @@ class Ctrl:
         d.cfg_vff_rel.value = cfg["vff_rel"]                     # A135
         d.cfg_vff_rel_lp.value = cfg["vff_rel_lp"]               # A136
         d.cfg_vff_seed.value = cfg["vff_seed"]                   # A137
+        d.cfg_vff_vs_kr.value = cfg["vff_vs_kr"] & 0xFFFF; d.cfg_vff_vs_kt.value = cfg["vff_vs_kt"] & 0xFFFF   # A148
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1313,6 +1315,79 @@ async def _ramp_then_enable(dut, seed, ton_en=None):
     await _vin(dut, 2400)
     await ReadOnly()
     return [_ton_ph(dut, k) for k in range(4)]
+
+
+# ---- A148: phase 1's low-side edge offset (scb_vff lo_add) ----
+def _lo_add(dut):
+    return signed(int(dut.u_vff.lo_add.value), TW)
+
+
+async def _vs_step(dut, c, kr, kt):
+    """A136's setup (rel 307 on ton's low-pass, ton 133 -> 200 just before a Vin rise 2400 -> 2640 codes) with the
+    offset coefficients kr, kt. Returns (lo_add, expected from the registered rail and rss, ton_1)."""
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=307, vff_rel_lp=1, vff_vs_kr=kr, vff_vs_kt=kt)
+    await _vin(dut, 2400, 4)
+    await c.set(cfg_ton=200)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2640)
+    await ReadOnly()
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    rss = lp20 - ((lp20 * 3) >> 2) - 50 * 256
+    tref = (133 * 256 + (((200 - 133) * 256) >> 6)) >> 8
+    t1 = _ton_ph(dut, 0)
+    want = (kr * tref * (rail - rss) + kt * (t1 - tref) * rail) >> 24
+    return _lo_add(dut), want, t1
+
+
+@cocotb.test()
+async def vs_offset_off_is_zero(dut):
+    """A148: vs_kr = vs_kt = 0 -> lo_add = 0 through a Vin rise, the cap unchanged."""
+    got, want, t1 = await _vs_step(dut, Ctrl(dut), 0, 0)
+    assert got == 0 and want == 0
+
+
+@cocotb.test()
+async def vs_offset_matches_the_law(dut):
+    """A148, kr = kt = 983 (g 0.75): lo_add = (kr tlp (rail - rss) + kt (ton_1 - tlp) rail) >>> 24 with the sample's
+    rail and rss and phase 1's capped Ton; kt alone gives the negative Ton term (ton_1 < tlp) bit for bit."""
+    got, want, t1 = await _vs_step(dut, Ctrl(dut), 983, 983)
+    assert got == want and got > 0, (got, want, t1)
+    await RisingEdge(dut.clk)
+    got, want, t1 = await _vs_step(dut, Ctrl(dut), 0, 983)      # the cap holds ton_1 below tlp: negative
+    assert got == want and got < 0, (got, want, t1)
+
+
+@cocotb.test()
+async def vs_offset_moves_the_timed_turn_off(dut):
+    """A148: once timed (lo_learn 2), phase 1's turn-off is at t_lon + dlo + lo_add; here lo_add comes from a Vin rise
+    2400 -> 2460 codes at constant ton (kr 983, kt 983: (983 x 133 x (rail - rss)) >>> 24, inside rs_low)."""
+    c = Ctrl(dut)
+    await c.start(lo_pred=1, lo_learn=2, vff=1, vff_c=(0, 0, 0, 0), vff_vs_kr=983, vff_vs_kt=983)
+    for code in (2400, 2400, 2400, 2400, 2460):                 # quick samples (no divider here): phase 1 waits
+        dut.vin_code.value = code; dut.vin_valid.value = 1
+        await RisingEdge(dut.clk)
+        dut.vin_valid.value = 0
+        await RisingEdge(dut.clk)
+    await ReadOnly()
+    add = _lo_add(dut)
+    lp20 = 2400 * 256 + ((60 * 256) >> 6)
+    assert add == (983 * 133 * (2 * 2460 * 256 - 2400 * 256 - lp20)) >> 24 and add > 0, add
+    await RisingEdge(dut.clk)
+    t1 = await _phase1_cycle(c, -1)
+    t2 = await _phase1_cycle(c, t1, hold=3)
+    lon = [e for e in c.edges if e[2] == "L" and e[3] == 1 and e[4] == 1][-1]
+    lo = [e for e in c.edges if e[2] == "L" and e[3] == 0 and e[4] == 1][-1]
+    learned = (lo[0] + lo[1]) - (lon[0] + lon[1])
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.dlo1.value) == learned and int(dut.lo_timed1.value) == 1, (int(dut.dlo1.value), learned)
+    off = await c.until("H", 0, 1, after=t2)
+    await c.set(cmp_zl=0b0001)
+    lon3 = await c.until("L", 1, 1, after=off[0] + off[1])
+    await c.set(cmp_zl=0)
+    lo3 = await c.until("L", 0, 1, after=lon3[0] + lon3[1], limit=800)
+    assert lo3[0] + lo3[1] == lon3[0] + lon3[1] + learned + add, (lon3, lo3, learned, add)
 
 
 @cocotb.test()
