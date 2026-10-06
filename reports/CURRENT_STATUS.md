@@ -13,8 +13,13 @@ session's work was committed unchanged as the baseline (`0f50511`).
 **Since 2026-09-30 the mathematical model is P24-native** (D43-D67 in
 `symbolic_derivations/03_P24_native/`; the cycle-by-cycle valley map D63
 is its core), because the physical model is P24's four-phase module and
-the two models must describe the same circuit to check each other. They
-still do: every co-simulated experiment registers D63's prediction first.
+the two models must describe the same circuit to check each other. Each
+BOUNDARY names its cheaper check: D63 for controller transients (latest
+A143, A148-A150), D65 and the single-edge harnesses for the package
+(A144-A151), D66 for current sharing (C14). Not yet in any mathematical
+model: RTL arbitration (A141, A142, C13), the start-up handover (A152's
+start-up Ton is calibrated on short co-simulations) and the slow turn-on
+above 100 pH (the harness underpredicts it, A151).
 Section 1's P25-native three-phase form is the record of D39-D42 (+ A69)
 and is not continued; its open items were answered in the P24-native form
 (see "Verification and next step").
