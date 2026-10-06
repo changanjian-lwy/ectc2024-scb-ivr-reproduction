@@ -58,3 +58,8 @@ wrong. Criterion 1 failing at 100 / 150 pH was predicted.
 - Cause: mode S runs open loop at ton_ns 35.5. Its turn-ons are hard, and a slow turn-on loses on-time, so Vo reaches
   only 0.958 V by the handover (1.016 V at 72 A/ns). The loop's P term then adds ~15 ns to Ton (51 ns).
 - So "100 pH at 18 A/ns solves it" holds only with a start-up Ton compensation (ton_ns 37.5: 148 A). A152 tests that spec.
+
+## 5. Post hoc note (A160, 2026-10-07)
+- The "1 NEW oracle event" of on9_l100_l_p48_1us is phase 1's post-step swing peak (170.6 A) at the ramp's end + 1.0 us,
+  the oracle's K4-window edge that recurs with slow turn-ons (A154, A158, A159); it is not a defect. "9 A/ns is too
+  slow" rests on the load-step Vo (+2.8 us) and the 150 pH line step (Vo outside 1 % for 44 us).

@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-74: D68, D69 and A153-A159). This is the current navigation
+package drive specification A151-A152; items 68-75: D68, D69 and A153-A160). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1673,6 +1673,15 @@ each question:
          down to 125 pH (A156) - item 69's "~150 pH" is superseded. At large
          L the overshoot (di/dt <= x / L) and the transient response pull
          the turn-on rate in opposite directions.
+     75. The oracle's K4 window (2026-10-07, analysis):
+         [A160](../experiments/track_A_periodic_steady_state/A160_p24_oracle_k4_window/RESULTS.md).
+         A 2 us window (instead of 1 us after a ramp) would clear the
+         slow-turn-on swing peaks of A154 / A158 / A159 and hide nothing
+         traced (25 events, all spikes below their run's post-step peak),
+         but it also clears A151's single 9 A/ns "NEW" event, which the
+         registration had wrongly listed as traced: it is the same swing
+         peak. FAIL as registered, K4 stays 1 us; A151's "9 A/ns too slow"
+         now rests on its Vo evidence alone (post hoc note).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
