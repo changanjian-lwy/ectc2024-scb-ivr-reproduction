@@ -19,7 +19,7 @@ def ports(src: str):
     body = src[src.index(") (") + 3: src.index(");", src.index(") ("))]
     out = []
     for line in body.splitlines():
-        m = re.match(r"\s*(input|output)\s+(?:wire|reg)\s*(\[[^\]]+\])?\s*(\w+)\s*,?", line)
+        m = re.match(r"\s*(input|output)\s+(?:wire|reg)\s*(?:signed\s*)?(\[[^\]]+\])?\s*(\w+)\s*,?", line)
         if not m:
             continue
         direction, rng, name = m.groups()
