@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-73: D68, D69 and A153-A158). This is the current navigation
+package drive specification A151-A152; items 68-74: D68, D69 and A153-A159). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 47 co-simulated experiments, every registered
+the acceptance gate holds 48 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1663,6 +1663,16 @@ each question:
          harness's ring residual does not predict it (300 pH at Q 7 holds
          with 7.5 V left). 0/2 as registered: both misses are the post-step
          swing peak 0.05 us after the oracle's K4 window (A154's case).
+     74. The recommended loop bound is 125 pH, not 150 (2026-10-07, mixed):
+         [A159](../experiments/track_A_periodic_steady_state/A159_p24_spec_at_150ph/RESULTS.md).
+         At 150 pH with the adopted x_on 1.8 V (12 A/ns) every switch stays
+         <= 38.0 V, but the slow turn-on costs regulation: load-step dip
+         -16.1 mV (ideal -11.9), +4.8 V / 10 us back after 46.2 us, 33 late
+         fires on -8 V / 10 us. 2/5 as registered (NEW flags are the oracle's
+         K4-window timing again). By the registered rule the bound comes
+         down to 125 pH (A156) - item 69's "~150 pH" is superseded. At large
+         L the overshoot (di/dt <= x / L) and the transient response pull
+         the turn-on rate in opposite directions.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

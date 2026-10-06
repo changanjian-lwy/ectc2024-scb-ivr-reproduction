@@ -155,8 +155,11 @@ are budgets over plausible ranges:
   18 A/ns. In general: turn-on ≤ 1.8 V / L (3.0-3.2 V / L is the voltage
   limit), turn-off 72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
   Published embedded-GaN loops are 230-320 pH, which this design can drive
-  only at several percent of efficiency: **the loop should be bounded to
-  ~150 pH by layout.**
+  only at several percent of efficiency: **the loop should be bounded by
+  layout to ~125 pH.** At 150 pH the turn-on that 1.8 V / L allows (12 A/ns)
+  starts to cost regulation (load-step dip −16 instead of −12 mV, slower
+  recovery after slow line ramps): the overshoot wants a slower turn-on, the
+  transient response a faster one.
 - **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
   48 V transients, and EPC's Phase 16 reliability report allows repetitive
   overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The

@@ -110,7 +110,7 @@ l_p48_1us, turn-off 72 A/ns, Q 7):
   250 W module at those four points, against ~2.7 W at 72 A/ns: +3 to +11 % of the module's power. The harness reads
   15-22 % above the records.
 - **So the drive cannot carry a large loop cheaply:** ≤ 150 pH costs only the slow turn-on (≤ 0.4 W); 200 pH about
-  +7 W; 300 pH +20-28 W. The package spec has to bound the loop (≤ ~150 pH), not the drive.
+  +7 W; 300 pH +20-28 W. The package spec has to bound the loop, not the drive (≤ 125 pH after A159, Section 11).
 - With x_on = 2.4 V the turn-on side stays at 35.9-38.3 V (A154) on top of A153's check of the x-curve.
 
 ## 8. The start-up ton with loop and turn-off terms (A155)
@@ -142,3 +142,9 @@ At 125 pH × 24 A/ns (x_on 3.0 V) A152's 13 rows and four modules all stay ≤ 4
 39.7); the ramp rows read 0.5-0.9 V above the offset prediction, so 3.2 V on the matrix is extrapolated. Criterion 3
 failed (late fires on −8 V / 10 µs growing with the loop, 0 / 6 / 16 at 50 / 100 / 125 pH; two clock-boundary
 duplicate records), none with a consequence; by the registered rule the adopted turn-on stays at x_on ≤ 1.8 V.
+## 11. The recommended loop bound (A159)
+
+At 150 pH the adopted x_on 1.8 V means a 12 A/ns turn-on. On A152's matrix every switch stays ≤ 38.0 V, but the slow
+turn-on costs regulation: load-step dip −16.1 mV (ideal −11.9), +4.8 V / 10 µs back after 46.2 µs, 33 late fires on
+−8 V / 10 µs (0 / 6 / 16 at 50 / 100 / 125 pH). The overshoot wants di/dt_on ≤ x / L, the transient response a fast
+turn-on: they meet near 150 pH. **Recommended loop bound: 125 pH.**

@@ -73,6 +73,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A156": (TA / "A156_p24_formula_spec_at_the_limit", "a156_analyze.py", "a156_summary.json"),
     "A157": (TA / "A157_p24_loop_damping", "a157_analyze.py", "a157_summary.json"),
     "A158": (TA / "A158_p24_damping_boundary", "a158_analyze.py", "a158_summary.json"),
+    "A159": (TA / "A159_p24_spec_at_150ph", "a159_analyze.py", "a159_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -309,6 +310,13 @@ EXCEPTIONS["A157"] = {("criteria", f"{c}/{r}"): _UND for c, rows in (("1_vds_ban
 _K4T158 = "phase 1's post-step swing peak at 1002.05 us, 0.05 us after the oracle's K4 window (slow turn-on, as A154); 0 late fires (RESULTS 0)"
 EXCEPTIONS["A158"] = {("criteria", "1_h1_q_only/q15_s100"): _K4T158, ("criteria", "1_h1_q_only/q30_s100"): _K4T158,
                       ("criteria", "2_q30_at_100ph/q30_s100"): _K4T158}
+EXCEPTIONS["A159"] = {
+    ("criteria", "c3"): "l_m80_10us late 33 (trend 0 / 6 / 16 / 33 at 50-150 pH) and two post-step swing peaks just after the "
+                        "oracle's K4 window (RESULTS 0)",
+    ("criteria", "c4"): "12 A/ns turn-on at 150 pH: load-step dip -16.1 mV (0.2 mV over), +4.8 V / 10 us back 46.2 us (1.1 us "
+                        "over): the recommended loop bound comes down to 125 pH (RESULTS 0)",
+    ("criteria", "c5"): "four modules: one K4-timing swing peak per module, 36.4 V, late 0 (RESULTS 0)"}
+NOT_ROWS["A159"] = r"m4_|s150_"
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
