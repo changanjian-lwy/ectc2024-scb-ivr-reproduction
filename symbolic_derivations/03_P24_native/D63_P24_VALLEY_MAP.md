@@ -1,6 +1,7 @@
 # D63 - the cycle-by-cycle valley map
 
-2026-10-03. Code: `src/scb_ivr/p24_valley_map.py`. Validation and design map:
+2026-10-03, extended 2026-10-06 (Sections 9-10: the blocks added after A118, accuracy at 2.5 MHz, later limits).
+Code: `src/scb_ivr/p24_valley_map.py`. Validation and design map:
 `scripts/p24_valley_map.py` → `diagnostics/D63_valley_map.json`. Tests:
 `tests/test_p24_valley_map.py`.
 
@@ -150,6 +151,8 @@ away on +4.8 V / 1 µs (A116 t60: 546 A).
 
 ## 6. Limits
 
+(As of A118; the limits found later are in Section 10.)
+
 - No controller learning beyond dlo: dt_pred, error correctors, early
   reports, the trim.
 - No comparator or driver delay; no in-cycle Cs ripple.
@@ -209,3 +212,43 @@ cost.
   191, 183 / 169 A), but 18% under at 15 µF (241 / 204).
 - **The map's recovery times run short with the floor** (17.6 against
   31.8-46.8 µs).
+
+## 9. 2.5 MHz and the blocks added after A118 (A124-A150)
+
+Every block is off by default; the earlier results are unchanged.
+
+| block | what it adds | for | against the co-simulation |
+|---|---|---|---|
+| `ton_cap` (`a134_predict.Law`) | scb_vff's absolute phase-1 cap k / rail | A134 | reproduces the L+ lock: s_p62 locked from L × 1.05 (cosim: cap-bound at 1.05, locked at 1.1) |
+| RTL-exact feed-forward (`a135_predict.VffRTL`, A136's low-pass cap, A140's slope gate; in the experiment folders, passed as `rule` / `ton_cap`) | the adopted vff | A135-A140 | A138 / A139's prior, A143's cheap check |
+| `Design.von` (`von_table`) | each phase's turn-on V_DS: D57's free node at t_tr | A148 | phase 1 p90 0.01 V (hard turn-ons 0.42 V) over 193 k turn-ons; phases 2-4 read 0.46 V low |
+| `floor_keeps_dlo` | a floor turn-off keeps dlo, as scb_phase does | A148 | found mid-run (the map rewrote dlo) |
+| `lo_add` | an offset on phase 1's timed edge (the volt-second law) | A148 | |
+| `Design.sh` | SH_k peak = rail_(k−1) + rail_k + f(turn-on V_DS of phase k−1), f per (L, turn-off di/dt) from A144 / A145 | A149 | held out: rising rows +0.15..+0.68 V, falling −0.56..−1.21 V; 1.7-1.9 V conservative on A149's post hoc runs |
+
+**Accuracy at 2.5 MHz and over the registered rows:**
+- **A124:** load step +16.8 / −10.1 mV against +15.9 / −12.0 mV; the refitted crossing rule held prospectively
+  (t125_s_m62 recovers).
+- **A125 (43 registered rows, A117-A124):** the co-simulated peak is −1.3 % to +18.4 % of D63. The map
+  under-predicts, so the conformal band is asymmetric.
+- **A138 / A139 (the 200 A line-step boundary over L / Cs × 0.7-1.3):** cosim − D63 mean −0.9 A, sd 5.7 A
+  (A138). Classification rising 0.85 / falling 0.55 against the GP's 0.90 / 0.90; MAE 4.2 / 15.8 A. The falling
+  residual (+7.8 ± 19.6 A) is tied to L.
+- **A149:** peaks L0 199 / 196 against 196.5 / 193.1 A; L × 1.3 205.7 against 200.8 A; L × 0.7 202 against
+  202 / 199 A.
+
+## 10. Limits found after A118
+
+- **No dt_pred block** (A143). Phases 2-4 learn their turn-on delay from the error; after a stretched period it
+  falls from 11 to 2-4 ns and the phases swing with Cs (~4.6 µs). The map, with a fixed t_tr, stays damped:
+  196 A on +4.8 V / 5 µs where A149's laws gave 325 / 223 A, and it missed A142's comparator-phase oscillation.
+- **Period-stretching laws** (A148-A150): Vo excursions 2-3× too small; the shape (dip, stretch-end rebound) is
+  right.
+- **Falling line steps** are its weakest class (classification 0.55, A139).
+- **No RTL arbitration:** duplicate turn-ons and floor-first races (A140-A142, C13) need the event logs and the
+  oracles.
+- **No start-up:** mode S and the handover are not in the map; A152's start-up Ton came from short
+  co-simulations (D68 derives it).
+- **Package:** the SH block knows 72 A/ns turn-on edges only; the slow turn-on (A151) is D68's.
+- Vo extreme sign flips on 9 of 43 rows (A125); recovery time good to about ×3.
+
