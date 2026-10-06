@@ -1,8 +1,8 @@
 # Current Work Status
 
-Updated: **2026-09-29**. This is the current navigation summary; dated reports
-remain historical snapshots. No experiment parameters were changed for this
-repository presentation update.
+Updated: **2026-10-06** (items 62-67: the ML block A146-A150 and the
+package drive specification A151-A152). This is the current navigation
+summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
 the **mathematical model** (native P25 event model, Section 1) and the
@@ -1488,6 +1488,84 @@ each question:
          0.5 L I^2 was twice the damper's energy). Edges alone 1.2 / 2.7 W;
          D62's turn-off formula ~30 % low. **The hard-turn-on overshoot is a
          control problem (next: A148 in the ML block); loop spec ~70 pH.**
+     62. CNN identification of the commutation loop (2026-10-06, ML):
+         [A146](../extensions/ml_design_assist/experiments/A146_cnn_loop_identification/RESULTS.md).
+         From one simulated V_DS capture (unknown probe 0.7-2 GHz, noise,
+         jitter, I0 error) a 1-D CNN reads L / Q / di/dt / k with medians
+         2.2 / 4.0 / 5.9 % / 0.012 and 90 % conformal coverage 0.90-0.91
+         (damped-sine fit 7.9 / 25 / 42 %). A 6-parameter simulator fit is
+         more accurate (1.1 / 0.6 / 1.7 %) but sticks at a bound on 6 of 40
+         captures, 5 of them fast edges; started from the CNN it recovers 4.
+         3/5 as registered (the misses are the measurement limits).
+         **Procedure: CNN, then fit; needs noise <= ~0.4 V rms, probe
+         >= 0.7 GHz and > 1 / t_f, I0 within ~2 %.**
+     63. Learned anomaly detector against the oracles (2026-10-06, ML):
+         [A147](../extensions/ml_design_assist/experiments/A147_cnn_anomaly_detector/RESULTS.md).
+         2/4 as registered. On the oracle classes the CNN autoencoder adds
+         nothing (AUROC 1.000 vs z-score 0.999; z-score 0.3 % false alarms
+         vs 1.4 %). Its unexplained flags found a property no check
+         watched, ZVS loss: in the frozen design, after the in-spec +4.8 V /
+         1 us step, phase 1's low side turns off at +12..+15 A for ~13 us,
+         so the next phase-1 turn-on is hard (V_DS 17-19 V vs 3.9 V).
+         **This is the root cause of A144 / A145's line-step overshoot
+         (SH2 52-58 V).** Oracle "zvs" added in A148.
+     64. Phase 1's low-side timing through steps (2026-10-06, mixed):
+         [A148](../extensions/ml_design_assist/experiments/A148_rl_zvs_line_step/RESULTS.md).
+         Volt-second law on phase 1's timed edge (cfg vff "vs_g", off
+         bit-identical) against PPO. FAIL 3/7, not adopted. Load steps are
+         fixed (s_p62 turn-on V_DS 11.5-12.2 -> 6.9-7.2 V on every phase;
+         with loop + edges 36.1 -> 32.5 V at 50 pH). The rising step is
+         not: rail 1 takes the whole step, phase 1 needs ~22 % more
+         volt-seconds, the common period stretches 504 -> ~600 ns and Vo
+         is back in 1 % after 42 us instead of 8; switch 41.8 -> 41.2 V at
+         50 pH. Falling steps stay below start-up (36.9 / 42.6 V at 50 /
+         100 pH). RL neither found nor beat the law: 8 of 9 policies fail
+         the steady check (features downstream of the action close a loop).
+     65. The control path for the package closed (2026-10-06, mixed):
+         [A149](../extensions/ml_design_assist/experiments/A149_bo_rising_step_overshoot/RESULTS.md),
+         [A150](../extensions/ml_design_assist/experiments/A150_gpbo_vo_priced_package/RESULTS.md).
+         A149 (FAIL as registered, stop rule): D63 gains an SH_k block;
+         post hoc the rail term alone keeps 50 pH <= 40 V (38.4 / 38.8 V)
+         but Vo needs 42 us and +4.8 V / 5 us oscillates (325 / 223 A,
+         A143's dt_pred). Charge balance: a held phase-1 valley stops the
+         ladder until phases 2-4 dig deeper, an output deficit, so every
+         ZVS-holding law measured needs 41.6-42.5 us. A150 (FAIL, counted
+         as no): constrained GP-BO over (gr, gt) in cosim found the band its
+         5 rows allow (gr 0.675-0.725, gt 0.175-0.35; 39.85 V), but the
+         neighbouring slews and L x 1.3 oscillate (203-275 A) and Vo back
+         is 31-52 us. **Not solvable by control at an acceptable Vo cost
+         (scorecard T20). ML lesson: measure a family constraint on its
+         worst member.**
+     66. A slow hard turn-on (2026-10-06, mixed):
+         [A151](../experiments/track_A_periodic_steady_state/A151_p24_slow_hard_turn_on/RESULTS.md).
+         cfg edge didt_on < didt_off slows only the hard turn-on, the
+         ring's excitation; the 72 A/ns turn-off and the controller stay.
+         Every switch <= 40 V incl. start-up up to 150 pH: 50 pH at
+         36 A/ns 37.1 V, 100 pH at 18 A/ns 36.4 V, 150 pH at 18 A/ns
+         38.0 V; +0.12-0.36 W, load-step Vo +1.9 us. 9 A/ns is too slow; a
+         5 us bus slew does not help. 4/5 (the single-edge harness
+         underpredicts at >= 100 pH). Post hoc (A152): criterion 4 checked
+         post-step peaks only; at 18 A/ns the start-up handover reaches
+         224 A at 100 pH.
+     67. The package drive specification (2026-10-06, mixed):
+         [A152](../experiments/track_A_periodic_steady_state/A152_p24_drive_spec_robustness/RESULTS.md).
+         Start-up fix, cfg only: ton_ns = 35.5 + 36 A / turn-on di/dt (open
+         mode S loses on-time on slow hard turn-ons, Vo 0.958 V at the
+         handover, and the loop's P term added 15 ns): 224 -> 155 A at
+         100 pH, nothing else moves. S50 (50 pH, turn-on 36 A/ns, turn-off
+         72, ton 36.5 ns) passes on 13 rows (falling, L x 0.7 / 1.3,
+         +4.8 V at 2-10 us) and four modules: <= 37.6 V, start-up
+         <= 198 A, post-step <= 180 A. S100 (100 pH, 18 A/ns, 37.5 ns) 4/5:
+         6 late fires on -8 V / 10 us, no consequence. 300 pH fails at any
+         turn-on rate: the 72 A/ns turn-off ring alone is 48.8 V steady, so
+         above ~150 pH the turn-off must slow too (loss). Also fixed:
+         gen_multi read "signed" as a port name, so no four-module build
+         compiled between A148 and A152 (626a8f0). **Package spec: loop
+         <= 50 pH (loss allows ~70 pH for 1 %), a separate turn-on drive
+         <= 36 A/ns, start-up Ton compensated. EPC2067 is rated 40 V
+         continuous, 48 V transient (EPC Phase 16: <= 120 % for <= 1 % of
+         life). Questions for Mihai: P24's turn-on di/dt, his derating
+         rule, P24's actual loop L, how P24 sets the start-up Ton.**
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
