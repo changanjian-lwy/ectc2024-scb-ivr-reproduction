@@ -99,3 +99,40 @@ l_p48_1us, turn-off 72 A/ns, Q 7):
 - **Spec formulas (≤ 150 pH):** di/dt_on ≤ 3.2 V / L; ton_S = 35.5 ns + 16 (d^-½ − 72^-½) with ~0.3 ns margin.
   Above 150 pH the turn-off side binds (A154).
 
+## 7. Above 150 pH: the turn-off side (A154)
+
+- Above ~150 pH the 72 A/ns turn-off ring passes 40 V by itself. For a turn-off ramp longer than half the ring
+  period the peak is ~ V_rail + 2 L·di/dt_off (a current ramp into an LC: v = L·di/dt (1 − cos ωt)); for faster
+  ramps ½ L I² sets it (A145's harness, 72 edges).
+- **Rule: x_off = L·di/dt_off ≤ ~10 V** with the post-step rail. A154 (registered): 200 pH × 48 A/ns 36.5 V,
+  250 × 40 38.3 V, 300 × 32 37.7 V, 300 × 24 35.9 V; 300 × 48 (x_off 14.4 V) 48.4 V. The 40 V side right on 5 / 5.
+- **Price:** the channel's V-I overlap during the slower current fall. Edge power 10.1 / 14.2 / 22.6 / 31.1 W per
+  250 W module at those four points, against ~2.7 W at 72 A/ns: +3 to +11 % of the module's power. The harness reads
+  15-22 % above the records.
+- **So the drive cannot carry a large loop cheaply:** ≤ 150 pH costs only the slow turn-on (≤ 0.4 W); 200 pH about
+  +7 W; 300 pH +20-28 W. The package spec has to bound the loop (≤ ~150 pH), not the drive.
+- With x_on = 2.4 V the turn-on side stays at 35.9-38.3 V (A154) on top of A153's check of the x-curve.
+
+## 8. The start-up ton with loop and turn-off terms (A155)
+
+D68's Section 3 has no L term, and above 150 pH its ton under-compensates (A154: handover Vo 0.984-1.000 V, start-up
+166-190 A). A least-squares law over all 27 package runs (A145, A151-A154):
+
+  Vo(143.5 µs) = 1.048 + 0.0283 (ton − 35.5) − 0.447 d_on^-½ − 0.171 L[nH] + 0.279 d_off^-½   (rms 3.3 mV, LOO 4.4 mV)
+
+- The slope (0.0283 V/ns) and the turn-on term (K = 15.8) come out of the fit as A152's calibration and Section 3's law:
+  the structure holds. New: **6.0 ns of on-time per nH of loop** (the loop delays the on-time) and a turn-off gain of
+  9.8 d_off^-½ ns (a slower turn-off keeps the node up longer).
+- **ton_S = 35.5 + [1.015 − 1.048 + 0.447 d_on^-½ + 0.171 L − 0.279 d_off^-½] / 0.0283 ns.**
+- **Tested by A155 (registered):** 175 / 200 / 250 / 300 pH at drives never run: Vo 1.010-1.023 V, start-up 151-152 A;
+  the 300 pH control with Section 3's ton 0.995 V (predicted 0.994), 162 A.
+
+## 9. The package drive spec as formulas (≤ 40 V, start-up ≈ 150 A)
+
+| loop L | turn-on di/dt | turn-off di/dt | start-up ton | drive loss over 72 / 72 A/ns |
+|---|---|---|---|---|
+| any L ≤ 150 pH | ≤ 3.2 V / L | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
+| 150-300 pH | ≤ 3.2 V / L (2.4 V with margin) | ≤ ~10 V / L | Section 8 | +7 W (200 pH) to +20-28 W (300 pH) per module |
+
+Tested points: A151-A155 (50-300 pH). Not covered: L / Cs corners above 100 pH, four modules above 100 pH, a gate model.
+
