@@ -152,8 +152,8 @@ are budgets over plausible ranges:
   2-10 µs, falling steps, inductance × 0.7 / 1.3) and on four modules: loop
   ≤ 50 pH, turn-on 36 A/ns, turn-off 72 A/ns, start-up on-time 36.5 ns →
   switch ≤ 37.6 V, start-up ≤ 198 A, after steps ≤ 180 A. 100 pH works at
-  18 A/ns. In general: turn-on ≤ 3.2 V / L, turn-off 72 A/ns up to 150 pH and
-  ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
+  18 A/ns. In general: turn-on ≤ 1.8 V / L (3.0-3.2 V / L is the voltage
+  limit), turn-off 72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
   Published embedded-GaN loops are 230-320 pH, which this design can drive
   only at several percent of efficiency: **the loop should be bounded to
   ~150 pH by layout.**
