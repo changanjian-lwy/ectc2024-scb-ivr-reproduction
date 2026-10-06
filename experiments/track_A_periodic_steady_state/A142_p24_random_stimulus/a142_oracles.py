@@ -20,6 +20,7 @@ from pathlib import Path
 N = 4
 V_HARD = 6.0
 DUP_S, RACE_S, SPIKE_A, AFTER_S = 20e-9, 1e-9, 10.0, 60e-9
+K4_US = 1.0                                   # K4 window after a line ramp's end or a load step (us); A160 tests 2.0
 
 
 def module(md, t_lo, lsb, tdrv):
@@ -85,9 +86,9 @@ def classify(e, cfg, dups):
     if k == "spike":
         if any(d["module"] == e["module"] and d["phase"] == e["phase"] and 0 < t - d["t_s"] < AFTER_S for d in dups):
             return "FF"
-        if ls and ls["t_us"] * 1e-6 <= t <= (ls["t_us"] + ls["slew_us"] + 1.0) * 1e-6:
+        if ls and ls["t_us"] * 1e-6 <= t <= (ls["t_us"] + ls["slew_us"] + K4_US) * 1e-6:
             return "K4"
-        if ld and ld["t_us"] * 1e-6 <= t <= (ld["t_us"] + 1.0) * 1e-6:
+        if ld and ld["t_us"] * 1e-6 <= t <= (ld["t_us"] + K4_US) * 1e-6:
             return "K4"
     if k == "dup_floor_first":                    # C13: K5 = tie, both commands in one LSB (a_tlo == t_lo)
         return "K5" if e["dt_ns"] < 0.5 * cfg["t_clk_ns"] / 2 ** cfg["fb"] else "FF"
