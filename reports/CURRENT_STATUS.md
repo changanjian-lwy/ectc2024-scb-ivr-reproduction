@@ -10,7 +10,19 @@ the **mathematical model** (native P25 event model, Section 1) and the
 2026-09-29 both are maintained by one session. The mathematical-model
 session's work was committed unchanged as the baseline (`0f50511`).
 
+**Since 2026-09-30 the mathematical model is P24-native** (D43-D67 in
+`symbolic_derivations/03_P24_native/`; the cycle-by-cycle valley map D63
+is its core), because the physical model is P24's four-phase module and
+the two models must describe the same circuit to check each other. They
+still do: every co-simulated experiment registers D63's prediction first.
+Section 1's P25-native three-phase form is the record of D39-D42 (+ A69)
+and is not continued; its open items were answered in the P24-native form
+(see "Verification and next step").
+
 ## 1. Mathematical model — native P25, three phases / one module
+
+**Status (2026-10-06): closed in this form, kept as the record.** The
+mathematical model continues P24-native (header above; items 2-67, from D43).
 
 **Latest (2026-09-29, D39–D42, cross-checked by A69):**
 
@@ -256,6 +268,13 @@ the original archived files. Consult each case before reusing a number.
 
 ## 3. Zero-start — separate from periodic-state analysis
 
+**Status (2026-10-06): carried by the co-simulation.** Start-up is the RTL
+sequence of A103 (mode S open loop, handover to mode P), with the
+feed-forward seed of A137 / C10 and A152's start-up Ton for a slow
+turn-on; every co-simulated row includes it. Track B's LTspice
+zero-start records stay as they are; R04E16's ~55 % ladder question
+(below) is not pursued.
+
 [Track B](../experiments/track_B_zero_start_extension/README.md) and the
 [startup model audit](../results/ZERO_START_BOUNDARY_AND_MATH_MODEL_AUDIT.md)
 record startup assumptions and mathematical construction. Fixed-PWM
@@ -264,6 +283,19 @@ event-controlled ZVS. A prescribed periodic-state voltage ladder must never
 be reported as self-established startup balance.
 
 ## Verification and next step
+
+**Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
+the acceptance gate holds 41 co-simulated experiments, every registered
+miss documented in its RESULTS. The 2026-09-29 text below is kept as the
+record. Its open items were answered in the P24-native models:
+1. a phase shift that follows the measured period -> D51 / D52 and
+   A92-A97 (period-following slots, then `slot_lo`, C02);
+2. closed-loop Ton -> D59 (voltage loop, A104) and D63 (closed-loop valley
+   map, checked against every co-simulated transient);
+3. the valley trigger in the control memory -> D47 (predicted turn-on)
+   and the floor (A118);
+4. device realism -> EPC2067's datasheet Coss(V) and reverse conduction in
+   the co-simulation plant (A59, A88). P25's GS61008T was not run.
 
 On 2026-09-29, the current shared workspace passed **520 portable checks**
 and **539 full local checks** on a fresh rerun. Counts include both sessions' work.
