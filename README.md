@@ -15,7 +15,7 @@ device assumptions coexist in one physically consistent operating cycle?**
 [Project overview](PROJECT_OVERVIEW.md) · [Current status](reports/CURRENT_STATUS.md) ·
 [Derivations](symbolic_derivations/README.md) · [Experiments](experiments/README.md)
 
-> Research in progress—not a completed 1 kW reproduction or hardware validation.
+> A simulation-level reproduction: the 1 kW system runs closed loop in co-simulation; there is no hardware validation.
 > A local ZVS event, a passing unit test and a full periodic solution are different evidence levels.
 
 **Status, 6 October 2026.** One P24 module and the four-module, 16-phase
