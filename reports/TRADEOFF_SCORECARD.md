@@ -320,7 +320,9 @@ four-module design (C13) and the package drive (A152). What is left rests on val
 - **Output path and load side (D70, D71):** the module-to-load path (63-628 pH by Fig. 5's geometry) is not in the
   plant; its common motion drops L/4 · di/dt at the load (16-157 mV at 1 kA/µs) unless the processor-side decoupling or
   the load slew covers it; the co-simulated load-step Vo is at the modules' node. Interface items, not converter levers.
-- **Loop damping.** Ring Q 7 is assumed; undamped, the ring breaks the valley detection (A144).
+- **Loop damping.** The runs use an ideal parallel damper (Q 7); Q 15 / 30 behave the same, Q 100 / 300 and undamped
+  lose the valley tracking, so the boundary is Q 30-100 independent of L (A144, A157, A158). Which physical element
+  gives Q ≤ 30 (~4-8 mΩ series at the ring frequency, D70) is open.
 - **Temperature (D73).** The co-simulations run at 25 °C. A lumped electrothermal fixed point in the form of the
   team's framework (Krishnakumar et al. 2026; Choi et al. 2025, threshold 85 °C), on D72's buildable array: at 85 °C the
   2.5 MHz converter is 83.9-86.3 % (all copper hot / switches only; 86.6-87.7 % at 25 °C), package-inclusive 78-84 %,
@@ -345,8 +347,10 @@ The 1 MHz items of the 2026-10-03 list are superseded by the 2.5 MHz design (A12
 
 ## 中文摘要
 
-**现状（2026-10-06）：** 单模块和四模块设计都已冻结（2.5 MHz、12.5 %、定时关断 + 地板、100 kHz、前馈；C13）。
-封装规格由 A152 定：回路 ≤ 50 pH，开通单独 36 A/ns，关断 72 A/ns，启动 Ton 36.5 ns。下面是比较各设计时的记录。
+**现状（2026-10-07）：** 单模块和四模块设计都已冻结（2.5 MHz、12.5 %、定时关断 + 地板、100 kHz、前馈；C13）。
+封装规格（D68、A151–A162）：开通单独放慢，L × 开通 di/dt ≤ 1.8 V（电压上限 3.0 V），开通 ≥ 约 20 A/ns（调节），
+关断 72 A/ns；回路候选上限 150 pH（留余量 125 pH）；振铃 Q ≤ 30；启动 Ton 按 D68 公式。热和磁芯损耗见 D73–D78。
+下面是比较各设计时的记录。
 
 **一句话：** 所有 trade-off 最后都汇到一个量上，就是**谷底裕量**（I_th − i_neg）：负电流目标离 ZVS 门槛还差多少安培。
 
