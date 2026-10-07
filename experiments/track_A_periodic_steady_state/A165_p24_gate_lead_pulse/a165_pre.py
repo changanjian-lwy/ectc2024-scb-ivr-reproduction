@@ -22,6 +22,10 @@ _s.loader.exec_module(A4)
 RUNS = {"nom_L0": ("l_p48_1us", "nom", 3.0, 39.615), "nom_L07": ("L07_l_p48_1us", "nom", 3.0, 34.813),
         "ss_r36": ("l_p48_1us", "ss", 3.0, 48.348), "ss_r455": ("l_p48_1us", "ss30", 3.5, 52.0)}
 A4.CORNERS["ss30"] = {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3}
+A4.CORNERS["ss10"] = {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.1}
+# second batch (after A164's slow-corner rows: 65 late fires in the handover, ~160 after rising line steps):
+# the slow corner at +-10 % (3.3 ohm, lead 8) and at 3.6 ohm with a 12 ns lead (t_drv 14 ns so the bridge can apply it)
+RUNS2 = {"ss_r33": ("l_p48_1us", "ss10", 3.0, 46.9, 8.0, None), "ss_r36_lead12": ("l_p48_1us", "ss", 3.0, 48.348, 12.0, 14.0)}
 
 
 def cfgs():
@@ -35,9 +39,20 @@ def cfgs():
                                                          indent=1) + "\n")
 
 
+def cfgs2():
+    for name, (row, corner, r_on, ton, lead, t_drv) in RUNS2.items():
+        A4.R_ON = r_on
+        c = A4.gate_cfg(A4.MC.row_cfg(row), corner, ton, lead)
+        c["driver"] = dict(c["driver"], lead_mode="pulse")
+        if t_drv:
+            c["t_drv_ns"] = t_drv
+        (PRE / f"cfg_{name}.json").write_text(json.dumps(dict(c, t_end_us=190.0, out=f"run_{name}.json",
+                                                              note=f"A165 pre: {name}"), indent=1) + "\n")
+
+
 def main():
     out = {}
-    for name in RUNS:
+    for name in list(RUNS) + list(RUNS2):
         p = PRE / f"run_{name}.json"
         if not p.exists():
             continue
@@ -55,4 +70,4 @@ def main():
 
 
 if __name__ == "__main__":
-    cfgs() if sys.argv[1:] == ["cfgs"] else main()
+    cfgs() if sys.argv[1:] == ["cfgs"] else cfgs2() if sys.argv[1:] == ["cfgs2"] else main()
