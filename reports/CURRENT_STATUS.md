@@ -1,7 +1,8 @@
 # Current Work Status
 
-Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-87: D68-D78, A153-A162 and the hot efficiency). This is the current navigation
+Updated: **2026-10-08** (items 62-67: the ML block A146-A150 and the
+package drive specification A151-A152; items 68-87: D68-D78, A153-A162 and the hot efficiency; items 88-90: D79 and
+A163-A166, the gate drive). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1796,6 +1797,36 @@ each question:
          per module). At kappa 1 with h >= 2e4 it does not bind (85 C holds
          to a processor side of 85-95 C); at kappa 4 with a 45 C coolant it
          decides (processor side <= 55-83 C needed).
+     88. The gate drive at gate level (2026-10-07/08, mixed):
+         [D79](../symbolic_derivations/03_P24_native/D79_P24_GATE_DRIVE.md),
+         [A163](../experiments/track_A_periodic_steady_state/A163_p24_gate_driven_edges/RESULTS.md).
+         EPC's EPC2067 model (outside the repository) drives the plant's
+         high-side edges. It matches the datasheet and LTspice; off, the
+         plant is unchanged bit for bit. A163 (2.5 / 0.3 ohm, 29 runs) is a
+         FAIL as registered:
+         - nominal devices hold (<= 36.4 V, edge power 2.4 W per module);
+         - the spread breaks the frozen controller three ways: the
+           open-loop start-up on-time; the valley-timing limit (gate delay
+           <= ~5.5 ns on phase 4, because dt_pred >= 0); the driver at
+           -30 % (40.6 V);
+         - D79's +1.5 V / C_ISS x 1.5 corners are outside the datasheet
+           (now +1.0 V / Q_G x 1.29);
+         - the ramp model's peaks (A145-A162) were command-time currents;
+           the physical peaks are 5-8 A higher.
+     89. The drive spec over the spread (2026-10-08, mixed):
+         [A164](../experiments/track_A_periodic_steady_state/A164_p24_gate_drive_spread/RESULTS.md).
+         Spec tested: 3.0 / 0.3 ohm with +-20 %, an 8 ns high-side turn-on
+         lead (bridge driver option, off = unchanged) and a per-board
+         start-up trim (Vo 1.035 V at the handover). FAIL as registered,
+         but 10 of 17 rows and four modules pass:
+         - peaks and V_DS hold at every corner (fast 38.5 V);
+         - the lead is needed even at nominal;
+         - misses: L x 0.7's handover (218.6 A, a lead-made on-time step),
+           the slow corner's late fires after the handover and rising
+           steps, ff -8 V Vo +0.6 mV;
+         - +-30 % has no single-resistor window (pre runs);
+         - a fixed lead removes the dt_pred >= 0 interlock: shoot-throughs
+           in pre runs when dt_pred collapsed.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
