@@ -49,8 +49,10 @@ Controller-side analog functions modelled here:
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
 applied while the same phase's complement conducts is counted, and with "stop_on_overlap" the run ends there.
-"hs_on_lead_ns" (A164, < t_drv): high-side turn-on commands reach the plant that much earlier than the other edges
-(a shorter driver path), so the valley learning can put a gate-delayed turn-on before the low side's turn-off command.
+"hs_on_lead_ns" (A164, < t_drv): predictive high-side turn-ons (t_lo + dt_pred) reach the plant that much earlier, as
+if dt_pred could go below zero by the lead, so the valley learning can put a gate-delayed turn-on before the low
+side's turn-off command. With gate-driven high sides a turn-on commanded against a conducting low side is counted
+("overlaps_cmd") but is a shoot-through ("overlaps", stop) only when its channel starts while the low side conducts.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
 from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
@@ -439,7 +441,9 @@ class ModuleSim:
         if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
             raise ValueError("driver hs_on_lead_ns must be in [0, t_drv_ns)")
         self.rng = np.random.default_rng(int(self.drv.get("seed", 1))) if self.drv else None
-        self.ovl = {"count": 0, "first": None, "stop": False}
+        self.ovl = {"count": 0, "first": None, "stop": False, "cmd": 0, "shoot": 0}
+        gm = getattr(plant, "gm", None)                           # A164: gate-driven high sides
+        self.gated = frozenset(j for j in (gm.sw if gm is not None else ()) if j < N)
         self.meas_l = {}; self.lowons = []
         self.trim_now = list(self.trim_init)
         self.mlo = {"armed": False, "t": None, "report": None, "t_timed": None}   # A99: crossing measurement of phase 1
@@ -452,13 +456,13 @@ class ModuleSim:
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
 
-    def t_apply(self, t_cmd, j, on=False):
-        """A91: the time the plant sees an edge commanded at t_cmd on switch j (on: a turn-on)."""
+    def t_apply(self, t_cmd, j, pred_on=False):
+        """A91: the time the plant sees an edge commanded at t_cmd on switch j (pred_on: a predictive turn-on)."""
         drv = self.drv
         if not drv:
             return t_cmd + self.t_drv
         d = self.t_drv + (drv.get("m_ns", 0.0) * 1e-9 if j >= N else 0.0)
-        if on and j < N:
+        if pred_on and j < N:
             d -= drv.get("hs_on_lead_ns", 0.0) * 1e-9                # A164
         edges = drv.get("jitter_edges", "all")                   # A98: "high" or "low" restricts the jitter
         if drv.get("sigma_ps", 0.0) > 0.0 and (edges == "all" or (edges == "high") == (j < N)):
@@ -539,7 +543,9 @@ class ModuleSim:
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
         to_lsb, na = self.to_lsb, self.na
         k = j % N
-        if level and (plant.gl[k] if j < N else plant.gh[k]):   # A91: turn-on against a conducting complement
+        if level and j in self.gated and plant.gl[k]:            # A164: counted at the channel's start (shoot_check)
+            ovl["cmd"] += 1
+        elif level and (plant.gl[k] if j < N else plant.gh[k]):   # A91: turn-on against a conducting complement
             ovl["count"] += 1
             if ovl["first"] is None:
                 ovl["first"] = {"t_s": plant.t, "phase": k + 1, "switch": "SH" if j < N else "SL", "mode_p": st["mode_p"]}
@@ -678,8 +684,8 @@ class ModuleSim:
                     t_cmd = (w + field(fine, k, fb)) * lsb
                     j = k if gate == "H" else N + k
                     meta = {"how": field(how, k, 3), "bind": bool(field(bind, k, 1))}
-                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j, bool(field(lvl, k, 1))), self.seq[0], j,
-                                               field(lvl, k, 1), meta))
+                    pred_on = gate == "H" and bool(field(lvl, k, 1)) and meta["how"] == 0
+                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j, pred_on), self.seq[0], j, field(lvl, k, 1), meta))
                     self.seq[0] += 1
         return w
 
@@ -736,10 +742,24 @@ class ModuleSim:
             ta, _, j, lvl, meta = heapq.heappop(pend)
             self.integrate_to(ta)
             self.apply(j, lvl, meta)
+            if self.gated:
+                self.shoot_check()
             if self.ovl["stop"]:                                # A91: no integration through a shoot-through
                 return False
         self.integrate_to(t_win_end)
-        return True
+        if self.gated:
+            self.shoot_check()
+        return not self.ovl["stop"]
+
+    def shoot_check(self):
+        """A164: a gate-driven high side whose channel started while its low side conducted is a shoot-through."""
+        n = sum(self.plant.gm.stats["shoot_on"])
+        if n > self.ovl["shoot"]:
+            self.ovl["count"] += n - self.ovl["shoot"]; self.ovl["shoot"] = n
+            if self.ovl["first"] is None:
+                self.ovl["first"] = {"t_s": self.plant.t, "phase": None, "switch": "SH", "mode_p": self.st["mode_p"]}
+            if self.cfg.get("stop_on_overlap", 0):
+                self.ovl["stop"] = True
 
     def sample(self):
         """The comparators at the window end."""
@@ -772,6 +792,8 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if self.gated:                                               # A164
+            out["overlaps_cmd"] = ovl["cmd"]
         if self.dep_on:                                              # A132
             out["dep_log"] = self.dep_log
         if self.ph_floor:                                            # A133
