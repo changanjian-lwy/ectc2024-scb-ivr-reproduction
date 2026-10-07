@@ -121,7 +121,8 @@ class Module(unittest.TestCase):
 
     def test_losses_follow_local_temperatures(self):
         m, t, st, src, it, fh = self.res[0.0]
-        ind = sum(self.src["inductor"] / 4 * (1 + self.a_cu * (ti - 25)) for ti in st["t_ind_cols"])
+        ind = sum((self.src["inductor"] * (1 + self.a_cu * (ti - 25)) + self.src["core"]) / 4 for ti in st["t_ind_cols"])
+        self.assertGreater(self.src["core"], 0.0)
         self.assertAlmostEqual(st["p_inductor_w"], ind, delta=1e-3)      # losses lag one iterate (tol 1e-3 K)
         self.assertGreater(st["p_dies_w"], sum(2 * c[0] + 3 * c[1] for c in self.src["die_cond"].values()))
 

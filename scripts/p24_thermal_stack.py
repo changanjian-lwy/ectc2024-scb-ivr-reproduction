@@ -3,8 +3,9 @@ bottleneck, and how much via copper does glass 1 need?
 
     PYTHONPATH=src python3 scripts/p24_thermal_stack.py [--jobs 8]
 
-Losses: D73's per-module split for the 2.5 MHz design (D72 array, N = 29 units per phase; package cases 86 um / 150 pH
-and 429 um / 50 pH) with D73's temperature coefficients, resolved per die / column (scb_ivr.p24_thermal.coupled).
+Losses: D73's per-module split for the 2.5 MHz design (D72 array, N = 29 units per phase) with D73's temperature
+coefficients, resolved per die / column (scb_ivr.p24_thermal.coupled); lateral copper for the 20 mm deep module (D75,
+package cases 86 um / 150 pH and 429 um / 50 pH); the array's core loss (D76, kappa 1 or 4) in the inductor body.
 Geometry: scb_ivr.p24_thermal.STACK (one 250 W module on two of P24's 10 x 10 mm sites; every dimension P24 does not
 print is a scenario value). Cooling: the heat spreader's face (Fig. 5c-d, below the GaN dies) with h_bot to T_cool;
 the processor-side face adiabatic unless h_top is set. Criterion: hottest point <= 85 C (the team's threshold).
@@ -31,13 +32,17 @@ FILLS = (0.0, 0.0025, 0.005, 0.01, 0.02, 0.05, 0.1, 0.196)     # 0.196 = 30 um v
 H_BOT = (5e3, 1e4, 2e4, 5e4, 1e5)
 T_COOL = (25.0, 45.0)
 PKG_CU = {"86um_150pH": 86e-6, "429um_50pH": 429e-6}
-CASES = {"buildable": 1.0, "d73_density": 2.0}                  # heat x 1 on 2 cm^2; x 2 = 250 W per cm^2 (D73)
+CASES = {"buildable_k1": (1.0, 1.0), "buildable_k4": (1.0, 4.0),  # (heat scale, core kappa): x 1 on 2 cm^2
+         "d73_density_k1": (2.0, 1.0)}                           # x 2 = 250 W per cm^2 (D73)
 COL_AREA = 10e-3 * 20e-3                                       # the module's phase-column area (m^2)
 
 
-def sources(design="2.5MHz_N29", pkg="86um_150pH", scale=1.0):
-    """Per-module 25 C losses for coupled(): per-die conduction / fixed parts recovered from D73's 25 / 85 C die map."""
+def sources(design="2.5MHz_N29", pkg="86um_150pH", scale=1.0, kappa=1.0):
+    """Per-module 25 C losses for coupled(): per-die conduction / fixed parts recovered from D73's 25 / 85 C die map;
+    lateral copper at 20 mm depth (D75); core loss kappa x D76's small-signal value."""
     d = json.loads((DIAG / "D73_electrothermal.json").read_text())
+    d75 = json.loads((DIAG / "D75_footprint.json").read_text())
+    d76 = json.loads((DIAG / "D76_core_loss.json").read_text())
     a_sw, a_cu = d["assumptions"]["a_sw_per_k"], d["assumptions"]["a_cu_per_k"]
     dm25, dm85 = d["die_map_2.5MHz"]["25C"], d["die_map_2.5MHz"]["85C"]
     cond, fixed = {}, {}
@@ -47,17 +52,19 @@ def sources(design="2.5MHz_N29", pkg="86um_150pH", scale=1.0):
         fixed[a["phase"]] = tuple(scale * (a[k] - x) for k, x in zip(("hs_die_w", "ls_die_w"), c))
     r = d["designs"][design]["split_25c"]
     pk = d["assumptions"]["pkg"][pkg]
-    src = {"die_cond": cond, "die_fixed": fixed, "inductor": scale * r["cu"], "gate": scale * r["gate"],
-           "caps": scale * r["cs"], "loop": scale * pk["loop"], "lat_cu": scale * pk["lat_cu"]}
+    lat = d75["lateral"][pkg.split("_")[0]]["w_20mm"]
+    core = kappa * d76["designs"][design.split("_")[0]]["core_w"]["k1"]
+    src = {"die_cond": cond, "die_fixed": fixed, "inductor": scale * r["cu"], "core": scale * core, "gate": scale * r["gate"],
+           "caps": scale * r["cs"], "loop": scale * pk["loop"], "lat_cu": scale * lat}
     return src, a_sw, a_cu
 
 
 def run(job):
-    """One coupled solve; job = (tag, params, design, pkg, scale)."""
-    tag, prm, design, pkg, scale = job
+    """One coupled solve; job = (tag, params, design, pkg, scale, kappa)."""
+    tag, prm, design, pkg, scale, kappa = job
     prm = dict(prm)
     prm.setdefault("t_cu", PKG_CU[pkg])
-    src25, a_sw, a_cu = sources(design, pkg, scale)
+    src25, a_sw, a_cu = sources(design, pkg, scale, kappa)
     m = T.build(prm)
     t, st, src, it, fh = T.coupled(m, src25, a_sw, a_cu, method="cg")
     z = m["z_layers"]
@@ -65,7 +72,7 @@ def run(job):
     lm = st["layers_mean"]
     p = m["p"]
     tc = p["t_cool"]
-    out = {"tag": tag, "params": {k: v for k, v in prm.items()}, "design": design, "pkg": pkg, "scale": scale,
+    out = {"tag": tag, "params": {k: v for k, v in prm.items()}, "design": design, "pkg": pkg, "scale": scale, "kappa": kappa,
            "t_max": st["t_max"], "junction_max": st["junction_max"], "inductor_max": st["inductor_max"],
            "inductor_mean": st["inductor_mean"], "p_total_w": st["p_total_w"], "p_inductor_w": st["p_inductor_w"],
            "p_dies_w": st["p_dies_w"], "iterations": it, "energy_rel": 2 * sum(fh.values()) / st["p_total_w"] - 1,
@@ -109,10 +116,10 @@ def refine(base_job, rows):
             lo, hi = a["params"]["f_g1"], b["params"]["f_g1"]
     if lo is None:
         return f_star(rows)
-    tag, prm, design, pkg, scale = base_job
+    tag, prm, design, pkg, scale, kappa = base_job
     while hi - lo > 0.02 * hi:
         mid = 0.5 * (lo + hi)
-        r = run((tag, dict(prm, f_g1=mid), design, pkg, scale))
+        r = run((tag, dict(prm, f_g1=mid), design, pkg, scale, kappa))
         if r["t_max"] <= T_LIMIT:
             hi = mid
         else:
@@ -127,13 +134,13 @@ def main():
     out = {"stack": {k: v for k, v in T.STACK.items()}, "t_limit_c": T_LIMIT, "fills": FILLS, "h_bot": H_BOT,
            "t_cool": T_COOL, "col_area_m2": COL_AREA, "sweep": [], "f_star": {}, "sensitivity": {}, "decomposition": {}}
     jobs = []
-    for case, scale in CASES.items():
+    for case, (scale, kappa) in CASES.items():
         for pkg in PKG_CU:
             for h in H_BOT:
                 for tc in T_COOL:
                     for f in FILLS:
                         jobs.append((f"{case}|{pkg}|h{h:g}|T{tc:g}", {"f_g1": f, "h_bot": h, "t_cool": tc},
-                                     "2.5MHz_N29", pkg, scale))
+                                     "2.5MHz_N29", pkg, scale, kappa))
     base = {"h_bot": 2e4, "t_cool": 45.0}
     sens = {"baseline": {}, "k_glass_0.9": {"k_glass": 0.9}, "k_glass_1.4": {"k_glass": 1.4},
             "t_g1_100um": {"t_g1": 100e-6}, "t_g1_500um": {"t_g1": 500e-6}, "k_ind_z_1": {"k_ind_z": 1.0},
@@ -142,17 +149,18 @@ def main():
             "strip_no_vias": {"f_strip": 0.0}, "strip_full_vias": {"f_strip": 0.196}, "k_fill_0.3": {"k_fill": 0.3},
             "bump_frac_0.3": {"bump_frac": 0.3}, "cu_cov_0.4": {"cu_cov": 0.4},
             "top_cooled_1e4": {"h_top": 1e4, "t_top": 45.0}, "spreader_1mm": {"t_spreader": 1e-3},
-            "design_N40": {}}
+            "design_N40": {}, "core_kappa_0": {}, "core_kappa_2": {}, "core_kappa_4": {}}
     for name, prm in sens.items():
         for f in FILLS:
             design = "2.5MHz_N40" if name == "design_N40" else "2.5MHz_N29"
-            jobs.append((f"sens|{name}", dict(base, **prm, f_g1=f), design, "86um_150pH", 1.0))
+            kappa = float(name[-1]) if name.startswith("core_kappa") else 1.0
+            jobs.append((f"sens|{name}", dict(base, **prm, f_g1=f), design, "86um_150pH", 1.0, kappa))
     with ProcessPoolExecutor(args.jobs) as pool:
         results = list(pool.map(run, jobs, chunksize=2))
     groups = {}
     for job, r in zip(jobs, results):
         groups.setdefault(job[0], []).append((job, r))
-    out["sweep"] = [{k: r[k] for k in ("tag", "pkg", "scale", "t_max", "junction_max", "inductor_max", "p_total_w",
+    out["sweep"] = [{k: r[k] for k in ("tag", "pkg", "scale", "kappa", "t_max", "junction_max", "inductor_max", "p_total_w",
                                        "p_inductor_w", "iterations", "energy_rel", "glass1_flux_strip_share", "hot_in")}
                     | {"f_g1": r["params"]["f_g1"], "h_bot": r["params"]["h_bot"], "t_cool": r["params"]["t_cool"]}
                     for r in results]
@@ -174,14 +182,14 @@ def main():
         if tag.startswith("sens|"):
             out["sensitivity"][tag[5:]] = out["f_star"][tag]
     out["abf_microvias"] = {}
-    abf_jobs = [(f"abf|{fmv:g}|{f:g}", dict(base, mv_follow=False, f_mv=fmv, f_g1=f), "2.5MHz_N29", "86um_150pH", 1.0)
+    abf_jobs = [(f"abf|{fmv:g}|{f:g}", dict(base, mv_follow=False, f_mv=fmv, f_g1=f), "2.5MHz_N29", "86um_150pH", 1.0, 1.0)
                 for fmv in (0.0, 0.0025, 0.005, 0.01, 0.02, 0.05) for f in (0.02, 0.196)]
     with ProcessPoolExecutor(args.jobs) as pool:
         for job, r in zip(abf_jobs, pool.map(run, abf_jobs)):
             out["abf_microvias"][job[0][4:]] = {k: r[k] for k in ("t_max", "junction_max", "inductor_max", "steps_k")}
     for tc in T_COOL:
         for f in (0.0, 0.02, 0.196):
-            r = run(("decomp", {"f_g1": f, "h_bot": 2e4, "t_cool": tc}, "2.5MHz_N29", "86um_150pH", 1.0))
+            r = run(("decomp", {"f_g1": f, "h_bot": 2e4, "t_cool": tc}, "2.5MHz_N29", "86um_150pH", 1.0, 1.0))
             out["decomposition"][f"T{tc:g}_f{f:g}"] = {k: r[k] for k in ("t_max", "junction_max", "inductor_max",
                                                                           "steps_k", "layers_mean", "p_total_w",
                                                                           "glass1_flux_strip_share")}
@@ -198,7 +206,7 @@ def main():
                     cells.append(f"h{h:.0e}: " + ("none" if fs is None else f"{100 * fs:.2f}%")
                                  + f" (T0 {x['t_max_f0']:.0f}, Tmin {x['t_max_fmax']:.0f})")
                 print(f"    T_cool {tc:.0f}: " + "; ".join(cells))
-    print("Sensitivity (buildable, 86 um, h 2e4, T_cool 45): f*, T_max at f 0 / 2 % / 19.6 %, inductor - junction at 19.6 %")
+    print("Sensitivity (buildable, kappa 1, 86 um, h 2e4, T_cool 45): f*, T_max at f 0 / 2 % / 19.6 %, inductor - junction at 19.6 %")
     for name, x in out["sensitivity"].items():
         fs = x["f_star"]
         print(f"  {name:18s} f* {'none' if fs is None else f'{100 * fs:.2f}%':>7s}  T {x['t_max_f0']:.1f} / "

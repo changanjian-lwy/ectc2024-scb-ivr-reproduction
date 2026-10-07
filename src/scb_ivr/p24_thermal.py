@@ -414,7 +414,8 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=50):
     own mean junction temperature, each column's inductor copper at its body's mean temperature, the lateral copper
     at the mean temperature of its two copper layers in that column; switching, gate, capacitor and loop losses fixed.
 
-    src25 (whole module, 25 C): die_cond / die_fixed {phase: (hs, ls)} per die, inductor, lat_cu, gate, caps, loop.
+    src25 (whole module, 25 C): die_cond / die_fixed {phase: (hs, ls)} per die, inductor (copper), core (the inductor
+    array's core loss, held constant, in the inductor body), lat_cu, gate, caps, loop.
     Returns (T, stats, src at the fixed point, iterations, face heat)."""
     g, lay, p = m["grid"], m["lay"], m["p"]
     vol = g.volume()
@@ -437,7 +438,8 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=50):
         for d, td in zip(m["dies"], t_die):
             j = 0 if d["kind"] == "hs" else 1
             src["die_list"].append(src25["die_cond"][d["phase"]][j] * (1 + a_sw * (td - 25)) + src25["die_fixed"][d["phase"]][j])
-        src["inductor_cols"] = [src25.get("inductor", 0.0) / p["n_ph"] * (1 + a_cu * (ti - 25)) for ti in t_ind]
+        src["inductor_cols"] = [(src25.get("inductor", 0.0) * (1 + a_cu * (ti - 25)) + src25.get("core", 0.0)) / p["n_ph"]
+                                for ti in t_ind]
         src["lat_cu_cols"] = [w * (1 + a_cu * (tc - 25)) for w, tc in zip(lat25, t_cu)]
         t_new = solver.solve(heat_sources(m, src), t0=t)
         change = np.inf if t is None else float(np.abs(t_new - t).max())
