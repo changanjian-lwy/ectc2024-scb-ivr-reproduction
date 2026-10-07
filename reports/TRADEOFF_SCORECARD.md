@@ -313,6 +313,9 @@ four-module design (C13) and the package drive (A152). What is left rests on val
 - **Gate dynamics.** Edges are linear current ramps (A145): no gate model, no Miller plateau; which gate
   resistor gives 18-36 A/ns on EPC2067 is open (A151).
 - **Above 150 pH:** only the +4.8 V / 1 µs row and start-up were run (A154, A155); corners and four modules not.
+- **Output path and load side (D70, D71):** the module-to-load path (63-628 pH by Fig. 5's geometry) is not in the
+  plant; its common motion drops L/4 · di/dt at the load (16-157 mV at 1 kA/µs) unless the processor-side decoupling or
+  the load slew covers it; the co-simulated load-step Vo is at the modules' node. Interface items, not converter levers.
 - **Loop damping.** Ring Q 7 is assumed; undamped, the ring breaks the valley detection (A144).
 - **Temperature.** The co-simulations run at 25 °C. First order (D62's budget on A124's p125_n0 waveforms): 88.1 %
   with the switches at 125 °C (R_on × 1.59, A90; conduction 13.2 → 20.9 W), 87.5 % with the inductor copper +100 K too

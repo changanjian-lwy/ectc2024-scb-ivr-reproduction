@@ -85,3 +85,6 @@ The per-module output path (R and L) between each module and the shared output n
 and the only coupling between modules. Its DC effects are bounded above (2.1-2.2); the plant is needed for its
 inductance (load steps, module interaction), whose value needs Fig. 5's strip geometry, not yet estimated. Before
 that, the copper requirement should keep the one-way estimate valid (drop ≲ 2 %).
+**Decided by D71:** the path does not need the plant now. Its module-to-module motion is negligible (≤ ~1 mV); its
+common motion is an inductive drop in front of the load (L/4 · di/dt, 16-157 pH), set by the output-capacitor
+placement, the processor-side decoupling and the load slew, which P24 does not give. They become interface requirements.

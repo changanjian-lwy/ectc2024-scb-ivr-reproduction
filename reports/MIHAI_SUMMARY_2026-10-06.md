@@ -186,6 +186,7 @@ are budgets over plausible ranges:
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
+| output-capacitor placement, processor-side decoupling | the lateral Vo path is 63-628 pH per module (Fig. 5 geometry); with the capacitors at the modules a 1 kA/µs load slew drops 16-157 mV at the processor, faster than the loop (module-to-module ringing ≤ 1 mV) | load-side decoupling or load slew; Vo sensed at the common strip |
 
 Four answers would narrow the package specification most:
 

@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-79: D68-D70, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-80: D68-D71, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1718,6 +1718,17 @@ each question:
          The loop bound, Q <= 30, efficiency and late-fire statements now
          carry their conditions. Next dynamic element: the per-module
          output path (R and L).
+     80. The output path, decided without the plant (2026-10-07, math):
+         [D71](../symbolic_derivations/03_P24_native/D71_P24_OUTPUT_PATH.md).
+         Fig. 5's lateral Vo path is 63-628 pH per module (glass thickness
+         missing). Module-against-module motion (93-294 kHz, Q 0.2-9) is
+         driven only by current mismatch: <= ~1 mV. The common motion is
+         an inductive drop at the load, L/4 x di/dt = 16-157 mV at 1 kA/us
+         with the capacitors at the modules, faster than the loop. No plant
+         change; two interface requirements: sense Vo at the common strip,
+         and processor-side decoupling / load slew covering L/4 di/dt (a
+         250 A step >= 0.4-4 us for 1 %). The co-simulated load-step Vo is
+         at the modules' joined node, not at the processor.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
