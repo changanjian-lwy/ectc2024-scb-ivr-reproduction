@@ -313,7 +313,9 @@ four-module design (C13) and the package drive (A152). What is left rests on val
   resistor gives 18-36 A/ns on EPC2067 is open (A151).
 - **Above 150 pH:** only the +4.8 V / 1 µs row and start-up were run (A154, A155); corners and four modules not.
 - **Loop damping.** Ring Q 7 is assumed; undamped, the ring breaks the valley detection (A144).
-- **Temperature.** Everything at 25 °C; at 125 °C R_on × 1.59 (A90) moves the optimum i_neg down.
+- **Temperature.** The co-simulations run at 25 °C. First order (D62's budget on A124's p125_n0 waveforms): 88.1 %
+  with the switches at 125 °C (R_on × 1.59, A90; conduction 13.2 → 20.9 W), 87.5 % with the inductor copper +100 K too
+  (90.61 % at 25 °C reproduced). A hot R_on also moves the optimum i_neg down.
 - **Coss spread and per-module driver delay** (C04 Section 3).
 - **Losses not modelled:** core loss and saturation, Coss hysteresis, AC resistance, driver quiescent power,
   output-capacitor ESR; Cs ESL.

@@ -30,7 +30,9 @@ unpublished values the remaining conclusions rest on.
 Results (co-simulation, 25 °C):
 
 - **Efficiency 90.6 %** per module (loss model applied to the simulated
-  waveforms; 92.5 % with an ideal inductor).
+  waveforms; 92.5 % with an ideal inductor). Hot, to first order: 88.1 %
+  with the switches at 125 °C, 87.5 % with the inductor copper 100 K hotter
+  too.
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it

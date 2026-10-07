@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-77: D68, D69 and A153-A162). This is the current navigation
+package drive specification A151-A152; items 68-78: D68, D69, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1697,6 +1697,11 @@ each question:
          phases 2 and 4, none in steady state: a bounded settling
          transient that lasts longer with a larger loop. PASS 2/2; the
          150 pH bound stands.
+     78. Efficiency when hot (2026-10-07, math):
+         D62's budget on A124's p125_n0 waveforms (25 °C: 90.61 % again):
+         88.1 % with the switches at 125 °C (R_on x 1.59, A90), 87.5 % with
+         the inductor copper 100 K hotter too. First order: the waveforms
+         are the 25 °C ones (A90: the module still works at 125 °C).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
