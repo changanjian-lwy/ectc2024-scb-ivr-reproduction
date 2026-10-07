@@ -424,9 +424,10 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
 
     src25 (whole module, 25 C): die_cond / die_fixed {phase: (hs, ls)} per die, inductor (copper), core (the inductor
     array's core loss, held constant, in the inductor body), lat_cu, gate, caps, loop.
-    coolant {m_dot (kg/s through the modelled width), t_in, cp}: the z0 face's fluid temperature follows the coolant
-    along +y, channel by channel (each x column of cells carries m_dot dx / width): T_f = t_in + the heat taken up
-    upstream / (m_dot_i cp), updated with the losses until both settle (needs the full module length, y_full).
+    coolant {m_dot (kg/s through the modelled width), t_in, cp}: the z0 face exchanges heat with a coolant flowing along
+    +y, channel by channel (each x column of cells carries m_dot dx / width): the fluid temperatures join the linear
+    system (first-order upwind per channel, m_i cp (T_f,j - T_f,j-1) = G_j (T_w,j - T_f,j), energy exact, stable at any
+    NTU) and the augmented matrix is factorised once (needs the full module length, y_full).
     Returns (T, stats, src at the fixed point, iterations, face heat)."""
     g, lay, p = m["grid"], m["lay"], m["p"]
     vol = g.volume()
@@ -440,11 +441,25 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
         return float((t * vol)[mk].sum() / vol[mk].sum())
 
     if coolant:
-        assert m["y_mult"] == 1.0, "the coolant march needs the full module length (y_full)"
-        sl0, gb0, _ = solver.face_g["z0"]
+        assert m["y_mult"] == 1.0, "the coolant needs the full module length (y_full)"
+        sl0, gb0, tref0 = solver.face_g["z0"]
+        nx, ny, _ = g.shape
+        ns, nf = g.n, nx * ny
         mdot_i = coolant["m_dot"] * g.dx / (g.xe[-1] - g.xe[0])
-        t_f = np.full(gb0.shape, float(coolant["t_in"]))
-        solver.set_face_ref("z0", t_f)
+        cap = np.repeat(mdot_i * coolant["cp"], ny)                 # W/K per fluid cell, C order (i, j)
+        wall = np.arange(ns).reshape(g.shape)[:, :, 0].ravel()       # solid cells on the z0 face
+        fl = ns + np.arange(nf)
+        gbf = np.asarray(gb0, float).ravel()
+        up = (np.arange(nf) % ny) > 0                                # cells with an upstream neighbour
+        rows = np.concatenate([wall, fl, fl, fl[up]])
+        cols = np.concatenate([fl, wall, fl, fl[up] - 1])
+        vals = np.concatenate([-gbf, -gbf, cap + gbf, -cap[up]])
+        aug = sp.bmat([[solver.matrix, None], [None, sp.csc_matrix((nf, nf))]], format="csc")
+        aug = (aug + sp.csc_matrix((vals, (rows, cols)), shape=(ns + nf, ns + nf))).tocsc()
+        lu_aug = spla.splu(aug, permc_spec="MMD_AT_PLUS_A")
+        rhs_s = solver.rhs_bc.copy()
+        rhs_s[sl0] -= gb0 * tref0                                    # the face now sees the fluid, not t_ref
+        rhs_f = np.where(up, 0.0, cap * coolant["t_in"])
     t = None
     t_die = [25.0] * len(m["dies"])
     t_ind = [25.0] * p["n_ph"]
@@ -458,25 +473,22 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
         src["inductor_cols"] = [(src25.get("inductor", 0.0) * (1 + a_cu * (ti - 25)) + src25.get("core", 0.0)) / p["n_ph"]
                                 for ti in t_ind]
         src["lat_cu_cols"] = [w * (1 + a_cu * (tc - 25)) for w, tc in zip(lat25, t_cu)]
-        t_new = solver.solve(heat_sources(m, src), t0=t)
+        if coolant:
+            x = lu_aug.solve(np.concatenate([(heat_sources(m, src) + rhs_s).ravel(), rhs_f]))
+            t_new, t_f = x[:ns].reshape(g.shape), x[ns:].reshape(nx, ny)
+        else:
+            t_new = solver.solve(heat_sources(m, src), t0=t)
         change = np.inf if t is None else float(np.abs(t_new - t).max())
         t = t_new
         t_die = [vmean(t, d["mask"] & lay["junction"]) for d in m["dies"]]
         t_ind = [vmean(t, mk) for mk in ind_m]
         t_cu = [vmean(t, mk) for mk in cu_m]
-        change_f = 0.0
-        if coolant:
-            q = gb0 * (t[:, :, 0] - t_f)
-            t_new_f = coolant["t_in"] + (np.cumsum(q, axis=1) - 0.5 * q) / (mdot_i[:, None] * coolant["cp"])
-            change_f = float(np.abs(t_new_f - t_f).max())
-            t_f = t_new_f
-            solver.set_face_ref("z0", t_f)
-        if change < tol and change_f < tol:
+        if change < tol:
             break
     stats = region_stats(m, t)
     if coolant:
         q = gb0 * (t[:, :, 0] - t_f)
-        t_out = coolant["t_in"] + q.sum(axis=1) / (mdot_i * coolant["cp"])
+        t_out = t_f[:, -1]
         stats.update({"coolant_t_out_mean": float(np.sum(mdot_i * t_out) / np.sum(mdot_i)),
                       "coolant_t_out_max": float(t_out.max()), "coolant_t_f_max": float(t_f.max()),
                       "coolant_heat_w": float(q.sum()), "coolant_t_f": t_f})
@@ -485,7 +497,10 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
                   "p_inductor_w": float(sum(src["inductor_cols"])), "p_dies_w": m["y_mult"] * float(sum(
                       w * min(1.0, (min(d["y"][1], m["y_max"]) - d["y"][0]) / (d["y"][1] - d["y"][0]))
                       for w, d in zip(src["die_list"], m["dies"])))})
-    return t, stats, src, it, solver.face_heat(t)
+    face = solver.face_heat(t)
+    if coolant:
+        face["z0"] = stats["coolant_heat_w"]
+    return t, stats, src, it, face
 
 
 def region_stats(m, t):
