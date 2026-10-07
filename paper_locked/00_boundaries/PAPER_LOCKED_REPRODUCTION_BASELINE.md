@@ -124,6 +124,20 @@ project-side transcription error as the cause of the discrepancy.
 - 2024 Sec. II-B asks for approximately 1-2% negative peak current before
   low-side turn-off.
 
+### Text vs Eq. (4) / Table I: the inductance trend (recorded 2026-10-08)
+
+Sec. II-B's last paragraph says that "by choosing higher phases and modules
+count, the inductor peak current and the inductance value can be reduced".
+The peak current does fall (Eq. (2): `IL,pk = 2 Po / (nP nM)`), but the
+paper's own critical inductance rises:
+- Eq. (4) at 5 MHz, `nM = 4`: 1.47 / 2.10 / 2.67 / 4.27 nH at `nP` 4 / 6 / 8 / 16;
+- Table I, same rows: 2.68 / 4.2 / 5.32 / 4.27 nH;
+- at fixed `nP`, more modules lower `IL,pk` and so raise Eq. (4)'s value too.
+So the sentence holds for the current, not for the inductance. Read it as a
+text slip, not as a hidden formula. It changes no locked input (the main model
+uses Eq. (4), `1.4667 nH`). It belongs in any correspondence with the authors,
+next to the Table I / Eq. (4) factor above.
+
 ### Mandatory ideal/device-layer separation
 
 The 2024 `125 A` value is a lossless analytical target. It is tested directly
