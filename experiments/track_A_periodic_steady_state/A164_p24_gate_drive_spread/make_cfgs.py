@@ -1,8 +1,10 @@
 """A164 cosim cfgs: the gate drive over the datasheet-consistent spread (A163 RESULTS) with three changes to A163's S50:
-r_on 3.5 ohm (margin for the driver's -30 %), a lead on predictive high-side turn-ons (bridge driver "hs_on_lead_ns"),
-and a per-board start-up trim (each board's start-up ton set from one start-up run).
-Boards: device corner x inductor corner. Corners: nom; ff = threshold -0.3 V + driver x 0.7; ss = threshold +1.0 V +
-charge x 1.29 + driver x 1.3; hot = 125 C.
+r_on 3.0 ohm with a +-20 % driver tolerance (A164 pre: at +-30 % no single resistor holds both the fast corner's V_DS
+and the slow corner's timing), a lead on predictive high-side turn-ons (bridge driver "hs_on_lead_ns"), and a
+per-board start-up trim (each board's start-up ton set from one start-up run).
+Boards: device corner x inductor corner. Corners: nom; ff = threshold -0.3 V + driver x 0.8; ss = threshold +1.0 V +
+charge x 1.29 + driver x 1.2; hot = 125 C. (cosim_cal_r35/: the same calibration at 3.5 ohm / +-30 %, before the
+change; not used.)
   python3 make_cfgs.py cal   stage 1: cosim_cal/cfg_<board>.json, start-up to 150 us at a first-guess ton
   python3 make_cfgs.py       stage 2: the trim ton = ton0 + (1.035 - Vo(143.5 us)) / 0.026 per board (one shot, slope
                              from A163's diagnostics 0.025-0.0265 V/ns) -> cosim/cfg_*.json, cosim/ORDER.txt, trims.json"""
@@ -22,13 +24,14 @@ MC = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(MC)
 M = MC.M
 
-L_PH, R_ON, R_OFF, LEAD = 50, 3.5, 0.3, 8.0
+L_PH, R_ON, R_OFF, LEAD = 50, 3.0, 0.3, 8.0
 VO_TGT, SLOPE = 1.035, 0.026
-CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3},
+CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.8}, "ss": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.2},
            "hot": {"temp": 125.0}}
-# board: (corner, L row prefix, first-guess ton ns from A163 / A164 pre)
-BOARDS = {"nom_L0": ("nom", "", 40.4), "nom_L07": ("nom", "L07_", 35.7), "nom_L13": ("nom", "L13_", 42.0),
-          "ff_L0": ("ff", "", 37.85), "ss_L0": ("ss", "", 52.0), "hot_L0": ("hot", "", 40.1)}
+# board: (corner, L row prefix, first-guess ton ns: the 3.5 ohm trims (cosim_cal_r35) less ~0.8 ns, ss from the
+# pre run ss20_lead8 (Vo 1.068 V at 49.5 ns))
+BOARDS = {"nom_L0": ("nom", "", 39.6), "nom_L07": ("nom", "L07_", 34.3), "nom_L13": ("nom", "L13_", 41.0),
+          "ff_L0": ("ff", "", 37.85), "ss_L0": ("ss", "", 48.2), "hot_L0": ("hot", "", 39.25)}
 # run: (board, row, lead ns)
 RUNS = ([("nom_L0", r, LEAD) for r in ("l_p48_1us", "s_p62", "l_m80_10us", "slew4")]
         + [("nom_L07", "L07_l_p48_1us", LEAD), ("nom_L13", "L13_l_p48_1us", LEAD)]

@@ -1,5 +1,5 @@
 {
- "note": "A164 stage 1: board nom_L13 start-up at ton 42.0 ns",
+ "note": "A164 stage 1: board nom_L13 start-up at ton 41.0 ns",
  "t_clk_ns": 4.0,
  "fb": 7,
  "fine": 1,
@@ -8,7 +8,7 @@
  "trim": 1,
  "trim_lsb_a": 0.25,
  "v_hys": 0.05,
- "ton_ns": 42.0,
+ "ton_ns": 41.0,
  "t0_ns": 400.0,
  "tdead_ns": 4.5,
  "rs_high_ns": 28.284271,
@@ -99,7 +99,7 @@
  },
  "gate": {
   "dev": "EPC2067",
-  "r_on": 3.5,
+  "r_on": 3.0,
   "r_off": 0.3,
   "meas": "act"
  },
