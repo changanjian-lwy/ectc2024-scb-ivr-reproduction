@@ -452,9 +452,10 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
         fl = ns + np.arange(nf)
         gbf = np.asarray(gb0, float).ravel()
         up = (np.arange(nf) % ny) > 0                                # cells with an upstream neighbour
+        dia = cap + gbf                                              # fluid rows are scaled by 1 / (cap + G)
         rows = np.concatenate([wall, fl, fl, fl[up]])
         cols = np.concatenate([fl, wall, fl, fl[up] - 1])
-        vals = np.concatenate([-gbf, -gbf, cap + gbf, -cap[up]])
+        vals = np.concatenate([-gbf, -gbf / dia, np.ones(nf), -cap[up] / dia[up]])
         aug = sp.bmat([[solver.matrix, None], [None, sp.csc_matrix((nf, nf))]], format="csr")
         aug = (aug + sp.csr_matrix((vals, (rows, cols)), shape=(ns + nf, ns + nf))).tocsr()
         line = solver.lu if solver.method == "cg" else Solver(g, m["kx"], m["kx"], m["kz"], m["bc"], "cg").lu
@@ -462,7 +463,7 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
 
         def precond(r):
             xs = line.solve(r[:ns])
-            rf = r[ns:].reshape(nx, ny) + gbm * xs.reshape(g.shape)[:, :, 0]
+            rf = r[ns:].reshape(nx, ny) * (capm + gbm) + gbm * xs.reshape(g.shape)[:, :, 0]
             xf = np.empty((nx, ny))
             prev = np.zeros(nx)
             for j in range(ny):                                      # (cap + G) T_j - cap T_(j-1) = r_j
@@ -474,7 +475,7 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
         x_prev = None
         rhs_s = solver.rhs_bc.copy()
         rhs_s[sl0] -= gb0 * tref0                                    # the face now sees the fluid, not t_ref
-        rhs_f = np.where(up, 0.0, cap * coolant["t_in"])
+        rhs_f = np.where(up, 0.0, cap * coolant["t_in"] / dia)
     t = None
     t_die = [25.0] * len(m["dies"])
     t_ind = [25.0] * p["n_ph"]
