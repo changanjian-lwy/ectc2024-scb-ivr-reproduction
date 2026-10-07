@@ -1693,7 +1693,7 @@ each question:
      77. The late fires located (2026-10-07, RTL cfg diagnostic):
          [A162](../experiments/track_A_periodic_steady_state/A162_p24_late_fire_timing/RESULTS.md).
          cfg late_log (bridge, off = unchanged; identity bit for bit) puts
-         every late fire of -8 V / 10 us at 2-10 us after the ramp, on
+         every late fire of -8 V / 10 us at 2-17 us after the ramp, on
          phases 2 and 4, none in steady state: a bounded settling
          transient that lasts longer with a larger loop. PASS 2/2; the
          150 pH bound stands.
