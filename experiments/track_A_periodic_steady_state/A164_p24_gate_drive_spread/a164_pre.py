@@ -22,7 +22,8 @@ _spec.loader.exec_module(MC)
 
 R_ON, R_OFF = 3.5, 0.3
 CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3},
-           "hot": {"temp": 125.0}, "ss20": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.2}}
+           "hot": {"temp": 125.0}, "ss20": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.2},
+           "ssseed": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3}}
 # start-up ton guesses for Vo(143.5 us) ~1.035 V: 37.887 + 0.9 at 2.5 ohm, + ~1 ns for 3.5 ohm, the corner's extra
 # on-time loss (~2 x its single-edge turn-on delay change, A163 s50vthmax) and (wrongly) minus the lead: the lead acts
 # on predictive turn-ons only, not in the start-up, so the lead runs start ~8 ns short (their handover is not a result)
@@ -31,7 +32,9 @@ CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "c
 # skipped (learn decided at the command), dt_pred could not learn and it is not a result.
 RUNS = [("nom", 0.0, 39.8), ("nom", 8.0, 31.8), ("ff", 0.0, 39.2), ("ff", 8.0, 31.2), ("ss", 0.0, 52.0),
         ("ss", 4.0, 48.0), ("ss", 8.0, 52.0), ("ss", 9.5, 52.0), ("hot", 0.0, 39.8), ("hot", 8.0, 31.8),
-        ("ss20", 8.0, 49.5, 3.0)]   # contingency: r_on 3.0 ohm with a +-20 % driver (slow side 3.6 ohm)
+        ("ss20", 8.0, 49.5, 3.0),   # contingency: r_on 3.0 ohm with a +-20 % driver (slow side 3.6 ohm)
+        ("ssseed", 8.0, 52.0, 3.5)]  # ss at 4.55 ohm with the valley seed dt_init 5.7 ns (ss_lead8's learned dt_pred)
+SEED = {"ssseed": 5.7}
 
 
 def gate_cfg(corner, lead, ton, t_end=300.0, r_on=R_ON):
@@ -43,6 +46,8 @@ def gate_cfg(corner, lead, ton, t_end=300.0, r_on=R_ON):
         else:
             g[k] = v
     out = dict(cfg, gate=g, ton_ns=ton, t_end_us=t_end)
+    if corner in SEED:
+        out["dt_init_ns"] = SEED[corner]
     if lead:
         out["driver"] = dict(cfg.get("driver") or {}, hs_on_lead_ns=lead)
     return out
