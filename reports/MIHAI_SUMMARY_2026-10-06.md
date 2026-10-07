@@ -32,9 +32,9 @@ Results (co-simulation, 25 °C):
 - **Estimated efficiency 86.6-87.7 %** per module with a buildable inductor
   array (loss model on the simulated waveforms; 29-40 current-rated HBS1-class
   units per phase). The often-quoted 90.6 % uses the largest HBS1 unit's
-  R/L, which would take ~170 units per phase; 92.5 % with an ideal inductor. Hot, to first order: 88.1 %
-  with the switches at an assumed 125 °C, 87.5 % with the inductor copper
-  100 K hotter too (no thermal model).
+  R/L, which would take ~170 units per phase; 92.5 % with an ideal inductor. Hot, to first order: about
+  2.5 points lower with the switches at an assumed 125 °C, 3 with the
+  inductor copper 100 K hotter too (no thermal model).
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
