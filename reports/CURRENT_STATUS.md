@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-81: D68-D72, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-82: D68-D73, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1739,6 +1739,18 @@ each question:
          85.7-87.1 %: 2.5 MHz stays, by 0.2-0.6 points. Estimated
          efficiency ~87 %, package-inclusive ~81-86 %. Fit and core loss
          are open; heat is a requirement (39-58 W per 1 cm^2 module).
+     82. An electrothermal closure in the team's framework form (2026-10-07,
+         math): [D73](../symbolic_derivations/03_P24_native/D73_P24_ELECTROTHERMAL.md).
+         The loop of Krishnakumar et al. 2026 (Fig. 4) and Choi et al. 2025
+         (losses -> temperature -> losses, 85 C threshold) with one lumped
+         node per module on D72's losses: at 85 C the 2.5 MHz converter is
+         83.9-86.3 % (package-inclusive 78-84 %) if each module's path to a
+         25 C coolant is <= 0.8-1.0 K cm^2/W (0.5-0.7 at 45 C; hottest
+         module). Coupling raises the loss 8-25 % (the team: 13.5-15.8 %).
+         The inductor array makes 28-44 % of the heat inside glass 2, away
+         from the dies' spreader: its path binds. Stable (runaway above
+         5 K cm^2/W); 2.5 MHz leads 5 MHz by 0-0.5 points hot. 125 C is now a
+         bound, not the design point.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
@@ -1783,5 +1795,7 @@ P24 transfer remains a separately declared topology/sequence branch.
 4. **封装层的结论要带条件讲：** 在所测模型（理想并联阻尼 Q 7、25 °C、标称 Cs、线性边沿）里，开通 di/dt 的窗口
    （约 20 A/ns 到 3.0 V / L）在 150 pH 附近闭合，最坏角落离 40 V 只有 0.6 V：这是布局的候选上限，不是硬件极限。阻尼
    Q ≤ 30 是理想阻尼器下的结果，物理来源未定。横向铜只在损耗预算里，含封装的估算效率约 81–86 %（铜厚 86–429 µm，D70 / D72）。
+   高温按团队论文的 85 °C 门槛和电热闭环（D73，集总一节点）：变换器约 84–86 %，含封装约 78–84 %，前提是每个 1 cm² 模块到
+   25 °C 冷却液的热阻 ≤ 0.8–1.0 K·cm²/W；28–44 % 的热在玻璃 2 里的电感阵列，它的散热路径才是瓶颈，不是 GaN。
 5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
-   问题；动态模型里还没有模块输出路径的 R / L、磁芯损耗和热（D70 的清单）。
+   问题；动态模型里还没有模块输出路径的 R / L、磁芯损耗和热场（D70 的清单；热只有 D73 的集总要求）。

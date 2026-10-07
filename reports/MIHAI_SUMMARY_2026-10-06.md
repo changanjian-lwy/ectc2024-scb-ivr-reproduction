@@ -32,9 +32,9 @@ Results (co-simulation, 25 °C):
 - **Estimated efficiency 86.6-87.7 %** per module with a buildable inductor
   array (loss model on the simulated waveforms; 29-40 current-rated HBS1-class
   units per phase). The often-quoted 90.6 % uses the largest HBS1 unit's
-  R/L, which would take ~170 units per phase; 92.5 % with an ideal inductor. Hot, to first order: about
-  2.3 points lower with the switches at an assumed 125 °C, about 4 with the
-  array's copper 100 K hotter too (no thermal model).
+  R/L, which would take ~170 units per phase. At the 85 °C threshold of Choi,
+  Khorasani et al. (TCPMT 2025), with their electrothermal loop lumped:
+  ~84-86 % (with package ~78-84 %) for ≤ ~0.8-1.0 K·cm²/W to a 25 °C coolant.
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
@@ -174,11 +174,9 @@ are budgets over plausible ranges:
   at Q 7, 25 °C, nominal Cs, linear current-ramp edges) the turn-on window
   closes near 150 pH, with 0.6 V margin at the worst corner: a candidate
   bound for layout (125 pH for margin), not a hardware limit.**
-- **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
-  48 V transients, and EPC's Phase 16 reliability report allows repetitive
-  overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The
-  specification does not rely on that rule; without the slow turn-on,
-  50 pH would satisfy it and 100 pH would not.
+- **Rating used:** EPC2067's 40 V continuous rating, not the datasheet's
+  48 V transient or EPC Phase 16's 120 % for ≤ 1 % of life (100 V parts);
+  under that rule 50 pH would pass without the slow turn-on, 100 pH not.
 
 ## 4. Open values, with the cases run
 
@@ -187,15 +185,16 @@ are budgets over plausible ranges:
 | input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A, inductance × 0.7-1.3 included. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising (≥ 50 µs at inductance × 0.7). Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
-| inductor technology, footprint per phase | MPC-class R/L 79 µΩ/nH (= 170 HBS1 500 nH units per phase): 2.5 MHz best; with 29-40 current-rated units per phase, 86.6-87.7 % and 2.5 MHz best by 0.2-0.6 points; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
+| inductor technology, footprint per phase | 29-40 current-rated HBS1-class units per phase: 86.6-87.7 %, 2.5 MHz best by 0.2-0.6 points; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
 | QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
+| thermal path, coolant temperature | 85 °C fixed point: ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant (0.5-0.7 at 45 °C); 28-44 % of the heat in the inductor array, behind glass | the hot efficiency; where cooling must reach |
 | output-capacitor placement, processor-side decoupling | the lateral Vo path is 63-628 pH per module (Fig. 5 geometry); with the capacitors at the modules a 1 kA/µs load slew drops 16-157 mV at the processor, faster than the loop (module-to-module ringing ≤ 1 mV) | load-side decoupling or load slew; Vo sensed at the common strip |
 
-Four answers would narrow the package specification most:
+Five answers would narrow the package specification most:
 
 1. Can P24's gate driver give the turn-on its own, slower edge (18-36 A/ns)
    while the turn-off stays near 72 A/ns? From the datasheet's gate charge
@@ -207,27 +206,24 @@ Four answers would narrow the package specification most:
    EPC's 120 % for ≤ 1 % of life?
 3. What is the prototype's commutation-loop inductance? A double-pulse
    V_DS capture would do: a CNN trained on simulated captures, followed by a
-   circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz,
-   noise ≤ 0.4 V rms, current known within 2 %). The same capture gives the
+   circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz). The same capture gives the
    ring's Q, which must stay ≤ ~30. With L known, the drive spec follows
    from the formulas above; above ~150 pH the turn-off must
    slow as well, at several percent of efficiency.
 4. How was the start-up on-time set? A slow turn-on needs it raised by
    ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
+5. Has P24's IVR been through Choi et al.'s electrothermal framework? Which
+   face is cooled, at what coolant temperature? The inductor array, behind
+   glass, binds; our per-layer loss map is ready as the solver's input.
 
 Otherwise I will continue across the ranges above.
 
 ## 5. How the results are checked
 
 - Every experiment registers its pass criteria before it runs; results are
-  reported against them, misses included.
-- Two independent models check each other: an analytical event map and
-  averaged model, and the co-simulation.
-- Every controller option reproduces the previous design bit for bit when
-  switched off; a regression suite runs on every push.
-- Learned models (surrogates, Gaussian processes, CNNs, reinforcement
-  learning) propose or flag; the co-simulation decides. An anomaly detector
-  trained on clean runs found the ZVS loss behind the package overshoot,
-  which no hand-written check covered.
-- About 180 experiments and over 60 derivation notes so far. Running status:
-  `reports/CURRENT_STATUS.md`; trade-offs: `reports/TRADEOFF_SCORECARD.md`.
+  reported against them, misses included. Two independent models check each
+  other (an analytical event map and averaged model; the co-simulation), and
+  every controller option reproduces the previous design bit for bit when off.
+- Learned models propose or flag; the co-simulation decides. About 180
+  experiments and over 60 derivation notes; status in
+  `reports/CURRENT_STATUS.md`, trade-offs in `reports/TRADEOFF_SCORECARD.md`.

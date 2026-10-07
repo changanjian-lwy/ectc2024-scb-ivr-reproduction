@@ -302,7 +302,8 @@ four-module design (C13) and the package drive (A152). What is left rests on val
 | the bus slew is limited to ≲ 2.4 V/µs | the +4.8 V / 1 µs peak stops binding | T18 |
 | Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |
 | a smaller node (P24 Sec. IV's 1 + 2 devices) | I_th falls (D57: 9.5-12.8% at 1 MHz), so the margin grows at the same i_neg | T12; not yet run |
-| a hotter junction (125 C) | R_on ×1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
+| a hotter junction (85 °C design point, D73; 125 °C a bound) | R_on × 1.35 / 1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
+| the thermal path is known (R_th per module, coolant temperature) | D73's fixed point gives the hot efficiency; the inductor array's path is the one to check first | D73 |
 | the gate drivers' high-to-low mismatch can exceed the node's fall (~1-2 ns) | budget ~0.25 points per ns at 1 MHz: +3.4 ns cost 0.85 points (A119 m3p) | driver (A91, A119) |
 | more modules | interleave per C02; inductor matching within about ±5 % worst case (the 200 A crossing is near ±7 %); the final design needs the slave floor (C06) | T16, T17 (D66, C14) |
 | the package loop L is known | driver: turn-on di/dt ≤ 3.2 V / L; turn-off 72 A/ns to 150 pH, ≤ 10 V / L above (+7 to +28 W per module at 200-300 pH); start-up Ton by D68 Section 8 (A151-A155); not the controller (A148-A150); the loop's own loss limit is ~70 pH for 1 % | T20 (D68, A151-A155) |
@@ -318,9 +319,13 @@ four-module design (C13) and the package drive (A152). What is left rests on val
   plant; its common motion drops L/4 · di/dt at the load (16-157 mV at 1 kA/µs) unless the processor-side decoupling or
   the load slew covers it; the co-simulated load-step Vo is at the modules' node. Interface items, not converter levers.
 - **Loop damping.** Ring Q 7 is assumed; undamped, the ring breaks the valley detection (A144).
-- **Temperature.** The co-simulations run at 25 °C. First order (D62's budget on A124's p125_n0 waveforms): 88.1 %
-  with the switches at 125 °C (R_on × 1.59, A90; conduction 13.2 → 20.9 W), 87.5 % with the inductor copper +100 K too
-  (90.61 % at 25 °C reproduced). A hot R_on also moves the optimum i_neg down.
+- **Temperature (D73).** The co-simulations run at 25 °C. A lumped electrothermal fixed point in the form of the
+  team's framework (Krishnakumar et al. 2026; Choi et al. 2025, threshold 85 °C), on D72's buildable array: at 85 °C the
+  2.5 MHz converter is 83.9-86.3 % (all copper hot / switches only; 86.6-87.7 % at 25 °C), package-inclusive 78-84 %,
+  if each 1 cm² module's path to a 25 °C coolant is ≤ 0.8-1.0 K·cm²/W (0.5-0.7 at 45 °C; the hottest module, +5 %
+  current). The inductor array makes 28-44 % of the heat inside glass 2, away from the dies' spreader: its path binds,
+  not the GaN (hottest die 1.3 W, 0.5 K above its case). Stable: runaway only above 5 K·cm²/W. Hot, 2.5 MHz leads
+  5 MHz by 0-0.5 points. A hot R_on also moves the optimum i_neg down.
 - **Coss spread and per-module driver delay** (C04 Section 3).
 - **Losses not modelled:** core loss and saturation, Coss hysteresis, AC resistance, driver quiescent power,
   output-capacitor ESR; Cs ESL.

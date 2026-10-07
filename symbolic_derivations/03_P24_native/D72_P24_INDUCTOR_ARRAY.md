@@ -41,7 +41,8 @@ array technology, because the unit size follows the frequency.
 - **Heat (a requirement, not a result):** the converter, copper and loop losses come to ~39-58 W per 10 × 10 mm module
   (35-39 W converter at 87.65-86.56 %, 2.5-12.5 W copper, 1.6-6.4 W loop). The 125 °C used for the hot estimate holds only if the
   package removes that from ~1 cm² per module; P24 gives no thermal path (the IVR sits on the back of the processor
-  package, Fig. 6).
+  package, Fig. 6). **D73** closes it to first order in the team's electrothermal form: at the 85 °C threshold of
+  Choi et al. 2025, ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant, converter ~84-86 %.
 
 ## 4. Limits
 

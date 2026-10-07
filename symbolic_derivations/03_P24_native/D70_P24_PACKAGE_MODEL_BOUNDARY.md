@@ -19,7 +19,7 @@ package conclusions may claim and checks the one-way loss estimates, the damper'
 | module-to-module and module-to-load path (R, L) | **not in the plant**: four modules joined at one ideal node each 4 ns window | budget: lateral copper (D65) | four-module sharing, load steps |
 | lateral Vo / GND copper, vias, strip | budget only (D65, one-way) | 35 / 86 / 429 µm: 30.7 / 12.5 / 2.5 W | package efficiency |
 | input source | plant: ideal 48 V with programmed steps | | line-step rows |
-| temperature | assumed (25 °C; 125 °C in the budget only) | | hot efficiency (no thermal model) |
+| temperature | assumed (25 °C; 125 °C in the budget only); D73: lumped electrothermal fixed point, 85 °C threshold | R_th ≤ 0.8-1.0 K·cm²/W per module (25 °C coolant) | hot efficiency |
 | Coss hysteresis, common-source and gate-loop inductance, EMI | **not modelled** | | |
 
 ## 2. Checks
@@ -90,3 +90,4 @@ common motion is an inductive drop in front of the load (L/4 · di/dt, 16-157 pH
 placement, the processor-side decoupling and the load slew, which P24 does not give. They become interface requirements.
 **D72 (inductor array):** 90.61 % uses the 500 nH HBS1 unit's R/L (~170 units per phase). With 29-40 current-rated
 units per phase the converter is 86.6-87.7 %, and Section 2.5's package-inclusive figures become ~81-86 %.
+**D73 (electrothermal):** the temperature row is closed to first order; the thermal field and the cooled face stay open.
