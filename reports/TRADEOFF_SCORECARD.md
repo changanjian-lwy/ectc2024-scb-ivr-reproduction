@@ -29,7 +29,8 @@ kept as Appendix A.
 
 - **Adopted and frozen, one module:** 2.5 MHz, L 2.933 nH, Cs 6 µF, i_neg 12.5 % (margin 7.9 A), timed phase-1
   turn-off with a 2 A floor, PI loop at 100 kHz, Vin feed-forward with slope gate and low-pass cap, floor_late,
-  lo_learn 4 (A124, A129, A136, A137, A141, A143). 90.61 % (D62 middle case, package copper not included).
+  lo_learn 4 (A124, A129, A136, A137, A141, A143). Estimated 86.6-87.7 % with a buildable HBS1-class inductor array
+  (D72; 90.61 % with D62's middle R/L, which means ~170 units per phase), package copper not included.
 - **Four modules, frozen:** C12 + lo_learn 4 (C13); passive sharing needs inductor matching within about ±5 %
   (D66, C14).
 - **Package (A151-A155, D68):** the drive spec is formulas in (L, di/dt): turn-on ≤ 3.2 V / L; turn-off 72 A/ns to

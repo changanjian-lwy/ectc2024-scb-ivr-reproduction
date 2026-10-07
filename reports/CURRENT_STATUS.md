@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-80: D68-D71, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-81: D68-D72, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1729,6 +1729,16 @@ each question:
          and processor-side decoupling / load slew covering L/4 di/dt (a
          250 A step >= 0.4-4 us for 1 %). The co-simulated load-step Vo is
          at the modules' joined node, not at the processor.
+     81. The inductor as a buildable array (2026-10-07, math):
+         [D72](../symbolic_derivations/03_P24_native/D72_P24_INDUCTOR_ARRAY.md).
+         D62's middle R/L (79 uOhm/nH, A124's 90.61 %) is the 500 nH HBS1
+         unit's: ~170 units per phase (P24: 12). With units sized for the
+         current (>= 5 A each, 29-40 per phase) and R/L following the unit
+         size (power law through P24 Table 2's two HBS1 points), the design
+         records give 2.5 MHz 86.6-87.7 %, 5 MHz 86.4-87.1 %, 1 MHz
+         85.7-87.1 %: 2.5 MHz stays, by 0.2-0.6 points. Estimated
+         efficiency ~87 %, package-inclusive ~81-86 %. Fit and core loss
+         are open; heat is a requirement (39-58 W per 1 cm^2 module).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

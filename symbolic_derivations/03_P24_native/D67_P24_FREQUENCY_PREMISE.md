@@ -49,3 +49,8 @@
 ## 6. Limits
 - A124 holds R/L constant as L scales with 1/f; D64's parallel plate (w = 5h, h <= 2 mm, no fringing, ripple
   harmonics left out); no core loss or saturation; 25 °C.
+## 6. Update (D72, 2026-10-07)
+
+79 µΩ/nH is the 500 nH HBS1 unit's R/L, i.e. ~170 units per phase at 2.5 MHz. With units sized for the current
+(29-40 per phase) the R/L follows the unit size (power law through P24 Table 2's two HBS1 points), and on the design
+records 2.5 MHz stays best by 0.2-0.6 points (86.6-87.7 %), against 86.4-87.1 % at 5 MHz and 85.7-87.1 % at 1 MHz.
