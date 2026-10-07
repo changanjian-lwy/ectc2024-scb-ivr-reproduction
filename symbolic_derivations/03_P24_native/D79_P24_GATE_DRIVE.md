@@ -2,7 +2,8 @@
 
 2026-10-07. Code: `src/scb_ivr/p24_gate_model.py` (device), `src/scb_ivr/cosim/gate.py` (the plant's gate-driven
 edges, cfg "gate"), `scripts/p24_ltspice.py` (LTspice in batch), `scripts/p24_gate_edges.py` →
-`diagnostics/D79_gate_validation.json`, `D79_gate_sweep.json`, `D79_gate_candidates.json`, `D79_dvdt.json`.
+`diagnostics/D79_gate_validation.json`, `D79_gate_sweep.json`, `D79_gate_candidates.json`, `D79_dvdt.json`,
+`D79_mismatch_gate_loop.json`.
 Vendor model: EPC GaN library (EPC2067 entry, 2021-10-18), kept **outside** the repository (`vendor_models/` next
 to it, or `SCB_EPC_LIB`); `tests/test_p24_gate_model.py` skips without it. System test: A163.
 
@@ -97,6 +98,14 @@ one step; peaks, times and energies are unaffected, only a "max di/dt" of the ch
 6. **dv/dt immunity** (LTspice, low sides held off through 0.3 Ω): during SH1's 17 V turn-on SL1's internal gate
    rises to 0.39-0.47 V (threshold min 0.7 V), during its turn-off it dips to −1.05 V; SH2 ≤ 0.21 V. So the
    low-side sink must stay ≤ ~0.3 Ω.
+7. **Threshold mismatch between parallel devices** (LTspice, 50 pH, 2.5 / 0.3 Ω, SH1's two devices 0.5 V apart): the
+   lower-threshold device takes the edges: turn-on at 17 V 1741 vs 184 nJ (matched 940 each), turn-off at 200 A
+   611 vs 80 nJ and 136 vs 99 A peak (matched 323 nJ, 104 A). The total hardly changes; the hottest die carries
+   ~1.9x its share of the edge loss (~1 W at R_θJC 0.4 K/W: small), far below the 409 A pulsed rating.
+8. **Gate-loop inductance** (per device, same point): turn-on unaffected (2 nH: +0.8 V at 17 V, +9 % energy at 3.8 V);
+   at the strong-sink turn-off the gate rings to −0.31 / −1.07 / −2.09 V at 0.5 / 1 / 2 nH (limit −4 V) and back up
+   to 0.06 / 0.26 / 0.72 V after the edge (0.40 V without L_g, the Miller bump of the drain ring): at 2 nH a
+   minimum-threshold device would partly turn on again. So the gate loop must stay ≤ ~1 nH per device.
 
 ## 5. The drive in resistors (worst single edge over the spread)
 
@@ -111,15 +120,15 @@ one step; peaks, times and energies are unaffected, only a "max di/dt" of the ch
 So in resistor terms: **turn-on as fast as the line-step overshoot allows (≈ 2.5 Ω per device at 50 pH,
 3.5 Ω at 75 pH), turn-off as fast as possible (a ~0.3 Ω sink), low-side sink ≤ 0.3 Ω, Kelvin source, loop
 ≤ 75 pH for the 200 A budget and ≤ 50 pH if 260 A excursions (C13's falling ramps) must also stay ≤ 40 V.**
-This reverses D69's "name a slow turn-off" and lowers the ramp model's 125-150 pH bound. Start-up on-time
+Gate loop ≤ ~1 nH per device (Section 4.8). This reverses D69's "name a slow turn-off" and lowers the ramp model's
+125-150 pH bound. Start-up on-time
 (cosim to the handover, A155's 0.0283 V/ns): Vo(143.5 µs) at ton 36.5 ns is 0.998 / 0.950 / 0.962 V for
 2 / 3 Ω (75 pH) / 4.5 Ω; the A163 configurations add (1.015 − Vo) / 0.0283 ns.
 
 ## 6. Limits
 
-- Identical parallel devices: no threshold mismatch between the 2 (3) devices of a switch, so no current sharing
-  during an edge.
-- No gate-loop inductance besides L_cs; the driver is an ideal source behind a resistor (no supply droop, no
-  propagation-delay spread beyond the bridge's t_drv); the damper is the ideal Q 7 resistor.
+- The plant's devices are identical (mismatch and gate-loop inductance are LTspice single edges, Sections 4.7-4.8);
+  the driver is an ideal source behind a resistor (no supply droop, no propagation-delay spread beyond the bridge's
+  t_drv); the damper is the ideal Q 7 resistor.
 - The plant's low sides keep instantaneous (ZVS) edges; their dv/dt immunity is checked in LTspice only.
 - Single edges are snapshots of A145's state; the system (frozen controller, deferred measurement, start-up) is A163.

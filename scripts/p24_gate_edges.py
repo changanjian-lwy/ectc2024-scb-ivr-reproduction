@@ -129,7 +129,8 @@ def edge_plant(case, l_ph, r, dv=3.8, i1=0.0, i0=143.0, q=7, lcs=0.0, t_win=40e-
 
 
 def lt_netlist(case, l_ph, r, dv=3.8, i1=0.0, i0=143.0, q=7, lcs=0.0, t_win=40e-9, temp=25.0, dk2=0.0,
-               r_hs_off=1.0, r_ls=0.0):
+               r_hs_off=1.0, r_ls=0.0, lg=0.0, mis=0.0):
+    """... lg: gate-loop inductance (H) in series with each SH1 gate resistor; mis: SH1b's threshold shift (V)."""
     import p24_ltspice as LT
     rp = q_rp(l_ph * 1e-12, q) if (q and l_ph) else 0.0
     pr, el = LT.flat_device()
@@ -160,8 +161,13 @@ def lt_netlist(case, l_ph, r, dv=3.8, i1=0.0, i0=143.0, q=7, lcs=0.0, t_win=40e-
                 lines.append(f"Lcs{k + 1}{mdev} {sp} {src[k]} {lcs:.6e} ic={(iloop1 / 2) if k == 0 else 0.0}")
                 ic[sp] = v[src[k]]
             g = f"g{k + 1}{mdev}"
-            lines += LT.instance(el, inst, g, f"h{k + 1}", sp)
-            if k == 0:
+            k2i = (2.115 + dk2 + mis) if (k == 0 and mdev == "b" and mis) else None
+            lines += LT.instance(el, inst, g, f"h{k + 1}", sp, k2=k2i)
+            if k == 0 and lg:
+                lines += [f"Rgd{k + 1}{mdev} dr1 gl{k + 1}{mdev}x {max(r, 1e-3):.6e}",
+                          f"Lgd{k + 1}{mdev} gl{k + 1}{mdev}x {g} {lg:.6e}"]
+                ic[f"gl{k + 1}{mdev}x"] = v[src[k]] + (5.0 if case == "off" else 0.0)
+            elif k == 0:
                 lines.append(f"Rgd{k + 1}{mdev} dr1 {g} {max(r, 1e-3):.6e}")
             else:
                 lines.append(f"Rgo{k + 1}{mdev} {g} {src[k]} {r_hs_off:.6e}")
@@ -200,7 +206,8 @@ def lt_netlist(case, l_ph, r, dv=3.8, i1=0.0, i0=143.0, q=7, lcs=0.0, t_win=40e-
             continue
         lines += [f"Shold_{n} {n} hv_{n} hctl 0 SWH", f"Vhv_{n} hv_{n} 0 {val:.9g}"]
     lines.append(f".tran 0 {T_REL + T_ON + t_win:.4e} 0 5e-12 uic")
-    lines.append(".save V(h1) V(a1) V(h2) V(a2) I(Bswitch_h1a) I(Bswitch_h1b) V(h1a_g) V(h1a_s) V(l1a_g) V(h2a_g) V(h2a_s)")
+    lines.append(".save V(h1) V(a1) V(h2) V(a2) I(Bswitch_h1a) I(Bswitch_h1b) V(h1a_g) V(h1a_s) V(h1b_g) V(h1b_s) "
+                 "V(l1a_g) V(h2a_g) V(h2a_s)")
     return "\n".join(lines) + "\n"
 
 
@@ -230,6 +237,15 @@ def edge_lt(case, l_ph, r, dv=3.8, i1=0.0, i0=143.0, q=7, lcs=0.0, t_win=40e-9, 
         v_act = d.vgs_for(i0 / 2, 0.2)
         k = np.argmax((vg < v_act) & m)
     out["delay_ns"] = float(t[k]) * 1e9
+    ia, ib = col("I(Bswitch_h1a)"), col("I(Bswitch_h1b)")   # per device (a mismatch case: b's threshold shifted)
+    va = col("V(h1a_g)") - col("V(h1a_s)"); vb = col("V(h1b_g)") - col("V(h1b_s)")
+    out["ia_pk"], out["ib_pk"] = float(np.abs(ia[m]).max()), float(np.abs(ib[m]).max())
+    out["ea_nj"] = float(np.trapezoid((v1 * ia)[m], t[m])) * 1e9
+    out["eb_nj"] = float(np.trapezoid((v1 * ib)[m], t[m])) * 1e9
+    out["vgs_sh1_max"], out["vgs_sh1_min"] = float(max(va[m].max(), vb[m].max())), float(min(va[m].min(), vb[m].min()))
+    tail = t[m] > (out["t50_ns"] or 0) * 1e-9 + 3e-9 if case == "off" else None
+    if tail is not None:                                # re-turn-on after the turn-off: gate back above 1 V
+        out["vgs_sh1_tail_max"] = float(max(va[m][tail].max(), vb[m][tail].max()))
     gl1 = col("V(l1a_g)")                               # SL1's internal gate (source = ground)
     gh2 = col("V(h2a_g)") - col("V(h2a_s)")
     out["vgs_sl1_max"], out["vgs_sl1_min"] = float(gl1[m].max()), float(gl1[m].min())
@@ -386,6 +402,28 @@ def sweep2(jobs_n=6):
     with Pool(jobs_n) as pool:
         rows = pool.map(_job, sweep2_jobs(), chunksize=1)
     (OUT / "D79_gate_candidates.json").write_text(json.dumps(rows, indent=1, default=float))
+    return rows
+
+
+def mismatch_and_gate_loop():
+    """LTspice at S50 (50 pH, 2.5 / 0.3 ohm): SH1's two devices with thresholds 0.5 V apart (turn-on 17 V, turn-off
+    200 A), and a gate-loop inductance of 0.5 / 1 / 2 nH per device (turn-on 3.8 V and 17 V, turn-off 200 A)."""
+    rows = []
+    l, ron, roff = CAND["S50b"]
+    for case, kw in (("on", dict(dv=17.0)), ("off", dict(i0=200.0))):
+        r = ron if case == "on" else roff
+        for mis in (0.0, 0.5):
+            out, _ = edge_lt(case, l, r, mis=mis, tag=f"_mis{mis}", **kw)
+            rows.append(dict(kind="mismatch", case=case, mis_v=mis, **kw, res=out))
+            print(rows[-1]["case"], mis, {k: round(out[k], 2) for k in ("vpk_v", "ia_pk", "ib_pk", "ea_nj", "eb_nj")})
+    for case, kw in (("on", dict(dv=3.8)), ("on", dict(dv=17.0)), ("off", dict(i0=200.0)), ("off", dict(i0=143.0))):
+        r = ron if case == "on" else roff
+        for lg in (0.0, 0.5e-9, 1e-9, 2e-9):
+            out, _ = edge_lt(case, l, r, lg=lg, tag=f"_lg{lg * 1e9:g}", **kw)
+            rows.append(dict(kind="gate_loop", case=case, lg_nh=lg * 1e9, **kw, res=out))
+            print(case, kw, lg * 1e9, {k: round(out[k], 2) for k in ("vpk_v", "e_ch_nj", "vgs_sh1_max", "vgs_sh1_min")},
+                  round(out.get("vgs_sh1_tail_max", float("nan")), 2))
+    (OUT / "D79_mismatch_gate_loop.json").write_text(json.dumps(rows, indent=1, default=float))
     return rows
 
 

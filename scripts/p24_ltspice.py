@@ -60,14 +60,18 @@ def flat_device(name="EPC2067"):
     return params, elems
 
 
-def instance(elems, inst, g, d, s):
+def instance(elems, inst, g, d, s, k2=None):
     """Element lines of one device instance: element names suffixed, pins mapped to (g, d, s), internal nodes
-    <inst>_g / _d / _s (gate, drain, source after rg / rd / rs)."""
+    <inst>_g / _d / _s (gate, drain, source after rg / rd / rs). k2 (V) gives this instance its own threshold
+    parameter (a mismatch case; returned lines then start with its .param)."""
     m = {"gatein": g, "drainin": d, "sourcein": s, "gate": f"{inst}_g", "drain": f"{inst}_d", "source": f"{inst}_s"}
-    out = []
+    out = [f".param k2_{inst}={k2}"] if k2 is not None else []
     for e in elems:
         nm, rest = e.split(None, 1)
-        out.append(f"{nm}_{inst} " + _NODE.sub(lambda k: m[k.group(1).lower()], rest))
+        rest = _NODE.sub(lambda k: m[k.group(1).lower()], rest)
+        if k2 is not None:
+            rest = re.sub(r"\bk2\b", f"k2_{inst}", rest)
+        out.append(f"{nm}_{inst} " + rest)
     return out
 
 
