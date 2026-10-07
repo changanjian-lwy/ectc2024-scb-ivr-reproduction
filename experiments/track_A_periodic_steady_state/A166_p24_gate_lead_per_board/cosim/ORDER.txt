@@ -1,0 +1,13 @@
+m4_nom_l_p48_1us
+nom_l_p48_1us
+nom_s_p62
+nom_slew4
+nom_L07_l_p48_1us
+nom_L13_l_p48_1us
+ff_l_p48_1us
+ff_l_m80_10us
+ss_l_p48_1us
+ss_s_p62
+ss_l_m80_10us
+ss_slew4
+hot_l_p48_1us

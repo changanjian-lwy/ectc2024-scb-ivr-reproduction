@@ -1,0 +1,26 @@
+{
+ "ff_L0": {
+  "delay_min_ns": 1.474,
+  "lead_ns": 0.47
+ },
+ "hot_L0": {
+  "delay_min_ns": 2.06,
+  "lead_ns": 1.06
+ },
+ "nom_L0": {
+  "delay_min_ns": 2.31,
+  "lead_ns": 1.31
+ },
+ "nom_L07": {
+  "delay_min_ns": 2.274,
+  "lead_ns": 1.27
+ },
+ "nom_L13": {
+  "delay_min_ns": 2.27,
+  "lead_ns": 1.27
+ },
+ "ss_L0": {
+  "delay_min_ns": 7.064,
+  "lead_ns": 6.06
+ }
+}
