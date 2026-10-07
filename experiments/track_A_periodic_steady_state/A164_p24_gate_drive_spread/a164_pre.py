@@ -35,6 +35,8 @@ RUNS = [("nom", 0.0, 39.8), ("nom", 8.0, 31.8), ("ff", 0.0, 39.2), ("ff", 8.0, 3
         ("ss20", 8.0, 49.5, 3.0),   # contingency: r_on 3.0 ohm with a +-20 % driver (slow side 3.6 ohm)
         ("ssseed", 8.0, 52.0, 3.5)]  # ss at 4.55 ohm with the valley seed dt_init 5.7 ns (ss_lead8's learned dt_pred)
 SEED = {"ssseed": 5.7}
+# handover check at the registered point (3.0 ohm, trimmed nominal ton 39.615 ns, to 190 us): lead 8 vs 0
+HAND = [("nom", 8.0, 39.615, 3.0), ("nom", 0.0, 39.615, 3.0)]
 
 
 def gate_cfg(corner, lead, ton, t_end=300.0, r_on=R_ON):
