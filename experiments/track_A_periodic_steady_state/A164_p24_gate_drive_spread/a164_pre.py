@@ -22,7 +22,7 @@ _spec.loader.exec_module(MC)
 
 R_ON, R_OFF = 3.5, 0.3
 CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3},
-           "hot": {"temp": 125.0}}
+           "hot": {"temp": 125.0}, "ss20": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.2}}
 # start-up ton guesses for Vo(143.5 us) ~1.035 V: 37.887 + 0.9 at 2.5 ohm, + ~1 ns for 3.5 ohm, the corner's extra
 # on-time loss (~2 x its single-edge turn-on delay change, A163 s50vthmax) and (wrongly) minus the lead: the lead acts
 # on predictive turn-ons only, not in the start-up, so the lead runs start ~8 ns short (their handover is not a result)
@@ -30,28 +30,30 @@ CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "c
 # ss_lead8 (ton 44) ran before the fix: with the command ahead of the low side's turn-off, the valley measurement was
 # skipped (learn decided at the command), dt_pred could not learn and it is not a result.
 RUNS = [("nom", 0.0, 39.8), ("nom", 8.0, 31.8), ("ff", 0.0, 39.2), ("ff", 8.0, 31.2), ("ss", 0.0, 52.0),
-        ("ss", 4.0, 48.0), ("ss", 8.0, 52.0), ("ss", 9.5, 52.0), ("hot", 0.0, 39.8), ("hot", 8.0, 31.8)]
+        ("ss", 4.0, 48.0), ("ss", 8.0, 52.0), ("ss", 9.5, 52.0), ("hot", 0.0, 39.8), ("hot", 8.0, 31.8),
+        ("ss20", 8.0, 49.5, 3.0)]   # contingency: r_on 3.0 ohm with a +-20 % driver (slow side 3.6 ohm)
 
 
-def gate_cfg(corner, lead, ton, t_end=300.0):
+def gate_cfg(corner, lead, ton, t_end=300.0, r_on=R_ON):
     cfg = MC.M.package(MC.row_cfg("l_p48_1us"), 50, round(MC.M.E.q_rp(50e-12, 7), 4), 36.0, ton)
-    g = {"dev": "EPC2067", "r_on": R_ON, "r_off": R_OFF, "meas": "act"}
+    g = {"dev": "EPC2067", "r_on": r_on, "r_off": R_OFF, "meas": "act"}
     for k, v in CORNERS[corner].items():
         if k == "r_scale":
-            g["r_on"], g["r_off"] = round(R_ON * v, 4), round(R_OFF * v, 4)
+            g["r_on"], g["r_off"] = round(r_on * v, 4), round(R_OFF * v, 4)
         else:
             g[k] = v
     out = dict(cfg, gate=g, ton_ns=ton, t_end_us=t_end)
     if lead:
-        out["driver"] = {"hs_on_lead_ns": lead}
+        out["driver"] = dict(cfg.get("driver") or {}, hs_on_lead_ns=lead)
     return out
 
 
 def cfgs():
     PRE.mkdir(exist_ok=True)
-    for c, lead, ton in RUNS:
+    for c, lead, ton, *r in RUNS:
         name = f"{c}_lead{lead:g}"
-        (PRE / f"cfg_{name}.json").write_text(json.dumps(dict(gate_cfg(c, lead, ton), out=f"run_{name}.json",
+        (PRE / f"cfg_{name}.json").write_text(json.dumps(dict(gate_cfg(c, lead, ton, r_on=r[0] if r else R_ON),
+                                                              out=f"run_{name}.json",
                                                               note=f"A164 pre: {c}, lead {lead} ns, ton {ton} ns"),
                                                          indent=1) + "\n")
 
@@ -72,7 +74,7 @@ def stats(path):
 
 def main():
     out = {}
-    for c, lead, _ in RUNS:
+    for c, lead, *_ in RUNS:
         p = PRE / f"run_{c}_lead{lead:g}.json"
         if p.exists():
             out[p.stem[4:]] = st = stats(p)
