@@ -303,7 +303,7 @@ four-module design (C13) and the package drive (A152). What is left rests on val
 | Co may grow | the droop at the 1 MHz loop ceiling falls ∝ 1/Co | T6 |
 | a smaller node (P24 Sec. IV's 1 + 2 devices) | I_th falls (D57: 9.5-12.8% at 1 MHz), so the margin grows at the same i_neg | T12; not yet run |
 | a hotter junction (85 °C design point, D73; 125 °C a bound) | R_on × 1.35 / 1.59 (A90): conduction grows, so the optimum i_neg moves down | T8 |
-| the thermal path is known (R_th per module, coolant temperature) | D73's fixed point gives the hot efficiency; the inductor array's path is the one to check first | D73 |
+| the thermal path is known (R_th per module, coolant temperature) | D73's fixed point gives the hot efficiency; D74: the inductor layer binds through glass 1, ~2 % copper fill under the columns (stacked through the build-ups, landing on copper) fixes it; then h ≥ 2·10⁴ W/(m²K) at a 45 °C coolant | D73, D74 |
 | the gate drivers' high-to-low mismatch can exceed the node's fall (~1-2 ns) | budget ~0.25 points per ns at 1 MHz: +3.4 ns cost 0.85 points (A119 m3p) | driver (A91, A119) |
 | more modules | interleave per C02; inductor matching within about ±5 % worst case (the 200 A crossing is near ±7 %); the final design needs the slave floor (C06) | T16, T17 (D66, C14) |
 | the package loop L is known | driver: turn-on di/dt ≤ 3.2 V / L; turn-off 72 A/ns to 150 pH, ≤ 10 V / L above (+7 to +28 W per module at 200-300 pH); start-up Ton by D68 Section 8 (A151-A155); not the controller (A148-A150); the loop's own loss limit is ~70 pH for 1 % | T20 (D68, A151-A155) |
@@ -326,6 +326,11 @@ four-module design (C13) and the package drive (A152). What is left rests on val
   current). The inductor array makes 28-44 % of the heat inside glass 2, away from the dies' spreader: its path binds,
   not the GaN (hottest die 1.3 W, 0.5 K above its case). Stable: runaway only above 5 K·cm²/W. Hot, 2.5 MHz leads
   5 MHz by 0-0.5 points. A hot R_on also moves the optimum i_neg down.
+  **D74** (3D conduction, verified against closed forms; cooling face = h under the GaN spreader; stack values assumed):
+  the inductor layer is the hottest (processor face adiabatic); with no via copper glass 1 takes 30 of the 60 K at h 2·10⁴ (inductor
+  85.5 °C, junction 42.9 °C, 25 °C coolant); ~2 % copper fill (≈ 5,700 × 30 µm vias, 4 mm² per 250 W module) takes it
+  to 4-5 K, provided the vias land on copper and every ABF dielectric has ≥ 0.5-1 % copper. Then the inductor core
+  (~9 K) and 1/h bind; a 250 W module needs two P24 sites (20 dies = 185 mm²). Open: a coolant model, the processor face.
 - **Coss spread and per-module driver delay** (C04 Section 3).
 - **Losses not modelled:** core loss and saturation, Coss hysteresis, AC resistance, driver quiescent power,
   output-capacitor ESR; Cs ESL.

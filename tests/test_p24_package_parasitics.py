@@ -43,3 +43,13 @@ def test_overshoot_linear_c():
     l, i, vr, c, n = 100e-12, 100.0, 12.0, 1e-9, 2
     exact = np.sqrt(vr ** 2 + l * i ** 2 / (n * c))       # 0.5 L I^2 = n C (V^2 - Vr^2) / 2
     assert abs(P.overshoot(l, i, vr, _ConstC(c), n) - exact) < 1e-3
+
+
+def load_tests(loader, tests, pattern):
+    """The portable suite collects with unittest; wrap the module's test functions so they run there too."""
+    import unittest
+    suite = unittest.TestSuite()
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            suite.addTest(unittest.FunctionTestCase(fn, description=name))
+    return suite

@@ -73,7 +73,9 @@ capacitors 2.7 W. Per die (phases 1-4): low side 1.31-1.34 W, high side 0.34-0.3
   is embedded in glass 2, with glass 1 between it and the dies' heat spreader (Fig. 5c-d). Glass conducts ~1 W/(m·K)
   (assumed; P24 gives no glass data): 0.1 mm costs ~0.9 K·cm²/W, so 18.5-22.9 W crossing ~0.3 mm of glass alone would
   use the whole 60 K budget. The array needs its own path (copper via fill or a cooler on its side); P24 gives neither
-  the glass thicknesses nor the via counts nor which face of the IVR is cooled.
+  the glass thicknesses nor the via counts nor which face of the IVR is cooled. *D74 checks this in 3D:* with no via
+  copper glass 1 takes 30 of the 60 K at h 2·10⁴ W/(m²K) (inductor 85.5 °C, junction 42.9 °C); ~2 % copper fill under
+  the columns takes it to 4-5 K.
 - **Not covered:** the temperature field inside a module (one node), the core's loss and saturation at temperature,
   the processor's own heat next to the IVR, thermal transients.
 

@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-82: D68-D73, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-83: D68-D74, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1751,6 +1751,21 @@ each question:
          from the dies' spreader: its path binds. Stable (runaway above
          5 K cm^2/W); 2.5 MHz leads 5 MHz by 0-0.5 points hot. 125 C is now a
          bound, not the design point.
+     83. The module stack as a 3D conduction model (2026-10-07, math):
+         [D74](../symbolic_derivations/03_P24_native/D74_P24_THERMAL_STACK.md).
+         Finite-volume solver verified against closed forms (slab, layered
+         1D exact, Muzychka / Yovanovich flux channels to 0.07-0.2 %,
+         resolved vias vs effective medium), convective cooling face under
+         the GaN spreader, per-die electrothermal loop on D73's losses. The
+         inductor layer is the hottest part (processor face adiabatic) and
+         glass 1 is the barrier: at h 2e4 W/(m2 K), 25 C coolant, no via copper, inductor
+         85.5 C vs junction 42.9 C, glass 1 takes 30 of the 60 K. About 2 %
+         copper fill under the columns (~5,700 vias of 30 um, 4 mm^2 per
+         module) takes the glass step to 4-5 K; the 85 C minimum is 0-0.7 %
+         at h 2e4, more at lower h or D73's density. Conditions: vias land on
+         copper on both glass faces, every ABF dielectric >= 0.5-1 % copper.
+         Then the inductor stays ~9 K above the junctions (its core) and 1/h
+         dominates. A 250 W module (20 dies, 185 mm^2) needs two P24 sites.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
@@ -1797,5 +1812,7 @@ P24 transfer remains a separately declared topology/sequence branch.
    Q ≤ 30 是理想阻尼器下的结果，物理来源未定。横向铜只在损耗预算里，含封装的估算效率约 81–86 %（铜厚 86–429 µm，D70 / D72）。
    高温按团队论文的 85 °C 门槛和电热闭环（D73，集总一节点）：变换器约 84–86 %，含封装约 78–84 %，前提是每个 1 cm² 模块到
    25 °C 冷却液的热阻 ≤ 0.8–1.0 K·cm²/W；28–44 % 的热在玻璃 2 里的电感阵列，它的散热路径才是瓶颈，不是 GaN。
+   D74 的三维导热模型（解析解验证过）证实了这一点：冷却面换热系数 2×10⁴、玻璃 1 不加铜时电感比结温高约 43 K，玻璃 1 占
+   一半温升；玻璃 1 里约 2 % 的铜过孔（每模块约 5,700 个 30 µm 孔），并且过孔两端落在铜层上、ABF 也有微孔，就能解决。
 5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
-   问题；动态模型里还没有模块输出路径的 R / L、磁芯损耗和热场（D70 的清单；热只有 D73 的集总要求）。
+   问题；动态模型里还没有模块输出路径的 R / L 和磁芯损耗（D70 的清单）；热场有 D74 的稳态导热模型，冷却面还是换热系数，没有冷却液模型。

@@ -191,7 +191,7 @@ are budgets over plausible ranges:
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
-| thermal path, coolant temperature | 85 °C fixed point: ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant (0.5-0.7 at 45 °C); 28-44 % of the heat in the inductor array, behind glass | the hot efficiency; where cooling must reach |
+| thermal path, coolant temperature | 85 °C fixed point: ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant (0.5-0.7 at 45 °C); in 3D (D74) the inductor array is hottest; ~2 % via copper in glass 1 fixes it | the hot efficiency; where cooling must reach |
 | output-capacitor placement, processor-side decoupling | the lateral Vo path is 63-628 pH per module (Fig. 5 geometry); with the capacitors at the modules a 1 kA/µs load slew drops 16-157 mV at the processor, faster than the loop (module-to-module ringing ≤ 1 mV) | load-side decoupling or load slew; Vo sensed at the common strip |
 
 Five answers would narrow the package specification most:
@@ -213,8 +213,8 @@ Five answers would narrow the package specification most:
 4. How was the start-up on-time set? A slow turn-on needs it raised by
    ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
 5. Has P24's IVR been through Choi et al.'s electrothermal framework? Which
-   face is cooled, at what coolant temperature? The inductor array, behind
-   glass, binds; our per-layer loss map is ready as the solver's input.
+   face is cooled, at what coolant temperature? Thermal vias in glass 1? Without
+   them our 3D model has the inductor array 43 K above the dies.
 
 Otherwise I will continue across the ranges above.
 

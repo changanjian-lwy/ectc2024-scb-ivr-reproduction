@@ -1,0 +1,327 @@
+{
+ "V1_slab_generation": {
+  "rows": [
+   {
+    "nz": 4,
+    "max_err_k": 0.3906250000000213,
+    "energy_rel": 2.220446049250313e-16
+   },
+   {
+    "nz": 8,
+    "max_err_k": 0.09765625000005684,
+    "energy_rel": 3.552713678800501e-15
+   },
+   {
+    "nz": 16,
+    "max_err_k": 0.0244140625,
+    "energy_rel": -1.1102230246251565e-16
+   },
+   {
+    "nz": 32,
+    "max_err_k": 0.006103515624982236,
+    "energy_rel": -3.774758283725532e-15
+   },
+   {
+    "nz": 64,
+    "max_err_k": 0.0015258789063139488,
+    "energy_rel": 5.10702591327572e-15
+   }
+  ],
+  "order": [
+   1.9999999999992393,
+   2.0000000000008398,
+   2.000000000004199,
+   1.9999999999353386
+  ],
+  "case": "L 1 mm, k 2, q''' 1e8 W/m3, h 2e4, adiabatic at z = 0"
+ },
+ "V2_layered_1d": {
+  "n_cells": 25,
+  "t_top_k": 154.6743556443498,
+  "exact_k": 154.67435564435564,
+  "rel_err": -3.785860513971784e-14,
+  "contrast": 975.0
+ },
+ "V3_flux_channel": {
+  "exact_k": 43.17025081021372,
+  "rows": [
+   {
+    "dxy_mm": 0.5,
+    "n": 1600,
+    "mean_rise_k": 46.167015634380505,
+    "rel_err": 0.06941735959193851,
+    "energy_rel": 6.681322162194192e-13
+   },
+   {
+    "dxy_mm": 0.25,
+    "n": 12800,
+    "mean_rise_k": 44.12511288702935,
+    "rel_err": 0.02211852048331675,
+    "energy_rel": -9.416911694870578e-13
+   },
+   {
+    "dxy_mm": 0.125,
+    "n": 102400,
+    "mean_rise_k": 43.46206531874543,
+    "rel_err": 0.006759620411162182,
+    "energy_rel": -6.56030785251005e-13
+   },
+   {
+    "dxy_mm": 0.0625,
+    "n": 819200,
+    "mean_rise_k": 43.2568767600419,
+    "rel_err": 0.002006612150784237,
+    "energy_rel": 9.043876758596525e-13
+   }
+  ],
+  "order": [
+   1.6500416044838915,
+   1.7102407474992365,
+   1.7521804422574452
+  ],
+  "richardson_rel_err": 0.0,
+  "case": "10 x 10 x 1 mm, k 20, h 1e4, 2 x 2 mm source 100 W/cm2 (Muzychka et al. 2003)"
+ },
+ "V4_compound_channel": {
+  "exact_k": 6.321231571803301,
+  "rows": [
+   {
+    "dxy_mm": 0.5,
+    "n": 6776,
+    "mean_rise_k": 6.380603073042229,
+    "rel_err": 0.00939239459344643,
+    "energy_rel": -3.943512183468556e-13
+   },
+   {
+    "dxy_mm": 0.25,
+    "n": 24696,
+    "mean_rise_k": 6.3373730199101885,
+    "rel_err": 0.0025535289956610807,
+    "energy_rel": -1.8485213360008856e-13
+   },
+   {
+    "dxy_mm": 0.125,
+    "n": 91854,
+    "mean_rise_k": 6.325936075933284,
+    "rel_err": 0.000744238535884012,
+    "energy_rel": -1.212363542890671e-13
+   }
+  ],
+  "order": [
+   1.8790005791133064,
+   1.7786554424039807
+  ],
+  "case": "200 um Cu on 300 um glass (k 1.1), h 2e4, die-size source 1.33 W (Yovanovich et al. 1999)"
+ },
+ "V5_orthotropic": {
+  "kxy": 1.2151040615624709,
+  "kz": 20.545,
+  "exact_k": 49.00985829482893,
+  "isotropic_kz_k": 22.344329436867092,
+  "rows": [
+   {
+    "dxy_mm": 0.25,
+    "n": 4800,
+    "mean_rise_k": 52.911319080713675,
+    "rel_err": 0.07960563285889743
+   },
+   {
+    "dxy_mm": 0.125,
+    "n": 19200,
+    "mean_rise_k": 50.41608945988764,
+    "rel_err": 0.028692822505203663
+   },
+   {
+    "dxy_mm": 0.0625,
+    "n": 76800,
+    "mean_rise_k": 49.44540836878721,
+    "rel_err": 0.008886989048981553
+   }
+  ],
+  "order": [
+   1.4721806262262984,
+   1.6909232770895046
+  ],
+  "case": "300 um glass with 5 % Cu vias (kxy 1.22, kz 20.5), 1 x 1 mm source, h 2e4"
+ },
+ "V6_resolved_vias": {
+  "rows": [
+   {
+    "caps": false,
+    "fill": 0.0625,
+    "pitch_um": 240.0,
+    "pillar_um": 60.0,
+    "fill_drawn": 0.0625,
+    "n": 110592,
+    "resolved_k": 189.15232884110742,
+    "homogenised_series_k": 68.48465208172786,
+    "rel_diff_resolved_vs_series": 1.7619667048228234
+   },
+   {
+    "caps": false,
+    "fill": 0.0625,
+    "pitch_um": 120.0,
+    "pillar_um": 30.0,
+    "fill_drawn": 0.0625,
+    "n": 442368,
+    "resolved_k": 145.46172209060532,
+    "homogenised_series_k": 68.48465208172786,
+    "rel_diff_resolved_vs_series": 1.1240046881893329
+   },
+   {
+    "caps": false,
+    "fill": 0.25,
+    "pitch_um": 60.0,
+    "pillar_um": 30.0,
+    "fill_drawn": 0.25,
+    "n": 442368,
+    "resolved_k": 80.3589312044292,
+    "homogenised_series_k": 51.288129542059025,
+    "rel_diff_resolved_vs_series": 0.566813450245452
+   },
+   {
+    "caps": true,
+    "fill": 0.0625,
+    "pitch_um": 240.0,
+    "pillar_um": 60.0,
+    "fill_drawn": 0.0625,
+    "n": 147456,
+    "resolved_k": 18.182036452322766,
+    "homogenised_series_k": 17.640604462212618,
+    "rel_diff_resolved_vs_series": 0.030692371753469727
+   },
+   {
+    "caps": true,
+    "fill": 0.0625,
+    "pitch_um": 120.0,
+    "pillar_um": 30.0,
+    "fill_drawn": 0.0625,
+    "n": 589824,
+    "resolved_k": 17.883847478577675,
+    "homogenised_series_k": 17.640604462212618,
+    "rel_diff_resolved_vs_series": 0.013788814146709072
+   },
+   {
+    "caps": true,
+    "fill": 0.25,
+    "pitch_um": 60.0,
+    "pillar_um": 30.0,
+    "fill_drawn": 0.25,
+    "n": 589824,
+    "resolved_k": 14.9118298045368,
+    "homogenised_series_k": 14.913020648516405,
+    "rel_diff_resolved_vs_series": -7.98526339949035e-05
+   }
+  ],
+  "case": "1.44 x 1.44 mm channel, 300 um glass (k 1.1), 0.48 x 0.48 mm source 200 W/cm2, h 2e4"
+ },
+ "V7_epc2067_rjc": {
+  "k_si_120": {
+   "r_jc_1d": 0.4660368870895186,
+   "r_jc_model_k_per_w": 0.46603688708951796
+  },
+  "k_si_148": {
+   "r_jc_1d": 0.37786774628879893,
+   "r_jc_model_k_per_w": 0.3778677462888026
+  },
+  "datasheet_r_jc": 0.4
+ },
+ "V8_module": [
+  {
+   "f_g1": 0.0,
+   "base_direct": {
+    "n": 81700,
+    "junction_max": 42.90056947681281,
+    "inductor_max": 85.54259149546404,
+    "p_total_w": 64.64050796610934,
+    "face_heat_w": 64.64050796608427,
+    "iterations": 7,
+    "energy_rel": -3.878009025015672e-13
+   },
+   "base_cg": {
+    "n": 81700,
+    "junction_max": 42.90056947687869,
+    "inductor_max": 85.54259149530563,
+    "p_total_w": 64.64050796611079,
+    "face_heat_w": 64.6405079661068,
+    "iterations": 7,
+    "energy_rel": -6.17284001691587e-14
+   },
+   "dx_0.125": {
+    "n": 315400,
+    "junction_max": 43.01275036396429,
+    "inductor_max": 85.44732858395626,
+    "p_total_w": 64.62071126612307,
+    "face_heat_w": 64.62071126613904,
+    "iterations": 7,
+    "energy_rel": 2.4713564528155985e-13
+   },
+   "dx_0.0625": {
+    "n": 1238800,
+    "junction_max": 43.079181558577304,
+    "inductor_max": 85.414324486303,
+    "p_total_w": 64.6134442510875,
+    "face_heat_w": 64.6134442510899,
+    "iterations": 7,
+    "energy_rel": 3.708144902248023e-14
+   },
+   "nz_x4": {
+    "n": 326800,
+    "junction_max": 42.94536372539801,
+    "inductor_max": 85.51187831232555,
+    "p_total_w": 64.63302676024603,
+    "face_heat_w": 64.63302676042272,
+    "iterations": 7,
+    "energy_rel": 2.7338131758369855e-12
+   }
+  },
+  {
+   "f_g1": 0.02,
+   "base_direct": {
+    "n": 81700,
+    "junction_max": 41.63461669451496,
+    "inductor_max": 56.161759483314086,
+    "p_total_w": 62.143008573482774,
+    "face_heat_w": 62.1430085734603,
+    "iterations": 5,
+    "energy_rel": -3.61710661422876e-13
+   },
+   "base_cg": {
+    "n": 81700,
+    "junction_max": 41.6346166944903,
+    "inductor_max": 56.16175948316126,
+    "p_total_w": 62.1430085734835,
+    "face_heat_w": 62.14300857348462,
+    "iterations": 5,
+    "energy_rel": 1.7985612998927536e-14
+   },
+   "dx_0.125": {
+    "n": 315400,
+    "junction_max": 41.628767117005715,
+    "inductor_max": 56.133763207391254,
+    "p_total_w": 62.137791884014014,
+    "face_heat_w": 62.137791884027045,
+    "iterations": 5,
+    "energy_rel": 2.0961010704922955e-13
+   },
+   "dx_0.0625": {
+    "n": 1238800,
+    "junction_max": 41.62874249393431,
+    "inductor_max": 56.12309374881623,
+    "p_total_w": 62.135517135495775,
+    "face_heat_w": 62.13551713549734,
+    "iterations": 5,
+    "energy_rel": 2.5091040356528538e-14
+   },
+   "nz_x4": {
+    "n": 326800,
+    "junction_max": 41.64762140353769,
+    "inductor_max": 56.116415823678466,
+    "p_total_w": 62.13702977109333,
+    "face_heat_w": 62.137029771203366,
+    "iterations": 5,
+    "energy_rel": 1.7708057242771247e-12
+   }
+  }
+ ]
+}
