@@ -76,6 +76,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A159": (TA / "A159_p24_spec_at_150ph", "a159_analyze.py", "a159_summary.json"),
     "A161": (TA / "A161_p24_150ph_faster_turn_on", "a161_analyze.py", "a161_summary.json"),
     "A162": (TA / "A162_p24_late_fire_timing", "a162_analyze.py", "a162_summary.json"),
+    "A163": (TA / "A163_p24_gate_driven_edges", "a163_analyze.py", "a163_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -322,6 +323,25 @@ NOT_ROWS["A159"] = r"m4_|s150_"
 EXCEPTIONS["A161"] = {("criteria", "c3"): "l_m80_10us late 28 (they follow the loop: 0 / 6 / 16 / 33 / 28 at 50-150 pH), 0 NEW, "
                                            "no consequence; bound 150 pH at 20 A/ns by the registered rule (RESULTS 0)"}
 NOT_ROWS["A161"] = r"m4_|s150_"
+_DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
+_LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
+EXCEPTIONS["A163"] = {
+    **{("criteria", f"{r}/c3"): _DEF163 for r in ("s50_l_p48_1us", "s50_s_p62", "s50_slew10", "s50_slew3", "s50_slew5",
+                                                    "s50_L07_l_p48_1us", "s50_L07_s_p62", "s50vthmin_l_p48_1us",
+                                                    "s50vthmin_s_p62", "s50r07_l_p48_1us", "s50r07_s_p62", "s75_s_p62")},
+    **{("criteria", f"s50_L07_{r}/c2"): "L x 0.7 start-up 215.6 A physical in mode S: the ton calibrated at L0 gives Vo 1.147 "
+       "V there (A152 physical 205.6 A); the per-board trim is A164's fix (RESULTS 0)" for r in ("l_p48_1us", "s_p62")},
+    ("criteria", "s50_slew4/c3"): "late 5 on phase 4: " + _LATE163 + "; peak " + _DEF163,
+    ("criteria", "m4_s50_l_p48_1us/c3"): "late 38, module 4 phase 4: " + _LATE163 + "; peak " + _DEF163,
+    **{("criteria", f"s75_{r}/c3"): "late fires after the line steps at 3.5 ohm: " + _LATE163
+       for r in ("l_p48_1us", "l_m80_10us", "slew2")},
+    ("criteria", "s50r07_l_p48_1us/c1"): "40.6 V: driver -30 % (1.75 ohm), mechanism 3 (RESULTS 0)",
+    **{("criteria", f"s50cissmax_{r}/c3"): "late 179 / 44 (+3 NEW): the handover at Vo 0.980 V (mechanism 1) and the line "
+       "step; C_ISS x 1.5 is outside the datasheet's Q_G max (RESULTS 0)" for r in ("l_p48_1us", "s_p62")},
+    **{("criteria", f"s50vthmax_{r}/c{c}"): "threshold +1.5 V, outside the datasheet's R_DS(on) / V_GS(TH) max: start-up "
+       "on-time (Vo 0.833 V, 368 A, 46.6 V) and the valley-timing limit (1407 late on phase 4), mechanisms 1-2 (RESULTS 0)"
+       for r in ("l_p48_1us", "s_p62") for c in (1, 2, 3)},
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -329,6 +349,8 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A145": lambda d: {**d["criteria"], "2_voltage": {k: bool(v) for k, v in d["criteria"]["2_voltage"].items()}},
     # (A145 lists the inductances that pass per di/dt; the criterion passes for a di/dt with any)
     "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
+    # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
+    "A163": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items() if "cmd" not in s},
 }
 
 
