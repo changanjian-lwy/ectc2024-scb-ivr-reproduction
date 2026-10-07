@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-78: D68, D69, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-79: D68-D70, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1653,7 +1653,7 @@ each question:
          the valley tracking is lost from start-up on (8600-8960 late
          fires on all phases, 58-69 V), as A144 found with instantaneous
          edges: the slow turn-on does not remove the ring after every
-         edge. **Spec adds ring Q <= 30; the loop's real damping is a
+         edge. **Spec adds ring Q <= 30 (ideal parallel damper); the loop's real damping is a
          question for Mihai.**
      73. The damping boundary (2026-10-07, mixed):
          [A158](../experiments/track_A_periodic_steady_state/A158_p24_damping_boundary/RESULTS.md).
@@ -1687,7 +1687,7 @@ each question:
          150 pH with a 20 A/ns turn-on (x_on 3.0 V): matrix and four
          modules <= 39.4 V, regulation back (dip -14.8 mV), 0 NEW, late 28.
          4/5 as registered. Voltage wants di/dt_on <= 3.0 V / L, regulation
-         >= ~20 A/ns; the window closes at 150 pH, which is the loop bound
+         >= ~20 A/ns; the window closes near 150 pH: a candidate bound in the tested model (D70)
          (item 74's 125 pH is the margin value). Late fires follow L, not
          x_on, so item 71's adoption of x_on <= 1.8 V is superseded.
      77. The late fires located (2026-10-07, RTL cfg diagnostic):
@@ -1695,13 +1695,29 @@ each question:
          cfg late_log (bridge, off = unchanged; identity bit for bit) puts
          every late fire of -8 V / 10 us at 2-17 us after the ramp, on
          phases 2 and 4, none in steady state: a bounded settling
-         transient that lasts longer with a larger loop. PASS 2/2; the
-         150 pH bound stands.
+         transient that lasts longer with a larger loop. PASS 2/2; no
+         consequence observed, the late edge's type not identified, and
+         A161's criterion 3 stays failed.
      78. Efficiency when hot (2026-10-07, math):
          D62's budget on A124's p125_n0 waveforms (25 °C: 90.61 % again):
          88.1 % with the switches at 125 °C (R_on x 1.59, A90), 87.5 % with
          the inductor copper 100 K hotter too. First order: the waveforms
          are the 25 °C ones (A90: the module still works at 125 °C).
+     79. The package model's boundary (2026-10-07, audit):
+         [D70](../symbolic_derivations/03_P24_native/D70_P24_PACKAGE_MODEL_BOUNDARY.md).
+         After an external review: a ledger of what the plant holds (loop
+         L with an ideal parallel damper, linear-ramp edges, Coss, reverse
+         conduction, ideal Cs / Co, modules joined at one ideal node), what
+         only the budgets hold (lateral copper, vias, Cs ESR, R_on, inductor
+         R/L) and what is missing (output-path R / L, Cs ESL, core loss,
+         gate dynamics, thermal). The lateral copper's one-way estimate is
+         invalid at 35 um (12 % drop) and holds for >= ~215 um; a path
+         resistance changes four-module sharing by ~1 % only; Q 7 needs
+         ~20-30 mOhm series at the ring frequency, Q 30 ~4-8 mOhm; no
+         double counting. Package-inclusive efficiency 85-89 % (86-429 um).
+         The loop bound, Q <= 30, efficiency and late-fire statements now
+         carry their conditions. Next dynamic element: the per-module
+         output path (R and L).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
@@ -1735,9 +1751,16 @@ project policy; measured-peak feedback still needs its own observer contract.
 Finite-grid event scans are not certified interval root coverage.
 P24 transfer remains a separately declared topology/sequence branch.
 
-## 中文汇报提纲
+## 中文汇报提纲（2026-10-07，P24 主线）
 
-1. **先讲拆分方法：**纵向分成来源、方程、事件控制、器件、实验和验证；横向按一相的物理事件拆周期。
-2. **再讲做出的东西：**共享节点模型、可复用控制与事件模块、15模态代数组装、独立SPICE交叉验证，以及器件/损耗敏感性实验。
-3. **讲一个有价值的失败：**局部SH2换流还没完成，另一相电流已先过零；用同一条轨迹的伏秒与电荷积分解释，而不是任意改初始电流。
-4. **最后讲边界和缺口：**P25三相数学模型与P24四相实验分开。P25量级下的周期解已经闭合（D41），加阻尼后稳定（D42），并经独立电路仿真验证（A69）；但它仍是开环、理想器件的结果，零启动衔接和闭环调节尚未验证，不能说已经完整复现论文。
+1. **问题和结论：** P24 的拓扑、时序和器件假设能否同时成立？不能原样成立：用它自己的参数，1–2 % 负电流给不了高侧 ZVS
+   （约需 27 %）。设计改用 12.5 % 负电流、高侧部分软开通，用“谷底裕量”解释为什么停在这里。
+2. **做出的东西（仿真层面）：** Verilog 控制器接电路模型的联合仿真，四模块 1 kW 从零启动到闭环稳压；2.5 MHz 设计估算效率
+   90.6 %（损耗模型，25 °C）；单模块和四模块控制器经随机测试后冻结；数学模型（D63、D68）与联合仿真互相检验。
+3. **一个有价值的发现链：** 异常检测器找到线电压阶跃后的 ZVS 丢失 → 控制修不了（串联电容的电荷平衡）→ 单独放慢开通解决 →
+   从节点电荷推出“过冲只取决于 L × 开通 di/dt”，在没跑过的点上事前预测并验证。
+4. **封装层的结论要带条件讲：** 在所测模型（理想并联阻尼 Q 7、25 °C、标称 Cs、线性边沿）里，开通 di/dt 的窗口
+   （约 20 A/ns 到 3.0 V / L）在 150 pH 附近闭合，最坏角落离 40 V 只有 0.6 V：这是布局的候选上限，不是硬件极限。阻尼
+   Q ≤ 30 是理想阻尼器下的结果，物理来源未定。横向铜只在损耗预算里，含封装的估算效率 85–89 %（铜厚 86–429 µm）。
+5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
+   问题；动态模型里还没有模块输出路径的 R / L、磁芯损耗和热（D70 的清单）。

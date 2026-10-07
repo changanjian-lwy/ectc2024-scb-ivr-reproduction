@@ -110,7 +110,7 @@ l_p48_1us, turn-off 72 A/ns, Q 7):
   250 W module at those four points, against ~2.7 W at 72 A/ns: +3 to +11 % of the module's power. The harness reads
   15-22 % above the records.
 - **So the drive cannot carry a large loop cheaply:** ≤ 150 pH costs only the slow turn-on (≤ 0.4 W); 200 pH about
-  +7 W; 300 pH +20-28 W. The package spec has to bound the loop, not the drive (≤ 150 pH, Section 11).
+  +7 W; 300 pH +20-28 W. The package spec has to bound the loop, not the drive (a candidate near 150 pH in the tested model, Section 11; D70).
 - With x_on = 2.4 V the turn-on side stays at 35.9-38.3 V (A154) on top of A153's check of the x-curve.
 
 ## 8. The start-up ton with loop and turn-off terms (A155)
@@ -134,7 +134,7 @@ D68's Section 3 has no L term, and above 150 pH its ton under-compensates (A154:
 | any L ≤ 150 pH | between ~20 A/ns (regulation) and 3.0 V / L (40 V on the matrix; 3.2 V nominal row) | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
 | 150-300 pH | ≤ 3.2 V / L (2.4 V with margin) | ≤ ~10 V / L | Section 8 | +7 W (200 pH) to +20-28 W (300 pH) per module |
 
-Plus **loop damping: ring Q ≤ 30** (A157 / A158: Q 15 / 30 hold at 50 and 100 pH, Q 7 to 300 pH; Q 100, Q 300 and
+Plus **loop damping: ring Q ≤ 30 with an ideal parallel damper** (physical source open, D70) (A157 / A158: Q 15 / 30 hold at 50 and 100 pH, Q 7 to 300 pH; Q 100, Q 300 and
 undamped lose the valley tracking from start-up on, whatever the drive). Tested points: A151-A158 (50-300 pH). Not covered: L / Cs corners above 100 pH, four modules above 100 pH, a gate model.
 ## 10. The spec at its limit on the robustness matrix (A156)
 
@@ -151,7 +151,8 @@ turn-on: they meet near 150 pH.
 
 **A161:** at 150 pH with 20 A/ns (x_on 3.0 V) the matrix and four modules stay ≤ 39.4 V and the regulation recovers
 (load dip −14.8 mV, slow ramps inside 1 %); late fires 28. So the turn-on has a window, ~20 A/ns ≤ di/dt_on ≤ 3.0 V / L,
-which closes at L = 150 pH: **recommended loop bound 150 pH (125 pH for margin).** The late fires follow L (0 / 6 / 16 /
+which closes at L = 150 pH: **a candidate loop bound near 150 pH in the tested model (Q 7 ideal damper, 25 °C, nominal Cs,
+linear-ramp edges; 0.6 V margin at the worst corner; 125 pH for margin), not a hardware limit (D70 Section 3).** The late fires follow L (0 / 6 / 16 /
 28-33 at 50 / 100 / 125 / 150 pH), not x_on, so A156's adoption of x_on ≤ 1.8 V (Section 10) is superseded.
 **A162:** they all fall 2-17 µs (100 pH: 2-4 µs) after the −8 V ramp ends (phases 2 and 4, none in steady state): a bounded settling
 transient of the slotted phases that takes more periods with a larger loop, each one a < 4 ns edge delay.

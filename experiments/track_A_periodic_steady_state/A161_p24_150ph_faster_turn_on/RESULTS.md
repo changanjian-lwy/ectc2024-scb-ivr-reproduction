@@ -28,3 +28,8 @@ Boundary: 89f21c0. Records: release records-a161 (14 runs). Outputs: a161_summar
 ## 2. Limits
 - 0.6 V of voltage margin at the worst corner; Cs corners, temperature and a gate model not covered.
 - The late fires' mechanism (phase 4's slot after a falling ramp, growing with L) is still not traced.
+
+## Wording note (D70, 2026-10-07)
+- "Loop bound 150 pH" means: in the tested model (Q 7 ideal damper, 25 C, nominal Cs, linear-ramp edges) the turn-on
+  window closes near 150 pH with 0.6 V margin at the worst corner; a candidate for layout, not a hardware limit. The
+  regulation side rests on four turn-on rates (12 fails, 18 / 20 / 24 pass).

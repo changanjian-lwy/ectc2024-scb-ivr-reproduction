@@ -23,3 +23,7 @@ Boundary: 95c93bf. Records: release records-a157 (5 runs). Outputs: a157_summary
 - Q 15 and 30 on one point only (S50, l_p48_1us); the boundary between Q 30 and undamped is not located.
 - The damper is an ideal parallel resistor across each loop inductance; a real package damps through copper and core
   losses whose Q is unknown (a question for Mihai).
+
+## Wording note (D70, 2026-10-07)
+- "Ring Q <= 30" holds with the plant's ideal parallel damper across the loop inductance; the physical source of the
+  damping (and of its loss) is open. At the ring frequency Q 30 is ~4-8 mOhm series-equivalent, Q 7 ~20-30 mOhm (D70).

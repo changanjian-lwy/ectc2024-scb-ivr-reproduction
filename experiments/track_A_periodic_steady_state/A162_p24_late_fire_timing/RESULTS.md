@@ -10,7 +10,8 @@ Boundary: 4af997e. Records: release records-a162 (2 runs). Output: a162_summary.
   phase 3 1.
 - So the count grows with the loop because the post-ramp settling of the slotted phases (2-4) takes more periods with a
   larger loop, while each late fire is one edge fired at once in the next clock window (a delay of < 4 ns). With no
-  peak, voltage or Vo consequence (A156, A159, A161), the loop bound (150 pH) stands.
+  peak, voltage or Vo consequence observed (A156, A159, A161). This does not turn A161's failed criterion 3 into a pass,
+  and which timed edge is late is not identified.
 
 ## 1. Criteria
 | # | criterion | result |

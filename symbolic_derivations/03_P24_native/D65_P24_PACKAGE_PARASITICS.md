@@ -19,7 +19,7 @@ Geometry: `paper_locked/02_ectc2024_main/P24_FIG5_FIG6_PACKAGE_TRANSCRIPTION.md`
 - Scenarios (none printed by P24): copper 35-400 um per stack, Cu 17 nOhm m (VPD framework, Table III); via arrays at
   pitch 2 d (R x A = 5.1 rho h, independent of d; matches Table III's TSV within 3 %); glass 0.3 / 0.5 mm; Cs ESR
   0.2-2 mOhm; commutation loop 25-500 pH (published embedded-GaN power loops: 0.23-0.32 nH PCB-embedded, 1.03 nH DBC).
-- Reference: 250 W module, measured 90.61 % -> 25.9 W loss; EPC2067 rating 40 V.
+- Reference: 250 W module, estimated 90.61 % (D62's loss model on A124's simulated waveforms) -> 25.9 W loss; EPC2067 rating 40 V.
 
 ## 3. Results
 | path | scenario | loss per module |

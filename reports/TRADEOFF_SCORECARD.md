@@ -35,7 +35,8 @@ kept as Appendix A.
 - **Package (A151-A155, D68):** the drive spec is formulas in (L, di/dt): turn-on ≤ 3.2 V / L; turn-off 72 A/ns to
   150 pH, ≤ 10 V / L above at +7 W (200 pH) to +20-28 W (300 pH) per module; start-up Ton from D68 Section 8. Loss
   limits the loop to ~70 pH for 1 % (A145); the turn-on must lie between ~20 A/ns (regulation, A159 / A161) and
-  3.0 V / L (40 V), a window that closes at 150 pH: bound the loop there (125 pH for margin); ring Q ≤ 30 (A157 / A158); the lateral output copper is the largest loss (D65).
+  3.0 V / L (40 V), a window that closes near 150 pH in the tested model (D70's conditions): a candidate bound, 0.6 V
+  margin (125 pH for margin); ring Q ≤ 30 with an ideal parallel damper, physical source open (A157 / A158, D70); the lateral output copper is the largest loss (D65).
 - **Still a choice:** Section 6. **Still unknown:** Section 8. Sections 2 and 4 are the record of the comparisons
   as they were made; the 1 and 5 MHz columns stay for that reason.
 

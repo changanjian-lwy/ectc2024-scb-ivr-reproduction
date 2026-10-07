@@ -31,8 +31,8 @@ Results (co-simulation, 25 °C):
 
 - **Efficiency 90.6 %** per module (loss model applied to the simulated
   waveforms; 92.5 % with an ideal inductor). Hot, to first order: 88.1 %
-  with the switches at 125 °C, 87.5 % with the inductor copper 100 K hotter
-  too.
+  with the switches at an assumed 125 °C, 87.5 % with the inductor copper
+  100 K hotter too (no thermal model).
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
@@ -106,7 +106,11 @@ are budgets over plausible ranges:
   a central Vo / GND strip. With one 35 µm layer each way this costs 30.7 W
   per 250 W module (12.3 %), more than the converter's own 25.9 W. 5 % needs
   86 µm of copper per stack, 1 % needs 429 µm. Vias, the strip and the
-  series-capacitor ESR (≤ 0.5 mΩ) together stay below ~1 %.
+  series-capacitor ESR (≤ 0.5 mΩ) together stay below ~1 %. This copper is
+  in the loss budget only: at 35 µm its 12 % drop would move the converter's
+  operating point, so the estimate holds for thick copper (≲ 2 % drop,
+  ≳ 215 µm). Package-inclusive, first-order sum: 86-89 % at 50 pH and
+  85-88 % at 150 pH for 86-429 µm.
 - **The loop inductance sets loss; hard turn-ons set the device voltage.**
   With the loop in the circuit model (ring Q 7) and 1-2 ns switching edges,
   the steady high-side peak stays ≤ 34 V up to 150 pH. The loop costs
@@ -159,8 +163,10 @@ are budgets over plausible ranges:
   18 A/ns. In general: turn-on between ~20 A/ns and 3.0 V / L, turn-off
   72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
   Published embedded-GaN loops are 230-320 pH, which this design can drive
-  only at several percent of efficiency: **the loop should be bounded by
-  layout to 150 pH, where the turn-on window closes (125 pH for margin).**
+  only at several percent of efficiency. **In the tested model (ideal damper
+  at Q 7, 25 °C, nominal Cs, linear current-ramp edges) the turn-on window
+  closes near 150 pH, with 0.6 V margin at the worst corner: a candidate
+  bound for layout (125 pH for margin), not a hardware limit.**
 - **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
   48 V transients, and EPC's Phase 16 reliability report allows repetitive
   overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The
@@ -178,7 +184,7 @@ are budgets over plausible ranges:
 | QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
-| loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 |
+| loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
 
 Four answers would narrow the package specification most:

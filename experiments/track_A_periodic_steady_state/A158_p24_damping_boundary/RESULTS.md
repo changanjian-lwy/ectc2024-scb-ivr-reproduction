@@ -25,3 +25,6 @@ Boundary: cea976e. Records: release records-a158 (5 runs). Outputs: a158_summary
 - The oracle's K4 window (line ramp + 1 us) is narrower than the post-step swing with a slow turn-on (+1.05-1.16 us in
   A154 / A158); widening it would reclassify earlier records and is left as a registered change for later.
 - Q 30-100 not resolved; one row (+4.8 V / 1 us) per point.
+
+## Wording note (D70, 2026-10-07)
+- As A157: the boundary Q 30-100 is for the ideal parallel damper; real damping is open (D70).
