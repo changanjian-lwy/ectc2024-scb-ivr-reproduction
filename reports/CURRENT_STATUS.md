@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-75: D68, D69 and A153-A160). This is the current navigation
+package drive specification A151-A152; items 68-76: D68, D69 and A153-A161). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 48 co-simulated experiments, every registered
+the acceptance gate holds 49 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1682,6 +1682,14 @@ each question:
          registration had wrongly listed as traced: it is the same swing
          peak. FAIL as registered, K4 stays 1 us; A151's "9 A/ns too slow"
          now rests on its Vo evidence alone (post hoc note).
+     76. The turn-on window and the loop bound (2026-10-07, mixed):
+         [A161](../experiments/track_A_periodic_steady_state/A161_p24_150ph_faster_turn_on/RESULTS.md).
+         150 pH with a 20 A/ns turn-on (x_on 3.0 V): matrix and four
+         modules <= 39.4 V, regulation back (dip -14.8 mV), 0 NEW, late 28.
+         4/5 as registered. Voltage wants di/dt_on <= 3.0 V / L, regulation
+         >= ~20 A/ns; the window closes at 150 pH, which is the loop bound
+         (item 74's 125 pH is the margin value). Late fires follow L, not
+         x_on, so item 71's adoption of x_on <= 1.8 V is superseded.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

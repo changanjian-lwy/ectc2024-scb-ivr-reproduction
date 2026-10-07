@@ -74,6 +74,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A157": (TA / "A157_p24_loop_damping", "a157_analyze.py", "a157_summary.json"),
     "A158": (TA / "A158_p24_damping_boundary", "a158_analyze.py", "a158_summary.json"),
     "A159": (TA / "A159_p24_spec_at_150ph", "a159_analyze.py", "a159_summary.json"),
+    "A161": (TA / "A161_p24_150ph_faster_turn_on", "a161_analyze.py", "a161_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -317,6 +318,9 @@ EXCEPTIONS["A159"] = {
                         "over): the recommended loop bound comes down to 125 pH (RESULTS 0)",
     ("criteria", "c5"): "four modules: one K4-timing swing peak per module, 36.4 V, late 0 (RESULTS 0)"}
 NOT_ROWS["A159"] = r"m4_|s150_"
+EXCEPTIONS["A161"] = {("criteria", "c3"): "l_m80_10us late 28 (they follow the loop: 0 / 6 / 16 / 33 / 28 at 50-150 pH), 0 NEW, "
+                                           "no consequence; bound 150 pH at 20 A/ns by the registered rule (RESULTS 0)"}
+NOT_ROWS["A161"] = r"m4_|s150_"
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

@@ -138,10 +138,12 @@ are budgets over plausible ranges:
   as (di/dt)^-½ plus 6 ns per nH of loop. Both laws were registered and then
   tested at loops and rates never run before (75-300 pH, 6-40 A/ns): peak
   V_DS within −0.1..+0.6 V, the 40 V side right on every point, start-up
-  151-155 A. At L·di/dt 3.0 V the whole robustness matrix and four modules
-  stay ≤ 39.5 V, but timing misses on a falling −8 V ramp grow with the loop
-  (0 / 6 / 16 late edges at 50 / 100 / 125 pH, no consequence), so the
-  adopted value is 1.8 V.
+  151-155 A. The whole robustness matrix and four modules stay ≤ 39.5 V
+  at L·di/dt 3.0 V (125 and 150 pH).
+- **The turn-on rate has a window.** Voltage wants di/dt_on ≤ 3.0 V / L;
+  regulation wants di/dt_on ≥ ~20 A/ns (at 150 pH, 12 A/ns deepens the
+  load-step dip from −12 to −16 mV and slows the recovery; 18-24 A/ns do
+  not). The window closes at L ≈ 3.0 V / 20 A/ns = 150 pH.
 - **Above ~150 pH the turn-off binds and has a price.** The 72 A/ns turn-off
   ring exceeds 40 V on its own; a slower turn-off peaks near
   V_rail + 2 L·di/dt, so L·di/dt_off ≤ ~10 V is needed (300 pH: ~32 A/ns,
@@ -152,14 +154,11 @@ are budgets over plausible ranges:
   2-10 µs, falling steps, inductance × 0.7 / 1.3) and on four modules: loop
   ≤ 50 pH, turn-on 36 A/ns, turn-off 72 A/ns, start-up on-time 36.5 ns →
   switch ≤ 37.6 V, start-up ≤ 198 A, after steps ≤ 180 A. 100 pH works at
-  18 A/ns. In general: turn-on ≤ 1.8 V / L (3.0-3.2 V / L is the voltage
-  limit), turn-off 72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
+  18 A/ns. In general: turn-on between ~20 A/ns and 3.0 V / L, turn-off
+  72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
   Published embedded-GaN loops are 230-320 pH, which this design can drive
   only at several percent of efficiency: **the loop should be bounded by
-  layout to ~125 pH.** At 150 pH the turn-on that 1.8 V / L allows (12 A/ns)
-  starts to cost regulation (load-step dip −16 instead of −12 mV, slower
-  recovery after slow line ramps): the overshoot wants a slower turn-on, the
-  transient response a faster one.
+  layout to 150 pH, where the turn-on window closes (125 pH for margin).**
 - **Rating used:** EPC2067's 40 V continuous rating. The datasheet allows
   48 V transients, and EPC's Phase 16 reliability report allows repetitive
   overshoot up to 120 % for ≤ 1 % of life (measured on 100 V parts). The

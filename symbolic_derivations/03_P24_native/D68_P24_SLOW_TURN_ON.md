@@ -110,7 +110,7 @@ l_p48_1us, turn-off 72 A/ns, Q 7):
   250 W module at those four points, against ~2.7 W at 72 A/ns: +3 to +11 % of the module's power. The harness reads
   15-22 % above the records.
 - **So the drive cannot carry a large loop cheaply:** ≤ 150 pH costs only the slow turn-on (≤ 0.4 W); 200 pH about
-  +7 W; 300 pH +20-28 W. The package spec has to bound the loop, not the drive (≤ 125 pH after A159, Section 11).
+  +7 W; 300 pH +20-28 W. The package spec has to bound the loop, not the drive (≤ 150 pH, Section 11).
 - With x_on = 2.4 V the turn-on side stays at 35.9-38.3 V (A154) on top of A153's check of the x-curve.
 
 ## 8. The start-up ton with loop and turn-off terms (A155)
@@ -131,7 +131,7 @@ D68's Section 3 has no L term, and above 150 pH its ton under-compensates (A154:
 
 | loop L | turn-on di/dt | turn-off di/dt | start-up ton | drive loss over 72 / 72 A/ns |
 |---|---|---|---|---|
-| any L ≤ 150 pH | ≤ 3.2 V / L for 40 V (3.0 V checked on the matrix, A156); 1.8 V / L adopted | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
+| any L ≤ 150 pH | between ~20 A/ns (regulation) and 3.0 V / L (40 V on the matrix; 3.2 V nominal row) | 72 A/ns | Section 8 | ≤ 0.4 W (turn-on only) |
 | 150-300 pH | ≤ 3.2 V / L (2.4 V with margin) | ≤ ~10 V / L | Section 8 | +7 W (200 pH) to +20-28 W (300 pH) per module |
 
 Plus **loop damping: ring Q ≤ 30** (A157 / A158: Q 15 / 30 hold at 50 and 100 pH, Q 7 to 300 pH; Q 100, Q 300 and
@@ -147,4 +147,9 @@ duplicate records), none with a consequence; by the registered rule the adopted 
 At 150 pH the adopted x_on 1.8 V means a 12 A/ns turn-on. On A152's matrix every switch stays ≤ 38.0 V, but the slow
 turn-on costs regulation: load-step dip −16.1 mV (ideal −11.9), +4.8 V / 10 µs back after 46.2 µs, 33 late fires on
 −8 V / 10 µs (0 / 6 / 16 at 50 / 100 / 125 pH). The overshoot wants di/dt_on ≤ x / L, the transient response a fast
-turn-on: they meet near 150 pH. **Recommended loop bound: 125 pH.**
+turn-on: they meet near 150 pH.
+
+**A161:** at 150 pH with 20 A/ns (x_on 3.0 V) the matrix and four modules stay ≤ 39.4 V and the regulation recovers
+(load dip −14.8 mV, slow ramps inside 1 %); late fires 28. So the turn-on has a window, ~20 A/ns ≤ di/dt_on ≤ 3.0 V / L,
+which closes at L = 150 pH: **recommended loop bound 150 pH (125 pH for margin).** The late fires follow L (0 / 6 / 16 /
+28-33 at 50 / 100 / 125 / 150 pH), not x_on, so A156's adoption of x_on ≤ 1.8 V (Section 10) is superseded.
