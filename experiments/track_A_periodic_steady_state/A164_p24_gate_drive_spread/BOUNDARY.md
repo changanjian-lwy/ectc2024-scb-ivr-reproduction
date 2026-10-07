@@ -14,7 +14,7 @@ records, its 15 start-up diagnostics, single edges (scripts/p24_gate_edges.edge_
   8.7-10.0 ns; late fires 0 / 2 / 25 / 47 by 300 us.
 Decision it changes: the package drive spec (A163's 2.5 ohm resistor drive failed the spread).
 Cheaper check done first: single edges and the pre runs.
-Budget: 6 calibration runs (150 us) and 18 matrix runs + four modules, ~5 h at 10 jobs.
+Budget: 6 calibration runs (150 us) and 17 matrix runs + four modules, ~5 h at 10 jobs.
 
 ## 1. What and why
 - A163 broke on three mechanisms, each with one change here:
