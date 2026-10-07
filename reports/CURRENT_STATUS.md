@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-76: D68, D69 and A153-A161). This is the current navigation
+package drive specification A151-A152; items 68-77: D68, D69 and A153-A162). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -290,7 +290,7 @@ be reported as self-established startup balance.
 ## Verification and next step
 
 **Current (2026-10-06):** the portable suite (631 tests, all pass, 1 skipped) runs on every push (CI);
-the acceptance gate holds 49 co-simulated experiments, every registered
+the acceptance gate holds 50 co-simulated experiments, every registered
 miss documented in its RESULTS. The 2026-09-29 text below is kept as the
 record. Its open items were answered in the P24-native models:
 1. a phase shift that follows the measured period -> D51 / D52 and
@@ -1690,6 +1690,13 @@ each question:
          >= ~20 A/ns; the window closes at 150 pH, which is the loop bound
          (item 74's 125 pH is the margin value). Late fires follow L, not
          x_on, so item 71's adoption of x_on <= 1.8 V is superseded.
+     77. The late fires located (2026-10-07, RTL cfg diagnostic):
+         [A162](../experiments/track_A_periodic_steady_state/A162_p24_late_fire_timing/RESULTS.md).
+         cfg late_log (bridge, off = unchanged; identity bit for bit) puts
+         every late fire of -8 V / 10 us at 2-10 us after the ramp, on
+         phases 2 and 4, none in steady state: a bounded settling
+         transient that lasts longer with a larger loop. PASS 2/2; the
+         150 pH bound stands.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

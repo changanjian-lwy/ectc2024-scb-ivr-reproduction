@@ -153,3 +153,5 @@ turn-on: they meet near 150 pH.
 (load dip −14.8 mV, slow ramps inside 1 %); late fires 28. So the turn-on has a window, ~20 A/ns ≤ di/dt_on ≤ 3.0 V / L,
 which closes at L = 150 pH: **recommended loop bound 150 pH (125 pH for margin).** The late fires follow L (0 / 6 / 16 /
 28-33 at 50 / 100 / 125 / 150 pH), not x_on, so A156's adoption of x_on ≤ 1.8 V (Section 10) is superseded.
+**A162:** they all fall 2-10 µs after the −8 V ramp ends (phases 2 and 4, none in steady state): a bounded settling
+transient of the slotted phases that takes more periods with a larger loop, each one a < 4 ns edge delay.
