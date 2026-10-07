@@ -80,6 +80,8 @@ the branch current, 0 without one) at each high-side turn-off ("highoffs_last").
 Commutation-loop inductance (cfg "loop" {"l_ph", "rp_ohm" 0, "phases" 1..N}, A144): l_ph pH in series with each listed
 high-side switch (upstream of its drain) with rp_ohm across it (0: undamped); the switch's V_DS is its own (drain node
 behind the inductance). Adds "loop_params" and each turn-off's loop current ("i_loop_a" in highoffs_last).
+Late-fire log (cfg "late_log" 1, A162): every section adds "late", the N phases' cumulative late-fire counters (off:
+unchanged).
 Windowed V_DS peaks (cfg "vds_win" 1, A144): every section adds "vds_win_v", the 2N switches' peak V_DS since the
 previous section; "vds_max_v" stays the whole run's peak.
 Finite switching edges (cfg "edge" {"didt_a_ns", "didt_on_a_ns" = didt_a_ns}, A145): a turn-off's channel current falls
@@ -286,6 +288,7 @@ class ModuleSim:
         c0 = self.plant.sim.ns - nlp                                   # A144: each phase's loop-current column
         self.loop_col = [c0 + p.loop_phases.index(k + 1) if (k + 1) in p.loop_phases else None for k in range(N)]
         self.vds_win = bool(cfg.get("vds_win", 0))
+        self.late_log = bool(cfg.get("late_log", 0))                 # A162: per-section snapshot of the late-fire counters
         self.vmax_all = np.full(2 * N, -np.inf)
         self.adc_lsb, self.adc_max = cfg["adc_lsb_v"], (1 << 12) - 1
         # Controller initial registers: the predictive delay starts at half the node resonance period, as in
@@ -556,6 +559,8 @@ class ModuleSim:
                     self.sections[-1]["vds_win_v"] = vw.tolist()
                     np.maximum(self.vmax_all, vw, out=self.vmax_all)
                     vw[:] = [plant.vds(q) for q in range(2 * N)]
+                if self.late_log:                               # A162: cumulative late fires per phase at this section
+                    self.sections[-1]["late"] = [field(self.ctl.get("late_fires"), q, 16) for q in range(N)]
                 if na:                                          # A101: Cm voltages, branch int i^2 dt and extremes
                     self.sections[-1].update(vm_v=[float(plant.y[x]) for x in self.im], aux_i2s=[float(x) for x in plant.aux_e2],
                                              aux_imax_a=[float(x) for x in plant.aux_imax],
