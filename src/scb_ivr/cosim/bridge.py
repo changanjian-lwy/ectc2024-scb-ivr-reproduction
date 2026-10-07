@@ -561,9 +561,12 @@ class ModuleSim:
             rec = {"t_s": plant.t, "phase": k + 1, "how": meta["how"], "vds_v": float(v),
                    "i_a": float(plant.y[nv + k])}
             self.turnons.append(rec)
-            learn = (meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))) and mon.vmin_set[k]
+            how_ok = meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))
+            learn = how_ok and mon.vmin_set[k]
 
             def measure(rec=rec, k=k, learn=learn, deferred=False):
+                if deferred:                                     # A164: armed by now if a lead put the command
+                    learn = how_ok and mon.vmin_set[k]           # before the low side's turn-off
                 if learn:
                     # early: the minimum was lowered by the step that landed on this edge (node still falling),
                     # the same test as A75's "Vds at the edge below the minimum of the previous steps"

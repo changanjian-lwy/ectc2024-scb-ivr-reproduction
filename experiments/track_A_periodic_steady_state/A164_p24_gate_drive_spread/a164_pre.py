@@ -24,9 +24,13 @@ R_ON, R_OFF = 3.5, 0.3
 CORNERS = {"nom": {}, "ff": {"dk2": -0.3, "r_scale": 0.7}, "ss": {"dk2": 1.0, "cg_scale": 1.29, "r_scale": 1.3},
            "hot": {"temp": 125.0}}
 # start-up ton guesses for Vo(143.5 us) ~1.035 V: 37.887 + 0.9 at 2.5 ohm, + ~1 ns for 3.5 ohm, the corner's extra
-# on-time loss (~2 x its single-edge turn-on delay change, A163 s50vthmax) and minus the lead
+# on-time loss (~2 x its single-edge turn-on delay change, A163 s50vthmax) and (wrongly) minus the lead: the lead acts
+# on predictive turn-ons only, not in the start-up, so the lead runs start ~8 ns short (their handover is not a result)
+# Second batch (after the bridge fix below): ss at ss_lead0's ton (Vo 1.035 V) with leads 8 and 9.5 ns. The first
+# ss_lead8 (ton 44) ran before the fix: with the command ahead of the low side's turn-off, the valley measurement was
+# skipped (learn decided at the command), dt_pred could not learn and it is not a result.
 RUNS = [("nom", 0.0, 39.8), ("nom", 8.0, 31.8), ("ff", 0.0, 39.2), ("ff", 8.0, 31.2), ("ss", 0.0, 52.0),
-        ("ss", 4.0, 48.0), ("ss", 8.0, 44.0), ("hot", 0.0, 39.8), ("hot", 8.0, 31.8)]
+        ("ss", 4.0, 48.0), ("ss", 8.0, 52.0), ("ss", 9.5, 52.0), ("hot", 0.0, 39.8), ("hot", 8.0, 31.8)]
 
 
 def gate_cfg(corner, lead, ton, t_end=300.0):
@@ -59,7 +63,7 @@ def stats(path):
     return {"ton_ns": r["cfg"]["ton_ns"], "vo_143_5": float(np.mean([q["vo"] for q in r["sections"] if 143e-6 < q["t_s"] < 144e-6])),
             "start_pk": max(e["i_max_a"] for e in go if e["t_s"] < 140e-6),
             "hand_pk": max(e["i_max_a"] for e in go if 140e-6 <= e["t_s"] < 200e-6),
-            "steady_pk": max(e["i_max_a"] for e in go if e["t_s"] >= 200e-6),
+            "steady_pk": max((e["i_max_a"] for e in go if e["t_s"] >= 200e-6), default=None), "t_end_us": r["t_end_s"] * 1e6,
             "vds_max": max(max(q["vds_win_v"]) for q in s), "late": [int(x) for x in r["late_fires"]],
             "dt_pred_ns": r["dt_pred_final_ns"], "shoot_on": g.get("shoot_on"), "overlaps": r["overlaps"],
             "delay_on_ns": [x * 1e9 for x in g.get("delay_on_s", [0, 0])],
@@ -73,7 +77,7 @@ def main():
         if p.exists():
             out[p.stem[4:]] = st = stats(p)
             print(f"{p.stem[4:]:10s} ton {st['ton_ns']:5.1f} Vo {st['vo_143_5']:.3f} start {st['start_pk']:5.1f} hand "
-                  f"{st['hand_pk']:5.1f} steady {st['steady_pk']:5.1f} V {st['vds_max']:4.1f} late {st['late']} dtp "
+                  f"{st['hand_pk']:5.1f} steady {st['steady_pk'] or 0:5.1f} to {st['t_end_us']:3.0f} us V {st['vds_max']:4.1f} late {st['late']} dtp "
                   f"{[round(x, 1) for x in st['dt_pred_ns']]} shoot {sum(st['shoot_on'] or [0])} ovl {st['overlaps']}")
     (HERE / "a164_pre.json").write_text(json.dumps(out, indent=1) + "\n")
 
