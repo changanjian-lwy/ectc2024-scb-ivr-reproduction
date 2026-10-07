@@ -135,7 +135,8 @@ class GateEdges:
         self.stats = {"on": [0] * n2, "off": [0] * n2, "on_zvs": [0] * n2, "off_rev": [0] * n2, "forced": 0,
                       "newton_max": 0, "steps": 0, "delay_on_s": [math.inf, 0.0], "delay_off_s": [math.inf, 0.0],
                       "active_on_s": [math.inf, 0.0], "active_off_s": [math.inf, 0.0], "didt_on_max_a_ns": 0.0,
-                      "didt_off_max_a_ns": 0.0, "vds_cmd_on_max_v": 0.0, "e_total_j": [0.0] * n2}
+                      "didt_off_max_a_ns": 0.0, "vds_cmd_on_max_v": 0.0, "e_total_j": [0.0] * n2,
+                      "shoot_on": [0] * n2}
         self._ext = None                               # (t, y at the previous step's start, gates there, h, active)
 
     # ---- helpers ----
@@ -297,6 +298,8 @@ class GateEdges:
                         s["off_rec"] = [pl.t, j + 1, ip, ip]
                 else:
                     s["i_s"] = 0.0
+                    if j < p_n(self) and pl.gl[j]:     # A164: the channel starts while its low side conducts
+                        self.stats["shoot_on"][j] += 1
                 done.append(j)
                 cb = self.on_act.pop(j, None)
                 if cb is not None:

@@ -47,6 +47,27 @@ class GateModelDatasheet(unittest.TestCase):
             self.assertTrue(math.isclose(f.q_gate(v, x), float(d.q_gate(v, x)), rel_tol=1e-12))
             self.assertTrue(math.isclose(f.cin(v, x), float(d.c_gs(v, -x) + d.c_gd(v - x)), rel_tol=1e-12))
 
+    def test_spread_corner_meets_the_datasheet(self):
+        # A164: a rigid threshold shift of the typical curve meets R_DS(on) max 1.55 mOhm and V_GS(TH) max 2.5 V up to
+        # +1.0 V; A163's +1.5 V does not (1.81 mOhm, 2.99 V). Q_G max 22.3 nC bounds the charge scale at 1.29.
+        hi, over = load_device(dk2=1.0), load_device(dk2=1.5)
+        self.assertTrue(hi.rds_on() <= 1.55e-3 and hi.vth() <= 2.5)
+        self.assertTrue(over.rds_on() > 1.55e-3 and over.vth() > 2.5)
+        self.assertLessEqual(load_device(cg_scale=1.29).gate_charge()["q_g"], 22.3e-9)
+        self.assertGreater(load_device(cg_scale=1.5).gate_charge()["q_g"], 22.3e-9)
+
+
+class DriverLead(unittest.TestCase):
+    def test_high_side_turn_on_lead(self):
+        from types import SimpleNamespace
+        from scb_ivr.cosim.bridge import N, ModuleSim
+        m = SimpleNamespace(drv={"hs_on_lead_ns": 4.0}, t_drv=10e-9)
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, True), 1e-6 + 6e-9, delta=1e-18)
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, False), 1e-6 + 10e-9, delta=1e-18)
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, N, True), 1e-6 + 10e-9, delta=1e-18)
+        m.drv = None
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, True), 1e-6 + 10e-9, delta=1e-18)
+
 
 @unittest.skipUnless(HAVE, "EPC library not present (SCB_EPC_LIB / vendor_models)")
 class GateEdgeInPlant(unittest.TestCase):

@@ -49,6 +49,8 @@ Controller-side analog functions modelled here:
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
 applied while the same phase's complement conducts is counted, and with "stop_on_overlap" the run ends there.
+"hs_on_lead_ns" (A164, < t_drv): high-side turn-on commands reach the plant that much earlier than the other edges
+(a shorter driver path), so the valley learning can put a gate-delayed turn-on before the low side's turn-off command.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
 from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
@@ -434,6 +436,8 @@ class ModuleSim:
         self.highoffs = []                                       # A101: phase (and branch) currents at high-side turn-offs
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
+        if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
+            raise ValueError("driver hs_on_lead_ns must be in [0, t_drv_ns)")
         self.rng = np.random.default_rng(int(self.drv.get("seed", 1))) if self.drv else None
         self.ovl = {"count": 0, "first": None, "stop": False}
         self.meas_l = {}; self.lowons = []
@@ -448,12 +452,14 @@ class ModuleSim:
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
 
-    def t_apply(self, t_cmd, j):
-        """A91: the time the plant sees an edge commanded at t_cmd on switch j."""
+    def t_apply(self, t_cmd, j, on=False):
+        """A91: the time the plant sees an edge commanded at t_cmd on switch j (on: a turn-on)."""
         drv = self.drv
         if not drv:
             return t_cmd + self.t_drv
         d = self.t_drv + (drv.get("m_ns", 0.0) * 1e-9 if j >= N else 0.0)
+        if on and j < N:
+            d -= drv.get("hs_on_lead_ns", 0.0) * 1e-9                # A164
         edges = drv.get("jitter_edges", "all")                   # A98: "high" or "low" restricts the jitter
         if drv.get("sigma_ps", 0.0) > 0.0 and (edges == "all" or (edges == "high") == (j < N)):
             d += self.rng.normal(0.0, drv["sigma_ps"] * 1e-12)
@@ -476,7 +482,7 @@ class ModuleSim:
         t_cmd = self.plant.t + self.t_async
         bind = not self.floor_on()                               # A118: a floor turn-off reports no residual (no trim)
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": bind})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, True), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
     def ph_fire(self, k):                                        # A133: phase k's floor fires (as latch_fire's floor)
@@ -484,7 +490,7 @@ class ModuleSim:
         f["fired"] = True; f["fires"] += 1; self.ph_log.append((self.plant.t, k + 1))
         t_cmd = self.plant.t + self.t_async
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + k), self.seq[0], N + k, 0, {"how": None, "bind": False})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, True), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         f["report"] = int(round(t_cmd / lsb))
 
     def ph_latches(self):
@@ -672,7 +678,8 @@ class ModuleSim:
                     t_cmd = (w + field(fine, k, fb)) * lsb
                     j = k if gate == "H" else N + k
                     meta = {"how": field(how, k, 3), "bind": bool(field(bind, k, 1))}
-                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j), self.seq[0], j, field(lvl, k, 1), meta))
+                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j, bool(field(lvl, k, 1))), self.seq[0], j,
+                                               field(lvl, k, 1), meta))
                     self.seq[0] += 1
         return w
 
