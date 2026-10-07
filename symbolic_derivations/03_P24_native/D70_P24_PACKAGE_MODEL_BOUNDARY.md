@@ -91,3 +91,6 @@ placement, the processor-side decoupling and the load slew, which P24 does not g
 **D72 (inductor array):** 90.61 % uses the 500 nH HBS1 unit's R/L (~170 units per phase). With 29-40 current-rated
 units per phase the converter is 86.6-87.7 %, and Section 2.5's package-inclusive figures become ~81-86 %.
 **D73 (electrothermal):** the temperature row is closed to first order; the thermal field and the cooled face stay open.
+**D75 (footprint):** a 250 W module takes two sites (10 × 20 mm): the lateral copper halves (86 µm: 6.2 W, 429 µm:
+1.25 W), the one-way estimate holds from ≳ 107 µm, and Section 2.5's package-inclusive range becomes ~83-87 % before
+core loss. **D76:** core loss is now priced (7.5-30 W per module at 2.5 MHz, κ 1-4).

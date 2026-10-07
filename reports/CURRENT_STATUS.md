@@ -1,7 +1,7 @@
 # Current Work Status
 
 Updated: **2026-10-07** (items 62-67: the ML block A146-A150 and the
-package drive specification A151-A152; items 68-83: D68-D74, A153-A162 and the hot efficiency). This is the current navigation
+package drive specification A151-A152; items 68-87: D68-D78, A153-A162 and the hot efficiency). This is the current navigation
 summary; dated reports remain historical snapshots.
 
 The project runs two models in parallel on purpose, each checking the other:
@@ -1756,16 +1756,46 @@ each question:
          Finite-volume solver verified against closed forms (slab, layered
          1D exact, Muzychka / Yovanovich flux channels to 0.07-0.2 %,
          resolved vias vs effective medium), convective cooling face under
-         the GaN spreader, per-die electrothermal loop on D73's losses. The
-         inductor layer is the hottest part (processor face adiabatic) and
-         glass 1 is the barrier: at h 2e4 W/(m2 K), 25 C coolant, no via copper, inductor
-         85.5 C vs junction 42.9 C, glass 1 takes 30 of the 60 K. About 2 %
-         copper fill under the columns (~5,700 vias of 30 um, 4 mm^2 per
-         module) takes the glass step to 4-5 K; the 85 C minimum is 0-0.7 %
-         at h 2e4, more at lower h or D73's density. Conditions: vias land on
-         copper on both glass faces, every ABF dielectric >= 0.5-1 % copper.
-         Then the inductor stays ~9 K above the junctions (its core) and 1/h
-         dominates. A 250 W module (20 dies, 185 mm^2) needs two P24 sites.
+         the GaN spreader, per-die electrothermal loop; revised with D75's
+         copper and D76's core loss. The inductor layer is the hottest part
+         in all 656 solves and glass 1 is the barrier: at h 2e4 W/(m2 K),
+         25 C coolant, kappa 1, no via copper, inductor 96.6 C vs junction
+         42.9 C, glass 1 takes 35 of the 72 K. About 2 % copper fill under
+         the columns (~5,700 vias of 30 um per module) holds 85 C to a 45 C
+         coolant at kappa 1; kappa 4 needs ~4 % and h >= 5e4. Conditions:
+         vias land on copper on both glass faces, every ABF dielectric
+         >= 1-2 % copper. The inductor then stays ~12 K above the junctions.
+     84. The module footprint (2026-10-07, math):
+         [D75](../symbolic_derivations/03_P24_native/D75_P24_MODULE_FOOTPRINT.md).
+         20 EPC2067 (185 mm^2) do not fit a 10 x 10 mm site (P24's own 12:
+         111 mm^2); a 250 W module takes two sites (10 x 20 mm), 1.25 A/mm^2.
+         Lateral copper halves (86 um: 6.2 W), the one-way estimate holds
+         from ~107 um, package-inclusive ~83-87 % before core loss.
+     85. The inductor array's core loss (2026-10-07, math):
+         [D76](../symbolic_derivations/03_P24_native/D76_P24_CORE_LOSS.md).
+         HBS1's R_acx metric (P24's ref. [10]; curves digitised from Murali
+         et al. ECTC 2022), loss kappa R_acx L I_ac^2, independent of the unit
+         count: 7.5 / 15 / 30 W per module at kappa 1 / 2 / 4 (2.5 MHz design,
+         measured 1.98 MHz). Converter 84.4-85.4 % to 78.4-79.3 % at 25 C;
+         85 C with package 78.2-82.2 % to 73.1-76.6 %. Core loss grows as
+         f^0.55: 5 MHz falls 1.4-4.5 points behind, 1 MHz ties 2.5 MHz within
+         ~1 point; 2.5 MHz stays for valley margin and the frozen controller.
+     86. A microchannel coolant model (2026-10-07, math):
+         [D77](../symbolic_derivations/03_P24_native/D77_P24_COOLANT.md).
+         Shah-London Nu / f Re, fin efficiency, the coolant in the linear
+         system (upwind, GMRES). Copper channels give h_eff 3.8e4-2.6e5; the
+         coolant's own rise then sets the flow: per module >= 0.44 g/s at a
+         25 C inlet, 1.12 g/s at 45 C (kappa 1, 2 % fill); kappa 4 1.15 g/s at
+         25 C, a 45 C inlet only with 19.6 % fill (2.3 g/s). The framework's
+         1.6 g/s over four modules gives 88 C. Pumping < 0.5 W per package.
+     87. The processor-side face (2026-10-07, math):
+         [D78](../symbolic_derivations/03_P24_native/D78_P24_PROCESSOR_SIDE.md).
+         Linked through the package substrate (1.2-12 K cm^2/W) to the
+         processor's temperature (45-95 C): a second path when cooler than
+         the IVR's top face, a source when warmer (up to ~33 W out / ~39 W in
+         per module). At kappa 1 with h >= 2e4 it does not bind (85 C holds
+         to a processor side of 85-95 C); at kappa 4 with a 45 C coolant it
+         decides (processor side <= 55-83 C needed).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
@@ -1804,15 +1834,20 @@ P24 transfer remains a separately declared topology/sequence branch.
 1. **问题和结论：** P24 的拓扑、时序和器件假设能否同时成立？不能原样成立：用它自己的参数，1–2 % 负电流给不了高侧 ZVS
    （约需 27 %）。设计改用 12.5 % 负电流、高侧部分软开通，用“谷底裕量”解释为什么停在这里。
 2. **做出的东西（仿真层面）：** Verilog 控制器接电路模型的联合仿真，四模块 1 kW 从零启动到闭环稳压；2.5 MHz 设计估算效率约
-   87 %（损耗模型，25 °C，按可实现的电感单元阵列；按 P24 最大单元的 R/L 是 90.6 %，但那要每相约 170 个单元，D72）；单模块和四模块控制器经随机测试后冻结；数学模型（D63、D68）与联合仿真互相检验。
+   87 %（损耗模型，25 °C，按可实现的电感单元阵列，不含磁芯损耗；按 HBS1 自己的 R_acx 指标加上磁芯损耗是 78–85 %，D76；
+   按 P24 最大单元的 R/L 是 90.6 %，但那要每相约 170 个单元，D72）；单模块和四模块控制器经随机测试后冻结；数学模型（D63、D68）与联合仿真互相检验。
 3. **一个有价值的发现链：** 异常检测器找到线电压阶跃后的 ZVS 丢失 → 控制修不了（串联电容的电荷平衡）→ 单独放慢开通解决 →
    从节点电荷推出“过冲只取决于 L × 开通 di/dt”，在没跑过的点上事前预测并验证。
 4. **封装层的结论要带条件讲：** 在所测模型（理想并联阻尼 Q 7、25 °C、标称 Cs、线性边沿）里，开通 di/dt 的窗口
    （约 20 A/ns 到 3.0 V / L）在 150 pH 附近闭合，最坏角落离 40 V 只有 0.6 V：这是布局的候选上限，不是硬件极限。阻尼
-   Q ≤ 30 是理想阻尼器下的结果，物理来源未定。横向铜只在损耗预算里，含封装的估算效率约 81–86 %（铜厚 86–429 µm，D70 / D72）。
-   高温按团队论文的 85 °C 门槛和电热闭环（D73，集总一节点）：变换器约 84–86 %，含封装约 78–84 %，前提是每个 1 cm² 模块到
-   25 °C 冷却液的热阻 ≤ 0.8–1.0 K·cm²/W；28–44 % 的热在玻璃 2 里的电感阵列，它的散热路径才是瓶颈，不是 GaN。
-   D74 的三维导热模型（解析解验证过）证实了这一点：冷却面换热系数 2×10⁴、玻璃 1 不加铜时电感比结温高约 43 K，玻璃 1 占
-   一半温升；玻璃 1 里约 2 % 的铜过孔（每模块约 5,700 个 30 µm 孔），并且过孔两端落在铜层上、ABF 也有微孔，就能解决。
+   Q ≤ 30 是理想阻尼器下的结果，物理来源未定。横向铜只在损耗预算里；20 片芯片放不进 10×10 mm，一个模块占 P24 的两个位置
+   （D75），横向铜损减半，含封装的估算效率约 83–87 %（不含磁芯损耗），含磁芯损耗约 75–85 %。
+   磁芯损耗（D76，HBS1 的 R_acx 指标，大信号系数 κ 1–4）每模块 7.5–30 W，让 2.5 MHz 在效率上不再领先 1 MHz，5 MHz 落后
+   1.4–4.5 个点；2.5 MHz 仍保留（谷底裕量、控制器已冻结）。高温 85 °C 含封装约 73–82 %。
+   热（D74，三维导热、解析解验证）：电感层就是最热处，玻璃 1 是瓶颈（κ 1、h 2×10⁴、不加铜时电感比结温高约 54 K）；
+   玻璃 1 里约 2 % 的铜过孔（每模块约 5,700 个 30 µm 孔，落在铜层上、ABF 有 1–2 % 微孔）能解决，κ 4 要约 4 %。
+   冷却液（D77，微通道）：h 不再是限制，冷却液温升才是；每模块 ≥ 0.44 g/s（25 °C 进口）/ 1.1 g/s（45 °C），泵功不到 0.5 W。
+   处理器面（D78）：比 IVR 顶面冷时是第二条散热路径，热时是热源；κ 1 时不构成限制，κ 4 加 45 °C 冷却液时要求处理器侧 ≤ 55–83 °C。
 5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
-   问题；动态模型里还没有模块输出路径的 R / L 和磁芯损耗（D70 的清单）；热场有 D74 的稳态导热模型，冷却面还是换热系数，没有冷却液模型。
+   问题；动态模型里还没有模块输出路径的 R / L（D70 的清单）；磁芯损耗只有基于 R_acx 指标的估算（κ 未实测）；热场有 D74 / D77 /
+   D78 的稳态模型（叠层尺寸都是假设值），没有瞬态。

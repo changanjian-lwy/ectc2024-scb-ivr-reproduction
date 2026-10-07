@@ -54,3 +54,10 @@
 79 µΩ/nH is the 500 nH HBS1 unit's R/L, i.e. ~170 units per phase at 2.5 MHz. With units sized for the current
 (29-40 per phase) the R/L follows the unit size (power law through P24 Table 2's two HBS1 points), and on the design
 records 2.5 MHz stays best by 0.2-0.6 points (86.6-87.7 %), against 86.4-87.1 % at 5 MHz and 85.7-87.1 % at 1 MHz.
+
+## 7. Update (D76, 2026-10-07): core loss
+
+With the HBS1 core loss priced by its R_acx metric (κ R_acx L I_ac², R_acx ∝ f^1.55, so ∝ f^0.55 at the same ripple),
+the efficiency ranking changes: 5 MHz falls 1.4-4.5 points behind 2.5 MHz, and 1 MHz ties 2.5 MHz within ~1 point
+(which leads depends on the metric below 2 MHz, where the data stop). The 2.5 MHz design keeps its valley margin and
+the frozen controller; it no longer has an efficiency argument over 1 MHz with this core material.

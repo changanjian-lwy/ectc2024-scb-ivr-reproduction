@@ -48,3 +48,8 @@ array technology, because the unit size follows the frequency.
 
 - Two HBS1 points and a power law; the real family may not follow it.
 - Waveforms from the 25 °C ideal-inductor co-simulations; a lossy inductor changes them little at these R values.
+
+**Update (D75 / D76, 2026-10-07).** The module takes two P24 sites (20 dies), so the lateral copper loss halves and
+the package-inclusive range becomes ~83-87 % (D75). The array's core loss (HBS1 R_acx metric, independent of the unit
+count) adds 7.5 / 15 / 30 W per module at κ 1 / 2 / 4 at 2.5 MHz: converter 84.4-85.4 % to 78.4-79.3 %; 2.5 MHz no
+longer leads 1 MHz, and 5 MHz falls behind by 1.4-4.5 points (D76).

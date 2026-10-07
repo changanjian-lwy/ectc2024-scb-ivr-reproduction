@@ -29,12 +29,10 @@ unpublished values the remaining conclusions rest on.
 
 Results (co-simulation, 25 °C):
 
-- **Estimated efficiency 86.6-87.7 %** per module with a buildable inductor
-  array (loss model on the simulated waveforms; 29-40 current-rated HBS1-class
-  units per phase). The often-quoted 90.6 % uses the largest HBS1 unit's
-  R/L, which would take ~170 units per phase. At the 85 °C threshold of Choi,
-  Khorasani et al. (TCPMT 2025), with their electrothermal loop lumped:
-  ~84-86 % (with package ~78-84 %) for ≤ ~0.8-1.0 K·cm²/W to a 25 °C coolant.
+- **Estimated efficiency 86.6-87.7 % before core loss** per module (loss model on
+  the simulated waveforms, 29-40 current-rated HBS1-class units per phase). HBS1's
+  own loss metric (R_acx, P24's ref. [10]) adds 7.5-30 W per module (small to large
+  signal): **78-85 %**; at Choi, Khorasani et al.'s 85 °C (TCPMT 2025), with the package, ~73-82 %.
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
@@ -77,8 +75,9 @@ Results (co-simulation, 25 °C):
    inside Fig. 5's footprint (0.25-0.63 cm² per phase) the optimum moves to
    5 MHz, 2-9 points above 2.5 MHz. The 2.5 MHz design therefore assumes a
    magnetic inductor; at 144 A per phase that is about 29 HBS1-class units
-   in parallel (P24: 12 at 62.5 A), 40 for the 200 A transient budget;
-   whether they fit, and their core loss, are open. P24's Table I (2.68 nH at 5 MHz) and
+   in parallel (P24: 12 at 62.5 A), 40 for the 200 A transient budget; their fit is
+   open, and their core loss (R_acx ∝ f^1.55) removes the efficiency lead: 5 MHz falls
+   1.4-4.5 points behind, 1 MHz ties within ~1 point. P24's Table I (2.68 nH at 5 MHz) and
    Eq. (4) (1.47 nH) disagree; this work follows Eq. (4).
 4. **Interleave errors grow with the phase count.** A 9.4 ns slot offset,
    invisible on one module (N·D = 0.31), gave 45.9 A rms of 16-phase output
@@ -115,9 +114,9 @@ are budgets over plausible ranges:
   86 µm of copper per stack, 1 % needs 429 µm. Vias, the strip and the
   series-capacitor ESR (≤ 0.5 mΩ) together stay below ~1 %. This copper is
   in the loss budget only: at 35 µm its 12 % drop would move the converter's
-  operating point, so the estimate holds for thick copper (≲ 2 % drop,
-  ≳ 215 µm). Package-inclusive, first-order sum with the buildable
-  inductor array: ~81-86 % for 86-429 µm and 50-150 pH.
+  operating point, so the estimate holds for thick copper (≲ 2 % drop, ≳ 107 µm
+  on the 10 × 20 mm a 250 W module needs for its 20 dies). Package-inclusive with
+  the buildable array: ~83-87 % for 86-429 µm and 50-150 pH, 75-85 % with core loss.
 - **The loop inductance sets loss; hard turn-ons set the device voltage.**
   With the loop in the circuit model (ring Q 7) and 1-2 ns switching edges,
   the steady high-side peak stays ≤ 34 V up to 150 pH. The loop costs
@@ -185,13 +184,13 @@ are budgets over plausible ranges:
 | input-bus slew, load-step specification | steps ≤ 4.8 V at any tested slew from 1 µs: ≤ 200 A, inductance × 0.7-1.3 included. 8 V steps need ≥ 6 µs falling, ≥ 10 µs rising (≥ 50 µs at inductance × 0.7). Faster falling ramps: 218-260 A | the valley margin to keep, so how close to high-side ZVS the design may run |
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
-| inductor technology, footprint per phase | 29-40 current-rated HBS1-class units per phase: 86.6-87.7 %, 2.5 MHz best by 0.2-0.6 points; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
+| inductor technology, footprint per phase | 29-40 current-rated HBS1-class units per phase: 86.6-87.7 %, 2.5 MHz best by 0.2-0.6 points before core loss, 1 MHz ties once it is counted; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
 | QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
 | gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
-| thermal path, coolant temperature | 85 °C fixed point: ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant (0.5-0.7 at 45 °C); in 3D (D74) the inductor array is hottest; ~2 % via copper in glass 1 fixes it | the hot efficiency; where cooling must reach |
+| thermal path, coolant temperature | 85 °C fixed point: ≤ 0.8-1.0 K·cm²/W per module to a 25 °C coolant (0.5-0.7 at 45 °C); inductor array hottest (3D); 2-4 % via copper in glass 1 and ≥ 0.4-1.1 g/s of coolant per module hold 85 °C | hot efficiency; vias; coolant flow |
 | output-capacitor placement, processor-side decoupling | the lateral Vo path is 63-628 pH per module (Fig. 5 geometry); with the capacitors at the modules a 1 kA/µs load slew drops 16-157 mV at the processor, faster than the loop (module-to-module ringing ≤ 1 mV) | load-side decoupling or load slew; Vo sensed at the common strip |
 
 Five answers would narrow the package specification most:
@@ -212,9 +211,9 @@ Five answers would narrow the package specification most:
    slow as well, at several percent of efficiency.
 4. How was the start-up on-time set? A slow turn-on needs it raised by
    ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
-5. Has P24's IVR been through Choi et al.'s electrothermal framework? Which
-   face is cooled, at what coolant temperature? Thermal vias in glass 1? Without
-   them our 3D model has the inductor array 43 K above the dies.
+5. Which face of the IVR is cooled, at what coolant temperature? Thermal vias in
+   glass 1? The core's large-signal loss at ~5 A per unit? Without vias our 3D
+   model has the inductor array 54 K above the dies; the core costs 2-8 points.
 
 Otherwise I will continue across the ranges above.
 

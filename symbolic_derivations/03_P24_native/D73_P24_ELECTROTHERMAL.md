@@ -84,3 +84,11 @@ capacitors 2.7 W. Per die (phases 1-4): low side 1.31-1.34 W, high side 0.34-0.3
 The input Choi et al.'s solver takes, per component and position, is in `D73_electrothermal.json` (`die_map_2.5MHz`,
 `designs.*.layers_85C`) with the temperature coefficients. A Mihai question follows: has P24's IVR been run through
 that framework, and which face of the IVR is cooled, at what coolant temperature?
+
+## 6. Update (D75 / D76, 2026-10-07)
+
+The module footprint is 10 × 20 mm (D75): the lateral copper halves and the per-area requirement doubles (the K/W per
+module above is unchanged). With the HBS1 core loss (D76, held constant with temperature) the 2.5 MHz converter at 85 °C
+is 81.9-83.1 % (κ 1) to 76.3-77.3 % (κ 4), package-inclusive 78.2-82.2 % to 73.1-76.6 %, and the per-module R_th for
+85 °C at a 25 °C coolant 0.86-0.92 / 0.65-0.69 K/W (86 µm). D74 / D77 / D78 give the stack, the coolant and the
+processor side.
