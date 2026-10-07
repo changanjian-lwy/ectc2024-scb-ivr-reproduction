@@ -5,7 +5,7 @@ edges, cfg "gate"), `scripts/p24_ltspice.py` (LTspice in batch), `scripts/p24_ga
 `diagnostics/D79_gate_validation.json`, `D79_gate_sweep.json`, `D79_gate_candidates.json`, `D79_dvdt.json`,
 `D79_mismatch_gate_loop.json`.
 Vendor model: EPC GaN library (EPC2067 entry, 2021-10-18), kept **outside** the repository (`vendor_models/` next
-to it, or `SCB_EPC_LIB`); `tests/test_p24_gate_model.py` skips without it. System test: A163.
+to it, or `SCB_EPC_LIB`); `tests/test_p24_gate_model.py` skips without it. System tests: A163-A165 (Section 6).
 
 ## 1. Why
 
@@ -91,7 +91,8 @@ one step; peaks, times and energies are unaffected, only a "max di/dt" of the ch
    loop costs watts (100 pH, 0.5 Ω: 37.4 V at 200 A, 0.6 µJ at 143 A ≈ 4.7 W).
 4. **Common-source inductance** slows the turn-off (100 pH, 200 A, 1.2 Ω: 33.9 → 26.4 / 22.2 V at L_cs 25 / 50 pH)
    at more loss (2.9 → 4.4 / 5.9 µJ) and hardly touches the turn-on: a Kelvin gate return is wanted.
-5. **Spread** (threshold −0.3 / +1.5 V, C_ISS × 1.5, 125 °C, driver resistance ± 30 %): on the line-step turn-on
+5. **Spread** (threshold −0.3 / +1.5 V, C_ISS × 1.5, 125 °C, driver resistance ± 30 %; the +1.5 V and × 1.5 corners are
+   outside the datasheet, see Section 6): on the line-step turn-on
    the driver at −30 % adds 4.3-4.7 V and the minimum threshold 1.8-1.9 V (50 pH, 2.5 Ω: 34.7 → 39.0 / 36.5 V);
    the slow side (maximum threshold, C_ISS max) doubles to quintuples the turn-on loss (294 → 566 / 1345 nJ) and
    speeds the turn-off (+1-4 V at 200-260 A).
@@ -120,12 +121,54 @@ one step; peaks, times and energies are unaffected, only a "max di/dt" of the ch
 So in resistor terms: **turn-on as fast as the line-step overshoot allows (≈ 2.5 Ω per device at 50 pH,
 3.5 Ω at 75 pH), turn-off as fast as possible (a ~0.3 Ω sink), low-side sink ≤ 0.3 Ω, Kelvin source, loop
 ≤ 75 pH for the 200 A budget and ≤ 50 pH if 260 A excursions (C13's falling ramps) must also stay ≤ 40 V.**
-Gate loop ≤ ~1 nH per device (Section 4.8). This reverses D69's "name a slow turn-off" and lowers the ramp model's
+Gate loop ≤ ~1 nH per device (Section 4.8). (In the system this table's 2.5 Ω fails the spread; Section 6 gives the
+spec that holds: 3.0 Ω ± 20 % with a turn-on lead and a per-board start-up trim, loop ~50-60 pH.) This reverses D69's "name a slow turn-off" and lowers the ramp model's
 125-150 pH bound. Start-up on-time
 (cosim to the handover, A155's 0.0283 V/ns): Vo(143.5 µs) at ton 36.5 ns is 0.998 / 0.950 / 0.962 V for
 2 / 3 Ω (75 pH) / 4.5 Ω; the A163 configurations add (1.015 − Vo) / 0.0283 ns.
 
-## 6. Limits
+## 6. In the system: A163-A165 (cosim with the frozen controller)
+
+**Correction to Section 4.5.** The spread used here was +1.5 V of threshold and C_ISS x 1.5, with a driver
+tolerance of +-30 %. The first two are outside the datasheet: EPC's typical curve already sits at V_GS(TH) 1.51 V
+(18 mA), so +1.5 V gives 2.99 V and R_DS(on) 1.81 mOhm, against the 2.5 V / 1.55 mOhm maxima, and x 1.5 gives Q_G
+25.8 nC against 22.3 nC max. The consistent corners are +1.0 V (2.49 V, 1.53 mOhm) and charge x 1.29
+(tests/test_p24_gate_model.py). The +-30 % driver tolerance was an assumption, and A164's pre runs show no single
+resistor survives it (below). A163 RESULTS records the original verdict.
+
+**A163** (2.5 / 0.3 ohm, 29 runs). With nominal devices the gate-driven edges hold:
+- V_DS <= 36.4 V, physical peaks within +-2 A of the ramp model's;
+- edge power 2.4 W per module (the ramps gave 3.9 W);
+- the channel starts on the valley (0.11 ns), because the valley is measured when the channel starts.
+Over the spread, three mechanisms fail the frozen controller:
+1. **Start-up on-time.** Mode S is open loop, and the gate delay eats its on-time. Vo(143.5 us) falls 0.054 V per
+   0.5 V of threshold (0.903 V at +1.0 V, 376 A at the handover). The handover has a cliff below ~0.99 V and is
+   benign up to 1.17 V. Fix: trim each board's start-up ton from one start-up run.
+2. **The valley-timing limit.** The RTL cannot command a predictive turn-on before the low side's turn-off command
+   plus about one 4 ns clock (dt_pred >= 0). The valley comes 9.5 ns after that command on phase 4 (11.1 ns on
+   phases 1-3). So the turn-on gate delay (command to channel start) must stay below ~5.5 ns on phase 4. Nominal is
+   2.4 ns; +1.0 V gives 6.0 ns and late fires. Fix: a lead on predictive high-side turn-ons.
+3. **Driver -30 %** gives 40.6 V on the line step, 1.6 V above this note's single-edge harness. Fix: r_on margin.
+
+**A164 pre runs.** At +-30 % the slow corner (+1.0 V, Q_G x 1.29, 3.5 ohm x 1.3 = 4.55 ohm) has turn-on delays of
+9-20 ns and transitions up to 32 ns, close to the whole on-time. Without a lead every period fires late. With an
+8-9.5 ns lead the steady state holds, but the handover reaches 216-228 A. Any resistor fast enough for that corner
+breaks 40 V at the fast corner (-0.3 V, x 0.7). The turn-on resistance is mostly the external resistor, so the
+spec takes +-20 %. Single edges then put the fast corner at 37.0 V (cosim 38.5 V) for r_on 3.0 ohm.
+
+**A164 / A165** (50 pH, 3.0 / 0.3 ohm +-20 %, 8 ns lead, per-board trim): see their RESULTS.
+- A164's lead moves only the predictive turn-on, so the pulse is 8 ns wider in mode P than in mode S. That is an
+  on-time step at the handover: 218.6 A at L x 0.7.
+- A165 moves the whole pulse (a signed dt_pred) and removes the step: 189.6 A at L x 0.7, 178 A at the +-30 % slow
+  corner (190 us pre runs).
+
+**Loop bound under this drive.** The turn-on delay does not depend on the loop.
+- 75 pH needs r_on ~4 ohm for the fast corner's 40 V (+-20 %), which puts the slow corner at 4.8 ohm, beyond A164's
+  4.55 ohm failure with the turn-on-only lead.
+- So with resistors alone the loop bound is ~50-60 pH (Section 5's 75 pH was the nominal device). Whether the pulse
+  lead reopens 75 pH is untested.
+
+## 7. Limits
 
 - The plant's devices are identical (mismatch and gate-loop inductance are LTspice single edges, Sections 4.7-4.8);
   the driver is an ideal source behind a resistor (no supply droop, no propagation-delay spread beyond the bridge's
