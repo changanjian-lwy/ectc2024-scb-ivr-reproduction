@@ -5,7 +5,7 @@ module at 85 C once the coolant heats along the channels.
 
 Cooler (scb_ivr.p24_microchannel): parallel channels under the spreader along the 20 mm columns, effective h on the
 cooled face from Shah-London Nu and fin efficiency, optional interface resistance (a cold plate attached through a TIM
-instead of channels in the spreader). Module: D74's stack, full length, coolant marched channel by channel
+instead of channels in the spreader). Module: D74's stack, full length, coolant coupled channel by channel
 (scb_ivr.p24_thermal.coupled(coolant=...)); losses as D74 (D75 lateral copper, D76 core loss at kappa 1 / 4), glass-1
 fill 2 % (D74's design point) or 19.6 %. Flow quoted per module with its half of the strip: a quarter of the package.
 Checks: Shah-London limits; a 2D finite-volume fin against tanh(mH) / mH; full = half module at uniform h; coolant
@@ -106,7 +106,7 @@ def min_flow(rows):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--jobs", type=int, default=8)
+    ap.add_argument("--jobs", type=int, default=3)
     args = ap.parse_args()
     jobs = []
     for cooler in COOLERS:
@@ -124,7 +124,7 @@ def main():
     out = {"coolers": {k: list(v) for k, v in COOLERS.items()}, "flows_per_module": FLOWS, "t_in": T_IN,
            "cooler_props": {c: {f"{m * 1e3:g}gs": cooler_h(c, m) for m in FLOWS} for c in COOLERS},
            "rows": rows, "min_flow": {}, "checks": chk}
-    print(f"{len(rows)} coupled solves with the coolant march; worst energy balance "
+    print(f"{len(rows)} coupled solves with the coolant; worst energy balance "
           f"{max(abs(r['energy_rel']) for r in rows):.1e}, iterations <= {max(r['iterations'] for r in rows)}")
     c = chk
     print(f"checks: Shah-London Nu {c['shah_london']['nu_h1_plates']:.3f} / {c['shah_london']['nu_h1_square']:.3f}, fRe "
