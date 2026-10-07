@@ -77,6 +77,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A161": (TA / "A161_p24_150ph_faster_turn_on", "a161_analyze.py", "a161_summary.json"),
     "A162": (TA / "A162_p24_late_fire_timing", "a162_analyze.py", "a162_summary.json"),
     "A163": (TA / "A163_p24_gate_driven_edges", "a163_analyze.py", "a163_summary.json"),
+    "A164": (TA / "A164_p24_gate_drive_spread", "a164_analyze.py", "a164_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -342,6 +343,15 @@ EXCEPTIONS["A163"] = {
        "on-time (Vo 0.833 V, 368 A, 46.6 V) and the valley-timing limit (1407 late on phase 4), mechanisms 1-2 (RESULTS 0)"
        for r in ("l_p48_1us", "s_p62") for c in (1, 2, 3)},
 }
+EXCEPTIONS["A164"] = {
+    ("criteria", "nom_L07_l_p48_1us/c2"): "218.6 A 2.4 us into mode P: the turn-on-only lead widens every mode-P pulse by 8 ns "
+    "(an on-time step at the handover); mode S itself 202.5 A, the frozen design's open-loop start at L x 0.7 (RESULTS 0)",
+    ("criteria", "ff_l_m80_10us/c4"): "Vo +28.5 mV against 27.9 allowed (nominal -20.9 mV) (RESULTS 0)",
+    **{("criteria", f"ss_{r}/c3"): "slow corner: late fires in the handover (65) and after rising line steps (~160), NEW spikes "
+       "10-13 A after the steps, no peak or V_DS consequence (RESULTS 0)" for r in ("l_p48_1us", "s_p62", "l_m80_10us", "slew4")},
+    ("criteria", "nom_lead0_l_p48_1us/c3"): "control without the lead: 48 late fires after +4.8 V / 1 us, the reason for "
+    "the lead (RESULTS 0)",
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -351,6 +361,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
     "A163": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items() if "cmd" not in s},
+    "A164": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
 }
 
 
