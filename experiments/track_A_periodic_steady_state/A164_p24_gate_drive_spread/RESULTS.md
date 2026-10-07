@@ -30,6 +30,13 @@ cosim_pre). Outputs: a164_summary.json (a164_analyze.py), trims.json, a164_pre.j
     NEW spikes (1-14 per row) follow the steps: one-period peaks 10-13 A above their neighbours, <= 176 A. The handover
     peak is 199.5 A.
   - **ff -8 V / 10 us, criterion 4:** Vo +28.5 mV against 27.9 mV allowed. At nominal the same row gives -20.9 mV.
+- **Safety: a fixed lead removes the controller's interlock.** With dt_pred >= 0 the high side was never commanded
+  before the low side's turn-off command. With an 8 ns lead, a dt_pred that falls to 0 starts the channel under a
+  conducting low side whenever the gate delay is shorter than the lead.
+  - The matrix's 18 runs had none.
+  - Pre runs did: hot corner, 222 us, phase 1, after a disturbed handover (cosim_pre/run_hot_lead8, wrong ton). A165's
+    pre runs did too: slow corner, phase 4, at +-10 % with 8 ns and at +-20 % with 12 ns.
+  - A166 bounds the lead by each board's shortest turn-on delay.
 - **Edge power per module** (600-950 us, high sides gate-driven, low sides on A152's ramps):
   | board | nominal | ff | hot | slow | L x 0.7 | L x 1.3 |
   |---|---|---|---|---|---|---|
