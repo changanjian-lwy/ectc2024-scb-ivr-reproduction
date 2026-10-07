@@ -51,7 +51,9 @@ sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", o
 applied while the same phase's complement conducts is counted, and with "stop_on_overlap" the run ends there.
 "hs_on_lead_ns" (A164, < t_drv): predictive high-side turn-ons (t_lo + dt_pred) reach the plant that much earlier, as
 if dt_pred could go below zero by the lead, so the valley learning can put a gate-delayed turn-on before the low
-side's turn-off command. With gate-driven high sides a turn-on commanded against a conducting low side is counted
+side's turn-off command. "lead_mode" "on" (A164, default): only the turn-on moves, so the pulse is wider by the lead
+(a faster turn-on path in the driver); "pulse" (A165): that pulse's turn-off and the low side's turn-on after it move
+too, as a controller with a signed dt_pred would time them (t_on = t_lo + dt_pred - lead, the rest from t_on). With gate-driven high sides a turn-on commanded against a conducting low side is counted
 ("overlaps_cmd") but is a shoot-through ("overlaps", stop) only when its channel starts while the low side conducts.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
@@ -440,6 +442,7 @@ class ModuleSim:
         self.drv = cfg.get("driver")                             # A91: driver timing model
         if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
             raise ValueError("driver hs_on_lead_ns must be in [0, t_drv_ns)")
+        self.lead_k = [False] * N                                 # A165: a lead-shifted pulse is open on phase k
         self.rng = np.random.default_rng(int(self.drv.get("seed", 1))) if self.drv else None
         self.ovl = {"count": 0, "first": None, "stop": False, "cmd": 0, "shoot": 0}
         gm = getattr(plant, "gm", None)                           # A164: gate-driven high sides
@@ -456,14 +459,27 @@ class ModuleSim:
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
 
-    def t_apply(self, t_cmd, j, pred_on=False):
-        """A91: the time the plant sees an edge commanded at t_cmd on switch j (pred_on: a predictive turn-on)."""
+    def lead_s(self, j, level, pred_on):
+        """A164 / A165: how much earlier than the other edges this edge reaches the plant (driver hs_on_lead_ns)."""
+        drv = self.drv
+        if not drv or not drv.get("hs_on_lead_ns"):
+            return 0.0
+        k, lead = j % N, drv["hs_on_lead_ns"] * 1e-9
+        if j < N and level:                                     # a high-side turn-on: only a predictive one moves
+            self.lead_k[k] = pred_on and drv.get("lead_mode", "on") == "pulse"
+            return lead if pred_on else 0.0
+        if self.lead_k[k] and (j < N) != bool(level):           # A165: that pulse's turn-off, then the low side's turn-on
+            if j >= N:
+                self.lead_k[k] = False
+            return lead
+        return 0.0
+
+    def t_apply(self, t_cmd, j, lead=0.0):
+        """A91: the time the plant sees an edge commanded at t_cmd on switch j (lead: lead_s)."""
         drv = self.drv
         if not drv:
             return t_cmd + self.t_drv
-        d = self.t_drv + (drv.get("m_ns", 0.0) * 1e-9 if j >= N else 0.0)
-        if pred_on and j < N:
-            d -= drv.get("hs_on_lead_ns", 0.0) * 1e-9                # A164
+        d = self.t_drv + (drv.get("m_ns", 0.0) * 1e-9 if j >= N else 0.0) - lead
         edges = drv.get("jitter_edges", "all")                   # A98: "high" or "low" restricts the jitter
         if drv.get("sigma_ps", 0.0) > 0.0 and (edges == "all" or (edges == "high") == (j < N)):
             d += self.rng.normal(0.0, drv["sigma_ps"] * 1e-12)
@@ -486,7 +502,7 @@ class ModuleSim:
         t_cmd = self.plant.t + self.t_async
         bind = not self.floor_on()                               # A118: a floor turn-off reports no residual (no trim)
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": bind})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, True), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, self.lead_s(0, 1, True)), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
     def ph_fire(self, k):                                        # A133: phase k's floor fires (as latch_fire's floor)
@@ -494,7 +510,7 @@ class ModuleSim:
         f["fired"] = True; f["fires"] += 1; self.ph_log.append((self.plant.t, k + 1))
         t_cmd = self.plant.t + self.t_async
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + k), self.seq[0], N + k, 0, {"how": None, "bind": False})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, True), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, self.lead_s(k, 1, True)), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         f["report"] = int(round(t_cmd / lsb))
 
     def ph_latches(self):
@@ -687,8 +703,9 @@ class ModuleSim:
                     t_cmd = (w + field(fine, k, fb)) * lsb
                     j = k if gate == "H" else N + k
                     meta = {"how": field(how, k, 3), "bind": bool(field(bind, k, 1))}
-                    pred_on = gate == "H" and bool(field(lvl, k, 1)) and meta["how"] == 0
-                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j, pred_on), self.seq[0], j, field(lvl, k, 1), meta))
+                    lv = field(lvl, k, 1)
+                    ld = self.lead_s(j, lv, gate == "H" and bool(lv) and meta["how"] == 0)
+                    heapq.heappush(self.pend, (self.t_apply(t_cmd, j, ld), self.seq[0], j, lv, meta))
                     self.seq[0] += 1
         return w
 

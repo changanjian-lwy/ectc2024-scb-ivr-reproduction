@@ -63,12 +63,20 @@ class DriverLead(unittest.TestCase):
     def test_high_side_turn_on_lead(self):
         from types import SimpleNamespace
         from scb_ivr.cosim.bridge import N, ModuleSim
-        m = SimpleNamespace(drv={"hs_on_lead_ns": 4.0}, t_drv=10e-9)
-        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, True), 1e-6 + 6e-9, delta=1e-18)
-        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, False), 1e-6 + 10e-9, delta=1e-18)
-        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, N, True), 1e-6 + 10e-9, delta=1e-18)
+        m = SimpleNamespace(drv={"hs_on_lead_ns": 4.0}, t_drv=10e-9, lead_k=[False] * N)
+        lead = ModuleSim.lead_s(m, 0, 1, True)                      # a predictive turn-on moves
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, lead), 1e-6 + 6e-9, delta=1e-18)
+        self.assertEqual(ModuleSim.lead_s(m, 0, 1, False), 0.0)      # timed / restart turn-ons do not
+        self.assertEqual(ModuleSim.lead_s(m, 0, 0, False), 0.0)      # "on": the turn-off stays
+        self.assertEqual(ModuleSim.lead_s(m, N, 1, False), 0.0)
+        m.drv["lead_mode"] = "pulse"                                 # A165: the pulse and the low-side turn-on move
+        self.assertAlmostEqual(ModuleSim.lead_s(m, 1, 1, True), 4e-9, delta=1e-18)
+        self.assertAlmostEqual(ModuleSim.lead_s(m, 1, 0, False), 4e-9, delta=1e-18)
+        self.assertEqual(ModuleSim.lead_s(m, N + 1, 0, False), 0.0)  # the low side's turn-off never
+        self.assertAlmostEqual(ModuleSim.lead_s(m, N + 1, 1, False), 4e-9, delta=1e-18)
+        self.assertEqual(ModuleSim.lead_s(m, N + 1, 1, False), 0.0)  # once per pulse
         m.drv = None
-        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0, True), 1e-6 + 10e-9, delta=1e-18)
+        self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0), 1e-6 + 10e-9, delta=1e-18)
 
 
 @unittest.skipUnless(HAVE, "EPC library not present (SCB_EPC_LIB / vendor_models)")
