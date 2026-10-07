@@ -161,6 +161,12 @@ class Solver:
                 raise RuntimeError(f"cg did not converge ({info})")
         return t.reshape(self.grid.shape)
 
+    def set_face_ref(self, face, t_ref):
+        """Change a convective or fixed face's reference temperature (scalar or per face cell); the matrix stays."""
+        sl, gb, old = self.face_g[face]
+        self.rhs_bc[sl] += gb * (np.asarray(t_ref, float) - np.asarray(old, float))
+        self.face_g[face] = (sl, gb, t_ref)
+
     def face_heat(self, t):
         """Heat leaving through each non-adiabatic face (W)."""
         return {f: float(np.sum(gb * (t[sl] - tr))) for f, (sl, gb, tr) in self.face_g.items()}
@@ -278,7 +284,7 @@ ABF_LAYERS = ("abf_l1", "abf_l2", "abf_m1", "abf_m2", "abf_u1", "abf_u2")
 
 def die_layout(p):
     """Five EPC2067-area blocks per phase column (LS HS LS HS LS along y), drawn to the column width with the die's
-    area (9.26 mm^2); the half-module y range [0, module_y / 2] keeps the mirror plane at y = module_y / 2."""
+    area (9.26 mm^2); symmetric about y = module_y / 2, so the half module [0, module_y / 2] has a mirror plane there."""
     area = 2.85e-3 * 3.25e-3
     ly = area / p["col_w"]
     pitch = p["module_y"] / 5
@@ -292,7 +298,8 @@ def die_layout(p):
 
 
 def build(p):
-    """Grid, conductivities and region masks of one module plus half the strip, half module in y (mirror plane)."""
+    """Grid, conductivities and region masks of one module plus half the strip: half the module in y with a mirror
+    plane, or the full module length with p["y_full"] (needed when the coolant flows along y)."""
     p = dict(STACK, **p)
     thick = {"spreader": p["t_spreader"], "attach": p["t_attach"], "die": p["t_die"] - p["t_junction"],
              "junction": p["t_junction"], "bump": p["t_bump"], "cu_gnd": p["t_cu"], "cu_vo": p["t_cu"],
@@ -308,7 +315,8 @@ def build(p):
     xw = p["n_ph"] * p["col_w"]
     xb = [-p["strip_half"]] + [k * p["col_w"] for k in range(p["n_ph"] + 1)]
     dies = die_layout(p)
-    yb = sorted({0.0, p["module_y"] / 2} | {y for d in dies for y in d["y"] if 0 < y < p["module_y"] / 2})
+    y_max = p["module_y"] if p.get("y_full") else p["module_y"] / 2
+    yb = sorted({0.0, y_max} | {y for d in dies for y in d["y"] if 0 < y < y_max})
     g = Grid(edges(xb, p["dx"]), edges(yb, p["dy"]), np.array(ze))
     zr = {name: (z0, z1) for (name, _), z0, z1 in zip(layers, zb[:-1], zb[1:])}
     lay = {name: g.box(z=zr[name]) for name in zr}
@@ -353,12 +361,12 @@ def build(p):
     if p["h_top"] > 0:
         bc["z1"] = ("h", p["h_top"], p["t_top"])
     return {"p": p, "grid": g, "kx": kx, "kz": kz, "lay": lay, "strip": strip, "cols": cols, "dies": die_regions,
-            "die_mask": die_mask, "bc": bc, "z_layers": zr}
+            "die_mask": die_mask, "bc": bc, "z_layers": zr, "y_max": y_max, "y_mult": p["module_y"] / y_max}
 
 
 def z_flux(m, t, z):
-    """Downward heat (W, half module) across the cell face nearest to height z, split into the strip and the
-    columns."""
+    """Downward heat (W, modelled part of the module) across the cell face nearest to height z, split into the strip
+    and the columns."""
     g = m["grid"]
     k = int(np.argmin(np.abs(g.ze[1:-1] - z)))           # face between cells k and k + 1
     dz, kz = g.dz, m["kz"]
@@ -369,7 +377,7 @@ def z_flux(m, t, z):
 
 
 def heat_sources(m, src):
-    """Heat map (W per cell) of the half module from per-module component losses src (W, whole module):
+    """Heat map (W per cell) of the modelled part (half or full module) from per-module losses src (W, whole module):
     die {phase: (hs W, ls W)} per die; inductor (in glass 2 over the columns, equal per phase); gate (die layer,
     with the dies); caps (glass 1, uniform over the columns); loop (lower ABF copper over the columns); lat_cu
     (half in the GND copper, half in the Vo copper, column k weighted by the square of the current it carries,
@@ -377,7 +385,7 @@ def heat_sources(m, src):
     g, lay, p = m["grid"], m["lay"], m["p"]
     vol = g.volume()
     q = np.zeros(g.shape)
-    half = 0.5                                            # the half module carries half of every module total
+    half = 1.0 / m["y_mult"]                              # share of every module total in the modelled part
 
     def spread(mask, watts):
         v = vol[mask].sum()
@@ -388,7 +396,7 @@ def heat_sources(m, src):
     for i, d in enumerate(m["dies"]):
         w = src["die_list"][i] if "die_list" in src else src["die"][d["phase"]][0 if d["kind"] == "hs" else 1]
         full = 2.85e-3 * 3.25e-3
-        cut = (min(d["y"][1], p["module_y"] / 2) - d["y"][0]) / (d["y"][1] - d["y"][0])
+        cut = (min(d["y"][1], m["y_max"]) - d["y"][0]) / (d["y"][1] - d["y"][0])
         mask = d["mask"] & jn
         spread(mask, w * cut)
         d["area_check"] = vol[mask].sum() / (p["t_junction"] * full * cut)
@@ -409,13 +417,16 @@ def heat_sources(m, src):
 LAT_WEIGHTS = np.array([16.0, 9.0, 4.0, 1.0])
 
 
-def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=50):
+def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolant=None):
     """Electrothermal fixed point (the DVPD framework's loop, spatially resolved): every die's conduction loss at its
     own mean junction temperature, each column's inductor copper at its body's mean temperature, the lateral copper
     at the mean temperature of its two copper layers in that column; switching, gate, capacitor and loop losses fixed.
 
     src25 (whole module, 25 C): die_cond / die_fixed {phase: (hs, ls)} per die, inductor (copper), core (the inductor
     array's core loss, held constant, in the inductor body), lat_cu, gate, caps, loop.
+    coolant {m_dot (kg/s through the modelled width), t_in, cp}: the z0 face's fluid temperature follows the coolant
+    along +y, channel by channel (each x column of cells carries m_dot dx / width): T_f = t_in + the heat taken up
+    upstream / (m_dot_i cp), updated with the losses until both settle (needs the full module length, y_full).
     Returns (T, stats, src at the fixed point, iterations, face heat)."""
     g, lay, p = m["grid"], m["lay"], m["p"]
     vol = g.volume()
@@ -428,6 +439,12 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=50):
     def vmean(t, mk):
         return float((t * vol)[mk].sum() / vol[mk].sum())
 
+    if coolant:
+        assert m["y_mult"] == 1.0, "the coolant march needs the full module length (y_full)"
+        sl0, gb0, _ = solver.face_g["z0"]
+        mdot_i = coolant["m_dot"] * g.dx / (g.xe[-1] - g.xe[0])
+        t_f = np.full(gb0.shape, float(coolant["t_in"]))
+        solver.set_face_ref("z0", t_f)
     t = None
     t_die = [25.0] * len(m["dies"])
     t_ind = [25.0] * p["n_ph"]
@@ -447,13 +464,26 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=50):
         t_die = [vmean(t, d["mask"] & lay["junction"]) for d in m["dies"]]
         t_ind = [vmean(t, mk) for mk in ind_m]
         t_cu = [vmean(t, mk) for mk in cu_m]
-        if change < tol:
+        change_f = 0.0
+        if coolant:
+            q = gb0 * (t[:, :, 0] - t_f)
+            t_new_f = coolant["t_in"] + (np.cumsum(q, axis=1) - 0.5 * q) / (mdot_i[:, None] * coolant["cp"])
+            change_f = float(np.abs(t_new_f - t_f).max())
+            t_f = t_new_f
+            solver.set_face_ref("z0", t_f)
+        if change < tol and change_f < tol:
             break
     stats = region_stats(m, t)
-    total = 2 * float(heat_sources(m, src).sum())                 # whole module
+    if coolant:
+        q = gb0 * (t[:, :, 0] - t_f)
+        t_out = coolant["t_in"] + q.sum(axis=1) / (mdot_i * coolant["cp"])
+        stats.update({"coolant_t_out_mean": float(np.sum(mdot_i * t_out) / np.sum(mdot_i)),
+                      "coolant_t_out_max": float(t_out.max()), "coolant_t_f_max": float(t_f.max()),
+                      "coolant_heat_w": float(q.sum()), "coolant_t_f": t_f})
+    total = m["y_mult"] * float(heat_sources(m, src).sum())          # whole module
     stats.update({"p_total_w": total, "t_die_mean": t_die, "t_ind_cols": t_ind, "t_latcu_cols": t_cu,
-                  "p_inductor_w": float(sum(src["inductor_cols"])), "p_dies_w": 2 * float(sum(
-                      w * min(1.0, (min(d["y"][1], p["module_y"] / 2) - d["y"][0]) / (d["y"][1] - d["y"][0]))
+                  "p_inductor_w": float(sum(src["inductor_cols"])), "p_dies_w": m["y_mult"] * float(sum(
+                      w * min(1.0, (min(d["y"][1], m["y_max"]) - d["y"][0]) / (d["y"][1] - d["y"][0]))
                       for w, d in zip(src["die_list"], m["dies"])))})
     return t, stats, src, it, solver.face_heat(t)
 
