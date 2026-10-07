@@ -1,0 +1,78 @@
+{
+ "calibration": {
+  "S50": {
+   "ton_36p5": {
+    "vo": 0.9758,
+    "hand_pk": 195.4
+   },
+   "ton": 37.887,
+   "at_ton": {
+    "vo": 1.0119,
+    "hand_pk": 156.8,
+    "vds": 31.3
+   }
+  },
+  "S75": {
+   "ton_36p5": {
+    "vo": 0.9305,
+    "hand_pk": 306.6,
+    "vds": 47.4
+   },
+   "ton": 39.485,
+   "at_ton": {
+    "vo": 1.0058,
+    "hand_pk": 164.7,
+    "vds": 30.6
+   }
+  }
+ },
+ "A": {
+  "vds_whole_v": [
+   33.0,
+   37.0
+  ],
+  "peaks_vs_a152_a": 5.0,
+  "edge_w": [
+   4.0,
+   6.0
+  ],
+  "late": [
+   0,
+   5
+  ]
+ },
+ "B": {
+  "vds_whole_v_max": 39.0,
+  "vthmax_edge_w_ratio": 2.0,
+  "vthmax_risk": "criterion 2 at the handover"
+ },
+ "C": {
+  "turnon_late_ns": [
+   1.5,
+   2.5
+  ]
+ },
+ "D": {
+  "vds_whole_v_max": 38.5,
+  "edge_w": 6.0
+ },
+ "d79_single_edge": {
+  "S50": {
+   "on17_nom_v": 34.7,
+   "on17_worst_v": 39.0,
+   "off200_worst_v": 25.9,
+   "off260_worst_v": 34.4,
+   "e_on_nj": 294,
+   "e_off_143_nj": 286
+  },
+  "S75": {
+   "on17_nom_v": 33.5,
+   "on17_worst_v": 38.2,
+   "off200_worst_v": 33.9,
+   "off260_worst_v": 44.6,
+   "e_on_nj": 448,
+   "e_off_143_nj": 336
+  }
+ },
+ "ramp_reference_edge_w_s50_s_p62": 3.89
+}

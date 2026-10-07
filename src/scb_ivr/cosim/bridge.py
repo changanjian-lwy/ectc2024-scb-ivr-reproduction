@@ -88,6 +88,14 @@ Finite switching edges (cfg "edge" {"didt_a_ns", "didt_on_a_ns" = didt_a_ns}, A1
 at didt_a_ns, a hard turn-on's (V_DS > 0) rises at didt_on_a_ns until V_DS <= 0 (plant.py). Sections add
 "edge_energy_j" (each switch's channel int V_DS i dt during its edges since the previous section); the record adds
 "edge_params" and "edge_stats" (ramps per switch, Python edge steps, hard turn-on extremes, the whole run's energies).
+Gate-driven edges (cfg "gate" {"dev" "EPC2067", "r_on", "r_off" (ohm per device, external + driver), "v_on" 5, "l_cs_ph" 0,
+"temp" 25, "dk2" 0, "cg_scale" 1, "v_hand" 0.2, "switches" "high" | "all" | [indices], "meas" "act" | "cmd"}, A163):
+the listed switches' edges follow the gate model (gate.py; the vendor library is read at run time). With "meas" "act"
+(default) a hard high-side turn-on's valley measurement is taken when its channel starts to conduct (the physical
+edge a switch-node detector sees) instead of at the gate command; "cmd" keeps the command. Edge energies go to
+"edge_energy_j" as with "edge"; the record adds "gate_params", "gate_stats" and "gate_offs_last" (each physical high-side
+turn-off: t_s, phase, i_act_a = the phase current when the channel takes over, i_max_a = its maximum in the edge);
+turn-ons add "t_act_s" / "vds_act_v" when deferred.
 """
 import gzip
 import heapq
@@ -259,6 +267,15 @@ def make_params(cfg, ref):
     if edge:
         extra.update(edge_didt_off=float(edge["didt_a_ns"]) * 1e9,
                      edge_didt_on=float(edge.get("didt_on_a_ns", edge["didt_a_ns"])) * 1e9)
+    gate = cfg.get("gate")                                            # A163: gate-driven edges
+    if gate:
+        sw = gate.get("switches", "high")
+        idx = tuple(range(N)) if sw == "high" else tuple(range(2 * N)) if sw == "all" else tuple(int(j) for j in sw)
+        extra.update(gate_dev=str(gate.get("dev", "EPC2067")), gate_switches=idx, gate_r_on=float(gate["r_on"]),
+                     gate_r_off=float(gate["r_off"]), gate_v_on=float(gate.get("v_on", 5.0)),
+                     gate_l_cs=float(gate.get("l_cs_ph", 0.0)) * 1e-12, gate_temp=float(gate.get("temp", 25.0)),
+                     gate_dk2=float(gate.get("dk2", 0.0)), gate_cg_scale=float(gate.get("cg_scale", 1.0)),
+                     gate_v_hand=float(gate.get("v_hand", 0.2)))
     return Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
 
 
@@ -427,6 +444,7 @@ class ModuleSim:
         if self.trace["path"]:                         # optional process trace: a running hash of the plant state
             import hashlib
             self.trace["h"] = hashlib.blake2b(digest_size=16)
+        self.gate_meas_act = (cfg.get("gate") or {}).get("meas", "act") == "act"   # A163
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
 
@@ -531,18 +549,29 @@ class ModuleSim:
             rec = {"t_s": plant.t, "phase": k + 1, "how": meta["how"], "vds_v": float(v),
                    "i_a": float(plant.y[nv + k])}
             self.turnons.append(rec)
-            if (meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))) and mon.vmin_set[k]:
-                # early: the minimum was lowered by the step that landed on this edge (node still falling),
-                # the same test as A75's "Vds at the edge below the minimum of the previous steps"
-                tv, vm = float(mon.t_vmin[k]), float(mon.vmin[k])
-                early = abs(tv - plant.t) < 1e-15 and tv > self.t_lo_act[k]
-                dip = vm < self.v_lo[k] - self.v_hys and tv > self.t_lo_act[k]
-                err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
-                self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err)
-                rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
+            learn = (meta["how"] == 0 or (meta["how"] == 3 and cfg.get("learn_at_restart", 0))) and mon.vmin_set[k]
+
+            def measure(rec=rec, k=k, learn=learn, deferred=False):
+                if learn:
+                    # early: the minimum was lowered by the step that landed on this edge (node still falling),
+                    # the same test as A75's "Vds at the edge below the minimum of the previous steps"
+                    tv, vm = float(mon.t_vmin[k]), float(mon.vmin[k])
+                    early = abs(tv - plant.t) < 1e-15 and tv > self.t_lo_act[k]
+                    dip = vm < self.v_lo[k] - self.v_hys and tv > self.t_lo_act[k]
+                    err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
+                    self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err)
+                    rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
+                if deferred:                                     # A163: taken at the physical turn-on
+                    rec["t_act_s"] = plant.t; rec["vds_act_v"] = float(plant.vds(k))
+                mon.vmin_set[k] = 0
+
+            gm = plant.gm
+            if gm is not None and j in gm.st and self.gate_meas_act and v > 0.0:
+                gm.next_cb[j] = lambda m=measure: m(deferred=True)    # A163: run by the gate model at activation
+            else:
+                measure()
             if self.dep_on and k == 0 and meta["how"] == 0:              # A132: the V_DS comparator at the edge
                 self.meas_v = bool(v > self.v_set)
-            mon.vmin_set[k] = 0
             if k == 0:
                 vo, vin = float(plant.y[self.i_out]), p.vin_at(plant.t)
                 ia = [plant.sim.idx[f"a{q}"] for q in range(1, N)]; ix = [plant.sim.idx[f"x{q}"] for q in range(1, N)]
@@ -748,6 +777,14 @@ class ModuleSim:
         if plant.edges:                                              # A145
             out["edge_params"] = {"didt_off_a_s": p.edge_didt_off, "didt_on_a_s": p.edge_didt_on}
             out["edge_stats"] = plant.edge_stats
+        if plant.gm is not None:                                     # A163
+            out["gate_params"] = {k: getattr(p, k) for k in ("gate_dev", "gate_switches", "gate_r_on", "gate_r_off",
+                                                             "gate_v_on", "gate_l_cs", "gate_temp", "gate_dk2",
+                                                             "gate_cg_scale", "gate_v_hand")}
+            out["gate_params"]["gate_switches"] = list(p.gate_switches)
+            out["gate_params"]["meas"] = "act" if self.gate_meas_act else "cmd"
+            out["gate_stats"] = plant.gm.summary()
+            out["gate_offs_last"] = [{"t_s": a, "phase": b, "i_act_a": c, "i_max_a": d} for a, b, c, d in plant.gm.off_log]
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
                                  "vm0_v": self.vm0, "valley_zero": int(self.mon.vmin_zero), "t_en_us": self.t_en * 1e6,

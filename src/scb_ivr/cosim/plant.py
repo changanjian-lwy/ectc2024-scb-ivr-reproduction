@@ -323,7 +323,7 @@ class FastPlant:
         self.last_donly = [False] * (2 * self.n)
         self._vd = None; self._vd_t = None
         _aux_setup(self, p, gl)                                       # A101 (no branches: na = 0)
-        self.edges = p.edge_didt_off > 0 or p.edge_didt_on > 0        # A145: finite switching edges
+        self.edges = p.edge_didt_off > 0 or p.edge_didt_on > 0 or bool(p.gate_dev)   # A145 / A163: finite edges
         self.ramps = {}                                               # switch -> (t0, i0, slope A/s)
         self.edge_e = [0.0] * (2 * self.n)
         if self.edges:
@@ -331,6 +331,34 @@ class FastPlant:
             self.edge_stats = {"off": [0] * (2 * self.n), "on": [0] * (2 * self.n), "steps": 0, "off_neg_steps": 0,
                                "on_vds_max_v": 0.0, "on_t_max_s": 0.0, "on_i_max_a": 0.0, "on_forced": 0,
                                "e_total_j": [0.0] * (2 * self.n)}
+        self.gm = None
+        if p.gate_dev:                                                # A163: gate-driven edges (gate.py)
+            from scb_ivr.cosim.gate import GateEdges
+            self.gm = GateEdges(self)
+
+    def eff(self, j):
+        """Switch j's physical conduction: the commanded gate, except during a gate-model edge (A163)."""
+        a = (self.gh + self.gl)[j]
+        gm = self.gm
+        if gm is None or j not in gm.st:
+            return a
+        return (a and not gm.suppressed(j)) or gm.forced(j)
+
+    def phys_gates(self):
+        """(gh, gl) as conducting (A163); the commanded lists without a gate model."""
+        if self.gm is None:
+            return self.gh, self.gl
+        e = [self.eff(j) for j in range(2 * self.n)]
+        return e[:self.n], e[self.n:]
+
+    def _h_next(self, t_target):
+        """The next step: p.h, the window end, or a gate model's pending activation (A163)."""
+        hh = min(self.p.h, t_target - self.t)
+        if self.gm is not None:
+            ta = self.gm.next_act() - self.t
+            if 1e-18 < ta < hh:
+                hh = ta
+        return hh
 
     @property
     def vds_max(self):
@@ -351,9 +379,18 @@ class FastPlant:
         """One step with A73's diode_check: a diode-only branch whose Vds ends > 0 is cut and the step redone."""
         n2, g = 2 * self.n, self.gh + self.gl
         ramps, src = self.ramps, None
+        gm = self.gm
+        if gm is not None:                                            # A163: physical states of gate-model edges
+            if gm.activate_due():
+                self.euler_left = 2
+            g = [self.eff(j) for j in range(n2)]
+        gact = gm is not None and gm.any_active()
         if ramps:                                                     # A145: a switch in an edge is open
             g = [a and j not in ramps for j, a in enumerate(g)]
         d = list(self.diode)
+        if gact:
+            for j in gm.active():
+                d[j] = False
         euler = self.euler_left > 0
         rev = self.p.rev_drop
         t0, t1 = self.t, self.t + h
@@ -364,7 +401,10 @@ class FastPlant:
         for _ in range(n2 + 1):
             cond = tuple([bool(a or b) for a, b in zip(g, d)]) + aux
             donly = tuple([bool(b and not a) for a, b in zip(g, d)]) if rev else None
-            y1 = self.sim.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1, src)
+            if gact:                                                  # A163: channels and gates in the step
+                y1 = gm.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1, src)
+            else:
+                y1 = self.sim.step(self.y, cond, h, euler, t0, self.load_on, donly, vin0, vin1, src)
             cand = [j for j in range(n2) if d[j] and not g[j]]
             if not cand:
                 break
@@ -388,6 +428,14 @@ class FastPlant:
         self._vd, self._vd_t = vd, self.t
         if ramps:
             g = self._edge_after(t1, h, vd0, vd, i0s, i1s)
+        if gact:                                                      # A163: gates, energies, finished edges
+            if gm.commit(self.y, vin1):
+                self.euler_left = 2
+            g = [self.eff(j) and j not in self.ramps for j in range(n2)]
+            for j in gm.active():
+                g[j] = True                                           # no diode flag on an active channel
+        if gm is not None:
+            gm.track()
         if rev:                                                       # A89: reverse-conduction energy (A87)
             for j in range(n2):
                 if self.last_donly[j]:
@@ -406,11 +454,15 @@ class FastPlant:
 
     def integrate_to(self, t_target, on_step):
         while self.t < t_target - 1e-18:
-            self._advance(min(self.p.h, t_target - self.t))
+            self._advance(self._h_next(t_target))
             on_step()
 
     def set_gate(self, j, level):
-        if self.edges:
+        gm = self.gm
+        if gm is not None and j in gm.st:                             # A163: the gate model takes this switch's edges
+            if bool(level) != bool((self.gh + self.gl)[j]):
+                gm.command(j, bool(level), self.eff(j))
+        elif self.edges:
             self._edge_gate(j, bool(level))
         if j < self.n:
             self.gh[j] = bool(level)
@@ -635,8 +687,10 @@ class Monitors:
 
     def py_step(self, plant):
         n, t = self.n, plant.t
+        pg = getattr(plant, "phys_gates", None)                       # A163: physical states (ReferencePlant: commanded)
+        gh, gl = pg() if pg is not None else (plant.gh, plant.gl)
         for k in range(n):
-            if self.hoff_set[k] and not self.cross_set[k] and not plant.gh[k] and not plant.gl[k]:
+            if self.hoff_set[k] and not self.cross_set[k] and not gh[k] and not gl[k]:
                 v = plant.vds(n + k)
                 if v <= 0.0:
                     vp, tp = self.v_prev[k], self.t_prev[k]
@@ -644,7 +698,7 @@ class Monitors:
                     self.cross_set[k] = 1
                 self.v_prev[k] = v; self.t_prev[k] = t; self.vprev_valid[k] = 1
         for k in range(n):
-            if self.vmin_set[k] and not plant.gh[k] and not plant.gl[k]:
+            if self.vmin_set[k] and not gh[k] and not gl[k]:
                 v = plant.vds(k)
                 if v < self.vmin[k] and not (self.vmin_zero and self.vmin[k] <= 0.0):
                     self.vmin[k] = v; self.t_vmin[k] = t
@@ -775,8 +829,12 @@ class KernelPlant2(KernelPlant):
 
     def set_gate(self, j, level):
         super().set_gate(j, level)
-        self._buf["gh"][:] = [int(bool(x)) for x in self.gh]
-        self._buf["gl"][:] = [int(bool(x)) for x in self.gl]
+        self._sync_gbuf()
+
+    def _sync_gbuf(self):
+        gh, gl = self.phys_gates()                                    # A163: the C loop sees physical states
+        self._buf["gh"][:] = [int(bool(x)) for x in gh]
+        self._buf["gl"][:] = [int(bool(x)) for x in gl]
 
     def attach_monitors(self, mon):
         r = self._run
@@ -832,15 +890,26 @@ class KernelPlant2(KernelPlant):
             for k, (idx, thr_k, _) in enumerate(xl):
                 self._run.xl_idx[k], self._run.xl_thr[k] = idx, thr_k
             self._run.n_xl = len(xl)
+        gm = self.gm
         while True:
-            if self.ramps:                                            # A145: edge steps are Python's
-                if not self.t < t_target - 1e-18:
+            t_stop = t_target
+            if self.ramps or (gm is not None and (gm.any_active() or gm.next_act() <= self.t + 1e-18)):
+                if not self.t < t_target - 1e-18:                     # A145 / A163: edge steps are Python's
                     return
                 rc = 3
             else:
-                rc = self._pk_run(self.sim._ctxp, self._runp, t_target, int(bool(armed)), thr)
+                trk = gm is not None and gm.tracking()
+                if gm is not None:                                    # A163: stop at a gate's activation, or after
+                    t_stop = min(t_target, gm.next_act())             # each step while a turn-on gate is tracked
+                    if trk:
+                        t_stop = min(t_stop, self.t + self.p.h)
+                rc = self._pk_run(self.sim._ctxp, self._runp, t_stop, int(bool(armed)), thr)
                 self._vd, self._vd_t = self._buf["vd"], self.t
+                if trk:
+                    gm.track()
             if rc == 0:
+                if t_stop < t_target:
+                    continue
                 return
             if rc == 1:                                               # latch condition after a C step
                 armed = False
@@ -864,7 +933,9 @@ class KernelPlant2(KernelPlant):
             if rc == 6:
                 raise np.linalg.LinAlgError("Singular matrix")
             # rc == 3: this step in Python (partial step or chord fallback), then the monitors and the latch
-            self._advance(min(self.p.h, t_target - self.t))
+            self._advance(self._h_next(t_target))
+            if gm is not None:
+                self._sync_gbuf()
             self._buf["vd"][:] = self._vd
             self._vd = self._buf["vd"]
             monitors.py_step(self)

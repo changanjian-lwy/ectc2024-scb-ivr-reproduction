@@ -21,6 +21,7 @@ Circuit (N phases):
 - optional finite switching edges (edge_didt_off / edge_didt_on, A145): the plants (plant.py, not Sim) model a switch
   in an edge as open with its channel current as a source from drain to source in the right-hand side (edge_inc);
   0 = instantaneous edges, every matrix and step as before.
+- optional gate-driven edges (gate_dev, A163): the listed switches' edges follow a gate model (gate.py); "" = off.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -129,6 +130,16 @@ class CircuitParams:
     loop_rp: float = 0.0         #   Ohm across loop_l (damping; 0: none)
     edge_didt_off: float = 0.0   # A145: channel current fall rate at a turn-off, A/s (0: instantaneous)
     edge_didt_on: float = 0.0    #   rise rate at a hard turn-on (V_DS > 0), A/s (0: instantaneous)
+    gate_dev: str = ""           # A163: gate-driven edges with this device's model ("": off; gate.py)
+    gate_switches: tuple = ()    #   switch indices (SH1..SHN = 0..N-1, SL1..SLN = N..2N-1)
+    gate_r_on: float = 0.0       #   ohm per device in series with its R_G (external + driver) at turn-on
+    gate_r_off: float = 0.0      #   ... at turn-off
+    gate_v_on: float = 5.0       #   gate drive voltage (V; off = 0 V)
+    gate_l_cs: float = 0.0       #   common-source inductance per device (H)
+    gate_temp: float = 25.0      #   device temperature (deg C)
+    gate_dk2: float = 0.0        #   threshold shift (V; spread case)
+    gate_cg_scale: float = 1.0   #   gate capacitances times this (spread case)
+    gate_v_hand: float = 0.2     #   V_DS (V) at which the channel hands over to / takes over from conduction
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
