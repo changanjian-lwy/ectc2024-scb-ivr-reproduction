@@ -22,14 +22,17 @@ RACX_HBS1 = {                                  # mOhm / nH, small signal, at RAC
 }
 
 
-def racx(f, d):
+def racx(f, d, alpha_low=None):
     """Small-signal R_acx (Ohm / H) of HBS1 at frequency f (Hz) and duty d: linear in d inside the digitised range
-    (clipped to it), power law in f through the neighbouring curves (below 2 MHz the 2-4 MHz exponent: extrapolated)."""
+    (clipped to it), power law in f through the neighbouring curves; below 2 MHz extrapolated with the 2-4 MHz exponent,
+    or with alpha_low if given."""
     d = float(np.clip(d, RACX_D[0], RACX_D[-1]))
     fs = sorted(RACX_HBS1)
     v = {fk: float(np.interp(d, RACX_D, RACX_HBS1[fk])) for fk in fs}
     lo, hi = (fs[0], fs[1]) if f <= fs[1] else (fs[1], fs[2])
     alpha = np.log(v[hi] / v[lo]) / np.log(hi / lo)
+    if f < fs[0] and alpha_low is not None:
+        alpha = alpha_low
     return v[lo] * (f / lo) ** alpha * 1e6          # mOhm / nH = 1e6 Ohm / H
 
 
@@ -37,12 +40,13 @@ def exponent(d, f_lo=2e6, f_hi=8e6):
     return float(np.log(racx(f_hi, d) / racx(f_lo, d)) / np.log(f_hi / f_lo))
 
 
-def phase_core_loss(valley, peak, ton, period, l_phase, kappa=1.0):
+def phase_core_loss(valley, peak, ton, period, l_phase, kappa=1.0, alpha_low=None):
     """Core loss (W) of one phase: triangular ripple valley -> peak over ton, back over the rest of the period."""
     i_ac2 = (peak - valley) ** 2 / 12.0
-    return kappa * racx(1.0 / period, ton / period) * l_phase * i_ac2
+    return kappa * racx(1.0 / period, ton / period, alpha_low) * l_phase * i_ac2
 
 
-def module_core_loss(m, l_phase, kappa=1.0):
+def module_core_loss(m, l_phase, kappa=1.0, alpha_low=None):
     """Sum over the phases of a p24_loss_budget.measure() record."""
-    return sum(phase_core_loss(p["valley"], p["peak"], m["ton_s"], m["period_s"], l_phase, kappa) for p in m["phases"])
+    return sum(phase_core_loss(p["valley"], p["peak"], m["ton_s"], m["period_s"], l_phase, kappa, alpha_low)
+               for p in m["phases"])

@@ -46,9 +46,11 @@ def main():
         r = C.racx(f, dty)
         i_ac = [abs(p["peak"] - p["valley"]) / np.sqrt(12) for p in m["phases"]]
         core1 = C.module_core_loss(m, l_ph, 1.0)
+        core1_a1 = C.module_core_loss(m, l_ph, 1.0, alpha_low=1.0)     # extrapolation below 2 MHz with f^1
         rec = {"f_hz": f, "duty": dty, "racx_mohm_per_nh": r * 1e-6, "omega_l_mohm": 2e3 * np.pi * f * l_ph,
                "tan_delta_equiv": r / (2 * np.pi * f), "i_ac_rms_a": i_ac, "extrapolated": f < 0.95 * 2e6,
-               "core_w": {f"k{k:g}": k * core1 for k in KAPPA}, "by_n": {}}
+               "core_w": {f"k{k:g}": k * core1 for k in KAPPA},
+               "core_w_alpha_low_1": {f"k{k:g}": k * core1_a1 for k in KAPPA}, "by_n": {}}
         for n in ns:
             x = d73["designs"][f"{name}_N{n}"]
             p25, p_out = x["p25_w"], x["split_25c"]["p_out"]
@@ -57,6 +59,7 @@ def main():
             for k in KAPPA:
                 core = k * core1
                 row[f"eff_k{k:g}"] = 100 * p_out / (p_out + p25 + core)
+                row[f"eff_k{k:g}_alpha_low_1"] = 100 * p_out / (p_out + p25 + k * core1_a1)
                 for pk, (cu_key, loop) in PKG.items():
                     lat = d75["lateral"][cu_key]["w_20mm"]
                     row[f"eff_k{k:g}_{pk}"] = 100 * p_out / (p_out + p25 + core + lat + loop)
@@ -96,8 +99,12 @@ def main():
         best = {name: max(rec["by_n"].values(), key=lambda r: r[key])[key] for name, rec in out["designs"].items()}
         worst = {name: min(rec["by_n"].values(), key=lambda r: r[key])[key] for name, rec in out["designs"].items()}
         out["ranking"][f"k{k:g}"] = {"best_n": best, "fewest_n": worst}
-        print(f"kappa {k:g}: " + ", ".join(f"{nm} {worst[nm]:.2f}-{best[nm]:.2f} %" for nm in best)
-              + f"  -> best {max(best, key=best.get)}")
+        line = f"kappa {k:g}: " + ", ".join(f"{nm} {worst[nm]:.2f}-{best[nm]:.2f} %" for nm in best) + f"  -> best {max(best, key=best.get)}"
+        if k:
+            a1 = {nm: [r[f"eff_k{k:g}_alpha_low_1"] for r in rec["by_n"].values()] for nm, rec in out["designs"].items()}
+            out["ranking"][f"k{k:g}"]["alpha_low_1"] = {nm: [min(v), max(v)] for nm, v in a1.items()}
+            line += "; with f^1 below 2 MHz: 1MHz " + f"{min(a1['1MHz']):.2f}-{max(a1['1MHz']):.2f} %"
+        print(line)
     (DIAG / "D76_core_loss.json").write_text(json.dumps(out, indent=1, default=float) + "\n")
     print(f"wrote {(DIAG / 'D76_core_loss.json').relative_to(ROOT)}")
 
