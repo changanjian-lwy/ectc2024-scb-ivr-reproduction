@@ -2,6 +2,7 @@
 plant (cosim/gate.py FastDev), and one gate-driven hard turn-on in the plant against LTspice with EPC's model
 (reference numbers from scripts/p24_gate_edges.py, D79_gate_validation.json). The vendor library is not in the
 repository: every test skips without it (CI)."""
+import importlib.util
 import math
 import sys
 import unittest
@@ -57,6 +58,7 @@ class GateModelDatasheet(unittest.TestCase):
         self.assertGreater(load_device(cg_scale=1.5).gate_charge()["q_g"], 22.3e-9)
 
 
+@unittest.skipUnless(importlib.util.find_spec("cocotb"), "cocotb not installed (the bridge imports it)")
 class DriverLead(unittest.TestCase):
     def test_high_side_turn_on_lead(self):
         from types import SimpleNamespace
