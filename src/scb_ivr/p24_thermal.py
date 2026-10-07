@@ -427,7 +427,8 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
     coolant {m_dot (kg/s through the modelled width), t_in, cp}: the z0 face exchanges heat with a coolant flowing along
     +y, channel by channel (each x column of cells carries m_dot dx / width): the fluid temperatures join the linear
     system (first-order upwind per channel, m_i cp (T_f,j - T_f,j-1) = G_j (T_w,j - T_f,j), energy exact, stable at any
-    NTU) and the augmented matrix is factorised once (needs the full module length, y_full).
+    NTU), solved by GMRES preconditioned with the solid's z-line solve followed by an exact downstream sweep of each
+    channel (needs the full module length, y_full).
     Returns (T, stats, src at the fixed point, iterations, face heat)."""
     g, lay, p = m["grid"], m["lay"], m["p"]
     vol = g.volume()
@@ -454,9 +455,23 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
         rows = np.concatenate([wall, fl, fl, fl[up]])
         cols = np.concatenate([fl, wall, fl, fl[up] - 1])
         vals = np.concatenate([-gbf, -gbf, cap + gbf, -cap[up]])
-        aug = sp.bmat([[solver.matrix, None], [None, sp.csc_matrix((nf, nf))]], format="csc")
-        aug = (aug + sp.csc_matrix((vals, (rows, cols)), shape=(ns + nf, ns + nf))).tocsc()
-        lu_aug = spla.splu(aug, permc_spec="MMD_AT_PLUS_A")
+        aug = sp.bmat([[solver.matrix, None], [None, sp.csc_matrix((nf, nf))]], format="csr")
+        aug = (aug + sp.csr_matrix((vals, (rows, cols)), shape=(ns + nf, ns + nf))).tocsr()
+        line = solver.lu if solver.method == "cg" else Solver(g, m["kx"], m["kx"], m["kz"], m["bc"], "cg").lu
+        capm, gbm = cap.reshape(nx, ny), gbf.reshape(nx, ny)
+
+        def precond(r):
+            xs = line.solve(r[:ns])
+            rf = r[ns:].reshape(nx, ny) + gbm * xs.reshape(g.shape)[:, :, 0]
+            xf = np.empty((nx, ny))
+            prev = np.zeros(nx)
+            for j in range(ny):                                      # (cap + G) T_j - cap T_(j-1) = r_j
+                prev = (rf[:, j] + capm[:, j] * prev) / (capm[:, j] + gbm[:, j])
+                xf[:, j] = prev
+            return np.concatenate([xs, xf.ravel()])
+
+        pre = spla.LinearOperator(aug.shape, matvec=precond)
+        x_prev = None
         rhs_s = solver.rhs_bc.copy()
         rhs_s[sl0] -= gb0 * tref0                                    # the face now sees the fluid, not t_ref
         rhs_f = np.where(up, 0.0, cap * coolant["t_in"])
@@ -474,7 +489,11 @@ def coupled(m, src25, a_sw, a_cu, method="direct", tol=1e-3, max_iter=80, coolan
                                 for ti in t_ind]
         src["lat_cu_cols"] = [w * (1 + a_cu * (tc - 25)) for w, tc in zip(lat25, t_cu)]
         if coolant:
-            x = lu_aug.solve(np.concatenate([(heat_sources(m, src) + rhs_s).ravel(), rhs_f]))
+            b = np.concatenate([(heat_sources(m, src) + rhs_s).ravel(), rhs_f])
+            x, info = spla.gmres(aug, b, x0=x_prev, M=pre, rtol=1e-11, restart=60, maxiter=400)
+            if info != 0:
+                raise RuntimeError(f"gmres did not converge ({info})")
+            x_prev = x
             t_new, t_f = x[:ns].reshape(g.shape), x[ns:].reshape(nx, ny)
         else:
             t_new = solver.solve(heat_sources(m, src), t0=t)

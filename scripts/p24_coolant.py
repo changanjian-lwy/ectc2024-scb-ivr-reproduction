@@ -106,7 +106,7 @@ def min_flow(rows):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--jobs", type=int, default=3)
+    ap.add_argument("--jobs", type=int, default=8)
     args = ap.parse_args()
     jobs = []
     for cooler in COOLERS:
