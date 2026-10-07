@@ -1,6 +1,6 @@
 # SCB-IVR reproduction: progress since 14 September
 
-Changan Jian · 6 October 2026 ·
+Changan Jian · 8 October 2026 ·
 [github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction)
 
 Since our meeting the work has moved from checking one module's switching
@@ -33,6 +33,7 @@ Results (co-simulation, 25 °C):
   the simulated waveforms, 29-40 current-rated HBS1-class units per phase). HBS1's
   own loss metric (R_acx, P24's ref. [10]) adds 7.5-30 W per module (small to large
   signal): **78-85 %**; at Choi, Khorasani et al.'s 85 °C (TCPMT 2025), with the package, ~73-82 %.
+  Gate-driven edges (Section 3) take about 0.5 point more.
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** on every registered test of one module
   (limit 200 A: this work's budget, 1.6 × P24's 125 A nominal peak; it
@@ -134,14 +135,18 @@ are budgets over plausible ranges:
   Bayesian search over the law's two gains found a narrow band that holds
   40 V at 50 pH, but there the loop oscillates on neighbouring line slews
   (203-275 A). The same law does fix load steps.
-- **The gate drive removes it.** Slowing only the hard turn-on, with the
-  72 A/ns turn-off kept, holds every switch ≤ 40 V, start-up included, up
-  to 150 pH: 37.1 V at 50 pH with 36 A/ns, 36.4 / 38.0 V at 100 / 150 pH
-  with 18 A/ns. It costs 0.1-0.4 W and 1.9 µs on the load step, because
-  under ZVS the turn-on carries no voltage. Dymond et al. (2018) report the
-  same on a 40 V GaN bridge leg. One side effect: open-loop start-up then
-  loses on-time (Vo 0.958 V when the loop takes over, 224 A at 100 pH); a
-  longer start-up on-time restores it (155 A).
+- **The gate drive removes it.** Slowing only the hard turn-on, with a fast
+  turn-off, holds every switch ≤ 40 V, start-up included. Dymond et al. (2018)
+  report the same on a 40 V GaN bridge leg.
+    - First shown with current-ramp edges: 37.1 V at 50 pH with 36 A/ns.
+    - With EPC's own EPC2067 model in the circuit (checked against the datasheet,
+      and against LTspice on all 20 devices), it means ~3 Ω turn-on and ≤ 0.3 Ω
+      turn-off per device.
+    - A real gate overshoots 3.5-5 V less than a linear ramp of the same slope, so
+      the ramp formulas below are conservative.
+    - The edges cost ~2.5 W per module at 50 pH, 1.0-1.9 W more than the loss
+      model's ideal edges (~0.5 point of efficiency). The ramp model's
+      "0.1-0.4 W" was an artefact of linear ramps.
 - **Both effects follow from the node charge** (2 + 3 EPC2067 swung by 12 V,
   Q ≈ 162 nC). The turn-on ramp lasts √(2Q / (di/dt)) and ends when the node
   swing plus L·di/dt reaches the rail; what it leaves undone, the LC ring
@@ -152,27 +157,51 @@ are budgets over plausible ranges:
   V_DS within −0.1..+0.6 V, the 40 V side right on every point, start-up
   151-155 A. The whole robustness matrix and four modules stay ≤ 39.5 V
   at L·di/dt 3.0 V (125 and 150 pH).
-- **The turn-on rate has a window.** Voltage wants di/dt_on ≤ 3.0 V / L;
-  regulation wants di/dt_on ≥ ~20 A/ns (at 150 pH, 12 A/ns deepens the
-  load-step dip from −12 to −16 mV and slows the recovery; 18-24 A/ns do
-  not). The window closes at L ≈ 3.0 V / 20 A/ns = 150 pH.
-- **Above ~150 pH the turn-off binds and has a price.** The 72 A/ns turn-off
-  ring exceeds 40 V on its own; a slower turn-off peaks near
-  V_rail + 2 L·di/dt, so L·di/dt_off ≤ ~10 V is needed (300 pH: ~32 A/ns,
-  37.7 V). Its V-I overlap costs channel loss: about +7 W per 250 W module at
-  200 pH and +20-28 W (8-11 %) at 300 pH, against ≤ 0.4 W for the slow
-  turn-on below 150 pH.
-- **Resulting specification,** checked on 13 transient tests (line ramps
-  2-10 µs, falling steps, inductance × 0.7 / 1.3) and on four modules: loop
-  ≤ 50 pH, turn-on 36 A/ns, turn-off 72 A/ns, start-up on-time 36.5 ns →
-  switch ≤ 37.6 V, start-up ≤ 198 A, after steps ≤ 180 A. 100 pH works at
-  18 A/ns. In general: turn-on between ~20 A/ns and 3.0 V / L, turn-off
-  72 A/ns up to 150 pH and ≤ 10 V / L above, start-up on-time from one fitted formula (50-300 pH).
-  Published embedded-GaN loops are 230-320 pH, which this design can drive
-  only at several percent of efficiency. **In the tested model (ideal damper
-  at Q 7, 25 °C, nominal Cs, linear current-ramp edges) the turn-on window
-  closes near 150 pH, with 0.6 V margin at the worst corner: a candidate
-  bound for layout (125 pH for margin), not a hardware limit.**
+- **The datasheet spread decides the drive, through timing.** EPC2067's limits
+  allow a threshold up to 2.5 V and Q_G up to 22.3 nC. With those and the gate
+  resistor's tolerance, the high-side turn-on delay (command to channel start)
+  runs from ~1.5 ns to ~16 ns. Two parts of the controller depend on it.
+    - **Open-loop start-up.** Its on-time moves by up to ~4 ns, which sets the
+      peak when the loop takes over: 157 A nominal, 376 A at the threshold maximum.
+      A one-shot trim per board fixes it: set the start-up on-time so that Vo is
+      1.035 V at the handover. That held on every board tested.
+    - **Valley timing.** Our controller commands the high side no earlier than one
+      clock after the low side's turn-off command, and the valley comes 9.5-11 ns
+      after that command. So it absorbs only ~5.5 ns of gate delay, and the high
+      side needs a lead.
+        - With an 8 ns lead, nominal, hot and fast-corner boards run without timing
+          faults, four modules included.
+        - The lead removes the implicit interlock. When the learned timing collapsed
+          in two corner runs, the high side shot through.
+        - Bounding the lead by each board's shortest delay minus 1 ns is safe, but
+          leaves late turn-ons after rising line steps.
+        - At the slow corner (threshold and Q_G at their maxima, resistance +20 %),
+          peaks and voltages hold, but the controller fires late during the handover
+          and after rising line steps whatever the lead.
+    - With ±30 % on the gate resistance no single resistor meets both the fast
+      corner's 40 V and the slow corner's timing; ±20 % does.
+- **The turn-off wants a strong sink.** With ≤ 0.3 Ω the channel is off before
+  V_DS rises, and the overshoot is the loop's energy bound: 27 / 35 / 42 V at 50 /
+  75 / 100 pH and 200 A. A ~1.2 Ω sink (~72 A/ns) instead costs ~10 W per module
+  in V-I overlap. In the ramp model above ~150 pH the turn-off binds: it needs
+  L·di/dt_off ≤ ~10 V, at +7 to +28 W per module (200-300 pH).
+- **Resulting specification.** Checked with EPC's gate model on the transient
+  tests (line steps and ramps, load steps, inductance × 0.7 / 1.3) at four device
+  corners (nominal, fast, slow, 125 °C) and on four modules.
+    - Loop ≤ 50 pH (~60 pH at most). 75 pH would need ~4 Ω turn-on for 40 V,
+      which the slow corner's timing cannot absorb.
+    - Per device: 3.0 Ω ± 20 % turn-on, ≤ 0.3 Ω turn-off, a Kelvin source and a
+      gate loop ≤ 1 nH. Low-side sink ≤ 0.3 Ω (dv/dt immunity).
+    - A high-side turn-on lead with an interlock: ~8 ns, or per board its
+      shortest delay − 1 ns.
+    - A per-board start-up trim.
+    - Results: switch ≤ 38.5 V and ≤ 192 A after steps at every corner. At
+      inductance × 0.7 the open-loop start-up peaks at 202 A.
+    - The ramp model's 125-150 pH bound does not survive the device spread.
+    - Peak currents in this section are physical, after the gate delays. The ramp
+      runs reported the current at the turn-off command, 5-8 A lower.
+    - Published embedded-GaN loops are 230-320 pH, which this design can drive
+      only at several percent of efficiency.
 - **Rating used:** EPC2067's 40 V continuous rating, not the datasheet's
   48 V transient or EPC Phase 16's 120 % for ≤ 1 % of life (100 V parts);
   under that rule 50 pH would pass without the slow turn-on, 100 pH not.
@@ -185,8 +214,8 @@ are budgets over plausible ranges:
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
 | inductor technology, footprint per phase | 29-40 current-rated HBS1-class units per phase: 86.6-87.7 %, 2.5 MHz best by 0.2-0.6 points before core loss, 1 MHz ties once it is counted; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
-| QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ≤ 40 V with turn-on ≤ 3.2 V / L to 150 pH; above, turn-off ≤ 10 V / L at +7 W (200 pH) to +20-28 W (300 pH) | loss, and whether the drive alone can hold 40 V |
-| gate drive, turn-on vs turn-off | 72 / 72 A/ns: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); the overshoot follows L × turn-on di/dt (≤ 3.2 V for 40 V), tested 50-300 pH | whether a separate turn-on path is needed |
+| QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ramp edges hold 40 V to 150 pH, but with EPC's gate model and the datasheet spread the drive and the controller's timing hold only to ~50-60 pH | loss; whether the resistor drive holds |
+| gate drive, turn-on vs turn-off | equal fast edges: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); 3.0 Ω ± 20 % turn-on / ≤ 0.3 Ω turn-off per device holds every corner (±30 % has no single-resistor window); the turn-on delay (1.5-16 ns) needs a high-side lead and a per-board start-up trim | the driver's resistances and tolerance; whether the controller can lead the high side |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
 | series-capacitor technology | ESR ≤ 0.5 mΩ: < 1 %; ESL not yet modelled | ladder ringing |
@@ -195,11 +224,15 @@ are budgets over plausible ranges:
 
 Five answers would narrow the package specification most:
 
-1. Can P24's gate driver give the turn-on its own, slower edge (18-36 A/ns)
-   while the turn-off stays near 72 A/ns? From the datasheet's gate charge
-   that is roughly 5-10 Ω source and ~1 Ω sink resistance per device; with
-   no sink resistor the turn-off would reach ~160 A/ns, which alone limits
-   the loop to ~60 pH.
+1. How do P24's driver and controller handle the high-side turn-on delay?
+    - The resistances that hold 40 V are ~3 Ω turn-on and ≤ 0.3 Ω turn-off per
+      device. With EPC2067's datasheet spread, the delay from command to channel
+      start then runs from ~1.5 to ~16 ns.
+    - Our controller commands the high side only after the low side's turn-off
+      command, so it absorbs ≤ ~5.5 ns. It needs a lead (a signed dt_pred) with an
+      interlock, or a bounded threshold spread.
+    - What gate resistance and tolerance does the driver have, and does the
+      controller lead the high side?
 2. Which derating rule do you apply to repetitive ns-scale drain overshoot
    on 40 V GaN: the continuous rating, or a transient allowance such as
    EPC's 120 % for ≤ 1 % of life?
@@ -207,10 +240,11 @@ Five answers would narrow the package specification most:
    V_DS capture would do: a CNN trained on simulated captures, followed by a
    circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz). The same capture gives the
    ring's Q, which must stay ≤ ~30. With L known, the drive spec follows
-   from the formulas above; above ~150 pH the turn-off must
-   slow as well, at several percent of efficiency.
-4. How was the start-up on-time set? A slow turn-on needs it raised by
-   ~16 ns × (di/dt in A/ns)^-½ plus ~6 ns per nH of loop (formula above).
+   from the gate-level results above (≤ ~50-60 pH for the resistor drive).
+4. How was the start-up on-time set? With real gates the threshold spread
+   moves the open-loop on-time by up to ~4 ns. That decides the peak at the
+   handover (157 A nominal, 376 A at the threshold maximum), so we trim it once
+   per board.
 5. Which face of the IVR is cooled, at what coolant temperature? Thermal vias in
    glass 1? The core's large-signal loss at ~5 A per unit? Without vias our 3D
    model has the inductor array 54 K above the dies; the core costs 2-8 points.
