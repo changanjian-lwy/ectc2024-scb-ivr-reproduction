@@ -217,6 +217,18 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
 - a per-board start-up trim measured on the board;
 - a threshold-form driver interlock (a channel waits until its complement's gate is below threshold, <= 0.5 ns).
 
+**Coverage and limits of the spec (A173-A176, after an external review; table: reports/FINAL_SPEC_COVERAGE.md).**
+- The final plant has run A152's 13-row matrix at nominal devices; the corners on +4.8 V / 1 us, the load step and
+  falling ramps; four modules at nominal, ss, a ±5 % inductor spread (196.5 A) and a load step. No run exceeds
+  38.4 V.
+- L x 0.7 after +4.8 V / 1 us: 199.5-201.5 A over five step phases (A174), at the 200 A edge.
+- Falling steps restart the valley prediction on phases 2-4 (10-20 A spikes). Only the lead and the gate-driven low
+  sides together do this (A176).
+- At the slow corner the post-ramp Vo dips 3-5 mV deeper than with ideal low sides (A173).
+- A realisable interlock: a fixed 1.0 V comparator reference releases up to 8.3 ns late at the slow corner. Peaks
+  hold, but late fires rise 26-90 % (four modules ×2, NEW spikes 8 -> 82). A per-board reference (V_th - 0.2 V,
+  <= 1.4 ns) is the form that meets the criteria (A173 / A174).
+
 ## 7. Limits
 
 - The plant's devices are identical (mismatch and gate-loop inductance are LTspice single edges, Sections 4.7-4.8);

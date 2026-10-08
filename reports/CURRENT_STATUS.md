@@ -1872,6 +1872,36 @@ each question:
          Open: the L x 0.7 open-loop start (200-202 A) and its 0.3 A
          post-step margin; the slow corner's late fires (194, no
          consequence).
+     92. External review of D70-D79 / A163-A172, and the final plant's
+         coverage (2026-10-09, mixed): D80, A173-A176,
+         [reports/FINAL_SPEC_COVERAGE.md](FINAL_SPEC_COVERAGE.md).
+         - The review found item 91's "passes every row" true only for
+           +4.8 V / 1 us: the other rows and four-module cases had run on
+           V2 (ideal low sides, no interlock). It also found the interlock
+           reported as solved although it is an idealised function, and a
+           0.3 A margin reported as a pass. A172 RESULTS Section 3 and D79
+           Section 6 now say so.
+         - A173 (17 rows on the final plant): 13 pass, no row above 200 A
+           or 34.1 V. Misses: the slow corner's Vo dips 3-5 mV deeper than
+           V2 after line ramps; ff -8 V one spike; four modules ss 8 NEW
+           spikes (4 = A160's K4 artefact). Four modules with C14's ±5 %
+           inductor spread: 196.5 A.
+         - A174: L x 0.7 over five step phases 199.5-201.5 A, so it
+           exceeds 200 A at one phase. A fixed 1.0 V interlock reference
+           (8.3 ns at ss) holds peaks but adds 26-90 % late fires at the
+           slow corner (four modules ×2, NEW 8 -> 82); the slow corner wants
+           a per-board reference.
+         - A175: at nominal devices the final plant has run A152's whole
+           13-row matrix; 12 pass, -4.8 V / 1 us restarts (oracle events).
+         - A176: those falling-step restarts need the lead and the
+           gate-driven low sides together (A169's mechanism without a
+           shoot-through). A valley-aware lead would remove them (RTL).
+         - D80: the thermal model with the final plant's edge losses and the
+           50 pH loop. The published thermal numbers are conservative (T_max
+           -0.7..-1.3 K). Efficiency costs 0.7 (nominal) to 1.6 points (ss),
+           not 0.5.
+         Spec unchanged; its statement now carries the coverage table and
+         these limits.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
