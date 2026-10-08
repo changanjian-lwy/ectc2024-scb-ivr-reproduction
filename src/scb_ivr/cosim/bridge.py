@@ -53,7 +53,9 @@ applied while the same phase's complement conducts is counted, and with "stop_on
 if dt_pred could go below zero by the lead, so the valley learning can put a gate-delayed turn-on before the low
 side's turn-off command. "lead_mode" "on" (A164, default): only the turn-on moves, so the pulse is wider by the lead
 (a faster turn-on path in the driver); "pulse" (A165): that pulse's turn-off and the low side's turn-on after it move
-too, as a controller with a signed dt_pred would time them (t_on = t_lo + dt_pred - lead, the rest from t_on). With gate-driven high sides a turn-on commanded against a conducting low side is counted
+too, as a controller with a signed dt_pred would time them (t_on = t_lo + dt_pred - lead, the rest from t_on).
+"lead_ramp_us" (A167): the lead grows linearly from 0 over that time after mode P starts (no on-time step at the
+handover). With gate-driven high sides a turn-on commanded against a conducting low side is counted
 ("overlaps_cmd") but is a shoot-through ("overlaps", stop) only when its channel starts while the low side conducts.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
@@ -465,6 +467,10 @@ class ModuleSim:
         if not drv or not drv.get("hs_on_lead_ns"):
             return 0.0
         k, lead = j % N, drv["hs_on_lead_ns"] * 1e-9
+        ramp = drv.get("lead_ramp_us", 0.0) * 1e-6                # A167: the lead grows over this after mode P
+        if ramp > 0.0:
+            t_p = self.st.get("t_mode_p")
+            lead *= 0.0 if t_p is None else min(1.0, max(0.0, (self.plant.t - t_p) / ramp))
         if j < N and level:                                     # a high-side turn-on: only a predictive one moves
             self.lead_k[k] = pred_on and drv.get("lead_mode", "on") == "pulse"
             return lead if pred_on else 0.0

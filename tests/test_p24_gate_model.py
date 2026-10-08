@@ -75,6 +75,13 @@ class DriverLead(unittest.TestCase):
         self.assertEqual(ModuleSim.lead_s(m, N + 1, 0, False), 0.0)  # the low side's turn-off never
         self.assertAlmostEqual(ModuleSim.lead_s(m, N + 1, 1, False), 4e-9, delta=1e-18)
         self.assertEqual(ModuleSim.lead_s(m, N + 1, 1, False), 0.0)  # once per pulse
+        m.drv = {"hs_on_lead_ns": 8.0, "lead_ramp_us": 20.0}             # A167: grows over 20 us after mode P
+        m.st, m.plant = {"t_mode_p": 100e-6}, SimpleNamespace(t=105e-6)
+        self.assertAlmostEqual(ModuleSim.lead_s(m, 2, 1, True), 2e-9, delta=1e-18)
+        m.plant.t = 200e-6
+        self.assertAlmostEqual(ModuleSim.lead_s(m, 2, 1, True), 8e-9, delta=1e-18)
+        m.st = {"t_mode_p": None}
+        self.assertEqual(ModuleSim.lead_s(m, 2, 1, True), 0.0)
         m.drv = None
         self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0), 1e-6 + 10e-9, delta=1e-18)
 
