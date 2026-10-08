@@ -21,7 +21,7 @@ def main():
         stem = Path(f).stem[4:]
         conf, row = stem.split("_", 1)
         rf = A8.ref_of(row)
-        st, ref = A8.A4.stats(f), A8.A4.stats(str(rf))
+        st, ref = A8.safe_stats(f), A8.A4.stats(str(rf))
         st["ref"] = {k: ref.get(k) for k in A8.KEYS}
         st["ref"]["vds_whole"], st["ref"]["file"] = ref["vds"]["whole"], f"{rf.parent.parent.name}/run_{row}.json"
         g = json.loads(Path(f).read_text()).get("gate_stats", {})
@@ -29,19 +29,16 @@ def main():
         st["delay_off_ls_ns"] = [None if x is None else x * 1e9 for x in g.get("delay_off_ls_s", [None, None])]
         a9 = A9 / f"run_{row}.json"
         if conf == "S50" and a9.exists():
-            o = A8.A4.stats(str(a9))
+            o = A8.safe_stats(str(a9))
             st["a169"] = {k: o.get(k) for k in ("start_pk", "hand_pk", "peak_post", "late", "extreme_mv", "shoot_on",
                                                 "overlaps", "edge_w")}
         runs[stem], verdict[stem] = st, {str(k): v for k, v in A8.judge(st, ref).items()}
     (HERE / "a170_summary.json").write_text(json.dumps({"runs": runs, "verdict": verdict}, indent=1, default=float))
     for stem, st in runs.items():
-        r, a = st["ref"], st.get("a169", {})
         miss = [f"{k}:{','.join(v)}" for k, v in verdict[stem].items() if v]
-        print(f"{stem:24s} V {st['vds']['whole']:4.1f} start {st['start_pk'] or 0:5.1f} hand {st.get('hand_pk') or 0:5.1f} "
-              f"({r['hand_pk'] or 0:5.1f}) post {st['peak_post']:5.1f} ({r['peak_post']:5.1f}) late {st['late']:3d} ({r['late']}; "
-              f"A169 {a.get('late')}) ext {st['extreme_mv']:6.1f} ({r['extreme_mv']:6.1f}) Vo {st['vo_143_5']:.3f} "
-              f"holds {sum(st['il_holds'] or [])} max {st['il_hold_max_ns']:.1f} ns P {st['edge_w'] or 0:4.2f} "
-              f"{'PASS' if not miss else 'miss ' + ' '.join(miss)}")
+        a = st.get("a169", {})
+        print(A8.line(stem, st, f" holds {sum(st['il_holds'] or [])} max {st['il_hold_max_ns']:.1f} ns, A169 late "
+                                f"{a.get('late')} post {a.get('peak_post')}"), 'PASS' if not miss else 'miss ' + ' '.join(miss))
 
 
 if __name__ == "__main__":

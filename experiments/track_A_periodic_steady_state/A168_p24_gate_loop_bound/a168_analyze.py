@@ -26,8 +26,32 @@ def ref_of(row):
     raise FileNotFoundError(row)
 
 
+def safe_stats(path):
+    """A164's stats; a run that stopped early (stop_on_overlap) gets its stop, whole-run peak and counts only."""
+    r = json.loads(Path(path).read_text())
+    if r.get("status") == "COMPLETED":
+        return A4.stats(str(path))
+    return {"stopped": r.get("status"), "t_stop_us": r["sections"][-1]["t_s"] * 1e6, "ipk_a": r.get("ipk_a"),
+            "first_overlap": r.get("first_overlap"), "shoot_on": int(sum(r.get("gate_stats", {}).get("shoot_on", [0]))),
+            "late": int(sum(r.get("late_fires", [0]))), "dt_pred_final_ns": r.get("dt_pred_final_ns")}
+
+
+def line(stem, st, extra=""):
+    if st.get("stopped"):
+        return (f"{stem:26s} {st['stopped']} at {st['t_stop_us']:.1f} us, whole-run peak {st['ipk_a']:.1f} A, "
+                f"shoot {st['shoot_on']}, late {st['late']}, dt_pred {[round(x, 1) for x in st['dt_pred_final_ns']]}")
+    r = st["ref"]
+    return (f"{stem:26s} V {st['vds']['whole']:4.1f} ({r['vds_whole']:4.1f}) start {st['start_pk'] or 0:5.1f} "
+            f"hand {st.get('hand_pk') or 0:5.1f} ({r['hand_pk'] or 0:5.1f}) post {st['peak_post']:5.1f} ({r['peak_post']:5.1f}) "
+            f"late {st['late']:3d} ({r['late']}) ext {st['extreme_mv']:6.1f} ({r['extreme_mv']:6.1f}) "
+            f"P {st['edge_w'] or 0:4.2f} ({r['edge_w'] or 0:4.2f}) W Vo {st['vo_143_5']:.3f}{extra}")
+
+
 def judge(st, ref):
     bad = {1: [], 2: [], 3: [], 4: []}
+    if st.get("stopped"):
+        bad[3].append(f"{st['stopped']} at {st['t_stop_us']:.1f} us")
+        return bad
     if st["vds"]["whole"] > 40.0:
         bad[1].append(f"{st['vds']['whole']:.1f} V")
     if abs(st["vo_143_5"] - A4.VO_TGT) > A4.VO_TOL:
@@ -63,20 +87,15 @@ def main():
         stem = Path(f).stem[4:]
         conf, row = stem.split("_", 1)
         rf = ref_of(row)
-        st, ref = A4.stats(f), A4.stats(str(rf))
+        st, ref = safe_stats(f), A4.stats(str(rf))
         st["ref"] = {k: ref.get(k) for k in KEYS}
         st["ref"]["vds_whole"], st["ref"]["file"] = ref["vds"]["whole"], f"{rf.parent.parent.name}/run_{row}.json"
         bad = judge(st, ref)
         runs[stem], verdict[stem] = st, {str(k): v for k, v in bad.items()}
     (HERE / "a168_summary.json").write_text(json.dumps({"runs": runs, "verdict": verdict}, indent=1, default=float))
     for stem, st in runs.items():
-        r = st["ref"]
         miss = [f"{k}:{','.join(v)}" for k, v in verdict[stem].items() if v]
-        print(f"{stem:26s} V {st['vds']['whole']:4.1f} ({r['vds_whole']:4.1f}) start {st['start_pk'] or 0:5.1f} "
-              f"hand {st.get('hand_pk') or 0:5.1f} ({r['hand_pk'] or 0:5.1f}) post {st['peak_post']:5.1f} ({r['peak_post']:5.1f}) "
-              f"late {st['late']:3d} ({r['late']}) ext {st['extreme_mv']:6.1f} ({r['extreme_mv']:6.1f}) "
-              f"P {st['edge_w'] or 0:4.2f} ({r['edge_w'] or 0:4.2f}) W Vo {st['vo_143_5']:.3f} "
-              f"{'PASS' if not miss else 'miss ' + ' '.join(miss)}")
+        print(line(stem, st), 'PASS' if not miss else 'miss ' + ' '.join(miss))
 
 
 if __name__ == "__main__":
