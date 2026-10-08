@@ -201,8 +201,10 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
   - L x 0.7: 10 holds <= 1.6 ns, phase-4 dt_pred stays at 11.3 ns;
   - slow corner: 84 holds <= 2.6 ns, 194 late fires (A167 260).
   - t_il 1.0 ns changes nothing that matters.
-  Integrated GaN drivers reach 0.03-1 ns adaptive dead times (workspace papers), so the comparator form is
-  realistic.
+  Integrated GaN drivers reach 0.03-1 ns adaptive dead times (workspace papers), so the form is plausible. It is
+  not shown to be buildable: the plant senses the complement's channel ideally and holds the gate exactly at its
+  own channel start. Zero shoot-throughs are imposed by the rule wherever it acted (L x 0.7, slow corner); on nom /
+  ff / hot and four modules it never acted (0 holds). A173 sets t_il to two realisable forms.
 - **A172, final plant**, the L x 0.7 board re-trimmed under it (ton 35.769 ns): start-up 200.2 A, handover 190.2 A,
   post-step 199.7 A (0.3 A margin), 2 late fires. Four modules: post-step 184.2 A, 0 late fires, 0 holds.
 

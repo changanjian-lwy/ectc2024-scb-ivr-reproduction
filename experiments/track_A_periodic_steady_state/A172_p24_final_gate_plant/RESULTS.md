@@ -29,3 +29,12 @@ Boundary: 41e0b51. Records: release records-a172 (run_*.json, run log). Analysis
 - One row each. The four-module system was run at the nominal corner only. Its corners (slow, L x 0.7) rest on the
   single-module rows of A171 / A172.
 - The interlock is ideal sensing plus a fixed 0.5 ns, as in A171.
+
+## 3. Post-review notes (2026-10-08, external review; verdict unchanged)
+- "The interlock item closes" holds in the model only: the interlock senses the complement's channel ideally. On
+  L x 0.7 it acted (2 holds <= 0.6 ns), so that row's zero shoot-throughs are imposed by the rule. Four modules: 0 holds.
+- The post-step 199.7 A is 0.3 A under 200 A. A129 measured 2-7 A of peak change from moving the step by less
+  than one period, so the margin is inside the noise: a marginal point, not a pass with margin.
+- Four modules' edge power 2.87 W came from a163's 600-950 us window, which contains the 800 us step. Steady
+  (600-790 us): 2.44-2.46 W per module (edge + reverse conduction; a173_analyze.steady_edge).
+- Only +4.8 V / 1 us ran on this plant (here and in A171). The other rows and four-module cases: A173.
