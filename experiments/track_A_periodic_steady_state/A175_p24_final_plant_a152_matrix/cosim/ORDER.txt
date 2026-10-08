@@ -1,0 +1,6 @@
+nom_slew10
+nom_slew5
+nom_slew3
+nom_slew2
+nom_l_m48_1us
+nom_L13_s_p62
