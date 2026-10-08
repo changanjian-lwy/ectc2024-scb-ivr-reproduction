@@ -32,8 +32,10 @@ Budget: 12 start-up calibrations to 150 us, then 13 runs to 1400 us (~3 h at 10 
    reference is above 197 A (L x 0.7's mode S, 202.5 A).
 3. Post-step:
    - physical peak <= 200 A and <= ref + 5 A;
-   - 0 NEW oracle events, 0 overlaps, 0 shoot-throughs, COMPLETED;
-   - late fires <= 1.5 x ref + 5.
+   - 0 overlaps, 0 shoot-throughs, COMPLETED;
+   - late fires <= 1.5 x ref + 5;
+   - NEW oracle events: 0 where the reference has none, else <= 1.5 x ref + 5. (Amended before any main run:
+     the slow corner's 50 pH references carry 4 / 14 NEW one-period spikes, A164 / A167 RESULTS.)
 4. Vo: |extreme| <= |ref| + 2 mV; where |extreme| > 11 mV, back within 1 % <= ref + 2 us.
 
 ## 3. Predictions (not criteria)
