@@ -1,5 +1,5 @@
 {
- "note": "A168 Q75_ss_s_p62: s_p62, 75 pH, r_on 4.0 / r_off 0.3 ohm, corner {'dk2': 1.0, 'cg_scale': 1.29, 'r_scale': 1.2}, lead 8.0 ns ramped over 20.0 us, trimmed ton 53.543 ns",
+ "note": "A168 Q75_ss_s_p62: s_p62, 75 pH, r_on 4.0 / r_off 0.3 ohm, corner {'dk2': 1.0, 'cg_scale': 1.29, 'r_scale': 1.2}, lead 8.0 ns ramped over 20.0 us, trimmed ton 53.268 ns",
  "t_clk_ns": 4.0,
  "fb": 7,
  "fine": 1,
@@ -8,7 +8,7 @@
  "trim": 1,
  "trim_lsb_a": 0.25,
  "v_hys": 0.05,
- "ton_ns": 53.543,
+ "ton_ns": 53.268,
  "t0_ns": 400.0,
  "tdead_ns": 4.5,
  "rs_high_ns": 28.284271,
