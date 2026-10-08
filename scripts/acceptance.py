@@ -79,6 +79,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A163": (TA / "A163_p24_gate_driven_edges", "a163_analyze.py", "a163_summary.json"),
     "A164": (TA / "A164_p24_gate_drive_spread", "a164_analyze.py", "a164_summary.json"),
     "A165": (TA / "A165_p24_gate_lead_pulse", "a165_analyze.py", "a165_summary.json"),
+    "A166": (TA / "A166_p24_gate_lead_per_board", "a166_analyze.py", "a166_summary.json"),
     "A167": (TA / "A167_p24_gate_lead_ramp", "a167_analyze.py", "a167_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
@@ -364,6 +365,15 @@ EXCEPTIONS["A165"] = {
     **{("criteria", f"ss_{r}/c3"): "slow corner: late fires in the handover and after rising steps, NEW spikes after the "
        "steps, no peak or V_DS consequence, as A164 (RESULTS 0)" for r in ("l_p48_1us", "s_p62", "l_m80_10us", "slew4")},
 }
+_LATE166 = "the per-board lead (shortest delay - 1 ns) is too small for hard turn-ons after rising steps: late fires, no peak or V_DS consequence - why it is not adopted (RESULTS 0)"
+EXCEPTIONS["A166"] = {
+    ("criteria", "nom_L07_l_p48_1us/c2"): "mode S 202.5 A, the frozen design's open-loop start at L x 0.7 (RESULTS 0)",
+    ("criteria", "nom_L07_l_p48_1us/c3"): "207.8 A physical (192.0 command-time) after +4.8 V / 1 us, 71 late fires, 2 NEW: " + _LATE166,
+    ("criteria", "ff_l_m80_10us/c3"): "command-time 170.5 A against 170.3 allowed (RESULTS 0)",
+    ("criteria", "ff_l_m80_10us/c4"): "Vo +29.1 mV, as A164 / A165 (RESULTS 0)",
+    **{("criteria", f"{r}/c3"): _LATE166 for r in ("nom_l_p48_1us", "nom_slew4", "hot_l_p48_1us", "m4_nom_l_p48_1us",
+                                                    "ss_l_p48_1us", "ss_s_p62", "ss_l_m80_10us", "ss_slew4")},
+}
 EXCEPTIONS["A167"] = {
     ("criteria", "nom_L07_l_p48_1us/c2"): "mode S 202.5 A, the frozen design's open-loop start at L x 0.7 (predicted); the "
     "handover 191.5 A (A164 218.6 A) (RESULTS 0)",
@@ -382,6 +392,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A163": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items() if "cmd" not in s},
     "A164": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A165": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
+    "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
 }
 
