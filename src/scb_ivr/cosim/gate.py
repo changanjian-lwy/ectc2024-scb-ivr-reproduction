@@ -19,9 +19,11 @@ the plant's Euler steps):
 q_g = q_gs + q_gd, i_s = i_ch + dq_oss/dt (the device's terminal current; q_oss = the plant's Coss per device).
 A shoot-through (stats shoot_on) is a turn-on whose channel starts while its complement conducts, physically (its
 turn-off still pending or active) when the complement is gate-driven too; low sides keep their own edge times (*_ls_s).
-Driver interlock (gate_il, A170): a turn-on commanded while its complement conducts (as above) is held, its gate
-not driven and its switch open, until the complement stops conducting; it then starts gate_t_il later as a normal
-command. Its delay is still counted from the original command (stats il_holds, il_hold_max_s).
+Driver interlock (gate_il; its delay is still counted from the original command; stats il_holds, il_hold_max_s):
+- "gate" (A170): a turn-on commanded while its complement conducts (as above) is held, its gate not driven and its
+  switch open, until the complement stops conducting; it then starts gate_t_il later as a normal command;
+- "threshold" (A171): the gate charges as usual; a turn-on whose channel would start while its complement conducts
+  is held there, gate frozen at that level and switch open, and starts gate_t_il after the complement stops.
 Gate voltages between edges follow the RC charge with C_in(v_gs, V_DS) at the last known V_DS (no Miller injection);
 a pending turn-off's activation time is computed that way (V_DS ~ 0 while it conducts) and the plants stop there.
 """
@@ -150,7 +152,8 @@ class GateEdges:
                       "active_on_s": [math.inf, 0.0], "active_off_s": [math.inf, 0.0], "didt_on_max_a_ns": 0.0,
                       "didt_off_max_a_ns": 0.0, "vds_cmd_on_max_v": 0.0, "e_total_j": [0.0] * n2,
                       "shoot_on": [0] * n2}
-        self.il = bool(p.gate_il)                       # A170: driver interlock
+        self.il = bool(p.gate_il)                       # A170 / A171: driver interlock
+        self.il_thr = p.gate_il == "threshold"
         if self.il:
             self.stats.update(il_holds=[0] * n2, il_hold_max_s=0.0)
         self.ls_keys = any(j >= p.n for j in self.sw)    # A169: gate-driven low sides keep their own edge times
@@ -215,6 +218,8 @@ class GateEdges:
     def _sync(self, j, t):
         s = self.st[j]
         if s["phase"] == "pending" and s["kind"] == "on":     # tracked step by step
+            return
+        if s["phase"] == "held" and s.get("frozen"):         # A171: held at the activation level
             return
         if s["phase"] != "active" and t > s["t"]:
             s["vgs"] = self._relax(s["vgs"], s["drv"], t - s["t"], s["vds"])
@@ -294,7 +299,7 @@ class GateEdges:
             return
         s["phase"], s["t_act"] = "idle", math.inf
         n = self.nsw[j]
-        if level and self.il and self.conducts((j + p_n(self)) % (2 * p_n(self))):   # A170: held by the interlock
+        if level and self.il and not self.il_thr and self.conducts((j + p_n(self)) % (2 * p_n(self))):  # A170
             s.update(phase="held", kind="on", drv=False, t_act=math.inf, t_cmd0=t)
             self.stats["il_holds"][j] += 1
             return
@@ -322,6 +327,10 @@ class GateEdges:
         registered for the switch runs at its activation (the physical turn-on's valley measurement)."""
         pl, done = self.plant, []
         for j, s in self.st.items():                   # A170: held turn-ons whose time has come start now
+            if s["phase"] == "held" and s["t_act"] <= pl.t + 1e-18 and s.get("frozen"):    # A171: activates now
+                s.update(phase="pending", frozen=False, t=pl.t, vds=float(pl.vds(j)))
+                self.stats["il_hold_max_s"] = max(self.stats["il_hold_max_s"], pl.t - s["t_hold"])
+                continue
             if s["phase"] == "held" and s["t_act"] <= pl.t + 1e-18:
                 t0 = s["t_cmd0"]
                 s["phase"], s["t_act"] = "idle", math.inf
@@ -335,6 +344,11 @@ class GateEdges:
                         cb()
         for j, s in self.st.items():
             if s["phase"] == "pending" and s["t_act"] <= pl.t + 1e-18:
+                if (self.il_thr and s["kind"] == "on"
+                        and self.conducts((j + p_n(self)) % (2 * p_n(self)))):      # A171: wait at the threshold
+                    s.update(phase="held", frozen=True, t_act=math.inf, t_hold=pl.t)
+                    self.stats["il_holds"][j] += 1
+                    continue
                 self._sync(j, pl.t)
                 s["phase"], s["t_act"], s["t_a0"] = "active", math.inf, pl.t
                 key = _key("delay_on_s" if s["kind"] == "on" else "delay_off_s", j, p_n(self))
