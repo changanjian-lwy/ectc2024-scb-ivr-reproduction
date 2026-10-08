@@ -1,0 +1,13 @@
+P60_ss_l_p48_1us
+Q60_ss_l_p48_1us
+Q60_ss_s_p62
+Q75_ss_l_p48_1us
+Q75_ss_s_p62
+P60_nom_L07_l_p48_1us
+Q60_nom_L07_l_p48_1us
+Q75_nom_L07_l_p48_1us
+P60_ff_l_p48_1us
+P60_nom_l_p48_1us
+Q60_ff_l_p48_1us
+Q75_ff_l_p48_1us
+Q75_nom_l_p48_1us

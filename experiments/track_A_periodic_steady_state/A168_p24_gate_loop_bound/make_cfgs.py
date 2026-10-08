@@ -3,6 +3,8 @@ after mode P, per-board start-up trim) at a larger power loop. Configurations (l
 P60 (60, 3.0) the spec as it stands; Q60 (60, 3.5) its fallback if P60's fast corner passes 40 V; Q75 (75, 4.0).
 Boards and corners are A164's (nom / ff / ss; ss = threshold +1.0 V, Q_G x 1.29, driver x 1.2, so 4.8 ohm at Q75).
   python3 make_cfgs.py cal   stage 1: cosim_cal/cfg_<config>_<board>.json, start-up to 150 us at a first-guess ton
+  python3 make_cfgs.py cal2  stage 1b: boards whose first Vo missed 1.035 +- 0.02 (below A163's ~0.99 V cliff the slope
+                             fails) start up again at the one-shot trim -> cosim_cal/cfg_<config>_<board>_it2.json
   python3 make_cfgs.py       stage 2: trim ton = ton0 + (1.035 - Vo(143.5 us)) / 0.026 per board -> cosim/cfg_*.json,
                              cosim/ORDER.txt (longest first), trims.json"""
 from __future__ import annotations
@@ -64,15 +66,35 @@ def cal():
             (CAL / f"cfg_{conf}_{b}.json").write_text(json.dumps(cfg, indent=1) + "\n")
 
 
+def _vo(path):
+    r = json.loads(path.read_text())
+    return r["cfg"]["ton_ns"], float(np.mean([q["vo"] for q in r["sections"] if 143e-6 < q["t_s"] < 144e-6]))
+
+
 def trims():
+    """One-shot trim; where a second start-up exists (stage 1b), the secant through both points."""
     out = {}
     for conf in CONFIGS:
         for b in BOARDS:
-            r = json.loads((CAL / f"run_{conf}_{b}.json").read_text())
-            vo = float(np.mean([q["vo"] for q in r["sections"] if 143e-6 < q["t_s"] < 144e-6]))
-            ton0 = r["cfg"]["ton_ns"]
-            out[f"{conf}_{b}"] = {"ton0_ns": ton0, "vo0": vo, "ton_ns": round(ton0 + (VO_TGT - vo) / SLOPE, 3)}
+            ton0, vo = _vo(CAL / f"run_{conf}_{b}.json")
+            e = {"ton0_ns": ton0, "vo0": vo, "ton_ns": round(ton0 + (VO_TGT - vo) / SLOPE, 3)}
+            f2 = CAL / f"run_{conf}_{b}_it2.json"
+            if f2.exists():
+                ton1, vo1 = _vo(f2)
+                e.update(ton1_ns=ton1, vo1=vo1, ton_ns=round(ton1 + (VO_TGT - vo1) * (ton1 - ton0) / (vo1 - vo), 3))
+            out[f"{conf}_{b}"] = e
     return out
+
+
+def cal2():
+    for key, e in trims().items():
+        if abs(e["vo0"] - VO_TGT) > 0.02 and "vo1" not in e:
+            conf, b = key.split("_", 1)
+            cfg = dict(gate_cfg(MC.row_cfg(BOARDS[b][1] + "l_p48_1us"), conf, BOARDS[b][0], e["ton_ns"], 0.0),
+                       t_end_us=150.0, out=f"run_{key}_it2.json",
+                       note=f"A168 stage 1b: {conf} board {b} start-up at the one-shot trim {e['ton_ns']} ns")
+            (CAL / f"cfg_{key}_it2.json").write_text(json.dumps(cfg, indent=1) + "\n")
+            print("cal2", key, e["ton_ns"])
 
 
 def main():
@@ -96,4 +118,4 @@ def main():
 
 
 if __name__ == "__main__":
-    cal() if sys.argv[1:] == ["cal"] else main()
+    {"cal": cal, "cal2": cal2}.get(sys.argv[1] if sys.argv[1:] else "", main)()
