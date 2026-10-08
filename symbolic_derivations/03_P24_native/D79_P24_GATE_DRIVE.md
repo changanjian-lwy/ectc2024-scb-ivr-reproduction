@@ -156,11 +156,22 @@ Over the spread, three mechanisms fail the frozen controller:
 breaks 40 V at the fast corner (-0.3 V, x 0.7). The turn-on resistance is mostly the external resistor, so the
 spec takes +-20 %. Single edges then put the fast corner at 37.0 V (cosim 38.5 V) for r_on 3.0 ohm.
 
-**A164 / A165** (50 pH, 3.0 / 0.3 ohm +-20 %, 8 ns lead, per-board trim): see their RESULTS.
-- A164's lead moves only the predictive turn-on, so the pulse is 8 ns wider in mode P than in mode S. That is an
-  on-time step at the handover: 218.6 A at L x 0.7.
-- A165 moves the whole pulse (a signed dt_pred) and removes the step: 189.6 A at L x 0.7, 178 A at the +-30 % slow
-  corner (190 us pre runs).
+**A164-A167** (50 pH, 3.0 / 0.3 ohm +-20 %, per-board trim; see their RESULTS). Peaks and V_DS hold at every
+corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest.
+- **A164, 8 ns on the turn-on only.** No timing faults at nominal, hot or fast, four modules included. Without a
+  lead, +4.8 V gives 48 late fires. But in mode P every pulse is 8 ns wider than in mode S, an on-time step at the
+  handover: 218.6 A at L x 0.7.
+- **A165, the same lead as a pulse shift.** The handover is smooth, but L x 0.7 reaches 211 A after the line step.
+  The bridge moves plant edges, not the RTL's phase-1 timeline.
+- **A166, interlock-safe per-board lead** (shortest delay - 1 ns, 1.3 ns nominal). Late fires after the rising steps,
+  and 208 A at L x 0.7.
+- **A167, A164's lead ramped in over 20 us after the handover.** L x 0.7's handover is 191.5 A and its post-step
+  195.3 A. Only mode S's 202.5 A remains: the frozen design's open-loop start.
+- **The slow corner** (+1.0 V, Q_G x 1.29, 3.6 ohm) fires late after the handover and after rising steps with every
+  form, without peak or voltage consequence. Its hard turn-ons take up to 16.6 ns.
+- A fixed lead removes the dt_pred >= 0 interlock. Pre runs shot through when dt_pred collapsed after a disturbed
+  handover (hot corner, lead 8; slow corner, lead 8 at +-10 % or 12 ns). A controller needs a bound on the lead, or a
+  lead that is low during the handover, as A167's is.
 
 **Loop bound under this drive.** The turn-on delay does not depend on the loop.
 - 75 pH needs r_on ~4 ohm for the fast corner's 40 V (+-20 %), which puts the slow corner at 4.8 ohm, beyond A164's

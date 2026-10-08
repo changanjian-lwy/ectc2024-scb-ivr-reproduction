@@ -79,6 +79,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A163": (TA / "A163_p24_gate_driven_edges", "a163_analyze.py", "a163_summary.json"),
     "A164": (TA / "A164_p24_gate_drive_spread", "a164_analyze.py", "a164_summary.json"),
     "A165": (TA / "A165_p24_gate_lead_pulse", "a165_analyze.py", "a165_summary.json"),
+    "A167": (TA / "A167_p24_gate_lead_ramp", "a167_analyze.py", "a167_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -363,6 +364,13 @@ EXCEPTIONS["A165"] = {
     **{("criteria", f"ss_{r}/c3"): "slow corner: late fires in the handover and after rising steps, NEW spikes after the "
        "steps, no peak or V_DS consequence, as A164 (RESULTS 0)" for r in ("l_p48_1us", "s_p62", "l_m80_10us", "slew4")},
 }
+EXCEPTIONS["A167"] = {
+    ("criteria", "nom_L07_l_p48_1us/c2"): "mode S 202.5 A, the frozen design's open-loop start at L x 0.7 (predicted); the "
+    "handover 191.5 A (A164 218.6 A) (RESULTS 0)",
+    **{("criteria", f"ss_{r}/c3"): "slow corner: late fires in the handover (102, more than A164's 65 while the lead ramps "
+       "in) and after rising steps, NEW spikes after the steps, no peak or V_DS consequence (RESULTS 0)"
+       for r in ("l_p48_1us", "s_p62")},
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -374,6 +382,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A163": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items() if "cmd" not in s},
     "A164": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A165": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
+    "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
 }
 
 
