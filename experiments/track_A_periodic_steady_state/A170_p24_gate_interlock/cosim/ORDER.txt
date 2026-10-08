@@ -1,0 +1,8 @@
+S50_ss_l_p48_1us
+S50_nom_L07_l_p48_1us
+S50_hot_l_p48_1us
+S50_ff_l_p48_1us
+S50_nom_l_p48_1us
+S50t1_nom_L07_l_p48_1us
+Q60_nom_L07_l_p48_1us
+Q75_nom_L07_l_p48_1us
