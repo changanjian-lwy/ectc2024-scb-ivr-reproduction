@@ -181,6 +181,17 @@ are budgets over plausible ranges:
         - At the slow corner (threshold and Q_G at their maxima, resistance +20 %),
           peaks and voltages hold, but the controller fires late during the handover
           and after rising line steps whatever the lead.
+        - Once the low sides' own turn-off is modelled too (≤ 2.9 ns delay +
+          1.8 ns edge), the 8 ns lead shoots through after the inductance × 0.7
+          handover and at the slow corner. A bound on the lead cannot help: it
+          would have to be negative.
+        - **A driver interlock closes it, without touching the controller.** A
+          turn-on's gate charges as usual, but its channel waits at the threshold
+          until the complementary switch has stopped conducting (comparators and
+          logic, 0.5 ns; integrated GaN drivers reach 0.03-1 ns adaptive dead
+          times). Every corner then passes, and the slow corner fires late less
+          (194 against 260 times). Holding the gate at 0 V instead puts the two
+          delays in series: 214 A at inductance × 0.7.
     - With ±30 % on the gate resistance no single resistor meets both the fast
       corner's 40 V and the slow corner's timing; ±20 % does.
 - **The turn-off wants a strong sink.** With ≤ 0.3 Ω the channel is off before
@@ -191,16 +202,19 @@ are budgets over plausible ranges:
 - **Resulting specification.** Checked with EPC's gate model on the transient
   tests (line steps and ramps, load steps, inductance × 0.7 / 1.3) at four device
   corners (nominal, fast, slow, 125 °C) and on four modules.
-    - Loop ≤ 50 pH (~60 pH at most). 75 pH would need ~4 Ω turn-on for 40 V,
-      which the slow corner's timing cannot absorb.
+    - Loop ≤ 50 pH. At 60 pH the fast corner reaches 40.3 V with 3.0 Ω; 3.5 Ω
+      holds it but costs the slow corner's timing. 75 pH with 4.0 Ω loses the
+      line step's regulation (12.6 mV, 46 µs) and the slow corner's timing.
     - Per device: 3.0 Ω ± 20 % turn-on, ≤ 0.3 Ω turn-off, a Kelvin source and a
       gate loop ≤ 1 nH. Low-side sink ≤ 0.3 Ω (dv/dt immunity).
     - An 8 ns high-side turn-on lead, enabled over ~20 µs after the handover
-      so the loop takes over without an on-time step, plus an interlock (see
-      above).
+      so the loop takes over without an on-time step, plus the threshold-form
+      driver interlock (see above). The controller stays as frozen.
     - A per-board start-up trim.
-    - Results: switch ≤ 38.5 V and ≤ 195 A after steps at every corner. At
-      inductance × 0.7 the open-loop start-up peaks at 202 A.
+    - Results, with all eight switches gate-driven: switch ≤ 38.4 V and
+      ≤ 200 A after steps at every corner; inductance × 0.7 reaches 199.7 A,
+      the thinnest margin. Four modules: 184 A. At inductance × 0.7 the
+      open-loop start-up peaks at 200 A.
     - The ramp model's 125-150 pH bound does not survive the device spread.
     - Peak currents in this section are physical, after the gate delays. The ramp
       runs reported the current at the turn-off command, 5-8 A lower.
@@ -218,7 +232,7 @@ are budgets over plausible ranges:
 | output routing and copper | lateral at 35 / 86 / 429 µm: 12.3 / 5 / 1 % loss; a vertical output removes most of it | module efficiency |
 | inductor matching across modules | ±5 / 10 / 20 % spread: heaviest module +12-16 / +25-34 / +57-79 % loss; co-simulated peak 194 / 208 A at ±5 / 10 % worst case (200 A near ±7 %) | whether passive sharing suffices |
 | inductor technology, footprint per phase | 29-40 current-rated HBS1-class units per phase: 86.6-87.7 %, 2.5 MHz best by 0.2-0.6 points before core loss, 1 MHz ties once it is counted; air-core in 0.25-0.63 cm²: 5 MHz; saturation must cover the 200 A transient peak | the switching frequency; the efficiency; the peak-current budget |
-| QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ramp edges hold 40 V to 150 pH, but with EPC's gate model and the datasheet spread the drive and the controller's timing hold only to ~50-60 pH | loss; whether the resistor drive holds |
+| QH / QL placement, loop inductance | 50-300 pH: loop loss 1.4 / 3.8 / 6.4 W at 50 / 100 / 150 pH; ramp edges hold 40 V to 150 pH, but with EPC's gate model and the datasheet spread the drive and the controller's timing hold only to 50 pH (60 pH at the edge) | loss; whether the resistor drive holds |
 | gate drive, turn-on vs turn-off | equal fast edges: 42-51 V after a 4.8 V / 1 µs step (50-100 pH); 3.0 Ω ± 20 % turn-on / ≤ 0.3 Ω turn-off per device holds every corner (±30 % has no single-resistor window); the turn-on delay (1.5-16 ns) needs a high-side lead and a per-board start-up trim | the driver's resistances and tolerance; whether the controller can lead the high side |
 | derating rule | 40 V continuous used; a 120 % / 1 %-of-life rule would admit 50 pH without the slow turn-on | how much drive slowing is needed |
 | loop damping | ring Q 7-30 at 50-100 pH: no change; Q 100, 300 or undamped: valley detection lost from start-up (2400-9000 late edges) even with the slow turn-on | a damping requirement, Q ≤ 30 with an ideal parallel damper; at the ring frequency that is ≳ 4-8 mΩ series-equivalent (Q 7: 19-32 mΩ); the physical source is open |
@@ -233,10 +247,12 @@ Five answers would narrow the package specification most:
       device. With EPC2067's datasheet spread, the delay from command to channel
       start then runs from ~1.5 to ~16 ns.
     - Our controller commands the high side only after the low side's turn-off
-      command, so it absorbs ≤ ~5.5 ns. It needs a lead (a signed dt_pred) with an
-      interlock, or a bounded threshold spread.
-    - What gate resistance and tolerance does the driver have, and does the
-      controller lead the high side?
+      command, so it absorbs ≤ ~5.5 ns. It needs a lead, and the lead is safe
+      only with a driver interlock that holds a channel at its threshold until
+      the complementary switch is off.
+    - What gate resistance and tolerance does the driver have, does the
+      controller lead the high side, and does the driver have such an interlock
+      (or adaptive dead time)?
 2. Which derating rule do you apply to repetitive ns-scale drain overshoot
    on 40 V GaN: the continuous rating, or a transient allowance such as
    EPC's 120 % for ≤ 1 % of life?
@@ -244,7 +260,7 @@ Five answers would narrow the package specification most:
    V_DS capture would do: a CNN trained on simulated captures, followed by a
    circuit fit, recovers L, Q and di/dt within 1-6 % (probe ≥ 0.7 GHz). The same capture gives the
    ring's Q, which must stay ≤ ~30. With L known, the drive spec follows
-   from the gate-level results above (≤ ~50-60 pH for the resistor drive).
+   from the gate-level results above (≤ 50 pH for the resistor drive).
 4. How was the start-up on-time set? With real gates the threshold spread
    moves the open-loop on-time by up to ~4 ns. That decides the peak at the
    handover (157 A nominal, 376 A at the threshold maximum), so we trim it once
