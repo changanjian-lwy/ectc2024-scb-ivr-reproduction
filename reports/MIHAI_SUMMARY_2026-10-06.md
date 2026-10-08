@@ -104,7 +104,7 @@ P24 does not describe the controller, start-up or module synchronisation;
 these are this work's choices, taken from the critical-mode PFC
 interleaving literature.
 
-## 3. Package level (5-6 October)
+## 3. Package level (5-8 October)
 
 P24 Figs. 5-6 give the layout but no copper, via or loop values, so these
 are budgets over plausible ranges:
@@ -170,11 +170,14 @@ are budgets over plausible ranges:
       after that command. So it absorbs only ~5.5 ns of gate delay, and the high
       side needs a lead.
         - With an 8 ns lead, nominal, hot and fast-corner boards run without timing
-          faults, four modules included.
+          faults, four modules included. The lead is enabled over ~20 µs after the
+          handover; switched on at once it is an on-time step there (219 A at
+          inductance × 0.7).
         - The lead removes the implicit interlock. When the learned timing collapsed
           in two corner runs, the high side shot through.
-        - Bounding the lead by each board's shortest delay minus 1 ns is safe, but
-          leaves late turn-ons after rising line steps.
+        - Bounding the lead by each board's shortest delay minus 1 ns is safe: no
+          shoot-through in 13 runs. But it is too small for the hard turn-ons after
+          a rising line step: 19-85 late turn-ons, and 208 A at inductance × 0.7.
         - At the slow corner (threshold and Q_G at their maxima, resistance +20 %),
           peaks and voltages hold, but the controller fires late during the handover
           and after rising line steps whatever the lead.
@@ -192,10 +195,11 @@ are budgets over plausible ranges:
       which the slow corner's timing cannot absorb.
     - Per device: 3.0 Ω ± 20 % turn-on, ≤ 0.3 Ω turn-off, a Kelvin source and a
       gate loop ≤ 1 nH. Low-side sink ≤ 0.3 Ω (dv/dt immunity).
-    - A high-side turn-on lead with an interlock: ~8 ns, or per board its
-      shortest delay − 1 ns.
+    - An 8 ns high-side turn-on lead, enabled over ~20 µs after the handover
+      so the loop takes over without an on-time step, plus an interlock (see
+      above).
     - A per-board start-up trim.
-    - Results: switch ≤ 38.5 V and ≤ 192 A after steps at every corner. At
+    - Results: switch ≤ 38.5 V and ≤ 195 A after steps at every corner. At
       inductance × 0.7 the open-loop start-up peaks at 202 A.
     - The ramp model's 125-150 pH bound does not survive the device spread.
     - Peak currents in this section are physical, after the gate delays. The ramp
