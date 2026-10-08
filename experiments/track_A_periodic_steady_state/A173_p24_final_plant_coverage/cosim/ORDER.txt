@@ -1,0 +1,16 @@
+m4_ss_l_p48_1us
+m4_nom_s_p62
+m4_w5_l_p48_1us
+il1p4_ss_l_p48_1us
+il8p3_ss_l_p48_1us
+il2p0_nom_L07_l_p48_1us
+nom_s_p62
+nom_l_m80_10us
+nom_slew4
+ff_s_p62
+ff_l_m80_10us
+hot_s_p62
+ss_s_p62
+ss_l_m80_10us
+ss_slew4
+nom_L07_s_p62
