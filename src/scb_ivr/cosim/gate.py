@@ -17,6 +17,8 @@ solved with the plant state and each gate's charge balance by Newton on the step
 the plant's Euler steps):
     q_g(v1, d1) - q_g(v0, d0) = (h / 2R)(2 V_drv - v0 - v1) - (L_cs / R)(i_s1 - i_s0),
 q_g = q_gs + q_gd, i_s = i_ch + dq_oss/dt (the device's terminal current; q_oss = the plant's Coss per device).
+A shoot-through (stats shoot_on) is a turn-on whose channel starts while its complement conducts, physically (its
+turn-off still pending or active) when the complement is gate-driven too; low sides keep their own edge times (*_ls_s).
 Gate voltages between edges follow the RC charge with C_in(v_gs, V_DS) at the last known V_DS (no Miller injection);
 a pending turn-off's activation time is computed that way (V_DS ~ 0 while it conducts) and the plants stop there.
 """
@@ -105,6 +107,14 @@ def p_n(ge):
     return ge.p.n
 
 
+LS_KEYS = ("delay_on_ls_s", "delay_off_ls_s", "active_on_ls_s", "active_off_ls_s")
+
+
+def _key(k, j, n):
+    """High-side stats key k, or its low-side twin (A169) for switch j >= n."""
+    return k if j < n else k[:-2] + "_ls_s"
+
+
 class GateEdges:
     def __init__(self, plant):
         from scb_ivr.p24_gate_model import load_device
@@ -137,9 +147,18 @@ class GateEdges:
                       "active_on_s": [math.inf, 0.0], "active_off_s": [math.inf, 0.0], "didt_on_max_a_ns": 0.0,
                       "didt_off_max_a_ns": 0.0, "vds_cmd_on_max_v": 0.0, "e_total_j": [0.0] * n2,
                       "shoot_on": [0] * n2}
+        self.ls_keys = any(j >= p.n for j in self.sw)    # A169: gate-driven low sides keep their own edge times
+        if self.ls_keys:
+            self.stats.update({k: [math.inf, 0.0] for k in LS_KEYS})
         self._ext = None                               # (t, y at the previous step's start, gates there, h, active)
 
     # ---- helpers ----
+    def conducts(self, j):
+        """Switch j carries channel current: commanded on, or (gate-driven, A169) a turn-off not yet ended."""
+        s = self.st.get(j)
+        return bool((self.plant.gh + self.plant.gl)[j]) or (s is not None and s["kind"] == "off"
+                                                             and s["phase"] in ("pending", "active"))
+
     def r_tot(self, drv):
         return (self.p.gate_r_on if drv else self.p.gate_r_off) + self.rg
 
@@ -287,7 +306,7 @@ class GateEdges:
             if s["phase"] == "pending" and s["t_act"] <= pl.t + 1e-18:
                 self._sync(j, pl.t)
                 s["phase"], s["t_act"], s["t_a0"] = "active", math.inf, pl.t
-                key = "delay_on_s" if s["kind"] == "on" else "delay_off_s"
+                key = _key("delay_on_s" if s["kind"] == "on" else "delay_off_s", j, p_n(self))
                 dl = pl.t - s["t_cmd"]
                 self.stats[key][0] = min(self.stats[key][0], dl); self.stats[key][1] = max(self.stats[key][1], dl)
                 vds = float(pl.vds(j))
@@ -298,7 +317,7 @@ class GateEdges:
                         s["off_rec"] = [pl.t, j + 1, ip, ip]
                 else:
                     s["i_s"] = 0.0
-                    if j < p_n(self) and pl.gl[j]:     # A164: the channel starts while its low side conducts
+                    if self.conducts((j + p_n(self)) % (2 * p_n(self))):  # A164 / A169: its complement conducts
                         self.stats["shoot_on"][j] += 1
                 done.append(j)
                 cb = self.on_act.pop(j, None)
@@ -425,7 +444,7 @@ class GateEdges:
             if t1 - s["t_a0"] >= T_ACTIVE_MAX:
                 done = True; self.stats["forced"] += 1
             if done:
-                key = "active_on_s" if s["drv"] else "active_off_s"
+                key = _key("active_on_s" if s["drv"] else "active_off_s", j, p_n(self))
                 da = t1 - s["t_a0"]
                 self.stats[key][0] = min(self.stats[key][0], da); self.stats[key][1] = max(self.stats[key][1], da)
                 s["phase"] = "idle"
@@ -437,7 +456,7 @@ class GateEdges:
 
     def summary(self):
         out = dict(self.stats)
-        for k in ("delay_on_s", "delay_off_s", "active_on_s", "active_off_s"):
+        for k in ("delay_on_s", "delay_off_s", "active_on_s", "active_off_s") + (LS_KEYS if self.ls_keys else ()):
             out[k] = [None if math.isinf(x) else x for x in out[k]]
         out["device"], out["model_sha1"] = self.dev.name, self.dev.sha1
         return out

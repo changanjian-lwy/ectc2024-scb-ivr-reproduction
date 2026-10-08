@@ -86,6 +86,25 @@ class DriverLead(unittest.TestCase):
         self.assertAlmostEqual(ModuleSim.t_apply(m, 1e-6, 0), 1e-6 + 10e-9, delta=1e-18)
 
 
+class GateBookkeeping(unittest.TestCase):                           # no vendor library needed
+    def test_complement_conducts_until_its_gate_edge_ends(self):
+        from types import SimpleNamespace
+        from scb_ivr.cosim.gate import GateEdges, _key
+        ge = SimpleNamespace(plant=SimpleNamespace(gh=[False] * 4, gl=[False] * 4),
+                             st={5: dict(kind="off", phase="pending")})
+        self.assertTrue(GateEdges.conducts(ge, 5))                   # SL2 commanded off, its gate still discharging
+        ge.st[5]["phase"] = "active"
+        self.assertTrue(GateEdges.conducts(ge, 5))
+        ge.st[5]["phase"] = "idle"
+        self.assertFalse(GateEdges.conducts(ge, 5))
+        self.assertFalse(GateEdges.conducts(ge, 6))                  # not gate-driven: the command decides
+        ge.plant.gl[2] = True
+        self.assertTrue(GateEdges.conducts(ge, 6))
+        self.assertEqual(_key("delay_off_s", 1, 4), "delay_off_s")
+        self.assertEqual(_key("delay_off_s", 5, 4), "delay_off_ls_s")
+        self.assertEqual(_key("active_on_s", 4, 4), "active_on_ls_s")
+
+
 @unittest.skipUnless(HAVE, "EPC library not present (SCB_EPC_LIB / vendor_models)")
 class GateEdgeInPlant(unittest.TestCase):
     def test_hard_turn_on_matches_ltspice(self):
