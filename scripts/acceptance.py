@@ -86,6 +86,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A170": (TA / "A170_p24_gate_interlock", "a170_analyze.py", "a170_summary.json"),
     "A171": (TA / "A171_p24_gate_interlock_threshold", "a171_analyze.py", "a171_summary.json"),
     "A172": (TA / "A172_p24_final_gate_plant", "a172_analyze.py", "a172_summary.json"),
+    "A173": (TA / "A173_p24_final_plant_coverage", "a173_analyze.py", "a173_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -418,6 +419,16 @@ EXCEPTIONS["A171"] = {
     ("criteria", "Q75_nom_L07_l_p48_1us/c3"): "75 pH / 4.0 ohm: NEW 48, late 15, as A168's slow timing (RESULTS 0)",
     ("criteria", "Q75_nom_L07_l_p48_1us/c4"): "75 pH / 4.0 ohm: Vo -11.2 mV (RESULTS 0)",
 }
+EXCEPTIONS["A173"] = {
+    ("criteria", "ff_l_m80_10us/c3"): "one phase-2 restart (K3) and a 153 A spike 14.5 us after the falling ramp: A148's "
+    "valley loss, one period deeper than on V2; step positions in A174 (RESULTS 0)",
+    ("criteria", "ff_l_m80_10us/c4"): "Vo 31.1 mV and back 24.9 us, each 0.6 over the limit (RESULTS 0)",
+    ("criteria", "ss_l_m80_10us/c4"): "slow corner: post-ramp Vo dip 2.9 mV deeper than V2 (low-side turn-off delay plus "
+    "holds), -25.2 mV (RESULTS 0)",
+    ("criteria", "ss_slew4/c4"): "slow corner: post-ramp Vo dip -13.5 mV (V2 -8.6), outside 1 % for 7.6 us (RESULTS 0)",
+    ("criteria", "m4_ss_l_p48_1us/c3"): "8 NEW 10-16 A spikes: 4 = A160's K4-window artefact, 3 slow-corner ladder spikes as "
+    "on V2, 1 duplicate turn-on 0.1 ns apart; peaks 193.0 / 181.4 A (RESULTS 0)",
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -432,7 +443,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     **{e: (lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()})
-       for e in ("A168", "A169", "A170", "A171", "A172")},
+       for e in ("A168", "A169", "A170", "A171", "A172", "A173")},
 }
 
 
