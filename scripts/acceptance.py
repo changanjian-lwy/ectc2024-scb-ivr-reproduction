@@ -81,6 +81,11 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A165": (TA / "A165_p24_gate_lead_pulse", "a165_analyze.py", "a165_summary.json"),
     "A166": (TA / "A166_p24_gate_lead_per_board", "a166_analyze.py", "a166_summary.json"),
     "A167": (TA / "A167_p24_gate_lead_ramp", "a167_analyze.py", "a167_summary.json"),
+    "A168": (TA / "A168_p24_gate_loop_bound", "a168_analyze.py", "a168_summary.json"),
+    "A169": (TA / "A169_p24_gate_low_sides", "a169_analyze.py", "a169_summary.json"),
+    "A170": (TA / "A170_p24_gate_interlock", "a170_analyze.py", "a170_summary.json"),
+    "A171": (TA / "A171_p24_gate_interlock_threshold", "a171_analyze.py", "a171_summary.json"),
+    "A172": (TA / "A172_p24_final_gate_plant", "a172_analyze.py", "a172_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -381,6 +386,38 @@ EXCEPTIONS["A167"] = {
        "in) and after rising steps, NEW spikes after the steps, no peak or V_DS consequence (RESULTS 0)"
        for r in ("l_p48_1us", "s_p62")},
 }
+_SHOOT = ("shoot-through after the L x 0.7 handover: phase-4 dt_pred fell below the ramped lead (A164's mechanism); "
+          "closed by A171's threshold interlock (RESULTS 0)")
+_TRIM = "Vo(143.5 us) off the trim window: A164's trim was set without low-side gates; A172 re-trims (RESULTS 2)"
+_GATE = "gate-form interlock serialises the low side's turn-off and the high side's gate delay (RESULTS 0)"
+EXCEPTIONS["A168"] = {
+    ("criteria", "P60_ff_l_p48_1us/c1"): "60 pH at 3.0 ohm: fast corner 40.3 V after +4.8 V / 1 us (predicted 40.0) - the "
+    "reason the loop bound is 50 pH (RESULTS 0)",
+    ("criteria", "Q60_nom_L07_l_p48_1us/c3"): _SHOOT,
+    ("criteria", "Q75_nom_L07_l_p48_1us/c3"): _SHOOT,
+    ("criteria", "Q60_ss_l_p48_1us/c3"): "slow corner at 4.2 ohm: 19 NEW one-period spikes, 376 late fires - why 60 pH is "
+    "marginal (RESULTS 0)",
+    ("criteria", "Q75_nom_l_p48_1us/c4"): "4.0 ohm: line-step Vo 12.6 mV / 46.1 us - why 75 pH does not work (RESULTS 0)",
+    **{("criteria", f"Q75_ss_{r}/c3"): "slow corner at 4.8 ohm: late fires and NEW spikes - why 75 pH does not work "
+       "(RESULTS 0)" for r in ("l_p48_1us", "s_p62")},
+}
+EXCEPTIONS["A169"] = {("criteria", f"{r}/c3"): "with gate-driven low sides the adopted drive shoots through where "
+                      "dt_pred collapses; fixed by A171's interlock (RESULTS 0)" for r in ("nom_L07_l_p48_1us", "ss_l_p48_1us")}
+EXCEPTIONS["A170"] = {
+    **{("criteria", f"{s}/c{c}"): _GATE for s, cs in (("S50_nom_l_p48_1us", (3, 4)), ("S50_ss_l_p48_1us", (3,)),
+                                                       ("S50_nom_L07_l_p48_1us", (3, 4)), ("S50t1_nom_L07_l_p48_1us", (3, 4)),
+                                                       ("Q60_nom_L07_l_p48_1us", (3, 4)), ("Q75_nom_L07_l_p48_1us", (3, 4)))
+       for c in cs},
+    **{("criteria", f"{s}/c2"): _TRIM + "; Q60 / Q75 also carry their mode-S start-up peak (A168)"
+       for s in ("S50_nom_L07_l_p48_1us", "S50t1_nom_L07_l_p48_1us", "Q60_nom_L07_l_p48_1us", "Q75_nom_L07_l_p48_1us")},
+}
+EXCEPTIONS["A171"] = {
+    **{("criteria", f"{s}/c2"): _TRIM + "; Q60 / Q75 also carry their mode-S start-up peak (A168)"
+       for s in ("S50_nom_L07_l_p48_1us", "S50t1_nom_L07_l_p48_1us", "Q60_nom_L07_l_p48_1us", "Q75_nom_L07_l_p48_1us")},
+    ("criteria", "Q60_nom_L07_l_p48_1us/c4"): "60 pH / 3.5 ohm L x 0.7: Vo 11.5 mV / 35.6 us, as A168's margin (RESULTS 0)",
+    ("criteria", "Q75_nom_L07_l_p48_1us/c3"): "75 pH / 4.0 ohm: NEW 48, late 15, as A168's slow timing (RESULTS 0)",
+    ("criteria", "Q75_nom_L07_l_p48_1us/c4"): "75 pH / 4.0 ohm: Vo -11.2 mV (RESULTS 0)",
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -394,6 +431,8 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A165": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
+    **{e: (lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()})
+       for e in ("A168", "A169", "A170", "A171", "A172")},
 }
 
 
