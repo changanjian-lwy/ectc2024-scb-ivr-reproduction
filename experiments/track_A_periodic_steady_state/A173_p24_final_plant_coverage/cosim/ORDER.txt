@@ -14,3 +14,4 @@ ss_s_p62
 ss_l_m80_10us
 ss_slew4
 nom_L07_s_p62
+nom_L13_l_p48_1us
