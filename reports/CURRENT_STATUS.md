@@ -1827,6 +1827,27 @@ each question:
          - +-30 % has no single-resistor window (pre runs);
          - a fixed lead removes the dt_pred >= 0 interlock: shoot-throughs
            in pre runs when dt_pred collapsed.
+     90. The form of the lead (2026-10-08, mixed):
+         [A165](../experiments/track_A_periodic_steady_state/A165_p24_gate_lead_pulse/RESULTS.md),
+         [A166](../experiments/track_A_periodic_steady_state/A166_p24_gate_lead_per_board/RESULTS.md),
+         [A167](../experiments/track_A_periodic_steady_state/A167_p24_gate_lead_ramp/RESULTS.md).
+         - A165 moves the whole pulse (a signed dt_pred, emulated in the
+           bridge): handovers are lower everywhere, but L x 0.7 reaches
+           211 A after +4.8 V, because the RTL's phase-1 timeline does not
+           move. Not adopted.
+         - A166 uses an interlock-safe lead per board (shortest delay - 1
+           ns): 0 shoot-throughs, but 19-85 late fires after rising steps
+           and 208 A at L x 0.7. Not adopted.
+         - A167 ramps A164's 8 ns lead in over 20 us after the handover:
+           L x 0.7 handover 191.5 A, post-step as A164 (195 A). ADOPTED.
+         Spec: 50 pH, 3.0 / 0.3 ohm +-20 %, the 8 ns ramped lead,
+         per-board start-up trim.
+         Open:
+         - the slow corner's transient late fires (no peak or V_DS
+           consequence);
+         - the L x 0.7 open-loop start at 202 A;
+         - an interlock by construction needs a controller-side lead that
+           follows each edge's V_DS (RTL change).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

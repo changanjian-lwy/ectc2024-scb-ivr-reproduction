@@ -38,8 +38,10 @@ kept as Appendix A.
   - Turn-on ~3.0 Ω ± 20 % and turn-off ≤ 0.3 Ω per device; ±30 % has no single-resistor window.
   - The controller must absorb a 1.5-16 ns turn-on delay. Two pieces do that:
     - a per-board start-up trim (Vo at the handover 1.035 V);
-    - a high-side turn-on lead, which needs an interlock: a fixed 8 ns lead shot through when dt_pred collapsed in
-      pre runs, and a per-board lead of the shortest delay − 1 ns is safe but leaves line-step late fires.
+    - a high-side turn-on lead of 8 ns, enabled over ~20 µs after the handover (A167; switched on at once it is an
+      on-time step, 219 A at L × 0.7). A fixed lead removes the dt_pred ≥ 0 interlock: pre runs shot through when
+      dt_pred collapsed. A per-board lead of the shortest delay − 1 ns is safe but too small after rising steps
+      (A166). A signed dt_pred emulated as a pulse shift slows L × 0.7's recovery (A165).
   - Loop ~50-60 pH (75 pH needs ~4 Ω, beyond the slow corner's timing). The ramp-model window (≤ 3.2 V / L,
     ≥ ~20 A/ns, 125-150 pH) is superseded.
   - The slow corner (threshold, Q_G max, +20 %) holds peaks and V_DS but fires late after the handover and rising
@@ -361,7 +363,8 @@ The 1 MHz items of the 2026-10-03 list are superseded by the 2.5 MHz design (A12
 封装规格改到栅极层（D79、A163–A166）：每个器件开通 3.0 Ω ± 20 %、关断 ≤ 0.3 Ω；
 器件分布让开通延迟在 1.5–16 ns 之间。这需要两样东西：
 - 每块板单独标定启动导通时间；
-- 高边开通提前量，而且要有互锁：固定 8 ns 在 dt_pred 掉到 0 时会直通；按"最短延迟 − 1 ns"取的每板提前量安全，但阶跃后会有迟发。
+- 高边开通提前量 8 ns，在交接后约 20 µs 内逐渐加满（A167）。一次性加上会在交接时造成导通时间跳变，L×0.7 冲到 219 A。
+  固定提前量在 dt_pred 掉到 0 时会直通；按"最短延迟 − 1 ns"取的每板提前量安全，但不够（A166）。
 
 回路上限约 50–60 pH，斜坡模型的 125–150 pH 作废；振铃 Q ≤ 30。斜坡时代判的峰值都是指令时刻电流，物理峰值高 5–8 A。
 热和磁芯损耗见 D73–D78。
