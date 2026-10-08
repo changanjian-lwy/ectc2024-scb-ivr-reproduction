@@ -122,12 +122,13 @@ So in resistor terms: **turn-on as fast as the line-step overshoot allows (≈ 2
 3.5 Ω at 75 pH), turn-off as fast as possible (a ~0.3 Ω sink), low-side sink ≤ 0.3 Ω, Kelvin source, loop
 ≤ 75 pH for the 200 A budget and ≤ 50 pH if 260 A excursions (C13's falling ramps) must also stay ≤ 40 V.**
 Gate loop ≤ ~1 nH per device (Section 4.8). (In the system this table's 2.5 Ω fails the spread; Section 6 gives the
-spec that holds: 3.0 Ω ± 20 % with a turn-on lead and a per-board start-up trim, loop ~50-60 pH.) This reverses D69's "name a slow turn-off" and lowers the ramp model's
+spec that holds: 3.0 Ω ± 20 % with a turn-on lead, a per-board start-up trim and a threshold-form driver interlock,
+loop ≤ 50 pH.) This reverses D69's "name a slow turn-off" and lowers the ramp model's
 125-150 pH bound. Start-up on-time
 (cosim to the handover, A155's 0.0283 V/ns): Vo(143.5 µs) at ton 36.5 ns is 0.998 / 0.950 / 0.962 V for
 2 / 3 Ω (75 pH) / 4.5 Ω; the A163 configurations add (1.015 − Vo) / 0.0283 ns.
 
-## 6. In the system: A163-A165 (cosim with the frozen controller)
+## 6. In the system: A163-A172 (cosim with the frozen controller)
 
 **Correction to Section 4.5.** The spread used here was +1.5 V of threshold and C_ISS x 1.5, with a driver
 tolerance of +-30 %. The first two are outside the datasheet: EPC's typical curve already sits at V_GS(TH) 1.51 V
@@ -173,16 +174,55 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
   handover (hot corner, lead 8; slow corner, lead 8 at +-10 % or 12 ns). A controller needs a bound on the lead, or a
   lead that is low during the handover, as A167's is.
 
-**Loop bound under this drive.** The turn-on delay does not depend on the loop.
-- 75 pH needs r_on ~4 ohm for the fast corner's 40 V (+-20 %), which puts the slow corner at 4.8 ohm, beyond A164's
-  4.55 ohm failure with the turn-on-only lead.
-- So with resistors alone the loop bound is ~50-60 pH (Section 5's 75 pH was the nominal device). Whether the pulse
-  lead reopens 75 pH is untested.
+**Loop bound under this drive (A168).** The turn-on delay does not depend on the loop; the overshoot does.
+- Single edges (fast corner, 17 V turn-on, 3.0 ohm): 37.0 / 38.5 / 40.4 V at 50 / 60 / 75 pH. The closed loop adds
+  ~1.5 V.
+- 60 pH at 3.0 ohm: the fast corner reaches 40.3 V after +4.8 V / 1 us.
+- 60 pH at 3.5 ohm holds 38.1 V, but the slow corner (4.2 ohm) gains NEW spikes and +45 % late fires, and L x 0.7's
+  handover reaches 202 A.
+- 75 pH at 4.0 ohm holds 38.6 V but loses the line step's Vo (12.6 mV, 46 us) and the slow corner's timing (577 late
+  fires).
+- **The loop bound is 50 pH.** Edge power rises with the resistor: +0.3 W per module nominal at 75 pH, +1.6 W at
+  the slow corner.
+
+**Gate-driven low sides and the interlock (A169-A172).**
+- **A169.** With the low sides gate-driven too, the turn-off takes <= 2.2-2.9 ns delay plus <= 1.2-1.8 ns edge, and
+  the adopted drive shoots through where dt_pred collapses: L x 0.7 at 152 us, slow corner at 161 us. Phase 4's
+  valley goes to -43..-65 A after the handover, the node swings within ~2 ns of the low side's turn-off, and the
+  error-based dt_pred falls below the ramped lead. A lead bound cannot fix it: at dt_pred = 0 a safe lead needs lead
+  <= fast high-side delay (~1.5 ns) - low-side turn-off (~2.5 ns) < 0.
+- **A170, interlock in gate form** (a turn-on's gate waits at 0 V until the complement stops). Every shoot-through
+  goes, but the low side's turn-off and the high side's whole gate delay are now in series:
+  - post-step delay p90 rises from 4.3 to 9.4 ns;
+  - nom 187.6 A and Vo 12.6 mV / 45.5 us; L x 0.7 214.3 A; slow corner 4906 late fires.
+- **A171, interlock in threshold form** (the gate charges as usual; a channel about to start while the complement
+  conducts waits at that level, then starts t_il = 0.5 ns after the complement stops). It blocks only real overlaps:
+  - nom / ff / hot: 0 holds, equal to A169;
+  - L x 0.7: 10 holds <= 1.6 ns, phase-4 dt_pred stays at 11.3 ns;
+  - slow corner: 84 holds <= 2.6 ns, 194 late fires (A167 260).
+  - t_il 1.0 ns changes nothing that matters.
+  Integrated GaN drivers reach 0.03-1 ns adaptive dead times (workspace papers), so the comparator form is
+  realistic.
+- **A172, final plant**, the L x 0.7 board re-trimmed under it (ton 35.769 ns): start-up 200.2 A, handover 190.2 A,
+  post-step 199.7 A (0.3 A margin), 2 late fires. Four modules: post-step 184.2 A, 0 late fires, 0 holds.
+
+**Spec (2026-10-08):**
+- loop <= 50 pH;
+- 3.0 ohm +-20 % turn-on and <= 0.3 ohm turn-off per device;
+- Kelvin source, gate loop <= 1 nH;
+- low-side sink <= 0.3 ohm;
+- an 8 ns turn-on lead ramped in over ~20 us after the handover;
+- a per-board start-up trim measured on the board;
+- a threshold-form driver interlock (a channel waits until its complement's gate is below threshold, <= 0.5 ns).
 
 ## 7. Limits
 
 - The plant's devices are identical (mismatch and gate-loop inductance are LTspice single edges, Sections 4.7-4.8);
   the driver is an ideal source behind a resistor (no supply droop, no propagation-delay spread beyond the bridge's
   t_drv); the damper is the ideal Q 7 resistor.
-- The plant's low sides keep instantaneous (ZVS) edges; their dv/dt immunity is checked in LTspice only.
+- Since A169 the low sides can be gate-driven (cfg gate switches "all"; A171 / A172 use it). They take the high
+  sides' resistors, so their start-up hard turn-ons go through 3.0 ohm. A ZVS turn-on still conducts at once (its
+  reverse conduction is not delayed), and dv/dt immunity is checked in LTspice only.
+- The interlock senses channel current and its own activation level ideally, then adds a fixed t_il. A real driver
+  compares gate voltages with references whose margin is not modelled.
 - Single edges are snapshots of A145's state; the system (frozen controller, deferred measurement, start-up) is A163.

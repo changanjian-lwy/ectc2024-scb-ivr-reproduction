@@ -1848,6 +1848,30 @@ each question:
          - the L x 0.7 open-loop start at 202 A;
          - an interlock by construction needs a controller-side lead that
            follows each edge's V_DS (RTL change).
+     91. Loop bound, gate-driven low sides, driver interlock (2026-10-08,
+         mixed): [A168](../experiments/track_A_periodic_steady_state/A168_p24_gate_loop_bound/RESULTS.md)-[A172](../experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/RESULTS.md),
+         D79 Section 6.
+         - A168: the loop bound is 50 pH. 60 pH at 3.0 ohm gives the fast
+           corner 40.3 V; at 3.5 ohm the slow corner and L x 0.7 lose a few
+           amperes. 75 pH at 4.0 ohm loses line-step Vo (12.6 mV, 46 us) and
+           the slow corner's timing.
+         - A169: with gate-driven low sides (turn-off <= 2.9 ns + 1.8 ns),
+           A167's drive shoots through where dt_pred collapses (L x 0.7,
+           slow corner). A lead bound cannot fix it.
+         - A170: an interlock that holds the gate at 0 V until the
+           complement stops removes the shoot-throughs but serialises the
+           delays (L x 0.7 214 A, slow corner 4906 late fires). Not adopted.
+         - A171 / A172: an interlock that lets the gate charge and holds
+           only a channel about to start against a conducting complement
+           (threshold form, 0.5 ns) passes every row. Four modules: 184.2 A,
+           0 late. L x 0.7 re-trimmed: 199.7 A after the step (0.3 A
+           margin).
+         Spec: item 90's plus gate-driven low sides (sink <= 0.3 ohm) and a
+         threshold-form driver interlock; loop <= 50 pH. The RTL stays
+         frozen; item 90's interlock item is closed.
+         Open: the L x 0.7 open-loop start (200-202 A) and its 0.3 A
+         post-step margin; the slow corner's late fires (194, no
+         consequence).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
