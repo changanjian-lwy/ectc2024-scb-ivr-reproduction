@@ -87,6 +87,8 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A171": (TA / "A171_p24_gate_interlock_threshold", "a171_analyze.py", "a171_summary.json"),
     "A172": (TA / "A172_p24_final_gate_plant", "a172_analyze.py", "a172_summary.json"),
     "A173": (TA / "A173_p24_final_plant_coverage", "a173_analyze.py", "a173_summary.json"),
+    "A174": (TA / "A174_p24_final_plant_margins", "a174_analyze.py", "a174_summary.json"),
+    "A175": (TA / "A175_p24_final_plant_a152_matrix", "a175_analyze.py", "a175_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -429,6 +431,23 @@ EXCEPTIONS["A173"] = {
     ("criteria", "m4_ss_l_p48_1us/c3"): "8 NEW 10-16 A spikes: 4 = A160's K4-window artefact, 3 slow-corner ladder spikes as "
     "on V2, 1 duplicate turn-on 0.1 ns apart; peaks 193.0 / 181.4 A (RESULTS 0)",
 }
+_FFPH = "ff -8 V / 10 us at another step phase: Vo 30.6-31.8 mV at every phase (limit 30.5), post-step +5-6 A over V2 " \
+        "from the gate-driven low sides (A176); the spike only at 2 of 5 phases (RESULTS 0)"
+_FIXREF = "fixed 1.0 V interlock reference (8.3 ns) at the slow corner: peaks hold, timing does not - the slow corner " \
+          "needs the per-board reference (RESULTS 0)"
+EXCEPTIONS["A174"] = {
+    ("criteria", "sh4_nom_L07_l_p48_1us/c3"): "L x 0.7 at +4 T/5: 201.5 A - the board exceeds 200 A at one of five step "
+    "phases; the spec names it (RESULTS 0)",
+    ("criteria", "sh4_nom_L07_l_p48_1us/c4"): "L x 0.7 at +4 T/5: Vo 11.0 mV, back 37.9 us (RESULTS 0)",
+    **{("criteria", f"sh{k}_ff_l_m80_10us/c{c}"): _FFPH for k, cs in ((1, (3, 4)), (2, (3, 4)), (3, (4,)), (4, (3, 4)))
+       for c in cs},
+    **{("criteria", f"fr_{r}/c4"): _FIXREF for r in ("ss_l_m80_10us", "ss_s_p62", "ss_slew4", "m4_ss_l_p48_1us")},
+}
+EXCEPTIONS["A175"] = {
+    ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
+    "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "
+    "172.4 A (RESULTS 0)",
+}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -443,7 +462,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     **{e: (lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()})
-       for e in ("A168", "A169", "A170", "A171", "A172", "A173")},
+       for e in ("A168", "A169", "A170", "A171", "A172", "A173", "A174", "A175")},
 }
 
 
