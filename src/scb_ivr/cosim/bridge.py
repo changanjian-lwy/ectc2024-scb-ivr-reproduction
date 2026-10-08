@@ -57,6 +57,8 @@ too, as a controller with a signed dt_pred would time them (t_on = t_lo + dt_pre
 "lead_ramp_us" (A167): the lead grows linearly from 0 over that time after mode P starts (no on-time step at the
 handover). With gate-driven high sides a turn-on commanded against a conducting low side is counted
 ("overlaps_cmd") but is a shoot-through ("overlaps", stop) only when its channel starts while the low side conducts.
+cfg gate "interlock" 1 (A170) holds such a turn-on in the driver until the complement stops conducting, then starts
+it "t_il_ns" later (gate.py); the controller is unchanged.
 
 RTL configuration from cfg: timing (ton, t0, tdead, restarts, dt_init/step/max), trim, fine, voltage loop (ki; kp
 from A104), async, low_pred (dtl_init/step/max), blank, the error-based correctors (err_low, err_high, el_tgt_ps,
@@ -283,7 +285,8 @@ def make_params(cfg, ref):
                      gate_r_off=float(gate["r_off"]), gate_v_on=float(gate.get("v_on", 5.0)),
                      gate_l_cs=float(gate.get("l_cs_ph", 0.0)) * 1e-12, gate_temp=float(gate.get("temp", 25.0)),
                      gate_dk2=float(gate.get("dk2", 0.0)), gate_cg_scale=float(gate.get("cg_scale", 1.0)),
-                     gate_v_hand=float(gate.get("v_hand", 0.2)))
+                     gate_v_hand=float(gate.get("v_hand", 0.2)), gate_il=bool(gate.get("interlock", 0)),
+                     gate_t_il=float(gate.get("t_il_ns", 0.0)) * 1e-9)
     return Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
 
 
@@ -838,6 +841,8 @@ class ModuleSim:
                                                              "gate_cg_scale", "gate_v_hand")}
             out["gate_params"]["gate_switches"] = list(p.gate_switches)
             out["gate_params"]["meas"] = "act" if self.gate_meas_act else "cmd"
+            if p.gate_il:                                            # A170
+                out["gate_params"].update(gate_il=True, gate_t_il=p.gate_t_il)
             out["gate_stats"] = plant.gm.summary()
             out["gate_offs_last"] = [{"t_s": a, "phase": b, "i_act_a": c, "i_max_a": d} for a, b, c, d in plant.gm.off_log]
         if na:

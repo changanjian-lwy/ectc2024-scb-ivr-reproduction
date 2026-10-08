@@ -104,6 +104,22 @@ class GateBookkeeping(unittest.TestCase):                           # no vendor 
         self.assertEqual(_key("delay_off_s", 5, 4), "delay_off_ls_s")
         self.assertEqual(_key("active_on_s", 4, 4), "active_on_ls_s")
 
+    def test_interlock_holds_until_the_complement_stops(self):                 # A170
+        from types import SimpleNamespace
+        from scb_ivr.cosim.gate import GateEdges
+        pl = SimpleNamespace(gh=[True, False, False, False], gl=[True, False, False, False], t=1e-6)
+        ge = SimpleNamespace(plant=pl, p=SimpleNamespace(n=4, gate_t_il=0.5e-9),
+                             st={0: dict(phase="held", kind="on", drv=False, t_act=math.inf)})
+        ge.conducts = lambda j: GateEdges.conducts(ge, j)
+        self.assertTrue(GateEdges.suppressed(ge, 0))                 # commanded on, held open
+        GateEdges.il_update(ge)
+        self.assertTrue(math.isinf(ge.st[0]["t_act"]))               # SL1 still on
+        self.assertEqual(GateEdges.next_act(ge), math.inf)
+        pl.gl[0] = False
+        GateEdges.il_update(ge)
+        self.assertAlmostEqual(ge.st[0]["t_act"], 1e-6 + 0.5e-9, delta=1e-18)
+        self.assertAlmostEqual(GateEdges.next_act(ge), 1e-6 + 0.5e-9, delta=1e-18)
+
 
 @unittest.skipUnless(HAVE, "EPC library not present (SCB_EPC_LIB / vendor_models)")
 class GateEdgeInPlant(unittest.TestCase):

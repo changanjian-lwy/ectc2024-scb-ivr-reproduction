@@ -19,6 +19,9 @@ the plant's Euler steps):
 q_g = q_gs + q_gd, i_s = i_ch + dq_oss/dt (the device's terminal current; q_oss = the plant's Coss per device).
 A shoot-through (stats shoot_on) is a turn-on whose channel starts while its complement conducts, physically (its
 turn-off still pending or active) when the complement is gate-driven too; low sides keep their own edge times (*_ls_s).
+Driver interlock (gate_il, A170): a turn-on commanded while its complement conducts (as above) is held, its gate
+not driven and its switch open, until the complement stops conducting; it then starts gate_t_il later as a normal
+command. Its delay is still counted from the original command (stats il_holds, il_hold_max_s).
 Gate voltages between edges follow the RC charge with C_in(v_gs, V_DS) at the last known V_DS (no Miller injection);
 a pending turn-off's activation time is computed that way (V_DS ~ 0 while it conducts) and the plants stop there.
 """
@@ -147,6 +150,9 @@ class GateEdges:
                       "active_on_s": [math.inf, 0.0], "active_off_s": [math.inf, 0.0], "didt_on_max_a_ns": 0.0,
                       "didt_off_max_a_ns": 0.0, "vds_cmd_on_max_v": 0.0, "e_total_j": [0.0] * n2,
                       "shoot_on": [0] * n2}
+        self.il = bool(p.gate_il)                       # A170: driver interlock
+        if self.il:
+            self.stats.update(il_holds=[0] * n2, il_hold_max_s=0.0)
         self.ls_keys = any(j >= p.n for j in self.sw)    # A169: gate-driven low sides keep their own edge times
         if self.ls_keys:
             self.stats.update({k: [math.inf, 0.0] for k in LS_KEYS})
@@ -158,6 +164,13 @@ class GateEdges:
         s = self.st.get(j)
         return bool((self.plant.gh + self.plant.gl)[j]) or (s is not None and s["kind"] == "off"
                                                              and s["phase"] in ("pending", "active"))
+
+    def il_update(self):
+        """A170: a held turn-on whose complement stopped conducting starts gate_t_il from now."""
+        n2 = 2 * p_n(self)
+        for j, s in self.st.items():
+            if s["phase"] == "held" and math.isinf(s["t_act"]) and not self.conducts((j + n2 // 2) % n2):
+                s["t_act"] = self.plant.t + self.p.gate_t_il
 
     def r_tot(self, drv):
         return (self.p.gate_r_on if drv else self.p.gate_r_off) + self.rg
@@ -211,7 +224,7 @@ class GateEdges:
     def suppressed(self, j):
         """Commanded on but not (yet) conducting."""
         s = self.st.get(j)
-        return s is not None and s["drv"] and s["phase"] in ("pending", "active")
+        return s is not None and ((s["drv"] and s["phase"] in ("pending", "active")) or s["phase"] == "held")
 
     def forced(self, j):
         """Commanded off but still conducting (gate above the activation level)."""
@@ -225,7 +238,7 @@ class GateEdges:
         return [j for j, s in self.st.items() if s["phase"] == "active"]
 
     def next_act(self):
-        return min((s["t_act"] for s in self.st.values() if s["phase"] == "pending"), default=math.inf)
+        return min((s["t_act"] for s in self.st.values() if s["phase"] in ("pending", "held")), default=math.inf)
 
     def tracking(self):
         """A pending turn-on whose gate is integrated after every step."""
@@ -265,10 +278,12 @@ class GateEdges:
             self._command(j, level, conducting_now, pl, s, d, t)
         finally:
             if cb is not None:                         # a pending edge runs it at activation, anything else now
-                if s["phase"] == "pending" and s["kind"] == "on":
+                if s["phase"] in ("pending", "held") and s["kind"] == "on":
                     self.on_act[j] = cb
                 else:
                     cb()
+            if self.il:                                # A170: this edge may end a hold / start one
+                self.il_update()
 
     def _command(self, j, level, conducting_now, pl, s, d, t):
         self._sync(j, t)
@@ -279,6 +294,10 @@ class GateEdges:
             return
         s["phase"], s["t_act"] = "idle", math.inf
         n = self.nsw[j]
+        if level and self.il and self.conducts((j + p_n(self)) % (2 * p_n(self))):   # A170: held by the interlock
+            s.update(phase="held", kind="on", drv=False, t_act=math.inf, t_cmd0=t)
+            self.stats["il_holds"][j] += 1
+            return
         if level:
             if vds <= 0.0:
                 self.stats["on_zvs"][j] += 1
@@ -302,6 +321,18 @@ class GateEdges:
         """Pending edges whose time has come become active (gate synced to now); returns them. A callback the bridge
         registered for the switch runs at its activation (the physical turn-on's valley measurement)."""
         pl, done = self.plant, []
+        for j, s in self.st.items():                   # A170: held turn-ons whose time has come start now
+            if s["phase"] == "held" and s["t_act"] <= pl.t + 1e-18:
+                t0 = s["t_cmd0"]
+                s["phase"], s["t_act"] = "idle", math.inf
+                self._command(j, True, False, pl, s, self.fd, pl.t)
+                s["t_cmd"] = t0
+                self.stats["il_hold_max_s"] = max(self.stats["il_hold_max_s"], pl.t - t0)
+                if not (s["phase"] == "pending" and s["kind"] == "on"):     # conducting at once (ZVS by now)
+                    done.append(j)
+                    cb = self.on_act.pop(j, None)
+                    if cb is not None:
+                        cb()
         for j, s in self.st.items():
             if s["phase"] == "pending" and s["t_act"] <= pl.t + 1e-18:
                 self._sync(j, pl.t)
@@ -452,6 +483,8 @@ class GateEdges:
                     self.off_log.append(tuple(s["off_rec"]))
                     s["off_rec"] = None
                 ended.append(j)
+        if self.il and ended:                          # A170: an ended turn-off may release its complement
+            self.il_update()
         return ended
 
     def summary(self):

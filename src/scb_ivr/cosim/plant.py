@@ -468,6 +468,8 @@ class FastPlant:
             self.gh[j] = bool(level)
         else:
             self.gl[j - self.n] = bool(level)
+        if gm is not None and gm.il:                                  # A170: a held turn-on may go now
+            gm.il_update()
         self.euler_left = 2
         _aux_gate(self, j, level)
 

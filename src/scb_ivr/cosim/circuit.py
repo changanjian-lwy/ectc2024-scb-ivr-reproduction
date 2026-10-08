@@ -140,6 +140,8 @@ class CircuitParams:
     gate_dk2: float = 0.0        #   threshold shift (V; spread case)
     gate_cg_scale: float = 1.0   #   gate capacitances times this (spread case)
     gate_v_hand: float = 0.2     #   V_DS (V) at which the channel hands over to / takes over from conduction
+    gate_il: bool = False        #   A170: driver interlock (a turn-on waits until its complement stops conducting)
+    gate_t_il: float = 0.0       #   ... then starts this much later (s; the interlock's propagation delay)
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
