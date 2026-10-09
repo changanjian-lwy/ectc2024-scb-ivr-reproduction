@@ -1961,6 +1961,21 @@ each question:
            corner; the slow corner's own limit is open (~0.8 L0 estimate).
            V_DS <= 33.8 V, no shoot-through. FAIL as registered, accepted
            with 7 documented exceptions.
+     96. LSCB capacitor ladder on one P24 module (2026-10-09, extension
+         lscb_ladder; A180 + A182, open-loop LTspice power stage, no
+         controller; line closed, not adopted):
+         - A180: a ladder of four C_DC with a clamp switched in a window
+           halves rail 1's +4.8 V / 1 us jump (4.64 -> 2.17 V, peak
+           243 -> 161 A at 20 uF; 1.68 V at 60 uF). LSCB's passive 0.7 V
+           diode takes the GaN dead-time current (phase spread 11.3 %),
+           and a clamp closed every period costs 4.59 W.
+         - A182 (second external review, point 6): a detector at 0.75 V
+           (steady deviation 0.29 V) with <= 0.3 us delay keeps the
+           benefit (+2.15 / +2.16 V, 161 A) at twice the clamp current
+           (289 vs 146 A, resistance-limited); 1.0 us or a 1.5 V threshold
+           loses it. 0/4 as registered: criterion 1 counted the .ic
+           settling (1.129 V at 0.95 us) and moved 2-4 to 1.5 V.
+         - Closed loop (step 2) not run (user, 2026-10-09).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
