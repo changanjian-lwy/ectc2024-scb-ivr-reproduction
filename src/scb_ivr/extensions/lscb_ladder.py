@@ -14,6 +14,10 @@ vin-SH1-a1-SH2-a2-SH3-a3-SH4-x4, Csk a_k-x_k (k < 4), SLk x_k-0, Lk x_k-out. Cla
   for exactly this reason.
 Every clamp current is reported positive from the ladder into a_k.
 
+Detector-triggered window (A182): p["win"] = (w0, w1) replaces the fixed window; the switch then closes on the
+overlap of each SL_k on-interval with [w0, w1] (it may close mid-interval). detect() gives the time a detector of
+threshold vth would fire: the first time max_k |V(d(4-k)) - Vcs_k| reaches vth. p["save_ls"] adds I(SL1..3).
+
 Power stage: switches of r_on, linear Coss (c_high / c_low as the cosim's linear default), reverse conduction as a
 diode per switch (EPC2067 Fig. 8 fit 2.089 V + 6.01 mOhm per device / n devices), R per phase in the inductor, the
 cosim's Co and resistive load. Drive (precomputed PWL gates, t_edge transitions): fixed period T, phases interleaved by
@@ -127,6 +131,8 @@ def netlist(var, row, p=None):
             f".model DRL D(Ron={_g(p['rev_r'] / p['n_low'])} Roff=1e9 Vfwd={_g(p['rev_vf'])} epsilon=0.02)"]
     save = ["V(vin)", "V(out)"] + [f"V(a{k})" for k in (1, 2, 3)] + [f"V(x{k})" for k in (1, 2, 3, 4)] + \
            [f"I(L{k})" for k in (1, 2, 3, 4)] + ["I(Vin)"]
+    if p.get("save_ls"):
+        save += [f"I(SL{k})" for k in (1, 2, 3)]
     if v is not None:
         c = v["cdc"]
         for k, (hi, lo) in enumerate((("d1", "0"), ("d2", "d1"), ("d3", "d2"), ("vin", "d3")), 1):
@@ -136,13 +142,18 @@ def netlist(var, row, p=None):
             out.append(f".model SWC SW(Ron={_g(v['r'])} Roff=1e7 Vt=0.5 Vh=-0.2)")
             w0, w1 = (-1.0, 1.0) if v.get("always") else \
                      ((p["t_step"], p["t_step"] + p["t_win"]) if step else (0.0, p["t_ramp"] + 2e-6))
+            win = p.get("win")
         for k in (1, 2, 3):
             d = f"d{4 - k}"
             out.append(f"DC{k} {d} a{k} DCL")
             save.append(f"I(DC{k})")
             if v["kind"] == "active":                         # closed only inside SL_k's on-intervals in the window
                 out.append(f"SC{k} {d} a{k} gc{k} 0 SWC")
-                out += _pwl(f"gc{k}", f"gc{k}", [(c, e) for _, _, c, e in gates[k] if c >= w0 and e <= w1], tr)
+                if win is None:
+                    pulses = [(c, e) for _, _, c, e in gates[k] if c >= w0 and e <= w1]
+                else:                                         # detector window: overlap with each LS on-interval
+                    pulses = [(max(c, win[0]), min(e, win[1])) for _, _, c, e in gates[k] if e > win[0] + tr and c < win[1] - tr]
+                out += _pwl(f"gc{k}", f"gc{k}", pulses, tr)
                 save.append(f"I(SC{k})")
         save += ["V(d1)", "V(d2)", "V(d3)"]
     if step:                                                  # start near the steady state; the start-up row from zero
@@ -187,6 +198,22 @@ def waves(names, arr):
                 pin=-vin * c("I(Vin)"), a=[c(f"V(a{k})") for k in (1, 2, 3)])
 
 
+def deviations(names, arr):
+    """Per clamp k (1..3): V(d(4-k)) - Vcs_k, the voltage a detector across clamp k sees (needs the ladder)."""
+    c = lambda n: _col(names, arr, n)
+    return [c(f"V(d{4 - k})") - (c(f"V(a{k})") - c(f"V(x{k})")) for k in (1, 2, 3)]
+
+
+def detect(names, arr, vth, t_from):
+    """(first time >= t_from at which max_k |deviation_k| >= vth or None, max |deviation| before t_from)."""
+    t = arr[:, 0]
+    dev = np.max(np.abs(np.array(deviations(names, arr))), axis=0)
+    before = t < t_from
+    pre = float(np.max(dev[before])) if before.any() else 0.0
+    hit = np.nonzero((t >= t_from) & (dev >= vth))[0]
+    return (float(t[hit[0]]) if hit.size else None), pre
+
+
 def metrics(names, arr, row, p=None):
     """Steady window before the step (or the last 2 us of the start-up ramp) and the disturbance window after it."""
     p = {**PARAMS, **(p or {})}
@@ -223,6 +250,9 @@ def metrics(names, arr, row, p=None):
             post["clamp_peak_a"] = [float(np.max(np.abs(i[m2]))) for i in w["clamp"]]
             post["clamp_charge_uc"] = [float(np.trapezoid(i[m2], t[m2]) * 1e6) for i in w["clamp"]]
             post["clamp_energy_uj"] = float(sum(np.trapezoid((dv * i)[m2], t[m2]) for dv, i in zip(drops, w["clamp"])) * 1e6)
+        sl = [_col(names, arr, f"I(SL{k})") for k in (1, 2, 3)]
+        if sl[0] is not None:                                 # low-side switch current magnitude (channel only)
+            post["ls_peak_a"] = [float(np.max(np.abs(i[m2]))) for i in sl]
         res["post"] = post
     else:
         res["startup"] = dict(il_peak=[float(np.max(i)) for i in w["il"]], il_min=[float(np.min(i)) for i in w["il"]],
