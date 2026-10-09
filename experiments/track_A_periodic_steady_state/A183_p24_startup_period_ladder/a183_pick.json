@@ -1,0 +1,55 @@
+{
+ "per_t0": {
+  "200.0": {
+   "bracketed": false
+  },
+  "250.0": {
+   "bracketed": true,
+   "pair": [
+    "t250_n37p600",
+    "t250_n39p600"
+   ],
+   "checks": {
+    "t250_n37p600": {
+     "S1": true,
+     "S2": false,
+     "S3": true
+    },
+    "t250_n39p600": {
+     "S1": true,
+     "S2": true,
+     "S3": true
+    }
+   },
+   "pass": false,
+   "worst_a": 210.99694321730914,
+   "trim_ns": 39.288
+  },
+  "300.0": {
+   "bracketed": true,
+   "pair": [
+    "t300_n40p000",
+    "t300_n43p000"
+   ],
+   "checks": {
+    "t300_n40p000": {
+     "S1": true,
+     "S2": true,
+     "S3": true
+    },
+    "t300_n43p000": {
+     "S1": true,
+     "S2": true,
+     "S3": true
+    }
+   },
+   "pass": true,
+   "worst_a": 196.03111866220627,
+   "trim_ns": 40.324
+  },
+  "500.0": {
+   "bracketed": false
+  }
+ },
+ "t0_star": 300.0
+}
