@@ -92,6 +92,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A177": (TA / "A177_p24_per_board_interlock_reference", "a177_analyze.py", "a177_summary.json"),
     "A178": (TA / "A178_p24_inductance_tolerance_final", "a178_analyze.py", "a178_summary.json"),
     "A179": (TA / "A179_p24_interlock_release_threshold", "a179_analyze.py", "a179_summary.json"),
+    "A181": (TA / "A181_p24_locked_trim_joint_corner", "a181_analyze.py", "a181_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -457,6 +458,13 @@ EXCEPTIONS["A179"] = {
     "(47 in A177) against 36.5 - the slow corner's release time is <= 1.0 ns (RESULTS 0)",
     ("criteria", "3_release/ss_s_p62 1.4"): _R2NEW,
     ("criteria", "3_release/ss_s_p62 1.0"): _R2NEW,
+}
+_S75 = "slow devices with L x 0.75, trimmed once at 25 C: open-loop start-up 202-207 A (any trim near the target is " \
+       "above 200 A) and a 278 A handover runaway at 25 C - L x 0.75 holds with nominal devices only (RESULTS 0, 2)"
+EXCEPTIONS["A181"] = {
+    **{(f"runs/S75_{t}_p{k}", "c1_startup"): _S75 for t in ("25", "hot") for k in range(3)},
+    ("runs/S75_hot_p1", "c2_post"): "slow devices, L x 0.75, 125 C: 202.8 A after +4.8 V / 1 us at one of three step "
+    "positions (RESULTS 0)",
 }
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
