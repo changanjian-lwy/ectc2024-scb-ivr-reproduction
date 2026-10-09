@@ -21,4 +21,4 @@ unique.
 |---|---|---|
 | [aux_commutation_branch](aux_commutation_branch/README.md) | per phase, Lr and a bidirectional switch to a self-balanced Cm, for the high side's zero-voltage turn-on (A101, A102, D56, D57) | built and evaluated as cases; not adopted |
 | [ml_design_assist](ml_design_assist/README.md) | machine learning that assists the physics models: an MLP surrogate of D63 (A120), a Gaussian-process residual and active learning (A121), a policy-gradient turn-off rule in the D63 environment (A122); numpy only | started 2026-10-03 |
-| [lscb_ladder](lscb_ladder/README.md) | LSCB's capacitor ladder (Tong et al., VLSI 2026) with diode or switched clamps to the series nodes, against rising line steps on rail 1 (A180) | A180 registered 2026-10-09 |
+| [lscb_ladder](lscb_ladder/README.md) | LSCB's capacitor ladder (Tong et al., VLSI 2026) with diode or switched clamps to the series nodes, against rising line steps on rail 1 (A180) | A180 done 2026-10-09: helps only as a windowed switched clamp with C_DC >= 20 uF; not adopted, step 2 open |
