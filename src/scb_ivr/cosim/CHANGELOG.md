@@ -4,6 +4,21 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-09 (A184) - mode S's own Ton (user-authorised RTL change)
+
+**Source:** A183. A 200 ns mode-S period balances the series-capacitor ladder,
+but its start-up trim is 0.55-1.1x the loop's steady Ton, and ton_ns also set
+the loop's reset value, scb_vff's C10 seed (tpre) and the 0.5x / 2x clamps.
+scb_ctrl gets cfg_ton_s: ton_now outside mode P is cfg_ton_s. ton_acc still
+resets to cfg_ton. scb_vff gets tseed (scb_ctrl's old ton_now expression with
+cfg_ton), and tpre follows it instead of ton. scb_multi is regenerated. The
+bridge's cfg "ton_s_ns" sets cfg_ton_s; absent = ton_ns. The testbench mirrors
+cfg_ton into cfg_ton_s unless a test sets it.
+**Gate:** cfg_ton_s = cfg_ton is the old controller bit for bit (ton_seed ==
+ton_now). Unit tests 89/89, 1 of them new (mode_s_own_ton). pytest 693 passed.
+cosim_regression --full and an A183 start-up rerun are identical (A184
+BOUNDARY).
+
 ## 2026-10-05 (A145) - finite switching edges
 
 **Source:** A144's overshoot came from instantaneous edges. cfg "edge"

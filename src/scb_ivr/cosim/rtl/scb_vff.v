@@ -19,6 +19,7 @@
 //   that sample, as the very first sample does: the low-passes do not carry the start-up ramp's lag into mode P.
 //   C10: seed 2 restarts tlp from ton's value in the clock before en rose (mode S's Ton) instead of the sample's ton, so
 //   the seed does not depend on when a module enters mode P (a slave that enters after the master's loop has moved ton).
+//   A184: tpre follows tseed (scb_ctrl: cfg_ton in mode S) instead of ton, which may be mode S's own Ton.
 // - A148: phase 1's low-side edge offset (scb_phase lo_add, LSB), from the rail and rss of the last sample:
 //   lo_add = (vs_kr x tlp x (rail - rss) + vs_kt x (ton_1 - tlp) x rail) >>> 24, ton_1 = ton_ph[0] (live), tlp = ton's
 //   low-pass (>> 8), clamped to +-32767. With vs_kr = vs_kt = g 2^24 vin_lsb / (256 Vo) it is the volt-second balance of
@@ -44,6 +45,7 @@ module scb_vff #(
     input  wire [AW-1:0]   gth,
     input  wire [AW-1:0]   vo_code,
     input  wire [TW-1:0]   ton,
+    input  wire [TW-1:0]   tseed,               // A184: the C10 seed source while en is low (= ton unless mode S has its own Ton)
     input  wire signed [15:0] vs_kr,           // A148: lo_add's rail coefficient (Q24 of LSB per LSB x Q8 code)
     input  wire signed [15:0] vs_kt,           // A148: its Ton coefficient
     output wire [N*TW-1:0] ton_ph,
@@ -93,11 +95,11 @@ module scb_vff #(
         if (rst) begin
             init <= 1'b0; lp2 <= 0; lp20 <= 0; tlp <= 0; vprev <= 0; en_q <= 1'b0; rpend <= 1'b0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
             rail_q <= 0; rss_q <= 0;
-            tpre <= ton;
+            tpre <= tseed;
             for (j = 0; j < N; j = j + 1) m[j] <= 0;
         end else begin
             en_q <= en;                                                       // A137
-            if (!en) tpre <= ton;                                             // C10
+            if (!en) tpre <= tseed;                                           // C10, A184
             if (rise && !vin_valid) rpend <= 1'b1;
             if (vin_valid) begin
                 rpend <= 1'b0;

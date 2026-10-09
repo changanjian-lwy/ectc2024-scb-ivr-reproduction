@@ -33,6 +33,8 @@
 //   A136: cfg_vff_rel_lp takes ton's low-pass for it; A137: cfg_vff_seed restarts scb_vff's low-passes at mode P's entry;
 //   C10: cfg_vff_seed 2 seeds ton's low-pass with mode S's Ton. A148: cfg_vff_vs_kr / kt give phase 1's timed low-side
 //   edge an offset from scb_vff (the volt-second law; lo_add, 0 when both are 0).
+// - A184: mode S runs at cfg_ton_s; the loop's reset value (ton_acc) and scb_vff's C10 seed keep cfg_ton, so a short
+//   mode-S period can have its own trim. cfg_ton_s = cfg_ton is the old controller bit for bit.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -53,6 +55,7 @@ module scb_ctrl #(
     input  wire                cfg_start_s,    // 1: start in mode S (fixed timing)
     input  wire                hand_req,       // hand over to mode P at the next phase-1 turn-on
     input  wire [TW-1:0]       cfg_ton,
+    input  wire [TW-1:0]       cfg_ton_s,      // A184: mode S's Ton (cfg_ton stays the loop's reset value and scb_vff's seed)
     input  wire [TW-1:0]       cfg_ton_min,
     input  wire [TW-1:0]       cfg_ton_max,
     input  wire [TW-1:0]       cfg_t0,
@@ -198,13 +201,14 @@ module scb_ctrl #(
     wire signed [AW1-1:0] ton_cl   = (ton_sum < acc_min) ? acc_min : (ton_sum > acc_max) ? acc_max : ton_sum;
     wire signed [AW1-1:0] acc_rnd  = ton_cl + (1 <<< (FRAC - 1));
     wire [TW-1:0] ton_loop = acc_rnd[AW1-1:FRAC];
-    assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;   // C2
+    assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton_s; // C2, A184
+    wire [TW-1:0] ton_seed = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;  // A184
 
     wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
     wire signed [TW-1:0] lo_add;               // A148: phase 1's low-side edge offset
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
-        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now),
+        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now), .tseed(ton_seed),
         .vs_kr(cfg_vff_vs_kr), .vs_kt(cfg_vff_vs_kt), .ton_ph(ton_ph), .lo_add(lo_add)
     );
 

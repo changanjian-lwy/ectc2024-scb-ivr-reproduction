@@ -16,7 +16,8 @@ Time base. Each 4 ns clock cycle n covers the plant window [n*T_clk, (n+1)*T_clk
 
 Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase
 1 HIGH and phases 2..N LOW, input ramp over t_ramp, load connection at t_load and handover request at t_hand (cfg
-"t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115); "nonlinear_coss" (datasheet Coss(V),
+"t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115; "ton_s_ns", A184: mode S's Ton, while
+"ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
 
 Controller-side analog functions modelled here:
@@ -334,6 +335,7 @@ class ModuleSim:
         cfg, c, to_lsb = self.cfg, self.ctl, self.to_lsb
         c.set("rst", 1)
         c.set("cfg_ton", to_lsb(cfg["ton_ns"] * 1e-9))
+        c.set("cfg_ton_s", to_lsb(cfg.get("ton_s_ns", cfg["ton_ns"]) * 1e-9))   # A184: mode S's own Ton (default ton_ns)
         c.set("cfg_rs_high", to_lsb(cfg["rs_high_ns"] * 1e-9))
         c.set("cfg_rs_low", to_lsb(cfg["rs_low_ns"] * 1e-9))
         c.set("cfg_dt_step", max(1, to_lsb(cfg["dt_step_ns"] * 1e-9)))

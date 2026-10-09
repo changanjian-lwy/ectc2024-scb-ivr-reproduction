@@ -34,7 +34,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0,                                                           # A129
             vff_rel=0, vff_rel_lp=0, vff_seed=0,                                 # A135, A136, A137
-            vff_vs_kr=0, vff_vs_kt=0)                                            # A148
+            vff_vs_kr=0, vff_vs_kt=0,                                            # A148
+            ton_s=None)                                                          # A184: None = ton
 
 
 def pack(values, width):
@@ -66,6 +67,7 @@ class Ctrl:
         cocotb.start_soon(Clock(d.clk, 4, unit="ns").start())
         d.rst.value = 1
         d.cfg_ton.value = cfg["ton"]
+        d.cfg_ton_s.value = cfg["ton"] if cfg["ton_s"] is None else cfg["ton_s"]   # A184
         d.cfg_rs_high.value = cfg["rs_high"]
         d.cfg_rs_low.value = cfg["rs_low"]
         d.cfg_dt_step.value = cfg["dt_step"]
@@ -171,6 +173,8 @@ class Ctrl:
 
     async def set(self, **sig):
         await FallingEdge(self.dut.clk)
+        if "cfg_ton" in sig and "cfg_ton_s" not in sig:   # A184: mode S's Ton follows cfg_ton unless set on its own
+            sig["cfg_ton_s"] = sig["cfg_ton"]
         for name, value in sig.items():
             getattr(self.dut, name).value = value
 
@@ -403,6 +407,26 @@ async def voltage_loop_clamps(dut):
     await c.set(adc_valid=0)
     await ReadOnly()
     assert int(dut.ton_now.value) == 67
+
+
+@cocotb.test()
+async def mode_s_own_ton(dut):
+    """A184: mode S runs at cfg_ton_s (phase 1's first pulse 100 LSB: window 96, fine 4); scb_vff's C10 seed tpre and
+    the loop's reset value keep cfg_ton, so mode P starts at 133 after the handover."""
+    c = Ctrl(dut)
+    await c.start(start_s=1, vloop=1, ton=133, ton_s=100, vff=1, vff_seed=2)
+    e = await c.until("H", 0, 1)
+    assert (e[0], e[1]) == (96, 4), e
+    assert int(dut.ton_now.value) == 100 and int(dut.mode_p.value) == 0
+    assert int(dut.u_vff.tpre.value) == 133, int(dut.u_vff.tpre.value)
+    await c.set(hand_req=1)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.mode_p.value):
+            break
+    assert int(dut.mode_p.value) == 1
+    assert int(dut.ton_now.value) == 133, int(dut.ton_now.value)
 
 
 @cocotb.test()
