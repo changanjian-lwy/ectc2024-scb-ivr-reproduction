@@ -193,7 +193,9 @@ are budgets over plausible ranges:
     - **Open-loop start-up.** Its on-time moves by up to ~4 ns, which sets the
       peak when the loop takes over: 157 A nominal, 376 A at the threshold maximum.
       A one-shot trim per board fixes it: set the start-up on-time so that Vo is
-      1.035 V at the handover. That held on every board tested.
+      1.035 V at the handover. That held on every board tested; each was
+      trimmed at its own condition (125 °C included). A trim locked at 25 °C
+      and started hot is only estimated: +8.5 mV, away from the cliff.
     - **Valley timing.** Our controller commands the high side no earlier than one
       clock after the low side's turn-off command, and the valley comes 9.5-11 ns
       after that command. So it absorbs only ~5.5 ns of gate delay, and the high
@@ -230,7 +232,8 @@ are budgets over plausible ranges:
           three step positions per delay, the slow corner's late turn-ons
           after a −8 V ramp stay at 9-32 up to 1.0 ns and reach ~50 at
           1.4 ns at two of four positions: the release should be within
-          1.0 ns. The per-board reference (~1.4 ns) is just above that, a
+          1.0 ns. That is a timing target from the late-fire count: peaks,
+          V_DS and Vo do not separate 0.5-1.4 ns. The per-board reference (~1.4 ns) is just above that, a
           fixed one far above.
     - With ±30 % on the gate resistance no single resistor meets both the fast
       corner's 40 V and the slow corner's timing; ±20 % does.
@@ -257,16 +260,18 @@ are budgets over plausible ranges:
       so the loop takes over without an on-time step, plus the threshold-form
       driver interlock (see above). The controller stays as frozen.
     - A per-board start-up trim.
-    - Results: switch ≤ 38.4 V on every run. Peaks ≤ 198.3 A on every run
-      with the inductance at ≥ 0.75 × nominal (the 0.75 × and 0.8 × boards
-      at five step phases each). At 0.7 × the board reaches
-      199.5-201.5 A after +4.8 V / 1 µs, and its open-loop start-up 200 A, so
-      the inductor tolerance for the 200 A budget is −25 %. Four modules:
-      184 A; 196.5 A with a ±5 % inductor spread.
+    - Results: switch ≤ 38.4 V on every run. Peaks ≤ 198.3 A on the 0.75 ×
+      and 0.8 × inductance boards at five step phases each (nominal devices).
+      At 0.7 × the board reaches 199.5-201.5 A after +4.8 V / 1 µs, and its
+      open-loop start-up 200 A. These are tested points, not a range (the peak
+      is not monotone in L), and each limit was found with the others at
+      nominal; combined corners are not run. Four modules: 184 A; 196.5 A with
+      a ±5 % inductor spread.
     - Open, with no current or voltage consequence:
         - Falling line steps make the controller restart its valley prediction
-          on phases 2-4, with 10-20 A spikes. This needs both the lead and the
-          gate-driven low sides; each alone gives none. A lead held off while a
+          on phases 2-4, with 10-20 A spikes. The variants support needing
+          both the lead and the gate-driven low sides (each alone gave none,
+          at one step position each). A lead held off while a
           valley is lost would remove it, but that is an RTL change.
         - At the slow corner, Vo dips 3-5 mV deeper after line ramps (up to
           −25 mV).

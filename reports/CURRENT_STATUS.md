@@ -1896,12 +1896,14 @@ each question:
            release time is a timing spec, < 1.4 ns wanted at the slow corner
            (A179 refines it to <= 1.0 ns, item 93).
          - A178: L x 0.75 / 0.8 <= 198.3 / 194.7 A at five step phases;
-           the inductor tolerance for 200 A is -25 % (L x 0.7 201.5 A).
+           the inductor tolerance for 200 A is -25 % (L x 0.7 201.5 A;
+           nominal devices, tested points - see FINAL_SPEC Section 5).
          - A175: at nominal devices the final plant has run A152's whole
            13-row matrix; 12 pass, -4.8 V / 1 us restarts (oracle events).
-         - A176: those falling-step restarts need the lead and the
-           gate-driven low sides together (A169's mechanism without a
-           shoot-through). A valley-aware lead would remove them (RTL).
+         - A176: the variants support the lead and the gate-driven low
+           sides together as the cause of those falling-step restarts
+           (A169's mechanism without a shoot-through; one step position
+           per variant). A valley-aware lead would remove them (RTL).
          - D80: the thermal model with the final plant's edge losses and the
            50 pH loop. The published thermal numbers are conservative (T_max
            -0.7..-1.3 K). The edges add 1.7 W (nominal) to 3.9 W (ss) per

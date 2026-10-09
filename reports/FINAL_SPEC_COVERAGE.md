@@ -13,7 +13,8 @@ comes from, and says what may be claimed.
 | devices | EPC2067, EPC's model (vendor library at run time), 2 + 3 per phase; spread corners ff (V_th −0.3 V, driver ×0.8), ss (V_th +1.0 V, Q_G ×1.29, driver ×1.2), hot (125 °C) | D79, A163 |
 | drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
 | controller-side lead | high-side turn-on 8 ns earlier, ramped in over 20 µs after the handover | A167 |
-| start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026 | A164 |
+| start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026. Every tested condition was trimmed at its own corner, the 125 °C board included (39.289 vs 39.615 ns at 25 °C); a trim locked at 25 °C and started hot is estimated (Vo(143.5 µs) +8.5 mV, 1.044 V, away from the 0.99 V cliff), not run | A164 |
+| calibrated vs adaptive | factory, once per board: the start-up trim. Adapting at run time: valley timing (dt_pred, dlo), low-side dead time (dtl), negative-current trim, the Vin feed-forward's filters. Fixed: drive resistors, lead, t_il | A143, A164 |
 | driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above. This settles the ramp's late fires only: at 1.0 ns the load step's spike count still fails its registered tolerance (scatter, open), and a real comparator's offset, noise and early release are not modelled | A171, A173, A174, A177, A179 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
@@ -80,7 +81,8 @@ A142 / C13); the inductor spread beyond ±5 % (V0, C14).
 The misses are regulation or oracle events, none on voltage; the only current miss is L × 0.7 at one step phase
 (201.5 A, A174):
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
-  10-20 A spikes, which V2 does not show (cause: A176);
+  10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
+  step position per variant, so "none" on a variant is one sample);
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 
@@ -91,6 +93,9 @@ The misses are regulation or oracle events, none on voltage; the only current mi
   shown. Where it never acted (0 holds: nom / ff / hot one module, four modules nominal), they do not depend on it.
   A173 / A174 set t_il to realisable forms (above). A comparator reference above a device's channel-off level
   would release early; the spec excludes it, and it is not modelled.
+- **Each limit was found with the others at nominal.** Not run together: a small inductance with the slow
+  corner, a 1.0 ns interlock, a trim locked at 25 °C and an adverse step phase. Step positions are offsets in
+  absolute time, not aligned to a physical event across variants.
 - Devices inside a board are identical (mismatch only in LTspice single edges, D79 4.7). Four-module boards
   share one corner.
 - The damper is an ideal Q 7 resistor; the driver is an ideal source behind a resistor.
@@ -100,11 +105,17 @@ The misses are regulation or oracle events, none on voltage; the only current mi
 
 - "The final plant passed the listed rows (Section 3)", not "every corner" or "every test".
 - Inductance tolerance (A174 / A178, +4.8 V / 1 µs, five step phases per board): 0.75 L0 ≤ 198.3 A, 0.8 L0 ≤
-  194.7 A, 0.7 L0 199.5-201.5 A. State "≥ 0.75 L0 keeps ≤ 200 A at every tested phase; 0.7 L0 reaches 201.5 A".
+  194.7 A, 0.7 L0 199.5-201.5 A (nominal devices, t_il 0.5 ns, each board trimmed). State "at 0.75 and 0.8 L0
+  every tested phase stays ≤ 200 A; 0.7 L0 reaches 201.5 A" - not "every L ≥ 0.75 L0": the peak is not monotone
+  in L (L0 182.5 A, 1.3 L0 188.7 A).
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
 - The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
   delay up to 8.3 ns keeps peaks and voltages; at the slow corner it should release within 1.0 ns, which a
   per-board comparator reference (~1.4 ns) just misses and a fixed reference misses by far (A174, A177, A179)".
+- Two layers. Engineering: peak current, V_DS, Vo extreme and recovery, loss. Diagnostic: late fires, oracle NEW
+  events, restarts. The interlock's 1.0 ns is a diagnostic target: in A179 peaks (169-171 / 183-185 A), V_DS
+  (≤ 32.9 V) and Vo extremes (within ~2 mV) do not separate 0.5-1.4 ns; up to 8.3 ns peaks and V_DS held and
+  four-module Vo was −13.7 against −9.9 mV (A174).
 - Efficiency: η = P_out / (P_out + P_loss). A loss increase divided by 250 W is a share of the output, not
   efficiency points: the gate-level edges add 1.7 / 3.9 W per module (nominal / slow corner), −0.4..−0.5 /
   −1.0..−1.2 points depending on the baseline (D80, corrected 2026-10-09).
@@ -113,3 +124,18 @@ The misses are regulation or oracle events, none on voltage; the only current mi
 - Edge power: per module 2.26 / 2.45 / 2.86 / 4.57 W at ff / nom / hot / ss (A171), 4.18 W at L × 0.7 (A172),
   2.44-2.46 W on four modules (steady window; A172's 2.87 W included the step). D62's ideal-edge terms were
   0.94 W. The thermal result with these losses: D80.
+
+## 6. Second external review (2026-10-09): experiment design
+
+| # | point | verdict | action |
+|---|---|---|---|
+| 1 | each corner re-trimmed (125 °C too): shows "works after re-calibration", not "a board trimmed once still starts hot" | correct; estimated impact small (nominal board: hot trim 0.33 ns shorter → Vo(143.5 µs) +8.5 mV, away from the cliff); slow corner + hot never run | row "start-up" and "calibrated vs adaptive" in Section 1; locked-trim test proposed, not run |
+| 2 | relative criteria (late ≤ 1.5 ref + 5, NEW ≤ ref + 2, Vo ± 2 mV) are regression checks, not hardware requirements | correct in principle; the 1.0 ns was already called a timing (not safety) spec, but it reads like a requirement | Section 5 "Two layers": 1.0 ns is a diagnostic target; engineering metrics do not separate 0.5-1.4 ns |
+| 3 | A176 ran one step position per variant; "none" may be phase luck | correct; A176's own limits said so, its verdict and later docs said "only together" | reworded to "supports" (Section 3, D79, summary, status) |
+| 4 | separately found limits do not combine; discrete points are not a range | correct; our data show the peak is not monotone in L (L0 182.5, 1.3 L0 188.7 A) | Section 5 states tested points; Section 4 "each limit found with the others at nominal" |
+| 5 | an ideal interlock cannot release early, so its safety is preset by the model | correct; already stated in Section 4 ("imposed by the rule, not shown"; early release "not modelled") | none; a comparator model with offset / noise / mismatch would be new work |
+| 6 | A180's step-2 rule tied the windowed clamp to the always-on clamp's loss | partly: A180 RESULTS already reads the rule as not authorising step 2; criterion 5 stood in for the windowed clamp's ideal trigger | A180 unchanged (FAIL stays); a separate windowed-clamp test with a real detector is the right next step, not run |
+
+Proposed, not run (this phase is archived): lock each board's 25 °C trim, then run it hot, at the slow corner with
+L × 0.75 and t_il 1.0 ns, with the step aligned to the same physical event (e.g. phase 1's low-side turn-off) at
+several offsets; judge the engineering layer first.

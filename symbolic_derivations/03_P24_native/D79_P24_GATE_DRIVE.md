@@ -222,9 +222,10 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
   falling ramps; four modules at nominal, ss, a ±5 % inductor spread (196.5 A) and a load step. No run exceeds
   38.4 V.
 - L x 0.7 after +4.8 V / 1 us: 199.5-201.5 A over five step phases (A174), at the 200 A edge; L x 0.75 / 0.8 stay
-  <= 198.3 / 194.7 A at five phases (A178): the inductor tolerance for the 200 A budget is -25 %.
-- Falling steps restart the valley prediction on phases 2-4 (10-20 A spikes). Only the lead and the gate-driven low
-  sides together do this (A176).
+  <= 198.3 / 194.7 A at five phases (A178, nominal devices). These are tested points, not a range: the peak is not
+  monotone in L (L0 182.5 A, L x 1.3 188.7 A), and combined corners are not run.
+- Falling steps restart the valley prediction on phases 2-4 (10-20 A spikes). A176's variants support the lead and
+  the gate-driven low sides together as the cause (each alone gave none, at one step position each).
 - At the slow corner the post-ramp Vo dips 3-5 mV deeper than with ideal low sides (A173).
 - A realisable interlock releases later than the ideal 0.5 ns: ~1.4 ns with a per-board comparator reference
   (V_th - 0.2 V), up to 8.3 ns with a fixed 1.0 V reference at the slow corner. No delay up to 8.3 ns changed a
