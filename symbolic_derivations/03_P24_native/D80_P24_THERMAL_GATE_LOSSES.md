@@ -37,9 +37,11 @@ cu_100_400 cooler, 2 % fill (D77).
   edges add 1.4-3.6 W per module at the dies, which sit ~53 K below the inductor hot spot: +0.4 to +1.0 K at
   T_max. The 50 pH loop removes 4.9 W of loop loss against the 150 pH case the published runs used (5.2 W with the
   temperature feedback): −1.7 K. Net: T_max −0.7 to −1.3 K, fill for 85 °C −6 to −19 %, coolant flow −3 to −11 %.
-- **Efficiency.** Against D73 at 50 pH the module loses 1.7 W more at nominal devices (0.7 point at 250 W), 2.1 W at
-  125 °C devices, 3.9 W at the slow corner (1.6 points). The summary's "about 0.5 point" is ~0.7 point at nominal devices
-  and up to 1.6 at the slow corner.
+- **Efficiency.** Against D73 at 50 pH the module loses 1.7 W more at nominal devices, 2.1 W at 125 °C devices and
+  3.9 W at the slow corner (0.7 / 0.8 / 1.6 % of the 250 W output). With η = P_out / (P_out + P_loss) that is
+  −0.43 / −0.55 / −1.00 point from this table's 80.5 % (60.5 W), and about −0.5 / −0.6 / −1.2 point at the ~87 %
+  converter level. Corrected 2026-10-09 (external review): this paragraph first called the loss fractions "points"
+  (0.7 / 1.6) and said the summary's "about 0.5 point" was too low; for nominal devices 0.5 was the closer figure.
 
 ## 4. Limits
 

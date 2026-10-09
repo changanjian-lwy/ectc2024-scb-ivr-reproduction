@@ -1904,8 +1904,10 @@ each question:
            shoot-through). A valley-aware lead would remove them (RTL).
          - D80: the thermal model with the final plant's edge losses and the
            50 pH loop. The published thermal numbers are conservative (T_max
-           -0.7..-1.3 K). Efficiency costs 0.7 (nominal) to 1.6 points (ss),
-           not 0.5.
+           -0.7..-1.3 K). The edges add 1.7 W (nominal) to 3.9 W (ss) per
+           module: about -0.5 / -1.0..-1.2 points of efficiency (corrected
+           2026-10-09: first written as 0.7 / 1.6 points, which are the
+           losses as % of the output).
          Spec unchanged; its statement now carries the coverage table and
          these limits.
      93. Interlock release time and the paper map (2026-10-09 afternoon,
@@ -1917,12 +1919,14 @@ each question:
            modules pass at 1.4 ns (A177's NEW miss was position scatter).
            The load step's one-period spike count scatters 7-27 at
            >= 1.0 ns without a trend: open. FAIL as registered, accepted
-           with 3 documented exceptions.
+           with 3 documented exceptions (accepted = documented, not
+           passed).
          - reports/PAPER_REPRODUCTION_MAP.md: P24 / P25 item by item. P24:
            5 of 10 checkable items agree, 2 differ at this design point,
            3 do not hold as printed (1-2 % for ZVS, frequency free of
            switching loss, Table I L_crit). P25: ZVS and the single sensor
-           hold at its own point (A67, D41, A69); duty typo and an
+           are consistent with its own point (A67; D41 near-closed, strict
+           return only at 4 mOhm; A69); duty typo and an
            inductance / peak inconsistency; hardware not reproduced.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up

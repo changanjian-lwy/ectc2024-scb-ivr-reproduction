@@ -14,7 +14,7 @@ comes from, and says what may be claimed.
 | drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
 | controller-side lead | high-side turn-on 8 ns earlier, ramped in over 20 µs after the handover | A167 |
 | start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026 | A164 |
-| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above | A171, A173, A174, A177, A179 |
+| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above. This settles the ramp's late fires only: at 1.0 ns the load step's spike count still fails its registered tolerance (scatter, open), and a real comparator's offset, noise and early release are not modelled | A171, A173, A174, A177, A179 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
 ## 2. Plant versions
@@ -105,6 +105,11 @@ The misses are regulation or oracle events, none on voltage; the only current mi
 - The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
   delay up to 8.3 ns keeps peaks and voltages; at the slow corner it should release within 1.0 ns, which a
   per-board comparator reference (~1.4 ns) just misses and a fixed reference misses by far (A174, A177, A179)".
+- Efficiency: η = P_out / (P_out + P_loss). A loss increase divided by 250 W is a share of the output, not
+  efficiency points: the gate-level edges add 1.7 / 3.9 W per module (nominal / slow corner), −0.4..−0.5 /
+  −1.0..−1.2 points depending on the baseline (D80, corrected 2026-10-09).
+- Acceptance: "ACCEPTED" means every registered criterion passes or is a documented exception; it includes
+  experiments that FAIL as registered (A163, A179, ...). It is not a count of successful designs.
 - Edge power: per module 2.26 / 2.45 / 2.86 / 4.57 W at ff / nom / hot / ss (A171), 4.18 W at L × 0.7 (A172),
   2.44-2.46 W on four modules (steady window; A172's 2.87 W included the step). D62's ideal-edge terms were
   0.94 W. The thermal result with these losses: D80.

@@ -42,8 +42,8 @@ module) and the physical model (A67-A69).
 | # | P25 item | This work | |
 |---|---|---|---|
 | 1 | Figs. 1-2: topology and the 15-mode order (Fig. 3 shows 9, the text explains 6) | all 15 modes from node equations (D15); M1-M15 complete at P25 scale (D40) | ✓ |
-| 2 | ZVS of every switch with 5-10 % negative current (Mode 4; "up to 5 %" in Sec. III), measured in Fig. 4 | P25's point needs 1.5-2.0 % (A67); the periodic orbit has ZVS on all three high sides (D41) | ✓ |
-| 3 | Sec. III: one current sensor per module suffices | D41: phase 1 sensed, phases 2-3 at fixed shifts → a periodic ZVS orbit (1.946 µs); weakly unstable lossless, stable at P25's estimated 4.9 mΩ (\|λ\| 0.926). A69, an independent circuit simulation, reproduces period (3.5 ps), growth (1.059 / 1.060) and decay (0.929 / 0.926) | ✓ |
+| 2 | ZVS of every switch with 5-10 % negative current (Mode 4; "up to 5 %" in Sec. III), measured in Fig. 4 | P25's point needs 1.5-2.0 % (A67); the near-closed orbit of item 3 has ZVS on all three high sides (D41) | ✓ |
+| 3 | Sec. III: one current sensor per module suffices | D41: phase 1 sensed, phases 2-3 at fixed shifts → a near-closed ZVS orbit (1.946 µs). The strict return check (1e-8 A / 1e-8 V) passes only at 4 mΩ per phase; the lossless point and P25's estimated 4.9 mΩ stay 1.4-7.9× outside it (`reports/AUDIT_D41_D42_RETURN_ACCEPTANCE_2026-09-29.md`), so their eigenvalues (\|λ\| 1.06 lossless, 0.93 at 4.9 mΩ) are linearised estimates near a near-closed section, not a proof of a stable periodic orbit. A69, an independent circuit simulation, reproduces period (3.5 ps), growth (1.059 / 1.060) and decay (0.929 / 0.926) | ✓ near-closure; strict return at 4 mΩ only |
 | + | (not in P25) | started far from the orbit, the fixed-shift control deadlocks (timed low sides turn off without enough negative current, nothing forces a turn-on): hardware needs a timeout (A69) | + |
 | 4 | Eq. (17) conversion ratio; Eqs. (18)-(19) D ≤ 1/nP | adopted; P24's 4 phases at 48 V give 8.33 % | ✓ |
 | 5 | Table II "D = 0.26 %" | Eq. (17) gives 0.25 | ≠ (typo) |
@@ -72,7 +72,8 @@ Of P24's ten checkable items, five agree (topology, equations, the interval sequ
 choice), two give different numbers at this design point (inductor count, package size), and three do not hold as
 printed: the two performance claims (1-2 % negative current gives full ZVS; zero switching loss leaves the frequency
 free) and Table I's inductance against its own Eq. (4). P25's two central claims (ZVS at a small negative current,
-one sensor per module) hold at P25's own operating point in two independent models; its data carry a duty-cycle typo
+one sensor per module) are consistent with P25's own operating point: the ZVS criterion (A67) and a near-closed
+one-sensor ZVS orbit (D41; strict return only at 4 mΩ per phase) reproduced by an independent circuit simulation (A69); its data carry a duty-cycle typo
 and an inductance / peak-current inconsistency; its hardware and the three-module closed loop were not reproduced.
 What neither paper describes - controller, start-up, multi-module operation, losses, package parasitics, gate drive,
 thermal - is this work's.

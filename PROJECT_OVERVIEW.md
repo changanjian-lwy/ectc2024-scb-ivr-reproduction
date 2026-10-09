@@ -41,7 +41,7 @@ single-phase successes.
 | Question assumptions | Separate capacitance, timing, temperature and load sensitivity studies |
 | Report negative results honestly | Partial handoffs are not promoted to complete reproduction |
 
-## Where it stands (2026-10-09, closed)
+## Where it stands (2026-10-09, this phase archived; open items listed, not solved)
 
 - **Achieved in simulation:** the 1 kW system (four four-phase modules, 48 V to 1 V) runs closed loop in co-simulation
   (Verilog controller against a circuit plant with datasheet Coss and reverse conduction), from a zero start through the

@@ -34,8 +34,10 @@ Item by item in `reports/PAPER_REPRODUCTION_MAP.md`.
   start-up, multi-module operation, losses, package parasitics, gate drive and
   thermal are this work's.
 - **P25** (12 V prototype): ZVS at a small negative current and one current
-  sensor per module hold at its own operating point in two independent models
-  (A67, D41, A69). Table II's duty is a typo (0.26 % for 0.25), and the 22 nH /
+  sensor per module are consistent with its own operating point: the ZVS
+  criterion needs 1.5-2 % (A67), and one sensor gives a near-closed ZVS orbit
+  (D41; the strict return check passes only at 4 mΩ per phase) that an
+  independent circuit simulation reproduces (A69). Table II's duty is a typo (0.26 % for 0.25), and the 22 nH /
   50 A operating point does not close with Eq. (20) (~32 nH). Its hardware and
   the three-module closed loop were not reproduced.
 - **The link:** the negative current ZVS needs scales as √(L·C_node) / Ton:
@@ -55,8 +57,9 @@ Results (co-simulation, 25 °C):
   the simulated waveforms, 29-40 current-rated HBS1-class units per phase). HBS1's
   own loss metric (R_acx, P24's ref. [10]) adds 7.5-30 W per module (small to large
   signal): **78-85 %**; at Choi, Khorasani et al.'s 85 °C (TCPMT 2025), with the package, ~73-82 %.
-  Gate-driven edges (Section 3) take ~0.7 point more with nominal devices and up to
-  1.6 points at the slow corner (thermal model rerun with these losses: D80).
+  Gate-driven edges (Section 3) add 1.7 W per module with nominal devices and 3.9 W at
+  the slow corner: about −0.5 and −1.0 to −1.2 points of efficiency (thermal model rerun
+  with these losses: D80).
 - **±62.5 A load step:** +15.3 / −11.9 mV, back within 1 % in 6.2 / 3.6 µs.
 - **Peak switch current ≤ 196 A** (ideal switches, no package; with the package
   and gate model see Section 3) on every registered test of one module
@@ -170,7 +173,7 @@ are budgets over plausible ranges:
       the ramp formulas below are conservative.
     - The edges cost 2.3-2.9 W per module at 50 pH (fast / nominal / 125 °C
       devices) and 4.6 W at the slow corner: 1.4-3.6 W more than the loss model's
-      ideal edges, 0.7-1.6 points of efficiency. Rerun in the thermal model,
+      ideal edges, 0.4-1.1 points of efficiency at ~87 %. Rerun in the thermal model,
       they change no thermal conclusion. The ramp model's "0.1-0.4 W" was an
       artefact of linear ramps.
 - **Both effects follow from the node charge** (2 + 3 EPC2067 swung by 12 V,
