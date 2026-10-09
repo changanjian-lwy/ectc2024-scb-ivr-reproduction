@@ -5,10 +5,13 @@ scatter measured at each release time.
   end = step + 400 us (A173: step 1000 / 800 us, end + 400 us). T = the steady period before the step in A173's
   records (450-990 us): 0.5048 us single, 0.5069 us four modules. Before the step every run equals A173's.
 - t_il: R1 0.5 / 0.8 / 1.0 / 1.4 ns, R2 and M4 0.5 / 1.4 ns.
-Writes cosim/cfg_*.json, cosim/ORDER.txt (four-module runs first: the longest)."""
+- Stage 2 (BOUNDARY Section 4: R2 failed criterion 3 at 1.4 ns, R1 passes up to 1.0 ns): R2 at t_il 1.0 ns, three
+  positions (`python3 make_cfgs.py stage2`).
+Writes cosim/cfg_*.json, cosim/ORDER.txt (four-module runs first: the longest; stage 2: ORDER2.txt)."""
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -20,16 +23,17 @@ PERIOD = {"single": 0.5048, "m4": 0.5069}           # us, A173 ss records 450-99
 ROWS = {"m4_ss_l_p48_1us": ((0.5, 1.4), (0.0, 0.5)),            # row: (t_il ns, step offsets in periods)
         "ss_l_m80_10us": ((0.5, 0.8, 1.0, 1.4), (0.0, 1 / 3, 2 / 3)),
         "ss_s_p62": ((0.5, 1.4), (0.0, 1 / 3, 2 / 3))}
+STAGE2 = {"ss_s_p62": ((1.0,), (0.0, 1 / 3, 2 / 3))}
 
 
 def til_tag(t):
     return f"t{int(round(t * 10)):02d}"
 
 
-def main():
+def main(stage2=False):
     COS.mkdir(exist_ok=True)
     out = {}
-    for row, (tils, offs) in ROWS.items():
+    for row, (tils, offs) in (STAGE2 if stage2 else ROWS).items():
         base = json.loads((A3 / f"cfg_{row}.json").read_text())
         key = "line_step" if "line_step" in base else "load_step"
         per = PERIOD["m4" if row.startswith("m4") else "single"]
@@ -43,9 +47,9 @@ def main():
                                       f"(500 us + {f:.3f} T), end + {POST_US:.0f} us")
     for name, c in out.items():
         (COS / f"cfg_{name}.json").write_text(json.dumps(c, indent=1) + "\n")
-    (COS / "ORDER.txt").write_text("\n".join(out) + "\n")
+    (COS / ("ORDER2.txt" if stage2 else "ORDER.txt")).write_text("\n".join(out) + "\n")
     print(len(out), "cfgs")
 
 
 if __name__ == "__main__":
-    main()
+    main(stage2=sys.argv[1:] == ["stage2"])
