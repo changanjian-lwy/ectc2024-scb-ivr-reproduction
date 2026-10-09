@@ -109,17 +109,25 @@ def main():
         if til in OLD:
             st["identity"] = identity(f, str(OLD[til]).format(row=row))
         groups.setdefault(row, {}).setdefault(til, []).append(st)
-    out = {"runs": groups, "old": {}, "c2": {}, "c3": {}}
+    out = {"runs": {r["name"]: r for by in groups.values() for runs in by.values() for r in runs},
+           "old": {}, "misses": {"c2": {}, "c3": {}}}
     for row, by in groups.items():
         for til, runs in by.items():
             old = Path(str(OLD[til]).format(row=row)) if til in OLD else None
             if old and old.exists():
                 o = stats(str(old))
                 out["old"][f"{row} {til}"] = {k: o.get(k) for k in KEYS}
-                out["c2"][f"{row} {til}"] = inside(o, runs)
+                out["misses"]["c2"][f"{row} {til}"] = inside(o, runs)
             if 0.5 in by:
-                out["c3"][f"{row} {til}"] = judge(runs, by[0.5])
-    out["c1"] = {r["name"]: r["identity"] for by in groups.values() for runs in by.values() for r in runs if "identity" in r}
+                out["misses"]["c3"][f"{row} {til}"] = judge(runs, by[0.5])
+    c3 = out["misses"]["c3"]
+    passing = [t for t in (1.4, 1.0, 0.8) if not c3.get(f"ss_l_m80_10us {t}", ["not run"])]
+    x = max(passing, default=None)
+    out["criteria"] = {"1_identity": {n: r["identity"]["equal"] for n, r in out["runs"].items() if "identity" in r},
+                       "2_window": {k: not v for k, v in out["misses"]["c2"].items()},
+                       "3_release": {k: not v for k, v in c3.items()}}
+    out["decision"] = {"x_ns": x, "r2_at_x": not c3.get(f"ss_s_p62 {x}", ["not run"]),
+                       "m4_at_1.4": not c3.get("m4_ss_l_p48_1us 1.4", ["not run"])}
     (HERE / "a179_summary.json").write_text(json.dumps(out, indent=1, default=float) + "\n")
     for row, by in groups.items():
         for til in sorted(by):
@@ -131,8 +139,9 @@ def main():
             if key in out["old"]:
                 o = out["old"][key]
                 print(f"{'  old window':26s} step {o['t_step_us']:9.4f} post {o['peak_post']:6.1f} late {o['late_pre']:4d} + "
-                      f"{o['late_post']:4d} NEW {o['oracle_new']:3d} ext {o['extreme_mv']:6.1f}   c2 {out['c2'][key]}")
-            print(f"  c3 {key}: {out['c3'].get(key)}")
+                      f"{o['late_post']:4d} NEW {o['oracle_new']:3d} ext {o['extreme_mv']:6.1f}   c2 {out['misses']['c2'][key]}")
+            print(f"  c3 {key}: {c3.get(key)}")
+    print("decision", out["decision"])
 
 
 if __name__ == "__main__":

@@ -40,3 +40,10 @@ three rows (+15 / +8 / −1 %), wrong on −8 V (+60 %); four modules 800-950 - 
 - One step position per row; A174 measured 2-3 A of phase spread on peaks, and the NEW / Vo scatter here is of the
   same nature.
 - No release time between 0.5 and 1.4 ns was run, so the threshold of the slow corner's timing is not located.
+
+## 3. Post hoc (A179, 2026-10-09; verdict above unchanged)
+A179 reran these rows at three step positions per delay. The -8 V miss is real at some positions (post-step late
+fires 1.4 ns 12 / 51 / 15 against <= 21 at 0.5 ns): the slow corner's release time is <= 1.0 ns. The four-module
+NEW miss (13 vs 8) is step-position scatter (0.5 ns alone gives 22 / 5) and four modules pass at 1.4 ns. The
+load-step NEW count scatters 7-27 at 1.0-1.4 ns without a trend. The late fires that rose with the delay on the
+load step (72 / 83 / 104) all fall in the start-up settling at 160-300 us, none after the step.

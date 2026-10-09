@@ -91,6 +91,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A175": (TA / "A175_p24_final_plant_a152_matrix", "a175_analyze.py", "a175_summary.json"),
     "A177": (TA / "A177_p24_per_board_interlock_reference", "a177_analyze.py", "a177_summary.json"),
     "A178": (TA / "A178_p24_inductance_tolerance_final", "a178_analyze.py", "a178_summary.json"),
+    "A179": (TA / "A179_p24_interlock_release_threshold", "a179_analyze.py", "a179_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -449,6 +450,14 @@ _PB = "per-board interlock reference (1.4 ns) at the slow corner: small timing e
       "rise monotonically with the release delay; NEW / Vo scatter near the tolerance); no peak or V_DS change - the " \
       "slow corner wants a release below 1.4 ns (RESULTS 0)"
 EXCEPTIONS["A177"] = {("criteria", f"pb_{r}/c4"): _PB for r in ("ss_l_m80_10us", "ss_s_p62", "m4_ss_l_p48_1us")}
+_R2NEW = "ss load step: one-period 10-18 A spikes after the step scatter 7-27 at >= 1.0 ns (means 18 / 19 / 14 at " \
+         "0.5 / 1.0 / 1.4 ns) against the +2 tolerance; no late fires, peaks unchanged - named open (RESULTS 0, 2)"
+EXCEPTIONS["A179"] = {
+    ("criteria", "3_release/ss_l_m80_10us 1.4"): "-8 V / 10 us at 1.4 ns: 51 post-step late fires at one of three positions "
+    "(47 in A177) against 36.5 - the slow corner's release time is <= 1.0 ns (RESULTS 0)",
+    ("criteria", "3_release/ss_s_p62 1.4"): _R2NEW,
+    ("criteria", "3_release/ss_s_p62 1.0"): _R2NEW,
+}
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
     "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "
