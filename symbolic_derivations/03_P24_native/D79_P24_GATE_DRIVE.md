@@ -223,7 +223,9 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
   38.4 V.
 - L x 0.7 after +4.8 V / 1 us: 199.5-201.5 A over five step phases (A174), at the 200 A edge; L x 0.75 / 0.8 stay
   <= 198.3 / 194.7 A at five phases (A178, nominal devices). These are tested points, not a range: the peak is not
-  monotone in L (L0 182.5 A, L x 1.3 188.7 A), and combined corners are not run.
+  monotone in L (L0 182.5 A, L x 1.3 188.7 A). With slow devices L x 0.75 fails (A181: start-up 202-207 A, a
+  278 A handover excursion at 25 C), so the tolerance is per device corner. A start-up trim locked at 25 C holds
+  at 125 C on the L0 boards (A181).
 - Falling steps restart the valley prediction on phases 2-4 (10-20 A spikes). A176's variants support the lead and
   the gate-driven low sides together as the cause (each alone gave none, at one step position each).
 - At the slow corner the post-ramp Vo dips 3-5 mV deeper than with ideal low sides (A173).

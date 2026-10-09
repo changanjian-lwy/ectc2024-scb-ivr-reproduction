@@ -1948,6 +1948,19 @@ each question:
            D63's "<= 4.7 A" crossing is <= 5.5 A.
          - D60 scope note (A142 / A143 counterexamples), D71 reworded,
            evidence-class table (D81 Section 4).
+     95. Locked trim and a joint corner (2026-10-09 evening, mixed; A181,
+         after the second external review, FINAL_SPEC Section 6):
+         - A start-up trim set once at 25 C and locked holds at 125 C on
+           the nominal and slow L0 boards (Vo(143.5 us) 1.040 / 1.057 V,
+           peaks <= 183.5 A).
+         - Slow devices with L x 0.75 (trimmed once at 25 C) break the
+           200 A budget: open-loop start-up 202-207 A (no trim near the
+           target is below 200 A), a 278 A phase-1 handover excursion at
+           25 C (~11 us), 202.8 A after +4.8 V / 1 us at one of three
+           positions at 125 C. The inductance tolerance is per device
+           corner; the slow corner's own limit is open (~0.8 L0 estimate).
+           V_DS <= 33.8 V, no shoot-through. FAIL as registered, accepted
+           with 7 documented exceptions.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

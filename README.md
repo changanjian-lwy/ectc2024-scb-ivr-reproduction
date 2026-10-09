@@ -28,8 +28,9 @@ specification, checked on the listed rows of a gate-level plant (EPC's device
 model): loop <= 50 pH, 3.0 / 0.3 ohm +-20 % per device, an 8 ns ramped high-side
 lead, a per-board start-up trim and an (idealised) driver interlock releasing
 within 1.0 ns at the slow corner. Not all rows pass: L x 0.7 reaches 201.5 A at
-one step position, the nominal 13-row matrix passes 12, and slow-corner / falling-step
-timing events remain. Which rows ran on
+one step position, slow devices with L x 0.75 exceed 200 A at start-up (so the
+inductance tolerance is per device corner), the nominal 13-row matrix passes 12, and
+slow-corner / falling-step timing events remain. Which rows ran on
 which plant version: [reports/FINAL_SPEC_COVERAGE.md](reports/FINAL_SPEC_COVERAGE.md).
 Summary: [reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md)
 (dated 9 October); P24 / P25 item by item:
