@@ -54,7 +54,8 @@ kept as Appendix A.
     lead plus the gate-driven low sides, A176); the slow corner's post-ramp Vo dips 3-5 mV deeper. The interlock is
     idealised; its release time is a timing spec (no delay up to 8.3 ns changed a peak or V_DS). Fixed 1.0 V reference
     (8.3 ns): slow corner late +26-90 %, four modules ×2 with NEW 8 -> 82 (A174); per-board reference (1.4 ns): close
-    to ideal, 2 of 5 slow-corner rows pass as registered (A177) -> < 1.4 ns wanted. Edge loss 0.7-1.6 points; thermal
+    to ideal, but -8 V late fires ~50 at 2 of 4 step positions (A177 / A179) -> release <= 1.0 ns (A179; the load
+    step's spike count scatters 7-27, open). Edge loss 0.7-1.6 points; thermal
     conclusions unchanged (D80).
   - Loop ≤ 50 pH (A168: 60 pH at 3.0 Ω gives the fast corner 40.3 V; 3.5 Ω or 75 pH / 4.0 Ω lose the slow corner's
     timing or the line step's Vo). The ramp-model window (≤ 3.2 V / L, ≥ ~20 A/ns, 125-150 pH) is superseded.
@@ -387,7 +388,7 @@ A168–A172：回路上限定为 50 pH（60 pH 用 3.0 Ω 时快角点 40.3 V；
 A173–A176（外部评审后补测，覆盖表 reports/FINAL_SPEC_COVERAGE.md）：最终装置补跑了其余各行和四模块工况，电流、电压都没超限，只有一处例外：
 L×0.7 换 5 个阶跃相位是 199.5–201.5 A，卡在 200 A 边上。下降阶跃会让相 2–4 的谷底预测重启（要提前量和低侧真实栅极同时存在，A176）；
 慢角点线路斜坡后 Vo 多下陷 3–5 mV。互锁是理想功能，它的放行时间是时序指标而不是安全指标（0.5–8.3 ns 都不改变峰值和电压）：固定 1.0 V 参考（慢角点 8.3 ns）
-迟发多 26–90 %（四模块翻倍、新事件 8 → 82）；按板标定参考（1.4 ns）接近理想，但按登记判据 5 行只过 2 行 → 慢角点要 < 1.4 ns。
+迟发多 26–90 %（四模块翻倍、新事件 8 → 82）；按板标定参考（1.4 ns）接近理想，但 −8 V 斜坡后在 4 个阶跃相位里有 2 个迟发到约 50 次 → 慢角点放行时间要 ≤ 1.0 ns（A179；负载阶跃的单周期尖峰数随相位散布 7–27，没有趋势，列为遗留）。
 电感公差：L×0.75 / 0.8 五个相位都 ≤ 198.3 / 194.7 A，200 A 预算对应 −25 %（A178）。边沿损耗 0.7–1.6 个百分点，热结论不变（D80）。
 斜坡模型的 125–150 pH 作废；振铃 Q ≤ 30。斜坡时代判的峰值都是指令时刻电流，物理峰值高 5–8 A。
 热和磁芯损耗见 D73–D78。

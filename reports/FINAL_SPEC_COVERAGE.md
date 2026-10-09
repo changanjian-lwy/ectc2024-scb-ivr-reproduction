@@ -14,7 +14,7 @@ comes from, and says what may be claimed.
 | drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
 | controller-side lead | high-side turn-on 8 ns earlier, ramped in over 20 µs after the handover | A167 |
 | start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026 | A164 |
-| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. The slow corner's timing wants < 1.4 ns: a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) nearly meets the criteria, a fixed 1.0 V reference (8.3 ns) does not | A171, A173, A174, A177 |
+| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above | A171, A173, A174, A177, A179 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
 ## 2. Plant versions
@@ -61,6 +61,13 @@ Interlock delay (A173 / A174), against the 0.5 ns runs:
   late fires +60 % on the −8 V ramp, NEW +3 on the load step, NEW +5 on four modules. It keeps four modules at 792
   late fires (0.5 ns: 803; fixed: 1608). Late fires grow monotonically with the delay; NEW and Vo scatter between
   neighbouring runs;
+- A179, three step positions per row and delay (step at 500 µs, exact against the old runs before the step): after
+  the −8 V ramp the late fires are 12-21 at 0.5 ns, 9-21 at 0.8, 12-32 at 1.0 and 12-51 at 1.4 ns (51 and A177's 47
+  at 2 of 4 positions; limit 36.5) → release ≤ 1.0 ns. The load step has no late fires after the step at any delay;
+  its one-period 10-18 A spikes number 16-19 at 0.5 ns and 7-27 at 1.0 / 1.4 ns without a trend (open, peaks
+  unchanged). Four modules pass at 1.4 ns: A177's NEW 13 vs 8 is position scatter (0.5 ns alone gives 5-22). The
+  late fires that rise with the delay before the step (72 / 79 / 77 / 83 at 0.5 / 0.8 / 1.0 / 1.4 ns) fall in the
+  start-up settling at 160-300 µs;
 - ff at 1.0 ns (its fixed-reference value) and L × 0.7 at 2.0 ns: same as 0.5 ns.
 
 Step position (A174, 4 more phases per row): L × 0.7 +4.8 V / 1 µs 199.7, 199.9, 199.8, 199.5, 201.5 A. At the
@@ -96,8 +103,8 @@ The misses are regulation or oracle events, none on voltage; the only current mi
   194.7 A, 0.7 L0 199.5-201.5 A. State "≥ 0.75 L0 keeps ≤ 200 A at every tested phase; 0.7 L0 reaches 201.5 A".
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
 - The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
-  delay up to 8.3 ns keeps peaks and voltages; the slow corner's timing wants < 1.4 ns, which a per-board
-  comparator reference nearly meets and a fixed reference does not (A174, A177)".
+  delay up to 8.3 ns keeps peaks and voltages; at the slow corner it should release within 1.0 ns, which a
+  per-board comparator reference (~1.4 ns) just misses and a fixed reference misses by far (A174, A177, A179)".
 - Edge power: per module 2.26 / 2.45 / 2.86 / 4.57 W at ff / nom / hot / ss (A171), 4.18 W at L × 0.7 (A172),
   2.44-2.46 W on four modules (steady window; A172's 2.87 W included the step). D62's ideal-edge terms were
   0.94 W. The thermal result with these losses: D80.

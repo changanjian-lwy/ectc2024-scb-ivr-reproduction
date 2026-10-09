@@ -229,9 +229,10 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
 - A realisable interlock releases later than the ideal 0.5 ns: ~1.4 ns with a per-board comparator reference
   (V_th - 0.2 V), up to 8.3 ns with a fixed 1.0 V reference at the slow corner. No delay up to 8.3 ns changed a
   peak or V_DS (A173 / A174 / A177), so the release time is a timing spec. The slow corner's late fires grow with
-  it (four modules 803 / 792 / 1608 at 0.5 / 1.4 / 8.3 ns; NEW 8 / 13 / 82). The per-board form passes 2 of 5
-  slow-corner rows as registered, with small excesses on the rest; the slow corner wants < 1.4 ns (adaptive
-  dead-time drivers reach 0.03-1 ns).
+  it (four modules 803 / 792 / 1608 at 0.5 / 1.4 / 8.3 ns). A179 repeated the slow-corner rows at three step
+  positions per delay: after the -8 V ramp the late fires stay <= 32 up to 1.0 ns and reach ~50 at 1.4 ns at 2 of 4
+  positions, so the release should be within 1.0 ns (adaptive dead-time drivers reach 0.03-1 ns). Four modules pass
+  at 1.4 ns; the load step's one-period spike count scatters 7-27 at >= 1.0 ns without a trend (open).
 
 ## 7. Limits
 

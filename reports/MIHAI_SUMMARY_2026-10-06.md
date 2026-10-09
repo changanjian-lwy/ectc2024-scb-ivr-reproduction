@@ -21,6 +21,26 @@ ECTC 2024 paper (P24):
 The sections below separate what agrees with P24, what does not, and which
 unpublished values the remaining conclusions rest on.
 
+## 0. How far the two papers are reproduced
+
+Item by item in `reports/PAPER_REPRODUCTION_MAP.md`.
+
+- **P24** (analytical and conceptual, no measurement): of ten checkable items,
+  five agree (topology, Eqs. (1)-(3), Fig. 4's interval sequence, the series
+  capacitors' balance, Table 3's devices); two give other numbers at this
+  design point (inductor count, module footprint); three do not hold as
+  printed: 1-2 % negative current for full ZVS, a frequency free of switching
+  loss, and Table I's L_crit against its own Eq. (4). The controller,
+  start-up, multi-module operation, losses, package parasitics, gate drive and
+  thermal are this work's.
+- **P25** (12 V prototype): ZVS at a small negative current and one current
+  sensor per module hold at its own operating point in two independent models
+  (A67, D41, A69). Table II's duty is a typo (0.26 % for 0.25), and the 22 nH /
+  50 A operating point does not close with Eq. (20) (~32 nH). Its hardware and
+  the three-module closed loop were not reproduced.
+- **The link:** the negative current ZVS needs scales as √(L·C_node) / Ton:
+  1.5-2 % at P25's point, 22-26 % at P24's 48 V / 5 MHz point.
+
 ## 1. The design that runs
 
 | | |
@@ -203,10 +223,12 @@ are budgets over plausible ranges:
           by the rule. A buildable comparator releases later: ~1.4 ns with a
           reference set per board, up to 8.3 ns with a fixed 1.0 V reference
           at the slow corner. No delay up to 8.3 ns changed a peak or a
-          voltage, so the release time is a timing specification. The slow
-          corner's late turn-ons grow with it: on four modules 803 / 792 /
-          1608 at 0.5 / 1.4 / 8.3 ns. The per-board reference comes close to
-          the ideal one, a fixed one does not; the slow corner wants < 1.4 ns.
+          voltage, so the release time is a timing specification. Repeated at
+          three step positions per delay, the slow corner's late turn-ons
+          after a −8 V ramp stay at 9-32 up to 1.0 ns and reach ~50 at
+          1.4 ns at two of four positions: the release should be within
+          1.0 ns. The per-board reference (~1.4 ns) is just above that, a
+          fixed one far above.
     - With ±30 % on the gate resistance no single resistor meets both the fast
       corner's 40 V and the slow corner's timing; ±20 % does.
 - **The turn-off wants a strong sink.** With ≤ 0.3 Ω the channel is off before
@@ -280,7 +302,7 @@ Five answers would narrow the package specification most:
       command, so it absorbs ≤ ~5.5 ns. It needs a lead, and the lead is safe
       only with a driver interlock that holds a channel at its threshold until
       the complementary switch is off. Its release time decides the slow
-      corner's timing (not its peaks): < 1.4 ns wanted.
+      corner's timing (not its peaks): within 1.0 ns.
     - What gate resistance and tolerance does the driver have, does the
       controller lead the high side, and does the driver have such an interlock
       (or adaptive dead time), with what reference?

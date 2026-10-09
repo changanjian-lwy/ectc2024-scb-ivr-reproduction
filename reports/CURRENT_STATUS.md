@@ -1,6 +1,6 @@
 # Current Work Status
 
-Updated: **2026-10-08** (items 62-67: the ML block A146-A150 and the
+Updated: **2026-10-09** (item 93: A179 and the paper map; items 62-67: the ML block A146-A150 and the
 package drive specification A151-A152; items 68-87: D68-D78, A153-A162 and the hot efficiency; items 88-90: D79 and
 A163-A166, the gate drive). This is the current navigation
 summary; dated reports remain historical snapshots.
@@ -1907,6 +1907,22 @@ each question:
            not 0.5.
          Spec unchanged; its statement now carries the coverage table and
          these limits.
+     93. Interlock release time and the paper map (2026-10-09 afternoon,
+         mixed):
+         - A179 (slow corner, three step positions per delay, step at
+           500 us - exact against A173 / A177 before the step): after the
+           -8 V ramp the late fires stay <= 32 up to 1.0 ns and reach 51 /
+           47 at 1.4 ns at 2 of 4 positions -> release <= 1.0 ns. Four
+           modules pass at 1.4 ns (A177's NEW miss was position scatter).
+           The load step's one-period spike count scatters 7-27 at
+           >= 1.0 ns without a trend: open. FAIL as registered, accepted
+           with 3 documented exceptions.
+         - reports/PAPER_REPRODUCTION_MAP.md: P24 / P25 item by item. P24:
+           5 of 10 checkable items agree, 2 differ at this design point,
+           3 do not hold as printed (1-2 % for ZVS, frequency free of
+           switching loss, Table I L_crit). P25: ZVS and the single sensor
+           hold at its own point (A67, D41, A69); duty typo and an
+           inductance / peak inconsistency; hardware not reproduced.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
