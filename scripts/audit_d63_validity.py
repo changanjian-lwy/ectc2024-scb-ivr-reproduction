@@ -200,17 +200,11 @@ def pass_c():
     def period(self, s, vin, i_step, *a, **k):
         t0 = s["t"]
         r = per(self, s, vin, i_step, *a, **k)
-        hist.append((t0, {"vo": [s["vo"]], "vc": list(s["vc"]), "valley": list(s["valley"]), "acc": [s["acc"]],
-                          "ton": r["ton"]}))
+        hist.append((t0, vm.steady_record(s, r)))           # the state steady_check compares (control memory included)
         return r
 
     def lag(h):
-        tol = vm.STEADY_TOL
-        for p in range(1, len(h) // 2 + 1):
-            if all(max(abs(a - b) for j in range(p, len(h)) for a, b in zip(h[j][k], h[j - p][k])) <= tol[k] for k in tol) \
-                    and all(h[j]["ton"] == h[j - p]["ton"] for j in range(p, len(h))):
-                return p
-        return None
+        return vm.steady_lag(h, len(h) // 2)
 
     vm.ValleyMap.period = period
     rep = {}

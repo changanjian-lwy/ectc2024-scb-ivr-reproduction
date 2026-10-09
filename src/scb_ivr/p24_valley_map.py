@@ -312,6 +312,26 @@ STEADY_TOL = {"vo": 1e-5, "vc": 1e-4, "valley": 1e-3, "acc": 1e-13,   # V, V, A,
               "dlo": 1e-13, "t_hist": 1e-13}                           # s: the timed edge and the slot history
 
 
+def steady_record(s, r):
+    """The state steady_check compares after one period (state s after ValleyMap.period returned record r): the
+    continuous states as lists (STEADY_TOL's keys), the Ton codes and the adaptive step's memory (step, last_up)."""
+    return {"vo": [s["vo"]], "vc": list(s["vc"]), "valley": list(s["valley"]), "acc": [s["acc"]], "ton": r["ton"],
+            "dlo": [0.0 if s["dlo"] is None else s["dlo"]], "t_hist": [0.0 if x is None else x for x in s["t_hist"]],
+            "mem": (s["step"], s["last_up"])}
+
+
+def steady_lag(hist, pmax, tol=None):
+    """The smallest p <= pmax with every state of steady_record within tol and identical Ton codes and step memory
+    over hist[p:] against hist[:-p]; None if there is none."""
+    tol = tol or STEADY_TOL
+    n = len(hist)
+    for p in range(1, min(pmax, n // 2) + 1):               # every candidate compared over at least n / 2 periods
+        if all(max(abs(a - b) for j in range(p, n) for a, b in zip(hist[j][k], hist[j - p][k])) <= tol[k] for k in tol) \
+                and all(hist[j]["ton"] == hist[j - p]["ton"] and hist[j]["mem"] == hist[j - p]["mem"] for j in range(p, n)):
+            return p
+    return None
+
+
 def steady_check(m: ValleyMap, s, vin, n=64, pmax=16, tol=None):
     """Whether state s is on a periodic orbit of the map (a fixed point, or the repeating pattern of a quantised limit
     cycle): runs n periods on a copy (s is not touched) and finds the smallest p <= pmax with |x_j - x_(j-p)| within
@@ -323,19 +343,10 @@ def steady_check(m: ValleyMap, s, vin, n=64, pmax=16, tol=None):
     c, hist = copy.deepcopy(s), []
     for _ in range(n):
         r = m.period(c, vin, 0.0)
-        hist.append({"vo": [c["vo"]], "vc": list(c["vc"]), "valley": list(c["valley"]), "acc": [c["acc"]], "ton": r["ton"],
-                     "dlo": [0.0 if c["dlo"] is None else c["dlo"]], "t_hist": [0.0 if x is None else x for x in c["t_hist"]],
-                     "mem": (c["step"], c["last_up"])})
-
-    def diff(p):
-        return {k: max(abs(a - b) for j in range(p, n) for a, b in zip(hist[j][k], hist[j - p][k])) for k in tol}
-
-    for p in range(1, min(pmax, n // 2) + 1):               # every candidate compared over at least n / 2 periods
-        dp = diff(p)
-        if all(dp[k] <= tol[k] for k in tol) and all(hist[j]["ton"] == hist[j - p]["ton"] and hist[j]["mem"] == hist[j - p]["mem"]
-                                                     for j in range(p, n)):
-            return {"settled": True, "cycle": p, "drift": diff(1)}
-    return {"settled": False, "cycle": None, "drift": diff(1)}
+        hist.append(steady_record(c, r))
+    drift = {k: max(abs(a - b) for j in range(1, n) for a, b in zip(hist[j][k], hist[j - 1][k])) for k in tol}
+    p = steady_lag(hist, pmax, tol)
+    return {"settled": p is not None, "cycle": p, "drift": drift}
 
 
 def simulate(d: Design, t_end, t_step, i_step=0.0, dvin=0.0, t_slew=0.0, ton0=None, warm=None):
