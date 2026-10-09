@@ -125,7 +125,8 @@ away on +4.8 V / 1 µs (A116 t60: 546 A).
      co-simulation.**
 3. **The floor** (Section 5) **with 3 µF meets every row from 2 µs**
    (197 / 189 A) and both load steps, with phase 1's crossing held to
-   ≤ 4.7 A.
+   ≤ 4.7 A (≤ 5.5 A, 4.8 A from 2 µs, with D57's threshold below 8 V instead of the table's
+   8 V end value; D81 Section 2).
 4. **Cs is a new trade:** 3 µF costs ~1 V of high-side turn-on in steady
    state (A107's 0.6 µF at 5 MHz had the same Q/Cs). D63 does not model
    the in-cycle ripple, so that cost comes from A107.
@@ -252,3 +253,18 @@ Every block is off by default; the earlier results are unchanged.
 - **Package:** the SH block knows 72 A/ns turn-on edges only; the slow turn-on (A151) is D68's.
 - Vo extreme sign flips on 9 of 43 rows (A125); recovery time good to about ×3.
 
+## 11. Validity checks (D81, 2026-10-09, after an external review)
+
+The map now says when it leaves its tables or a formula's range; numbers inside the range are unchanged (the archived
+D63 / A117 / A118 / A124 / A134 / A135 outputs are reproduced value for value, apart from runs that had already
+diverged).
+- **Records:** `rec["flags"]`: `ith_rail` (a rail outside the I_th table, 8-17 V by default; the end value is used),
+  `past_level` (phase 1 at or below its turn-off level when its high side ends: the comparator fires at once),
+  `von_grid` / `sh_grid` (A148 / A149 tables). `metrics()` counts them after the step (`flag_periods`).
+- **seg_time** returns `inf` for a level the current never reaches (it returned a negative time when the level was
+  behind); r = 0 uses the ramp limit (it divided by zero).
+- **steady_ton** refuses an interval without a root and checks the residual; **simulate** checks the warm-up end
+  state (`steady_check`: periodic within a lag of 16 periods, Vo to 10 µV, valleys to 1 mA, Ton codes equal) and
+  reports it in the first record and as `metrics()["warm_settled"]`. Scripts with their own warm-up loop
+  (A134 / A135 / A138 / A140 / A148, ml_rl*) can call steady_check; they do not yet.
+- What the checks found in the archived runs is in D81 Section 2.

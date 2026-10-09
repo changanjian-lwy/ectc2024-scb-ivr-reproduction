@@ -1930,6 +1930,24 @@ each question:
            are consistent with its own point (A67; D41 near-closed, strict
            return only at 4 mOhm; A69); duty typo and an
            inductance / peak inconsistency; hardware not reproduced.
+     94. Math-model acceptance after an external review (2026-10-09
+         evening, math; D81):
+         - Floquet moduli of D45-D51 came from Newton's chord matrix.
+           Recomputed at all 36 orbits (fresh central differences, five
+           steps, event order checked): changes <= 8.1e-4, every orbit
+           inside the unit circle (worst 0.9959). Steps of 1e-6 / 1e-7
+           carry up to 4e-3 of integrator noise; 1e-3..1e-5 agree to
+           4e-5. Solver, D45 / D46 scripts and the D47-D51 gate use
+           section_jacobian now.
+         - D63 says when it leaves its range: record flags (ith_rail,
+           past_level, von_grid, sh_grid), inf for unreachable levels,
+           R = 0 limit, steady_ton acceptance, steady_check after the
+           warm-up. Archived outputs reproduced except 4 + 2 rows that
+           had diverged (the old code's negative periods); thresholds
+           below 8 V move peaks <= 0.56 A, no outcome class changes;
+           D63's "<= 4.7 A" crossing is <= 5.5 A.
+         - D60 scope note (A142 / A143 counterexamples), D71 reworded,
+           evidence-class table (D81 Section 4).
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

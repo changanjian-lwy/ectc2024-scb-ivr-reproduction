@@ -139,3 +139,17 @@ The misses are regulation or oracle events, none on voltage; the only current mi
 Proposed, not run (this phase is archived): lock each board's 25 °C trim, then run it hot, at the slow corner with
 L × 0.75 and t_il 1.0 ns, with the step aligned to the same physical event (e.g. phase 1's low-side turn-off) at
 several offsets; judge the engineering layer first.
+
+## 7. Third external review (2026-10-09): the mathematical model
+
+Details, numbers and the scripts: `symbolic_derivations/03_P24_native/D81_P24_MATH_MODEL_ACCEPTANCE.md`.
+
+| # | point | verdict | action |
+|---|---|---|---|
+| 1 | stability eigenvalues taken from a reused (possibly stale) Jacobian | correct (D45-D51 used Newton's chord matrix); recomputed at all 36 orbits: largest modulus moves ≤ 8.1e-4, all < 1 (worst 0.9959). Step size matters more: 1e-6-1e-7 adds up to 4e-3 of integrator noise | `section_jacobian` (central, 1e-4, event-order flag) in the solver and gate; D45-D51 notes |
+| 2 | lookups and event times leave their range silently; R = 0 | correct; the old code clamped I_th (8-17 V), and gave negative periods once a level was passed (only in runs that had already diverged). Rail < 8 V on falling steps: real thresholds move peaks ≤ 0.56 A, no outcome class changes. R = 0 raised, it did not return a wrong number | flags in every D63 record, `inf` for unreachable levels, R = 0 limit; D63 "≤ 4.7 A" → ≤ 5.5 A |
+| 3 | "steady state" by a fixed warm-up, root finding without acceptance | correct; 139 of 142 simulate() warm-ups are periodic (fixed point or 2 / 4-period quantised cycle), 3 drift within 0.09 mV / 0.35 A; A134 / A135's L × 1.3 absolute cap locks before its step | `steady_check`, `metrics()["warm_settled"]`; `steady_ton` bracket + residual |
+| 4 | reduced models cannot certify the final system | correct; the counterexamples were already in the repo (A142, A143 oscillations D60 / D63 cannot represent) | D60 scope note; final stability only from co-simulation of the named plant version |
+| 5 | calibrated models counted as independent evidence | correct in principle; D58 / D63 / D68 already named their fits, but no overview existed | evidence-class table (D81 Section 4) |
+| 6 | order-of-magnitude estimates written as proofs | correct for D71's "negligible" | reworded with its assumptions |
+

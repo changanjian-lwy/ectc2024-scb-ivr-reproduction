@@ -29,7 +29,11 @@ Q = √(L/C) / R:
 With a common Ton every module is close to a current source (D58), so only a current difference between modules drives
 this motion. A ±5 % inductor spread gives ~5 % of a 62.5 A step, ~3 A, i.e. Z0 × 3 A = 0.35-1.1 mV of ringing; the
 16-phase switching ripple (~8 MHz per module) stays in each module's own capacitor (Z_C 4 µΩ against Z_L 3-32 mΩ).
-A loop sensing the common node does not see the symmetric part. **Negligible: no plant change for it.**
+A loop sensing the common node does not see the symmetric part. **Expected small within the stated bounds: not
+modelled for now.** (Scope, D81 2026-10-09: this is an order-of-magnitude estimate, not a proof. It assumes ideal
+output capacitors, modules as current sources with a common Ton, a ±5 % inductor spread and a 62.5 A step; at
+R 0.04 mΩ the mode's Q is up to 9, so its decay is slow even if its amplitude is small, and a mode the common-node loop
+cannot see is not thereby shown to be stable. It was a priority call, not a demonstration.)
 
 **Common (all modules against the load).** If the output capacitance sits at the modules, the load sits behind the
 four paths in parallel, L/4 = 16-157 pH. A load slew of di/dt drops L/4 · di/dt at the load before the module
@@ -39,7 +43,7 @@ decoupling at the load that carries the step until the path current has ramped.
 
 ## 3. What follows
 
-- **No plant change is needed now.** The differential motion is negligible; the common motion is an inductive drop in
+- **No plant change for now.** The differential motion is expected to be small within the bounds above (an estimate, not modelled); the common motion is an inductive drop in
   front of the load, set by two values P24 does not give (output-capacitor placement, processor-side decoupling) and
   by the load slew. A plant run would only sweep those unknowns.
 - **Two interface requirements join the spec:** (1) sense Vo at the common strip (the plant's joined node), not at a
