@@ -1,0 +1,641 @@
+{
+ "F0_25_p0": {
+  "cond": "F0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 21.334,
+  "ton_ns": 42.962,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0325945550671685,
+    "ladder": 1.0059846462131337,
+    "start_pk": 124.97867456841668,
+    "hand_pk": 166.40846226825752,
+    "gap_pk": 147.99286416478765,
+    "post_pk": null,
+    "vo_min_entry": 0.9926504864122347,
+    "ton_max_entry_ns": 43.75000000000001,
+    "ton_steady_ns": 30.875000000000004,
+    "steady_pk": [
+     145.58551314482432,
+     144.6012979953875,
+     144.56348024094586,
+     146.9365355791105
+    ],
+    "vds_max_v": 32.275980064647044,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_ff_s_p62.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.08890039941269379
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9926504864122347,
+    "ref": 0.9982808071288127
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "M4_25_p0": {
+  "cond": "M4_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 44.443,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0325849732599814,
+    "ladder": 1.011161387761722,
+    "start_pk": 124.74303636210838,
+    "hand_pk": 168.75893855615988,
+    "gap_pk": 147.49378368475513,
+    "post_pk": null,
+    "vo_min_entry": 0.9890569114938845,
+    "ton_max_entry_ns": 46.53125,
+    "ton_steady_ns": 32.3125,
+    "steady_pk": [
+     145.71775509917362,
+     144.61228775453222,
+     144.6953695531796,
+     146.9750650706832
+    ],
+    "vds_max_v": 29.821886631910797,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325730484196494,
+    "ladder": 1.0112028344664215,
+    "start_pk": 124.72455927648029,
+    "hand_pk": 169.50880386303982,
+    "gap_pk": 147.4833911985959,
+    "post_pk": null,
+    "vo_min_entry": 0.9889485402577166,
+    "ton_max_entry_ns": 46.53125,
+    "ton_steady_ns": 32.3125,
+    "steady_pk": [
+     145.64021407897144,
+     144.65678566509507,
+     144.60942358477786,
+     147.00244447636226
+    ],
+    "vds_max_v": 30.089496022164774,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325721710952034,
+    "ladder": 1.011239921750652,
+    "start_pk": 124.70526719224289,
+    "hand_pk": 170.40564181144708,
+    "gap_pk": 148.11187971807675,
+    "post_pk": null,
+    "vo_min_entry": 0.9888579975664885,
+    "ton_max_entry_ns": 46.53125,
+    "ton_steady_ns": 32.3125,
+    "steady_pk": [
+     145.70862890313063,
+     144.60524867298625,
+     144.69658915808915,
+     146.99060844293726
+    ],
+    "vds_max_v": 30.35274675465172,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325764671825746,
+    "ladder": 1.011281680457944,
+    "start_pk": 124.68695863911783,
+    "hand_pk": 173.23314648789008,
+    "gap_pk": 147.4890665146355,
+    "post_pk": null,
+    "vo_min_entry": 0.9887323935253417,
+    "ton_max_entry_ns": 46.53125,
+    "ton_steady_ns": 32.3125,
+    "steady_pk": [
+     145.63977552844264,
+     144.65667619682287,
+     144.60953961559517,
+     147.00284955012341
+    ],
+    "vds_max_v": 30.549778447213708,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_m4_nom_s_p62.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.4191117639190338,
+   0.4582521278357774,
+   0.08413853719471831,
+   0.15894487802137292
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9890569114938845,
+    "ref": 0.9984854825393217
+   },
+   {
+    "vo_min": 0.9889485402577166,
+    "ref": 0.9984826815593287
+   },
+   {
+    "vo_min": 0.9888579975664885,
+    "ref": 0.9984632801623129
+   },
+   {
+    "vo_min": 0.9887323935253417,
+    "ref": 0.9984661520418144
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N07_25_p0": {
+  "cond": "N07_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.657,
+  "ton_ns": 33.45,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.032007724956875,
+    "ladder": 1.0144162850938223,
+    "start_pk": 139.9253453858225,
+    "hand_pk": 149.99251403070036,
+    "gap_pk": 149.31434651678114,
+    "post_pk": null,
+    "vo_min_entry": 0.9999415040117657,
+    "ton_max_entry_ns": 33.43750000000001,
+    "ton_steady_ns": 21.397933467741936,
+    "steady_pk": [
+     147.45577006259674,
+     146.7168655512886,
+     146.81173118169949,
+     146.4824525600699
+    ],
+    "vds_max_v": 28.572414225530707,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_il2p0_nom_L07_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.07241322745090883
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9999415040117657,
+    "ref": 1.000086132268549
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "N0_25_p0": {
+  "cond": "N0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 44.48,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.032609730934991,
+    "ladder": 1.0111610155487911,
+    "start_pk": 124.74311689261303,
+    "hand_pk": 165.40853004313024,
+    "gap_pk": 148.47452099334592,
+    "post_pk": 182.83436812873063,
+    "vo_min_entry": 0.9913792884920192,
+    "ton_max_entry_ns": 45.65625,
+    "ton_steady_ns": 32.34339488636363,
+    "steady_pk": [
+     146.00283589158104,
+     144.90924360421334,
+     144.72054496680462,
+     146.90483183890754
+    ],
+    "vds_max_v": 33.646282489872966,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_nom_s_p62.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.3515853196508658
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9913792884920192,
+    "ref": 0.998631010849105
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N0_hot_p0": {
+  "cond": "N0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 44.48,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0484348704988602,
+    "ladder": 1.013684054732375,
+    "start_pk": 125.81428703639911,
+    "hand_pk": 147.4143334245915,
+    "gap_pk": 148.31439178151874,
+    "post_pk": null,
+    "vo_min_entry": 1.0001304917422333,
+    "ton_max_entry_ns": 44.46875000000001,
+    "ton_steady_ns": 31.925781250000004,
+    "steady_pk": [
+     145.68919932428707,
+     144.67180715012438,
+     144.80522382180396,
+     146.8000098989564
+    ],
+    "vds_max_v": 28.860115650852403,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_N0_hot_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.23650105275680744
+  ],
+  "c6": [
+   {
+    "vo_min": 1.0001304917422333,
+    "ref": 0.9986292455810521
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true
+  },
+  "c6_hot_diagnostic": true
+ },
+ "N13_25_p0": {
+  "cond": "N13_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.645,
+  "ton_ns": 55.541,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0328990389254407,
+    "ladder": 1.0062531044201075,
+    "start_pk": 116.50992546179008,
+    "hand_pk": 153.27872227719743,
+    "gap_pk": 149.17003683245824,
+    "post_pk": null,
+    "vo_min_entry": 1.0000883325551333,
+    "ton_max_entry_ns": 55.53125,
+    "ton_steady_ns": 43.28125,
+    "steady_pk": [
+     145.8145812412604,
+     144.55128031633436,
+     144.55563700821745,
+     145.80651910191693
+    ],
+    "vds_max_v": 29.869326094791877,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_nom_L13_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.07147343416460217
+  ],
+  "c6": [
+   {
+    "vo_min": 1.0000883325551333,
+    "ref": 0.9836873062105456
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "N75_25_p0": {
+  "cond": "N75_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.672,
+  "ton_ns": 35.577,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.032875312246087,
+    "ladder": 1.0143252054908658,
+    "start_pk": 136.60728873422454,
+    "hand_pk": 148.8470945365489,
+    "gap_pk": 148.59041690398772,
+    "post_pk": null,
+    "vo_min_entry": 1.000011246548387,
+    "ton_max_entry_ns": 35.56250000000001,
+    "ton_steady_ns": 23.21875,
+    "steady_pk": [
+     147.08967602205018,
+     146.28470663291932,
+     146.24255246492365,
+     146.65979403532947
+    ],
+    "vds_max_v": 28.606736429937115,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A178_p24_inductance_tolerance_final/cosim/run_L075_sh0_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.1363591537246407
+  ],
+  "c6": [
+   {
+    "vo_min": 1.000011246548387,
+    "ref": 0.9936459850595301
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S0_25_p0": {
+  "cond": "S0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 35.795,
+  "ton_ns": 54.563,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0353698159150408,
+    "ladder": 1.0197587584340078,
+    "start_pk": 123.57880610258226,
+    "hand_pk": 164.5593598863364,
+    "gap_pk": 159.8413257964576,
+    "post_pk": null,
+    "vo_min_entry": 0.9959025282733011,
+    "ton_max_entry_ns": 54.5625,
+    "ton_steady_ns": 40.998595505617985,
+    "steady_pk": [
+     144.38653273572984,
+     143.58042762503993,
+     143.5791164694615,
+     145.8859257373768
+    ],
+    "vds_max_v": 28.59801801830702,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_il1p4_ss_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.2035332228586526
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9959025282733011,
+    "ref": 0.9833143191046491
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S0_hot_p0": {
+  "cond": "S0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.795,
+  "ton_ns": 54.563,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.1262477176884491,
+    "ladder": 1.0271364366436264,
+    "start_pk": 131.23595440446127,
+    "hand_pk": 138.13798596116047,
+    "gap_pk": 149.69463665999166,
+    "post_pk": null,
+    "vo_min_entry": 0.9905920689017281,
+    "ton_max_entry_ns": 54.5625,
+    "ton_steady_ns": 39.35217696629214,
+    "steady_pk": [
+     144.531817664316,
+     143.65805255727483,
+     143.71715474568128,
+     146.02132107892564
+    ],
+    "vds_max_v": 28.39153047671703,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S0_hot_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.13217673081103953
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9905920689017281,
+    "ref": 0.991365294007814
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true
+  },
+  "c6_hot_diagnostic": true
+ },
+ "S75_25_p0": {
+  "cond": "S75_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 45.355,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.0338371357722433,
+    "ladder": 1.0224232745327773,
+    "start_pk": 135.69207230602174,
+    "hand_pk": 161.81370839709143,
+    "gap_pk": 153.01049929318717,
+    "post_pk": 191.93157419787642,
+    "vo_min_entry": 0.9997493259383501,
+    "ton_max_entry_ns": 45.34375000000001,
+    "ton_steady_ns": 32.37203663793103,
+    "steady_pk": [
+     146.3874583841067,
+     145.79168578370457,
+     145.7233083325788,
+     146.66476673783094
+    ],
+    "vds_max_v": 33.05905065900099,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_25_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   1.4157957929599831
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9997493259383501,
+    "ref": 0.9612279121899476
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S75_hot_p0": {
+  "cond": "S75_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 45.355,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.129334102964073,
+    "ladder": 1.0283258190087232,
+    "start_pk": 144.6411733815036,
+    "hand_pk": 146.72308696445768,
+    "gap_pk": 151.24767536248316,
+    "post_pk": 193.8046268927785,
+    "vo_min_entry": 0.9772196141459536,
+    "ton_max_entry_ns": 45.34375000000001,
+    "ton_steady_ns": 30.685381355932204,
+    "steady_pk": [
+     145.35238758962137,
+     144.73339367255653,
+     144.71910571578027,
+     145.90792500979447
+    ],
+    "vds_max_v": 31.763405173494256,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_hot_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.3003640497168192
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9772196141459536,
+    "ref": 0.9910153955739249
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true
+  },
+  "c6_hot_diagnostic": false
+ }
+}

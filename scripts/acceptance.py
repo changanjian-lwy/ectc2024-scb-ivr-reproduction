@@ -95,6 +95,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A181": (TA / "A181_p24_locked_trim_joint_corner", "a181_analyze.py", "a181_summary.json"),
     "A183": (TA / "A183_p24_startup_period_ladder", "a183_analyze.py", "a183_summary.json"),
     "A184": (TA / "A184_p24_startup_own_ton", "a184_analyze.py", "a184_summary.json"),
+    "A185": (TA / "A185_p24_bumpless_loop_seed", "a185_analyze.py", "a185_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -483,6 +484,9 @@ EXCEPTIONS["A184"] = {
     ("S75_hot_p0", "c2"): "slow devices, L x 0.75, 125 C: 206.7 A after +4.8 V / 1 us with the step at phase 0.86 of the "
     "period - a mode-P property (A181 at t0 400: 202.8 A at phase 0.81); 25 C <= 198.7 A (RESULTS 0)",
 }
+EXCEPTIONS["A185"] = {(r, "c6"): "L0 board, 25 C: handover Vo minimum 1-4 mV below the t0 400 record - 5 mV; the seed puts "
+                     "the first Ton on its steady value, the rest is the mode-S 200 ns -> mode-P ~520 ns period jump "
+                     "(phase 4's valley to -71 A while the slots catch up) (RESULTS 0)" for r in ("N0_25_p0", "F0_25_p0", "M4_25_p0")}
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
     "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "
