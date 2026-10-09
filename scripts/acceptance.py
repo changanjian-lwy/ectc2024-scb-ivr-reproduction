@@ -96,6 +96,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A183": (TA / "A183_p24_startup_period_ladder", "a183_analyze.py", "a183_summary.json"),
     "A184": (TA / "A184_p24_startup_own_ton", "a184_analyze.py", "a184_summary.json"),
     "A185": (TA / "A185_p24_bumpless_loop_seed", "a185_analyze.py", "a185_summary.json"),
+    "A186": (TA / "A186_p24_vo_triggered_handover", "a186_analyze.py", "a186_summary.json"),
+    "A187": (TA / "A187_p24_slow_corner_inductance_hot", "a187_analyze.py", "a187_summary.json"),
+    "A188": (TA / "A188_p24_handover_request_level", "a188_analyze.py", "a188_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -487,6 +490,19 @@ EXCEPTIONS["A184"] = {
 EXCEPTIONS["A185"] = {(r, "c6"): "L0 board, 25 C: handover Vo minimum 1-4 mV below the t0 400 record - 5 mV; the seed puts "
                      "the first Ton on its steady value, the rest is the mode-S 200 ns -> mode-P ~520 ns period jump "
                      "(phase 4's valley to -71 A while the slots catch up) (RESULTS 0)" for r in ("N0_25_p0", "F0_25_p0", "M4_25_p0")}
+_A186 = "request at 1.03 V: at 25 C it fires while Vo is still rising (N13 +5.3 mV/us, valleys 57 / 52 / 44 / 41 A), " \
+        "so mode P closes a larger current gap; superseded by A188's 1.045 V (RESULTS 0)"
+EXCEPTIONS["A186"] = {
+    ("N13_25_p0", "c4"): "Vo(143.5 us) 0.982 V lies inside mode P after the 140.4 us handover; " + _A186,
+    ("S75_25_p0", "c5"): "2.34 A: the controller's learned valley settles at -13.5 / -13.8 / -15.1 / -16.3 A across A181 / "
+    "A184-A186 (A143's history-dependent floor spread), Vo 1.000 V and Ton 32.3-32.5 ns in all (RESULTS 0)",
+    **{(r, "c6"): "handover minimum <= 2 mV below the t0 400 record - 5 mV; " + _A186
+       for r in ("F0_25_p0", "M4_25_p0", "N0_hot_p0")},
+}
+_A187 = "slow devices at 125 C after +4.8 V / 1 us: phases 3-4 lose their valley for ~25 us (valley-timing limit), Vo " \
+        "dips, the loop raises Ton ~20 % and a recovering valley meets it; above 200 A at 2 of 6 step positions on both " \
+        "boards - the slow corner's limit lies above 0.8 L0 at 125 C (RESULTS 0)"
+EXCEPTIONS["A187"] = {(r, "c2"): _A187 for r in ("S75_hot_p3", "S75_hot_p5", "S80_hot_p3", "S80_hot_p5")}
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
     "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "

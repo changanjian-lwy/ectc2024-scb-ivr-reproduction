@@ -1,0 +1,226 @@
+{
+ "F0_hot_p0": {
+  "cond": "F0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 21.334,
+  "ton_ns": 42.962,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0375461838411373,
+    "ladder": 1.0086320296510147,
+    "start_pk": 125.19628841823379,
+    "hand_pk": 148.7606271539046,
+    "gap_pk": 148.23228588129732,
+    "post_pk": null,
+    "vo_min_entry": 0.9999548655433418,
+    "ton_max_entry_ns": 42.96875000000001,
+    "ton_steady_ns": 30.675781250000004,
+    "steady_pk": [
+     145.7128567638147,
+     144.72045738169638,
+     144.7374292555652,
+     146.7596375874485
+    ],
+    "vds_max_v": 30.84326512332072,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": null,
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": null,
+  "c6": null,
+  "criteria": {
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": null,
+   "c6": null,
+   "c7": true
+  },
+  "t_hand_req_us": null,
+  "t_entry_us": 144.00400000000002,
+  "vin_entry_v": 48.0,
+  "vo_entry_v": 1.0371082540056038,
+  "vo_max_300us": 1.0382194168809578
+ },
+ "N0_hot_p0": {
+  "cond": "N0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 44.48,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0005978138874383,
+    "ladder": 1.0183918604663205,
+    "start_pk": 125.81428703639911,
+    "hand_pk": 158.78928874814238,
+    "gap_pk": 148.143604709223,
+    "post_pk": null,
+    "vo_min_entry": 0.9966173535372383,
+    "ton_max_entry_ns": 44.46875000000001,
+    "ton_steady_ns": 31.93039772727273,
+    "steady_pk": [
+     145.74538056267346,
+     144.75764878204492,
+     144.81746068987286,
+     146.73098865637436
+    ],
+    "vds_max_v": 29.957589405351904,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_N0_hot_p0.json",
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": [
+   0.18031981437042077
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9966173535372383,
+    "ref": 0.9986292455810521
+   }
+  ],
+  "criteria": {
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true,
+   "c7": true
+  },
+  "t_hand_req_us": 140.01000000000002,
+  "t_entry_us": 140.204,
+  "vin_entry_v": 48.0,
+  "vo_entry_v": 1.0457830141029891,
+  "vo_max_300us": 1.0457830141029891
+ },
+ "S0_25_p0": {
+  "criteria": {
+   "g0": true
+  },
+  "sections_compared": 731,
+  "t_hand_req_s": null
+ },
+ "S0_hot_p0": {
+  "cond": "S0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.795,
+  "ton_ns": 54.563,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0031077113599176,
+    "ladder": 1.0962818795281477,
+    "start_pk": 126.48704908070536,
+    "hand_pk": 171.54853944035887,
+    "gap_pk": 159.85636967474593,
+    "post_pk": null,
+    "vo_min_entry": 0.996496067280254,
+    "ton_max_entry_ns": 54.5625,
+    "ton_steady_ns": 39.367977528089895,
+    "steady_pk": [
+     144.88371877855892,
+     144.0217381514829,
+     144.02988542015828,
+     146.59759682534562
+    ],
+    "vds_max_v": 27.694729216586957,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S0_hot_p0.json",
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": [
+   0.5451030929669685
+  ],
+  "c6": [
+   {
+    "vo_min": 0.996496067280254,
+    "ref": 0.991365294007814
+   }
+  ],
+  "criteria": {
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true,
+   "c7": true
+  },
+  "t_hand_req_us": 131.60999999999999,
+  "t_entry_us": 131.804,
+  "vin_entry_v": 46.107564494971584,
+  "vo_entry_v": 1.0474942773927762,
+  "vo_max_300us": 1.0474942773927762
+ },
+ "S75_hot_p0": {
+  "cond": "S75_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 45.355,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.0042378388479316,
+    "ladder": 1.1001581926133266,
+    "start_pk": 139.02612439625958,
+    "hand_pk": 184.39918896061073,
+    "gap_pk": 161.9989501367357,
+    "post_pk": 193.82138681468348,
+    "vo_min_entry": 0.9953026955731696,
+    "ton_max_entry_ns": 45.34375000000001,
+    "ton_steady_ns": 30.65625,
+    "steady_pk": [
+     145.1376021829371,
+     144.4489617637405,
+     144.4642875706753,
+     145.67492429559857
+    ],
+    "vds_max_v": 31.776007497691786,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_hot_p0.json",
+  "g0_identical_pre_entry": false,
+  "c5_dev_a": [
+   0.028346553717312872
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9953026955731696,
+    "ref": 0.9910153955739249
+   }
+  ],
+  "criteria": {
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true,
+   "c7": true
+  },
+  "t_hand_req_us": 131.21,
+  "t_entry_us": 131.404,
+  "vin_entry_v": 45.967643200699605,
+  "vo_entry_v": 1.0473414376838825,
+  "vo_max_300us": 1.0473414376838825
+ }
+}
