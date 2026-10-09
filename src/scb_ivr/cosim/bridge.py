@@ -899,8 +899,6 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
             if cm.get("driver"):                                  # each module its own jitter sequence
                 cm["driver"] = dict(cm["driver"], seed=int(cm["driver"].get("seed", 1)) + 1000 * m)
         mods.append(ModuleSim(cm, make_params(cm, ref), MultiCtl(dut, m, n_mod, cache), first_high=(m == 0)))
-    for mod in mods[1:]:                                         # A186: one handover request for the system
-        mod.hand = mods[0].hand
     cocotb.start_soon(Clock(dut.clk, cfg["t_clk_ns"], unit="ns").start())
     for mod in mods:
         mod.configure()
@@ -912,6 +910,8 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
     dut.rst.value = 0
     for mod in mods:
         mod.start()
+    for mod in mods[1:]:                                         # A186: one handover request for the system
+        mod.hand = mods[0].hand
     flush_writes(dut, cache)
     t_end = float(os.environ.get("COSIM_T_END_US", cfg["t_end_us"])) * 1e-6
     t0w = time.time()
