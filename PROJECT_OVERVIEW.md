@@ -41,15 +41,17 @@ single-phase successes.
 | Question assumptions | Separate capacitance, timing, temperature and load sensitivity studies |
 | Report negative results honestly | Partial handoffs are not promoted to complete reproduction |
 
-## Where it stands (2026-10-07)
+## Where it stands (2026-10-09, closed)
 
 - **Achieved in simulation:** the 1 kW system (four four-phase modules, 48 V to 1 V) runs closed loop in co-simulation
   (Verilog controller against a circuit plant with datasheet Coss and reverse conduction), from a zero start through the
-  handover to regulation; both controller designs are frozen after randomised tests; the package drive is specified as
-  formulas in loop inductance and di/dt. Every step registered its criteria first ([status](reports/CURRENT_STATUS.md),
-  [Mihai summary](reports/MIHAI_SUMMARY_2026-10-06.md)).
+  handover to regulation; both controller designs are frozen after randomised tests; the package drive is specified on
+  a gate-level plant (loop <= 50 pH, 3.0 / 0.3 ohm +-20 %, ramped lead, per-board trim, an interlock releasing within
+  1.0 ns at the slow corner; [coverage](reports/FINAL_SPEC_COVERAGE.md)). Every step registered its criteria first
+  ([status](reports/CURRENT_STATUS.md), [Mihai summary](reports/MIHAI_SUMMARY_2026-10-06.md)).
 - **Where P24's assumptions do not hold together:** its 1-2 % negative current cannot give high-side ZVS with its own
-  values (about 27 % would be needed); the design runs at 12.5 % with partial ZVS instead.
+  values (about 27 % would be needed); the design runs at 12.5 % with partial ZVS instead. Item by item for P24 and
+  P25: [reports/PAPER_REPRODUCTION_MAP.md](reports/PAPER_REPRODUCTION_MAP.md).
 - **Not done:** hardware validation; the paper's unpublished values (loop inductance and damping, inductor technology,
   driver, transient specification) are covered by sweeps and stated as questions.
 
