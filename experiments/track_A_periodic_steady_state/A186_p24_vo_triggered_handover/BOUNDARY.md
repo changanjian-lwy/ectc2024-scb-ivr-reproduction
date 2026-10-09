@@ -42,8 +42,14 @@ Diagnostic: request and entry times, Vin at entry, the loop's Ton after entry.
   on S75 125 C is the closest). 25 C results within +-3 A / +-3 mV of A185, so c6 at 25 C misses on N0 / F0 / four
   modules as in A185 (the period jump).
 
-## 4. Decision rule
-- c1-c7 pass (c2 at S75 125 C read as above): start-up spec = t0 200 ns + per-board mode-S trim (cfg_ton_s) + bumpless
-  seed (ton_ns) + Vo-requested handover at 1.03 V, at 25 and 125 C. Update FINAL_SPEC, docs, acceptance gate.
-- c6 / c7 fail hot only: adopt for 25 C (A185's spec), hot named open with the mechanism.
-- Anything fails at 25 C: the Vo request harms the 25 C start-up; not adopted.
+## 4. Decision rule (amended 2026-10-10 03:10, after launch and before any result: the first version read A185's
+known 25 C c6 misses as harm by the request)
+- The request harms the 25 C start-up if any 25 C run fails c1-c5 or c7, or if its c6 minimum is > 3 mV below A185's
+  run of the same board. Then it is not adopted.
+- Otherwise the start-up spec is t0 200 ns + per-board mode-S trim (cfg_ton_s) + bumpless seed (ton_ns) +
+  Vo-requested handover at 1.03 V, adopted with c6's per-board misses stated, if all of these hold:
+  - c1-c5 and c7 pass at 25 and 125 C (c2 at S75 125 C read as in Section 2);
+  - c6 misses only where A185 already missed (L0 boards, the period jump);
+  - the worst handover minimum across boards is above the 400 ns design's worst (0.961 V).
+  FINAL_SPEC, docs and the acceptance gate are updated.
+- c6 / c7 fail hot beyond that: adopt for 25 C only and name the hot limit.
