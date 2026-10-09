@@ -24,7 +24,7 @@ import numpy as np
 
 from scripts.audit_p24_exact_orbits import ROOT, TRACK_A, PEAK
 from scb_ivr.p24_exact_event_map import Circuit, Control, ExactEventMap, section_full
-from scb_ivr.p24_nonlinear_event_map import Coss, NonlinearEventMap, nl_valley_after_lowoff, orbit_chord
+from scb_ivr.p24_nonlinear_event_map import Coss, NonlinearEventMap, nl_valley_after_lowoff, orbit_chord, section_jacobian
 
 DIAG = ROOT / "symbolic_derivations" / "03_P24_native" / "diagnostics"
 COSS_CSV = TRACK_A / "A59_nonlinear_coss_epc2067" / "epc2067_coss_qoss_eoss_digitized.csv"
@@ -56,7 +56,7 @@ def report(emap, sx, J, hist, log):
     lo = {x["phase"]: x["i"] for x in log["lowoff"]}
     ton = {x["phase"]: x for x in log["turnon"]}
     return {"section_free": sx.tolist(), "newton_residuals": hist, "period_ns": log["period"] * 1e9, "vo_v": float(sx[3]),
-            "floquet_abs": sorted(np.abs(np.linalg.eigvals(J)).tolist(), reverse=True),
+            "floquet_abs": sorted(np.abs(np.linalg.eigvals(section_jacobian(emap, sx)[0])).tolist(), reverse=True),  # D81
             "lowoff_i": [lo.get(k) for k in range(1, ckt.n + 1)],
             "turnon_vds": [ton[k]["vds"] if k in ton else None for k in range(1, ckt.n + 1)],
             "turnon_how": [ton[k]["how"] if k in ton else None for k in range(1, ckt.n + 1)],

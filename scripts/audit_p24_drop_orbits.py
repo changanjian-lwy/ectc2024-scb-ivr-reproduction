@@ -17,7 +17,7 @@ import numpy as np
 from scripts.audit_p24_exact_orbits import ROOT, PEAK
 from scripts.audit_p24_nonlinear_orbits import DIAG, T_RS, epc2067
 from scb_ivr.p24_exact_event_map import Circuit, Control, section_full
-from scb_ivr.p24_nonlinear_event_map import nl_valley_after_lowoff, orbit_chord
+from scb_ivr.p24_nonlinear_event_map import nl_valley_after_lowoff, orbit_chord, section_jacobian
 from scb_ivr.p24_drop_event_map import DropEventMap
 
 VF, R_DEV = 2.0894454508, 6.0134369436e-3        # A87's fit to Fig. 8 at 25 C, 10-100 A per device
@@ -55,7 +55,8 @@ def solve(coss, pct, td, ton, d0, s0, iters=30, tol=1e-8):
             rec.update(status="soft" if all(h == "high_on" for h in hows) else "restart", section_free=sx.tolist(),
                        ton_ns=ton * 1e9, period_ns=lg["period"] * 1e9, vo_v=float(sx[3]), d_ns=[x * 1e9 for x in d],
                        lowoff_i=[lo[k] for k in range(1, 5)], turnon_vds=[ton_ev[k]["vds"] for k in range(1, 5)],
-                       turnon_how=hows, floquet_abs=sorted(np.abs(np.linalg.eigvals(J)).tolist(), reverse=True),
+                       turnon_how=hows,
+                       floquet_abs=sorted(np.abs(np.linalg.eigvals(section_jacobian(emap, sx)[0])).tolist(), reverse=True),
                        natural_valley=[None if r is None else {"t_ns": r[0] * 1e9, "vds_v": r[1]} for r in valleys],
                        rev_energy_uj=[e * 1e6 for e in lg["rev_energy_j"]], rev_time_ns=[x * 1e9 for x in lg["rev_time_s"]],
                        p_rev_w=sum(lg["rev_energy_j"]) / lg["period"], events=[(t * 1e9, k, j) for t, k, j in lg["events"]])

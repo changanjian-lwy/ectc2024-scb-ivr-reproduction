@@ -5,7 +5,7 @@ import numpy as np
 
 from scb_ivr.p24_exact_event_map import (Circuit, Control, ExactEventMap, section_free, section_full,
                                          valley_after_lowoff)
-from scb_ivr.p24_nonlinear_event_map import Coss, NonlinearEventMap, nl_valley_after_lowoff
+from scb_ivr.p24_nonlinear_event_map import Coss, NonlinearEventMap, nl_valley_after_lowoff, orbit_chord, section_jacobian
 
 # D43's cross-check orbit at the A79 run 3 point (as tests/test_p24_exact_event_map.py)
 S_STAR = np.array([12.242053249, 23.885358378, 12.004905455, 0.999981176,
@@ -72,6 +72,25 @@ class NonlinearChargeTests(unittest.TestCase):
         tp = m.topo([True, False, False, False, False, True, True, True])
         v2, _ = tp.to_full(m.reinit(v, i, tp))
         np.testing.assert_allclose(v2, v, atol=1e-9)
+
+
+class FloquetJacobianTests(unittest.TestCase):    # D81: the chord matrix is not the derivative at the orbit
+    def test_chord_matrix_is_returned_unchanged_at_a_fixed_point(self):
+        import json
+        from pathlib import Path
+        diag = Path(__file__).resolve().parents[1] / "symbolic_derivations" / "03_P24_native" / "diagnostics"
+        r = json.loads((diag / "D45_orbits_D.json").read_text())["rows"][5]           # linear Co(tr), 5 %, soft
+        emap = ExactEventMap(Circuit(), Control(ton=r["ton_ns"] * 1e-9, i_target=-r["pct"] / 100 * 125.0,
+                                                d_high=tuple(x * 1e-9 for x in r["d_ns"]), t_restart_high=20e-9))
+        s = np.array(r["section_free"])
+        stale = 2.0 * np.eye(len(s))                                                  # moduli 2: "unstable"
+        _, J, hist, _ = orbit_chord(emap, s, J=stale)
+        self.assertLess(hist[-1], 1e-8)
+        self.assertIs(J, stale)                                                       # converged at once, J untouched
+        Jf, resid, same = section_jacobian(emap, s)
+        self.assertTrue(same)
+        self.assertLess(resid, 1e-8)
+        self.assertAlmostEqual(max(abs(np.linalg.eigvals(Jf))), 0.98607, delta=1e-4)  # D81 recheck
 
 
 if __name__ == "__main__":

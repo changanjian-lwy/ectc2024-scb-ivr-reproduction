@@ -27,7 +27,7 @@ import numpy as np
 
 from scb_ivr.p24_exact_event_map import Circuit, section_full
 from scb_ivr.p24_lowpred_event_map import ControlLP, LowPredEventMap
-from scb_ivr.p24_nonlinear_event_map import nl_valley_after_lowoff, orbit_chord
+from scb_ivr.p24_nonlinear_event_map import nl_valley_after_lowoff, orbit_chord, section_jacobian
 
 PEAK = 125.0            # A peak phase current of the P24 target sweep (scripts/audit_p24_exact_orbits.PEAK)
 T_RS = 20e-9            # high-side restart time
@@ -48,7 +48,9 @@ def solve(coss, pct, ton, d0, dl0, s0, high_rule, low_rule, ckt=None, vf=None, r
     """The outer iteration above. high_rule(valley) and low_rule(crossing) return the new delay in s. Returns the
     record (dict): inputs, the outer trace, and at convergence the orbit's section, timing, currents, turn-on
     voltages, Floquet moduli and reverse-conduction energy; final(rec, cross, valley, sx, emap), if given, adds a
-    variant's own fields at convergence."""
+    variant's own fields at convergence. The Floquet moduli come from section_jacobian at the converged orbit and
+    final parameters, not from Newton's chord matrix (D81); floquet_same_order False flags an event-order change
+    inside the difference step."""
     ckt = Circuit() if ckt is None else ckt
     target = -pct / 100 * PEAK
     d, dl, s, J = list(d0), list(dl0), np.array(s0, float), None
@@ -84,6 +86,7 @@ def solve(coss, pct, ton, d0, dl0, s0, high_rule, low_rule, ckt=None, vf=None, r
                              "t0_ns": None if t0 is None else t0 * 1e9})
         print(f"  outer: Vo {sx[3]:.6f} Ton {ton * 1e9:.4f} dd {dd * 1e9:.4f} ns", flush=True)
         if abs(sx[3] - 1.0) < 1e-6 and dd < 2e-12:
+            Jf, _, same = section_jacobian(emap, sx)
             lo = {x["phase"]: x["i"] for x in lg["lowoff"]}
             ton_ev = {x["phase"]: x for x in lg["turnon"]}
             hows = [ton_ev[k]["how"] for k in range(1, 5)]
@@ -92,7 +95,8 @@ def solve(coss, pct, ton, d0, dl0, s0, high_rule, low_rule, ckt=None, vf=None, r
                        d_low_ns=[x * 1e9 for x in dl], crossing_ns=[x * 1e9 for x in cross],
                        valley_ns=[None if x is None else x * 1e9 for x in valley], low_on_vds=lg["low_on_vds"],
                        lowoff_i=[lo[k] for k in range(1, 5)], turnon_vds=[ton_ev[k]["vds"] for k in range(1, 5)],
-                       turnon_how=hows, floquet_abs=sorted(np.abs(np.linalg.eigvals(J)).tolist(), reverse=True),
+                       turnon_how=hows, floquet_abs=sorted(np.abs(np.linalg.eigvals(Jf)).tolist(), reverse=True),
+                       floquet_same_order=same,
                        rev_energy_uj=[e * 1e6 for e in lg["rev_energy_j"]], rev_time_ns=[x * 1e9 for x in lg["rev_time_s"]],
                        p_rev_w=sum(lg["rev_energy_j"]) / lg["period"])
             if t0 is not None:

@@ -75,15 +75,28 @@ class Design:
 
 
 def seg_end(v, r, lf, i0, t):
-    """Current after t on di/dt = (v - r i) / lf from i0, and the charge."""
+    """Current after t on di/dt = (v - r i) / lf from i0, and the charge (r = 0: the linear ramp)."""
+    if r == 0:
+        return i0 + v * t / lf, i0 * t + 0.5 * v * t * t / lf
     a = math.exp(-r * t / lf)
     i1 = v / r - (v / r - i0) * a
     return i1, (v * t - lf * (i1 - i0)) / r
 
 
 def seg_time(v, r, lf, i0, i1):
+    """Time (>= 0) for the current on di/dt = (v - r i) / lf to go from i0 to i1; math.inf when it never gets there
+    in the future (i1 behind i0 in the direction of motion, or at / past the asymptote v / r). A comparator that is
+    already past its level fires at once: the caller handles that case (D81)."""
+    if r == 0:
+        t = lf * (i1 - i0) / v if v != 0 else (0.0 if i1 == i0 else math.inf)
+        return t if t >= 0 else math.inf
     x = (v - r * i0) / (v - r * i1)
-    return (lf / r) * math.log(x) if x > 0 else math.inf
+    return (lf / r) * math.log(x) if x >= 1 else math.inf
+
+
+def _level_time(v, r, lf, i0, level):
+    """A falling current's comparator (i <= level): 0 when it is already at or below the level, else seg_time."""
+    return 0.0 if i0 <= level else seg_time(v, r, lf, i0, level)
 
 
 def thresholds(lf, rails=np.arange(8.0, 17.01, 0.5)):
@@ -176,6 +189,7 @@ class ValleyMap:
         ton_new = min(max(s["acc"] + d.kp_ns * 1e-9 * e, self.ton_min), self.ton_max)
         ton_new = round(ton_new / LSB) * LSB
         rails = [vin - s["vc"][0]] + [s["vc"][j - 1] - s["vc"][j] for j in range(1, n - 1)] + [s["vc"][-1]]
+        rails_tab = self._ith[0]
         vo, v_prev = s["vo"], s["valley"]
         pk, q_on, q_tot, i_on, depth = [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n, [0.0] * n
         tons = [ton_new] * n
@@ -196,23 +210,28 @@ class ValleyMap:
             pk[k], q_on[k] = seg_end(rails[k] - vo, d.r, d.lf, i0, tons[k])
             q_tot[k] = q_on[k] + 0.5 * (v + i0) * d.t_tr[k] + pk[k] * d.t_dn
         # phase 1's low side
+        flags = set()
+        if any(not rails_tab[0] <= x <= rails_tab[-1] for x in rails):
+            flags.add("ith_rail")                  # I_th clamped at the table's end (thresholds() grid)
+        if pk[0] <= d.i_tgt:
+            flags.add("past_level")                # phase 1 is at / below its turn-off level when its high side ends
         if mode == "cmp":
-            t_ls1 = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
+            t_ls1 = _level_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             t_ls1 = min(t_ls1, d.rs_low_ns * 1e-9)
             if rule is not None:
                 s["dlo"] = t_ls1
         else:
             if s["dlo"] is None:
-                s["dlo"] = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
+                s["dlo"] = _level_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             t_ls1 = base = s["dlo"]
             if lo_add is not None:
                 add = lo_add(tons[0]) if callable(lo_add) else lo_add
                 t_ls1 = max(t_ls1 + add, 0.0)
             if mode == "floor":
-                t_ls1 = min(t_ls1, seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt - d.floor_a))
+                t_ls1 = min(t_ls1, _level_time(-vo, d.r, d.lf, pk[0], d.i_tgt - d.floor_a))
         v1, q_ls1 = seg_end(-vo, d.r, d.lf, pk[0], t_ls1)
         if mode in ("timed", "floor"):             # the crossing report steps dlo (A100's adaptive step)
-            t_cross = seg_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
+            t_cross = _level_time(-vo, d.r, d.lf, pk[0], d.i_tgt)
             up = (v1 > d.i_tgt) or (t_ls1 - t_cross < d.lo_tgt_ps * 1e-12)
             s["step"] = min(2 * s["step"], d.smax) if (s["last_up"] is not None and up == s["last_up"]) else 1
             s["last_up"] = up
@@ -249,16 +268,22 @@ class ValleyMap:
             cur, rv, t13, t4 = d.von
             rec["von"] = [_bilinear(cur, rv, t4 if k == n - 1 else t13, v_prev[k], rails[k]) for k in range(n)]
             rec["tons"] = list(tons)
+            if any(not (cur[0] <= v_prev[k] <= cur[-1] and rv[0] <= rails[k] <= rv[-1]) for k in range(n)):
+                flags.add("von_grid")
             if d.sh is not None:
                 g, x = d.sh
                 rec["sh"] = [rails[k - 1] + rails[k] + float(np.interp(rec["von"][k - 1], g, x)) for k in range(1, n)]
+                if any(not g[0] <= v <= g[-1] for v in rec["von"][:-1]):
+                    flags.add("sh_grid")
+        rec["flags"] = sorted(flags)
         s["t"] += t1
         return rec
 
 
 def steady_ton(d: Design, vin=None):
     """The boundary-mode Ton (s) at which the cycle-average phase current is vref / (r_load n): from 0 A to the peak,
-    down to the target, the valley transition and t_dn (the map's own segments)."""
+    down to the target, the valley transition and t_dn (the map's own segments). Bisection on [1 ns, 1 us]; raises
+    ValueError when the interval does not bracket a root or the result's current error exceeds 1e-6 of i_ph (D81)."""
     vin = d.vin if vin is None else vin
     i_ph = d.vref / d.r_load / d.n
 
@@ -270,17 +295,48 @@ def steady_ton(d: Design, vin=None):
         return q / (d.t_tr[0] + ton + d.t_dn + t_ls) - i_ph
 
     lo, hi = 1e-9, 1e-6
+    if not excess(lo) < 0 < excess(hi):
+        raise ValueError(f"steady_ton: [1 ns, 1 us] does not bracket a root (excess {excess(lo):.3g}, {excess(hi):.3g} A)")
     for _ in range(100):
         mid = 0.5 * (lo + hi)
         lo, hi = (mid, hi) if excess(mid) < 0 else (lo, mid)
-    return 0.5 * (lo + hi)
+    ton = 0.5 * (lo + hi)
+    if not abs(excess(ton)) <= 1e-6 * i_ph:
+        raise ValueError(f"steady_ton: residual {excess(ton):.3g} A at {ton * 1e9:.4f} ns (not a root)")
+    return ton
+
+
+STEADY_TOL = {"vo": 1e-5, "vc": 1e-4, "valley": 1e-3, "acc": 1e-13}   # V, V, A, s: well below an ADC / Ton LSB
+
+
+def steady_check(m: ValleyMap, s, vin, n=64, pmax=16, tol=None):
+    """Whether state s is on a periodic orbit of the map (a fixed point, or the repeating pattern of a quantised limit
+    cycle): runs n periods on a copy (s is not touched) and finds the smallest p <= pmax with |x_j - x_(j-p)| within
+    tol on every compared state (vo, vc, valley, acc) and identical Ton codes over the last n - p periods. Returns
+    {"settled", "cycle" (p or None), "drift" (largest difference per state at p = 1)} (D81)."""
+    import copy
+    tol = tol or STEADY_TOL
+    c, hist = copy.deepcopy(s), []
+    for _ in range(n):
+        r = m.period(c, vin, 0.0)
+        hist.append({"vo": [c["vo"]], "vc": list(c["vc"]), "valley": list(c["valley"]), "acc": [c["acc"]], "ton": r["ton"]})
+
+    def diff(p):
+        return {k: max(abs(a - b) for j in range(p, n) for a, b in zip(hist[j][k], hist[j - p][k])) for k in tol}
+
+    for p in range(1, min(pmax, n // 2) + 1):               # every candidate compared over at least n / 2 periods
+        dp = diff(p)
+        if all(dp[k] <= tol[k] for k in tol) and all(hist[j]["ton"] == hist[j - p]["ton"] for j in range(p, n)):
+            return {"settled": True, "cycle": p, "drift": diff(1)}
+    return {"settled": False, "cycle": None, "drift": diff(1)}
 
 
 def simulate(d: Design, t_end, t_step, i_step=0.0, dvin=0.0, t_slew=0.0, ton0=None, warm=None):
-    """From a converged steady state, a load step i_step (A, drawn from t_step on) and/or an input step dvin over
-    t_slew. The warm-up runs with the comparator turn-off and then, for the timed design, learns dlo from the last
-    comparator-decided turn-off, as the RTL does (lo_learn). Returns the per-period records after the warm-up (t from
-    0)."""
+    """A load step i_step (A, drawn from t_step on) and/or an input step dvin over t_slew, after a warm-up: comparator
+    turn-off for `warm` periods, then 200 periods of the design's own rule (for the timed design, dlo learnt from the
+    last comparator-decided turn-off, as the RTL does with lo_learn). Returns the per-period records after the warm-up
+    (t from 0); the first record carries "warm", steady_check() of the state the step starts from - a step from an
+    unsettled state (settled False) is not a step from steady state, and metrics() reports it."""
     mw = ValleyMap(replace(d, mode="cmp"))
     s = mw.init_state(ton0 or steady_ton(d))
     warm = warm or 600
@@ -290,6 +346,7 @@ def simulate(d: Design, t_end, t_step, i_step=0.0, dvin=0.0, t_slew=0.0, ton0=No
     for _ in range(200):
         m.period(s, d.vin, 0.0)
     s["t"] = 0.0
+    warm_rep = steady_check(m, s, d.vin)
     out = []
     while s["t"] < t_end:
         t = s["t"]
@@ -299,6 +356,8 @@ def simulate(d: Design, t_end, t_step, i_step=0.0, dvin=0.0, t_slew=0.0, ton0=No
         if not all(math.isfinite(x) and abs(x) < DIVERGED_A for x in rec["valley"] + rec["peak"]):
             rec["diverged"] = True                     # past the map's validity (the controller's timing is not modelled)
             break
+    if out:
+        out[0]["warm"] = warm_rep
     return out
 
 
@@ -323,7 +382,10 @@ def handover(d: Design, t_end, vo0, vcs0, ton0, valley0=None):
 
 def metrics(recs, t_step, vref=1.0, band=0.01):
     """Vo's extreme after the step (mV) and the last exit from vref +/- band (us); per phase the valley range after the
-    step, the deepest crossing (A) and the number of periods with a crossing; the largest peak (A)."""
+    step, the deepest crossing (A) and the number of periods with a crossing; the largest peak (A). Validity (D81):
+    "flag_periods", per flag the number of periods after the step that left a table or passed a comparator level
+    (ValleyMap.period's rec["flags"]), with the time of the first; "warm_settled" from simulate()'s warm-up check
+    (None when the records did not come from simulate)."""
     a = [r for r in recs if r["t"] >= t_step]
     vo = np.array([r["vo"] for r in a]); t = np.array([r["t"] for r in a])
     i = int(np.argmax(np.abs(vo - vref)))
@@ -339,4 +401,15 @@ def metrics(recs, t_step, vref=1.0, band=0.01):
             "crossing_periods": [sum(1 for r in a if r["depth"][k] > 0) for k in range(n)],
             "memory_max_a": [max(-r["i_on"][k] for r in a) for k in range(n)],
             "peak_max_a": max(max(r["peak"]) for r in a), "late": sum(sum(r["late"]) for r in a),
-            "diverged_us": float((a[-1]["t"] - t_step) * 1e6) if a[-1].get("diverged") else None}
+            "diverged_us": float((a[-1]["t"] - t_step) * 1e6) if a[-1].get("diverged") else None,
+            "flag_periods": _flag_periods(a, t_step),
+            "warm_settled": recs[0]["warm"]["settled"] if "warm" in recs[0] else None}
+
+
+def _flag_periods(a, t_step):
+    out = {}
+    for r in a:
+        for f in r.get("flags", ()):
+            e = out.setdefault(f, {"periods": 0, "first_us": float((r["t"] - t_step) * 1e6)})
+            e["periods"] += 1
+    return out

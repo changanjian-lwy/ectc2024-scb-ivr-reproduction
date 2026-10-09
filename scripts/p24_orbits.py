@@ -10,7 +10,9 @@
 
     python3 -m scripts.p24_orbits --gate [--jobs 4]
 recomputes every archived D47-D51 orbit into tmp/orbit_gate/ and compares each with the archived JSON: every key
-the archived record has (except wall_s) must be equal, the outer trace entry by entry on the archived fields.
+the archived record has (except wall_s) must be equal, the outer trace entry by entry on the archived fields. The
+archived floquet_abs came from Newton's chord matrix; the solver now takes them from a fresh Jacobian at the orbit,
+so they are compared with D81's recomputation (diagnostics/D81_floquet_recheck.json, fd 1e-4) to 1e-6.
 
 Each variant's seed and rules are those of its original script (audit_p24_lowpred / _hot / _offset / _errcorr /
 _followslot_orbits.py, which stay as they are).
@@ -129,11 +131,22 @@ GATE = [  # (variant, pct, m_ns, tol, archived file)
 ]
 
 
-def compare(old: dict, new: dict) -> list:
-    """Keys of the archived record (except wall_s) whose values differ; the outer trace on the archived fields."""
+def d81_floquet(name):
+    rows = json.loads((DIAG / "D81_floquet_recheck.json").read_text())["rows"]
+    return next(r["fd0.0001"]["abs"] for r in rows if r["file"] == name)
+
+
+def compare(old: dict, new: dict, name=None) -> list:
+    """Keys of the archived record (except wall_s) whose values differ; the outer trace on the archived fields;
+    floquet_abs against D81's fresh values for the archived file `name`."""
     bad = []
     for k, v in old.items():
         if k == "wall_s":
+            continue
+        if k == "floquet_abs" and name is not None:
+            ref = d81_floquet(name)
+            if len(ref) != len(new.get(k, [])) or max(abs(a - b) for a, b in zip(ref, new[k])) > 1e-6:
+                bad.append(k)
             continue
         if k == "outer":
             nv = new.get("outer", [])
@@ -158,7 +171,7 @@ def gate(jobs):
             return archived, ["no output"]
         old = json.loads((DIAG / archived).read_text())
         new = json.loads(out.read_text())
-        bad = compare(old, new)
+        bad = compare(old, new, archived)
         print(f"{archived:32s} {'IDENTICAL' if not bad else 'DIFFERENT ' + str(bad)} ({new.get('wall_s', 0):.0f} s)", flush=True)
         return archived, bad
 

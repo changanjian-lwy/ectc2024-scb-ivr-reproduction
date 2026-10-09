@@ -371,9 +371,35 @@ def nl_valley_after_lowoff(emap: ExactEventMap, v_full, i, phase: int, horizon=4
     return None
 
 
+def section_jacobian(emap: ExactEventMap, s, fd=1e-4):
+    """Central-difference Jacobian of the section map at s, for stability (D81), step fd * max(1, |s_c|). Returns
+    (J, residual, same_order): residual = max |F(s) - s|; same_order is False when a perturbed cycle's event sequence
+    (kind, switch) differs from the base cycle's - the difference then straddles an event-order change and J is not
+    a derivative. fd 1e-4: on the archived D45-D51 orbits the largest modulus is flat from 1e-3 to 1e-5; at 1e-6 and
+    below the integrator's noise (DOP853, rtol 1e-11) moves it by up to 4e-3 (D81)."""
+    from .p24_exact_event_map import section_free, section_full
+
+    def f(x):
+        v, i = section_full(x, emap.ckt)
+        v1, i1, log = emap.run_cycle(v, i)
+        return section_free(v1, i1, emap.ckt), [(k, j) for _, k, j in log["events"]]
+
+    s = np.array(s, float)
+    fs, order = f(s)
+    J, same = np.zeros((len(s), len(s))), True
+    for c in range(len(s)):
+        ds = np.zeros(len(s)); ds[c] = fd * max(1.0, abs(s[c]))
+        (fp, op), (fm, om) = f(s + ds), f(s - ds)
+        J[:, c] = (fp - fm) / (2 * ds[c])
+        same = same and op == order and om == order
+    return J, float(np.max(np.abs(fs - s))), same
+
+
 def orbit_chord(emap: ExactEventMap, s0, J=None, tol=1e-8, max_iter=15, fd=1e-6):
     """Newton on F(s) - s like D43's `orbit`, but reusing a supplied Jacobian (chord) and recomputing it (forward
-    differences) only when the residual falls by less than a factor 4 per step. Returns (s*, J, history, log)."""
+    differences) only when the residual falls by less than a factor 4 per step. Returns (s*, J, history, log).
+    J is Newton's chord matrix: it may come from an earlier state or parameter set (the caller's, or a step before
+    s*), so it is not the derivative at s* - use section_jacobian(emap, s*) for Floquet moduli (D81)."""
     from .p24_exact_event_map import section_free, section_full
 
     def f(s):
