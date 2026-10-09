@@ -89,6 +89,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A173": (TA / "A173_p24_final_plant_coverage", "a173_analyze.py", "a173_summary.json"),
     "A174": (TA / "A174_p24_final_plant_margins", "a174_analyze.py", "a174_summary.json"),
     "A175": (TA / "A175_p24_final_plant_a152_matrix", "a175_analyze.py", "a175_summary.json"),
+    "A178": (TA / "A178_p24_inductance_tolerance_final", "a178_analyze.py", "a178_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -462,7 +463,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     **{e: (lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()})
-       for e in ("A168", "A169", "A170", "A171", "A172", "A173", "A174", "A175")},
+       for e in ("A168", "A169", "A170", "A171", "A172", "A173", "A174", "A175", "A178")},
 }
 
 

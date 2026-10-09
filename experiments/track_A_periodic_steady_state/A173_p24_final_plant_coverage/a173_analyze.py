@@ -60,7 +60,8 @@ def main():
                          "extreme_mv": 0.0, "edge_w": 0.0}
             bad = A8.judge(st, ref)
             bad[4] = [] if base.startswith("m4") or st.get("stopped") else (
-                [] if math.isfinite(st.get("back_within_1pct_us") or math.inf) else ["Vo not back within 1 %"])
+                [] if st.get("back_within_1pct_us") is not None and math.isfinite(st["back_within_1pct_us"]) else
+                ["Vo not back within 1 %"])
         else:
             rf = A8.ref_of(base)
             ref = A8.A4.stats(str(rf))
