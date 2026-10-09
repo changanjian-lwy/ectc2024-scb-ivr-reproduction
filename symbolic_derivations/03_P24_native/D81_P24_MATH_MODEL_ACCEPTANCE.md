@@ -80,6 +80,15 @@ limit; `steady_ton` raises without a bracket or with a residual above 1e-6 of th
 the warm-up end state, and `simulate` reports it (`rec[0]["warm"]`, `metrics()["warm_settled"]`). Inside the range
 every number is unchanged.
 
+**Added 2026-10-10 (whole-project review, Section 3):**
+- `seg_time` returns `inf` when the target is the asymptote v / r (0 if the current is already there). It used to
+  divide by zero.
+- `steady_check` also compares the control memory: the timed edge `dlo` and the slot history `t_hist` (within
+  1e-13 s), and the adaptive step's `step` / `last_up` (exactly). The audit's pass C uses the same record
+  (`steady_record` / `steady_lag`).
+- Rerun of the audit: every count below is unchanged (139 / 142 warm-ups periodic; A134 / A135 lags and unsettled
+  arms identical). So the observables never settled while the memory still moved.
+
 **What the archived runs show** (`D81_d63_validity.json`; D63's validation and design map, A117, A118, A124, A134,
 A135; 524 outcome rows, 956,190 periods):
 
