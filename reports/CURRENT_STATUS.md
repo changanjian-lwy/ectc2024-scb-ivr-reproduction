@@ -1873,7 +1873,7 @@ each question:
          post-step margin; the slow corner's late fires (194, no
          consequence).
      92. External review of D70-D79 / A163-A172, and the final plant's
-         coverage (2026-10-09, mixed): D80, A173-A176,
+         coverage (2026-10-09, mixed): D80, A173-A178,
          [reports/FINAL_SPEC_COVERAGE.md](FINAL_SPEC_COVERAGE.md).
          - The review found item 91's "passes every row" true only for
            +4.8 V / 1 us: the other rows and four-module cases had run on
@@ -1889,8 +1889,13 @@ each question:
          - A174: L x 0.7 over five step phases 199.5-201.5 A, so it
            exceeds 200 A at one phase. A fixed 1.0 V interlock reference
            (8.3 ns at ss) holds peaks but adds 26-90 % late fires at the
-           slow corner (four modules ×2, NEW 8 -> 82); the slow corner wants
-           a per-board reference.
+           slow corner (four modules ×2, NEW 8 -> 82).
+         - A177: a per-board reference (1.4 ns) comes close to 0.5 ns (four
+           modules late 792 vs 803) but passes 2 of 5 slow-corner rows as
+           registered. No delay 0.5-8.3 ns changed a peak or V_DS; the
+           release time is a timing spec, < 1.4 ns wanted at the slow corner.
+         - A178: L x 0.75 / 0.8 <= 198.3 / 194.7 A at five step phases;
+           the inductor tolerance for 200 A is -25 % (L x 0.7 201.5 A).
          - A175: at nominal devices the final plant has run A152's whole
            13-row matrix; 12 pass, -4.8 V / 1 us restarts (oracle events).
          - A176: those falling-step restarts need the lead and the

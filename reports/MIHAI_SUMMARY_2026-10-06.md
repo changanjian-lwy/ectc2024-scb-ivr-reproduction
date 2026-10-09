@@ -200,11 +200,13 @@ are budgets over plausible ranges:
         - In the model this interlock is an idealised function: it senses the
           complement's channel exactly. It acted only on the inductance × 0.7
           board and at the slow corner; there its zero shoot-throughs are imposed
-          by the rule. A comparator with a fixed 1.0 V reference adds up to
-          8.3 ns at the slow corner. Peaks and voltages still hold, but late
-          turn-ons there rise by 26-90 % on one module and double on four
-          modules (with 82 small spikes against 8). So the slow corner wants a
-          reference set per board (≤ 1.4 ns; passed on the one row tested).
+          by the rule. A buildable comparator releases later: ~1.4 ns with a
+          reference set per board, up to 8.3 ns with a fixed 1.0 V reference
+          at the slow corner. No delay up to 8.3 ns changed a peak or a
+          voltage, so the release time is a timing specification. The slow
+          corner's late turn-ons grow with it: on four modules 803 / 792 /
+          1608 at 0.5 / 1.4 / 8.3 ns. The per-board reference comes close to
+          the ideal one, a fixed one does not; the slow corner wants < 1.4 ns.
     - With ±30 % on the gate resistance no single resistor meets both the fast
       corner's 40 V and the slow corner's timing; ±20 % does.
 - **The turn-off wants a strong sink.** With ≤ 0.3 Ω the channel is off before
@@ -230,11 +232,12 @@ are budgets over plausible ranges:
       so the loop takes over without an on-time step, plus the threshold-form
       driver interlock (see above). The controller stays as frozen.
     - A per-board start-up trim.
-    - Results: switch ≤ 38.4 V on every run. Peaks ≤ 196.5 A, except the
-      inductance × 0.7 board after +4.8 V / 1 µs: 199.5-201.5 A over five
-      step phases, so −30 % inductance sits at the edge of the 200 A budget.
-      Its open-loop start-up peaks at 200 A. Four modules: 184 A; 196.5 A with
-      a ±5 % inductor spread.
+    - Results: switch ≤ 38.4 V on every run. Peaks ≤ 198.3 A on every run
+      with the inductance at ≥ 0.75 × nominal (the 0.75 × and 0.8 × boards
+      at five step phases each). At 0.7 × the board reaches
+      199.5-201.5 A after +4.8 V / 1 µs, and its open-loop start-up 200 A, so
+      the inductor tolerance for the 200 A budget is −25 %. Four modules:
+      184 A; 196.5 A with a ±5 % inductor spread.
     - Open, with no current or voltage consequence:
         - Falling line steps make the controller restart its valley prediction
           on phases 2-4, with 10-20 A spikes. This needs both the lead and the
@@ -276,8 +279,8 @@ Five answers would narrow the package specification most:
     - Our controller commands the high side only after the low side's turn-off
       command, so it absorbs ≤ ~5.5 ns. It needs a lead, and the lead is safe
       only with a driver interlock that holds a channel at its threshold until
-      the complementary switch is off. With a fixed comparator reference the
-      slow corner loses timing; a per-board reference holds.
+      the complementary switch is off. Its release time decides the slow
+      corner's timing (not its peaks): < 1.4 ns wanted.
     - What gate resistance and tolerance does the driver have, does the
       controller lead the high side, and does the driver have such an interlock
       (or adaptive dead time), with what reference?

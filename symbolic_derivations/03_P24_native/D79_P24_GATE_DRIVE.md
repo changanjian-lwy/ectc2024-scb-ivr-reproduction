@@ -221,13 +221,17 @@ corner: fast 38.5 V, <= 195 A after steps. The form of the lead decides the rest
 - The final plant has run A152's 13-row matrix at nominal devices; the corners on +4.8 V / 1 us, the load step and
   falling ramps; four modules at nominal, ss, a ±5 % inductor spread (196.5 A) and a load step. No run exceeds
   38.4 V.
-- L x 0.7 after +4.8 V / 1 us: 199.5-201.5 A over five step phases (A174), at the 200 A edge.
+- L x 0.7 after +4.8 V / 1 us: 199.5-201.5 A over five step phases (A174), at the 200 A edge; L x 0.75 / 0.8 stay
+  <= 198.3 / 194.7 A at five phases (A178): the inductor tolerance for the 200 A budget is -25 %.
 - Falling steps restart the valley prediction on phases 2-4 (10-20 A spikes). Only the lead and the gate-driven low
   sides together do this (A176).
 - At the slow corner the post-ramp Vo dips 3-5 mV deeper than with ideal low sides (A173).
-- A realisable interlock: a fixed 1.0 V comparator reference releases up to 8.3 ns late at the slow corner. Peaks
-  hold, but late fires rise 26-90 % (four modules ×2, NEW spikes 8 -> 82). A per-board reference (V_th - 0.2 V,
-  <= 1.4 ns) is the form that meets the criteria (A173 / A174).
+- A realisable interlock releases later than the ideal 0.5 ns: ~1.4 ns with a per-board comparator reference
+  (V_th - 0.2 V), up to 8.3 ns with a fixed 1.0 V reference at the slow corner. No delay up to 8.3 ns changed a
+  peak or V_DS (A173 / A174 / A177), so the release time is a timing spec. The slow corner's late fires grow with
+  it (four modules 803 / 792 / 1608 at 0.5 / 1.4 / 8.3 ns; NEW 8 / 13 / 82). The per-board form passes 2 of 5
+  slow-corner rows as registered, with small excesses on the rest; the slow corner wants < 1.4 ns (adaptive
+  dead-time drivers reach 0.03-1 ns).
 
 ## 7. Limits
 

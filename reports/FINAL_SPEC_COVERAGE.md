@@ -14,7 +14,7 @@ comes from, and says what may be claimed.
 | drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
 | controller-side lead | high-side turn-on 8 ns earlier, ramped in over 20 µs after the handover | A167 |
 | start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026 | A164 |
-| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally); buildable as a comparator with a per-board reference (V_th − 0.2 V, ≤ 1.4 ns) - a fixed 1.0 V reference (8.3 ns at ss) costs the slow corner's timing | A171, A173, A174 |
+| driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. The slow corner's timing wants < 1.4 ns: a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) nearly meets the criteria, a fixed 1.0 V reference (8.3 ns) does not | A171, A173, A174, A177 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
 ## 2. Plant versions
@@ -38,7 +38,7 @@ Cell = physical post-step peak (A), A168's criteria (a168_analyze.judge) against
 
 | stimulus | nom | ff | hot | ss | L × 0.7 | L × 1.3 | four modules |
 |---|---|---|---|---|---|---|---|
-| +4.8 V / 1 µs | 182.5 ✓ (A171) | 181.8 ✓ (A171) | 179.3 ✓ (A171) | 178.7 ✓ (A171) | 199.7 (A172); 199.5-201.5 over 5 step phases (A174) ✗ at one | 188.7 ✓ (A173) | nom 184.2 ✓ (A172); ss 181.4 ✗ 8 NEW spikes (A173); ±5 % L spread 196.5 ✓ (A173) |
+| +4.8 V / 1 µs | 182.5 ✓ (A171) | 181.8 ✓ (A171) | 179.3 ✓ (A171) | 178.7 ✓ (A171) | 199.7 (A172); 199.5-201.5 over 5 step phases (A174) ✗ at one; L × 0.75 / 0.8: ≤ 198.3 / ≤ 194.7 ✓ over 5 phases (A178) | 188.7 ✓ (A173) | nom 184.2 ✓ (A172); ss 181.4 ✗ 8 NEW spikes (A173); ±5 % L spread 196.5 ✓ (A173) |
 | +4.8 V / 2, 3, 5, 10 µs | 182.9, 181.8, 182.3, 183.7 ✓ (A175) | — | — | — | — | — | — |
 | +4.8 V / 4 µs | 182.5 ✓ (A173) | — | — | 180.2 ✗ Vo −13.5 mV, 17 µs | — | — | — |
 | −4.8 V / 1 µs | 172.4 ✗ 3 restarts + 6 NEW spikes (A175) | — | — | — | — | — | — |
@@ -57,7 +57,10 @@ Interlock delay (A173 / A174), against the 0.5 ns runs:
   +26 % (+4.8 V / 1 µs), +44 % (load step), +57 % (4 µs ramp), +90 % (−8 V ramp); the load step gets 4 more NEW
   spikes. It misses A174's tolerance on 3 of 4 single rows. Four modules at ss: late fires ×2.0 (1608), NEW
   spikes 82 against 8, Vo −13.7 against −9.9 mV;
-- per-board reference = 1.4 ns at ss: +4.8 V / 1 µs passes (late +8 %);
+- per-board reference = 1.4 ns at ss (A173 / A177): passes +4.8 V / 1 µs and the 4 µs ramp. Small misses elsewhere:
+  late fires +60 % on the −8 V ramp, NEW +3 on the load step, NEW +5 on four modules. It keeps four modules at 792
+  late fires (0.5 ns: 803; fixed: 1608). Late fires grow monotonically with the delay; NEW and Vo scatter between
+  neighbouring runs;
 - ff at 1.0 ns (its fixed-reference value) and L × 0.7 at 2.0 ns: same as 0.5 ns.
 
 Step position (A174, 4 more phases per row): L × 0.7 +4.8 V / 1 µs 199.7, 199.9, 199.8, 199.5, 201.5 A. At the
@@ -89,11 +92,12 @@ The misses are regulation or oracle events, none on voltage; the only current mi
 ## 5. How to state the results
 
 - "The final plant passed the listed rows (Section 3)", not "every corner" or "every test".
-- The L × 0.7 board after +4.8 V / 1 µs: 199.5-201.5 A over five step phases. It exceeds the 200 A budget at one
-  of them: −30 % inductance is at the edge, not inside it. Its open-loop start-up is 200.2 A (registered limit
-  ref + 3 A = 205.5 A).
-- The interlock: "closes in the model with an idealised threshold interlock; buildable with a per-board comparator
-  reference; a fixed reference holds peaks but costs the slow corner's timing (A174)".
+- Inductance tolerance (A174 / A178, +4.8 V / 1 µs, five step phases per board): 0.75 L0 ≤ 198.3 A, 0.8 L0 ≤
+  194.7 A, 0.7 L0 199.5-201.5 A. State "≥ 0.75 L0 keeps ≤ 200 A at every tested phase; 0.7 L0 reaches 201.5 A".
+  The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
+- The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
+  delay up to 8.3 ns keeps peaks and voltages; the slow corner's timing wants < 1.4 ns, which a per-board
+  comparator reference nearly meets and a fixed reference does not (A174, A177)".
 - Edge power: per module 2.26 / 2.45 / 2.86 / 4.57 W at ff / nom / hot / ss (A171), 4.18 W at L × 0.7 (A172),
   2.44-2.46 W on four modules (steady window; A172's 2.87 W included the step). D62's ideal-edge terms were
   0.94 W. The thermal result with these losses: D80.

@@ -48,11 +48,14 @@ kept as Appendix A.
     Final plant: L x 0.7 re-trimmed 199.7 A after the step (0.3 A margin), four modules 184.2 A (A172).
   - Coverage of the final plant (A173-A176, reports/FINAL_SPEC_COVERAGE.md): nominal devices on A152's whole 13-row
     matrix, the corners on +4.8 V / 1 µs, load step and falling ramps, four modules nominal / ss / ±5 % L spread
-    (196.5 A). No run above 38.4 V; L x 0.7 is 199.5-201.5 A over five step phases (A174), at the 200 A edge.
+    (196.5 A). No run above 38.4 V; L x 0.7 is 199.5-201.5 A over five step phases (A174), at the 200 A edge;
+    L x 0.75 / 0.8 <= 198.3 / 194.7 A (A178): inductor tolerance -25 %.
     Open, no current or voltage consequence: falling steps restart the valley prediction on phases 2-4 (needs the
     lead plus the gate-driven low sides, A176); the slow corner's post-ramp Vo dips 3-5 mV deeper. The interlock is
-    idealised: a fixed 1.0 V comparator reference (8.3 ns) holds peaks but costs the slow corner 26-90 % more late
-    fires (four modules ×2, NEW 8 -> 82), so it wants a per-board reference (A174). Edge loss 0.7-1.6 points; thermal conclusions unchanged (D80).
+    idealised; its release time is a timing spec (no delay up to 8.3 ns changed a peak or V_DS). Fixed 1.0 V reference
+    (8.3 ns): slow corner late +26-90 %, four modules ×2 with NEW 8 -> 82 (A174); per-board reference (1.4 ns): close
+    to ideal, 2 of 5 slow-corner rows pass as registered (A177) -> < 1.4 ns wanted. Edge loss 0.7-1.6 points; thermal
+    conclusions unchanged (D80).
   - Loop ≤ 50 pH (A168: 60 pH at 3.0 Ω gives the fast corner 40.3 V; 3.5 Ω or 75 pH / 4.0 Ω lose the slow corner's
     timing or the line step's Vo). The ramp-model window (≤ 3.2 V / L, ≥ ~20 A/ns, 125-150 pH) is superseded.
   - The slow corner (threshold, Q_G max, +20 %) holds peaks and V_DS but fires late after the handover and rising
@@ -331,7 +334,7 @@ four-module design (C13) and the package drive (A152). What is left rests on val
 | the thermal path is known (R_th per module, coolant temperature) | D73's fixed point gives the hot efficiency; D74: the inductor layer binds through glass 1, ~2 % copper fill (κ 1, ~4 % at κ 4) under the columns, stacked and landing on copper; D77: with microchannels the coolant flow sets it (≥ 0.44 / 1.1 g/s per module at a 25 / 45 °C inlet); D78: the processor side must stay ≲ 85 °C | D73, D74, D77, D78 |
 | the gate drivers' high-to-low mismatch can exceed the node's fall (~1-2 ns) | budget ~0.25 points per ns at 1 MHz: +3.4 ns cost 0.85 points (A119 m3p) | driver (A91, A119) |
 | more modules | interleave per C02; inductor matching within about ±5 % worst case (the 200 A crossing is near ±7 %); the final design needs the slave floor (C06) | T16, T17 (D66, C14) |
-| the package loop L is known | gate level: ≤ 50 pH with 3.0 Ω ± 20 % on / ≤ 0.3 Ω off per device, a high-side turn-on lead, a per-board start-up trim and a threshold-form driver interlock with a per-board reference at the slow corner (D79, A163-A176; coverage reports/FINAL_SPEC_COVERAGE.md); the ramp formulas (turn-on ≤ 3.2 V / L, turn-off ≤ 10 V / L above 150 pH) stay as conservative bounds; the loop's own loss limit is ~70 pH for 1 % | T20 (D79, A163-A172; D68, A151-A155) |
+| the package loop L is known | gate level: ≤ 50 pH with 3.0 Ω ± 20 % on / ≤ 0.3 Ω off per device, a high-side turn-on lead, a per-board start-up trim and a threshold-form driver interlock releasing in < 1.4 ns (D79, A163-A178; coverage reports/FINAL_SPEC_COVERAGE.md); inductor tolerance -25 % for 200 A (A178); the ramp formulas (turn-on ≤ 3.2 V / L, turn-off ≤ 10 V / L above 150 pH) stay as conservative bounds; the loop's own loss limit is ~70 pH for 1 % | T20 (D79, A163-A172; D68, A151-A155) |
 
 ## 8. Not yet known
 
@@ -383,8 +386,9 @@ A168–A172：回路上限定为 50 pH（60 pH 用 3.0 Ω 时快角点 40.3 V；
 0.5 ns）没有代价（A171），最终装置 L×0.7 重新标定后阶跃 199.7 A（余量 0.3 A）、四模块 184.2 A（A172）。RTL 不动。
 A173–A176（外部评审后补测，覆盖表 reports/FINAL_SPEC_COVERAGE.md）：最终装置补跑了其余各行和四模块工况，电流、电压都没超限，只有一处例外：
 L×0.7 换 5 个阶跃相位是 199.5–201.5 A，卡在 200 A 边上。下降阶跃会让相 2–4 的谷底预测重启（要提前量和低侧真实栅极同时存在，A176）；
-慢角点线路斜坡后 Vo 多下陷 3–5 mV。互锁是理想功能：固定 1.0 V 参考（慢角点 8.3 ns）峰值不变，但迟发多 26–90 %（四模块翻倍、新事件 8 → 82），
-慢角点要按板标定参考。边沿损耗 0.7–1.6 个百分点，热结论不变（D80）。
+慢角点线路斜坡后 Vo 多下陷 3–5 mV。互锁是理想功能，它的放行时间是时序指标而不是安全指标（0.5–8.3 ns 都不改变峰值和电压）：固定 1.0 V 参考（慢角点 8.3 ns）
+迟发多 26–90 %（四模块翻倍、新事件 8 → 82）；按板标定参考（1.4 ns）接近理想，但按登记判据 5 行只过 2 行 → 慢角点要 < 1.4 ns。
+电感公差：L×0.75 / 0.8 五个相位都 ≤ 198.3 / 194.7 A，200 A 预算对应 −25 %（A178）。边沿损耗 0.7–1.6 个百分点，热结论不变（D80）。
 斜坡模型的 125–150 pH 作废；振铃 Q ≤ 30。斜坡时代判的峰值都是指令时刻电流，物理峰值高 5–8 A。
 热和磁芯损耗见 D73–D78。
 下面是比较各设计时的记录。
