@@ -1,0 +1,787 @@
+{
+ "F0_25_p0": {
+  "cond": "F0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 21.334,
+  "ton_ns": 37.692,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0325945550671685,
+    "ladder": 1.0059846462131337,
+    "start_pk": 124.97867456841668,
+    "hand_pk": 156.20860814081675,
+    "gap_pk": 148.25707582310426,
+    "post_pk": null,
+    "vo_min_entry": 0.9865040660519503,
+    "ton_max_entry_ns": 41.18750000000001,
+    "ton_steady_ns": 30.875000000000004,
+    "steady_pk": [
+     145.58732104260596,
+     144.60214154652795,
+     144.5632757948609,
+     146.93579947623618
+    ],
+    "vds_max_v": 32.275980064647044,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_ff_s_p62.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.08709250163104798
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9865040660519503,
+    "ref": 0.9982808071288127
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "F0_hot_p0": {
+  "cond": "F0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 21.334,
+  "ton_ns": 37.692,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0375461838411373,
+    "ladder": 1.0086320296510147,
+    "start_pk": 125.19628841823379,
+    "hand_pk": 146.3060339034614,
+    "gap_pk": 147.20094277002826,
+    "post_pk": null,
+    "vo_min_entry": 0.9985122080867688,
+    "ton_max_entry_ns": 37.6875,
+    "ton_steady_ns": 30.687500000000004,
+    "steady_pk": [
+     145.57792784466903,
+     144.5787735965578,
+     144.64944158982013,
+     146.86983406286967
+    ],
+    "vds_max_v": 30.71092857339638,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": null,
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": null,
+  "c6": null,
+  "criteria": {
+   "g0": null,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": null,
+   "c6": null
+  }
+ },
+ "M4_25_p0": {
+  "cond": "M4_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 39.615,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0325849732599814,
+    "ladder": 1.011161387761722,
+    "start_pk": 124.74303636210838,
+    "hand_pk": 165.70830387116862,
+    "gap_pk": 148.28057590293457,
+    "post_pk": null,
+    "vo_min_entry": 0.9818081848150617,
+    "ton_max_entry_ns": 45.125,
+    "ton_steady_ns": 32.28125,
+    "steady_pk": [
+     145.75282735539176,
+     144.7102214387329,
+     144.60293071249347,
+     146.61322182832598
+    ],
+    "vds_max_v": 29.618198719170664,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325730484196494,
+    "ladder": 1.0112028344664215,
+    "start_pk": 124.72455927648029,
+    "hand_pk": 166.28953769048317,
+    "gap_pk": 148.31177912814934,
+    "post_pk": null,
+    "vo_min_entry": 0.982079944953424,
+    "ton_max_entry_ns": 45.125,
+    "ton_steady_ns": 32.28125,
+    "steady_pk": [
+     145.78801838183875,
+     144.79181905535722,
+     144.9472092805282,
+     146.65464963032906
+    ],
+    "vds_max_v": 29.898693997629753,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325721710952034,
+    "ladder": 1.011239921750652,
+    "start_pk": 124.70526719224289,
+    "hand_pk": 165.82818839220184,
+    "gap_pk": 148.31030181570557,
+    "post_pk": null,
+    "vo_min_entry": 0.9818315303027823,
+    "ton_max_entry_ns": 45.125,
+    "ton_steady_ns": 32.28125,
+    "steady_pk": [
+     145.78620868941968,
+     144.78963355311623,
+     144.94378420558235,
+     146.65850356985473
+    ],
+    "vds_max_v": 30.081312381257092,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   },
+   {
+    "vo_143_5": 1.0325764671825746,
+    "ladder": 1.011281680457944,
+    "start_pk": 124.68695863911783,
+    "hand_pk": 168.89787667275795,
+    "gap_pk": 148.27578848166166,
+    "post_pk": null,
+    "vo_min_entry": 0.9815982244238332,
+    "ton_max_entry_ns": 45.125,
+    "ton_steady_ns": 32.28125,
+    "steady_pk": [
+     145.76712568404147,
+     144.690913056255,
+     144.60897564353354,
+     146.62562597021608
+    ],
+    "vds_max_v": 30.47770766785553,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_m4_nom_s_p62.json",
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": [
+   0.21274241211528988,
+   0.12459794331249441,
+   0.2966666326045697,
+   0.33082802676980805
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9818081848150617,
+    "ref": 0.9984854825393217
+   },
+   {
+    "vo_min": 0.982079944953424,
+    "ref": 0.9984826815593287
+   },
+   {
+    "vo_min": 0.9818315303027823,
+    "ref": 0.9984632801623129
+   },
+   {
+    "vo_min": 0.9815982244238332,
+    "ref": 0.9984661520418144
+   }
+  ],
+  "criteria": {
+   "g0": null,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N07_25_p0": {
+  "cond": "N07_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.657,
+  "ton_ns": 35.769,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.032007724956875,
+    "ladder": 1.0144162850938223,
+    "start_pk": 139.9253453858225,
+    "hand_pk": 151.03897713524609,
+    "gap_pk": 149.59197064025133,
+    "post_pk": null,
+    "vo_min_entry": 0.9998192726326347,
+    "ton_max_entry_ns": 35.78125,
+    "ton_steady_ns": 21.395665322580648,
+    "steady_pk": [
+     147.4649520162927,
+     146.7532604467353,
+     146.84040453178986,
+     146.4489123096244
+    ],
+    "vds_max_v": 28.572414225530707,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_il2p0_nom_L07_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.03887297700541126
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9998192726326347,
+    "ref": 1.000086132268549
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "N0_25_p0": {
+  "cond": "N0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 39.615,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.032609730934991,
+    "ladder": 1.0111610155487911,
+    "start_pk": 124.74311689261303,
+    "hand_pk": 162.5694366125116,
+    "gap_pk": 148.33022549156684,
+    "post_pk": 184.4383136691661,
+    "vo_min_entry": 0.9840564803767504,
+    "ton_max_entry_ns": 44.21875,
+    "ton_steady_ns": 32.30859375000001,
+    "steady_pk": [
+     145.82201939649084,
+     144.74820745857153,
+     144.6813777108812,
+     146.8561498539959
+    ],
+    "vds_max_v": 33.734173506543144,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_nom_s_p62.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.17076882456066755
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9840564803767504,
+    "ref": 0.998631010849105
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N0_hot_p0": {
+  "cond": "N0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 23.679,
+  "ton_ns": 39.615,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0484348704988602,
+    "ladder": 1.013684054732375,
+    "start_pk": 125.81428703639911,
+    "hand_pk": 151.34469592495753,
+    "gap_pk": 148.36546020856542,
+    "post_pk": null,
+    "vo_min_entry": 0.9889813599688019,
+    "ton_max_entry_ns": 40.875,
+    "ton_steady_ns": 31.94241573033708,
+    "steady_pk": [
+     145.83366111202557,
+     144.79117147683237,
+     144.77474299955895,
+     146.7220633495596
+    ],
+    "vds_max_v": 30.141128071893075,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_N0_hot_p0.json",
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": [
+   0.09203926501831461
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9889813599688019,
+    "ref": 0.9986292455810521
+   }
+  ],
+  "criteria": {
+   "g0": null,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N13_25_p0": {
+  "cond": "N13_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.645,
+  "ton_ns": 40.916,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0328990389254407,
+    "ladder": 1.0062531044201075,
+    "start_pk": 116.50992546179008,
+    "hand_pk": 157.61115216124475,
+    "gap_pk": 148.00560466743394,
+    "post_pk": null,
+    "vo_min_entry": 0.9709310491505991,
+    "ton_max_entry_ns": 51.87500000000001,
+    "ton_steady_ns": 43.28125,
+    "steady_pk": [
+     145.78266336623972,
+     144.54473059131323,
+     144.48643693334455,
+     145.76316916331504
+    ],
+    "vds_max_v": 34.00546972386705,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_nom_L13_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.007515654430420682
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9709310491505991,
+    "ref": 0.9836873062105456
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "N75_25_p0": {
+  "cond": "N75_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 23.672,
+  "ton_ns": 36.379,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.032875312246087,
+    "ladder": 1.0143252054908658,
+    "start_pk": 136.60728873422454,
+    "hand_pk": 148.38858048400581,
+    "gap_pk": 148.48280911950127,
+    "post_pk": null,
+    "vo_min_entry": 1.0000288502249965,
+    "ton_max_entry_ns": 36.375,
+    "ton_steady_ns": 23.21875,
+    "steady_pk": [
+     147.04415897205146,
+     146.2379865937551,
+     146.31230335724635,
+     146.61395415304344
+    ],
+    "vds_max_v": 28.606736429937115,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A178_p24_inductance_tolerance_final/cosim/run_L075_sh0_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.09660136036760036
+  ],
+  "c6": [
+   {
+    "vo_min": 1.0000288502249965,
+    "ref": 0.9936459850595301
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S0_25_p0": {
+  "cond": "S0_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 35.795,
+  "ton_ns": 48.348,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.0353698159150408,
+    "ladder": 1.0197587584340078,
+    "start_pk": 123.57880610258226,
+    "hand_pk": 147.20711505429813,
+    "gap_pk": 149.7983005914068,
+    "post_pk": null,
+    "vo_min_entry": 0.9965762200437767,
+    "ton_max_entry_ns": 48.34375000000001,
+    "ton_steady_ns": 40.98368055555556,
+    "steady_pk": [
+     144.45682648976737,
+     143.65144095220907,
+     143.6728139627808,
+     145.95198948643707
+    ],
+    "vds_max_v": 27.676657326034707,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A173_p24_final_plant_coverage/cosim/run_il1p4_ss_l_p48_1us.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.13746947379837593
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9965762200437767,
+    "ref": 0.9833143191046491
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S0_hot_p0": {
+  "cond": "S0_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.795,
+  "ton_ns": 48.348,
+  "full": false,
+  "modules": [
+   {
+    "vo_143_5": 1.1262477176884491,
+    "ladder": 1.0271364366436264,
+    "start_pk": 131.23595440446127,
+    "hand_pk": 132.2722114898599,
+    "gap_pk": 149.67489333155012,
+    "post_pk": null,
+    "vo_min_entry": 0.9780782098421053,
+    "ton_max_entry_ns": 48.34375000000001,
+    "ton_steady_ns": 39.383075842696634,
+    "steady_pk": [
+     144.5771339629524,
+     143.7859194932276,
+     143.75407841153705,
+     146.07755398135498
+    ],
+    "vds_max_v": 27.78966342069291,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S0_hot_p0.json",
+  "g0_identical_pre_entry": null,
+  "c5_dev_a": [
+   0.06313642414127685
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9780782098421053,
+    "ref": 0.991365294007814
+   }
+  ],
+  "criteria": {
+   "g0": null,
+   "c1": true,
+   "c2": null,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ },
+ "S75_25_p0": {
+  "cond": "S75_25",
+  "k": 0,
+  "temp": 25.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 43.325,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.0338371357722433,
+    "ladder": 1.0224232745327773,
+    "start_pk": 135.69207230602174,
+    "hand_pk": 151.0955558306393,
+    "gap_pk": 151.7691112252288,
+    "post_pk": 192.48873803964298,
+    "vo_min_entry": 0.9997252683867552,
+    "ton_max_entry_ns": 43.31250000000001,
+    "ton_steady_ns": 32.30561440677967,
+    "steady_pk": [
+     145.31928915996423,
+     144.68858458894263,
+     144.59398543976607,
+     145.54157580375
+    ],
+    "vds_max_v": 32.7868430873831,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_25_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.3126945981980498
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9997252683867552,
+    "ref": 0.9612279121899476
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S75_25_p1": {
+  "cond": "S75_25",
+  "k": 1,
+  "temp": 25.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 43.325,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.0338371357722433,
+    "ladder": 1.0224232745327773,
+    "start_pk": 135.69207230602174,
+    "hand_pk": 151.0955558306393,
+    "gap_pk": 151.7691112252288,
+    "post_pk": 191.52060097490246,
+    "vo_min_entry": 0.9997252683867552,
+    "ton_max_entry_ns": 43.31250000000001,
+    "ton_steady_ns": 32.30561440677967,
+    "steady_pk": [
+     145.31928915996423,
+     144.68858458894263,
+     144.59398543976607,
+     145.54157580375
+    ],
+    "vds_max_v": 31.226666432737645,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_25_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.3126945981980498
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9997252683867552,
+    "ref": 0.9612279121899476
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S75_25_p2": {
+  "cond": "S75_25",
+  "k": 2,
+  "temp": 25.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 43.325,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.0338371357722433,
+    "ladder": 1.0224232745327773,
+    "start_pk": 135.69207230602174,
+    "hand_pk": 151.0955558306393,
+    "gap_pk": 151.7691112252288,
+    "post_pk": 192.73481874259403,
+    "vo_min_entry": 0.9997252683867552,
+    "ton_max_entry_ns": 43.31250000000001,
+    "ton_steady_ns": 32.30561440677967,
+    "steady_pk": [
+     145.31928915996423,
+     144.68858458894263,
+     144.59398543976607,
+     145.54157580375
+    ],
+    "vds_max_v": 31.754238764733593,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_25_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.3126945981980498
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9997252683867552,
+    "ref": 0.9612279121899476
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": true,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": true
+  }
+ },
+ "S75_hot_p0": {
+  "cond": "S75_hot",
+  "k": 0,
+  "temp": 125.0,
+  "ton_s_ns": 35.451,
+  "ton_ns": 43.325,
+  "full": true,
+  "modules": [
+   {
+    "vo_143_5": 1.129334102964073,
+    "ladder": 1.0283258190087232,
+    "start_pk": 144.6411733815036,
+    "hand_pk": 142.46974167415146,
+    "gap_pk": 150.19695125501636,
+    "post_pk": 206.7228545593384,
+    "vo_min_entry": 0.9751097870792013,
+    "ton_max_entry_ns": 43.31250000000001,
+    "ton_steady_ns": 30.677617521367527,
+    "steady_pk": [
+     145.20318315791624,
+     144.56636592106383,
+     144.56479743171988,
+     145.79212188637484
+    ],
+    "vds_max_v": 33.870581377772346,
+    "status": "COMPLETED",
+    "shoot_on": 0,
+    "overlaps": 0
+   }
+  ],
+  "ref": "A181_p24_locked_trim_joint_corner/cosim/run_S75_hot_p0.json",
+  "g0_identical_pre_entry": true,
+  "c5_dev_a": [
+   0.13333629822412263
+  ],
+  "c6": [
+   {
+    "vo_min": 0.9751097870792013,
+    "ref": 0.9910153955739249
+   }
+  ],
+  "criteria": {
+   "g0": true,
+   "c1": true,
+   "c2": false,
+   "c3": true,
+   "c4": true,
+   "c5": true,
+   "c6": false
+  }
+ }
+}

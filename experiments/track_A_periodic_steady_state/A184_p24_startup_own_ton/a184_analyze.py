@@ -86,6 +86,7 @@ def run(path):
     out["c5_dev_a"] = dev
     out["c6"] = [{"vo_min": m["vo_min_entry"], "ref": rm["vo_min_entry"]} for m, rm in zip(mods, refm)] if refm else None
     out["criteria"] = {
+        "g0": out["g0_identical_pre_entry"],
         "c1": all(m["start_pk"] <= 200.0 and m["hand_pk"] <= 200.0 for m in mods),
         "c2": all(m["post_pk"] <= 200.0 for m in mods) if full else None,
         "c3": all(m["vds_max_v"] <= 40.0 and m["status"] == "COMPLETED" and m["shoot_on"] == 0 and m["overlaps"] == 0 for m in mods),

@@ -93,6 +93,8 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A178": (TA / "A178_p24_inductance_tolerance_final", "a178_analyze.py", "a178_summary.json"),
     "A179": (TA / "A179_p24_interlock_release_threshold", "a179_analyze.py", "a179_summary.json"),
     "A181": (TA / "A181_p24_locked_trim_joint_corner", "a181_analyze.py", "a181_summary.json"),
+    "A183": (TA / "A183_p24_startup_period_ladder", "a183_analyze.py", "a183_summary.json"),
+    "A184": (TA / "A184_p24_startup_own_ton", "a184_analyze.py", "a184_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -465,6 +467,21 @@ EXCEPTIONS["A181"] = {
     **{(f"runs/S75_{t}_p{k}", "c1_startup"): _S75 for t in ("25", "hot") for k in range(3)},
     ("runs/S75_hot_p1", "c2_post"): "slow devices, L x 0.75, 125 C: 202.8 A after +4.8 V / 1 us at one of three step "
     "positions (RESULTS 0)",
+}
+EXCEPTIONS["A183"] = {
+    ("S75_hot_p0", "c5"): "250-300 us against the 25 C record listed in the BOUNDARY: 2.59 A; the t0 400 references "
+    "were still settling there - at 400-495 us every full run is within 1.4 A of its own t0 400 record (RESULTS 0)",
+}
+_DIP = "handover Vo minimum below the t0 400 record - 5 mV: mode S at 200 ns ends with valleys at +25..+47 A against " \
+       "mode P's -15.6 A, which turns the loop's first-Ton shortfall below steady state into a dip; peaks unaffected " \
+       "(RESULTS 0)"
+_HOT = "hot, trim locked at 25 C: mode S's Vo drifts +15..+95 mV (every turn-on hard), kp drives Ton to the 0.5x clamp " \
+       "at entry and Vo undershoots (RESULTS 0)"
+EXCEPTIONS["A184"] = {
+    **{(r, "c6"): _DIP for r in ("N0_25_p0", "F0_25_p0", "N13_25_p0", "M4_25_p0")},
+    **{(r, "c6"): _HOT for r in ("N0_hot_p0", "S0_hot_p0", "S75_hot_p0")},
+    ("S75_hot_p0", "c2"): "slow devices, L x 0.75, 125 C: 206.7 A after +4.8 V / 1 us with the step at phase 0.86 of the "
+    "period - a mode-P property (A181 at t0 400: 202.8 A at phase 0.81); 25 C <= 198.7 A (RESULTS 0)",
 }
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
