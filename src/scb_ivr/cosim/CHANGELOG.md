@@ -4,6 +4,18 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-10 (A186) - handover requested on Vo (bridge, sequencer)
+
+**Source:** A184 / A185. At a 200 ns mode-S period the locked trim drifts up to
++95 mV hot, and a handover fixed at 144 us starts mode P from that state. cfg
+"hand_vo_v": the bridge raises hand_req once a phase-1 Vo sample (the ADC's
+instant) reaches it, or at t_hand, whichever is first. One latch is shared by
+the modules of a multi-module run, so they all get the request in the same
+window. The record adds "t_hand_req_s". The RTL is unchanged (hand_req is an
+input; in hardware a comparator / supervisor drives it).
+**Gate:** absent = t_hand only, bit for bit (cosim_regression --full and A183's
+N13 start-up rerun, A186 BOUNDARY).
+
 ## 2026-10-09 (A184) - mode S's own Ton (user-authorised RTL change)
 
 **Source:** A183. A 200 ns mode-S period balances the series-capacitor ladder,

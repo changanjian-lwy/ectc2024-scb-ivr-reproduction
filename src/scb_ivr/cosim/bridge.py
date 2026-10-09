@@ -17,7 +17,9 @@ Time base. Each 4 ns clock cycle n covers the plant window [n*T_clk, (n+1)*T_clk
 Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase
 1 HIGH and phases 2..N LOW, input ramp over t_ramp, load connection at t_load and handover request at t_hand (cfg
 "t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115; "ton_s_ns", A184: mode S's Ton, while
-"ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit); "nonlinear_coss" (datasheet Coss(V),
+"ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit; "hand_vo_v",
+A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
+absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
 
 Controller-side analog functions modelled here:
@@ -440,6 +442,8 @@ class ModuleSim:
         self.meas_v = None; self.dep_log = []       # A132: phase 1's V_DS > V_set at its predictive turn-on; (t, dep)
         self.adc = []                               # pending ADC sample of Vo (taken at phase 1's turn-on)
         self.adc_vin = []                           # A128: pending Vin sample (same instant)
+        self.hand_vo = cfg.get("hand_vo_v")         # A186: request the handover once a phase-1 Vo sample reaches this
+        self.hand = {"lat": False, "t": None}       #   (or at t_hand, whichever is first); shared by a run's modules
         self.st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
         self.lat = {"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0}   # A81 front end of phase 1
         self.ph_floor = bool(cfg.get("ph_floor", 0))                                      # A133: phases 2..N's floors
@@ -641,6 +645,8 @@ class ModuleSim:
                     plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
                 self.adc.append(min(max(int(round(vo / self.adc_lsb)), 0), self.adc_max))
                 self.adc_vin.append(min(max(int(round(vin / self.vin_lsb)), 0), self.adc_max))   # A128
+                if self.hand_vo is not None and not self.hand["lat"] and vo >= self.hand_vo:   # A186
+                    self.hand.update(lat=True, t=plant.t)
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
             mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
             ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
@@ -763,7 +769,7 @@ class ModuleSim:
         c.set("vin_valid", int(bool(self.adc_vin)))                       # A128
         c.set("vin_code", self.adc_vin[-1] if self.adc_vin else 0)
         self.adc_vin.clear()
-        c.set("hand_req", int(plant.t >= p.t_hand))
+        c.set("hand_req", int(plant.t >= p.t_hand or self.hand["lat"]))   # A186: or the Vo-triggered request
         plant.load_on = plant.t >= p.t_load
         if self.en["t"] is None and plant.t >= self.t_en:        # A102: arm the branches (each starts at its
             plant.aux_armed = [True] * self.na; self.en["t"] = plant.t   # next low-side turn-off)
@@ -825,6 +831,8 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if self.hand_vo is not None:                                 # A186
+            out["t_hand_req_s"] = self.hand["t"]
         if self.gated:                                               # A164
             out["overlaps_cmd"] = ovl["cmd"]
         if self.dep_on:                                              # A132
@@ -891,6 +899,8 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
             if cm.get("driver"):                                  # each module its own jitter sequence
                 cm["driver"] = dict(cm["driver"], seed=int(cm["driver"].get("seed", 1)) + 1000 * m)
         mods.append(ModuleSim(cm, make_params(cm, ref), MultiCtl(dut, m, n_mod, cache), first_high=(m == 0)))
+    for mod in mods[1:]:                                         # A186: one handover request for the system
+        mod.hand = mods[0].hand
     cocotb.start_soon(Clock(dut.clk, cfg["t_clk_ns"], unit="ns").start())
     for mod in mods:
         mod.configure()
