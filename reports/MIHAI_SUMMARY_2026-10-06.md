@@ -259,16 +259,22 @@ are budgets over plausible ranges:
     - An 8 ns high-side turn-on lead, enabled over ~20 µs after the handover
       so the loop takes over without an on-time step, plus the threshold-form
       driver interlock (see above). The controller stays as frozen.
-    - A per-board start-up trim.
+    - A start-up rebuilt on 9-10 October (A183-A188). The open-loop phase runs at a 200 ns period, so every
+      turn-on is hard and the series-capacitor ladder stays balanced; at 400 ns slow boards split it to 15.6 / 8.7 V.
+      It has a per-board trim of its own on-time: one added RTL register, user-authorised. The loop gets a
+      bumpless seed, and the handover is requested at Vo >= 1.045 V or at 144 µs. Hot overshoot <= 48 mV (was
+      57-71 mV); the L0 boards' handover dip is 5-9 mV deeper.
     - Results: switch ≤ 38.4 V on every run. Peaks ≤ 198.3 A on the 0.75 ×
       and 0.8 × inductance boards at five step phases each (nominal devices).
       At 0.7 × the board reaches 199.5-201.5 A after +4.8 V / 1 µs, and its
       open-loop start-up 200 A. These are tested points with nominal devices,
-      not a range (the peak is not monotone in L). Combined with slow devices
-      (trimmed once at 25 °C), 0.75 × fails: start-up 202-207 A, a 278 A
-      handover excursion at 25 °C, 202.8 A once after the step at 125 °C. So
-      the inductance tolerance is per device corner; the slow corner's own
-      limit is open (~0.8 × by an estimate). Four modules: 184 A; 196.5 A with
+      not a range (the peak is not monotone in L). With slow devices and the
+      old start-up, 0.75 × failed at start-up (202-207 A, a 278 A handover).
+      With the rebuilt start-up it holds at 25 °C (≤ 192.7 A). At 125 °C both
+      0.75 × and 0.8 × still exceed 200 A after +4.8 V / 1 µs at 2 of 6 step
+      positions (up to 207 / 217 A). The cause is the slow corner's valley
+      timing in closed loop: phases 3-4 lose their valley for ~25 µs. So the
+      inductance tolerance is per device corner and temperature. Four modules: 184 A; 196.5 A with
       a ±5 % inductor spread.
     - Open, with no current or voltage consequence:
         - Falling line steps make the controller restart its valley prediction
