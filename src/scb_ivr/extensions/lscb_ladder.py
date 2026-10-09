@@ -179,9 +179,9 @@ def waves(names, arr):
     if c("I(DC1)") is not None:
         clamp = []
         for k in (1, 2, 3):
-            i = c(f"I(DC{k})")
-            s = c(f"I(SC{k})")
-            clamp.append(i + s if s is not None else i)
+            i = c(f"I(DC{k})")                        # diode: positive anode (ladder) -> cathode (a_k)
+            s = c(f"I(SC{k})")                        # LTspice switch: positive from its second node (a_k) to the first
+            clamp.append(i - s if s is not None else i)
     ladder = [c(f"V(d{k})") for k in (1, 2, 3)] if c("V(d1)") is not None else None
     return dict(t=t, vin=vin, vo=c("V(out)"), vcs=vcs, rails=rails, il=il, clamp=clamp, ladder=ladder,
                 pin=-vin * c("I(Vin)"), a=[c(f"V(a{k})") for k in (1, 2, 3)])
