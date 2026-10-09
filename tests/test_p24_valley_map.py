@@ -125,6 +125,20 @@ class Validity(unittest.TestCase):              # D81: the map says when it leav
         r = m.period(s, D.vin + 10.0, 0.0)                                      # rail 1 = 22 V, table to 17 V
         self.assertIn("ith_rail", r["flags"])
 
+    def test_seg_time_asymptotic_target(self):
+        self.assertEqual(seg_time(1.0, 1.0, 1.0, 0.0, 1.0), math.inf)        # i1 = v / r: approached, never reached
+        self.assertEqual(seg_time(1.0, 1.0, 1.0, 1.0, 1.0), 0.0)             # already there
+        self.assertEqual(seg_time(1.0, 1.0, 1.0, 0.5, 1.0), math.inf)
+
+    def test_steady_check_compares_the_control_memory(self):
+        ms = ValleyMap(D)
+        s = ms.init_state(steady_ton(D))
+        for _ in range(400):
+            ms.period(s, D.vin, 0.0)
+        self.assertTrue(steady_check(ms, s, D.vin)["settled"])
+        moved = dict(s, t_hist=[x + 5e-9 for x in s["t_hist"]])            # only the slot history is off
+        self.assertNotEqual(steady_check(ms, moved, D.vin, n=4, pmax=2)["drift"]["t_hist"], 0.0)
+
     def test_steady_ton_refuses_without_a_root(self):
         with self.assertRaises(ValueError):
             steady_ton(D, vin=4.0)                                              # rail = Vo: no current at any Ton

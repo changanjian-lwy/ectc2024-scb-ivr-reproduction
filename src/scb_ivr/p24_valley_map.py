@@ -90,6 +90,8 @@ def seg_time(v, r, lf, i0, i1):
     if r == 0:
         t = lf * (i1 - i0) / v if v != 0 else (0.0 if i1 == i0 else math.inf)
         return t if t >= 0 else math.inf
+    if v - r * i1 == 0:                            # the target is the asymptote: reached only if already there
+        return 0.0 if i1 == i0 else math.inf
     x = (v - r * i0) / (v - r * i1)
     return (lf / r) * math.log(x) if x >= 1 else math.inf
 
@@ -306,27 +308,32 @@ def steady_ton(d: Design, vin=None):
     return ton
 
 
-STEADY_TOL = {"vo": 1e-5, "vc": 1e-4, "valley": 1e-3, "acc": 1e-13}   # V, V, A, s: well below an ADC / Ton LSB
+STEADY_TOL = {"vo": 1e-5, "vc": 1e-4, "valley": 1e-3, "acc": 1e-13,   # V, V, A, s: well below an ADC / Ton LSB
+              "dlo": 1e-13, "t_hist": 1e-13}                           # s: the timed edge and the slot history
 
 
 def steady_check(m: ValleyMap, s, vin, n=64, pmax=16, tol=None):
     """Whether state s is on a periodic orbit of the map (a fixed point, or the repeating pattern of a quantised limit
     cycle): runs n periods on a copy (s is not touched) and finds the smallest p <= pmax with |x_j - x_(j-p)| within
-    tol on every compared state (vo, vc, valley, acc) and identical Ton codes over the last n - p periods. Returns
-    {"settled", "cycle" (p or None), "drift" (largest difference per state at p = 1)} (D81)."""
+    tol on every compared state (vo, vc, valley, acc, and the control memory dlo and t_hist) and identical Ton codes
+    and adaptive-step state (step, last_up) over the last n - p periods. Returns {"settled", "cycle" (p or None),
+    "drift" (largest difference per state at p = 1)} (D81; the memory added 2026-10-10)."""
     import copy
     tol = tol or STEADY_TOL
     c, hist = copy.deepcopy(s), []
     for _ in range(n):
         r = m.period(c, vin, 0.0)
-        hist.append({"vo": [c["vo"]], "vc": list(c["vc"]), "valley": list(c["valley"]), "acc": [c["acc"]], "ton": r["ton"]})
+        hist.append({"vo": [c["vo"]], "vc": list(c["vc"]), "valley": list(c["valley"]), "acc": [c["acc"]], "ton": r["ton"],
+                     "dlo": [0.0 if c["dlo"] is None else c["dlo"]], "t_hist": [0.0 if x is None else x for x in c["t_hist"]],
+                     "mem": (c["step"], c["last_up"])})
 
     def diff(p):
         return {k: max(abs(a - b) for j in range(p, n) for a, b in zip(hist[j][k], hist[j - p][k])) for k in tol}
 
     for p in range(1, min(pmax, n // 2) + 1):               # every candidate compared over at least n / 2 periods
         dp = diff(p)
-        if all(dp[k] <= tol[k] for k in tol) and all(hist[j]["ton"] == hist[j - p]["ton"] for j in range(p, n)):
+        if all(dp[k] <= tol[k] for k in tol) and all(hist[j]["ton"] == hist[j - p]["ton"] and hist[j]["mem"] == hist[j - p]["mem"]
+                                                     for j in range(p, n)):
             return {"settled": True, "cycle": p, "drift": diff(1)}
     return {"settled": False, "cycle": None, "drift": diff(1)}
 
