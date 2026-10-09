@@ -1893,7 +1893,8 @@ each question:
          - A177: a per-board reference (1.4 ns) comes close to 0.5 ns (four
            modules late 792 vs 803) but passes 2 of 5 slow-corner rows as
            registered. No delay 0.5-8.3 ns changed a peak or V_DS; the
-           release time is a timing spec, < 1.4 ns wanted at the slow corner.
+           release time is a timing spec, < 1.4 ns wanted at the slow corner
+           (A179 refines it to <= 1.0 ns, item 93).
          - A178: L x 0.75 / 0.8 <= 198.3 / 194.7 A at five step phases;
            the inductor tolerance for 200 A is -25 % (L x 0.7 201.5 A).
          - A175: at nominal devices the final plant has run A152's whole

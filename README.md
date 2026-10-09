@@ -13,17 +13,23 @@ The engineering question: **can the published topology, switching sequence and
 device assumptions coexist in one physically consistent operating cycle?**
 
 [Project overview](PROJECT_OVERVIEW.md) · [Current status](reports/CURRENT_STATUS.md) ·
-[Derivations](symbolic_derivations/README.md) · [Experiments](experiments/README.md)
+[Derivations](symbolic_derivations/README.md) · [Experiments](experiments/README.md) ·
+[How far P24 / P25 are reproduced](reports/PAPER_REPRODUCTION_MAP.md) · [Final spec coverage](reports/FINAL_SPEC_COVERAGE.md)
 
 > A simulation-level reproduction: the 1 kW system runs closed loop in co-simulation; there is no hardware validation.
 > A local ZVS event, a passing unit test and a full periodic solution are different evidence levels.
 
-**Status, 6 October 2026.** One P24 module and the four-module, 16-phase
+**Status, 9 October 2026 (closed).** One P24 module and the four-module, 16-phase
 1 kW system run closed-loop in co-simulation (Verilog controller, circuit
 plant with nonlinear Coss); both controller designs are frozen. At the
-package level the switch overshoot is solved by the gate drive (loop
-<= 50 pH, a separate 36 A/ns turn-on). Summary:
-[reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md).
+package level the switch overshoot is solved by the gate drive, checked on a
+gate-level plant (EPC's device model): loop <= 50 pH, 3.0 / 0.3 ohm +-20 %
+per device, an 8 ns ramped high-side lead, a per-board start-up trim and a
+driver interlock releasing within 1.0 ns at the slow corner. Which rows ran on
+which plant version: [reports/FINAL_SPEC_COVERAGE.md](reports/FINAL_SPEC_COVERAGE.md).
+Summary: [reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md)
+(dated 9 October); P24 / P25 item by item:
+[reports/PAPER_REPRODUCTION_MAP.md](reports/PAPER_REPRODUCTION_MAP.md).
 
 | Line (2026-10-06) | Model | State |
 |---|---|---|
