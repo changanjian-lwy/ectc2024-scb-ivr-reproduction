@@ -1,7 +1,26 @@
 {
  "per_t0": {
   "200.0": {
-   "bracketed": false
+   "bracketed": true,
+   "pair": [
+    "t200_n35p300",
+    "t200_n35p751"
+   ],
+   "checks": {
+    "t200_n35p300": {
+     "S1": true,
+     "S2": true,
+     "S3": true
+    },
+    "t200_n35p751": {
+     "S1": true,
+     "S2": true,
+     "S3": true
+    }
+   },
+   "pass": true,
+   "worst_a": 168.12525231364475,
+   "trim_ns": 35.451
   },
   "250.0": {
    "bracketed": true,
@@ -48,8 +67,27 @@
    "trim_ns": 40.324
   },
   "500.0": {
-   "bracketed": false
+   "bracketed": true,
+   "pair": [
+    "t500_n46p182",
+    "t500_n46p782"
+   ],
+   "checks": {
+    "t500_n46p182": {
+     "S1": false,
+     "S2": false,
+     "S3": true
+    },
+    "t500_n46p782": {
+     "S1": false,
+     "S2": false,
+     "S3": true
+    }
+   },
+   "pass": false,
+   "worst_a": 319.63066081784206,
+   "trim_ns": 46.541
   }
  },
- "t0_star": 300.0
+ "t0_star": 200.0
 }

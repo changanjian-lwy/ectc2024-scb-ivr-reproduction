@@ -38,7 +38,10 @@ Short runs to 300 us: S0, N75, N07, N13, F0 at 25 C.
  c5 no harm in mode P: each board's mean per-phase peak over 250-300 us within +-2 A of its t0 = 400 record
     (S75 A181 S75_25_p0; S0 A173 il1p4_ss; N0 A173 nom_s_p62; N75 A178 L075_sh0; N07 A173 il2p0_nom_L07;
     N13 A173 nom_L13; F0 A173 ff_s_p62).
-Diagnostic: ladder max/min at entry, Vo min / max after entry, Ton max / cfg, late fires.
+Diagnostic: ladder max/min at entry, Vo min / max after entry, Ton max / cfg, late fires, and the peak between
+entry + 25 us and the step (pre_step_pk, covered by neither c1 nor c2; flagged if > 200 A).
+Added before stage 2 (criteria unchanged): trim start-ups at a guess and -+ 2 ns (make_cfgs cal: 1.035 V t0* / 12 V +
+k x S75's on-time loss at t0*, k 1 slow / 0.42 nominal / 0.30 ff); unbracketed boards get stage 1's extra-pair rule.
 
 ## 3. Predictions (not criteria)
 Volt-second estimate: mean mode-S valley = I_avg - Vo (t0 - T_eff) / (2 L), T_eff = Vo t0 / 12 V, Vo 1.035 V,

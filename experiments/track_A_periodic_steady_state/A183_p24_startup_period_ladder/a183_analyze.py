@@ -3,7 +3,10 @@ rails, max / min), mean mode-S valleys per phase (140 us .. entry), start-up pea
 mode P), handover peak (entry .. entry + 25 us), Vo minimum and largest loop Ton / cfg Ton in entry .. entry + 12 us,
 V_DS, shoot-throughs / overlaps, status. Writes a183_screen.json; pick() applies BOUNDARY Section 2's stage-1 rule
 (bracketing pair around Vo 1.035 V, both runs S1-S3) -> a183_pick.json.
-  python3 a183_analyze.py screen"""
+Stage 2 (stage2()): cosim/run_*.json against c1-c5 (BOUNDARY Section 2) -> a183_summary.json; c5 compares each
+board's mean per-phase physical peak over 250-300 us with its t0 = 400 ns record (REF). Diagnostic pre_step_pk:
+entry + 25 us .. step (or end), the window neither c1 nor c2 covers; flagged in RESULTS if > 200 A.
+  python3 a183_analyze.py screen | stage2"""
 from __future__ import annotations
 
 import glob
@@ -14,6 +17,14 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
+TA = HERE.parent
+REF = {"S75": "A181_p24_locked_trim_joint_corner/cosim/run_S75_25_p0.json",
+       "S0": "A173_p24_final_plant_coverage/cosim/run_il1p4_ss_l_p48_1us.json",
+       "N0": "A173_p24_final_plant_coverage/cosim/run_nom_s_p62.json",
+       "N75": "A178_p24_inductance_tolerance_final/cosim/run_L075_sh0_l_p48_1us.json",
+       "N07": "A173_p24_final_plant_coverage/cosim/run_il2p0_nom_L07_l_p48_1us.json",
+       "N13": "A173_p24_final_plant_coverage/cosim/run_nom_L13_l_p48_1us.json",
+       "F0": "A173_p24_final_plant_coverage/cosim/run_ff_s_p62.json"}
 
 
 def ladder(sec):
@@ -84,5 +95,41 @@ def screen():
     print("t0* =", pk["t0_star"])
 
 
+def steady_peaks(r):
+    g = r["gate_offs_last"]
+    return [float(np.mean([e["i_max_a"] for e in g if e["phase"] == k and 250e-6 <= e["t_s"] < 300e-6])) for k in (1, 2, 3, 4)]
+
+
+def run_stats(path):
+    st = start_stats(path)
+    r = json.loads(Path(path).read_text())
+    c = r["cfg"]
+    board = Path(path).stem[4:].split("_")[0]
+    t_step = c["line_step"]["t_us"] * 1e-6
+    full = r["t_end_s"] > t_step
+    post = [e["i_max_a"] for e in r["gate_offs_last"] if e["t_s"] >= t_step]
+    gap = [e["i_max_a"] for e in r["gate_offs_last"] if r["t_mode_p_s"] + 25e-6 <= e["t_s"] < min(t_step, r["t_end_s"])]
+    tp = r["t_mode_p_s"]
+    after = [q["vo"] for q in r["sections"] if tp < q["t_s"] < tp + 50e-6]
+    ref = steady_peaks(json.loads((TA / REF[board]).read_text()))
+    sp = steady_peaks(r)
+    st.update(board=board, temp=c["gate"].get("temp", 25.0), t_step_us=c["line_step"]["t_us"] if full else None,
+              peak_post=max(post) if full else None, pre_step_pk=max(gap), vo_max_hand=max(after), steady_pk=[round(x, 2) for x in sp],
+              steady_ref=[round(x, 2) for x in ref], steady_dev=max(abs(a - b) for a, b in zip(sp, ref)))
+    ok = passes(st)
+    st["criteria"] = {"c1": ok["S1"] and ok["S2"], "c2": (st["peak_post"] <= 200.0) if full else None, "c3": ok["S3"],
+                      "c4": (0.99 <= st["vo_143_5"] <= 1.17) if st["temp"] != 25.0 else None, "c5": st["steady_dev"] <= 2.0}
+    return st
+
+
+def stage2():
+    out = {Path(f).stem[4:]: run_stats(f) for f in sorted(glob.glob(str(HERE / "cosim" / "run_*.json")))}
+    (HERE / "a183_summary.json").write_text(json.dumps(out, indent=1) + "\n")
+    for k, s in out.items():
+        print(f"{k:12s} Vo {s['vo_143_5']:.3f} ladder {s['rail_ratio']:.2f} start {s['start_pk']:5.1f} hand {s['hand_pk'] or 0:5.1f} "
+              f"gap {s['pre_step_pk']:5.1f} post {s['peak_post'] or 0:5.1f} V {s['vds_max_v']:.1f} Vo {s['vo_min_hand']:.3f}-{s['vo_max_hand']:.3f} "
+              f"Ton {s['ton_max_hand']:.2f}x steady dev {s['steady_dev']:.2f} A {s['criteria']}")
+
+
 if __name__ == "__main__":
-    {"screen": screen}[sys.argv[1]]()
+    {"screen": screen, "stage2": stage2}[sys.argv[1]]()
