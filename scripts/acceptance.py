@@ -89,6 +89,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A173": (TA / "A173_p24_final_plant_coverage", "a173_analyze.py", "a173_summary.json"),
     "A174": (TA / "A174_p24_final_plant_margins", "a174_analyze.py", "a174_summary.json"),
     "A175": (TA / "A175_p24_final_plant_a152_matrix", "a175_analyze.py", "a175_summary.json"),
+    "A177": (TA / "A177_p24_per_board_interlock_reference", "a177_analyze.py", "a177_summary.json"),
     "A178": (TA / "A178_p24_inductance_tolerance_final", "a178_analyze.py", "a178_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
@@ -444,6 +445,10 @@ EXCEPTIONS["A174"] = {
        for c in cs},
     **{("criteria", f"fr_{r}/c4"): _FIXREF for r in ("ss_l_m80_10us", "ss_s_p62", "ss_slew4", "m4_ss_l_p48_1us")},
 }
+_PB = "per-board interlock reference (1.4 ns) at the slow corner: small timing excess over the 0.5 ns run (late fires " \
+      "rise monotonically with the release delay; NEW / Vo scatter near the tolerance); no peak or V_DS change - the " \
+      "slow corner wants a release below 1.4 ns (RESULTS 0)"
+EXCEPTIONS["A177"] = {("criteria", f"pb_{r}/c4"): _PB for r in ("ss_l_m80_10us", "ss_s_p62", "m4_ss_l_p48_1us")}
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
     "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "
@@ -463,7 +468,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A166": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     "A167": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
     **{e: (lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()})
-       for e in ("A168", "A169", "A170", "A171", "A172", "A173", "A174", "A175", "A178")},
+       for e in ("A168", "A169", "A170", "A171", "A172", "A173", "A174", "A175", "A177", "A178")},
 }
 
 
