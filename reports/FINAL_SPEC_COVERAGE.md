@@ -8,13 +8,13 @@ comes from, and says what may be claimed.
 
 | part | setting | source |
 |---|---|---|
-| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13) | A143, C13 |
+| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit) | A143, C13, A184 |
 | loop | 50 pH, ideal parallel damper at ring Q 7 | A168, A157 |
 | devices | EPC2067, EPC's model (vendor library at run time), 2 + 3 per phase; spread corners ff (V_th −0.3 V, driver ×0.8), ss (V_th +1.0 V, Q_G ×1.29, driver ×1.2), hot (125 °C) | D79, A163 |
 | drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
 | controller-side lead | high-side turn-on 8 ns earlier, ramped in over 20 µs after the handover | A167 |
-| start-up | per-board trim: ton = ton0 + (1.035 − Vo(143.5 µs)) / 0.026. Every tested condition was trimmed at its own corner, the 125 °C board included (39.289 vs 39.615 ns at 25 °C); a trim locked at 25 °C holds at 125 °C on the nominal and slow L0 boards (A181: Vo(143.5 µs) 1.040 / 1.057 V, peaks ≤ 183.5 A); below 25 °C not run | A164, A181 |
-| calibrated vs adaptive | factory, once per board: the start-up trim. Adapting at run time: valley timing (dt_pred, dlo), low-side dead time (dtl), negative-current trim, the Vin feed-forward's filters. Fixed: drive resistors, lead, t_il | A143, A164 |
+| start-up | **since 2026-10-10 (A188):** mode S at t0 = 200 ns, so every turn-on is hard and the series-capacitor ladder stays balanced (A183; at 400 ns slow boards split to 15.6 / 14.8 / 8.9 / 8.7 V). Per-board trim of mode S's Ton (cfg_ton_s) to Vo(143.5 µs) = 1.035 V: nominal 23.65-23.68 ns at L × 0.7-1.3, slow 35.45-35.80, ff 21.33 ns. The loop's seed is ton_ns = T_ss + (kp + ki)(Vo_entry − 1 V), from one closed-loop measurement (A185). The handover is requested at Vo ≥ 1.045 V or at 144 µs, whichever comes first: a sequencer comparator on the sampled Vo (A188; at 25 °C it never fires). Trims and seed are set once at 25 °C and locked; checked at 25 °C (A185) and 125 °C (A188); below 25 °C not run. Superseded: t0 400 ns with ton = ton0 + (1.035 − Vo)/0.026 (A164-A181) | A183-A188 |
+| calibrated vs adaptive | factory, once per board: the mode-S trim and the loop seed (one closed-loop measurement of T_ss). Adapting at run time: valley timing (dt_pred, dlo), low-side dead time (dtl), negative-current trim, the Vin feed-forward's filters. Fixed: drive resistors, lead, t_il | A143, A164 |
 | driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above. This settles the ramp's late fires only: at 1.0 ns the load step's spike count still fails its registered tolerance (scatter, open), and a real comparator's offset, noise and early release are not modelled | A171, A173, A174, A177, A179 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
@@ -27,7 +27,7 @@ comes from, and says what may be claimed.
 | V2 | gate model on the high sides; low sides ideal; no interlock | A163-A168 |
 | V3 | every switch gate-driven; no interlock | A169 |
 | V4 | every switch gate-driven; gate-form interlock | A170 |
-| **V5** | **every switch gate-driven; threshold-form interlock (final)** | **A171 (S50 rows), A172, A173** |
+| **V5** | **every switch gate-driven; threshold-form interlock (final)** | **A171 (S50 rows), A172, A173-A188** |
 
 A V2 result does not count as a V5 check. V2 and V5 differ in the low sides' turn-off delay (≤ 2.9 + 1.8 ns), and
 that delay is what made the lead shoot through (A169).
@@ -51,7 +51,14 @@ events only.
 
 Start-up / handover peaks (open loop, per-board trim): nom 162.1 / 149.7, ff 161.6 / 146.4, hot 161.8 / 150.3,
 ss 188.8 / 188.8, L × 0.7 200.2 / 190.2 (limit ref + 3 = 205.5), L × 1.3 146.5 / 137.2, four modules nom 162.1 /
-149.7, ss 193.0 / 193.0, ±5 % 169.1 / 161.9 A.
+149.7, ss 193.0 / 193.0, ±5 % 169.1 / 161.9 A (400 ns start-up).
+
+With the A188 start-up: at 25 °C (A185, seven boards and four nominal modules) start-up 116.5-139.9 A and handover
+148.8-173.2 A. At 125 °C (A188; S75, S0, N0, F0) start-up ≤ 139.0 A and handover ≤ 184.4 A. Vo ≤ 1.048 V throughout
+(400 ns: 57-71 mV overshoot on hot slow boards). Handover minima 0.989-1.000 V; the 400 ns design ranged from 0.961 V
+(S75) to 0.999 V, and the L0 nominal / ff / four-module boards lose 5-9 mV against it (the 200 → ~520 ns period jump,
+A185). Slow devices with L × 0.75 at 25 °C: start-up 135.7 A, handover 161.8 A, post-step ≤ 192.7 A at three
+positions (A184 / A185; 400 ns: 202.1 / 278.4 A).
 
 Interlock delay (A173 / A174), against the 0.5 ns runs:
 - fixed 1.0 V reference = t_il 8.3 ns at ss: peaks within ±0.7 A and V_DS no higher on every row. Late fires
@@ -78,9 +85,13 @@ the spike at 2 of 5.
 Only on earlier plants: the corners ff / hot / ss on the ramps and −4.8 V (V2, A164 for some); random stimuli (V0,
 A142 / C13); the inductor spread beyond ±5 % (V0, C14).
 
-The misses are regulation or oracle events, none on voltage. Current misses: L × 0.7 at one step phase (201.5 A,
-A174), and slow devices with L × 0.75 (A181: open-loop start-up 202-207 A, a 278 A handover runaway at 25 °C,
-202.8 A after the step at 125 °C at one position). The rest:
+The misses are regulation or oracle events, none on voltage. Current misses:
+- L × 0.7 at one step phase (201.5 A, A174);
+- slow devices at 125 °C after +4.8 V / 1 µs with L × 0.75 or 0.8: 204.5 / 207.2 A and 217.1 / 201.5 A, at 2 of 6
+  step positions each (A187). This happens in mode P: phases 3-4 lose their valley for ~25 µs (the valley-timing
+  limit), Vo dips 13-20 mV and Ton rises ~20 % until a recovering valley meets it.
+- A181's slow L × 0.75 start-up miss (202-207 A open loop, a 278 A handover) is fixed by the A188 start-up.
+The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
   step position per variant, so "none" on a variant is one sample);
@@ -94,8 +105,9 @@ A174), and slow devices with L × 0.75 (A181: open-loop start-up 202-207 A, a 27
   shown. Where it never acted (0 holds: nom / ff / hot one module, four modules nominal), they do not depend on it.
   A173 / A174 set t_il to realisable forms (above). A comparator reference above a device's channel-off level
   would release early; the spec excludes it, and it is not modelled.
-- **Each limit was found with the others at nominal, except A181's one combination** (slow devices, L × 0.75,
-  t_il 1.0 ns, a trim locked at 25 °C, 25 / 125 °C), which fails the 200 A budget. Other combinations (ff with a
+- **Each limit was found with the others at nominal, except the combinations of A181 and A183-A188** (slow devices,
+  L × 0.75 / 0.8, t_il 1.0 ns, trims locked at 25 °C, 25 / 125 °C). With the A188 start-up they pass at 25 °C and fail
+  the 200 A budget after the step at 125 °C (A187). Other combinations (ff with a
   small L, slow devices between 0.75 and 1.0 L0, four modules) are not run. Step positions are offsets in absolute
   time; A181 reads their phase after phase 1's low-side turn-off instead of imposing it.
 - Devices inside a board are identical (mismatch only in LTspice single edges, D79 4.7). Four-module boards
@@ -109,8 +121,10 @@ A174), and slow devices with L × 0.75 (A181: open-loop start-up 202-207 A, a 27
 - Inductance tolerance (A174 / A178, +4.8 V / 1 µs, five step phases per board): 0.75 L0 ≤ 198.3 A, 0.8 L0 ≤
   194.7 A, 0.7 L0 199.5-201.5 A (nominal devices, t_il 0.5 ns, each board trimmed). State "at 0.75 and 0.8 L0
   every tested phase stays ≤ 200 A with nominal devices; 0.7 L0 reaches 201.5 A" - not "every L ≥ 0.75 L0": the
-  peak is not monotone in L (L0 182.5 A, 1.3 L0 188.7 A). With slow devices 0.75 L0 fails (A181, start-up
-  202-207 A); the slow corner's own limit is open (~0.8 L0 from the open-loop start-up alone, an estimate).
+  peak is not monotone in L (L0 182.5 A, 1.3 L0 188.7 A). Slow devices, with the A188 start-up: 0.75 L0 holds at
+  25 °C (three step positions, ≤ 192.7 A). At 125 °C neither 0.75 nor 0.8 L0 holds after +4.8 V / 1 µs (2 of 6
+  positions each, up to 207.2 / 217.1 A, A187); L0 holds (A181, ≤ 183.5 A). The slow corner's 125 °C limit lies
+  above 0.8 L0, and it is not monotone in L either.
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
 - The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
   delay up to 8.3 ns keeps peaks and voltages; at the slow corner it should release within 1.0 ns, which a
@@ -140,7 +154,10 @@ A174), and slow devices with L × 0.75 (A181: open-loop start-up 202-207 A, a 27
 | 6 | A180's step-2 rule tied the windowed clamp to the always-on clamp's loss | partly: A180 RESULTS already reads the rule as not authorising step 2; criterion 5 stood in for the windowed clamp's ideal trigger | A180 unchanged (FAIL stays). Run as A182: a 0.75 V detector with <= 0.3 us delay keeps the ideal trigger's benefit at twice the clamp current (289 vs 146 A); 1.0 us or 1.5 V loses it (0/4 as registered; extension lscb_ladder closed) |
 
 Run as A181 (2026-10-09 evening): the locked 25 °C trim holds hot at L0; slow devices with L × 0.75 exceed 200 A
-at start-up (202-207 A), at the 25 °C handover (278 A) and once after the step at 125 °C (202.8 A).
+at start-up (202-207 A), at the 25 °C handover (278 A) and once after the step at 125 °C (202.8 A). Then A183-A188
+(10-09 / 10, after the user's "solve what is found"):
+- the start-up miss came from mode S's ladder split, fixed by the start-up above;
+- the 125 °C post-step miss is mode P's valley-timing limit at this corner, open (A187).
 
 ## 7. Third external review (2026-10-09): the mathematical model
 

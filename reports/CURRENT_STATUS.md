@@ -1976,6 +1976,36 @@ each question:
            loses it. 0/4 as registered: criterion 1 counted the .ic
            settling (1.129 V at 0.95 us) and moved 2-4 to 1.5 V.
          - Closed loop (step 2) not run (user, 2026-10-09).
+     97. The start-up rebuilt and the slow corner's limit (2026-10-09 / 10,
+         mixed; A183-A188, after the user's "solve what is found"; one RTL
+         register authorised, cfg_ton_s):
+         - Cause of A181's miss (records): mode S (fixed 400 ns, 4.5 ns dead
+           time) leaves valleys unregulated. Slow gates lose ~16 ns on hard
+           turn-ons, ZVS phases gain, and the ladder splits (15.6 / 14.8 /
+           8.9 / 8.7 V). That gives a 202 A open loop and, at the handover, a
+           74 mV dip that winds Ton to 1.3x (278 A).
+         - Start-up spec adopted (A188): mode S at 200 ns (every turn-on hard,
+           ladders 1.006-1.028), per-board mode-S trim (cfg_ton_s), a
+           bumpless loop seed T_ss + (kp + ki)(Vo_entry - 1 V), and the
+           handover requested at Vo >= 1.045 V or 144 us. 25 C (A185):
+           start-up <= 139.9 A, handover <= 173.2 A. 125 C (A188): <= 139.0 /
+           184.4 A, overshoot <= 48 mV (was 57-71 mV hot), minima 0.995-1.000 V.
+           Slow L x 0.75 at 25 C: 135.7 / 161.8 / <= 192.7 A (was 202 / 278 A).
+           Price: L0 nominal / ff / four-module handover minima 0.989-0.993 V
+           (were 0.998-0.999; the 200 -> ~520 ns period jump).
+         - Steps not adopted on the way: A183 (the trim also set the loop's
+           seed and clamps: N13 at 1.83x a 2x clamp), A184 (seed and clamps
+           decoupled; valley-gap dips), A186 (request at 1.03 V fired while
+           Vo still rose at 25 C).
+         - Still open (A187): slow devices at 125 C after +4.8 V / 1 us exceed
+           200 A at 2 of 6 step positions with L x 0.75 (204.5 / 207.2 A)
+           and L x 0.8 (217.1 / 201.5 A). This is mode P's valley-timing limit:
+           phases 3-4 lose their valley ~25 us, Vo dips, Ton rises ~20 %. The
+           limit is above 0.8 L0 and is a controller item.
+         - Also: seg_time at the asymptote and steady_check with the control
+           memory (D81 audit counts unchanged); the bridge's Vo request
+           (hand_vo_v); acceptance A183 35/1, A184 75/8, A185 63/3, A186
+           79/5, A187 44/4, A188 24/0.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
