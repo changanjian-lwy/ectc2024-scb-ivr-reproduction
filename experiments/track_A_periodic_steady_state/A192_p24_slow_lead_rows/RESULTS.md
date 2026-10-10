@@ -17,9 +17,11 @@ Code cfe581f, plant V5, t_il 1.0 ns, the A188 start-up, driver hs_on_lead_ns 9.5
     21-37 us instead of 0-19.
   - Four modules: 185.2 A against 180.0-183.2 A, and -15.7 against -9.9..-12.9 mV.
   - Mechanism (S75 p0 against A184 p0): the steady valleys are 1.3 A deeper (-15.8 / -14.5 A). In the first 30 us
-    after the step the deepest valleys on phases 2-4 reach -72 / -91 / -88 A, against -49 / -76 / -67 A. The lead
-    turns on earlier than the gate delay at 25 C needs. That is the same chain as A187: the valleys draw charge back,
-    Vo dips, and the loop raises Ton.
+    after the step the deepest valleys on phases 2-4 reach -72 / -91 / -88 A, against -49 / -76 / -67 A. From there
+    the chain is A187's: the valleys draw charge back, Vo dips, and the loop raises Ton. Why a larger lead deepens
+    the valleys is not traced. An earlier turn-on alone would make them shallower, and the learned valley timing
+    (dt_pred, dlo) adapts to the lead. "Too early at 25 C" is not shown either: hot, the slow device's V_th is lower
+    (2.29 / 2.49 V) and its gain lower (A1' 51 / 73).
 - **Worst S75 peak over 25 and 125 C:** 197.1 A with the lead, against 207.2 A without it (A187). The 25 C margin
   narrows, but the lead-8 spread at 25 C already reached 198.7 A (A181 p0, the 400 ns start-up). A temperature-
   scheduled lead (8 ns cold, 9.5 hot) would not lower the worst case below that, so it is not run.
