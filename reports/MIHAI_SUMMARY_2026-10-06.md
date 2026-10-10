@@ -256,8 +256,9 @@ are budgets over plausible ranges:
       line step's regulation (12.6 mV, 46 µs) and the slow corner's timing.
     - Per device: 3.0 Ω ± 20 % turn-on, ≤ 0.3 Ω turn-off, a Kelvin source and a
       gate loop ≤ 1 nH. Low-side sink ≤ 0.3 Ω (dv/dt immunity).
-    - An 8 ns high-side turn-on lead, enabled over ~20 µs after the handover
-      so the loop takes over without an on-time step, plus the threshold-form
+    - An 8 ns high-side turn-on lead (9.5 ns on slow boards, read from the
+      25 °C trim), enabled over ~20 µs after the handover so the loop takes
+      over without an on-time step, plus the threshold-form
       driver interlock (see above). The controller stays as frozen.
     - A start-up rebuilt on 9-10 October (A183-A188). The open-loop phase runs at a 200 ns period, so every
       turn-on is hard and the series-capacitor ladder stays balanced; at 400 ns slow boards split it to 15.6 / 8.7 V.
@@ -271,11 +272,13 @@ are budgets over plausible ranges:
       open-loop start-up 200 A. These are tested points with nominal devices,
       not a range (the peak is not monotone in L). With slow devices and the
       old start-up, 0.75 × failed at start-up (202-207 A, a 278 A handover).
-      With the rebuilt start-up it holds at 25 °C (≤ 192.7 A). At 125 °C both
-      0.75 × and 0.8 × still exceed 200 A after +4.8 V / 1 µs at 2 of 6 step
-      positions (up to 207 / 217 A). The cause is the slow corner's valley
-      timing in closed loop: phases 3-4 lose their valley for ~25 µs. So the
-      inductance tolerance is per device corner and temperature. Four modules: 184 A; 196.5 A with
+      With the rebuilt start-up it holds at 25 °C. At 125 °C, with the 8 ns
+      lead, 0.75 × and 0.8 × exceeded 200 A after +4.8 V / 1 µs at 2 of 6 step
+      positions (up to 207 / 217 A): the slow gates' delay eats the valley and
+      phases 3-4 lose it for ~25 µs. A 9.5 ns lead on slow boards holds all
+      six positions (≤ 196.9 / 192.8 A). Its cost is at 25 °C: 0.75 × reaches
+      197.1 A after the same step (192.7 A with 8 ns), and the dips are 3-5 mV
+      deeper. So the inductance tolerance is per device corner. Four modules: 184 A; 196.5 A with
       a ±5 % inductor spread.
     - Open, with no current or voltage consequence:
         - Falling line steps make the controller restart its valley prediction

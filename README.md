@@ -20,19 +20,19 @@ device assumptions coexist in one physically consistent operating cycle?**
 > A local ZVS event, a passing unit test and a full periodic solution are different evidence levels.
 
 **Status, 10 October 2026: this phase is archived** (a candidate design with its scope stated; open items are
-listed). Problems found after archiving are still fixed: the start-up was rebuilt on 9-10 October (A183-A188).
+listed). Problems found after archiving are still fixed: the start-up was rebuilt on 9-10 October (A183-A190), and slow boards got a 9.5 ns lead (A191-A192).
 One P24 module and the four-module, 16-phase 1 kW system run closed-loop in co-simulation (Verilog controller,
 circuit plant with nonlinear Coss). Both controller designs are frozen, except one user-authorised register,
 mode S's own Ton (A184). At the
 package level the switch overshoot is addressed by a candidate gate-drive
 specification, checked on the listed rows of a gate-level plant (EPC's device
 model): loop <= 50 pH, 3.0 / 0.3 ohm +-20 % per device, an 8 ns ramped high-side
-lead, an (idealised) driver interlock releasing within 1.0 ns at the slow corner,
+lead (9.5 ns on slow boards), an (idealised) driver interlock releasing within 1.0 ns at the slow corner,
 and a start-up with a 200 ns open-loop period, a per-board trim (with a per-corner
 table below 25 C), a bumpless loop seed and a handover at Vo >= 1.045 V or 144 us (-40 to 125 C). Not all rows pass:
 - L x 0.7 reaches 201.5 A at one step position;
-- slow devices at 125 C exceed 200 A after +4.8 V / 1 us with L x 0.75 or 0.8 at 2 of 6 step positions (A187), so
-  the inductance tolerance is per device corner and temperature;
+- slow devices with L x 0.75 hold 200 A at 25 and 125 C only with the 9.5 ns lead, with 2.9 A margin at 25 C
+  (A191 / A192; with 8 ns they reach 207 A at 125 C, A187), so the tolerance is stated per device corner;
 - the nominal 13-row matrix passes 12;
 - slow-corner / falling-step timing events remain. Which rows ran on
 which plant version: [reports/FINAL_SPEC_COVERAGE.md](reports/FINAL_SPEC_COVERAGE.md).

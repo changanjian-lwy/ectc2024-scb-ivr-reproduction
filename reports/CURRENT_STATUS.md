@@ -1997,11 +1997,17 @@ each question:
            seed and clamps: N13 at 1.83x a 2x clamp), A184 (seed and clamps
            decoupled; valley-gap dips), A186 (request at 1.03 V fired while
            Vo still rose at 25 C).
-         - Still open (A187): slow devices at 125 C after +4.8 V / 1 us exceed
-           200 A at 2 of 6 step positions with L x 0.75 (204.5 / 207.2 A)
+         - A187: with the 8 ns lead, slow devices at 125 C after +4.8 V / 1 us
+           exceed 200 A at 2 of 6 step positions with L x 0.75 (204.5 / 207.2 A)
            and L x 0.8 (217.1 / 201.5 A). This is mode P's valley-timing limit:
-           phases 3-4 lose their valley ~25 us, Vo dips, Ton rises ~20 %. The
-           limit is above 0.8 L0 and is a controller item.
+           phases 3-4 lose their valley ~25 us, Vo dips, Ton rises ~20 %.
+           Closed by a 9.5 ns lead on slow boards (the class read from the 25 C
+           trim; 8 ns elsewhere): A191 194.1-196.9 / 190.6-192.8 A at all six
+           positions. A192 checks the slow boards' other rows (14 runs, all
+           pass). The cost is at 25 C on +4.8 V / 1 us: S75 195.8-197.1 A (8 ns:
+           191.5-192.7), four modules 185.2 A (180.0-183.2), dips 3-5 mV deeper,
+           because the post-step valleys run deeper. Late fires fall everywhere
+           (-8 V: 0-21 vs 12-32). Worst S75 over 25 / 125 C: 197.1 A (was 207.2).
          - Also: seg_time at the asymptote and steady_check with the control
            memory (D81 audit counts unchanged); the bridge's Vo request
            (hand_vo_v); acceptance A183 35/1, A184 75/8, A185 63/3, A186
@@ -2014,7 +2020,7 @@ each question:
            +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 C) holds
            on hold-out S0, S80, N75, N13: Vo(143.5) 1.031-1.034 V, handover
            <= 166.3 A. The start-up spec covers -40 to 125 C (model
-           extrapolated below 25 C). Acceptance A189 30/6, A190 44/0.
+           extrapolated below 25 C). Acceptance A189 30/6, A190 44/0, A191 48/0, A192 60/0.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
