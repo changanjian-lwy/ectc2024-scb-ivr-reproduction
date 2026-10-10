@@ -262,7 +262,8 @@ are budgets over plausible ranges:
     - A start-up rebuilt on 9-10 October (A183-A188). The open-loop phase runs at a 200 ns period, so every
       turn-on is hard and the series-capacitor ladder stays balanced; at 400 ns slow boards split it to 15.6 / 8.7 V.
       It has a per-board trim of its own on-time: one added RTL register, user-authorised. The loop gets a
-      bumpless seed, and the handover is requested at Vo >= 1.045 V or at 144 µs. Hot overshoot <= 48 mV (was
+      bumpless seed, and the handover is requested at Vo >= 1.045 V or at 144 µs. Below 25 °C the trim follows
+      a per-corner table, which held on boards it was not fitted to (-40 / 0 °C). Hot overshoot <= 48 mV (was
       57-71 mV); the L0 boards' handover dip is 5-9 mV deeper.
     - Results: switch ≤ 38.4 V on every run. Peaks ≤ 198.3 A on the 0.75 ×
       and 0.8 × inductance boards at five step phases each (nominal devices).

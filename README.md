@@ -28,8 +28,8 @@ package level the switch overshoot is addressed by a candidate gate-drive
 specification, checked on the listed rows of a gate-level plant (EPC's device
 model): loop <= 50 pH, 3.0 / 0.3 ohm +-20 % per device, an 8 ns ramped high-side
 lead, an (idealised) driver interlock releasing within 1.0 ns at the slow corner,
-and a start-up with a 200 ns open-loop period, a per-board trim, a bumpless loop seed
-and a handover at Vo >= 1.045 V or 144 us. Not all rows pass:
+and a start-up with a 200 ns open-loop period, a per-board trim (with a per-corner
+table below 25 C), a bumpless loop seed and a handover at Vo >= 1.045 V or 144 us (-40 to 125 C). Not all rows pass:
 - L x 0.7 reaches 201.5 A at one step position;
 - slow devices at 125 C exceed 200 A after +4.8 V / 1 us with L x 0.75 or 0.8 at 2 of 6 step positions (A187), so
   the inductance tolerance is per device corner and temperature;

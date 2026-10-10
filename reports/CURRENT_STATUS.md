@@ -2006,6 +2006,15 @@ each question:
            memory (D81 audit counts unchanged); the bridge's Vo request
            (hand_vo_v); acceptance A183 35/1, A184 75/8, A185 63/3, A186
            79/5, A187 44/4, A188 24/0.
+         - Below 25 C (A189, A190): with the 25 C trim locked, slow boards
+           fail cold. Mode-S Vo falls ~1.2 mV/K (-40 C: 0.956 V, below the
+           cliff, 264-278 A), and at 0 C the bumpless seed overshoots the
+           first Ton (211 A). The 400 ns start-up also fails slow L0 at
+           -40 C (242 A). A per-corner trim table from S75 / N0 (slow
+           +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 C) holds
+           on hold-out S0, S80, N75, N13: Vo(143.5) 1.031-1.034 V, handover
+           <= 166.3 A. The start-up spec covers -40 to 125 C (model
+           extrapolated below 25 C). Acceptance A189 30/6, A190 44/0.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,
