@@ -38,6 +38,7 @@ table below 25 C), a bumpless loop seed and a handover at Vo >= 1.045 V or 144 u
 - slow-corner / falling-step timing events remain. Which rows ran on
 which plant version: [reports/FINAL_SPEC_COVERAGE.md](reports/FINAL_SPEC_COVERAGE.md).
 Closing summary (Chinese): [reports/PROJECT_SUMMARY_2026-10-10.md](reports/PROJECT_SUMMARY_2026-10-10.md).
+Which paper each step rests on, and that paper's own conditions: [reports/LITERATURE_BASIS.md](reports/LITERATURE_BASIS.md).
 Summary: [reports/MIHAI_SUMMARY_2026-10-06.md](reports/MIHAI_SUMMARY_2026-10-06.md)
 (dated 9 October); P24 / P25 item by item:
 [reports/PAPER_REPRODUCTION_MAP.md](reports/PAPER_REPRODUCTION_MAP.md).
