@@ -99,6 +99,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A186": (TA / "A186_p24_vo_triggered_handover", "a186_analyze.py", "a186_summary.json"),
     "A187": (TA / "A187_p24_slow_corner_inductance_hot", "a187_analyze.py", "a187_summary.json"),
     "A188": (TA / "A188_p24_handover_request_level", "a188_analyze.py", "a188_summary.json"),
+    "A189": (TA / "A189_p24_cold_startup", "a189_analyze.py", "a189_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -503,6 +504,11 @@ _A187 = "slow devices at 125 C after +4.8 V / 1 us: phases 3-4 lose their valley
         "dips, the loop raises Ton ~20 % and a recovering valley meets it; above 200 A at 2 of 6 step positions on both " \
         "boards - the slow corner's limit lies above 0.8 L0 at 125 C (RESULTS 0)"
 EXCEPTIONS["A187"] = {(r, "c2"): _A187 for r in ("S75_hot_p3", "S75_hot_p5", "S80_hot_p3", "S80_hot_p5")}
+_COLD = "slow devices below 25 C with the trim locked at 25 C: mode S's Vo falls ~1.2 mV/K (all turn-ons hard) and the " \
+        "bumpless seed assumes the 25 C entry Vo (RESULTS 0); the spec is stated for 25-125 C, A190 tests a compensated trim"
+EXCEPTIONS["A189"] = {("S75_c0", "c1"): _COLD, ("S75_m40", "c1"): _COLD, ("S75_m40", "c4"): _COLD, ("S0_m40", "c1"): _COLD,
+                      ("S0_m40", "c4"): _COLD,
+                      ("oldS0_m40", "c1"): "the 400 ns start-up at -40 C: slow L0 ladder split 1.73, handover 242.2 A (RESULTS 0)"}
 EXCEPTIONS["A175"] = {
     ("criteria", "nom_l_m48_1us/c3"): "-4.8 V / 1 us: 3 K3 restarts and 6 NEW 10-20 A spikes 27-41 us after the step - "
     "A148's falling-step valley loss turned into restarts by the lead plus the gate-driven low sides (A176); post-step "
