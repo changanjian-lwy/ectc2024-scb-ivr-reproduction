@@ -2008,6 +2008,13 @@ each question:
            191.5-192.7), four modules 185.2 A (180.0-183.2), dips 3-5 mV deeper,
            because the post-step valleys run deeper. Late fires fall everywhere
            (-8 V: 0-21 vs 12-32). Worst S75 over 25 / 125 C: 197.1 A (was 207.2).
+           Why the larger lead deepens the valleys is not traced. Cold (A193,
+           first mode-P post-step runs below 25 C): S75 +4.8 V / 1 us with
+           9.5 ns 191.1-195.0 A at -40 C and 194.5-197.8 A at 0 C; 8 ns at
+           -40 C 189.4-197.4 A. Worst S75 over -40..125 C: 197.8 A, margin
+           2.2 A at three positions per temperature. Cold runs carry more
+           one-period spikes (<= 187.8 A); with 8 ns at -40 C they last to the
+           run's end.
          - Also: seg_time at the asymptote and steady_check with the control
            memory (D81 audit counts unchanged); the bridge's Vo request
            (hand_vo_v); acceptance A183 35/1, A184 75/8, A185 63/3, A186
@@ -2020,7 +2027,7 @@ each question:
            +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 C) holds
            on hold-out S0, S80, N75, N13: Vo(143.5) 1.031-1.034 V, handover
            <= 166.3 A. The start-up spec covers -40 to 125 C (model
-           extrapolated below 25 C). Acceptance A189 30/6, A190 44/0, A191 48/0, A192 60/0.
+           extrapolated below 25 C). Acceptance A189 30/6, A190 44/0, A191 48/0, A192 60/0, A193 36/0.
 
         **Next at this level, one at a time** (superseded by item 26; kept as the record) (after the code clean-up
         agreed on 2026-10-01: one shared adopted version per component,

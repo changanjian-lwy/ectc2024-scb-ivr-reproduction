@@ -278,7 +278,9 @@ are budgets over plausible ranges:
       phases 3-4 lose it for ~25 µs. A 9.5 ns lead on slow boards holds all
       six positions (≤ 196.9 / 192.8 A). Its cost is at 25 °C: 0.75 × reaches
       197.1 A after the same step (192.7 A with 8 ns), and the dips are 3-5 mV
-      deeper. So the inductance tolerance is per device corner. Four modules: 184 A; 196.5 A with
+      deeper. At −40 and 0 °C the same board stays ≤ 195.0 / 197.8 A. The
+      smallest margin over −40 to 125 °C is 2.2 A, at three step positions
+      per temperature. So the inductance tolerance is per device corner. Four modules: 184 A; 196.5 A with
       a ±5 % inductor spread.
     - Open, with no current or voltage consequence:
         - Falling line steps make the controller restart its valley prediction
