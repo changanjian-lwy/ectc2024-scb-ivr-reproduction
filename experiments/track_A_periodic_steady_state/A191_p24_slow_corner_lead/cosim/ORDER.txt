@@ -1,0 +1,12 @@
+S75_hot_p0
+S75_hot_p1
+S75_hot_p2
+S75_hot_p3
+S75_hot_p4
+S75_hot_p5
+S80_hot_p0
+S80_hot_p1
+S80_hot_p2
+S80_hot_p3
+S80_hot_p4
+S80_hot_p5
