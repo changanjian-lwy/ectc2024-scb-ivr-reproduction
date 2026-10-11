@@ -3,7 +3,9 @@ of the physical peak, of the high-side gate delay and of the turn-on V_DS in the
 phase 1's timed-edge reports that are early, mean Vo, late fires in the window and the status.
   python3 a195_analyze.py records   the alternation in existing V2 / V5 records (the window is the 40 us before each
                                     record's event) -> a195_records.json
-  python3 a195_analyze.py           the A195 runs, window 290-330 us, against the reference record -> a195_summary.json"""
+  python3 a195_analyze.py           the A195 runs, window 290-330 us, against the reference record -> a195_summary.json
+whole(path): outside the criteria, the run up to 330 us: largest physical peak at the handover (144-200 us) and after
+it (200-330 us), the valley's range in the window, Vo's extremes over 150-330 us and the late fires up to 330 us."""
 from __future__ import annotations
 
 import glob
@@ -50,6 +52,16 @@ def alt(path, a, b):
     return out
 
 
+def whole(path, end=330e-6):
+    r = json.loads(Path(path).read_text())
+    pk = lambda a, b: max(e["i_max_a"] for e in r["gate_offs_last"] if a <= e["t_s"] < b)
+    lo = lambda ph: [e["i_a"] for e in r["lowoffs_last"] if e["phase"] == ph and WIN[0] <= e["t_s"] < WIN[1]]
+    vo = [q["vo"] for q in r["sections"] if 150e-6 <= q["t_s"] < end]
+    late = [q for q in r["sections"] if q["t_s"] < end and "late" in q]
+    return {"hand_pk": pk(144e-6, 200e-6), "after_pk": pk(200e-6, end), "valley_range": [max(lo(ph)) - min(lo(ph)) for ph in (1, 2, 3, 4)],
+            "vo_min_mv": 1e3 * (min(vo) - 1.0), "vo_max_mv": 1e3 * (max(vo) - 1.0), "late_to_330": sum(late[-1]["late"]) if late else 0}
+
+
 def line(name, s):
     f = lambda v: " ".join("  -  " if x is None else f"{x:5.2f}" for x in v)
     return (f"{name:44s} {s['temp']:6.1f} C lead {s['lead_ns']:4.1f} delay {s['delay_ns'][0]:5.2f} ns | valley alt {f(s['valley_alt'])} A | "
@@ -72,10 +84,10 @@ def records():
 
 
 def main():
-    res = {"reference": {b: {"290-330us": alt(p, *WIN), "459-499us": alt(p, 459e-6, 499e-6)} for b, p in REF.items() if p.exists()}}
+    res = {"reference": {b: {"290-330us": {**alt(p, *WIN), "whole": whole(p)}, "459-499us": alt(p, 459e-6, 499e-6)}
+                         for b, p in REF.items() if p.exists()}}
     for f in sorted(glob.glob(str(HERE / "cosim" / "run_*.json"))):
-        res[Path(f).stem[4:]] = alt(f, *WIN)
-    (HERE / "a195_summary.json").write_text(json.dumps(res, indent=1) + "\n")
+        res[Path(f).stem[4:]] = {**alt(f, *WIN), "whole": whole(f)}
     for b, s in res["reference"].items():
         for w, x in s.items():
             print(line(f"reference {b} {w}", x))
@@ -83,9 +95,15 @@ def main():
         if k != "reference":
             ref = res["reference"][k.split("_")[0]]["290-330us"]
             c1 = max(s["valley_alt"]) <= 1.0
-            c2 = (s["status"] == "COMPLETED" and not s["shoot_on"] and abs(s["vo_mv"] - ref["vo_mv"]) <= 1.0
+            c2 = (s["status"] == "COMPLETED" and not any(s["shoot_on"]) and abs(s["vo_mv"] - ref["vo_mv"]) <= 1.0
                   and all(abs(v + 15.625) <= 1.5 for v in s["valley_mean"]) and s["late_in_window"] <= ref["late_in_window"])
+            s["criteria"] = {"c1": c1, "c2": c2}
+            w, wr = s["whole"], ref["whole"]
             print(line(k, s), "| c1", c1, "c2", c2)
+            print(f"    hand {w['hand_pk']:.1f} ({wr['hand_pk']:.1f}) after {w['after_pk']:.1f} ({wr['after_pk']:.1f}) A | Vo {w['vo_min_mv']:+.1f} / {w['vo_max_mv']:+.1f} "
+                  f"({wr['vo_min_mv']:+.1f} / {wr['vo_max_mv']:+.1f}) mV | late to 330 us {w['late_to_330']} ({wr['late_to_330']}) | steady peak max "
+                  f"{max(s['peak_max']):.1f} ({max(ref['peak_max']):.1f}) | valley range {max(w['valley_range']):.1f} ({max(wr['valley_range']):.1f}) A")
+    (HERE / "a195_summary.json").write_text(json.dumps(res, indent=1) + "\n")
 
 
 if __name__ == "__main__":
