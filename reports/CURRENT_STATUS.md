@@ -2088,6 +2088,14 @@ each question:
          case stays the designed row (S75, +4.8 V / 1 us, 197.8 A). Found
          while checking: A191's 125 C rows ran with the 1.03 V handover
          request, not the adopted 1.045 V; rerun as A197.
+    101. The 125 C slow rows on the final configuration (2026-10-12, A197,
+         plant V5). A191's 12 runs (S75 / S80, +4.8 V / 1 us, six positions,
+         lead 9.5 ns) redone with the adopted handover request (1.045 V; A191
+         had A186's 1.03 V). 12 of 12 pass: post-step 194.6-196.3 / 190.8-
+         194.8 A (A191: 194.1-196.9 / 190.6-192.8 A), handover 184.5 /
+         182.0 A, V_DS <= 33.7 V. Vo reaches 1.0486 V on S80 over 0-300 us,
+         1.4 mV under the 1.05 V limit. The slow corner's worst case stays
+         197.8 A at 0 C (A193).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

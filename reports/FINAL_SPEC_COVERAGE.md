@@ -54,7 +54,8 @@ ss 188.8 / 188.8, L × 0.7 200.2 / 190.2 (limit ref + 3 = 205.5), L × 1.3 146.5
 149.7, ss 193.0 / 193.0, ±5 % 169.1 / 161.9 A (400 ns start-up).
 
 With the A188 start-up: at 25 °C (A185, seven boards and four nominal modules) start-up 116.5-139.9 A and handover
-148.8-173.2 A. At 125 °C (A188; S75, S0, N0, F0) start-up ≤ 139.0 A and handover ≤ 184.4 A. Vo ≤ 1.048 V throughout
+148.8-173.2 A. At 125 °C (A188; S75, S0, N0, F0) start-up ≤ 139.0 A and handover ≤ 184.4 A. Vo ≤ 1.048 V throughout;
+S80 at 125 °C (A197): handover 182.0 A and Vo 1.0486 V, 1.4 mV under the 1.05 V limit
 (400 ns: 57-71 mV overshoot on hot slow boards). Handover minima 0.989-1.000 V; the 400 ns design ranged from 0.961 V
 (S75) to 0.999 V, and the L0 nominal / ff / four-module boards lose 5-9 mV against it (the 200 → ~520 ns period jump,
 A185). Slow devices with L × 0.75 at 25 °C: start-up 135.7 A, handover 161.8 A, post-step ≤ 192.7 A at three
@@ -98,7 +99,8 @@ The misses are regulation or oracle events, none on voltage. Current misses:
 - L × 0.7 at one step phase (201.5 A, A174);
 - slow devices at 125 °C after +4.8 V / 1 µs with L × 0.75 or 0.8 exceeded 200 A with the 8 ns lead: 204.5 /
   207.2 A and 217.1 / 201.5 A at 2 of 6 step positions each (A187; valley-timing limit, phases 3-4 lose their valley
-  for ~25 µs). Fixed by the 9.5 ns lead on slow boards: 194.1-196.9 / 190.6-192.8 A at all six (A191). The lead's
+  for ~25 µs). Fixed by the 9.5 ns lead on slow boards: 194.6-196.3 / 190.8-194.8 A at all six with the final configuration
+  (A197). A191, where the lead was chosen, ran A186's 1.03 V handover request: 194.1-196.9 / 190.6-192.8 A. The lead's
   cost on the other slow rows is the 25 °C margin: S75 +4.8 V / 1 µs 195.8-197.1 A (A192, three positions). Cold,
   the same row gives 191.1-195.0 A at −40 °C and 194.5-197.8 A at 0 °C (A193). The worst tested S75 point over
   −40..125 °C is 197.8 A, a 2.2 A margin.
@@ -119,7 +121,7 @@ The rest:
   would release early; the spec excludes it, and it is not modelled.
 - **Each limit was found with the others at nominal, except the combinations of A181 and A183-A188** (slow devices,
   L × 0.75 / 0.8, t_il 1.0 ns, trims locked at 25 °C, 25 / 125 °C). With the A188 start-up and the 8 ns lead they pass at 25 °C and fail
-  the 200 A budget after the step at 125 °C (A187); with the slow boards' 9.5 ns lead they pass at both (A191, A192), and S75 passes +4.8 V / 1 µs at −40 and 0 °C (A193). Other combinations (ff with a
+  the 200 A budget after the step at 125 °C (A187); with the slow boards' 9.5 ns lead they pass at both (A192 at 25 °C; A197 at 125 °C; A191 at 125 °C ran the 1.03 V handover request of A186), and S75 passes +4.8 V / 1 µs at −40 and 0 °C (A193). Other combinations (ff with a
   small L, slow devices between 0.75 and 1.0 L0, four modules) are not run. Step positions are offsets in absolute
   time; A181 reads their phase after phase 1's low-side turn-off instead of imposing it.
 - Devices inside a board are identical (mismatch only in LTspice single edges, D79 4.7). Four-module boards
@@ -145,7 +147,8 @@ The rest:
   peak is not monotone in L (L0 182.5 A, 1.3 L0 188.7 A). Slow devices, with the A188 start-up: 0.75 L0 holds at
   25 °C (three step positions, ≤ 192.7 A). At 125 °C, with the 8 ns lead, neither 0.75 nor 0.8 L0
   holds after +4.8 V / 1 µs (2 of 6 positions each, up to 207.2 / 217.1 A, A187). With the slow boards' 9.5 ns lead
-  both hold at all six positions (≤ 196.9 / 192.8 A, A191). At 25 °C, 0.75 L0 then reaches 197.1 A (A192, three
+  both hold at all six positions (≤ 196.3 / 194.8 A with the adopted 1.045 V handover request, A197; ≤ 196.9 / 192.8 A
+  in A191, which ran the 1.03 V request). At 25 °C, 0.75 L0 then reaches 197.1 A (A192, three
   positions); slow L0 with 9.5 ns gives 181.4 / 182.7 A at 25 / 125 °C (one position each). Below 25 °C, 0.75 L0 holds at
   −40 °C (≤ 195.0 A) and 0 °C (≤ 197.8 A) on the same row (A193; device model extrapolated). Tested points only: the
   smallest margin is 2.2 A at three positions per temperature. 0.8 L0 at and below 25 °C, 0.85-0.95 L0, and other

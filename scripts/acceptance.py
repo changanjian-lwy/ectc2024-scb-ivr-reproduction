@@ -106,6 +106,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A193": (TA / "A193_p24_slow_lead_cold", "a193_analyze.py", "a193_summary.json"),
     "A194": (TA / "A194_p24_final_plant_random_stimuli", "a194_analyze.py", "a194_summary.json"),
     "A196": (TA / "A196_p24_slow_corrector_binding_row", "a196_analyze.py", "a196_summary.json"),
+    "A197": (TA / "A197_p24_slow_hot_final_handover", "a197_analyze.py", "a197_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)

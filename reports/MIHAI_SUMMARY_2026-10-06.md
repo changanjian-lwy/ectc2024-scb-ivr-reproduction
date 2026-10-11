@@ -276,7 +276,7 @@ are budgets over plausible ranges:
       lead, 0.75 × and 0.8 × exceeded 200 A after +4.8 V / 1 µs at 2 of 6 step
       positions (up to 207 / 217 A): the slow gates' delay eats the valley and
       phases 3-4 lose it for ~25 µs. A 9.5 ns lead on slow boards holds all
-      six positions (≤ 196.9 / 192.8 A). Its cost is at 25 °C: 0.75 × reaches
+      six positions (≤ 196.9 / 192.8 A; rerun with the final handover request, A197: ≤ 196.3 / 194.8 A). Its cost is at 25 °C: 0.75 × reaches
       197.1 A after the same step (192.7 A with 8 ns), and the dips are 3-5 mV
       deeper. At −40 and 0 °C the same board stays ≤ 195.0 / 197.8 A. The
       smallest margin over −40 to 125 °C is 2.2 A, at three step positions
