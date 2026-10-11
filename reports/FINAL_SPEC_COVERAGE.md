@@ -164,8 +164,10 @@ The rest:
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
 - Line steps after start-up: "+4.8 V / 1 µs is covered from 40 µs after the handover on the tested boards (S75 at 25
   and 125 °C, N0 at 25 °C); within the first 40 µs slow boards reach up to 217.3 A" - not "from start-up on". The
-  hold-off is counted from mode P's entry (131.4 µs on hot slow boards, 144.0 µs otherwise). A power-good signal
-  released 40 µs after the handover would carry it; no such signal is modelled.
+  hold-off is counted from mode P's entry (131.4 µs on hot slow boards, 144.0 µs otherwise). It is a condition on
+  the input bus: no step of this size until 40 µs after the handover, about 185 µs after enable. No run has a line
+  step during the open-loop start-up either. Load steps in the same window are not run; a power-good signal
+  released 40 µs after the handover would exclude them (the load, not the bus, is what power-good gates).
 - Slow-corner currents: "slow-device boards alternate by 4-7 A from one cycle to the next in steady state; the
   stated peaks include it" - not "the slow corner's steady peak is 150 A" without it. The steady valley of a slow
   board is a pair (S75, 25 °C, 9.5 ns: −12.9 / −17.3 A), not one number; A192's "deeper valleys with the 9.5 ns
