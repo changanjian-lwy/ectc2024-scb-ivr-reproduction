@@ -10,10 +10,10 @@
 
 ## Open points
 
-- `symbolic_derivations/03_P24_native/D65_P24_PACKAGE_PARASITICS.md` quotes "published embedded-GaN power loops: 0.23-0.32 nH PCB-embedded, 1.03 nH DBC" without naming the papers. The figure is repeated in A144, A151, A152, A154, the scorecard (T20) and the Mihai summary. It must be traced before it is quoted. The 1.03 nH value appears to match a 400 V-class PCB-on-DBC half-bridge module, a different voltage class from P24's 40 V devices.
+- **Traced 2026-10-11 (D82).** D65's "published embedded-GaN power loops: 0.23-0.32 nH PCB-embedded, 1.03 nH DBC" had no source. The figures match Moench et al., TPEL 2021 (0.23 nH, 600 V-class ICs in a PCB; not read), Heydari et al., Electronics Letters 2025 (0.32 nH, 200 V devices; not read) and Tian et al., TPEL 2024 (1.03 nH, 650 V GS66508T, 400 V / 25 A double-pulse test; read). All are higher voltage classes with one die per switch. The closest case is EPC's white paper WP010: 0.4 nH with a 40 V EPC2015 at 12 V / 20 A on a board with 100 um between the layers (read). The statement "published loops are 230-320 pH" should not be used without these conditions.
 - The four-block framing (power stage, controller, switch implementation, external networks) is from the MIT power-electronics lectures; the lecture number is not recorded.
 - Schuck & Pilawa-Podgurski (PECI 2013) was read as an abstract only.
-- The LMG1210's maximum propagation delay is written as 18 ns in A75 / A91 and as 21 ns in A88. Only the 10 ns typical value and the 1 / 3.4 ns mismatch are used in results.
+- **Resolved 2026-10-11 (D82 Section 5).** LMG1210 propagation delay: 10 ns typical / 18 ns maximum in independent-input mode (A75, A91), 11 / 21 ns in PWM-input mode; A88's "10 ns (21 ns max)" mixed the two. No result used a maximum.
 
 ## Part 1: Task and method
 

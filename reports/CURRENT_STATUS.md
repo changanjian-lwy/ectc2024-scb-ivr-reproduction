@@ -2051,6 +2051,17 @@ each question:
      trigger.
    - **Open.** Track B's LTspice ramp-only run (R04E16) ended at ~55% of
      the ladder level. It has no diodes, so this defect does not explain it.
+     98. The loop bound's literature comparison, sourced (2026-10-11, D82; no
+         simulation). D65's "published embedded-GaN loops 230-320 pH" had no
+         named source. Traced: 0.23 / 0.32 nH are 600 V-class and 200 V
+         modules (Moench 2021, Heydari 2025; not read), 1.03 nH a 650 V
+         PCB-on-DBC module at 400 V / 25 A (Tian 2024; read). The closest
+         case is EPC's WP010: 0.4 nH with a 40 V EPC2015 at 12 V / 20 A,
+         100 um between the layers. None is a 40 V in-package loop at
+         143-200 A. Two facing planes give mu0 h per square, so 50 pH asks
+         for <= ~40 um-squares (20-30 um build-up, capacitor within 1.3-2
+         squares, or loops in parallel). Also: the LMG1210's 18 ns / 21 ns
+         maxima are two input modes; no result used either.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

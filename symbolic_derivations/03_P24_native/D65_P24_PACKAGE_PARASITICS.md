@@ -18,7 +18,8 @@ Geometry: `paper_locked/02_ectc2024_main/P24_FIG5_FIG6_PACKAGE_TRANSCRIPTION.md`
   and low-side sources reach the strip laterally in the ABF build-up.
 - Scenarios (none printed by P24): copper 35-400 um per stack, Cu 17 nOhm m (VPD framework, Table III); via arrays at
   pitch 2 d (R x A = 5.1 rho h, independent of d; matches Table III's TSV within 3 %); glass 0.3 / 0.5 mm; Cs ESR
-  0.2-2 mOhm; commutation loop 25-500 pH (published embedded-GaN power loops: 0.23-0.32 nH PCB-embedded, 1.03 nH DBC).
+  0.2-2 mOhm; commutation loop 25-500 pH (published embedded-GaN power loops: 0.23-0.32 nH PCB-embedded, 1.03 nH DBC; sources and
+  their conditions traced on 2026-10-11 in D82: 200-650 V modules, one die per switch - not this case).
 - Reference: 250 W module, estimated 90.61 % (D62's loss model on A124's simulated waveforms) -> 25.9 W loss; EPC2067 rating 40 V.
 
 ## 3. Results
@@ -44,7 +45,7 @@ Geometry: `paper_locked/02_ectc2024_main/P24_FIG5_FIG6_PACKAGE_TRANSCRIPTION.md`
 | high side, C13's 260 A falling ramp at 16.4 V | 37 / 22 pH |
 | low side, C13's +173 A positive valley | 127 / 75 pH |
 
-   The published embedded-GaN loops (230-320 pH) exceed every row. The bound is pessimistic (a finite turn-off
+   The published embedded-GaN loops (230-320 pH; D82: higher voltage classes, see there) exceed every row. The bound is pessimistic (a finite turn-off
    lets part of the energy return), so the loop is the parasitic that needs the plant.
 
 ## 4. Decision

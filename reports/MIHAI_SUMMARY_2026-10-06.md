@@ -293,8 +293,11 @@ are budgets over plausible ranges:
     - The ramp model's 125-150 pH bound does not survive the device spread.
     - Peak currents in this section are physical, after the gate delays. The ramp
       runs reported the current at the turn-off command, 5-8 A lower.
-    - Published embedded-GaN loops are 230-320 pH, which this design can drive
-      only at several percent of efficiency.
+    - Published loops, each under its own conditions (D82): 0.4 nH on a board with a 40 V
+      EPC device (12 V, 20 A, 100 µm dielectric); 0.23-1.03 nH in 200-650 V modules. None is
+      a 40 V in-package loop. The 50 pH bound asks for at most ~40 µm-squares between the
+      loop's planes. This design can drive a 230-320 pH loop only at several percent of
+      efficiency.
 - **Rating used:** EPC2067's 40 V continuous rating, not the datasheet's
   48 V transient or EPC Phase 16's 120 % for ≤ 1 % of life (100 V parts);
   under that rule 50 pH would pass without the slow turn-on, 100 pH not.
