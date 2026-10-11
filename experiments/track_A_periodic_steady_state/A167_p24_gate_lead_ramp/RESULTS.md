@@ -37,3 +37,6 @@ with A164's run of the same row).
 - 5 rows; four modules not rerun (A164 / A165's four modules passed with the full lead from the handover).
 - The ramp (20 us) was not varied. The interlock is not guaranteed by construction: a dt_pred that collapses after the
   ramp would still meet the full lead.
+- Post hoc (2026-10-11, while drawing reports/figures/fig_ev_lead.png): the L x 0.7 "handover 191.5 A" is the largest value in the
+  registered 140-160 us window and is its first point (140.05 us, phase 1), still in open-loop mode S. After the handover
+  (144 us) the largest physical turn-off current is 185.6 A at 146.13 us (A164: 218.6 A at 146.45 us). No verdict changes.
