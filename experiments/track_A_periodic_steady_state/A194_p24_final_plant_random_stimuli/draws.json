@@ -1,0 +1,356 @@
+[
+ {
+  "k": 0,
+  "board": "S80",
+  "temp": "hot",
+  "kind": "load",
+  "stratum": "early",
+  "i_a": 40.47,
+  "t_us": 217.6533
+ },
+ {
+  "k": 1,
+  "board": "N75",
+  "temp": "c0",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 2.164,
+  "slew_us": 32.409,
+  "t_us": 210.3869
+ },
+ {
+  "k": 2,
+  "board": "S80",
+  "temp": "c0",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 2.237,
+  "slew_us": 10.249,
+  "t_us": 191.2236
+ },
+ {
+  "k": 3,
+  "board": "S80",
+  "temp": "25",
+  "kind": "fall",
+  "stratum": "early",
+  "dv": -4.542,
+  "slew_us": 16.902,
+  "t_us": 241.4815
+ },
+ {
+  "k": 4,
+  "board": "S75",
+  "temp": "hot",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 2.743,
+  "slew_us": 19.43,
+  "t_us": 176.8228
+ },
+ {
+  "k": 5,
+  "board": "S0",
+  "temp": "m40",
+  "kind": "load",
+  "stratum": "early",
+  "i_a": 28.06,
+  "t_us": 289.2623
+ },
+ {
+  "k": 6,
+  "board": "S80",
+  "temp": "hot",
+  "kind": "load",
+  "stratum": "early",
+  "i_a": -37.27,
+  "t_us": 273.0297
+ },
+ {
+  "k": 7,
+  "board": "F0",
+  "temp": "hot",
+  "kind": "fall",
+  "stratum": "early",
+  "dv": -4.151,
+  "slew_us": 19.952,
+  "t_us": 263.5208
+ },
+ {
+  "k": 8,
+  "board": "S80",
+  "temp": "hot",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 1.306,
+  "slew_us": 7.634,
+  "t_us": 182.9016
+ },
+ {
+  "k": 9,
+  "board": "S75",
+  "temp": "25",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 1.297,
+  "slew_us": 6.543,
+  "t_us": 181.2536
+ },
+ {
+  "k": 10,
+  "board": "S75",
+  "temp": "25",
+  "kind": "fall",
+  "stratum": "early",
+  "dv": -2.469,
+  "slew_us": 38.016,
+  "t_us": 203.5017
+ },
+ {
+  "k": 11,
+  "board": "S80",
+  "temp": "hot",
+  "kind": "fall",
+  "stratum": "early",
+  "dv": -3.929,
+  "slew_us": 18.37,
+  "t_us": 222.8781
+ },
+ {
+  "k": 12,
+  "board": "S0",
+  "temp": "25",
+  "kind": "fall",
+  "stratum": "early",
+  "dv": -3.393,
+  "slew_us": 1.507,
+  "t_us": 228.4719
+ },
+ {
+  "k": 13,
+  "board": "S0",
+  "temp": "m40",
+  "kind": "rise",
+  "stratum": "early",
+  "dv": 4.148,
+  "slew_us": 7.064,
+  "t_us": 188.2528
+ },
+ {
+  "k": 14,
+  "board": "S80",
+  "temp": "m40",
+  "kind": "fall",
+  "stratum": "settled",
+  "dv": -1.174,
+  "slew_us": 3.696,
+  "t_us": 500.2628
+ },
+ {
+  "k": 15,
+  "board": "S80",
+  "temp": "25",
+  "kind": "fall8",
+  "stratum": "settled",
+  "dv": -7.008,
+  "slew_us": 39.985,
+  "t_us": 500.0678
+ },
+ {
+  "k": 16,
+  "board": "F0",
+  "temp": "hot",
+  "kind": "fall",
+  "stratum": "settled",
+  "dv": -3.145,
+  "slew_us": 9.63,
+  "t_us": 500.1223
+ },
+ {
+  "k": 17,
+  "board": "S75",
+  "temp": "m40",
+  "kind": "load",
+  "stratum": "settled",
+  "i_a": -38.32,
+  "t_us": 500.2939
+ },
+ {
+  "k": 18,
+  "board": "N13",
+  "temp": "hot",
+  "kind": "fall",
+  "stratum": "settled",
+  "dv": -2.702,
+  "slew_us": 4.089,
+  "t_us": 500.2735
+ },
+ {
+  "k": 19,
+  "board": "S0",
+  "temp": "c0",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 2.032,
+  "slew_us": 11.724,
+  "t_us": 500.2919
+ },
+ {
+  "k": 20,
+  "board": "N0",
+  "temp": "25",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 2.12,
+  "slew_us": 8.165,
+  "t_us": 500.3061
+ },
+ {
+  "k": 21,
+  "board": "S75",
+  "temp": "hot",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 1.376,
+  "slew_us": 2.592,
+  "t_us": 500.2707
+ },
+ {
+  "k": 22,
+  "board": "N75",
+  "temp": "25",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 1.029,
+  "slew_us": 5.454,
+  "t_us": 500.157
+ },
+ {
+  "k": 23,
+  "board": "N75",
+  "temp": "c0",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 1.786,
+  "slew_us": 15.357,
+  "t_us": 500.3776
+ },
+ {
+  "k": 24,
+  "board": "N75",
+  "temp": "c0",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 2.694,
+  "slew_us": 1.156,
+  "t_us": 500.3757
+ },
+ {
+  "k": 25,
+  "board": "S75",
+  "temp": "25",
+  "kind": "fall8",
+  "stratum": "settled",
+  "dv": -6.295,
+  "slew_us": 30.782,
+  "t_us": 500.1352
+ },
+ {
+  "k": 26,
+  "board": "F0",
+  "temp": "hot",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 1.021,
+  "slew_us": 4.699,
+  "t_us": 500.0981
+ },
+ {
+  "k": 27,
+  "board": "S0",
+  "temp": "c0",
+  "kind": "fall8",
+  "stratum": "settled",
+  "dv": -6.719,
+  "slew_us": 27.996,
+  "t_us": 500.0732
+ },
+ {
+  "k": 28,
+  "board": "N0",
+  "temp": "25",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 4.599,
+  "slew_us": 11.738,
+  "t_us": 500.2457
+ },
+ {
+  "k": 29,
+  "board": "N0",
+  "temp": "hot",
+  "kind": "fall8",
+  "stratum": "settled",
+  "dv": -6.589,
+  "slew_us": 12.496,
+  "t_us": 500.1005
+ },
+ {
+  "k": 30,
+  "board": "F0",
+  "temp": "25",
+  "kind": "fall",
+  "stratum": "settled",
+  "dv": -1.848,
+  "slew_us": 5.084,
+  "t_us": 500.2579
+ },
+ {
+  "k": 31,
+  "board": "N75",
+  "temp": "c0",
+  "kind": "load",
+  "stratum": "settled",
+  "i_a": 46.44,
+  "t_us": 500.2655
+ },
+ {
+  "k": 32,
+  "board": "F0",
+  "temp": "25",
+  "kind": "load",
+  "stratum": "settled",
+  "i_a": -39.91,
+  "t_us": 500.2828
+ },
+ {
+  "k": 33,
+  "board": "N0",
+  "temp": "hot",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 3.022,
+  "slew_us": 10.416,
+  "t_us": 500.3892
+ },
+ {
+  "k": 34,
+  "board": "N13",
+  "temp": "m40",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 4.75,
+  "slew_us": 1.887,
+  "t_us": 500.1512
+ },
+ {
+  "k": 35,
+  "board": "S75",
+  "temp": "m40",
+  "kind": "rise",
+  "stratum": "settled",
+  "dv": 1.339,
+  "slew_us": 39.612,
+  "t_us": 500.1695
+ }
+]
