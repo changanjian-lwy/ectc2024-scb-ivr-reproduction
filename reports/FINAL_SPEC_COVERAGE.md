@@ -117,6 +117,15 @@ The rest:
   share one corner.
 - The damper is an ideal Q 7 resistor; the driver is an ideal source behind a resistor.
 - 50 pH is the bound **for this drive and this controller** (A168). It is not a package limit in general.
+- **Slow-device boards run on a two-cycle orbit in steady state (A195, found 2026-10-11 in 22 existing records).**
+  The valley and the peak alternate from one cycle to the next: valley by 3.7-7.2 A, peak by 4.0-7.9 A, on V2 and V5,
+  with the 8 and the 9.5 ns lead, on S0 / S75 / S80, at −40 / 0 / 25 / 125 °C. Nominal and fast boards: ≤ 0.9 A.
+  Every slow-corner peak and margin above includes it; no earlier report named it. Cause: the high-side turn-on
+  corrector hunts when the gate delay is 8-11 ns (nominal 2.8 ns). Corrector registers dt_step 0.0625 ns with
+  err_shift 2 cut it to 0.3-0.85 A on S0 and 0.84-1.40 A on S75 and lower S75's worst post-step peak to 194.4 /
+  194.7 A at 0 / 25 °C (reference 197.8 / 197.1 A), but raise its handover to 177.5-177.7 A (reference 150.7-154.0 A),
+  and the 125 °C handover is already 188.5 A. **Not adopted (A196, fails as registered).** The handover and the steady
+  state want different corrector settings; a setting that changes after the handover is not run.
 
 ## 5. How to state the results
 
@@ -133,6 +142,10 @@ The rest:
   smallest margin is 2.2 A at three positions per temperature. 0.8 L0 at and below 25 °C, 0.85-0.95 L0, and other
   rows or boards cold are not run.
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
+- Slow-corner currents: "slow-device boards alternate by 4-7 A from one cycle to the next in steady state; the
+  stated peaks include it" - not "the slow corner's steady peak is 150 A" without it. The steady valley of a slow
+  board is a pair (S75, 25 °C, 9.5 ns: −12.9 / −17.3 A), not one number; A192's "deeper valleys with the 9.5 ns
+  lead" is that pair's mean moving.
 - The interlock: "closes in the model with an idealised threshold interlock. Its release time is a timing spec: any
   delay up to 8.3 ns keeps peaks and voltages; at the slow corner it should release within 1.0 ns, which a
   per-board comparator reference (~1.4 ns) just misses and a fixed reference misses by far (A174, A177, A179)".

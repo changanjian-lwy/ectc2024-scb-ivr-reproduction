@@ -2062,6 +2062,20 @@ each question:
          for <= ~40 um-squares (20-30 um build-up, capacitor within 1.3-2
          squares, or loops in parallel). Also: the LMG1210's 18 ns / 21 ns
          maxima are two input modes; no result used either.
+     99. The slow corner's two-cycle orbit (2026-10-11 / 12, A195 + A196,
+         plant V5, cfg only). In every slow-device record since A164 the
+         valley and the peak alternate from one cycle to the next (3.7-7.2 /
+         4.0-7.9 A; nominal and fast <= 0.9 A); reports gave means and maxima,
+         so it was never named. Cause: the high-side turn-on corrector hunts
+         with an 8-11 ns gate delay. Step 0.0625 ns + late gain 1/4 removes
+         it on S0 (0.3-0.85 A; neither register alone; steady peak -0.9 A).
+         On S75, +4.8 V / 1 us, 0 / 25 C: 0.84-1.40 A left, worst post-step
+         194.4 / 194.7 A (reference 197.8 / 197.1 A), handover 177.5-177.7 A
+         (reference 150.7-154.0 A). Not adopted: A196 fails as registered
+         (c4), and the handover costs more than the step gains. A192's open
+         point (why the 9.5 ns lead "deepens the valleys") is closed: the
+         mean of an alternating pair moved. Open: a corrector setting that
+         changes after the handover (not run).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
