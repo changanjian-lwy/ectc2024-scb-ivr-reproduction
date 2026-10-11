@@ -82,8 +82,17 @@ Step position (A174, 4 more phases per row): L × 0.7 +4.8 V / 1 µs 199.7, 199.
 201.5 A phase Vo stays outside 1 % for 37.9 µs. ff −8 V / 10 µs: 181.5-183.0 A, Vo 30.6-31.8 mV at every phase,
 the spike at 2 of 5.
 
-Only on earlier plants: the corners ff / hot / ss on the ramps and −4.8 V (V2, A164 for some); random stimuli (V0,
-A142 / C13); the inductor spread beyond ±5 % (V0, C14).
+Random stimuli on V5 (A194, 2026-10-12, one module, final configuration): 36 draws over boards N0 / N75 / N13 / F0 /
+S0 / S75 / S80, −40 / 0 / 25 / 125 °C, rising line steps of 1-4.8 V over 1-40 µs, falling 1-8 V, load steps of
+±20-62.5 A; 14 of them 37-145 µs after the handover, 22 at 500 µs. All 36 pass: COMPLETED, 0 shoot-throughs, peak
+≤ 184.6 A, V_DS ≤ 33.9 V, Vo within 13.1 mV of 1 V, back inside 1 % within 10.3 µs. The handover reaches 184.5 A
+(S75) and 182.0 A (S80) at 125 °C and at most 166.4 A elsewhere. The draws did not reach the first 37 µs after the
+handover (the lead ramp) or a rising step ≥ 4 V on S75 / S80; the worst known case stays the designed row (197.8 A,
+A193). 36 of 36 bounds the miss rate under this distribution at about 8 % (95 %).
+
+Only on earlier plants: the corners ff / hot / ss on the registered ramps and −4.8 V rows (V2, A164 for some; A194's
+draws touch them at random amplitudes and slews); random stimuli on four modules (V0, C13); the inductor spread
+beyond ±5 % (V0, C14).
 
 The misses are regulation or oracle events, none on voltage. Current misses:
 - L × 0.7 at one step phase (201.5 A, A174);
@@ -124,7 +133,7 @@ The rest:
   corrector hunts when the gate delay is 8-11 ns (nominal 2.8 ns). Corrector registers dt_step 0.0625 ns with
   err_shift 2 cut it to 0.3-0.85 A on S0 and 0.84-1.40 A on S75 and lower S75's worst post-step peak to 194.4 /
   194.7 A at 0 / 25 °C (reference 197.8 / 197.1 A), but raise its handover to 177.5-177.7 A (reference 150.7-154.0 A),
-  and the 125 °C handover is already 188.5 A. **Not adopted (A196, fails as registered).** The handover and the steady
+  and the 125 °C handover is already 184.5 A (A194). **Not adopted (A196, fails as registered).** The handover and the steady
   state want different corrector settings; a setting that changes after the handover is not run.
 
 ## 5. How to state the results

@@ -13,9 +13,10 @@ References: A193 (0 C) and A192 (25 C), same cfgs but for the two registers.
 - **The price is at the handover, and it is larger than the gain: 177.5-177.7 A against 150.7-154.0 A
   (+23.5..+27.0 A).** It comes 0.5-3.4 us after mode P's entry on phases 3-4 (10-15 turn-offs above 165 A; the
   reference has none). Predicted 156-162 A from S0's +6.0 A, so the prediction missed by 15 A.
-  - Still below 200 A here. Not run at 125 C, where the slow boards' handover is already 188.5 A (S75) and 185.4 A
-    (S80) with the adopted setting (A191). Those peaks come later (+17..+19 us, phase 1), so the two effects need
-    not add, but 11.5 A is what is left.
+  - Still below 200 A here. Not run at 125 C, where the slow boards' handover is already 184.5 A (S75) and 182.0 A
+    (S80) with the adopted start-up (A194's hot draws; corrected 2026-10-12: the 188.5 / 185.4 A first written here
+    are A191's, which ran with the 1.03 V handover request). Those peaks come later (A191: +17..+19 us, phase 1),
+    so the two effects need not add, but 15.5 A is what is left.
 - **So the two halves of the run want different corrector settings.** The handover needs the fast late correction
   (the period jumps there); the steady state and the step after it do better with the slow one. One per-class
   value cannot give both. A setting that changes after the handover is a host register write (test bench change,
@@ -48,7 +49,7 @@ References: A193 (0 C) and A192 (25 C), same cfgs but for the two registers.
 
 ## 3. Limits
 - One board, two temperatures, one row, three positions. The 5.3 A margin is for these six runs only.
-- The handover's cost was measured at 0 and 25 C. The 125 C statement is a comparison of two separate records, not
+- The handover's cost was measured at 0 and 25 C. The 125 C statement is a comparison of separate records, not
   a run.
 - c4's threshold (1.0 A) came from the nominal boards' level; 0.84-1.40 A misses it by little. The rule was
   registered as written and is applied as written. The reason not to adopt that would stand without c4 is the

@@ -2076,6 +2076,18 @@ each question:
          point (why the 9.5 ns lead "deepens the valleys") is closed: the
          mean of an alternating pair moved. Open: a corrector setting that
          changes after the handover (not run).
+    100. Random stimuli on the final plant (2026-10-11 / 12, A194, plant V5,
+         one module, final configuration). 36 draws (numpy default_rng(194)):
+         seven boards, -40 / 0 / 25 / 125 C, rising 1-4.8 V over 1-40 us,
+         falling 1-8 V, load +-20-62.5 A; 14 events 37-145 us after the
+         handover, 22 at 500 us. 36 of 36 pass c1-c5: peak <= 184.6 A,
+         V_DS <= 33.9 V, Vo within 13.1 mV, back in 1 % within 10.3 us,
+         0 shoot-throughs. Handover 184.5 / 182.0 A on S75 / S80 at 125 C,
+         <= 166.4 A elsewhere. Not reached: the first 37 us after the
+         handover and a rising step >= 4 V on S75 / S80. The worst known
+         case stays the designed row (S75, +4.8 V / 1 us, 197.8 A). Found
+         while checking: A191's 125 C rows ran with the 1.03 V handover
+         request, not the adopted 1.045 V; rerun as A197.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

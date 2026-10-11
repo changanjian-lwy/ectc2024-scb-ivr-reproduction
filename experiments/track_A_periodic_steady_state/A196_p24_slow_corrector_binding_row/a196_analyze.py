@@ -1,7 +1,8 @@
 """A196 analysis (BOUNDARY Section 2). Per run: a192_analyze.run (start-up, handover, post-step peak, V_DS, Vo over
 0-300 us, late fires, oracle NEW events, Vo extreme and recovery), the largest physical peak of the whole run, and
 a195_analyze.alt over 459-499 us (the valley's cycle-to-cycle change before the step). The same numbers for the
-reference record (same cfg but for the two corrector registers). Criteria c1-c4 per run, c5 per temperature.
+reference record (same cfg but for the two corrector registers). Criteria c1-c4 per run, c5 per temperature
+(summary key criteria_c5, the form scripts/acceptance.py reads).
   python3 a196_analyze.py           the A196 runs -> a196_summary.json
   python3 a196_analyze.py refs      the reference records only (no file written)"""
 from __future__ import annotations
@@ -43,7 +44,7 @@ def one(path):
 
 
 def main(refs_only=False):
-    res = {"runs": {}, "reference": {}, "c5": {}}
+    res = {"runs": {}, "reference": {}, "criteria_c5": {}}
     for temp, pat in REF.items():
         for k in (0, 1, 2):
             name = f"S75_{temp}_p{k}"
@@ -55,7 +56,7 @@ def main(refs_only=False):
         ref = [res["reference"][f"S75_{temp}_p{k}"] for k in (0, 1, 2)]
         if all(new):
             d = [n["peak_post"] - r["peak_post"] for n, r in zip(new, ref)]
-            res["c5"][temp] = {"worst": max(n["peak_post"] for n in new), "worst_ref": max(r["peak_post"] for r in ref), "delta": d,
+            res["criteria_c5"][temp] = {"worst": max(n["peak_post"] for n in new), "worst_ref": max(r["peak_post"] for r in ref), "delta": d,
                                "pass": max(n["peak_post"] for n in new) <= GAIN_A and max(d) <= RISE_A}
     if not refs_only:
         (HERE / "a196_summary.json").write_text(json.dumps(res, indent=1) + "\n")
@@ -65,7 +66,7 @@ def main(refs_only=False):
                   f"V {s['vds_whole']:.1f} Vo300 {s['vo_max_300us']:.4f} | valley change {' '.join(f'{x:4.2f}' for x in s['valley_alt'])} A "
                   f"steady pk {s['steady_peak_max']:5.1f} | late {s['late_post']} NEW {s['oracle_new']} ext {s['extreme_mv']:+.1f} mV "
                   f"back {s['back_within_1pct_us']} | {s['criteria']} {s['commit']} mod {s['sources_modified']}")
-    for t, c in res["c5"].items():
+    for t, c in res["criteria_c5"].items():
         print(f"c5 {t}: worst {c['worst']:.1f} A (reference {c['worst_ref']:.1f}), per position {' '.join(f'{x:+.1f}' for x in c['delta'])} A -> {c['pass']}")
 
 
