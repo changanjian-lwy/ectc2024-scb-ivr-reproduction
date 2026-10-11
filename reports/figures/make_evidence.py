@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import sys
 
-from make_figures import BLUE, GREEN, GREY, HERE, ORANGE, PH, RED, TA, json, np, one, plt
+from make_figures import BLUE, GREEN, GREY, HERE, ML, ORANGE, PH, RED, TA, json, np, one, plt
 
 OLD = ("Co-simulation (Verilog controller + circuit), one module, 5 MHz design, 5 % negative current, 25 °C, ideal "
        "switches with datasheet Coss.")
@@ -14,9 +14,9 @@ NEW = "Co-simulation (Verilog controller + circuit), one module, 2.5 MHz design,
 SIZE = (8.6, 4.5)                                             # landscape: the slide body beside the text is about 7 x 3.7 in
 
 
-def rec(exp, run, sub="cosim"):
+def rec(exp, run, sub="cosim", root=TA):
     """A run record and its label 'A92 run_<name>.json'."""
-    p = one(TA / f"{exp}_*") / sub / f"run_{run}.json"
+    p = one(root / f"{exp}_*") / sub / f"run_{run}.json"
     return json.loads(p.read_text()), f"{exp} {p.name}"
 
 
@@ -290,8 +290,91 @@ def interlock():
         ylim=(100, 245))
 
 
-FIGS = {f.__name__: f for f in (shoot_through, mismatch, slots, startup_vo, line_step, lock, random_defect, duplicate, vds_loop,
-                                handover, gate_spread, lead, interlock)}
+def bistable():
+    """A80 / A83, 5 % negative current: phase 4's last 250 turn-ons with the voltage loop off (predicted edge), with the
+    loop on (every turn-on by the fallback timer, 11.3-12.2 V) and with the corrector also learning at fallback edges."""
+    fig, ax = plt.subplots(1, 3, figsize=SIZE, sharey=True)
+    for a, (exp, run, title) in zip(ax, (("A80", "f0_zero_start_loop_off", "state 1: predicted turn-on\n(voltage loop off)"),
+                                         ("A80", "f1_zero_start_loop_ki0p25", "state 2: fallback timer\n(voltage loop on)"),
+                                         ("A83", "h1_5pct_async_learn", "after the fix: the corrector\nlearns at fallback edges too"))):
+        r, name = rec(exp, run)
+        on = [e for e in r["turnons_last"] if e["phase"] == 4]
+        for how, c, lab in ((0, BLUE, "predicted edge"), (3, RED, "fallback timer")):
+            q = [(e["t_s"] * 1e6, e["vds_v"]) for e in on if e["how"] == how]
+            a.plot(*(zip(*q) if q else ([], [])), ".", ms=3, color=c, label=lab)
+        n3 = sum(e["how"] == 3 for e in on)
+        a.text(0.5, 0.06, f"{n3} of {len(on)} turn-ons\nby the fallback timer", transform=a.transAxes, ha="center", fontsize=10,
+               fontweight="bold", color=RED if n3 else BLUE)
+        a.set(title=title, xlabel="time (µs)", ylim=(6, 14))
+        a.xaxis.set_major_locator(plt.MaxNLocator(4, prune="both"))
+        a.title.set_fontsize(10)
+        tag(a, name)
+    ax[0].set_ylabel("phase 4: V_DS at turn-on (V)")
+    fig.legend(*ax[1].get_legend_handles_labels(), fontsize=8.5, ncol=2, frameon=False, loc="upper center", markerscale=3)
+    done(fig, "bistable", OLD.replace("ideal switches with datasheet Coss", "ideal switches, constant Coss") +
+         " The last 250 turn-ons of phase 4 in each run. Sources: A80, A83 (records); A82, A84, D43 (event-map model: both states "
+         "exist under one condition, and one kick switches between them).", top=0.95)
+
+
+def zvs_loss():
+    """A144's frozen design without loop inductance, +4.8 V / 1 us at 1000 us: each phase's low-side turn-off current and
+    high-side turn-on V_DS, one point per period (phase 1: up to +18.7 A for about 12 us, then turn-on at 15-19 V)."""
+    r, name = rec("A144", "b_l_p48_1us")
+    fig, ax = plt.subplots(1, 2, figsize=SIZE)
+    for a, key, val in ((ax[0], "lowoffs_last", "i_a"), (ax[1], "turnons_last", "vds_v")):
+        for ph in (4, 3, 2, 1):
+            q = [(e["t_s"] * 1e6, e[val]) for e in r[key] if e["phase"] == ph and 995 <= e["t_s"] * 1e6 <= 1030]
+            a.plot(*zip(*q), ".", ms=5 if ph == 1 else 2.5, color=PH[ph - 1], label=f"phase {ph}")
+            if ph == 1:
+                t, v = max(q, key=lambda x: x[1])
+                a.annotate(f"phase 1: {v:+.1f} A" if val == "i_a" else f"phase 1: {v:.1f} V", (t, v), (1012, v * 0.97), color=PH[0],
+                           fontsize=11, fontweight="bold", va="top", arrowprops={"arrowstyle": "->", "color": PH[0]})
+                a.text(996, q[0][1] + (2.2 if val == "i_a" else 1.2), f"before: {q[0][1]:.1f} {'A' if val == 'i_a' else 'V'}",
+                       color=PH[0], fontsize=9)
+        a.axvline(1000, color=GREY, ls=":", lw=1.2)
+        a.set(xlabel="time (µs)", xlim=(995, 1030))
+        a.title.set_fontsize(10)
+        tag(a, name)
+    ax[0].axhline(0, color="k", lw=0.8)
+    ax[0].set(ylabel="low-side turn-off current (A)", title="no current reversal on phase 1 ...", ylim=(-40, 25))
+    ax[1].set(ylabel="high-side V_DS at turn-on (V)", title="... so its next turn-on is hard", ylim=(0, 21))
+    for a in ax:
+        a.title.set_fontsize(10)
+    fig.legend(*ax[0].get_legend_handles_labels(), fontsize=8.5, ncol=4, frameon=False, loc="upper center", markerscale=2)
+    done(fig, "zvs_loss", NEW + ", ideal switches, no loop inductance: the frozen design. Input +4.8 V in 1 µs at 1000 µs. "
+         "Sources: A144 (record), A147 (found).", top=0.95)
+
+
+def control_limit():
+    """A148, +4.8 V / 1 us with and without the volt-second law on phase 1's turn-off (g 0.75): phase 1's turn-on V_DS
+    (19.0 -> 16.8 V, still hard) and Vo (back within 1 % after 7.6 -> 41.6 us)."""
+    fig, ax = plt.subplots(1, 2, figsize=SIZE)
+    for run, c, lab in (("id_l_p48_1us", GREY, "frozen design"), ("v075_l_p48_1us", RED, "with the volt-second law (g 0.75)")):
+        r, name = rec("A148", run, root=ML)
+        ts = r["cfg"]["line_step"]["t_us"]
+        on = [(e["t_s"] * 1e6 - ts, e["vds_v"]) for e in r["turnons_last"] if e["phase"] == 1 and -5 <= e["t_s"] * 1e6 - ts <= 80]
+        vo = [(q["t_s"] * 1e6 - ts, (q["vo"] - 1) * 1e3) for q in r["sections"] if -5 <= q["t_s"] * 1e6 - ts <= 80]
+        ax[0].plot(*zip(*on), ".", ms=3, color=c, label=f"{lab}  ({name})")
+        ax[1].plot(*zip(*vo), color=c, lw=1.5)
+        back = max(t for t, v in vo if abs(v) > 10)
+        k = max(on, key=lambda x: x[1])
+        ax[0].annotate(f"{k[1]:.1f} V", k, (k[0] + (14 if c == RED else 26), k[1] + (0.2 if c == RED else 1.4)), color=c, fontsize=11,
+                       fontweight="bold", arrowprops={"arrowstyle": "->", "color": c})
+        ax[1].axvline(back, color=c, ls=":", lw=1.2)
+        ax[1].text(back + 1, -23.5 if c == RED else -20, f"within 1 % after {back:.1f} µs", color=c, fontsize=9.5, fontweight="bold")
+    ax[0].set(xlabel="time after the input step (µs)", ylabel="phase 1: V_DS at turn-on (V)", xlim=(-5, 80), ylim=(0, 23),
+              title="the turn-on stays hard ...")
+    ax[1].axhspan(-10, 10, color=GREEN, alpha=0.15, lw=0)
+    ax[1].set(xlabel="time after the input step (µs)", ylabel="Vo - 1 V (mV)", xlim=(-5, 80), ylim=(-26, 22),
+              title="... and the output recovers five times slower")
+    for a in ax:
+        a.title.set_fontsize(10)
+    fig.legend(*ax[0].get_legend_handles_labels(), fontsize=8, ncol=2, frameon=False, loc="upper center", markerscale=3)
+    done(fig, "control_limit", NEW + ", ideal switches, no loop inductance. Input +4.8 V in 1 µs. Source: A148.", top=0.95)
+
+
+FIGS = {f.__name__: f for f in (bistable, shoot_through, mismatch, slots, startup_vo, line_step, lock, random_defect, duplicate,
+                                vds_loop, zvs_loss, control_limit, handover, gate_spread, lead, interlock)}
 
 if __name__ == "__main__":
     for n in (sys.argv[1:] or FIGS):
