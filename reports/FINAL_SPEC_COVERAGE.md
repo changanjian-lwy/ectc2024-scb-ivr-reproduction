@@ -91,6 +91,12 @@ S0 / S75 / S80, −40 / 0 / 25 / 125 °C, rising line steps of 1-4.8 V over 1-40
 handover (the lead ramp) or a rising step ≥ 4 V on S75 / S80; the worst known case stays the designed row (197.8 A,
 A193). 36 of 36 bounds the miss rate under this distribution at about 8 % (95 %).
 
+The worst row right after the handover (A198, 2026-10-12, one module, final configuration): +4.8 V / 1 µs placed 2 /
+10 / 20 / 40 / 80 µs after mode P's entry. N0 at 25 °C: 193.7 / 183.5 / 179.0 / 179.9 / 178.5 A, all pass. S75 at
+25 °C: 195.5 / 197.6 / **206.1** / 195.3 / 192.4 A. S75 at 125 °C: **202.8 / 214.4 / 217.3** / 186.7 / 187.2 A.
+V_DS ≤ 33.6 V, 0 shoot-throughs, Vo within 18.1 mV everywhere. **The row needs a hold-off of 40 µs after the
+handover** (first tested instant from which all three boards pass; the boundary lies between 20 and 40 µs).
+
 Only on earlier plants: the corners ff / hot / ss on the registered ramps and −4.8 V rows (V2, A164 for some; A194's
 draws touch them at random amplitudes and slews); random stimuli on four modules (V0, C13); the inductor spread
 beyond ±5 % (V0, C14).
@@ -105,6 +111,8 @@ The misses are regulation or oracle events, none on voltage. Current misses:
   the same row gives 191.1-195.0 A at −40 °C and 194.5-197.8 A at 0 °C (A193). The worst tested S75 point over
   −40..125 °C is 197.8 A, a 2.2 A margin.
 - A181's slow L × 0.75 start-up miss (202-207 A open loop, a 278 A handover) is fixed by the A188 start-up.
+- +4.8 V / 1 µs within the first 40 µs after the handover on slow boards with L × 0.75: up to 217.3 A at 125 °C and
+  206.1 A at 25 °C (A198). Not fixed: stated as a hold-off (Section 5).
 The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
@@ -154,6 +162,10 @@ The rest:
   smallest margin is 2.2 A at three positions per temperature. 0.8 L0 at and below 25 °C, 0.85-0.95 L0, and other
   rows or boards cold are not run.
   The 0.7 board's open-loop start-up is 200.2 A (registered limit ref + 3 A = 205.5 A).
+- Line steps after start-up: "+4.8 V / 1 µs is covered from 40 µs after the handover on the tested boards (S75 at 25
+  and 125 °C, N0 at 25 °C); within the first 40 µs slow boards reach up to 217.3 A" - not "from start-up on". The
+  hold-off is counted from mode P's entry (131.4 µs on hot slow boards, 144.0 µs otherwise). A power-good signal
+  released 40 µs after the handover would carry it; no such signal is modelled.
 - Slow-corner currents: "slow-device boards alternate by 4-7 A from one cycle to the next in steady state; the
   stated peaks include it" - not "the slow corner's steady peak is 150 A" without it. The steady valley of a slow
   board is a pair (S75, 25 °C, 9.5 ns: −12.9 / −17.3 A), not one number; A192's "deeper valleys with the 9.5 ns

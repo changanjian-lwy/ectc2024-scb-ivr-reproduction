@@ -2096,6 +2096,14 @@ each question:
          182.0 A, V_DS <= 33.7 V. Vo reaches 1.0486 V on S80 over 0-300 us,
          1.4 mV under the 1.05 V limit. The slow corner's worst case stays
          197.8 A at 0 C (A193).
+    102. The worst row right after the handover (2026-10-12, A198, plant V5,
+         one module, final configuration). +4.8 V / 1 us at 2 / 10 / 20 / 40 /
+         80 us after mode P's entry. N0 25 C <= 193.7 A, all pass. S75 25 C
+         206.1 A at 20 us. S75 125 C 202.8 / 214.4 / 217.3 A at 2 / 10 / 20 us:
+         phase 1's rail jump lands on the handover's own peak (184.5 A, about
+         19 us after the entry). At 40 and 80 us all pass (<= 195.3 A). The
+         row is specified from 40 us after the handover; no remedy run.
+         A194's draws had missed this window (earliest event 37 us).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

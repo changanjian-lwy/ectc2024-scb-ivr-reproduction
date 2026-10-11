@@ -107,6 +107,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A194": (TA / "A194_p24_final_plant_random_stimuli", "a194_analyze.py", "a194_summary.json"),
     "A196": (TA / "A196_p24_slow_corrector_binding_row", "a196_analyze.py", "a196_summary.json"),
     "A197": (TA / "A197_p24_slow_hot_final_handover", "a197_analyze.py", "a197_summary.json"),
+    "A198": (TA / "A198_p24_step_right_after_handover", "a198_analyze.py", "a198_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -524,6 +525,9 @@ EXCEPTIONS["A175"] = {
 EXCEPTIONS["A196"] = {(f"runs/S75_{t}_p{k}", "c4"): "corrector step 0.0625 ns + late gain 1/4 on S75: the cycle-to-cycle valley "
                       "change falls from 4.7-5.9 to 0.84-1.40 A, not to 1.0 A on every phase; not adopted - the handover "
                       "rises to 177.5-177.7 A (RESULTS 0)" for t in ("c0", "25") for k in (0, 1, 2)}
+_A198 = "+4.8 V / 1 us within 20 us after the handover on S75: phase 1's rail jump meets the handover's own peak (125 C) " \
+        "or a lost phase-1 valley (25 C, 20 us); passes from 40 us on - the row is specified with a 40 us hold-off (RESULTS 0)"
+EXCEPTIONS["A198"] = {(r, "c2"): _A198 for r in ("S75_25_d20", "S75_hot_d2", "S75_hot_d10", "S75_hot_d20")}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
