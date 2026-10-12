@@ -1,0 +1,14 @@
+{
+ "seed": 8,
+ "dtype": "float32",
+ "device": "mps",
+ "torch": "2.14.1",
+ "provenance": {
+  "commit": "05fce69",
+  "extension_modified": false
+ },
+ "epochs": 91,
+ "best_epoch": 75,
+ "best_val": 0.09800872727388525,
+ "train_s": 440.95787811279297
+}
