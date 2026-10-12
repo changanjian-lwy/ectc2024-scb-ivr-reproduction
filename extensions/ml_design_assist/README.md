@@ -50,7 +50,8 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
 - `src/scb_ivr/extensions/ml_nn.py`: the MLP; tested in
   `tests/extensions/test_ml_nn.py` against finite differences.
 - `src/scb_ivr/extensions/ml_cnn.py`: the 1-D CNN (A146); tested in
-  `tests/extensions/test_ml_cnn.py`.
+  `tests/extensions/test_ml_cnn.py`. Its forward, backward and training loop are confirmed against PyTorch in
+  [A199](../ml_torch_port/experiments/A199_cnn_torch_port/RESULTS.md) (extension ml_torch_port).
 - `src/scb_ivr/extensions/ml_d63_data.py`: D63 datasets.
 - `src/scb_ivr/extensions/ml_gp.py`: the Gaussian process; tested in
   `tests/extensions/test_ml_gp.py` against brute-force leave-one-out.

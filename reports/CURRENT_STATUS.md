@@ -2104,6 +2104,14 @@ each question:
          19 us after the entry). At 40 and 80 us all pass (<= 195.3 A). The
          row is specified from 40 us after the handover; no remedy run.
          A194's draws had missed this window (earliest event 37 us).
+    103. A146's CNN in PyTorch (2026-10-12, A199, extension
+         ml_torch_port; a software cross-check, no plant and no design
+         value involved). With the same weights in float64 the outputs
+         agree within 5.3e-15, autograd agrees with ml_cnn's hand-written
+         backward within 7.6e-15, 20 Adam steps stay within 6.7e-08.
+         Retrained on three seeds the test errors are 0.93-1.00 of
+         A146's; seed spread 11 / 23 / 12 / 2 % (L / Q_act / di/dt / k).
+         6 of 6 criteria pass. torch is not a repository requirement.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
