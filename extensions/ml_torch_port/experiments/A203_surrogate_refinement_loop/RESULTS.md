@@ -1,7 +1,7 @@
 # A203 - the surrogate search closed with D63: a refinement loop, scored against D63's own search (RESULTS)
 Boundary: c196329. Loop run from c196329. Records: a203_loop.json and a203_surrogate_final.npz (a203_loop.py),
 a203_reference.json (a203_d63_reference.py; the per-transient table d63_100k.npz is in release records-a203),
-a203_summary.json (a203_analyze.py). Post hoc items are marked.
+a203_summary.json (a203_analyze.py), a203_posthoc.json (a203_analyze.py --posthoc, from c4797ea). Post hoc items are marked.
 
 ## 0. Verdict
 - **4 of 4 criteria pass.** Closed with D63, the search finds in 160 D63 designs what 100 000 random D63 designs
@@ -28,12 +28,17 @@ a203_summary.json (a203_analyze.py). Post hoc items are marked.
   - Timed rule: 194 feasible (pct 5.4-6.2, Cs 3.0-6.1 uF) with a worst |Vo extreme| of 20-31 mV against 48-103 mV
     for the floor rule. The surrogate found one. Comparator rule: none.
   - After the loop: 1954 called feasible, 381 are (precision 0.19, recall 0.25), MAE on D63's feasible 5.0 A.
+- **Post hoc: the surrogate is right about the bulk and wrong at the knife-edge.** With the 1 us line steps left
+  out (A120's "bus slew >= 5 us" case), D63 finds 20 992 of the 100 000 feasible and the surrogate 21 085; by rule
+  and Cs band (3-5 / 5-8 / 8-12 / 12-20 uF) the floor rule is 97 / 70 / 35 / 7 % in D63 against 94 / 69 / 42 / 12 %,
+  the timed rule 18 / 13 / 7 / 1 % against 14 / 13 / 6 / 1 %. A120's quoted conclusion (floor rule, Cs <~ 8 uF, bus
+  slew >= 5 us) holds. The surrogate fails only where feasibility hangs on a few amps under 200 A.
 - **Post hoc, the two-objective front.** In D63 the timed rule dominates the trade-off: 191.8 A with 21 mV. The
   loop's feasible picks reach 76 % of the reference front's hypervolume (555 against 726; 160 random designs:
   median 164) and have the floor branch, but only one timed design (199.6 A).
 - **Decision (BOUNDARY Section 4).** A surrogate search closed with D63 runs is the method for surrogate-based
-  design; a one-shot surrogate search is not. A surrogate's feasible set is not quoted without D63: A120's
-  exploration gets a dated note. No design value changes (1 MHz design space).
+  design; a one-shot surrogate search is not. A surrogate's verdict near a limit is not quoted without D63
+  (its bulk statistics held): A120's exploration gets a dated note. No design value changes (1 MHz design space).
 
 ## 1. Criteria
 | # | criterion | result |

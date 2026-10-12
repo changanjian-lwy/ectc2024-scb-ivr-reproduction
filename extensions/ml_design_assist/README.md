@@ -66,7 +66,8 @@ Numbers are shared with the main line; A118 and A119 are reserved there.
   hand-written gradient here (ml_nn, ml_cnn, ml_ppo, ml_rl) agrees with autograd to rounding, and A150's
   Gaussian-process fits had converged (A199, A200). A146's CNN numbers are a range over ten seeds, and the mean of
   ten networks replaces the single network (A201). A gradient search through A120's surrogate does not hold in D63
-  at its optimum (A202).
+  at its optimum (A202); closed with D63 runs it does, and D63 corrects the surrogate's knife-edge feasible set
+  (A203; note in A120's RESULTS). The ten networks' disagreement is not a guard against out-of-range captures (A204).
 - `src/scb_ivr/extensions/ml_rl_ff.py`: the line-step environment
   (sensors rtl | vin | rails) and its fixed laws.
 - `src/scb_ivr/cosim/rtl/scb_vff.v`: the Vin feed-forward (opt-in, off =

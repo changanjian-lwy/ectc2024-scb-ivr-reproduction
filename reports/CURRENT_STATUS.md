@@ -2133,6 +2133,20 @@ each question:
          optimistic by 8.6 A); D63's best of 42 checked designs, 190.1 A,
          is ranked 196.8 A. 3 of 4: a surrogate optimum is not quoted
          without a D63 re-check.
+    107. The surrogate search closed with D63 (2026-10-12, A203; 1 MHz
+         design space, D63, no design value changes). Ten rounds of
+         search, 16 designs to D63, fine-tuning: 189.88 A in 160 D63
+         designs; the best of 100 000 random D63 designs is 190.33 A;
+         random D63 at equal cost 196.3 A (median). D63 finds 1530
+         feasible designs where A120's surrogate said 240 (precision
+         0.40, recall 0.06; 194 timed-rule designs missed); at bus slew
+         >= 5 us the surrogate's 21 % holds. 4 of 4.
+    108. The ten networks' disagreement as a guard (2026-10-12, A204;
+         A201's stored predictions). Inside the training conditions it
+         is calibrated (4.7 % flagged, cover 0.90); outside it flags
+         35 % at 0.8 V noise, 10 % at a 0.5 GHz probe, 6 % at I0 +5 %.
+         Not adopted: A146's measurement requirements stay external.
+         2 of 4.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

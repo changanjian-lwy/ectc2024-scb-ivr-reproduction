@@ -42,6 +42,15 @@ at epoch 332.
    - **With the 1 µs line steps, 0.24% are feasible:** 239 with the
      floor rule, 1 timed, none with the comparator. They have Cs
      3-4 µF, pct 5-8% and fc 48-80 kHz.
+     - **Note of 2026-10-12 (A203, extension ml_torch_port): D63 itself
+       disagrees with this set.** On the same 100 000 designs D63 finds
+       1.53% feasible (1530): 1336 with the floor rule (pct 5.4-14.6%,
+       Cs 3.0-7.95 µF) and 194 timed (pct 5.4-6.2%, with 20-31 mV of Vo
+       deviation against 48-103 mV). Of the surrogate's 240, 95 are
+       feasible in D63 (precision 0.40, recall 0.06). Feasibility here
+       hangs on a few amps under 200 A, inside the surrogate's error.
+       The ≥ 5 µs result below holds in D63 (21.0% against 21.1%; floor
+       97 / 70 / 35 / 7%, timed 18 / 13 / 7 / 1% by Cs band).
    - **With the bus slew ≥ 5 µs, 21%:**
 
      | rule | Cs 3-5 µF | 5-8 | 8-12 | 12-20 |
