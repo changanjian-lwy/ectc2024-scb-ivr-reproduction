@@ -1,0 +1,193 @@
+{
+ "criteria": {
+  "c1_reaches_reference": {
+   "loop_best_a": 189.87890969339787,
+   "reference_best_a": 190.3323922032614,
+   "first_round_within": 3,
+   "pass": true
+  },
+  "c2_beats_random_d63": {
+   "160": {
+    "found_feasible": 0.911,
+    "median_best_a": 196.2511749267578,
+    "loop_better": 1.0
+   },
+   "1160": {
+    "found_feasible": 1.0,
+    "median_best_a": 193.26039123535156,
+    "loop_better": 1.0
+   },
+   "pass": true
+  },
+  "c3_optimism_last_rounds": {
+   "values_a": [
+    -5.000528284396491,
+    -2.8025939973432656,
+    -3.4196838990815195
+   ],
+   "pass": true
+  },
+  "c4_test_mae": {
+   "before_a": 2.03819301837064,
+   "after_a": 1.680209659323059,
+   "pass": true
+  }
+ },
+ "passed": 4,
+ "of": 4,
+ "reference": {
+  "n": 100000,
+  "feasible": 1530,
+  "by_rule": {
+   "cmp": 0,
+   "timed": 194,
+   "floor": 1336
+  },
+  "best": {
+   "index": 10379,
+   "f1": 190.3323922032614,
+   "f2": 53.09789012226385,
+   "pct": 5.906798526332057,
+   "cs_uf": 3.012383985955841,
+   "fc_khz": 78.09052497898742,
+   "rule": "floor",
+   "floor_a": 3.779128580814258,
+   "kind": "load",
+   "di_a": -59.18812592538011,
+   "dv_v": 0.0,
+   "slew_us": 1.0
+  },
+  "diverged": 5876
+ },
+ "loop_best": {
+  "design": {
+   "pct": 8.747542634200151,
+   "cs_uf": 3.007680359081151,
+   "fc_khz": 79.87209358548127,
+   "rule": "floor",
+   "floor_a": 4.949613666331164
+  },
+  "kind": "front",
+  "mlp_f1": 198.84175331381476,
+  "mlp_f2": 54.5516518740568,
+  "mlp_feasible": true,
+  "d63_f1": 189.87890969339787,
+  "d63_f2": 46.80866716465837,
+  "d63_feasible": true,
+  "d63_diverged": false,
+  "round": 5
+ },
+ "d63_designs": 160,
+ "surrogate_vs_d63": {
+  "a120": {
+   "surrogate_feasible": 240,
+   "both": 95,
+   "precision": 0.3958333333333333,
+   "recall": 0.06209150326797386,
+   "peak_mae_on_d63_feasible_a": 7.660835337215128,
+   "peak_bias_on_d63_feasible_a": -7.62896417294141
+  },
+  "after_loop": {
+   "surrogate_feasible": 1954,
+   "both": 381,
+   "precision": 0.19498464687819858,
+   "recall": 0.24901960784313726,
+   "peak_mae_on_d63_feasible_a": 5.04532500069282,
+   "peak_bias_on_d63_feasible_a": -4.899774181700856
+  }
+ },
+ "per_round": [
+  {
+   "round": 1,
+   "surrogate_feasible_finals": 463,
+   "d63_feasible_picks": 9,
+   "margin_optimism_a": 9.00049713948626,
+   "best_d63_f1": 194.32247986926086,
+   "test_mae_after_a": 1.706539819700934
+  },
+  {
+   "round": 2,
+   "surrogate_feasible_finals": 407,
+   "d63_feasible_picks": 1,
+   "margin_optimism_a": 10.006665403412242,
+   "best_d63_f1": 194.32247986926086,
+   "test_mae_after_a": 1.709311942465476
+  },
+  {
+   "round": 3,
+   "surrogate_feasible_finals": 233,
+   "d63_feasible_picks": 9,
+   "margin_optimism_a": 2.111913646927089,
+   "best_d63_f1": 191.48431790053291,
+   "test_mae_after_a": 1.6830026004664738
+  },
+  {
+   "round": 4,
+   "surrogate_feasible_finals": 512,
+   "d63_feasible_picks": 5,
+   "margin_optimism_a": 2.348846533760625,
+   "best_d63_f1": 191.48431790053291,
+   "test_mae_after_a": 1.6826429026075147
+  },
+  {
+   "round": 5,
+   "surrogate_feasible_finals": 525,
+   "d63_feasible_picks": 9,
+   "margin_optimism_a": 1.3063740151758694,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.6903853239685545
+  },
+  {
+   "round": 6,
+   "surrogate_feasible_finals": 400,
+   "d63_feasible_picks": 14,
+   "margin_optimism_a": 6.897865707346469,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.665684407444917
+  },
+  {
+   "round": 7,
+   "surrogate_feasible_finals": 391,
+   "d63_feasible_picks": 13,
+   "margin_optimism_a": 2.1152297706159366,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.669586458410017
+  },
+  {
+   "round": 8,
+   "surrogate_feasible_finals": 518,
+   "d63_feasible_picks": 15,
+   "margin_optimism_a": -5.000528284396491,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.6597437542215974
+  },
+  {
+   "round": 9,
+   "surrogate_feasible_finals": 400,
+   "d63_feasible_picks": 16,
+   "margin_optimism_a": -2.8025939973432656,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.6978606998536283
+  },
+  {
+   "round": 10,
+   "surrogate_feasible_finals": 394,
+   "d63_feasible_picks": 15,
+   "margin_optimism_a": -3.4196838990815195,
+   "best_d63_f1": 189.87890969339787,
+   "test_mae_after_a": 1.680209659323059
+  }
+ ],
+ "provenance": {
+  "commit": "c196329",
+  "modified": false
+ },
+ "settings": {
+  "picks": 16,
+  "new_weight": 10.0,
+  "epochs": 100,
+  "lr": 0.0005,
+  "l2": 1e-05,
+  "rounds": 10
+ }
+}
