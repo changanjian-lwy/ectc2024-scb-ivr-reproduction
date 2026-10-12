@@ -2112,6 +2112,27 @@ each question:
          Retrained on three seeds the test errors are 0.93-1.00 of
          A146's; seed spread 11 / 23 / 12 / 2 % (L / Q_act / di/dt / k).
          6 of 6 criteria pass. torch is not a repository requirement.
+    104. Every other hand-written gradient against autograd (2026-10-12,
+         A200, ml_torch_port; software cross-check). MLP and its fit,
+         A147's autoencoder layers, PPO actor / critic incl. the anchored
+         policy, REINFORCE: all within 5.7e-14. A150's GP fits refitted
+         with the exact gradient move the likelihood by <= 5.3e-11.
+         7 of 7. The negative RL results are not gradient artefacts.
+    105. A146's CNN over ten seeds (2026-10-12, A201; A146's simulated
+         captures, no plant run). Test medians span L 1.9-2.8 %, Q_act
+         3.2-4.4 %, di/dt 5.3-6.8 %, k 0.0113-0.0122; A146's criterion 4
+         passes on 7 of 10 seeds. The mean of ten networks gives 1.26 /
+         1.94 / 4.13 % / 0.0102 with covers 0.90 and is adopted as the CNN
+         step; out of the training conditions it is more overconfident
+         (k cover 0.08 at I0 +5 %). 5 of 5.
+    106. Gradient design search through A120's surrogate (2026-10-12,
+         A202; surrogate and D63 at the superseded 1 MHz design space, no
+         design value changes). On the surrogate: worst peak 191.05 A
+         against 193.67 A for 100 000 random designs (192.86 A at equal
+         cost). In D63 that optimum is 198.8-200.1 A (surrogate
+         optimistic by 8.6 A); D63's best of 42 checked designs, 190.1 A,
+         is ranked 196.8 A. 3 of 4: a surrogate optimum is not quoted
+         without a D63 re-check.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
