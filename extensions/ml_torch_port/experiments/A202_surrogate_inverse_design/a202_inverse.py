@@ -130,14 +130,14 @@ def d63_check(designs, mlp_f1, mlp_f2, ith, ttr):
         ok = all(not r["diverged"] for r in res)
         pk, ex = max(r["peak_a"] for r in res), max(abs(r["extreme_mv"]) for r in res)
         feas = ok and verdict(np.array([r["peak_a"] for r in res]), np.array([r["ph1_depth_a"] for r in res]), np.array([r["ph1_periods"] for r in res]))
-        rows.append({"design": d, "mlp_f1": float(a), "mlp_f2": float(b), "d63_f1": pk if ok else None, "d63_f2": ex if ok else None,
+        rows.append({"design": d, "mlp_f1": float(a), "mlp_f2": float(b), "d63_f1": float(pk) if ok else None, "d63_f2": float(ex) if ok else None,
                      "d63_diverged": not ok, "d63_feasible": bool(feas)})
     return rows
 
 
 def group_stats(rows):
     ok = [r for r in rows if not r["d63_diverged"]]
-    return {"n": len(rows), "d63_feasible": sum(r["d63_feasible"] for r in rows), "d63_diverged": len(rows) - len(ok),
+    return {"n": len(rows), "d63_feasible": int(sum(r["d63_feasible"] for r in rows)), "d63_diverged": len(rows) - len(ok),
             "peak_optimism_a": float(np.mean([r["d63_f1"] - r["mlp_f1"] for r in ok])) if ok else None,
             "extreme_optimism_mv": float(np.mean([r["d63_f2"] - r["mlp_f2"] for r in ok])) if ok else None}
 
@@ -200,16 +200,16 @@ def main():
     stats = {nm: group_stats(rows) for nm, rows in checks.items()}
     best_b, best_g = float(b1[bfeas].min()), float(a1[af].min())
     gm = stats["grad_margin"]
-    crit = {"c1_port": {"forward_max_abs": port_fwd, "input_grad_rel": port_grad, "pass": port_fwd <= 1e-9 and port_grad <= 1e-6},
-            "c2_margin": {"brute_best_a": best_b, "grad_best_a": best_g, "pass": best_g <= best_b + 0.5},
-            "c3_front": {"hv_brute": hv_b, "hv_grad": hv_g, "ratio": hv_g / hv_b, "pass": hv_g >= 0.98 * hv_b},
-            "c4_d63": {**gm, "pass": gm["d63_feasible"] >= 0.8 * gm["n"] and gm["peak_optimism_a"] is not None and gm["peak_optimism_a"] <= 4.0}}
+    crit = {"c1_port": {"forward_max_abs": port_fwd, "input_grad_rel": port_grad, "pass": bool(port_fwd <= 1e-9 and port_grad <= 1e-6)},
+            "c2_margin": {"brute_best_a": best_b, "grad_best_a": best_g, "pass": bool(best_g <= best_b + 0.5)},
+            "c3_front": {"hv_brute": float(hv_b), "hv_grad": float(hv_g), "ratio": float(hv_g / hv_b), "pass": bool(hv_g >= 0.98 * hv_b)},
+            "c4_d63": {**gm, "pass": bool(gm["d63_feasible"] >= 0.8 * gm["n"] and gm["peak_optimism_a"] is not None and gm["peak_optimism_a"] <= 4.0)}}
     out = {"reference": REF, "n_brute": len(designs), "brute_feasible": int(bfeas.sum()), "grad_designs": len(alld), "grad_feasible": int(af.sum()),
            "grad_evaluations": len(alld) * steps, "seconds": {"brute": t_brute, "grad": t_grad},
-           "criteria": crit, "passed": sum(c["pass"] for c in crit.values()), "of": len(crit), "d63": stats,
+           "criteria": crit, "passed": int(sum(c["pass"] for c in crit.values())), "of": len(crit), "d63": stats,
            "front_brute": [{"f1": float(b1[i]), "f2": float(b2[i]), **designs[i]} for i in fb],
            "front_grad": [{"f1": float(a1[i]), "f2": float(a2[i]), **alld[i]} for i in fg], "checks": checks}
-    (HERE / "a202_summary.json").write_text(json.dumps(out, indent=1) + "\n")
+    (HERE / "a202_summary.json").write_text(json.dumps(out, indent=1, default=float) + "\n")
     ok = lambda c: "PASS" if crit[c]["pass"] else "FAIL"
     print(f"A202: {out['passed']} of {out['of']} criteria pass")
     print(f"C1 {ok('c1_port')} port: forward {port_fwd:.1e}, input gradient vs differences {port_grad:.1e}")
