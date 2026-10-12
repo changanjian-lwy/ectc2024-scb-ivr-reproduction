@@ -1,7 +1,11 @@
 """A203 analysis: the loop (a203_loop.json) against D63's own search (tmp/a203/d63_100k.npz, a203_reference.json)
 and the criteria of BOUNDARY.md. Writes a203_summary.json; prints <= 15 lines.
 
-    PYTHONPATH=src python3 .../a203_analyze.py        (numpy only)"""
+    PYTHONPATH=src python3 .../a203_analyze.py [--posthoc]        (numpy only)
+
+--posthoc (after the results, not criteria) writes a203_posthoc.json: the two-objective fronts in D63 (reference,
+the loop's picks, random search at the loop's cost), how rare the loop's best is, D63's feasible set by rule, and
+A120's "bus slew >= 5 us" table recomputed in D63."""
 from __future__ import annotations
 
 import json
@@ -37,7 +41,81 @@ def against(f1s, feas_s, f1, feas):
             "peak_bias_on_d63_feasible_a": float(np.mean(f1[feas] - f1s[feas]))}
 
 
+def front(f1, f2):
+    """Indices of the non-dominated points (both minimised), by increasing f1 (as a202_inverse.front)."""
+    keep, best = [], np.inf
+    for i in np.lexsort((f2, f1)):
+        if f2[i] < best:
+            keep.append(int(i)); best = f2[i]
+    return keep
+
+
+def hypervolume(f1, f2, ref=(200.0, 100.0)):
+    hv, idx = 0.0, [i for i in front(f1, f2) if f1[i] < ref[0] and f2[i] < ref[1]]
+    for a, i in enumerate(idx):
+        hv += ((f1[idx[a + 1]] if a + 1 < len(idx) else ref[0]) - f1[i]) * (ref[1] - f2[i])
+    return float(hv)
+
+
+def posthoc():
+    ref = json.loads((HERE / "a203_reference.json").read_text())
+    loop = json.loads((HERE / "a203_loop.json").read_text())
+    designs = DD.sample(ref["n"], ref["seed"])
+    res = np.load(TMP / "d63_100k.npz")["res"].astype(np.float64)
+    f1, f2, feas, _ = judge(res)
+    rule, cs = np.array([d["rule"] for d in designs]), np.array([d["cs_uf"] for d in designs])
+    fi = np.nonzero(feas)[0]
+    lf = np.array([(q["d63_f1"], q["d63_f2"]) for r in loop["rounds"] for q in r["picks"] if q["d63_feasible"]])
+    lr = [q["design"]["rule"] for r in loop["rounds"] for q in r["picks"] if q["d63_feasible"]]
+    rng = np.random.default_rng(0)
+    hv = []
+    for _ in range(300):
+        j = rng.choice(len(f1), BUDGETS[0], replace=False)
+        hv.append(hypervolume(f1[j][feas[j]], f2[j][feas[j]]) if feas[j].any() else 0.0)
+    best_loop = loop["best"]["d63_f1"]
+    sets = {}
+    for ru in DD.RULES:
+        m = fi[rule[fi] == ru]
+        if len(m):
+            a = np.array([[designs[i]["pct"], designs[i]["cs_uf"], designs[i]["fc_khz"], designs[i]["floor_a"]] for i in m])
+            sets[ru] = {"n": int(len(m)), "share_of_rule": float(len(m) / (rule == ru).sum()), "best_f1": float(f1[m].min()),
+                        "pct": [float(a[:, 0].min()), float(np.median(a[:, 0])), float(a[:, 0].max())],
+                        "cs_uf": [float(a[:, 1].min()), float(np.median(a[:, 1])), float(a[:, 1].max())],
+                        "fc_khz": [float(a[:, 2].min()), float(np.median(a[:, 2])), float(a[:, 2].max())],
+                        "f2_mv": [float(f2[m].min()), float(np.median(f2[m])), float(f2[m].max())]}
+        else:
+            sets[ru] = {"n": 0}
+    # A120's second exploration: the 1 us line steps left out
+    keep = [j for j, (k, di, dv, sl) in enumerate(STANDARD) if not (k == "line" and sl < 5)]
+    r5 = res[:, keep]
+    feas5 = np.array([(not r5[i, :, 4].any()) and verdict(r5[i, :, 0], r5[i, :, 2], r5[i, :, 3]) for i in range(len(r5))])
+    bands = ((3, 5), (5, 8), (8, 12), (12, 20))
+    ex = json.loads((A120 / "a120_explore.json").read_text())["slew_ge_5us"]
+    out = {"front_d63": {"reference_hv": hypervolume(f1[fi], f2[fi]), "loop_hv": hypervolume(lf[:, 0], lf[:, 1]), "random160_hv_median": float(np.median(hv)),
+                         "random160_hv_10_90": [float(np.percentile(hv, 10)), float(np.percentile(hv, 90))],
+                         "reference_points": [{"rule": designs[fi[i]]["rule"], "f1": float(f1[fi[i]]), "f2": float(f2[fi[i]])} for i in front(f1[fi], f2[fi])],
+                         "loop_points": [{"rule": lr[i], "f1": float(lf[i, 0]), "f2": float(lf[i, 1])} for i in front(lf[:, 0], lf[:, 1])]},
+           "reference_at_or_below_loop_best": int((f1[fi] <= best_loop).sum()), "reference_below_191": int((f1[fi] < 191).sum()),
+           "loop_feasible_picks": int(len(lf)), "loop_feasible_by_rule": {ru: lr.count(ru) for ru in DD.RULES}, "d63_feasible_sets": sets,
+           "slew_ge_5us": {"d63_feasible": int(feas5.sum()), "surrogate_feasible": ex["feasible"],
+                           "d63_share_by_rule_cs": {ru: {f"{lo}-{hi}": float(feas5[(rule == ru) & (cs >= lo) & (cs < hi)].mean()) for lo, hi in bands} for ru in DD.RULES},
+                           "surrogate_share_by_rule_cs": ex["share_by_rule_cs"]}}
+    (HERE / "a203_posthoc.json").write_text(json.dumps(out, indent=1) + "\n")
+    fr = out["front_d63"]
+    print(f"post hoc fronts in D63, hypervolume below (200 A, 100 mV): reference {fr['reference_hv']:.0f}, loop {fr['loop_hv']:.0f}, 160 random median {fr['random160_hv_median']:.0f}")
+    print(f"reference designs at or below the loop's best: {out['reference_at_or_below_loop_best']}; below 191 A: {out['reference_below_191']}; loop feasible picks {out['loop_feasible_picks']} {out['loop_feasible_by_rule']}")
+    for ru, v in sets.items():
+        if v["n"]:
+            print(f"  D63 feasible, {ru}: {v['n']} ({v['share_of_rule']:.2%}), best {v['best_f1']:.2f} A, pct {v['pct'][0]:.1f}-{v['pct'][2]:.1f}, Cs {v['cs_uf'][0]:.1f}-{v['cs_uf'][2]:.2f}, |Vo| {v['f2_mv'][0]:.0f}-{v['f2_mv'][2]:.0f} mV")
+    s5 = out["slew_ge_5us"]
+    print(f"bus slew >= 5 us: D63 {s5['d63_feasible']} feasible, A120's surrogate {s5['surrogate_feasible']}")
+    for ru in DD.RULES:
+        print(f"  {ru}: D63 " + " / ".join(f"{v:.0%}" for v in s5["d63_share_by_rule_cs"][ru].values()) + " | surrogate " + " / ".join(f"{v:.0%}" for v in s5["surrogate_share_by_rule_cs"][ru].values()))
+
+
 def main():
+    if "--posthoc" in sys.argv:
+        return posthoc()
     ref = json.loads((HERE / "a203_reference.json").read_text())
     loop = json.loads((HERE / "a203_loop.json").read_text())
     designs = DD.sample(ref["n"], ref["seed"])
