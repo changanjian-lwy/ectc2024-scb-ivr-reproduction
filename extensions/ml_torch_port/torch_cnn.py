@@ -9,7 +9,9 @@ Layer by layer (tensors are (samples, channels, time) in both):
   dense    nn.Linear(n_in, n_out)                       weight is (n_out, n_in): ml_cnn's W transposed
   pool     nn.AvgPool1d(2)                              mean of non-overlapping pairs, an odd last sample dropped
   relu     nn.ReLU()            flatten  nn.Flatten()   (channels, time) -> one axis, row-major as numpy's reshape
-The tanh / up / unflatten layers of ml_cnn (A147's autoencoder) are not ported.
+  tanh     nn.Tanh()            up       nn.Upsample(scale_factor=2)   each sample repeated twice (A147's decoder)
+  unflatten [c, t]  nn.Unflatten(1, (c, t))            one axis -> (channels, time)
+A199 checked conv / relu / pool / flatten / dense, A200 the rest.
 
 Needs torch, which the rest of the repository does not: this module stays in the extension's folder, not in
 src/scb_ivr, and nothing outside the extension imports it.
@@ -39,8 +41,11 @@ def build_model(specs, seed=0, dtype=torch.float64):
             lay = nn.Linear(n_in, n_out)
             nn.init.normal_(lay.weight, 0.0, (1.0 / n_in) ** 0.5, generator=gen)
             nn.init.zeros_(lay.bias)
-        elif kind in ("relu", "pool", "flatten"):
-            lay = {"relu": nn.ReLU(), "pool": nn.AvgPool1d(2), "flatten": nn.Flatten()}[kind]
+        elif kind in ("relu", "pool", "flatten", "tanh", "up"):
+            lay = {"relu": nn.ReLU(), "pool": nn.AvgPool1d(2), "flatten": nn.Flatten(), "tanh": nn.Tanh(),
+                   "up": nn.Upsample(scale_factor=2, mode="nearest")}[kind]
+        elif kind == "unflatten":
+            lay = nn.Unflatten(1, tuple(a))                        # (n, c * t) -> (n, c, t)
         else:
             raise ValueError(f"build_model: layer {kind!r} is not ported")
         layers.append(lay)
