@@ -2234,6 +2234,13 @@ each question:
          two on instead of four would save 19 / 31 / 41 % at 50 / 40 /
          30 % of the system's load on slow boards, 7-21 % on nominal
          ones. Shedding itself is not modelled; it needs RTL.
+    116. The nominal board's other rows on V6 (2026-10-14, A212; low
+         sides 0.3 ohm, ton_min_ns 4.0 ns). +4.8 V over 2-10 us, -4.8 V /
+         1 us, -8 V / 10 us and a +62.5 A load step all hold: peaks
+         <= 184.1 A, within 3 A of V5's (not below, as A206's 1 us row
+         suggested), V_DS <= 33.3 V, no late fire. -4.8 V / 1 us keeps
+         its oracle events (3 K3, 3 NEW). The nominal L0 column of the
+         coverage table is now on V6; the other columns are still V5.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

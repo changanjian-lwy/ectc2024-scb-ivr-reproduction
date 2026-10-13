@@ -145,8 +145,14 @@ within 13.6 mV of 1 V from 20 µs after the handover. One miss: 3.0 Ω on the lo
 maximum, handover 206.4 A (not the chosen value). Settled N0, semiconductor loss per module in the plant's books:
 20.15 W (high-side edges 2.44, low-side edges 1.41, dead-time reverse conduction 0.66, conduction 15.65), which is
 92.5 % as P_out / (P_out + loss) at 250 W; V5 booked 15.75 W (94.1 %). With typical switches 17.32 W, LTspice 17.36 W.
-Not on V6: falling steps, load steps, slower ramps, L × 0.7 / 0.8 / 1.3, fast devices, −40 °C, steps near the
-handover, four modules.
+**Nominal L0 board, the other rows (A212, 2026-10-14; V6, low sides 0.3 Ω, ton_min_ns 4.0 ns, one step position):**
++4.8 V over 2 / 3 / 4 / 5 / 10 µs 184.1 / 184.0 / 182.9 / 183.4 / 183.8 A (V5 182.9 / 181.8 / 182.5 / 182.3 / 183.7);
+−4.8 V / 1 µs 171.7 A with 3 K3 restarts and 3 NEW oracle events (V5 172.4 A, 3 restarts and 6 NEW spikes);
+−8 V / 10 µs 169.5 A (V5 166.7; the Ton register dips to 20.4 ns, below the old limit); +62.5 A 181.5 A (V5 181.4);
+the −62.5 A release 146.6 A (A207). All pass: V_DS ≤ 33.3 V, Vo within 26.5 mV, no late fire after a stimulus.
+
+Not on V6: the device corners' own rows, L × 0.7 / 0.8 / 1.3, fast devices, −40 °C, steps near the handover, four
+modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sides.
 
 ## 4. Not covered by the final plant
 
