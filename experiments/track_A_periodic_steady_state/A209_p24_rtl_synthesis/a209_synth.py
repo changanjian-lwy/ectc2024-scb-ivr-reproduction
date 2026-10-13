@@ -30,6 +30,7 @@ YOSYS = PROJECT / "tmp" / "venv_yosys" / "bin" / "yowasp-yosys"
 PORT_OLD = ".lo_add(IS_FIRST ? lo_add : {TW{1'b0}}),"
 PORT_NEW = ".lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),"
 T_CLK_PS = 4000.0
+T_MAX_S = 2400
 LIBC = {}
 FILES = "rtl/sync2.v rtl/scb_phase.v rtl/scb_vff.v rtl/scb_dep.v rtl/scb_ctrl.v"
 TOPS = {   # name: (top module, chparam, extra sources, libraries)
@@ -54,7 +55,7 @@ def script(top, chparam, extra, lib):
         s.append(f"chparam {chparam} {top}")
     s += [f"hierarchy -top {top}", f"synth -top {top} -flatten", "check -assert", "stat"]
     if lib:
-        s += [f"dfflibmap -liberty {lib}.lib", f"abc -liberty {lib}.lib -D {T_CLK_PS:g}", f"stat -liberty {lib}.lib",
+        s += [f"dfflibmap -liberty {lib}.lib", f"abc -fast -liberty {lib}.lib", f"stat -liberty {lib}.lib",
               f"write_json {top}_{lib}.json"]
     return "\n".join(s) + "\n"
 
@@ -79,7 +80,11 @@ def one(work, logs, name, lib):
     tag = f"{name}_{lib or 'generic'}"
     (work / f"{tag}.ys").write_text(script(top, chparam, extra, lib))
     t0 = time.time()
-    r = subprocess.run([str(YOSYS), "-q", "-l", f"{tag}.log", f"{tag}.ys"], cwd=work, capture_output=True, text=True)
+    try:
+        r = subprocess.run([str(YOSYS), "-q", "-l", f"{tag}.log", f"{tag}.ys"], cwd=work, capture_output=True, text=True, timeout=T_MAX_S)
+    except subprocess.TimeoutExpired:
+        return tag, {"top": top, "library": lib, "exit": None, "error": f"no result within {T_MAX_S} s", "problems": None,
+                     "cells_generic": None, "cells_mapped": None, "area": None, "delay_ps": None, "wall_s": T_MAX_S}
     log = (work / f"{tag}.log").read_text() if (work / f"{tag}.log").exists() else r.stdout + r.stderr
     (logs / f"{tag}.log").write_text(log)
     out = dict(parse(log), top=top, library=lib, exit=r.returncode)

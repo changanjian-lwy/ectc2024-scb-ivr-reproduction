@@ -55,3 +55,9 @@ floors and A141-A184). Budget: about 10 synthesis runs, minutes each.
   sign-off tool: none is installed. The figures are estimates from below (no wires, no clock tree).
 - yosys's standard output stops when ABC starts under this build; the logs are taken from yosys's own log file.
 - Criteria and predictions unchanged. Seen so far: scb_phase maps to about 77 000 um^2 in sky130 (no delay).
+- Second change, also before any delay was read: `abc -liberty -D 4000` (ABC's delay-targeted script with retiming)
+  did not finish within 2 h 10 min on scb_vff and on scb_ctrl under the WebAssembly build. Every row is mapped with
+  `abc -fast -liberty` instead (ABC's plain mapping, 13 s on scb_vff). It restructures less for delay, so a
+  timing-driven flow would do better on the long paths; with no wires on the other side, the figures are estimates
+  with errors in both directions, good to a factor, not to 10 %. Criteria c2-c4 are read with that in mind: a path
+  within a factor of 1.5 of 4 ns counts as undecided.

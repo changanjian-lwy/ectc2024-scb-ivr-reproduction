@@ -21,9 +21,43 @@ def _unit(lib):
     return tu, cu
 
 
+def _arr(g, key):
+    try:
+        v = g.get_array(key)
+    except Exception:
+        return None
+    return None if v is None else np.asarray(v, float)
+
+
+def _table(g, templates, tu, cu):
+    """(transition axis ns, load axis pF, values[transition, load] ns) of one lookup table; an axis the table does
+    not have is a single point."""
+    tpl = templates.get(str(g.args[0]).strip('"')) if g.args else None
+    v = _arr(g, "values")
+    idx = [_arr(g, "index_1"), _arr(g, "index_2")]
+    var = [None, None]
+    if tpl is not None:
+        idx = [i if i is not None else _arr(tpl, k) for i, k in zip(idx, ("index_1", "index_2"))]
+        var = [str(tpl.get(k)).strip('"') if tpl.get(k) is not None else None for k in ("variable_1", "variable_2")]
+    idx = [None if i is None else i.ravel() for i in idx]
+    v = np.atleast_2d(v) * tu
+    if idx[0] is None:                                    # a scalar
+        return np.array([0.0]), np.array([0.0]), v.ravel()[:1].reshape(1, 1)
+    if idx[1] is None:                                    # one axis
+        v = v.ravel()
+        if var[0] and "capacitance" in var[0]:
+            return np.array([0.0]), idx[0] * cu, v.reshape(1, -1)
+        return idx[0] * tu, np.array([0.0]), v.reshape(-1, 1)
+    v = v.reshape(idx[0].size, idx[1].size)
+    if var[0] and "capacitance" in var[0]:                # the table has the load first
+        return idx[1] * tu, idx[0] * cu, v.T
+    return idx[0] * tu, idx[1] * cu, v
+
+
 def load_lib(path):
     lib = parse_liberty(open(path).read())
     tu, cu = _unit(lib)
+    templates = {str(g.args[0]).strip('"'): g for g in lib.get_groups("lu_table_template")}
     cells = {}
     for c in lib.get_groups("cell"):
         d = {"seq": bool(c.get_groups("ff") or c.get_groups("latch")), "cap": {}, "dir": {}, "clock": set(), "arcs": {}}
@@ -40,8 +74,7 @@ def load_lib(path):
                     continue
                 arc = []
                 for kind in (("cell_rise", "cell_fall"), ("rise_transition", "fall_transition")):
-                    arc.append([(np.asarray(tabs[k].get_array("index_1")[0], float) * tu, np.asarray(tabs[k].get_array("index_2")[0], float) * cu,
-                                 np.asarray(tabs[k].get_array("values"), float) * tu) for k in kind if k in tabs])
+                    arc.append([_table(tabs[k], templates, tu, cu) for k in kind if k in tabs])
                 for rel in str(tm["related_pin"]).strip('"').split():
                     d["arcs"].setdefault((rel, name), []).append(arc)
         cells[str(c.args[0]).strip('"')] = d
@@ -51,7 +84,7 @@ def load_lib(path):
 def _look(tabs, slew, load):
     best = 0.0
     for i1, i2, v in tabs:
-        a = np.array([np.interp(load, i2, row) for row in v]) if v.ndim == 2 and v.shape[1] == i2.size else v.ravel()
+        a = np.array([np.interp(load, i2, row) for row in v])
         best = max(best, float(np.interp(slew, i1, a)))
     return best
 
