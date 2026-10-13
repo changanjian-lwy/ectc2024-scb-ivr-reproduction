@@ -48,6 +48,7 @@ ACT_I = 0.01                             # A per device: the plant's start-of-ch
 K2 = "k2=2.115e+00"                      # the vendor model's threshold parameter as written in the library
 L_IDEAL = "Rser=0 Rpar=1e15"             # LTspice gives every inductor 1 mOhm in series (and a parallel damper)
                                          # unless told otherwise; 1 mOhm is twice the plant's whole phase resistance
+HAND_V = 0.2                # V: below this |V_DS| the plant counts a commanded-on switch as conducting (gate_v_hand)
 HOLD_RON = 1e-3                          # ohm, as in D79's edge netlists (LTspice does not start with 1e-5 or less);
                                          # a held node that carries I amps therefore sits I mV off until the release
 
@@ -86,7 +87,10 @@ def rph_value(rec, t0, t1, mode):
     d = duty(rec, t0, t1)
     r = load_device(temp=c["gate_temp"], dk2=c["gate_dk2"], cg_scale=c["gate_cg_scale"]).rds_on()
     r_dw = d * r / c["n_high"] + (1 - d) * r / c["n_low"]
-    return c["R"] - r_dw, {"duty": d, "rds_on_ohm": r, "duty_weighted_ohm": r_dw}
+    r_plant = c["R"]
+    if c.get("r_sw"):                                          # A206: the plant's own switch resistances
+        r_plant += d * c["r_sw"][0] + (1 - d) * c["r_sw"][1]
+    return max(r_plant - r_dw, 0.0), {"duty": d, "rds_on_ohm": r, "duty_weighted_ohm": r_dw, "plant_ohm": r_plant}
 
 
 def _pwl(points):
@@ -140,7 +144,8 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12, r_on_ls=None):
     lines = [f"* A205 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
     lines.append("Vin vin 0 " + _pwl([(0.0, cp.vin_at(t0))] + [(t - t0 + T_REL, cp.vin_at(t)) for t in brk]))
     g_drv = f"(V({{u}})/{{r_on:.6g}}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
-    r_on = {"h": c["gate_r_on"], "l": c["gate_r_on"] if r_on_ls is None else r_on_ls}     # r_on_ls: a diagnostic variant
+    r_ls = c["gate_r_on_ls"] if c.get("gate_r_on_ls", -1.0) >= 0.0 else c["gate_r_on"]    # A206: the low sides' own
+    r_on = {"h": c["gate_r_on"], "l": r_ls if r_on_ls is None else r_on_ls}               # r_on_ls: a diagnostic variant
     ic, g = dict(v), s0["gate"]
     del ic["vin"]
 
@@ -280,6 +285,10 @@ def _loss(rec, k, t, vn, ip, vds, col, c, meta):
     e_sw = [1e6 * integ(vds[j] * ich[j] * n[j]) for j in range(8)]
     e_rph = [1e6 * meta["rph_ohm"] * integ(ip[q] ** 2) for q in range(4)]
     e_plant_r = [1e6 * c["R"] * integ(ip[q] ** 2) for q in range(4)]
+    e_plant_sw = None
+    if c.get("r_sw"):                              # A206: the plant's conducting switches, on LTspice's currents
+        rs = [c["r_sw"][0]] * 4 + [c["r_sw"][1]] * 4
+        e_plant_sw = [1e6 * rs[j] * integ((ich[j] * n[j]) ** 2 * (np.abs(vds[j]) <= HAND_V)) for j in range(8)]
     sec = [s for s in rec["sections"] if t0 < s["t_s"] <= ta]
     ls_on, hs_on = [], []
     ev = [e for e in rec["edges_log"] if t0 - 1e-15 <= e["t_s"] <= ta]
@@ -302,6 +311,7 @@ def _loss(rec, k, t, vn, ip, vds, col, c, meta):
                 hs_on.append({"phase": q + 1, "t_s": ts, "e_uj": 1e6 * float(np.trapezoid((vds[q] * ich[q] * n[q])[w], t[w])),
                               "vds_nvs": 1e9 * float(np.trapezoid(vds[q][w], t[w]))})
     return {"period_s": ta - t0, "lt_channel_uj": e_sw, "lt_rph_uj": e_rph, "plant_r_uj": e_plant_r,
+            "plant_sw_uj": e_plant_sw,
             "plant_edge_uj": [1e6 * x for x in sec[-1].get("edge_energy_j", [0.0] * 8)] if sec else None,
             "plant_rev_uj": [1e6 * x for x in sec[-1].get("rev_energy_j", [0.0] * 8)] if sec else None,
             "i_rms_a": [float(np.sqrt(integ(ip[q] ** 2) / (ta - t0))) for q in range(4)],

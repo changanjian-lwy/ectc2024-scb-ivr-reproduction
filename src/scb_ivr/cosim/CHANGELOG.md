@@ -724,3 +724,25 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
   hold start, switch, release), kept by gate.py in `hold_log`.
   - `cosim_regression.py --quick` passes.
   - A run with and without "snap_us" has equal sections (A205 BOUNDARY).
+
+
+## A206: zero-voltage turn-on as an edge, switch resistances (plant V6), opt-in
+
+- cfg gate "zvs_edge" 1 (`gate.py`): a turn-on commanded at V_DS <= 0 is an
+  active edge from the command. The device's third-quadrant channel carries
+  the reverse current while the gate charges; a turn-on edge then ends at
+  |V_DS| <= v_hand with the gate above its channel start. Under an
+  interlock, such a turn-on waits while its complement conducts.
+- cfg gate "miller" 1: an idle off gate follows its charge balance with its
+  drain's movement (`GateEdges._follow`), after Python steps and at commands.
+- cfg gate "r_on_ls": the low sides' own turn-on resistance.
+- cfg "r_sw_mohm" [high, low] (`CircuitParams.r_sw`, `Sim.g_sw`): the
+  resistance of a conducting switch position, in place of g_on.
+- Why: A205 found the plant 12.6 W and 3.5-6.8 A per period away from
+  LTspice with EPC's model. The harness
+  (`A206_p24_low_side_zvs_turn_on/a206_edge.py`) is within 3-8 % of LTspice
+  on one low-side turn-on at 3.0 / 1.0 / 0.3 ohm with the three parts on.
+- With all four absent every step is as before.
+  - `cosim_regression.py --quick` passes.
+  - A205's N0 record: 751 sections and 7 snapshots to 160 us, bit for bit.
+  - Unit tests: `tests/test_cosim_gate_zvs.py` (6; 4 need the vendor library).

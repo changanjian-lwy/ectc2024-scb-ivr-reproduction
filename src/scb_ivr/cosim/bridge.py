@@ -116,6 +116,12 @@ edge a switch-node detector sees) instead of at the gate command; "cmd" keeps th
 "edge_energy_j" as with "edge"; the record adds "gate_params", "gate_stats" and "gate_offs_last" (each physical high-side
 turn-off: t_s, phase, i_act_a = the phase current when the channel takes over, i_max_a = its maximum in the edge);
 turn-ons add "t_act_s" / "vds_act_v" when deferred.
+Zero-voltage turn-ons and switch resistances (A206, plant V6; each absent = as before): cfg gate "zvs_edge" 1 makes a
+turn-on at V_DS <= 0 an edge (the device's third-quadrant channel while its gate charges; "gate_stats" adds zvs_edges,
+zvs_waits, e_zvs_j and active_zvs_s per switch), gate "miller" 1 lets an off gate follow its drain's movement, gate
+"r_on_ls" gives the low sides their own turn-on resistance (ohm per device), and "r_sw_mohm" [high side, low side]
+makes a conducting switch position that resistance instead of g_on (set circuit "R" to what is left in series with
+the inductor); the record adds "r_sw_ohm".
 """
 import gzip
 import heapq
@@ -298,6 +304,14 @@ def make_params(cfg, ref):
                      gate_v_hand=float(gate.get("v_hand", 0.2)),
                      gate_il={1: "gate", "gate": "gate", "threshold": "threshold"}.get(gate.get("interlock", 0), ""),
                      gate_t_il=float(gate.get("t_il_ns", 0.0)) * 1e-9)
+        if "r_on_ls" in gate:                                         # A206: the low sides' own turn-on resistance
+            extra["gate_r_on_ls"] = float(gate["r_on_ls"])
+        if gate.get("zvs_edge", 0):                                   # A206: turn-ons at V_DS <= 0 as edges
+            extra["gate_zvs_edge"] = True
+        if gate.get("miller", 0):                                     # A206: off gates follow their drains
+            extra["gate_miller"] = True
+    if cfg.get("r_sw_mohm"):                                          # A206: resistance of a conducting high / low side
+        extra["r_sw"] = tuple(float(x) * 1e-3 for x in cfg["r_sw_mohm"])
     return Params(**{k: pr[k] for k in keep if k not in extra}, diode_check=True, **extra)
 
 
@@ -595,7 +609,7 @@ class ModuleSim:
                 moving = s["phase"] == "active" or (s["phase"] == "pending" and s["kind"] == "on") \
                     or (s["phase"] == "held" and s.get("frozen"))
                 if not moving and plant.t > s["t"]:
-                    v = gm._relax(v, s["drv"], plant.t - s["t"], s["vds"])
+                    v = gm._relax(v, s["drv"], plant.t - s["t"], s["vds"], int(j))
                 gate[str(j)] = {"phase": s["phase"], "kind": s["kind"], "drv": bool(s["drv"]), "vgs": float(v)}
         return {"t_s": plant.t, "y": [float(x) for x in plant.y], "vin_v": self.p.vin_at(plant.t),
                 "gh": [bool(x) for x in plant.gh], "gl": [bool(x) for x in plant.gl], "phys_h": [bool(x) for x in gh],
@@ -868,6 +882,9 @@ class ModuleSim:
                 "n", "vin", "L", "R", "cs", "co", "load_kind", "r_load", "i_load", "t_load", "i_step", "t_step", "vin_step",
                 "t_vstep", "t_vslew", "t_ramp", "n_high", "n_low", "loop_l", "loop_rp", "gate_r_on", "gate_r_off",
                 "gate_v_on", "gate_l_cs", "gate_temp", "gate_dk2", "gate_cg_scale", "rev_vf", "rev_r")}
+            if p.gate_r_on_ls >= 0.0 or p.gate_zvs_edge or p.gate_miller or p.r_sw:   # A206
+                out["snap_circuit"].update(gate_r_on_ls=p.gate_r_on_ls, gate_zvs_edge=p.gate_zvs_edge,
+                                           gate_miller=p.gate_miller, r_sw=list(p.r_sw))
         if self.hand_vo is not None:                                 # A186
             out["t_hand_req_s"] = self.hand["t"]
         if self.gated:                                               # A164
@@ -881,6 +898,8 @@ class ModuleSim:
             out["slot_ofs_final_lsb"] = [signed(field(c.get("slot_ofs"), k, TW), TW) for k in range(N)]
         if p.loop_phases:                                            # A144
             out["loop_params"] = {"phases": list(p.loop_phases), "l_h": p.loop_l, "rp_ohm": p.loop_rp}
+        if p.r_sw:                                                   # A206
+            out["r_sw_ohm"] = list(p.r_sw)
         if plant.edges:                                              # A145
             out["edge_params"] = {"didt_off_a_s": p.edge_didt_off, "didt_on_a_s": p.edge_didt_on}
             out["edge_stats"] = plant.edge_stats
@@ -892,6 +911,9 @@ class ModuleSim:
             out["gate_params"]["meas"] = "act" if self.gate_meas_act else "cmd"
             if p.gate_il:                                            # A170
                 out["gate_params"].update(gate_il=p.gate_il, gate_t_il=p.gate_t_il)
+            if p.gate_r_on_ls >= 0.0 or p.gate_zvs_edge or p.gate_miller:   # A206
+                out["gate_params"].update(gate_r_on_ls=p.gate_r_on_ls, gate_zvs_edge=p.gate_zvs_edge,
+                                          gate_miller=p.gate_miller)
             out["gate_stats"] = plant.gm.summary()
             out["gate_offs_last"] = [{"t_s": a, "phase": b, "i_act_a": c, "i_max_a": d} for a, b, c, d in plant.gm.off_log]
             if self.snap_win:                                        # A205: when the interlock held which gate

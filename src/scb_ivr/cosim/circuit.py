@@ -22,6 +22,9 @@ Circuit (N phases):
   in an edge as open with its channel current as a source from drain to source in the right-hand side (edge_inc);
   0 = instantaneous edges, every matrix and step as before.
 - optional gate-driven edges (gate_dev, A163): the listed switches' edges follow a gate model (gate.py); "" = off.
+- optional switch resistances (r_sw, A206): a conducting high / low side is r_sw[0] / r_sw[1] ohm (the whole position)
+  instead of g_on, so an on-time's path holds its own switches; R is then what is left in series with the inductor.
+  () = g_on, every matrix as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -144,6 +147,11 @@ class CircuitParams:
                                  #   stops conducting), "threshold" (A171: its gate charges to the activation level
                                  #   and waits there); "" = off
     gate_t_il: float = 0.0       #   ... then starts this much later (s; the interlock's propagation delay)
+    gate_r_on_ls: float = -1.0   # A206: the low sides' own turn-on resistance (ohm per device; < 0: gate_r_on)
+    gate_zvs_edge: bool = False  # A206: a turn-on at V_DS <= 0 is an edge too (third-quadrant channel while its gate
+                                 #   charges); False: it conducts at once
+    gate_miller: bool = False    # A206: an idle off gate follows its drain's movement (charge through C_GD)
+    r_sw: tuple = ()             # A206: (high side, low side) ohm of a conducting switch position; (): g_on
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
@@ -214,6 +222,7 @@ class Sim:
                     self.Bloop[self.idx[f"a{k - 1}"], b] = 1.0
                 self.Bloop[self.idx[f"h{k}"], b] = -1.0
         self.nsw = [p.n_high] * p.n + [p.n_low] * p.n            # devices per switch position
+        self.g_sw = ([1.0 / p.r_sw[0]] * p.n + [1.0 / p.r_sw[1]] * p.n) if p.r_sw else [p.g_on] * (2 * p.n)   # A206
         self.nl = None
         if p.nonlinear_coss:                                   # switch-branch incidence for the charge correction
             rsw = np.zeros((2 * p.n, ns)); vin_flag = np.zeros(2 * p.n)
@@ -235,7 +244,7 @@ class Sim:
         for j, (on, (name, d, s)) in enumerate(zip(conducting, self.switches)):
             if not on:
                 continue
-            g = p.g_on
+            g = self.g_sw[j]
             idd, iss = self.idx.get(d), self.idx.get(s)
             if donly is not None and donly[j]:                 # reverse conduction, I_ds = g (V_ds + Vf)
                 g = self.nsw[j] / p.rev_r

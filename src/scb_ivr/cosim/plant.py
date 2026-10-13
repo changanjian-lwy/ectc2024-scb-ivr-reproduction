@@ -488,7 +488,7 @@ class FastPlant:
         p, st = self.p, self.edge_stats
         r = self.ramps.pop(j, None)
         if not level:                                  # turn-off: the channel current now (ramp or g_on V_DS) falls
-            i0 = self._ramp_i(*r, self.t) if r else p.g_on * float(self.vds(j))
+            i0 = self._ramp_i(*r, self.t) if r else self.sim.g_sw[j] * float(self.vds(j))
             if p.edge_didt_off > 0 and i0 > 0.0:
                 self.ramps[j] = (self.t, i0, -p.edge_didt_off); st["off"][j] += 1
         else:                                          # turn-on: hard if V_DS > 0, then the current rises
