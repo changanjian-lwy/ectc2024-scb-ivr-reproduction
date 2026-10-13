@@ -108,6 +108,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A196": (TA / "A196_p24_slow_corrector_binding_row", "a196_analyze.py", "a196_summary.json"),
     "A197": (TA / "A197_p24_slow_hot_final_handover", "a197_analyze.py", "a197_summary.json"),
     "A198": (TA / "A198_p24_step_right_after_handover", "a198_analyze.py", "a198_summary.json"),
+    "A205": (TA / "A205_p24_ltspice_replay", "a205_analyze.py", "a205_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -528,6 +529,20 @@ EXCEPTIONS["A196"] = {(f"runs/S75_{t}_p{k}", "c4"): "corrector step 0.0625 ns + 
 _A198 = "+4.8 V / 1 us within 20 us after the handover on S75: phase 1's rail jump meets the handover's own peak (125 C) " \
         "or a lost phase-1 valley (25 C, 20 us); passes from 40 us on - the row is specified with a 40 us hold-off (RESULTS 0)"
 EXCEPTIONS["A198"] = {(r, "c2"): _A198 for r in ("S75_25_d20", "S75_hot_d2", "S75_hot_d10", "S75_hot_d20")}
+_A205 = {"c0": "the criterion compared node voltages, which cannot match next to a conducting switch (0 V in the plant, I x "
+               "R_DS(on) in a device); phase currents arrive within 0.004 A (RESULTS 1)",
+         "c1": "later peaks inherit the one-period current difference; the first peak of every replay is within 0.17 A (RESULTS 0)",
+         "c2": "the plant's zero-voltage low-side turn-on is instantaneous, LTspice's takes about 10 ns of reverse conduction "
+               "through 3.0 ohm (3.3 A per turn-on); the on-time loses 1.3-1.5 A more - the finding (RESULTS 0)",
+         "c4": "later turn-ons inherit the current difference; each phase's first is within 0.19 ns (RESULTS 1)"}
+
+
+_A205_ROWS = {   # run: (mode-S rows, rows outside mode S that pass c1, rows outside mode S that fail c1)
+    "N0_steady": ([f"S_k{k}_match" for k in range(4)], [f"P_k{k}_match" for k in range(7, 13)], [f"P_k{k}_zero" for k in (7, 8, 9)]),
+    "N0_step": ([], ["T_k0_match", "T_k1_match"], ["T_k45_match", "T_k46_match", "T_k47_match"]),
+    "N75_step": ([], [], [f"T_k{k}_match" for k in (1, 2, 52, 53, 54)])}
+EXCEPTIONS["A205"] = {(run, f"{row}/{c}"): _A205[c] for run, (ms, ok1, bad1) in _A205_ROWS.items()
+                      for row in ms + ok1 + bad1 for c in (("c0",) if row in ms else ("c0", "c2", "c4") + (("c1",) if row in bad1 else ()))}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

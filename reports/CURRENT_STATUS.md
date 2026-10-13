@@ -2147,6 +2147,23 @@ each question:
          35 % at 0.8 V noise, 10 % at a 0.5 GHz probe, 6 % at I0 +5 %.
          Not adopted: A146's measurement requirements stay external.
          2 of 4.
+    109. The plant against LTspice over whole periods (2026-10-13, A205,
+         registered as A199; plant V5, final configuration, nominal devices,
+         25 C). The bridge records the plant's state and every gate command
+         (cfg snap_us, read-only); scripts/p24_replay.py replays two periods
+         in LTspice with EPC's model on all 20 switches. 23 replays: the
+         plant's largest peaks within 0.17 A (182.8 A on N0, 198.5 A on N75),
+         hard switching within 0.024 ns / 0.14 V, V_DS within 1.5 V
+         everywhere. Not reproduced: a settled period ends 3.5-6.8 A lower
+         and 12.6 W of semiconductor loss are missing from the plant (27.4
+         against 14.8 W). Cause: a low side's zero-voltage turn-on is
+         instantaneous in the plant and takes about 10 ns of reverse
+         conduction through the specified 3.0 ohm (about 10 W); 4.0 W
+         remain with 0.3 ohm. At fixed commands the next peak is 1.1-2.7 A
+         higher (N75 201 A). Efficiency about -4 points as specified. Next:
+         the effect goes into the plant, then the binding rows are rerun.
+         Three faults of the replay tool were found on the way, one of them
+         LTspice's default 1 mOhm in every inductor (RESULTS Section 2).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

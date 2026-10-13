@@ -122,6 +122,18 @@ The rest:
 
 ## 4. Not covered by the final plant
 
+- **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
+  from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
+  one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within
+  0.17 A (182.7 / 182.8 A, 198.35 / 198.52 A), hard switching within 0.024 ns and 0.14 V, and every switch's largest
+  V_DS within 1.5 V (≤ 32.3 V). It does **not** reproduce a settled period: the currents end 3.5-6.8 A lower and
+  **12.6 W of semiconductor loss per module are missing from the plant** (27.4 W against 14.8 W). The plant makes a
+  low side conduct the instant it is commanded on at zero voltage; through the specified 3.0 Ω its gate needs about
+  10 ns, and until then the device conducts in reverse at up to 2.8 V (about 10 W, 3.3 A per turn-on). With 0.3 Ω
+  on the low sides in LTspice the gap is 4.0 W. At fixed commands phase 1's next peak is 1.1-2.7 A higher in LTspice
+  (N75: 200.5-201.3 A against 197.8-198.5 A). Every efficiency figure and every margin below about 3 A in this file
+  predates this and is stated for the plant as it was. Slow / fast devices, other temperatures, four modules and a
+  closed loop on the LTspice circuit are not done.
 - **The interlock is an idealised function.** It senses the complement's channel exactly and holds the gate at its
   own channel start. Where it acted (L × 0.7, slow corner), zero shoot-throughs are imposed by the rule, not
   shown. Where it never acted (0 holds: nom / ff / hot one module, four modules nominal), they do not depend on it.
@@ -179,6 +191,14 @@ The rest:
   events, restarts. The interlock's 1.0 ns is a diagnostic target: in A179 peaks (169-171 / 183-185 A), V_DS
   (≤ 32.9 V) and Vo extremes (within ~2 mV) do not separate 0.5-1.4 ns; up to 8.3 ns peaks and V_DS held and
   four-module Vo was −13.7 against −9.9 mV (A174).
+- After A205: "the plant's peaks, hard-switching edges and V_DS maxima agree with LTspice (vendor model, nominal
+  devices, 25 °C) within 0.2 A, 0.03 ns and 1.5 V on the replayed windows" may be said. "The efficiency is 90 %" may
+  not: the plant omits the low sides' reverse conduction at turn-on, about −4 points with 3.0 Ω on the low sides and
+  about −1.3 points with 0.3 Ω (open-loop estimate from one period). "The slow corner holds 200 A with a 2.2 A
+  margin" may not be said without "in the plant; LTspice's next peak is up to 2.7 A higher at fixed commands".
+- The drive specification "3.0 Ω ± 20 % on / ≤ 0.3 Ω off per device" was derived for hard high-side turn-ons. For
+  the low sides, which turn on at zero voltage, it is not a specification but an oversight: they need their own,
+  small turn-on resistance (A205; value and its effect on the low sides' rare hard turn-ons not yet determined).
 - Efficiency: η = P_out / (P_out + P_loss). A loss increase divided by 250 W is a share of the output, not
   efficiency points: the gate-level edges add 1.7 / 3.9 W per module (nominal / slow corner), −0.4..−0.5 /
   −1.0..−1.2 points depending on the baseline (D80, corrected 2026-10-09).
