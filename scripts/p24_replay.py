@@ -219,6 +219,8 @@ def compare(rec, k, periods, names, a, meta):
     hold = {n: at(vn[n], t0 + 1e-13) - y for n, y in zip(NODES, rec["snaps"][k]["y"][:12])}
     out["start_err_v_max"] = max(abs(x) for x in hold.values())            # the initial state arrived as given
     out["start_err_i_max"] = max(abs(at(ip[q], t0 + 1e-13) - rec["snaps"][k]["y"][12 + q]) for q in range(4))
+    out["start_err_vcs_max"] = max(abs(hold[f"a{r}"] - hold[f"x{r}"]) for r in range(1, 4))    # on state variables
+    out["start_err_vo"] = abs(hold["out"])
     st = []
     for q in range(1, periods + 1):                                        # the state one, two, ... periods later
         s = rec["snaps"][k + q]
