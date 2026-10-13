@@ -130,7 +130,7 @@ class GateEdges:
         self.on_act = {}                               # switch -> callback at its next activation (the bridge's)
         self.next_cb = {}                              # the bridge's callback for the command about to come
         self.off_log = deque(maxlen=OFF_LOG)           # (t_act, phase, i at activation, max i in the edge) high sides
-        self.hold_log = deque(maxlen=OFF_LOG)          # A199: (t_hold, switch, t_release) of the interlock's holds
+        self.hold_log = deque(maxlen=OFF_LOG)          # A205: (t_hold, switch, t_release) of the interlock's holds
         n2 = 2 * p.n
         self.sw = tuple(sorted(int(j) for j in p.gate_switches))
         self.nsw = plant.sim.nsw

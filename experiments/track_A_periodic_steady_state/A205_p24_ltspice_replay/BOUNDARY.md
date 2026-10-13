@@ -1,4 +1,7 @@
-# A199 - the plant against LTspice over whole periods (BOUNDARY)
+# A205 - the plant against LTspice over whole periods (BOUNDARY)
+**Renumbered 2026-10-13, after the runs and before the results were written.** Registered as A199 (commit ec33c6c). Another session had
+already used A199-A204 for extensions/ml_torch_port, so this experiment is A205. Nothing else in this file
+changed; the cfg notes inside the records and the commits before the renumbering still say A199.
 Method: mixed (cosim, plant V5, final configuration, to record states and gate commands; then LTspice with EPC's
 EPC2067 model on all 20 switches replaying those commands open loop; scripts/p24_replay.py)
 Track A, package layer. Written and committed before any replay. No replay of any snapshot has been run or seen:
@@ -25,13 +28,13 @@ Budget: 3 cosim runs (1.5 run-equivalents of 900 us, about 40 min) and 23 LTspic
   typical R_DS(on) (1.28 mOhm per device), so both circuits lose the same on average; "zero" as a second variant.
 - Runs (nominal devices, 25 C, a194 make_cfgs.board): N0 without an event (snapshots in mode S at 141.0-142.3 us,
   where every turn-on is hard, and settled at 292.0-296.5 us); N0 and N75 (L x 0.75) with +4.8 V / 1 us at 500 us.
-- Replays, fixed by rule (a199_analyze.plan): N0 steady: 4 in mode S, 6 settled, the first 3 settled again with
+- Replays, fixed by rule (a205_analyze.plan): N0 steady: 4 in mode S, 6 settled, the first 3 settled again with
   "zero". Step runs: the last snapshot before the step and the next one, and the three ending at the plant's
   largest peak (starting two periods, one period and no period before it). 23 in all.
 - Not tested: slow or fast devices, other temperatures, interlock holds (the replay refuses records with holds),
   four modules, anything longer than two periods.
 
-## 2. Criteria (per replay, LTspice minus plant; a199_analyze.judge)
+## 2. Criteria (per replay, LTspice minus plant; a205_analyze.judge)
  c0 the start state arrives: node voltages within 5 mV, phase currents within 0.05 A (a check of the tool).
  c1 every high-side turn-off peak within 2.0 A (1 % of the 200 A budget; the slow corner's margin is 2.2 A).
  c2 one period later: phase currents within 1.5 A, flying-capacitor voltages within 20 mV, Vo within 0.5 mV.

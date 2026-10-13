@@ -713,7 +713,7 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
 - Spec: `extensions/ml_design_assist/experiments/A128_cosim_vin_feedforward/SPEC_RTL.md`.
 
 
-## A199: replay snapshots, opt-in
+## A205: replay snapshots, opt-in
 
 - cfg "snap_us" [t0, t1]: the bridge records the full plant state and every
   gate voltage at phase 1's high-side turn-off commands inside the window
@@ -723,4 +723,4 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
 - With it the record also lists every interlock hold (`gate_holds_last`:
   hold start, switch, release), kept by gate.py in `hold_log`.
   - `cosim_regression.py --quick` passes.
-  - A run with and without "snap_us" has equal sections (A199 BOUNDARY).
+  - A run with and without "snap_us" has equal sections (A205 BOUNDARY).

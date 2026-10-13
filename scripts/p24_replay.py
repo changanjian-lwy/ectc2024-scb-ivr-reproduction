@@ -1,4 +1,4 @@
-"""A199: open-loop replay of a co-simulation window in LTspice, EPC's model on all 20 switches at all times.
+"""A205: open-loop replay of a co-simulation window in LTspice, EPC's model on all 20 switches at all times.
 
 A record made with cfg "snap_us" and "debug_edges_us" holds, at each phase-1 high-side turn-off command inside the
 window, the plant's full state (bridge Module.snapshot) and every gate command applied to the plant. replay(rec, k,
@@ -137,7 +137,7 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12, r_on_ls=None):
     if c["gate_dk2"]:
         assert any(K2 in x for x in pr)
         pr = [x.replace(K2, f"k2={2.115 + c['gate_dk2']:.4f}") for x in pr]
-    lines = [f"* A199 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
+    lines = [f"* A205 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
     lines.append("Vin vin 0 " + _pwl([(0.0, cp.vin_at(t0))] + [(t - t0 + T_REL, cp.vin_at(t)) for t in brk]))
     g_drv = f"(V({{u}})/{{r_on:.6g}}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
     r_on = {"h": c["gate_r_on"], "l": c["gate_r_on"] if r_on_ls is None else r_on_ls}     # r_on_ls: a diagnostic variant
@@ -308,7 +308,7 @@ def _loss(rec, k, t, vn, ip, vds, col, c, meta):
             "vo_mean_v": integ(vn["out"]) / (ta - t0), "ls_turn_on": ls_on, "hs_on_time": hs_on}
 
 
-def replay(rec, k, periods=2, rph="match", tag="a199", keep_raw=False, maxstep=5e-12, r_on_ls=None):
+def replay(rec, k, periods=2, rph="match", tag="a205", keep_raw=False, maxstep=5e-12, r_on_ls=None):
     import p24_ltspice as LT
     net, meta = netlist(rec, k, periods, rph, maxstep, r_on_ls)
     name = f"{tag}_k{k}_{rph}" + ("" if r_on_ls is None else f"_ls{r_on_ls:g}".replace(".", "p"))
@@ -344,7 +344,7 @@ def main(argv=None):
     ap.add_argument("--periods", type=int, default=2)
     ap.add_argument("--rph", default="match", choices=("match", "zero", "plant"))
     ap.add_argument("--out")
-    ap.add_argument("--tag", default="a199")
+    ap.add_argument("--tag", default="a205")
     ap.add_argument("--keep-raw", action="store_true")
     ap.add_argument("--r-on-ls", type=float, default=None, help="low-side turn-on resistance, ohm (diagnostic variant)")
     a = ap.parse_args(argv)

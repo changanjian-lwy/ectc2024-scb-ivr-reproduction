@@ -1,4 +1,4 @@
-"""A199 analysis: LTspice replays (scripts/p24_replay.py) of the three snapshot records, by the registered rule.
+"""A205 analysis (registered as A199, see BOUNDARY): LTspice replays (scripts/p24_replay.py) of the three snapshot records, by the registered rule.
 - N0_steady: mode S window, snapshots 0-3; settled mode P window, snapshots 0-5 (and 0-2 again with rph "zero").
 - N0_step / N75_step: S and S + 1 (S = the last snapshot before the step) and P - 2, P - 1, P (P = the last snapshot
   at or before the plant's largest physical peak after the step).
@@ -10,9 +10,9 @@ Each replay covers two phase-1 periods from its snapshot. Criteria per replay (L
  c4 every hard high-side turn-on: channel start within 0.3 ns and V_DS there within 1.0 V.
 Post hoc diagnostics (no criteria; DIAG): the first three settled snapshots again with the low sides' turn-on
 resistance at 0.3 and 1.0 ohm in LTspice (the plant's commands unchanged), to trace the one-period difference.
-  python3 a199_analyze.py identity   the records' sections against A194's N0 record made before the snapshot code
-  python3 a199_analyze.py run [--jobs 4]   the missing replays -> replays/<run>_<window>_k<k>_<rph>.json
-  python3 a199_analyze.py            -> a199_summary.json"""
+  python3 a205_analyze.py identity   the records' sections against A194's N0 record made before the snapshot code
+  python3 a205_analyze.py run [--jobs 4]   the missing replays -> replays/<run>_<window>_k<k>_<rph>.json
+  python3 a205_analyze.py            -> a205_summary.json"""
 from __future__ import annotations
 
 import json
@@ -73,7 +73,7 @@ def one(arg):
     name, label, k, rph, r_ls = arg
     import p24_replay as R
     rec = R.load(HERE / "cosim" / f"run_{name}.json")
-    o = R.replay(rec, k, PERIODS, rph, tag=f"a199_{name}_{label}", r_on_ls=r_ls)
+    o = R.replay(rec, k, PERIODS, rph, tag=f"a205_{name}_{label}", r_on_ls=r_ls)
     (REP / fname(name, label, k, rph, r_ls)).write_text(json.dumps(o, indent=1) + "\n")
     return f"{name} {label} {'' if r_ls is None else f'ls {r_ls} '}" + R.brief(o)
 
@@ -167,7 +167,7 @@ def main():
         res[name] = {"snapshots": len(rec["snaps"]), "commit": rec["provenance"]["git_commit"][:7],
                      "sources_modified": rec["provenance"]["cosim_sources_modified"], "replays": rows,
                      "criteria": {k: v["criteria"] for k, v in rows.items()}, "diagnostics": diag}
-    (HERE / "a199_summary.json").write_text(json.dumps(res, indent=1) + "\n")
+    (HERE / "a205_summary.json").write_text(json.dumps(res, indent=1) + "\n")
     f1 = lambda xs: " ".join(f"{x:+.2f}" for x in xs)
     for name, r in res.items():
         for k, m in list(r["replays"].items()) + [("diag " + a, b) for a, b in r["diagnostics"].items()]:

@@ -1,4 +1,4 @@
-"""A199 cosim cfgs: three runs of the final configuration (a194 make_cfgs.board: A188 start-up, lead 8 ns, t_il
+"""A205 cosim cfgs (registered as A199; the cfg notes and so the records keep that number): three runs of the final configuration (a194 make_cfgs.board: A188 start-up, lead 8 ns, t_il
 1.0 ns, nominal devices, 25 C) that record replay snapshots (cfg "snap_us") and every applied gate edge
 ("debug_edges_us") for scripts/p24_replay.py:
 - N0_steady: no event, to 297 us; snapshots in mode S (141.0-142.3 us) and in settled mode P (292.0-296.5 us);

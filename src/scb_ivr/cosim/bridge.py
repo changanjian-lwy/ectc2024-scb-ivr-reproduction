@@ -98,7 +98,7 @@ Late-fire log (cfg "late_log" 1, A162): every section adds "late", the N phases'
 unchanged).
 Windowed V_DS peaks (cfg "vds_win" 1, A144): every section adds "vds_win_v", the 2N switches' peak V_DS since the
 previous section; "vds_max_v" stays the whole run's peak.
-Replay snapshots (cfg "snap_us" [t0, t1] or a list of such windows, A199): at every phase-1 high-side turn-off
+Replay snapshots (cfg "snap_us" [t0, t1] or a list of such windows, A205): at every phase-1 high-side turn-off
 command inside a window the
 record's "snaps" gets the full plant state (y, input, commanded / physical gates, reverse-conduction flags, each
 gate-driven switch's gate voltage); with "debug_edges_us" (every applied edge) that is what an open-loop replay of
@@ -477,7 +477,7 @@ class ModuleSim:
         self.gate_meas_act = (cfg.get("gate") or {}).get("meas", "act") == "act"   # A163
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
-        w = cfg.get("snap_us")                                  # A199: replay snapshots at phase 1's high-side turn-offs
+        w = cfg.get("snap_us")                                  # A205: replay snapshots at phase 1's high-side turn-offs
         self.snap_win = ([w] if w and not isinstance(w[0], (list, tuple)) else w) or None   # one window or a list of them
         self.snaps = []
 
@@ -582,7 +582,7 @@ class ModuleSim:
             trace["digests"].append(trace["h"].hexdigest())
 
     def snapshot(self):
-        """A199: the plant at this instant, for an open-loop replay in another simulator: the state y, the input,
+        """A205: the plant at this instant, for an open-loop replay in another simulator: the state y, the input,
         the commanded and the physical gates, the reverse-conduction flags and every gate-driven switch's gate voltage
         (relaxed to now as gate.GateEdges._sync would, without touching the gate model's own state)."""
         plant = self.plant
@@ -678,7 +678,7 @@ class ModuleSim:
                     self.hand.update(lat=True, t=plant.t)
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
             if k == 0 and self.snap_win and any(a * 1e-6 <= plant.t <= b * 1e-6 for a, b in self.snap_win):
-                self.snaps.append(self.snapshot())               # A199 (read-only)
+                self.snaps.append(self.snapshot())               # A205 (read-only)
             mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
             ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
             self.highoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k]),
@@ -862,7 +862,7 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
-        if self.snap_win:                                            # A199: the snapshots and the circuit they belong to
+        if self.snap_win:                                            # A205: the snapshots and the circuit they belong to
             out["snaps"] = self.snaps
             out["snap_circuit"] = {k: getattr(p, k) for k in (
                 "n", "vin", "L", "R", "cs", "co", "load_kind", "r_load", "i_load", "t_load", "i_step", "t_step", "vin_step",
@@ -894,7 +894,7 @@ class ModuleSim:
                 out["gate_params"].update(gate_il=p.gate_il, gate_t_il=p.gate_t_il)
             out["gate_stats"] = plant.gm.summary()
             out["gate_offs_last"] = [{"t_s": a, "phase": b, "i_act_a": c, "i_max_a": d} for a, b, c, d in plant.gm.off_log]
-            if self.snap_win:                                        # A199: when the interlock held which gate
+            if self.snap_win:                                        # A205: when the interlock held which gate
                 out["gate_holds_last"] = [{"t_hold_s": a, "switch": b, "t_release_s": c} for a, b, c in plant.gm.hold_log]
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
