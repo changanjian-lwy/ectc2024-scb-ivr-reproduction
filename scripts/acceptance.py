@@ -116,6 +116,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A211": (TA / "A211_p24_loss_against_load", "a211_analyze.py", "a211_summary.json"),
     "A212": (TA / "A212_p24_nominal_rows_v6", "a212_analyze.py", "a212_summary.json"),
     "A213": (TA / "A213_p24_binding_row_ltspice", "a213_analyze.py", "a213_summary.json"),
+    "A214": (TA / "A214_p24_startup_light_load", "a214_analyze.py", "a214_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -593,6 +594,9 @@ _A213 = {"c1": "later peaks are 2.0-3.9 A lower in LTspice at the slow hot corne
 EXCEPTIONS["A213"] = {("criteria", f"{r}/c2"): _A213["c2"] for r in ("P_k0", "P_k1", "P_k2", "T_k8", "T_k9", "K_k53", "K_k54", "K_k55")}
 EXCEPTIONS["A213"].update({("criteria", f"{r}/c1"): _A213["c1"] for r in ("T_k8", "K_k53", "K_k54", "K_k55")})
 EXCEPTIONS["A213"].update({("criteria", f"{r}/c4"): _A213["c4"] for r in ("K_k53", "K_k54", "K_k55")})
+EXCEPTIONS["A214"] = {("runs/u_N0_25_30", "c6"): "a start into 30 % of the load reaches 1.0528 V, 2.8 mV over the 1.05 V limit, 0.6 us "
+                      "after mode P's entry; peaks, V_DS and the end state are inside their limits - the tested start-up range is "
+                      "50-100 % (RESULTS 0)"}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

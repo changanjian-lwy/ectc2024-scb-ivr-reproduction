@@ -192,6 +192,13 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   save 19 / 31 / 41 % of the loss at 50 / 40 / 30 % of the system's load on slow boards, 7-21 % on nominal ones,
   and would reach down to 7.5 %. **Not covered: shedding itself. No module leaves or re-enters in any run; the
   frozen controller cannot do it.** 0 and 125 °C on these rows, the gate drive's loss and the inductors' are not in.
+- **Start-up into less than the full load (A214, 2026-10-14; plant V6, the load resistance set from t = 0).** Every
+  earlier start ran into the full load. Nominal L0 with 75 and 50 % of the load, and slow 0.75 L0 with 50 % at 25 and
+  125 °C, start cleanly: Vo ≤ 1.0492 V, peaks ≤ 161.5 A, V_DS ≤ 30.6 V. The handover is requested by Vo (1.045 V)
+  at 109-137 µs instead of 144 µs, while Vin is still at 38-48 V, and mode P takes over. **Nominal L0 with 30 %
+  reaches 1.0528 V, 2.8 mV over the limit (record `A214_p24_startup_light_load/cosim/run_u_N0_25_30.json` in
+  release records-a214). Tested start-up range: 50-100 % of the load.** Slow boards at 30 %, 0 °C, a load that
+  switches on during the start, and four modules are not run.
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within

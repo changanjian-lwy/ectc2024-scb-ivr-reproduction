@@ -2250,6 +2250,12 @@ each question:
          1.3-2.0 A per period high at this corner (conservative; nominal:
          0.7 A), up to 3.0 A around the peak; settled loss books within
          0.5 % (39.9 W per module).
+    118. Start-up into less than the full load (2026-10-14, A214; cfg
+         only). N0 with 75 and 50 % of the load and S75 with 50 % at 25
+         and 125 C start cleanly (Vo <= 1.0492 V, peaks <= 161.5 A): the
+         handover requested on Vo comes at 109-137 us, while Vin is still
+         ramping, and mode P takes over. N0 with 30 % reaches 1.0528 V
+         (limit 1.05 V). Tested start-up range: 50-100 % of the load.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
