@@ -111,6 +111,8 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A205": (TA / "A205_p24_ltspice_replay", "a205_analyze.py", "a205_summary.json"),
     "A206": (TA / "A206_p24_low_side_zvs_turn_on", "a206_analyze.py", "a206_summary.json"),
     "A207": (TA / "A207_p24_load_range", "a207_analyze.py", "a207_summary.json"),
+    "A208": (TA / "A208_p24_ton_lower_limit", "a208_analyze.py", "a208_summary.json"),
+    "A210": (TA / "A210_p24_load_range_boards", "a210_analyze.py", "a210_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -565,6 +567,17 @@ EXCEPTIONS["A206"][("runs/E_N0_steady_ls3", "c6")] = _A206["c6"]
 _A207 = "the load is below the module's floor (about 174 A): the Ton register sits at cfg_ton_min = half the loop seed and Vo " \
         "leaves regulation (1.09-1.56 V) - the finding; not fixed, the controller is frozen (RESULTS 0)"
 EXCEPTIONS["A207"] = {(f"runs/f{p}", "r2"): _A207 for p in (60, 55, 50, 45, 40, 30, 10)}
+_A208 = {"r2": "10 % of the load is below the module's floor: the Ton register sits at the limit (2.0 or 4.0 ns), 38 / 47 A are "
+               "delivered and Vo ends at 1.05 / 1.09 V - the floor the experiment was run to find (RESULTS 0)",
+         "r3": "an instantaneous release of 200 A or more overshoots by 52.6-59 mV; reported apart from the floor (RESULTS 0)",
+         "r4": "at the 2.0 ns limit the switching is rough (late fires 59 / 0 / 118 / 43 in the last 20 us); the proposed 4.0 ns "
+               "limit keeps it clean on the same row (v10) (RESULTS 0)"}
+EXCEPTIONS["A208"] = {("runs/m20", "r3"): _A208["r3"], ("runs/v20", "r3"): _A208["r3"], ("runs/m10", "r2"): _A208["r2"],
+                      ("runs/m10", "r3"): _A208["r3"], ("runs/m10", "r4"): _A208["r4"], ("runs/v10", "r2"): _A208["r2"],
+                      ("runs/v10", "r3"): _A208["r3"]}
+_A210 = "nominal 0.75 L0 with 20 % of the load is below its floor: the register sits at the 4.0 ns limit, 65 A are delivered and Vo " \
+        "ends at 1.060 V with clean switching - the floor the experiment was run to find (RESULTS 0)"
+EXCEPTIONS["A210"] = {("runs/r_N75_25_20", "r2"): _A210, ("runs/r_N75_25_20", "r3"): _A210}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

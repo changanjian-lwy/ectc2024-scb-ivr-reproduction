@@ -2197,6 +2197,33 @@ each question:
          the remedy (the limit as its own cfg value, a light-load mode,
          module shedding) is the user's decision. D63 predicted 50-55 %:
          it lacks the lead's offset between register and on-time.
+    112. The lower Ton limit as its own value (2026-10-14, A208; the
+         user's decision to do it first). Bridge cfg "ton_min_ns" sets
+         cfg_ton_min (absent = half of ton_ns, bit for bit; regression
+         4 / 4; RTL unchanged). Board N0, plant V6: with the limit at
+         2.0 ns the module works at 60, 50, 40, 30 and 20 % of its load and
+         not at 10 % (38 A delivered, late fires). Proposed 4.0 ns: 20 %
+         works, and at 10 % the output rises to 1.087 V with clean
+         switching. Loss books 8.7 / 6.7 / 5.3 / 4.2 / 3.4 W at 60-20 %
+         (93.7-95.0 %), 2.8-5.2 MHz. The 18 earlier V6 records never
+         reach the old limit and stand.
+    113. The RTL as a circuit (2026-10-14, A209; synthesis estimate, no
+         RTL change). The RTL does not pass yosys's front end as written
+         (one signed / unsigned port expression from A148; a one-token
+         fix in a scratch copy). One module's controller: 125 821 generic
+         cells (A100: 43 924), 55 % scb_vff. Longest path 47.0 ns in
+         sky130 and 10.5 ns at 45 nm against the 4 ns clock, from the
+         loop's accumulator through scb_vff into phase 1; one phase's
+         per-clock logic alone 10 ns / 2.4 ns. A buildable version needs a
+         register stage after scb_vff and, in a 130-180 nm node, a faster
+         phase logic. Estimates good to a factor.
+    114. The minimum load on the other boards (2026-10-14, A210; 4.0 ns
+         limit, plant V6). N75 works at 40 and 30 % and reaches the limit
+         near 26 % (65 A). Slow 0.75 L0 regulates at 30 and 20 % at 0, 25
+         and 125 C, but books 15-19 W there (75-83 %; 9-12 W in high-side
+         edges at 5.5-6.6 MHz), and at 20 % no high-side turn-on
+         completes. The specification's minimum load is 30 % per module.
+         What shedding modules would save on these boards: A211.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

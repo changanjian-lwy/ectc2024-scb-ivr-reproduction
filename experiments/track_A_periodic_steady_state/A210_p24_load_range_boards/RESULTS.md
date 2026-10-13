@@ -16,7 +16,7 @@ ton_min_ns = 4.0 ns (A208), one module; part of the 250 A load released at 300 u
     a slow device's edge costs more. N75 books 6.5 W at 30 % (92.0 %), N0 4.2 W (94.7 %, A208).
   - At 20 % the gate command is 18-20 ns (register 8.5-10.5 ns plus the 9.5 ns lead) and the slow gate needs about
     as long to turn on: in the last 20 us the gate model records no high-side turn-off of a conducting switch
-    (0 of 532; at 30 % all of them; records cosim/run_r_S75_*_20.json). The switch is turned off while still
+    (none of about 530 on each of the three rows; at 30 % all of them; records cosim/run_r_S75_*_20.json). The switch is turned off while still
     turning on, at 31-37 A. Vo, valleys and late fires are normal, so the registered criteria pass. The plant has
     never been compared with LTspice in this regime. It is not counted as covered.
 - **What the limit does and does not do.** Moving it opens the range from 70 % to 30 % on every board at no cost to
