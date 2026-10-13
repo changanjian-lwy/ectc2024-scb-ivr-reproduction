@@ -1,0 +1,19 @@
+{
+ "i1": {
+  "cases": {
+   "a89_r2": "PASS",
+   "a92_j100": "PASS",
+   "a92_m3p": "PASS",
+   "a93_m3n_both": "PASS"
+  },
+  "pass": true
+ },
+ "i2": {
+  "absent": true,
+  "default": true,
+  "sections": 69,
+  "edges": 1032,
+  "reference_commit": "9a4e579",
+  "pass": true
+ }
+}

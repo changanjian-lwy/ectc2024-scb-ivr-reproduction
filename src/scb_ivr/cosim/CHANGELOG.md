@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A208) - the loop's lower Ton limit as its own cfg value (bridge)
+
+**Source:** A207. The bridge set cfg_ton_min to half of cfg ton_ns. ton_ns is
+the loop's reset value and grew to 44.48 ns for the handover (A185), so the
+limit rose to 22.25 ns and a module stopped regulating below about 70 % of
+its load. cfg "ton_min_ns" sets cfg_ton_min directly. The RTL is unchanged
+(cfg_ton_min is an existing input). cfg_ton_max stays at 2 ton_ns.
+**Gate:** absent = 0.5 ton_ns as before: regression quick 4 / 4 and A207's
+14 us smoke record bit for bit, also with the key set to the default's value
+(A208 BOUNDARY i1, i2).
+
 ## 2026-10-10 (A186) - handover requested on Vo (bridge, sequencer)
 
 **Source:** A184 / A185. At a 200 ns mode-S period the locked trim drifts up to

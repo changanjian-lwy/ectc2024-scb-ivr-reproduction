@@ -17,7 +17,8 @@ Time base. Each 4 ns clock cycle n covers the plant window [n*T_clk, (n+1)*T_clk
 Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive load), from the all-zero state, phase
 1 HIGH and phases 2..N LOW, input ramp over t_ramp, load connection at t_load and handover request at t_hand (cfg
 "t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115; "ton_s_ns", A184: mode S's Ton, while
-"ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit; "hand_vo_v",
+"ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit;
+"ton_min_ns", A208: the loop's lower Ton limit (cfg_ton_min) as its own value - absent = 0.5 ton_ns, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
 absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
@@ -376,7 +377,8 @@ class ModuleSim:
         c.set("hand_req", 0)
         c.set("cfg_t0", to_lsb(cfg["t0_ns"] * 1e-9))
         c.set("cfg_tdead", to_lsb(cfg["tdead_ns"] * 1e-9))
-        c.set("cfg_ton_min", to_lsb(0.5 * cfg["ton_ns"] * 1e-9))
+        ton_min = cfg.get("ton_min_ns")                              # A208: the loop's lower Ton limit as its own value
+        c.set("cfg_ton_min", to_lsb((0.5 * cfg["ton_ns"] if ton_min is None else float(ton_min)) * 1e-9))
         c.set("cfg_ton_max", to_lsb(2.0 * cfg["ton_ns"] * 1e-9))
         c.set("cfg_vloop", int(cfg["vloop"]))
         c.set("cfg_vref_code", int(round(cfg["vref_v"] / self.adc_lsb)))
