@@ -12,7 +12,8 @@ periods) starts LTspice from snapshot k, replays the commands over `periods` pha
 LTspice circuit = the plant's (circuit.py: four phases, a loop inductance with damping per high side, flying
 capacitors, output capacitor, load) with n_high / n_low flattened vendor devices per switch. Each gate has its own
 driver branch: gate_r_on to +5 V while the command is high, gate_r_off to the source while it is low (gate.py's
-assumption). Not replayed: an interlock hold (the plant freezes a gate; refused if the record has holds).
+assumption). An interlock hold (the plant freezes the gate at its level, record "gate_holds_last") opens the +5 V
+branch for the hold, so the gate floats; a record with holds but without that list is refused.
 The plant's switches have no on-resistance; its per-phase R stands for it (duty-weighted maximum R_DS(on), D62). The
 vendor devices bring their own (typical), so the phase resistance in LTspice is rph: "match" = R minus the devices'
 duty-weighted typical value, "zero", or "plant" (R as in the plant, so the devices' resistance counts twice).
@@ -90,15 +91,24 @@ def _pwl(points):
     return "PWL(" + " ".join(out) + ")"
 
 
-def _ctl(rec, j, t0, t1, level0):
-    """Driver command of switch j as a 0 / 1 V source in LTspice time (1 ps edges)."""
-    pts, lv = [(0.0, float(level0))], bool(level0)
-    for e in rec["edges_log"]:
-        if e["j"] == j and t0 - 1e-15 <= e["t_s"] <= t1 and bool(e["level"]) != lv:
-            tt = e["t_s"] - t0 + T_REL
-            pts += [(tt, float(lv)), (tt + 1e-12, float(not lv))]
-            lv = not lv
-    return _pwl(pts)
+def _ctl(rec, j, t0, t1, level0, held0=False):
+    """Switch j's driver as two 0 / 1 V sources in LTspice time (1 ps edges): the command (low = the pull-down
+    branch conducts) and the pull-up branch (command high and no interlock hold)."""
+    ev = [(e["t_s"], "cmd", bool(e["level"])) for e in rec["edges_log"] if e["j"] == j and t0 - 1e-15 <= e["t_s"] <= t1]
+    for h in rec.get("gate_holds_last") or []:
+        if h["switch"] == j:
+            ev += [(t, "hold", v) for t, v in ((h["t_hold_s"], True), (h["t_release_s"], False)) if t0 < t <= t1]
+    cmd, hold = bool(level0), bool(held0)
+    pc, pu = [(0.0, float(cmd))], [(0.0, float(cmd and not hold))]
+    for t, kind, val in sorted(ev):
+        tt = t - t0 + T_REL
+        if kind == "cmd" and val != cmd:
+            pc += [(tt, float(cmd)), (tt + 1e-12, float(val))]
+        up0 = cmd and not hold
+        cmd, hold = (val, hold) if kind == "cmd" else (cmd, val)
+        if (cmd and not hold) != up0:
+            pu += [(tt, float(up0)), (tt + 1e-12, float(cmd and not hold))]
+    return _pwl(pc), _pwl(pu)
 
 
 def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
@@ -106,8 +116,8 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
     c = rec["snap_circuit"]
     if c["n"] != 4 or c["gate_l_cs"] or c["gate_cg_scale"] != 1.0:
         raise ValueError("replay: four phases, no L_cs, typical gate capacitance only")
-    if sum((rec.get("gate_stats") or {}).get("il_holds") or [0]):
-        raise ValueError("replay: the record has interlock holds, which the driver branches do not reproduce")
+    if sum((rec.get("gate_stats") or {}).get("il_holds") or [0]) and "gate_holds_last" not in rec:
+        raise ValueError("replay: the record has interlock holds but not their times (gate_holds_last)")
     s0, t0, t1 = window(rec, k, periods)
     rphv, rinfo = rph_value(rec, t0, t1, rph)
     y = s0["y"]
@@ -132,11 +142,12 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         vg = g[str(j)]["vgs"]
         vs = 0.0 if src == "0" else v[src]
         lines.append(f"V5{tag}{q} v5{tag}{q} {src} {c['gate_v_on']:.6g}")
-        lines.append(f"Vc{tag}{q} c{tag}{q} 0 " + _ctl(rec, j, t0, t1, g[str(j)]["drv"]))
+        pc, pu = _ctl(rec, j, t0, t1, g[str(j)]["drv"], g[str(j)]["phase"] == "held")
+        lines.extend([f"Vc{tag}{q} c{tag}{q} 0 " + pc, f"Vu{tag}{q} u{tag}{q} 0 " + pu])
         for m in "abc"[:n_dev]:
             inst, gn = f"{tag}{q}{m}", f"g{tag}{q}{m}"
             lines.extend(LT.instance(el, inst, gn, drain, src))
-            lines.extend([f"Sup_{inst} v5{tag}{q} {gn} c{tag}{q} 0 SWU", f"Sdn_{inst} {gn} {src} 0 c{tag}{q} SWD"])
+            lines.extend([f"Sup_{inst} v5{tag}{q} {gn} u{tag}{q} 0 SWU", f"Sdn_{inst} {gn} {src} 0 c{tag}{q} SWD"])
             ic[gn] = ic[f"{inst}_g"] = vs + vg
             ic[f"{inst}_d"], ic[f"{inst}_s"] = v[drain], vs
 
@@ -190,7 +201,9 @@ def compare(rec, k, periods, names, a, meta):
     vds = [vn[f"h{q}"] - vn[SRC[q - 1]] for q in range(1, 5)] + [vn[f"x{q}"] for q in range(1, 5)]
     ich = [col(f"I(Bswitch_h{q}a)") for q in range(1, 5)]
     seg = lambda x, ta, tb: x[(t >= ta) & (t <= tb)]
-    out = {"k": k, "t0_s": t0, "periods": periods, "rph": meta["rph"], "rph_ohm": meta["rph_ohm"], "rds": meta["rds"]}
+    out = {"k": k, "t0_s": t0, "periods": periods, "rph": meta["rph"], "rph_ohm": meta["rph_ohm"], "rds": meta["rds"],
+           "holds": [h for h in rec.get("gate_holds_last") or [] if t0 <= h["t_hold_s"] <= t1],
+           "gates_moving_at_start": [j for j, x in rec["snaps"][k]["gate"].items() if x["phase"] != "idle"]}
     hold = {n: at(vn[n], t0 + 1e-13) - y for n, y in zip(NODES, rec["snaps"][k]["y"][:12])}
     out["start_err_v_max"] = max(abs(x) for x in hold.values())            # the initial state arrived as given
     out["start_err_i_max"] = max(abs(at(ip[q], t0 + 1e-13) - rec["snaps"][k]["y"][12 + q]) for q in range(4))

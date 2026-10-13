@@ -102,7 +102,8 @@ Replay snapshots (cfg "snap_us" [t0, t1] or a list of such windows, A199): at ev
 command inside a window the
 record's "snaps" gets the full plant state (y, input, commanded / physical gates, reverse-conduction flags, each
 gate-driven switch's gate voltage); with "debug_edges_us" (every applied edge) that is what an open-loop replay of
-the gate commands in another simulator needs. Read-only: the run is bit-identical with and without it.
+the gate commands in another simulator needs. Read-only: the run is bit-identical with and without it. The record
+also gets "gate_holds_last" (each interlock hold: t_hold_s, switch, t_release_s) and "snap_circuit".
 Finite switching edges (cfg "edge" {"didt_a_ns", "didt_on_a_ns" = didt_a_ns}, A145): a turn-off's channel current falls
 at didt_a_ns, a hard turn-on's (V_DS > 0) rises at didt_on_a_ns until V_DS <= 0 (plant.py). Sections add
 "edge_energy_j" (each switch's channel int V_DS i dt during its edges since the previous section); the record adds
@@ -893,6 +894,8 @@ class ModuleSim:
                 out["gate_params"].update(gate_il=p.gate_il, gate_t_il=p.gate_t_il)
             out["gate_stats"] = plant.gm.summary()
             out["gate_offs_last"] = [{"t_s": a, "phase": b, "i_act_a": c, "i_max_a": d} for a, b, c, d in plant.gm.off_log]
+            if self.snap_win:                                        # A199: when the interlock held which gate
+                out["gate_holds_last"] = [{"t_hold_s": a, "switch": b, "t_release_s": c} for a, b, c in plant.gm.hold_log]
         if na:
             out["aux_params"] = {"phases": list(p.aux_phases), "l_h": p.aux_l, "r_ohm": p.aux_r, "c_f": p.aux_c,
                                  "vm0_v": self.vm0, "valley_zero": int(self.mon.vmin_zero), "t_en_us": self.t_en * 1e6,

@@ -130,6 +130,7 @@ class GateEdges:
         self.on_act = {}                               # switch -> callback at its next activation (the bridge's)
         self.next_cb = {}                              # the bridge's callback for the command about to come
         self.off_log = deque(maxlen=OFF_LOG)           # (t_act, phase, i at activation, max i in the edge) high sides
+        self.hold_log = deque(maxlen=OFF_LOG)          # A199: (t_hold, switch, t_release) of the interlock's holds
         n2 = 2 * p.n
         self.sw = tuple(sorted(int(j) for j in p.gate_switches))
         self.nsw = plant.sim.nsw
@@ -330,6 +331,7 @@ class GateEdges:
             if s["phase"] == "held" and s["t_act"] <= pl.t + 1e-18 and s.get("frozen"):    # A171: activates now
                 s.update(phase="pending", frozen=False, t=pl.t, vds=float(pl.vds(j)))
                 self.stats["il_hold_max_s"] = max(self.stats["il_hold_max_s"], pl.t - s["t_hold"])
+                self.hold_log.append((s["t_hold"], j, pl.t))
                 continue
             if s["phase"] == "held" and s["t_act"] <= pl.t + 1e-18:
                 t0 = s["t_cmd0"]
@@ -337,6 +339,7 @@ class GateEdges:
                 self._command(j, True, False, pl, s, self.fd, pl.t)
                 s["t_cmd"] = t0
                 self.stats["il_hold_max_s"] = max(self.stats["il_hold_max_s"], pl.t - t0)
+                self.hold_log.append((t0, j, pl.t))
                 if not (s["phase"] == "pending" and s["kind"] == "on"):     # conducting at once (ZVS by now)
                     done.append(j)
                     cb = self.on_act.pop(j, None)

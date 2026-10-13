@@ -720,5 +720,7 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
   (record "snaps"). With "debug_edges_us" it is the input of an open-loop
   replay in LTspice (`scripts/p24_replay.py`).
 - Read-only (`Module.snapshot`); absent, the record has no new key.
+- With it the record also lists every interlock hold (`gate_holds_last`:
+  hold start, switch, release), kept by gate.py in `hold_log`.
   - `cosim_regression.py --quick` passes.
   - A run with and without "snap_us" has equal sections (A199 BOUNDARY).
