@@ -44,3 +44,14 @@ floors and A141-A184). Budget: about 10 synthesis runs, minutes each.
   not and what drives them, and the list of RTL changes a synthesizable version needs (the port expression; where
   registers or sequential arithmetic would go, with the latency each adds).
 - No RTL is changed in A209. The changes go to the user with the other controller items.
+
+## 5. Addendum, written before any delay was read (2026-10-14)
+- The yowasp build of yosys discards ABC's own output (its temporary stdouterr.txt is empty, and the script yosys
+  0.49 writes for `-D` has no timing print), so "ABC's timing print" of Section 1 does not exist here. Replaced by
+  a small timing estimate of our own on the mapped netlist (a209_sta.py): library tables for delay and transition
+  at the driving transition and the load (sum of driven pin capacitances, no wire), the worse of rise and fall on
+  every arc, flip-flop clock-to-Q at the start, no setup time at the end, typical corner.
+- Its plausibility is checked on a registered 32-bit adder synthesized the same way (row add32), not against a
+  sign-off tool: none is installed. The figures are estimates from below (no wires, no clock tree).
+- yosys's standard output stops when ABC starts under this build; the logs are taken from yosys's own log file.
+- Criteria and predictions unchanged. Seen so far: scb_phase maps to about 77 000 um^2 in sky130 (no delay).
