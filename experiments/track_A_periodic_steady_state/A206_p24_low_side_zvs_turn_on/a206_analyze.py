@@ -199,7 +199,7 @@ def whole(path):
                  "lumped_r": sum(lumped)}
         tot = sum(books.values())
         out["settled"] = {"window_us": [ta * 1e6, tb * 1e6], "periods": int(m.sum()), "period_ns": 1e9 * (tb - ta) / int(m.sum()),
-                          "ton_cmd_ns": 1e9 * float(np.mean(on_t)), "peak_a": [min(pg), max(pg)], "vo_mean_v": float(vo[m].mean()),
+                          "ton_cmd_ns": 1e9 * float(np.mean(on_t)), "peak_a": [min(pg), max(pg)] if pg else None, "vo_mean_v": float(vo[m].mean()),
                           "p_out_w": p_out, "books_w": books, "books_total_w": tot, "eff_books": p_out / (p_out + tot)}
     return out
 
