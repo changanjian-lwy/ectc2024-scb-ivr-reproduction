@@ -1,0 +1,264 @@
+{
+ "runs": {
+  "u_N0_25_30": {
+   "status": "COMPLETED",
+   "commit": "aac801c",
+   "sources_modified": false,
+   "wall_s": 1543.3992161750793,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 5,
+   "start_pk": 81.2345248854968,
+   "hand_pk": 117.87173517691076,
+   "after_pk": 93.59233254892833,
+   "peak_whole": 117.87173517691076,
+   "vds_whole": 30.019144489839995,
+   "vo_max_to_300us": 1.0527835111608173,
+   "vo_dev_max_mv": 22.34464430483518,
+   "t_mode_p_us": 118.604,
+   "t_hand_req_us": 118.41,
+   "share": 0.3,
+   "vin_at_entry_v": 41.488062964582426,
+   "vo_at_entry_v": 1.04776084209801,
+   "vo_max_v": 1.0527835111608173,
+   "t_vo_max_us": 119.24646271600017,
+   "vo_min_after_entry_v": 0.9898528259806847,
+   "t_vo_min_us": 150.8795,
+   "vo_end_v": [
+    0.9997402879045806,
+    1.0002704957437243
+   ],
+   "ton_reg_end_ns": [
+    7.75,
+    8.125
+   ],
+   "ton_reg_min_ns": 7.25,
+   "late_fires": [
+    2,
+    0,
+    0,
+    0
+   ],
+   "late_after_20us": [
+    2,
+    0,
+    0,
+    0
+   ],
+   "ton_s_ns": 23.4,
+   "ton_min_ns": 4.0,
+   "criteria": {
+    "c6": false
+   }
+  },
+  "u_N0_25_50": {
+   "status": "COMPLETED",
+   "commit": "aac801c",
+   "sources_modified": false,
+   "wall_s": 1570.2469370365143,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 1,
+   "start_pk": 94.50143983937876,
+   "hand_pk": 120.34011695886765,
+   "after_pk": 99.81231365910772,
+   "peak_whole": 120.34011695886765,
+   "vds_whole": 29.64310322465632,
+   "vo_max_to_300us": 1.0473130039295855,
+   "vo_dev_max_mv": 15.869885364865777,
+   "t_mode_p_us": 130.204,
+   "t_hand_req_us": 130.01000000000002,
+   "share": 0.5,
+   "vin_at_entry_v": 45.54578049846961,
+   "vo_at_entry_v": 1.0472473899178647,
+   "vo_max_v": 1.0473130039295855,
+   "t_vo_max_us": 130.52320948199497,
+   "vo_min_after_entry_v": 0.9960683592353773,
+   "t_vo_min_us": 157.93175,
+   "vo_end_v": [
+    0.9997355570192669,
+    1.0003174762969014
+   ],
+   "ton_reg_end_ns": [
+    15.125000000000002,
+    15.5
+   ],
+   "ton_reg_min_ns": 14.5,
+   "late_fires": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "late_after_20us": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_s_ns": 23.4,
+   "ton_min_ns": 4.0,
+   "criteria": {
+    "c6": true
+   }
+  },
+  "u_N0_25_75": {
+   "status": "COMPLETED",
+   "commit": "aac801c",
+   "sources_modified": false,
+   "wall_s": 1589.0329201221466,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 111.25160531247471,
+   "hand_pk": 123.9998893520056,
+   "after_pk": 116.16927627055811,
+   "peak_whole": 123.9998893520056,
+   "vds_whole": 28.588059722103782,
+   "vo_max_to_300us": 1.0478443460244526,
+   "vo_dev_max_mv": 10.774824236430058,
+   "t_mode_p_us": 137.604,
+   "t_hand_req_us": 137.41,
+   "share": 0.7499999999999999,
+   "vin_at_entry_v": 48.0,
+   "vo_at_entry_v": 1.0477967032981426,
+   "vo_max_v": 1.0478443460244526,
+   "t_vo_max_us": 137.61,
+   "vo_min_after_entry_v": 0.999629497978812,
+   "t_vo_min_us": 190.34112500000003,
+   "vo_end_v": [
+    0.9997221002526477,
+    1.00030383808981
+   ],
+   "ton_reg_end_ns": [
+    23.906250000000004,
+    24.28125
+   ],
+   "ton_reg_min_ns": 22.843750000000004,
+   "late_fires": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "late_after_20us": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_s_ns": 23.4,
+   "ton_min_ns": 4.0,
+   "criteria": {
+    "c6": true
+   }
+  },
+  "u_S75_25_50": {
+   "status": "COMPLETED",
+   "commit": "aac801c",
+   "sources_modified": false,
+   "wall_s": 2233.8612112998962,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 99,
+   "start_pk": 113.89093982913923,
+   "hand_pk": 161.5486445207529,
+   "after_pk": 159.3527337596326,
+   "peak_whole": 161.5486445207529,
+   "vds_whole": 30.57210635467545,
+   "vo_max_to_300us": 1.0492062649254987,
+   "vo_dev_max_mv": 20.335802334023654,
+   "t_mode_p_us": 114.40400000000001,
+   "t_hand_req_us": 114.21000000000001,
+   "share": 0.5,
+   "vin_at_entry_v": 40.018889374726726,
+   "vo_at_entry_v": 1.0491417780609131,
+   "vo_max_v": 1.0492062649254987,
+   "t_vo_max_us": 114.41,
+   "vo_min_after_entry_v": 0.9939332539473262,
+   "t_vo_min_us": 127.18418140000003,
+   "vo_end_v": [
+    0.9997418350351736,
+    1.0002594468372352
+   ],
+   "ton_reg_end_ns": [
+    18.000000000000004,
+    18.34375
+   ],
+   "ton_reg_min_ns": 17.468750000000004,
+   "late_fires": [
+    4,
+    73,
+    74,
+    77
+   ],
+   "late_after_20us": [
+    0,
+    19,
+    18,
+    27
+   ],
+   "ton_s_ns": 35.74,
+   "ton_min_ns": 4.0,
+   "criteria": {
+    "c6": true
+   }
+  },
+  "u_S75_hot_50": {
+   "status": "COMPLETED",
+   "commit": "aac801c",
+   "sources_modified": false,
+   "wall_s": 2206.558977127075,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 65,
+   "start_pk": 112.84549816329532,
+   "hand_pk": 158.85768864131555,
+   "after_pk": 152.35596876118402,
+   "peak_whole": 158.85768864131555,
+   "vds_whole": 27.663402377681468,
+   "vo_max_to_300us": 1.0479188798183237,
+   "vo_dev_max_mv": 18.226926053637627,
+   "t_mode_p_us": 109.004,
+   "t_hand_req_us": 108.81,
+   "share": 0.5,
+   "vin_at_entry_v": 38.1299519020551,
+   "vo_at_entry_v": 1.0478515051171409,
+   "vo_max_v": 1.0479188798183237,
+   "t_vo_max_us": 109.01,
+   "vo_min_after_entry_v": 0.9980605875298443,
+   "t_vo_min_us": 124.76026780000002,
+   "vo_end_v": [
+    0.9998769670611288,
+    1.0002542360974223
+   ],
+   "ton_reg_end_ns": [
+    16.34375,
+    16.53125
+   ],
+   "ton_reg_min_ns": 15.968750000000002,
+   "late_fires": [
+    0,
+    21,
+    0,
+    53
+   ],
+   "late_after_20us": [
+    0,
+    0,
+    0,
+    5
+   ],
+   "ton_s_ns": 35.74,
+   "ton_min_ns": 4.0,
+   "criteria": {
+    "c6": true
+   }
+  }
+ }
+}
