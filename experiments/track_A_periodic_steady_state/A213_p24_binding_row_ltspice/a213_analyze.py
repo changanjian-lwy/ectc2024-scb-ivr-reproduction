@@ -76,6 +76,7 @@ def main():
         res["criteria_identity"] = {"i1": bool(ref["sections"][:n] == rec["sections"]), "sections": n}
     pk = max((e for e in rec["gate_offs_last"] if e["t_s"] >= rec["cfg"]["line_step"]["t_us"] * 1e-6), key=lambda e: e["i_max_a"])
     res["plant_peak"] = {"a": pk["i_max_a"], "phase": pk["phase"], "t_us": pk["t_s"] * 1e6}
+    res["runs"] = {NAME: dict(res.pop("record"), plant_peak_a=pk["i_max_a"])}
     rows, c5 = {}, {"rows": {}}
     for label, k in plan(rec):
         f = REP / A5.fname(NAME, label, k, "match")
@@ -95,7 +96,7 @@ def main():
     res["criteria_c5"] = c5
     (HERE / "a213_summary.json").write_text(json.dumps(res, indent=1) + "\n")
     f1 = lambda xs: " ".join(f"{x:+.2f}" for x in xs)
-    print("record", res["record"], "identity", res.get("criteria_identity"), "plant peak", res["plant_peak"])
+    print("record", res["runs"][NAME], "identity", res.get("criteria_identity"), "plant peak", res["plant_peak"])
     for k, m in rows.items():
         b = m["books_w"]
         print(f"{k:8s} start {m['start_i']:.3f} A {1e3 * m['start_vcs']:.2f} mV | peaks {f1(m['peak_signed'])} | largest LT {m['peak_max']['lt_a']:.2f} plant {m['peak_max']['plant_a']:.2f} | "
