@@ -59,3 +59,21 @@ A row works with r1, r2 and r4. r3 is reported apart: it belongs to the size of 
   one more run shows the proposed value on that row (stage 2).
 - The four-module ranges, all on or with modules shed, are composed from the rows that work (not a run).
 - What stays open afterwards (a light-load mode, shedding) is named with its price; neither is part of A208.
+
+## 5. Addendum, written before the second stage (2026-10-14)
+Sections 1-4 stand. Written after the six rows (3a2d2c2) and before the two runs below.
+- First stage: 60, 50, 40, 30 and 20 % work (r1, r2, r4); 20 % misses r3 (1.0526 V at the release); 10 % does not
+  work: the register sits at the 2.0 ns limit, the module delivers 38 A, Vo ends at 1.0525 V and late fires keep
+  coming (59 / 0 / 118 / 43 in the last 20 us). No row fails r1.
+- By the rule the proposed value is 4.0 ns (20 %'s smallest register over its last 20 us is 4.22 ns). That value was
+  not itself run: at 20 % the register is below 4.0 ns in 67 sections up to 46 us after the release, so the row is
+  not bit for bit with it; and what the module does below its floor with a 4.0 ns limit is not known (at 2.0 ns it
+  switches roughly).
+- Second stage, two runs with ton_min_ns = 4.0: v20 (20 % left) and v10 (10 % left).
+  Criteria: v20 works (r1, r2, r4). v10: r1, and over its last 20 us every low-side turn-off current within
+  [-20, -12] A with no late fire (r4), while r2 is expected to miss.
+  Predictions: v20 works, Vo at the release 1.053-1.060 V (r3 misses as before), register 4.2-4.7 ns at the end.
+  v10: the register at 4.0 ns throughout, 46-49 A delivered, Vo ends at 1.085-1.10 V, r4 passes.
+- Rule: v20 works: 4.0 ns is the proposed value and one module's tested minimum load is 20 %. v20 does not work: the
+  value goes up to 30 %'s smallest end register rounded down (8.0 ns) and the tested minimum is 30 %, without a
+  further run. v10 misses r4: reported as the module's behaviour below its floor, with the record.
