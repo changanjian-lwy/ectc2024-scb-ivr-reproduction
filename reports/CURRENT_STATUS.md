@@ -2164,6 +2164,24 @@ each question:
          the effect goes into the plant, then the binding rows are rerun.
          Three faults of the replay tool were found on the way, one of them
          LTspice's default 1 mOhm in every inductor (RESULTS Section 2).
+    110. The missing effects in the plant, and the low sides' own turn-on
+         resistance (2026-10-13, A206; plant V6 = V5 + a turn-on at
+         V_DS <= 0 and a turn-off at reverse current as gate edges, an off
+         gate that follows its drain, on-resistance in the switches; all
+         cfg-gated, off = V5 bit for bit). Against LTspice (26 replays,
+         nominal devices, 25 C, two model rounds): one period later the
+         currents are within 0.68 A settled and 0.41 A in mode S, the
+         settled loss books within 0.7 % at 3.0 / 1.0 / 0.3 ohm. Stated
+         error: 0.75 L0 at the step's peak, where the plant is 1.5-2.3 A
+         high (not fixed). Low sides: 0.3 ohm, by the registered rule.
+         Semiconductor loss per module (switches at the datasheet maximum):
+         29.6 / 22.6 / 20.2 W at 3.0 / 1.0 / 0.3 ohm, V5 booked 15.8 W;
+         92.5 % at 0.3 ohm in these books. 3.0 ohm fails the handover on V6
+         (206.4 A). Start-up re-trimmed per board (-0.28 / -0.26 / +0.29 ns
+         on N0 / N75 / S75), five start-up runs pass. The twelve binding
+         rows (+4.8 V / 1 us on N0, N75, S75 at 0 / 25 / 125 C) hold 200 A:
+         at most 197.6 A, smallest margin 2.4 A on the slow board at 125 C.
+         That corner has not been replayed in LTspice: next.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

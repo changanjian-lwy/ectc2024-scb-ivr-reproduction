@@ -11,9 +11,9 @@ comes from, and says what may be claimed.
 | controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit) | A143, C13, A184 |
 | loop | 50 pH, ideal parallel damper at ring Q 7 | A168, A157 |
 | devices | EPC2067, EPC's model (vendor library at run time), 2 + 3 per phase; spread corners ff (V_th −0.3 V, driver ×0.8), ss (V_th +1.0 V, Q_G ×1.29, driver ×1.2), hot (125 °C) | D79, A163 |
-| drive | 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven | A164, A169 |
+| drive | high sides: 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven. **Low sides, since A206 (plant V6): their own turn-on resistance, 0.3 Ω times the board's drive factor (0.36 Ω on slow boards); turn-off 0.3 Ω as before.** They turn on at zero voltage and gain nothing from a slow gate: with 3.0 Ω the semiconductor loss is 29.6 W per module against 20.2 W, and the handover reaches 206.4 A with switches at the datasheet maximum. Up to A205 every switch had 3.0 Ω, and every V5 result in this file was run that way | A164, A169, A205, A206 |
 | controller-side lead | high-side turn-on earlier by 8 ns, or by 9.5 ns on slow boards (the corner read from the 25 °C trim), ramped in over 20 µs after the handover. The 9.5 ns lead closes the slow corner's 125 °C post-step miss (A191). On its other rows it costs 3-5 A of peak and 3-5 mV of dip at 25 °C on +4.8 V / 1 µs (S75 ≤ 197.1 A, A192). Below 25 °C the same row holds: S75 ≤ 195.0 A at −40 °C and ≤ 197.8 A at 0 °C (A193, three step positions each; margin 2.2 A) | A167, A191, A192, A193 |
-| start-up | **since 2026-10-10 (A188):** mode S at t0 = 200 ns, so every turn-on is hard and the series-capacitor ladder stays balanced (A183; at 400 ns slow boards split to 15.6 / 14.8 / 8.9 / 8.7 V). Per-board trim of mode S's Ton (cfg_ton_s) to Vo(143.5 µs) = 1.035 V: nominal 23.65-23.68 ns at L × 0.7-1.3, slow 35.45-35.80, ff 21.33 ns. The loop's seed is ton_ns = T_ss + (kp + ki)(Vo_entry − 1 V), from one closed-loop measurement (A185). The handover is requested at Vo ≥ 1.045 V or at 144 µs, whichever comes first: a sequencer comparator on the sampled Vo (A188; at 25 °C it never fires). Trims and seed are set once at 25 °C. Above 25 °C they stay locked (A188). Below 25 °C the mode-S trim follows a per-corner table, the corner read from the 25 °C trim: slow +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 °C (A190, held on hold-out boards; device model extrapolated below 25 °C). Without the table slow boards fail cold (A189: -40 °C entry 0.956 V, 278 A; 0 °C 211 A). Checked at -40, 0, 25 and 125 °C. Superseded: t0 400 ns with ton = ton0 + (1.035 − Vo)/0.026 (A164-A181) | A183-A190 |
+| start-up | **since 2026-10-10 (A188):** mode S at t0 = 200 ns, so every turn-on is hard and the series-capacitor ladder stays balanced (A183; at 400 ns slow boards split to 15.6 / 14.8 / 8.9 / 8.7 V). Per-board trim of mode S's Ton (cfg_ton_s) to Vo(143.5 µs) = 1.035 V: nominal 23.65-23.68 ns at L × 0.7-1.3, slow 35.45-35.80, ff 21.33 ns. The loop's seed is ton_ns = T_ss + (kp + ki)(Vo_entry − 1 V), from one closed-loop measurement (A185). The handover is requested at Vo ≥ 1.045 V or at 144 µs, whichever comes first: a sequencer comparator on the sampled Vo (A188; at 25 °C it never fires). Trims and seed are set once at 25 °C. Above 25 °C they stay locked (A188). Below 25 °C the mode-S trim follows a per-corner table, the corner read from the 25 °C trim: slow +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 °C (A190, held on hold-out boards; device model extrapolated below 25 °C). Without the table slow boards fail cold (A189: -40 °C entry 0.956 V, 278 A; 0 °C 211 A). Checked at -40, 0, 25 and 125 °C. Superseded: t0 400 ns with ton = ton0 + (1.035 − Vo)/0.026 (A164-A181). **On plant V6 with 0.3 Ω low sides the 25 °C trims move: nominal L0 −0.279 ns, nominal 0.75 L0 −0.261 ns, slow 0.75 L0 +0.289 ns (A206; the cold table stays on top). Checked on these three boards (slow also at 0 and 125 °C): Vo before the handover within 3.1 mV of V5's, Vo ≤ 1.0476 V, handover ≤ 182.0 A** | A183-A190, A206 |
 | calibrated vs adaptive | factory, once per board: the mode-S trim and the loop seed (one closed-loop measurement of T_ss). Adapting at run time: valley timing (dt_pred, dlo), low-side dead time (dtl), negative-current trim, the Vin feed-forward's filters. Fixed: drive resistors, lead (per corner class, set once), t_il | A143, A164, A192 |
 | driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above. This settles the ramp's late fires only: at 1.0 ns the load step's spike count still fails its registered tolerance (scatter, open), and a real comparator's offset, noise and early release are not modelled | A171, A173, A174, A177, A179 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
@@ -27,10 +27,15 @@ comes from, and says what may be claimed.
 | V2 | gate model on the high sides; low sides ideal; no interlock | A163-A168 |
 | V3 | every switch gate-driven; no interlock | A169 |
 | V4 | every switch gate-driven; gate-form interlock | A170 |
-| **V5** | **every switch gate-driven; threshold-form interlock (final)** | **A171 (S50 rows), A172, A173-A193** |
+| **V5** | **every switch gate-driven; threshold-form interlock (final up to A205)** | **A171 (S50 rows), A172, A173-A198, A205** |
+| **V6** | **V5 + a turn-on at V_DS ≤ 0 and a turn-off at reverse current are gate edges (the channel conducts in reverse while the gate moves), an off gate follows its drain, the on-resistance sits in the switches (lumped R = 0); low sides with their own turn-on resistance** | **A206 (settled N0, start-up on three boards, twelve binding rows)** |
 
 A V2 result does not count as a V5 check. V2 and V5 differ in the low sides' turn-off delay (≤ 2.9 + 1.8 ns), and
 that delay is what made the lead shoot through (A169).
+
+A V5 result does not count as a V6 check either. V5 misses 12.6 of 27.4 W of semiconductor loss and ends a settled
+period 3.5-6.8 A away from LTspice (A205); V6 is within 0.7 A and 0.7 % (A206, nominal devices, 25 °C). V6 has run
+only the rows of Section 3a. Every other row of Section 3 is a V5 result with 3.0 Ω on the low sides.
 
 ## 3. Coverage of the final plant
 
@@ -120,6 +125,28 @@ The rest:
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 
+## 3a. Plant V6 (A206, 2026-10-13)
+
+One module, final configuration, low sides at 0.3 Ω (× 1.2 on slow boards), switches at the datasheet maximum times
+the vendor model's temperature factor, new start-up trims. Stimulus: +4.8 V / 1 µs at 500 µs + k T / 6. Cell = largest
+post-step peak (A); V5 = the same row's record, read to the same time.
+
+| board | step positions k | V6 | V5 | margin on V6 |
+|---|---|---|---|---|
+| nominal L0, 25 °C | 0 | 179.0 | 182.8 | 21.0 A |
+| nominal 0.75 L0, 25 °C | 0, 2, 4 | 189.0-196.2 | 198.5 (k 0 only) | 3.8 A |
+| slow 0.75 L0, 25 °C | 0, 2, 4 | 194.9-195.8 | 195.9-197.1 | 4.2 A |
+| slow 0.75 L0, 0 °C | 0, 2, 4 | 195.0-195.4 | 194.5-197.8 | 4.6 A |
+| slow 0.75 L0, 125 °C | 1, 5 | 196.1-197.6 | 195.4-196.3 | 2.4 A |
+
+Every V6 run (29, start-up included): 0 shoot-throughs, 0 forced edges, V_DS ≤ 33.7 V, Vo ≤ 1.0476 V in start-up and
+within 13.6 mV of 1 V from 20 µs after the handover. One miss: 3.0 Ω on the low sides with switches at the datasheet
+maximum, handover 206.4 A (not the chosen value). Settled N0, semiconductor loss per module in the plant's books:
+20.15 W (high-side edges 2.44, low-side edges 1.41, dead-time reverse conduction 0.66, conduction 15.65), which is
+92.5 % as P_out / (P_out + loss) at 250 W; V5 booked 15.75 W (94.1 %). With typical switches 17.32 W, LTspice 17.36 W.
+Not on V6: falling steps, load steps, slower ramps, L × 0.7 / 0.8 / 1.3, fast devices, −40 °C, steps near the
+handover, four modules.
+
 ## 4. Not covered by the final plant
 
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
@@ -134,6 +161,14 @@ The rest:
   (N75: 200.5-201.3 A against 197.8-198.5 A). Every efficiency figure and every margin below about 3 A in this file
   predates this and is stated for the plant as it was. Slow / fast devices, other temperatures, four modules and a
   closed loop on the LTspice circuit are not done.
+- **Plant V6 against LTspice (A206, 2026-10-13).** The two effects are in the plant (cfg-gated; off = V5 bit for
+  bit). Same method, 26 replays, nominal devices, 25 °C, one module: one period later the currents are within 0.68 A
+  settled, 0.41 A in mode S and 1.05 A after N0's step, and the settled loss books within 0.7 % at 3.0, 1.0 and
+  0.3 Ω. **Stated error: 0.75 L0 at the step's peak**, where LTspice ends 1.52-1.57 A lower and single peaks are up to
+  2.3 A lower (the plant is the higher one). Cause: a high side commanded on whose node swings past the rail before
+  its gate reaches threshold conducts at 2.2 V in the plant and at 0.43 V in LTspice. Not fixed. **Not covered: the
+  binding row on V6 is the slow board at 125 °C (2.4 A margin), and slow devices, 125 °C and 0 °C have not been
+  replayed in LTspice; the plant's error there is not known.** Four modules and a closed loop in LTspice are not done.
 - **The interlock is an idealised function.** It senses the complement's channel exactly and holds the gate at its
   own channel start. Where it acted (L × 0.7, slow corner), zero shoot-throughs are imposed by the rule, not
   shown. Where it never acted (0 holds: nom / ff / hot one module, four modules nominal), they do not depend on it.
@@ -196,9 +231,16 @@ The rest:
   not: the plant omits the low sides' reverse conduction at turn-on, about −4 points with 3.0 Ω on the low sides and
   about −1.3 points with 0.3 Ω (open-loop estimate from one period). "The slow corner holds 200 A with a 2.2 A
   margin" may not be said without "in the plant; LTspice's next peak is up to 2.7 A higher at fixed commands".
+- After A206: "on plant V6, which agrees with LTspice within 0.7 A per period and 0.7 % of loss at nominal devices
+  and 25 °C, the twelve binding rows stay ≤ 197.6 A with 0.3 Ω on the low sides" may be said. The smallest margin
+  is then "2.4 A on the slow board at 125 °C, a corner not checked against LTspice". Semiconductor efficiency: "92.5 %
+  in the plant's books at nominal devices, 25 °C, switches at the datasheet maximum (20.2 W per 250 W module)"; it
+  leaves out the inductors, the loop's damper, the capacitors and the gate drive. A V5 efficiency figure may not be
+  quoted without its version.
 - The drive specification "3.0 Ω ± 20 % on / ≤ 0.3 Ω off per device" was derived for hard high-side turn-ons. For
   the low sides, which turn on at zero voltage, it is not a specification but an oversight: they need their own,
-  small turn-on resistance (A205; value and its effect on the low sides' rare hard turn-ons not yet determined).
+  small turn-on resistance (A205). A206 set it to 0.3 Ω: the low sides' hard turn-ons are at most 77 per run, all
+  but one or two in start-up and handover, with low-side V_DS ≤ 19.6 V. Fast devices (0.24 Ω) are not run.
 - Efficiency: η = P_out / (P_out + P_loss). A loss increase divided by 250 W is a share of the output, not
   efficiency points: the gate-level edges add 1.7 / 3.9 W per module (nominal / slow corner), −0.4..−0.5 /
   −1.0..−1.2 points depending on the baseline (D80, corrected 2026-10-09).

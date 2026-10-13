@@ -109,6 +109,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A197": (TA / "A197_p24_slow_hot_final_handover", "a197_analyze.py", "a197_summary.json"),
     "A198": (TA / "A198_p24_step_right_after_handover", "a198_analyze.py", "a198_summary.json"),
     "A205": (TA / "A205_p24_ltspice_replay", "a205_analyze.py", "a205_summary.json"),
+    "A206": (TA / "A206_p24_low_side_zvs_turn_on", "a206_analyze.py", "a206_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -543,6 +544,23 @@ _A205_ROWS = {   # run: (mode-S rows, rows outside mode S that pass c1, rows out
     "N75_step": ([], [], [f"T_k{k}_match" for k in (1, 2, 52, 53, 54)])}
 EXCEPTIONS["A205"] = {(run, f"{row}/{c}"): _A205[c] for run, (ms, ok1, bad1) in _A205_ROWS.items()
                       for row in ms + ok1 + bad1 for c in (("c0",) if row in ms else ("c0", "c2", "c4") + (("c1",) if row in bad1 else ()))}
+_A206 = {"c0": "capacitor 1's start voltage is 5.7-8.8 mV off against 5 mV: the replay holds every node through 1 mOhm while the "
+               "phase current flows; currents arrive within 0.003 A, Vo within 0.01 mV - a limit of the tool (RESULTS 1)",
+         "c1": "0.75 L0 at the step's peak: single peaks up to 2.3 A lower in LTspice, the plant is the higher one (RESULTS 0)",
+         "c2": "0.75 L0 at the step's peak: a high side's node passes the rail before its gate reaches threshold; the plant conducts "
+               "at 2.2 V, LTspice at 0.43 V (1.52-1.57 A against 1.5 A) - V6's stated error, second miss, not fixed (RESULTS 0)",
+         "c4": "turn-ons at V_DS near zero, where the measured channel start is the current's reversal; at 0.75 L0's peak the "
+               "traced cause itself (RESULTS 1)",
+         "c6": "3.0 ohm on the low sides with switches at the datasheet maximum: handover 206.4 A; not the chosen value - the "
+               "finding that the low sides need their own turn-on resistance (RESULTS 0)"}
+_A206_ROWS = {"V_N0_steady_ls0p3": [f"P_k{k}" for k in (2, 3, 4)], "V_N0_steady_ls1": [f"P_k{k}" for k in (3, 4, 5)],
+              "V_N0_steady_ls3": [f"S_k{k}" for k in range(4)] + [f"P_k{k}" for k in range(7, 13)],
+              "V_N0_step_ls3": [f"T_k{k}" for k in (0, 1, 42, 43, 44)], "V_N75_step_ls3": [f"T_k{k}" for k in (0, 1, 57, 58, 59)]}
+EXCEPTIONS["A206"] = {("criteria", f"{run}:{row}/c0"): _A206["c0"] for run, rows in _A206_ROWS.items() for row in rows}
+EXCEPTIONS["A206"].update({("criteria", f"V_N75_step_ls3:T_k{k}/{c}"): _A206[c]
+                           for k, cs in ((57, ("c1", "c2", "c4")), (58, ("c1", "c2", "c4")), (59, ("c2", "c4"))) for c in cs})
+EXCEPTIONS["A206"][("criteria", "V_N0_step_ls3:T_k42/c4")] = _A206["c4"]
+EXCEPTIONS["A206"][("runs/E_N0_steady_ls3", "c6")] = _A206["c6"]
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
