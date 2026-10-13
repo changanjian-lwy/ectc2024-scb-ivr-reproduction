@@ -1,0 +1,343 @@
+{
+ "runs": {
+  "n_l_m48_1us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2290.6162140369415,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 171.6780923983807,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 171.6780923983807,
+   "post_pk_phase": 4,
+   "post_pk_dt_us": 41.10221607360833,
+   "v5_post_pk": 172.4,
+   "vo_after_min_mv": -9.130924741971524,
+   "vo_after_max_mv": 2.8997651256224,
+   "vo_end_mv": [
+    -0.46213604737932457,
+    -0.03684492528976957
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 32.875,
+   "ton_reg_max_after_ns": 37.65625,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {
+    "K3": 3,
+    "NEW": 3
+   },
+   "oracle_new_after": 3,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_m80_10us": {
+   "status": "COMPLETED",
+   "commit": "58c1f16",
+   "sources_modified": false,
+   "wall_s": 1640.991357088089,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 21,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 169.53095192999112,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 26.52111995153583,
+   "post_pk": 169.53095192999112,
+   "post_pk_phase": 4,
+   "post_pk_dt_us": 7.319290942553675,
+   "v5_post_pk": 166.7,
+   "vo_after_min_mv": -26.52111995153583,
+   "vo_after_max_mv": 21.409846406663434,
+   "vo_end_mv": [
+    -0.2715504353203446,
+    0.16094782390885243
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 20.4375,
+   "ton_reg_max_after_ns": 41.53125,
+   "uses_new_limit": true,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_p48_10us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2276.583130836487,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 183.76716772298278,
+   "vds_whole": 31.59601127281372,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 183.76716772298278,
+   "post_pk_phase": 1,
+   "post_pk_dt_us": 28.721898028789024,
+   "v5_post_pk": 183.7,
+   "vo_after_min_mv": -9.250730381115346,
+   "vo_after_max_mv": 9.884744894357755,
+   "vo_end_mv": [
+    -0.39261523819911215,
+    0.3271274832155058
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 28.343750000000004,
+   "ton_reg_max_after_ns": 37.96875,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_p48_2us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2966.0634360313416,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 184.09757238085302,
+   "vds_whole": 33.33975495015662,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 184.09757238085302,
+   "post_pk_phase": 1,
+   "post_pk_dt_us": 25.627519899732388,
+   "v5_post_pk": 182.9,
+   "vo_after_min_mv": -6.558548199692593,
+   "vo_after_max_mv": 7.9996095589347505,
+   "vo_end_mv": [
+    -0.3589070582997733,
+    -0.04339664824248857
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 28.750000000000004,
+   "ton_reg_max_after_ns": 36.34375000000001,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_p48_3us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2984.670578956604,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 183.99819347165328,
+   "vds_whole": 33.055826439324406,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 183.99819347165328,
+   "post_pk_phase": 1,
+   "post_pk_dt_us": 26.25414551724406,
+   "v5_post_pk": 181.8,
+   "vo_after_min_mv": -6.481749228495648,
+   "vo_after_max_mv": 8.062001529568041,
+   "vo_end_mv": [
+    -0.30157551837406427,
+    -0.06931567320456189
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 28.71875,
+   "ton_reg_max_after_ns": 36.40625,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_p48_4us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2961.2145099639893,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 182.8991125578229,
+   "vds_whole": 32.8233623407467,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 182.8991125578229,
+   "post_pk_phase": 1,
+   "post_pk_dt_us": 26.862368307197023,
+   "v5_post_pk": 182.5,
+   "vo_after_min_mv": -4.892182839553394,
+   "vo_after_max_mv": 7.451421602212571,
+   "vo_end_mv": [
+    -0.31700120276367816,
+    -0.06001094738461443
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 28.6875,
+   "ton_reg_max_after_ns": 35.90625000000001,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_l_p48_5us": {
+   "status": "COMPLETED",
+   "commit": "21161e0",
+   "sources_modified": false,
+   "wall_s": 2272.3534400463104,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 183.42970700797778,
+   "vds_whole": 32.42427618869969,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 10.315803027904469,
+   "post_pk": 183.42970700797778,
+   "post_pk_phase": 1,
+   "post_pk_dt_us": 26.92005503749219,
+   "v5_post_pk": 182.3,
+   "vo_after_min_mv": -9.107530995659863,
+   "vo_after_max_mv": 9.861769167535561,
+   "vo_end_mv": [
+    -0.31650957738604824,
+    -0.06412312083392546
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 28.656250000000004,
+   "ton_reg_max_after_ns": 37.4375,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  },
+  "n_s_p62": {
+   "status": "COMPLETED",
+   "commit": "58c1f16",
+   "sources_modified": false,
+   "wall_s": 1597.1751608848572,
+   "shoot_on": 0,
+   "overlaps": 0,
+   "forced": 0,
+   "il_holds": 0,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 181.54272592332518,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_dev_max_mv": 15.027296337003616,
+   "post_pk": 181.54272592332518,
+   "post_pk_phase": 4,
+   "post_pk_dt_us": 68.16941676469456,
+   "v5_post_pk": 181.4,
+   "vo_after_min_mv": -15.027296337003616,
+   "vo_after_max_mv": 0.33123900322018507,
+   "vo_end_mv": [
+    -0.2850201110200512,
+    0.3254570510990984
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "ton_reg_min_after_ns": 32.875,
+   "ton_reg_max_after_ns": 41.84375,
+   "uses_new_limit": false,
+   "ton_min_ns": 4.0,
+   "oracle_after": {},
+   "oracle_new_after": 0,
+   "criteria": {
+    "c6": true,
+    "c7": true
+   }
+  }
+ }
+}
