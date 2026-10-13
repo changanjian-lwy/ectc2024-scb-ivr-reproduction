@@ -62,7 +62,7 @@ def script(top, chparam, extra, lib):
 
 def parse(log):
     out = {"problems": None, "error": None}
-    m = re.findall(r"found and reported (\d+) problems", log)
+    m = re.findall(r"found and reported (\d+) problems", log, re.I)
     out["problems"] = int(m[-1]) if m else None
     e = re.search(r"^ERROR: (.*)$", log, re.M)
     out["error"] = e.group(1)[:200] if e else None

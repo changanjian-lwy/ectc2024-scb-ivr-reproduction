@@ -1,0 +1,893 @@
+{
+ "yosys": "Yosys 0.49",
+ "t_clk_ps": 4000.0,
+ "port_rewrite": {
+  "old": ".lo_add(IS_FIRST ? lo_add : {TW{1'b0}}),",
+  "new": ".lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),"
+ },
+ "runs": {
+  "ctrl_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 125821,
+   "cells_mapped": 125821,
+   "area": null,
+   "top": "scb_ctrl",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 41.8
+  },
+  "ctrl_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 125821,
+   "cells_mapped": 136919,
+   "area": 774960.748801,
+   "top": "scb_ctrl",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 47006.158291635125,
+   "sta": {
+    "delay_ns": 47.006158291635124,
+    "end": "g_ph[0].u_ph.late_fires[1]",
+    "start": "ton_acc[0]",
+    "depth_cells": 145,
+    "cells": 136919,
+    "flops": 2182,
+    "endpoints": 3371,
+    "unmapped": {
+     "$scopeinfo": 7
+    },
+    "by_end_register": [
+     {
+      "end": "g_ph[0].u_ph.late_fires",
+      "delay_ns": 47.006,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.state",
+      "delay_ns": 46.597,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_fine",
+      "delay_ns": 46.593,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_ev",
+      "delay_ns": 46.497,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.t_lo",
+      "delay_ns": 46.411,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_lvl",
+      "delay_ns": 46.406,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.lo_pulse",
+      "delay_ns": 46.111,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.lo_bind_cur",
+      "delay_ns": 45.995,
+      "start": "ton_acc"
+     },
+     {
+      "end": "dlo1",
+      "delay_ns": 33.794,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.t_lon",
+      "delay_ns": 31.637,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[2].u_ph.t_lon",
+      "delay_ns": 29.44,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gh_ev",
+      "delay_ns": 28.933,
+      "start": "ton_acc"
+     }
+    ]
+   },
+   "wall_s": 155.5
+  },
+  "ctrl_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 125821,
+   "cells_mapped": 141377,
+   "area": 152699.428,
+   "top": "scb_ctrl",
+   "library": "nangate45",
+   "exit": 0,
+   "delay_ps": 10515.083739381482,
+   "sta": {
+    "delay_ns": 10.515083739381481,
+    "end": "g_ph[0].u_ph.late_fires[0]",
+    "start": "ton_acc[22]",
+    "depth_cells": 155,
+    "cells": 141377,
+    "flops": 2182,
+    "endpoints": 2899,
+    "unmapped": {
+     "$scopeinfo": 7
+    },
+    "by_end_register": [
+     {
+      "end": "g_ph[0].u_ph.late_fires",
+      "delay_ns": 10.515,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_lvl",
+      "delay_ns": 10.458,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.t_lo",
+      "delay_ns": 10.429,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_ev",
+      "delay_ns": 10.426,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.lo_pulse",
+      "delay_ns": 10.401,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.lo_bind_cur",
+      "delay_ns": 10.349,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.state",
+      "delay_ns": 10.249,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gl_fine",
+      "delay_ns": 10.246,
+      "start": "ton_acc"
+     },
+     {
+      "end": "dlo1",
+      "delay_ns": 7.59,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.t_lon",
+      "delay_ns": 7.151,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.gh_ev",
+      "delay_ns": 6.464,
+      "start": "ton_acc"
+     },
+     {
+      "end": "g_ph[0].u_ph.t_off",
+      "delay_ns": 6.459,
+      "start": "ton_acc"
+     }
+    ]
+   },
+   "wall_s": 154.4
+  },
+  "phase_first_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 16054,
+   "cells_mapped": 16054,
+   "area": null,
+   "top": "scb_phase",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 5.4
+  },
+  "phase_first_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 16054,
+   "cells_mapped": 18922,
+   "area": 102183.0016,
+   "top": "scb_phase",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 10169.806688373677,
+   "sta": {
+    "delay_ns": 10.169806688373678,
+    "end": "dlo[0]",
+    "start": "ton_q[3]",
+    "depth_cells": 39,
+    "cells": 18922,
+    "flops": 332,
+    "endpoints": 616,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "dlo",
+      "delay_ns": 10.17,
+      "start": "ton_q"
+     },
+     {
+      "end": "late_fires",
+      "delay_ns": 9.954,
+      "start": "dlo"
+     },
+     {
+      "end": "t_lon",
+      "delay_ns": 9.89,
+      "start": "t_on"
+     },
+     {
+      "end": "t_lo",
+      "delay_ns": 9.572,
+      "start": "now"
+     },
+     {
+      "end": "t_on",
+      "delay_ns": 9.561,
+      "start": "t_on"
+     },
+     {
+      "end": "state",
+      "delay_ns": 9.54,
+      "start": "now"
+     },
+     {
+      "end": "gl_lvl",
+      "delay_ns": 9.515,
+      "start": "now"
+     },
+     {
+      "end": "gl_ev",
+      "delay_ns": 9.415,
+      "start": "now"
+     },
+     {
+      "end": "gl_fine",
+      "delay_ns": 9.24,
+      "start": "t_on"
+     },
+     {
+      "end": "dt_pred",
+      "delay_ns": 9.187,
+      "start": "cfg_eh_tgt"
+     },
+     {
+      "end": "dtl",
+      "delay_ns": 8.962,
+      "start": "cfg_el_tgt"
+     },
+     {
+      "end": "lo_pulse",
+      "delay_ns": 8.807,
+      "start": "dlo"
+     }
+    ]
+   },
+   "wall_s": 14.8
+  },
+  "phase_first_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 16054,
+   "cells_mapped": 18665,
+   "area": 19983.782,
+   "top": "scb_phase",
+   "library": "nangate45",
+   "exit": 0,
+   "delay_ps": 2441.560933113644,
+   "sta": {
+    "delay_ns": 2.4415609331136436,
+    "end": "t_lon[1]",
+    "start": "now[0]",
+    "depth_cells": 39,
+    "cells": 18665,
+    "flops": 332,
+    "endpoints": 544,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "t_lon",
+      "delay_ns": 2.442,
+      "start": "now"
+     },
+     {
+      "end": "dlo",
+      "delay_ns": 2.358,
+      "start": "ton_q"
+     },
+     {
+      "end": "late_fires",
+      "delay_ns": 2.275,
+      "start": "t_lo"
+     },
+     {
+      "end": "dtl",
+      "delay_ns": 2.223,
+      "start": "cfg_el_tgt"
+     },
+     {
+      "end": "dt_pred",
+      "delay_ns": 2.184,
+      "start": "cfg_eh_tgt"
+     },
+     {
+      "end": "t_on",
+      "delay_ns": 2.175,
+      "start": "t_lo"
+     },
+     {
+      "end": "gl_lvl",
+      "delay_ns": 2.161,
+      "start": "now"
+     },
+     {
+      "end": "gl_fine",
+      "delay_ns": 2.161,
+      "start": "now"
+     },
+     {
+      "end": "on_pulse",
+      "delay_ns": 2.14,
+      "start": "t_lo"
+     },
+     {
+      "end": "gh_ev",
+      "delay_ns": 2.108,
+      "start": "t_lo"
+     },
+     {
+      "end": "gh_fine",
+      "delay_ns": 2.086,
+      "start": "t_lo"
+     },
+     {
+      "end": "state",
+      "delay_ns": 2.047,
+      "start": "now"
+     }
+    ]
+   },
+   "wall_s": 30.2
+  },
+  "phase_rest_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 12001,
+   "cells_mapped": 12001,
+   "area": null,
+   "top": "scb_phase",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 4.5
+  },
+  "phase_rest_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 12001,
+   "cells_mapped": 14282,
+   "area": 78853.1264,
+   "top": "scb_phase",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 9957.164596824216,
+   "sta": {
+    "delay_ns": 9.957164596824216,
+    "end": "late_fires[1]",
+    "start": "mode_p",
+    "depth_cells": 32,
+    "cells": 14282,
+    "flops": 349,
+    "endpoints": 631,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "late_fires",
+      "delay_ns": 9.957,
+      "start": "mode_p"
+     },
+     {
+      "end": "t_lo",
+      "delay_ns": 9.656,
+      "start": "mode_p"
+     },
+     {
+      "end": "t_lon",
+      "delay_ns": 9.483,
+      "start": "t_on"
+     },
+     {
+      "end": "t_on",
+      "delay_ns": 9.452,
+      "start": "mode_p"
+     },
+     {
+      "end": "gl_fine",
+      "delay_ns": 9.114,
+      "start": "mode_p"
+     },
+     {
+      "end": "fired_ref",
+      "delay_ns": 9.065,
+      "start": "mode_p"
+     },
+     {
+      "end": "sofs",
+      "delay_ns": 9.058,
+      "start": "st_step"
+     },
+     {
+      "end": "gl_lvl",
+      "delay_ns": 8.994,
+      "start": "mode_p"
+     },
+     {
+      "end": "on_how",
+      "delay_ns": 8.916,
+      "start": "mode_p"
+     },
+     {
+      "end": "state",
+      "delay_ns": 8.658,
+      "start": "dtl"
+     },
+     {
+      "end": "gh_lvl",
+      "delay_ns": 8.541,
+      "start": "mode_p"
+     },
+     {
+      "end": "pend_ref",
+      "delay_ns": 8.531,
+      "start": "mode_p"
+     }
+    ]
+   },
+   "wall_s": 20.9
+  },
+  "phase_rest_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 12001,
+   "cells_mapped": 14755,
+   "area": 15885.786,
+   "top": "scb_phase",
+   "library": "nangate45",
+   "exit": 0,
+   "delay_ps": 2396.739789781528,
+   "sta": {
+    "delay_ns": 2.396739789781528,
+    "end": "t_on[2]",
+    "start": "mode_p",
+    "depth_cells": 30,
+    "cells": 14755,
+    "flops": 349,
+    "endpoints": 559,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "t_on",
+      "delay_ns": 2.397,
+      "start": "mode_p"
+     },
+     {
+      "end": "t_lon",
+      "delay_ns": 2.186,
+      "start": "t_on"
+     },
+     {
+      "end": "late_fires",
+      "delay_ns": 2.171,
+      "start": "mode_p"
+     },
+     {
+      "end": "dt_pred",
+      "delay_ns": 2.073,
+      "start": "cfg_eh_tgt"
+     },
+     {
+      "end": "dtl",
+      "delay_ns": 2.05,
+      "start": "ml_err"
+     },
+     {
+      "end": "gl_fine",
+      "delay_ns": 2.05,
+      "start": "mode_p"
+     },
+     {
+      "end": "t_lo",
+      "delay_ns": 2.045,
+      "start": "mode_p"
+     },
+     {
+      "end": "gh_lvl",
+      "delay_ns": 2.011,
+      "start": "t_lo"
+     },
+     {
+      "end": "gh_fine",
+      "delay_ns": 2.01,
+      "start": "t_lo"
+     },
+     {
+      "end": "gl_lvl",
+      "delay_ns": 1.996,
+      "start": "mode_p"
+     },
+     {
+      "end": "on_pulse",
+      "delay_ns": 1.978,
+      "start": "t_lo"
+     },
+     {
+      "end": "on_how",
+      "delay_ns": 1.977,
+      "start": "mode_p"
+     }
+    ]
+   },
+   "wall_s": 24.4
+  },
+  "vff_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 68579,
+   "cells_mapped": 68579,
+   "area": null,
+   "top": "scb_vff",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 18.2
+  },
+  "vff_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 68579,
+   "cells_mapped": 75792,
+   "area": 442949.824,
+   "top": "scb_vff",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 32328.208994107335,
+   "sta": {
+    "delay_ns": 32.328208994107335,
+    "end": "lo_add[15]",
+    "start": "m[0][12]",
+    "depth_cells": 99,
+    "cells": 75792,
+    "flops": 490,
+    "endpoints": 801,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "lo_add",
+      "delay_ns": 32.328,
+      "start": "m[0]"
+     },
+     {
+      "end": "dnum",
+      "delay_ns": 24.676,
+      "start": "lp20"
+     },
+     {
+      "end": "ton_ph",
+      "delay_ns": 12.727,
+      "start": "m[0]"
+     },
+     {
+      "end": "dden",
+      "delay_ns": 10.986,
+      "start": "lp20"
+     },
+     {
+      "end": "drem",
+      "delay_ns": 10.886,
+      "start": "lp20"
+     },
+     {
+      "end": "dq",
+      "delay_ns": 10.886,
+      "start": "lp20"
+     },
+     {
+      "end": "cap_on",
+      "delay_ns": 10.334,
+      "start": "lp20"
+     },
+     {
+      "end": "g",
+      "delay_ns": 10.294,
+      "start": "lp2"
+     },
+     {
+      "end": "gate",
+      "delay_ns": 10.255,
+      "start": "lp2"
+     },
+     {
+      "end": "dcnt",
+      "delay_ns": 10.219,
+      "start": "lp20"
+     },
+     {
+      "end": "rss_q",
+      "delay_ns": 9.413,
+      "start": "lp20"
+     },
+     {
+      "end": "m[0]",
+      "delay_ns": 9.281,
+      "start": "g"
+     }
+    ]
+   },
+   "wall_s": 61.6
+  },
+  "vff_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 68579,
+   "cells_mapped": 83168,
+   "area": 85900.976,
+   "top": "scb_vff",
+   "library": "nangate45",
+   "exit": 0,
+   "delay_ps": 6926.607851402028,
+   "sta": {
+    "delay_ns": 6.926607851402029,
+    "end": "lo_add[15]",
+    "start": "m[0][15]",
+    "depth_cells": 110,
+    "cells": 83168,
+    "flops": 490,
+    "endpoints": 650,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "lo_add",
+      "delay_ns": 6.927,
+      "start": "m[0]"
+     },
+     {
+      "end": "dnum",
+      "delay_ns": 5.764,
+      "start": "lp20"
+     },
+     {
+      "end": "drem",
+      "delay_ns": 3.166,
+      "start": "lp20"
+     },
+     {
+      "end": "dq",
+      "delay_ns": 3.148,
+      "start": "lp20"
+     },
+     {
+      "end": "dden",
+      "delay_ns": 2.902,
+      "start": "lp20"
+     },
+     {
+      "end": "ton_ph",
+      "delay_ns": 2.895,
+      "start": "m[0]"
+     },
+     {
+      "end": "cap_on",
+      "delay_ns": 2.829,
+      "start": "lp20"
+     },
+     {
+      "end": "dcnt",
+      "delay_ns": 2.725,
+      "start": "lp20"
+     },
+     {
+      "end": "rss_q",
+      "delay_ns": 2.551,
+      "start": "lp20"
+     },
+     {
+      "end": "rail_q",
+      "delay_ns": 2.455,
+      "start": "lp20"
+     },
+     {
+      "end": "g",
+      "delay_ns": 2.282,
+      "start": "lp2"
+     },
+     {
+      "end": "gate",
+      "delay_ns": 2.273,
+      "start": "lp2"
+     }
+    ]
+   },
+   "wall_s": 62.6
+  },
+  "dep_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 653,
+   "cells_mapped": 653,
+   "area": null,
+   "top": "scb_dep",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 1.2
+  },
+  "dep_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 653,
+   "cells_mapped": 907,
+   "area": 5769.2832,
+   "top": "scb_dep",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 7256.483263771488,
+   "sta": {
+    "delay_ns": 7.2564832637714884,
+    "end": "dep[0]",
+    "start": "highs[0]",
+    "depth_cells": 27,
+    "cells": 907,
+    "flops": 51,
+    "endpoints": 59,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "dep",
+      "delay_ns": 7.256,
+      "start": "highs"
+     },
+     {
+      "end": "last_up",
+      "delay_ns": 3.898,
+      "start": "cnt"
+     },
+     {
+      "end": "step",
+      "delay_ns": 3.898,
+      "start": "cnt"
+     },
+     {
+      "end": "cnt",
+      "delay_ns": 3.623,
+      "start": "cnt"
+     },
+     {
+      "end": "highs",
+      "delay_ns": 3.623,
+      "start": "cnt"
+     },
+     {
+      "end": "spoil",
+      "delay_ns": 3.568,
+      "start": "cnt"
+     },
+     {
+      "end": "have_last",
+      "delay_ns": 3.001,
+      "start": "cnt"
+     }
+    ]
+   },
+   "wall_s": 2.5
+  },
+  "multi_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 219653,
+   "cells_mapped": 219653,
+   "area": null,
+   "top": "scb_multi",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 66.1
+  },
+  "add32_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 332,
+   "cells_mapped": 332,
+   "area": null,
+   "top": "add32",
+   "library": null,
+   "exit": 0,
+   "delay_ps": null,
+   "wall_s": 0.9
+  },
+  "add32_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 332,
+   "cells_mapped": 338,
+   "area": 3233.1008,
+   "top": "add32",
+   "library": "sky130",
+   "exit": 0,
+   "delay_ps": 3338.3324656095265,
+   "sta": {
+    "delay_ns": 3.3383324656095263,
+    "end": "y[31]",
+    "start": "ra[0]",
+    "depth_cells": 10,
+    "cells": 338,
+    "flops": 97,
+    "endpoints": 130,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "y",
+      "delay_ns": 3.338,
+      "start": "ra"
+     }
+    ]
+   },
+   "wall_s": 2.0
+  },
+  "add32_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 332,
+   "cells_mapped": 373,
+   "area": 702.772,
+   "top": "add32",
+   "library": "nangate45",
+   "exit": 0,
+   "delay_ps": 634.9883874067494,
+   "sta": {
+    "delay_ns": 0.6349883874067495,
+    "end": "y[31]",
+    "start": "ra[1]",
+    "depth_cells": 11,
+    "cells": 373,
+    "flops": 97,
+    "endpoints": 130,
+    "unmapped": {},
+    "by_end_register": [
+     {
+      "end": "y",
+      "delay_ns": 0.635,
+      "start": "ra"
+     }
+    ]
+   },
+   "wall_s": 1.5
+  }
+ },
+ "criteria": {
+  "c1": true,
+  "c2": false,
+  "c3": false,
+  "c4": false
+ }
+}
