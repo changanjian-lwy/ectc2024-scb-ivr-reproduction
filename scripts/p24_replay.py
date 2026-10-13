@@ -12,8 +12,10 @@ periods) starts LTspice from snapshot k, replays the commands over `periods` pha
 LTspice circuit = the plant's (circuit.py: four phases, a loop inductance with damping per high side, flying
 capacitors, output capacitor, load) with n_high / n_low flattened vendor devices per switch. Each gate has its own
 driver branch: gate_r_on to +5 V while the command is high, gate_r_off to the source while it is low (gate.py's
-assumption). An interlock hold (the plant freezes the gate at its level, record "gate_holds_last") opens the +5 V
-branch for the hold, so the gate floats; a record with holds but without that list is refused.
+assumption), written as one behavioural current source (V_drive - v_gs) x conductance. (With LTspice switch
+elements in the gate branches the time step collapses below 1 fs within 5-100 ns of these netlists.) An interlock
+hold (the plant freezes the gate at its level, record "gate_holds_last") sets that conductance to zero for the
+hold, so the gate floats; a record with holds but without that list is refused.
 The plant's switches have no on-resistance; its per-phase R stands for it (duty-weighted maximum R_DS(on), D62). The
 vendor devices bring their own (typical), so the phase resistance in LTspice is rph: "match" = R minus the devices'
 duty-weighted typical value, "zero", or "plant" (R as in the plant, so the devices' resistance counts twice).
@@ -43,6 +45,8 @@ T_REL = 0.2e-9
 TAIL = 30e-9
 ACT_I = 0.01                             # A per device: the plant's start-of-channel level (gate.py)
 K2 = "k2=2.115e+00"                      # the vendor model's threshold parameter as written in the library
+HOLD_RON = 1e-3                          # ohm, as in D79's edge netlists (LTspice does not start with 1e-5 or less);
+                                         # a held node that carries I amps therefore sits I mV off until the release
 
 
 def load(path):
@@ -132,8 +136,7 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         pr = [x.replace(K2, f"k2={2.115 + c['gate_dk2']:.4f}") for x in pr]
     lines = [f"* A199 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
     lines.append("Vin vin 0 " + _pwl([(0.0, cp.vin_at(t0))] + [(t - t0 + T_REL, cp.vin_at(t)) for t in brk]))
-    lines += [f".model SWU SW(Ron={c['gate_r_on']:.6g} Roff=1e9 Vt=0.5 Vh=0)",
-              f".model SWD SW(Ron={c['gate_r_off']:.6g} Roff=1e9 Vt=-0.5 Vh=0)"]
+    g_drv = f"(V({{u}})/{c['gate_r_on']:.6g}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
     ic, g = dict(v), s0["gate"]
     del ic["vin"]
 
@@ -141,13 +144,12 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         """One switch position: its devices, their driver branches and the command source."""
         vg = g[str(j)]["vgs"]
         vs = 0.0 if src == "0" else v[src]
-        lines.append(f"V5{tag}{q} v5{tag}{q} {src} {c['gate_v_on']:.6g}")
         pc, pu = _ctl(rec, j, t0, t1, g[str(j)]["drv"], g[str(j)]["phase"] == "held")
         lines.extend([f"Vc{tag}{q} c{tag}{q} 0 " + pc, f"Vu{tag}{q} u{tag}{q} 0 " + pu])
         for m in "abc"[:n_dev]:
             inst, gn = f"{tag}{q}{m}", f"g{tag}{q}{m}"
             lines.extend(LT.instance(el, inst, gn, drain, src))
-            lines.extend([f"Sup_{inst} v5{tag}{q} {gn} u{tag}{q} 0 SWU", f"Sdn_{inst} {gn} {src} 0 c{tag}{q} SWD"])
+            lines.append(f"Bd_{inst} {src} {gn} I=" + g_drv.format(u=f"u{tag}{q}", c=f"c{tag}{q}", g=gn, s=src))
             ic[gn] = ic[f"{inst}_g"] = vs + vg
             ic[f"{inst}_d"], ic[f"{inst}_s"] = v[drain], vs
 
@@ -178,7 +180,8 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         lines.append("Iload out 0 " + _pwl(pts))
     items = [f"V({n})={val:.9g}" for n, val in ic.items()]
     lines += [".ic " + " ".join(items[q:q + 6]) for q in range(0, len(items), 6)]
-    lines += [f"Vhold hctl 0 PWL(0 1 {T_REL:.4e} 1 {T_REL + 1e-13:.4e} 0)", ".model SWH SW(Ron=1m Roff=1e13 Vt=0.5 Vh=0)"]
+    lines += [f"Vhold hctl 0 PWL(0 1 {T_REL:.4e} 1 {T_REL + 1e-13:.4e} 0)",
+              f".model SWH SW(Ron={HOLD_RON:g} Roff=1e13 Vt=0.5 Vh=0)"]
     for n, val in ic.items():                                             # hold every node, the devices' internal ones too
         lines += [f"Shold_{n} {n} hv_{n} hctl 0 SWH", f"Vhv_{n} hv_{n} 0 {val:.12g}"]
     lines.append(f".tran 0 {T_REL + t1 - t0:.9e} 0 {maxstep:.3e} uic")
