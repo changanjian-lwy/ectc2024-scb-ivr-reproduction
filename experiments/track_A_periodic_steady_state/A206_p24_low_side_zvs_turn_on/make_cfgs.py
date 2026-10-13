@@ -12,8 +12,9 @@ Stage 2 (after stage 1 chose r_on_ls; `python3 make_cfgs.py stage2 R`): +4.8 V /
   binding boards of V5 (a194 make_cfgs.board): N75 25 C (k 0, 2, 4), S75 0 C and 25 C (k 0, 2, 4), S75 125 C (k 1, 5),
   N0 25 C (k 0); switches at the datasheet maximum times the vendor model's temperature factor; end 80 us after the step.
   A board's r_on_ls is R times its own drive-resistance factor (gate r_on / 3.0: 1.2 on the slow boards).
-Start-up (between the stages, BOUNDARY Section 4): the stage-2 boards to 150 us on V6 with the V5 trims (T0_*; N0 is
-  stage 1's E run), then with ton_s raised by trims.json (T1_*; N0 = the E run repeated, E_N0_steady_<ls>_t).
+Start-up (between the stages, BOUNDARY Sections 4-5): the stage-2 boards to 150 us on V6 with the V5 trims (T0_*; N0
+  is stage 1's E run), then to 175 us with ton_s moved by trims.json (T1_*; N0 = the E run repeated,
+  E_N0_steady_<ls>_t).
   trims.json {board_temp: ns} is written by a206_analyze.py trims; stage 2 applies it when it exists.
   python3 make_cfgs.py            stage 1: cosim/cfg_*.json, cosim/ORDER.txt
   python3 make_cfgs.py startup R  start-up runs with r_on_ls = R: cosim/cfg_T0_*.json or cfg_T1_*.json, ORDER_T.txt
@@ -37,6 +38,7 @@ PER0 = 0.5048                     # us, the nominal board's period (A194)
 STAGE2 = (("N75", "25", (0, 2, 4)), ("S75", "c0", (0, 2, 4)), ("S75", "25", (0, 2, 4)), ("S75", "hot", (1, 5)),
           ("N0", "25", (0,)))
 TRIMS = HERE / "trims.json"
+T_END = {"T0": 150.0, "T1": 175.0}        # us; T1 covers 25 us after the latest handover (the hot boards' own peak)
 
 
 def r_sw(r_dev):
@@ -93,6 +95,8 @@ def startup(r_ls):
     trims = json.loads(TRIMS.read_text())["dton_s_ns"] if TRIMS.exists() else None
     pre, order = ("T1" if trims else "T0"), []
     for b, tk in sorted({(b, tk) for b, tk, _ in STAGE2}):
+        if trims and not trims.get(f"{b}_{tk}", 0.0):
+            continue                                             # no trim change: its T0 (or E) run stands
         if b == "N0":
             if not trims:
                 continue                                         # T0 of N0 = stage 1's E run
@@ -100,13 +104,13 @@ def startup(r_ls):
             d = trims.get("N0_25", 0.0)
             name = f"E_N0_steady_{tag(r_ls)}_t"
             c = dict(c, ton_s_ns=round(c["ton_s_ns"] + d, 3), out=f"run_{name}.json",
-                     note=c["note"] + f"; ton_s raised by {d:g} ns (trims.json)")
+                     note=c["note"] + f"; ton_s moved by {d:+g} ns (trims.json)")
         else:
             c, r_b, d = board_v6(a194, b, tk, r_ls, trims)
             name = f"{pre}_{b}_{tk}_{tag(r_ls)}"
-            c = dict(c, t_end_us=150.0, out=f"run_{name}.json",
+            c = dict(c, t_end_us=T_END[pre], out=f"run_{name}.json",
                      note=f"A206 {name}: board {b}, {a194.TEMPS[tk]:g} C, final configuration on plant V6, low-side "
-                          f"turn-on {r_b:g} ohm, start-up to 150 us, ton_s {c['ton_s_ns']} ns (V5 trim + {d:g} ns)")
+                          f"turn-on {r_b:g} ohm, start-up to {T_END[pre]:g} us, ton_s {c['ton_s_ns']} ns (V5 trim {d:+g} ns)")
         (COS / f"cfg_{name}.json").write_text(json.dumps(c, indent=1) + "\n")
         order.append(name)
     (COS / f"ORDER_{pre}.txt").write_text("\n".join(order) + "\n")
@@ -128,7 +132,7 @@ def stage2(r_ls):
                      out=f"run_{name}.json",
                      note=f"A206 {name}: board {b}, {temp:g} C, final configuration on plant V6 (r_sw "
                           f"{r_sw(R_MAX * R_TEMP[temp])} mOhm = datasheet maximum x {R_TEMP[temp]}, R 0), low-side "
-                          f"turn-on {r_b:g} ohm, ton_s {c['ton_s_ns']} ns (V5 trim + {d:g} ns), "
+                          f"turn-on {r_b:g} ohm, ton_s {c['ton_s_ns']} ns (V5 trim {d:+g} ns), "
                           f"+4.8 V / 1 us at {t_us} us")
             (COS / f"cfg_{name}.json").write_text(json.dumps(c, indent=1) + "\n")
             order.append(name)
