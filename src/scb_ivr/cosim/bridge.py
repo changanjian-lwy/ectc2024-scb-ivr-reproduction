@@ -98,6 +98,11 @@ Late-fire log (cfg "late_log" 1, A162): every section adds "late", the N phases'
 unchanged).
 Windowed V_DS peaks (cfg "vds_win" 1, A144): every section adds "vds_win_v", the 2N switches' peak V_DS since the
 previous section; "vds_max_v" stays the whole run's peak.
+Replay snapshots (cfg "snap_us" [t0, t1] or a list of such windows, A199): at every phase-1 high-side turn-off
+command inside a window the
+record's "snaps" gets the full plant state (y, input, commanded / physical gates, reverse-conduction flags, each
+gate-driven switch's gate voltage); with "debug_edges_us" (every applied edge) that is what an open-loop replay of
+the gate commands in another simulator needs. Read-only: the run is bit-identical with and without it.
 Finite switching edges (cfg "edge" {"didt_a_ns", "didt_on_a_ns" = didt_a_ns}, A145): a turn-off's channel current falls
 at didt_a_ns, a hard turn-on's (V_DS > 0) rises at didt_on_a_ns until V_DS <= 0 (plant.py). Sections add
 "edge_energy_j" (each switch's channel int V_DS i dt during its edges since the previous section); the record adds
@@ -471,6 +476,9 @@ class ModuleSim:
         self.gate_meas_act = (cfg.get("gate") or {}).get("meas", "act") == "act"   # A163
         self.dbg = cfg.get("debug_edges_us")                    # A89 diagnostics only: log every applied edge
         self.edges_log = []
+        w = cfg.get("snap_us")                                  # A199: replay snapshots at phase 1's high-side turn-offs
+        self.snap_win = ([w] if w and not isinstance(w[0], (list, tuple)) else w) or None   # one window or a list of them
+        self.snaps = []
 
     def lead_s(self, j, level, pred_on):
         """A164 / A165: how much earlier than the other edges this edge reaches the plant (driver hs_on_lead_ns)."""
@@ -572,6 +580,26 @@ class ModuleSim:
                               + bytes(int(bool(x)) for x in plant.diode) + int(plant.euler_left).to_bytes(4, "little"))
             trace["digests"].append(trace["h"].hexdigest())
 
+    def snapshot(self):
+        """A199: the plant at this instant, for an open-loop replay in another simulator: the state y, the input,
+        the commanded and the physical gates, the reverse-conduction flags and every gate-driven switch's gate voltage
+        (relaxed to now as gate.GateEdges._sync would, without touching the gate model's own state)."""
+        plant = self.plant
+        gm = plant.gm
+        gh, gl = plant.phys_gates()
+        gate = {}
+        if gm is not None:
+            for j, s in gm.st.items():
+                v = s["vgs"]
+                moving = s["phase"] == "active" or (s["phase"] == "pending" and s["kind"] == "on") \
+                    or (s["phase"] == "held" and s.get("frozen"))
+                if not moving and plant.t > s["t"]:
+                    v = gm._relax(v, s["drv"], plant.t - s["t"], s["vds"])
+                gate[str(j)] = {"phase": s["phase"], "kind": s["kind"], "drv": bool(s["drv"]), "vgs": float(v)}
+        return {"t_s": plant.t, "y": [float(x) for x in plant.y], "vin_v": self.p.vin_at(plant.t),
+                "gh": [bool(x) for x in plant.gh], "gl": [bool(x) for x in plant.gl], "phys_h": [bool(x) for x in gh],
+                "phys_l": [bool(x) for x in gl], "diode": [bool(x) for x in plant.diode], "gate": gate}
+
     def apply(self, j, level, meta):
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
         to_lsb, na = self.to_lsb, self.na
@@ -648,6 +676,8 @@ class ModuleSim:
                 if self.hand_vo is not None and not self.hand["lat"] and vo >= self.hand_vo:   # A186
                     self.hand.update(lat=True, t=plant.t)
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
+            if k == 0 and self.snap_win and any(a * 1e-6 <= plant.t <= b * 1e-6 for a, b in self.snap_win):
+                self.snaps.append(self.snapshot())               # A199 (read-only)
             mon.hoff_set[k] = 1; mon.t_hoff[k] = plant.t; mon.cross_set[k] = 0; mon.vprev_valid[k] = 0
             ib = [plant.y[c] for a, c in enumerate(plant.aux_col) if plant.aux_k[a] == k]   # A101: and its branch
             self.highoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k]),
@@ -831,6 +861,12 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if self.snap_win:                                            # A199: the snapshots and the circuit they belong to
+            out["snaps"] = self.snaps
+            out["snap_circuit"] = {k: getattr(p, k) for k in (
+                "n", "vin", "L", "R", "cs", "co", "load_kind", "r_load", "i_load", "t_load", "i_step", "t_step", "vin_step",
+                "t_vstep", "t_vslew", "t_ramp", "n_high", "n_low", "loop_l", "loop_rp", "gate_r_on", "gate_r_off",
+                "gate_v_on", "gate_l_cs", "gate_temp", "gate_dk2", "gate_cg_scale", "rev_vf", "rev_r")}
         if self.hand_vo is not None:                                 # A186
             out["t_hand_req_s"] = self.hand["t"]
         if self.gated:                                               # A164

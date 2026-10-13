@@ -711,3 +711,14 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
   - `cosim_regression.py --full` passes.
   - Unit tests: 59/59, 3 of them new.
 - Spec: `extensions/ml_design_assist/experiments/A128_cosim_vin_feedforward/SPEC_RTL.md`.
+
+
+## A199: replay snapshots, opt-in
+
+- cfg "snap_us" [t0, t1]: the bridge records the full plant state and every
+  gate voltage at phase 1's high-side turn-off commands inside the window
+  (record "snaps"). With "debug_edges_us" it is the input of an open-loop
+  replay in LTspice (`scripts/p24_replay.py`).
+- Read-only (`Module.snapshot`); absent, the record has no new key.
+  - `cosim_regression.py --quick` passes.
+  - A run with and without "snap_us" has equal sections (A199 BOUNDARY).
