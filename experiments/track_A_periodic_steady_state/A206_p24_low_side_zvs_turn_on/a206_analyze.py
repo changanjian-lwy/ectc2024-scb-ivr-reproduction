@@ -48,8 +48,11 @@ TRIM_MIN_V = 0.010
 
 
 def parse(name):
+    """(kind, base, low-side turn-on resistance); a trailing _t (the re-trimmed E run) is its own kind."""
     kind, rest = name.split("_", 1)
     base, ls = rest.rsplit("_ls", 1)
+    if ls.endswith("_t"):
+        kind, ls = kind + "t", ls[:-2]
     return kind, base, float(ls.replace("p", "."))
 
 

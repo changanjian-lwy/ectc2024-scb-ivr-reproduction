@@ -1,0 +1,12 @@
+B_N75_25_p0_ls0p3
+B_N75_25_p2_ls0p3
+B_N75_25_p4_ls0p3
+B_S75_c0_p0_ls0p3
+B_S75_c0_p2_ls0p3
+B_S75_c0_p4_ls0p3
+B_S75_25_p0_ls0p3
+B_S75_25_p2_ls0p3
+B_S75_25_p4_ls0p3
+B_S75_hot_p1_ls0p3
+B_S75_hot_p5_ls0p3
+B_N0_25_p0_ls0p3
