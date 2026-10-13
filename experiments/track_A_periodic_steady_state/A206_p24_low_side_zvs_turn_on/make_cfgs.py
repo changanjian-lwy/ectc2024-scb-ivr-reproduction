@@ -11,6 +11,7 @@ Stage 1 (25 C, nominal devices; A205's three cfgs with their snapshot and edge-l
 Stage 2 (after stage 1 chose r_on_ls; `python3 make_cfgs.py stage2 R`): +4.8 V / 1 us at 500 us + k T / 6 on the
   binding boards of V5 (a194 make_cfgs.board): N75 25 C (k 0, 2, 4), S75 0 C and 25 C (k 0, 2, 4), S75 125 C (k 1, 5),
   N0 25 C (k 0); switches at the datasheet maximum times the vendor model's temperature factor; end 80 us after the step.
+  A board's r_on_ls is R times its own drive-resistance factor (gate r_on / 3.0: 1.2 on the slow boards).
   python3 make_cfgs.py            stage 1: cosim/cfg_*.json, cosim/ORDER.txt
   python3 make_cfgs.py stage2 R   stage 2 with r_on_ls = R: cosim/cfg_B_*.json, cosim/ORDER2.txt"""
 from __future__ import annotations
@@ -75,12 +76,14 @@ def stage2(r_ls):
         for k in ks:
             t_us = round(500.0 + k * per / 6.0, 4)
             name = f"B_{b}_{tk}_p{k}_{tag(r_ls)}"
-            c = v6(a194.board(b, tk), r_ls, R_MAX * R_TEMP[temp])
+            c = a194.board(b, tk)
+            r_b = round(r_ls * c["gate"]["r_on"] / 3.0, 4)          # the board's drive-resistance corner
+            c = v6(c, r_b, R_MAX * R_TEMP[temp])
             c = dict(c, line_step={"dv": 4.8, "slew_us": 1.0, "t_us": t_us}, t_end_us=round(t_us + 81.0, 4),
                      out=f"run_{name}.json",
                      note=f"A206 {name}: board {b}, {temp:g} C, final configuration on plant V6 (r_sw "
                           f"{r_sw(R_MAX * R_TEMP[temp])} mOhm = datasheet maximum x {R_TEMP[temp]}, R 0), low-side "
-                          f"turn-on {r_ls:g} ohm, +4.8 V / 1 us at {t_us} us")
+                          f"turn-on {r_b:g} ohm, +4.8 V / 1 us at {t_us} us")
             (COS / f"cfg_{name}.json").write_text(json.dumps(c, indent=1) + "\n")
             order.append(name)
     (COS / "ORDER2.txt").write_text("\n".join(order) + "\n")
