@@ -2241,6 +2241,15 @@ each question:
          suggested), V_DS <= 33.3 V, no late fire. -4.8 V / 1 us keeps
          its oracle events (3 K3, 3 NEW). The nominal L0 column of the
          coverage table is now on V6; the other columns are still V5.
+    117. The binding row against LTspice (2026-10-14, A213). The replay
+         tool now scales the vendor model's gate capacitances
+         (scale_params), so the slow corner can be replayed. S75 at 125 C,
+         +4.8 V / 1 us: the plant's largest peak is 197.57 A; LTspice from
+         the three snapshots before and at it gives 196.79 / 196.98 /
+         197.38 A. The 2.4 A margin may be stated with that. V6 is
+         1.3-2.0 A per period high at this corner (conservative; nominal:
+         0.7 A), up to 3.0 A around the peak; settled loss books within
+         0.5 % (39.9 W per module).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

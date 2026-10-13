@@ -209,9 +209,16 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   settled, 0.41 A in mode S and 1.05 A after N0's step, and the settled loss books within 0.7 % at 3.0, 1.0 and
   0.3 Ω. **Stated error: 0.75 L0 at the step's peak**, where LTspice ends 1.52-1.57 A lower and single peaks are up to
   2.3 A lower (the plant is the higher one). Cause: a high side commanded on whose node swings past the rail before
-  its gate reaches threshold conducts at 2.2 V in the plant and at 0.43 V in LTspice. Not fixed. **Not covered: the
-  binding row on V6 is the slow board at 125 °C (2.4 A margin), and slow devices, 125 °C and 0 °C have not been
-  replayed in LTspice; the plant's error there is not known.** Four modules and a closed loop in LTspice are not done.
+  its gate reaches threshold conducts at 2.2 V in the plant and at 0.43 V in LTspice. Not fixed. Four modules and a
+  closed loop in LTspice are not done.
+- **The binding row against LTspice (A213, 2026-10-14).** The slow 0.75 L0 board at 125 °C, +4.8 V / 1 µs, the row
+  with the smallest margin on V6 (197.57 A). LTspice with the vendor model at 125 °C, its threshold + 1.0 and its
+  gate capacitances × 1.29, replayed from the three snapshots before and at the peak, gives 196.79 / 196.98 /
+  197.38 A: 0.2-0.8 A below the plant. The settled loss books agree within 0.5 % (39.9 W per module at this
+  corner), V_DS within 1.2 V. V6's one-period error is larger here than at nominal, on the conservative side:
+  currents 1.3-2.0 A lower in LTspice settled and at the step, up to 3.0 A around the peak (not traced). **Not
+  covered: other step positions and boards at this corner, 0 °C, and any slow device that is not the typical
+  model with these three changes.**
 - **The interlock is an idealised function.** It senses the complement's channel exactly and holds the gate at its
   own channel start. Where it acted (L × 0.7, slow corner), zero shoot-throughs are imposed by the rule, not
   shown. Where it never acted (0 holds: nom / ff / hot one module, four modules nominal), they do not depend on it.
@@ -276,7 +283,8 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   margin" may not be said without "in the plant; LTspice's next peak is up to 2.7 A higher at fixed commands".
 - After A206: "on plant V6, which agrees with LTspice within 0.7 A per period and 0.7 % of loss at nominal devices
   and 25 °C, the twelve binding rows stay ≤ 197.6 A with 0.3 Ω on the low sides" may be said. The smallest margin
-  is then "2.4 A on the slow board at 125 °C, a corner not checked against LTspice". Semiconductor efficiency: "92.5 %
+  is then "2.4 A on the slow board at 125 °C; LTspice, replayed from the plant's state at that corner, is 0.2-0.8 A
+  lower (A213; two periods at fixed commands, one step position)". Semiconductor efficiency: "92.5 %
   in the plant's books at nominal devices, 25 °C, switches at the datasheet maximum (20.2 W per 250 W module)"; it
   leaves out the inductors, the loop's damper, the capacitors and the gate drive. A V5 efficiency figure may not be
   quoted without its version.

@@ -115,6 +115,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A210": (TA / "A210_p24_load_range_boards", "a210_analyze.py", "a210_summary.json"),
     "A211": (TA / "A211_p24_loss_against_load", "a211_analyze.py", "a211_summary.json"),
     "A212": (TA / "A212_p24_nominal_rows_v6", "a212_analyze.py", "a212_summary.json"),
+    "A213": (TA / "A213_p24_binding_row_ltspice", "a213_analyze.py", "a213_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -583,6 +584,15 @@ EXCEPTIONS["A210"] = {("runs/r_N75_25_20", "r2"): _A210, ("runs/r_N75_25_20", "r
 _A211 = "the slow board's two-cycle orbit (A195) is wider at 40-50 % of the load: valleys alternate between -17 and -7 A, past the " \
         "band's -8 A edge; the row regulates with no late fire at its end (RESULTS 0)"
 EXCEPTIONS["A211"] = {("runs/e_S75_25_50", "r4"): _A211, ("runs/e_S75_25_40", "r4"): _A211}
+_A213 = {"c1": "later peaks are 2.0-3.9 A lower in LTspice at the slow hot corner; the plant is the higher one, and the largest "
+               "peak agrees within 0.8 A (c5 passes) (RESULTS 0)",
+         "c2": "V6's one-period error at the slow hot corner: currents 1.25-1.96 A lower in LTspice settled and at the step, up "
+               "to 3.0 A around the peak, against 1.5 A; conservative, not traced, no model change in A213 (RESULTS 0)",
+         "c4": "around the peak, turn-ons at lost valleys differ by 2.8-9.6 ns and 8-11 V; settled and at the step they agree "
+               "within 0.18 ns (RESULTS 0)"}
+EXCEPTIONS["A213"] = {("criteria", f"{r}/c2"): _A213["c2"] for r in ("P_k0", "P_k1", "P_k2", "T_k8", "T_k9", "K_k53", "K_k54", "K_k55")}
+EXCEPTIONS["A213"].update({("criteria", f"{r}/c1"): _A213["c1"] for r in ("T_k8", "K_k53", "K_k54", "K_k55")})
+EXCEPTIONS["A213"].update({("criteria", f"{r}/c4"): _A213["c4"] for r in ("K_k53", "K_k54", "K_k55")})
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
