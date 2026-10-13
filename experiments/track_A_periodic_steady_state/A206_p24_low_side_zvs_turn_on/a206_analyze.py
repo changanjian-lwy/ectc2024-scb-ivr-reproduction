@@ -43,6 +43,10 @@ V5_REF = {"N0_25": V5_REC / "run_N0_steady.json", "N75_25": V5_REC / "run_N75_st
           "S75_25": TA / "A192_p24_slow_lead_rows" / "cosim" / "run_S75_25_p48_1us_p0.json",
           "S75_c0": TA / "A193_p24_slow_lead_cold" / "cosim" / "run_S75_c0_l9p5_p0.json",
           "S75_hot": TA / "A197_p24_slow_hot_final_handover" / "cosim" / "run_S75_hot_p0.json"}
+V5_ROWS = {("N0", "25"): (V5_REC, "run_N0_step.json", {0: None}), ("N75", "25"): (V5_REC, "run_N75_step.json", {0: None}),
+           ("S75", "25"): (TA / "A192_p24_slow_lead_rows" / "cosim", "run_S75_25_p48_1us_p{}.json", {0: 0, 2: 1, 4: 2}),
+           ("S75", "c0"): (TA / "A193_p24_slow_lead_cold" / "cosim", "run_S75_c0_l9p5_p{}.json", {0: 0, 2: 1, 4: 2}),
+           ("S75", "hot"): (TA / "A197_p24_slow_hot_final_handover" / "cosim", "run_S75_hot_p{}.json", {1: 1, 5: 5})}
 SLOPE = {"N0": 0.0535, "N75": 0.0535, "S75": 0.0545}      # V per ns of ton_s at the 200 ns start-up (A190 table.json)
 TRIM_MIN_V = 0.010
 
@@ -200,6 +204,43 @@ def whole(path):
     return out
 
 
+def after_step(path, t_stop=None):
+    """A step run's figures from its step to t_stop (default: its end): the peak with its phase and time, Vo's
+    extremes about 1 V, late fires per phase before (from 25 us after the handover) and after the step, the largest
+    V_DS in the window."""
+    r = json.loads(Path(path).read_text())
+    t_ev, tp = r["cfg"]["line_step"]["t_us"] * 1e-6, r["t_mode_p_s"]
+    t_stop = min(t_stop or r["t_end_s"], r["t_end_s"])
+    sec = [q for q in r["sections"] if q["t_s"] <= t_stop]
+    ts = np.array([q["t_s"] for q in sec]); vo = np.array([q["vo"] for q in sec])
+    e = max((x for x in r["gate_offs_last"] if t_ev <= x["t_s"] < t_stop), key=lambda x: x["i_max_a"])
+    late = lambda t: np.array(sec[int(np.searchsorted(ts, t, side="right")) - 1]["late"]) if "late" in sec[0] else None
+    out = {"record": str(Path(path).relative_to(TA)), "commit": r["provenance"]["git_commit"][:7], "t_step_us": t_ev * 1e6,
+           "t_stop_us": t_stop * 1e6, "post_pk": e["i_max_a"], "post_pk_phase": e["phase"], "post_pk_dt_us": (e["t_s"] - t_ev) * 1e6,
+           "vo_min_mv": 1e3 * float(vo[ts >= t_ev].min() - 1.0), "vo_max_mv": 1e3 * float(vo[ts >= t_ev].max() - 1.0),
+           "vds_post": float(np.max([q["vds_win_v"] for q in sec if q["t_s"] >= t_ev])) if "vds_win_v" in sec[-1] else None,
+           "il_holds_run": sum(r["gate_stats"].get("il_holds") or [0]), "ton_s_ns": r["cfg"]["ton_s_ns"]}
+    if late(t_ev) is not None:
+        out["late_before"] = (late(t_ev) - late(tp + 25e-6)).tolist()
+        out["late_after"] = (late(t_stop) - late(t_ev)).tolist()
+    return out
+
+
+def stage2():
+    """Every stage-2 row against V5's record of the same row (where one exists locally), both read to the same time."""
+    rows = {}
+    for f in sorted(COS.glob("run_B_*.json")):
+        b, tk, k = f.stem[6:].split("_")[:3]
+        v6 = after_step(f)
+        d, pat, ks = V5_ROWS[(b, tk)]
+        ref = d / pat.format(ks[int(k[1:])]) if int(k[1:]) in ks else None
+        v5 = after_step(ref, v6["t_stop_us"] * 1e-6) if ref is not None and ref.exists() else None
+        if v5 is not None and v5["t_stop_us"] < v6["t_stop_us"] - 1e-3:        # V5's record is the shorter one
+            v6 = after_step(f, v5["t_stop_us"] * 1e-6)
+        rows[f.stem[4:]] = {"v6": v6, "v5": v5}
+    return rows
+
+
 def startup(path):
     r = json.loads(Path(path).read_text())
     ts = np.array([q["t_s"] for q in r["sections"]]); vo = np.array([q["vo"] for q in r["sections"]])
@@ -252,13 +293,13 @@ def main():
             v5[base] = whole(p)
     res["v5"] = v5
     res["criteria"] = {f"{n}:{k}": m["criteria"] for n, rows in res["replays"].items() for k, m in rows.items()}
-    res["criteria_runs"] = {n: m["criteria"] for n, m in res["runs"].items()}
     c5 = {}
     for n, rows in res["replays"].items():
         if parse(n)[1] == "N0_steady":
             rel = [m["books_w"]["rel"] for k, m in rows.items() if k.startswith("P_")]
             c5[n] = {"rel": rel, "pass": bool(rel) and max(abs(x) for x in rel) <= LOSS_TOL}
-    res["c5"] = c5
+    res["criteria_c5"] = c5
+    res["stage2"] = stage2()
     (HERE / "a206_summary.json").write_text(json.dumps(res, indent=1) + "\n")
     f1 = lambda xs: " ".join(f"{x:+.2f}" for x in xs)
     for n, m in list(res["v5"].items()) + list(res["runs"].items()):
@@ -276,7 +317,14 @@ def main():
                   f"1 period di {f1(m['di'])} A dVcs {f1([x * 1e3 for x in m['dvcs']])} mV dVo {m['dvo'] * 1e3:+.3f} mV | V_DS {m['vds_max']:.2f} | "
                   f"t_on {None if m['t_on_max'] is None else round(m['t_on_max'] * 1e9, 3)} ns {m['v_on_max']} V | books plant "
                   f"{b['plant']['total']:.2f} W LT {b['lt']['total']:.2f} W ({100 * b['rel']:+.1f} %) | {m['criteria']}")
-    print("c5", res["c5"])
+    print("c5", res["criteria_c5"])
+    fl = lambda m, k: "-" if m is None or m.get(k) is None else (f"{sum(m[k])}" if isinstance(m[k], list) else f"{m[k]:.2f}")
+    for n, m in res["stage2"].items():
+        a, b = m["v6"], m["v5"]
+        print(f"{n:22s} to {a['t_stop_us']:.0f} us | post V6 {a['post_pk']:.2f} (ph {a['post_pk_phase']}, +{a['post_pk_dt_us']:.1f} us) V5 "
+              f"{fl(b, 'post_pk')} | Vo V6 {a['vo_min_mv']:+.1f} / {a['vo_max_mv']:+.1f} mV V5 {fl(b, 'vo_min_mv')} / {fl(b, 'vo_max_mv')} | "
+              f"V_DS {fl(a, 'vds_post')} / {fl(b, 'vds_post')} | late before {fl(a, 'late_before')} / {fl(b, 'late_before')} after "
+              f"{fl(a, 'late_after')} / {fl(b, 'late_after')} | holds {a['il_holds_run']} / {fl(b, 'il_holds_run')}")
 
 
 if __name__ == "__main__":
