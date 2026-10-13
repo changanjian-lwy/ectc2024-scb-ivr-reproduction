@@ -2182,6 +2182,21 @@ each question:
          rows (+4.8 V / 1 us on N0, N75, S75 at 0 / 25 / 125 C) hold 200 A:
          at most 197.6 A, smallest margin 2.4 A on the slow board at 125 C.
          That corner has not been replayed in LTspice: next.
+    111. The load range of the final configuration (2026-10-14, A207;
+         plant V6, board N0, 25 C, one module; started from LSCB's phase
+         shedding, Tong et al., VLSI 2026). No earlier run had less than
+         75 % of the load on a module. With part of the 250 A released, the
+         75 % row regulates (Ton register 24.09 ns, 2.42 MHz, 12.4 W); from
+         60 % down the register sits at its lower limit, 22.25 ns = half
+         the loop seed (bridge.py), the module keeps delivering 164-174 A
+         and Vo ends at 1.09-1.56 V (figure a207_vo.png). The limit is
+         reached at about 174 A, 70 %. Peaks and V_DS stay inside their
+         limits. Four modules all on cover 697-1000 A; shedding whole
+         modules would cover 174-1000 A with gaps at 250-349 and 500-523 A
+         (composition, not a run). Not fixed: the controller is frozen and
+         the remedy (the limit as its own cfg value, a light-load mode,
+         module shedding) is the user's decision. D63 predicted 50-55 %:
+         it lacks the lead's offset between register and on-time.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

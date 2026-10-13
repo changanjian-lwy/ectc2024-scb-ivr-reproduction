@@ -16,6 +16,7 @@ comes from, and says what may be claimed.
 | start-up | **since 2026-10-10 (A188):** mode S at t0 = 200 ns, so every turn-on is hard and the series-capacitor ladder stays balanced (A183; at 400 ns slow boards split to 15.6 / 14.8 / 8.9 / 8.7 V). Per-board trim of mode S's Ton (cfg_ton_s) to Vo(143.5 µs) = 1.035 V: nominal 23.65-23.68 ns at L × 0.7-1.3, slow 35.45-35.80, ff 21.33 ns. The loop's seed is ton_ns = T_ss + (kp + ki)(Vo_entry − 1 V), from one closed-loop measurement (A185). The handover is requested at Vo ≥ 1.045 V or at 144 µs, whichever comes first: a sequencer comparator on the sampled Vo (A188; at 25 °C it never fires). Trims and seed are set once at 25 °C. Above 25 °C they stay locked (A188). Below 25 °C the mode-S trim follows a per-corner table, the corner read from the 25 °C trim: slow +0.531 / +1.441 ns, nominal +0.113 / +0.313 ns at 0 / -40 °C (A190, held on hold-out boards; device model extrapolated below 25 °C). Without the table slow boards fail cold (A189: -40 °C entry 0.956 V, 278 A; 0 °C 211 A). Checked at -40, 0, 25 and 125 °C. Superseded: t0 400 ns with ton = ton0 + (1.035 − Vo)/0.026 (A164-A181). **On plant V6 with 0.3 Ω low sides the 25 °C trims move: nominal L0 −0.279 ns, nominal 0.75 L0 −0.261 ns, slow 0.75 L0 +0.289 ns (A206; the cold table stays on top). Checked on these three boards (slow also at 0 and 125 °C): Vo before the handover within 3.1 mV of V5's, Vo ≤ 1.0476 V, handover ≤ 182.0 A** | A183-A190, A206 |
 | calibrated vs adaptive | factory, once per board: the mode-S trim and the loop seed (one closed-loop measurement of T_ss). Adapting at run time: valley timing (dt_pred, dlo), low-side dead time (dtl), negative-current trim, the Vin feed-forward's filters. Fixed: drive resistors, lead (per corner class, set once), t_il | A143, A164, A192 |
 | driver interlock | threshold form: a channel about to start while its complement conducts waits at that gate level, then starts t_il = 0.5 ns after the complement stops (modelled ideally). The release time is a timing spec, not a safety one: no delay up to 8.3 ns changed a peak or V_DS. At the slow corner it should release within 1.0 ns (A179: after the −8 V ramp the late fires rise at 1.4 ns at 2 of 4 step positions); a per-board comparator reference (V_th − 0.2 V, ~1.4 ns) is just above that, a fixed 1.0 V reference (8.3 ns) far above. This settles the ramp's late fires only: at 1.0 ns the load step's spike count still fails its registered tolerance (scatter, open), and a real comparator's offset, noise and early release are not modelled | A171, A173, A174, A177, A179 |
+| load range | **A module regulates from 250 A down to about 174 A (70 %) and not below (A207, plant V6, nominal L0 board, 25 °C). Minimum load per module: 187.5 A tested, 174 A estimated.** The loop's Ton has a lower limit of half the loop seed (cfg_ton_min = 0.5 × ton_ns = 22.25 ns, set in bridge.py); the register is 32.85 ns at 250 A and 24.09 ns at 187.5 A. Below the limit's load the module keeps delivering 164-174 A and Vo rises: 1.09 V with 60 % of the load, 1.56 V with 10 %. Peaks and V_DS stay inside their limits. There is no light-load mode and no way to shed a module. Not a designed value: the limit followed the seed, which grew for the handover (A185) | A207 |
 | reference cfgs | `experiments/track_A_periodic_steady_state/A172_p24_final_gate_plant/cosim/cfg_nom_L07_l_p48_1us.json` (one module), `cfg_m4_nom_l_p48_1us.json` (four) | A172 |
 
 ## 2. Plant versions
@@ -149,6 +150,16 @@ handover, four modules.
 
 ## 4. Not covered by the final plant
 
+- **Light load (A207, 2026-10-14).** No run before A207 had less than 75 % of the load on a module. With part of the
+  250 A released (plant V6, nominal L0 board, 25 °C, one module) the 75 % row regulates (Ton register 24.09 ns,
+  2.42 MHz, 12.4 W of semiconductor loss); at 60 / 55 / 50 / 45 / 40 / 30 / 10 % the register sits at its 22.25 ns
+  limit from 1.4-2.8 µs after the release and Vo ends at 1.09 / 1.14 / 1.19 / 1.23 / 1.28 / 1.37 / 1.56 V (figure
+  `A207_p24_load_range/a207_vo.png`, records run_f60 .. run_f10 in release records-a207). The limit is reached at
+  about 174 A. How high Vo goes depends on the load model (4 mΩ plus a current fed back); that it leaves regulation
+  does not. Four modules all on therefore cover 697-1000 A only. Shedding whole modules, as LSCB (Tong et al., VLSI
+  2026) sheds phases, would cover 174-1000 A with gaps at 250-349 A and 500-523 A (a composition, not a run; the
+  frozen controller cannot shed a module). Not fixed. Other boards, temperatures, slow load changes and a start-up
+  into a light load are not run.
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within
@@ -241,6 +252,9 @@ handover, four modules.
   the low sides, which turn on at zero voltage, it is not a specification but an oversight: they need their own,
   small turn-on resistance (A205). A206 set it to 0.3 Ω: the low sides' hard turn-ons are at most 77 per run, all
   but one or two in start-up and handover, with low-side V_DS ≤ 19.6 V. Fast devices (0.24 Ω) are not run.
+- After A207: every statement about a module holds "between 75 and 100 % of its load" (tested; the limit is near
+  70 %). "1 kW from four modules" may be said; "a 1 kW regulator" without the minimum load may not: below about
+  700 A on four modules the output is not regulated. The efficiency at 75 % is 93.8 % in the plant's books (12.4 W).
 - Efficiency: η = P_out / (P_out + P_loss). A loss increase divided by 250 W is a share of the output, not
   efficiency points: the gate-level edges add 1.7 / 3.9 W per module (nominal / slow corner), −0.4..−0.5 /
   −1.0..−1.2 points depending on the baseline (D80, corrected 2026-10-09).

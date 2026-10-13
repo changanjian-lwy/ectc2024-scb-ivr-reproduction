@@ -110,6 +110,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A198": (TA / "A198_p24_step_right_after_handover", "a198_analyze.py", "a198_summary.json"),
     "A205": (TA / "A205_p24_ltspice_replay", "a205_analyze.py", "a205_summary.json"),
     "A206": (TA / "A206_p24_low_side_zvs_turn_on", "a206_analyze.py", "a206_summary.json"),
+    "A207": (TA / "A207_p24_load_range", "a207_analyze.py", "a207_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -561,6 +562,9 @@ EXCEPTIONS["A206"].update({("criteria", f"V_N75_step_ls3:T_k{k}/{c}"): _A206[c]
                            for k, cs in ((57, ("c1", "c2", "c4")), (58, ("c1", "c2", "c4")), (59, ("c2", "c4"))) for c in cs})
 EXCEPTIONS["A206"][("criteria", "V_N0_step_ls3:T_k42/c4")] = _A206["c4"]
 EXCEPTIONS["A206"][("runs/E_N0_steady_ls3", "c6")] = _A206["c6"]
+_A207 = "the load is below the module's floor (about 174 A): the Ton register sits at cfg_ton_min = half the loop seed and Vo " \
+        "leaves regulation (1.09-1.56 V) - the finding; not fixed, the controller is frozen (RESULTS 0)"
+EXCEPTIONS["A207"] = {(f"runs/f{p}", "r2"): _A207 for p in (60, 55, 50, 45, 40, 30, 10)}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
