@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -45,6 +46,22 @@ SRC = ("a1", "a2", "a3", "x4")          # high side k's source
 T_REL = 0.2e-9
 TAIL = 30e-9
 ACT_I = 0.01                             # A per device: the plant's start-of-channel level (gate.py)
+CG_PARAMS = ("ags1", "ags2", "ags5", "agd1", "agd2", "agd5", "agd8")   # amplitudes of q_gs and q_gd (p24_gate_model)
+
+
+def scale_params(pr, names, k):
+    """The vendor model's .param lines with each named parameter's expression multiplied by k (name={expr} ->
+    name={k*(expr)}); every name must be defined exactly once. With CG_PARAMS this is load_device(cg_scale=k): those
+    parameters appear only in the gate capacitors C_GS, C_CGS1, C_GD, C_CGD1."""
+    out = list(pr)
+    for n in names:
+        pat = re.compile(rf"(?i)\b({n})=\{{([^{{}}]*)\}}")
+        if sum(len(pat.findall(x)) for x in out) != 1:
+            raise ValueError(f"replay: parameter {n} is not defined exactly once in the vendor model")
+        out = [pat.sub(lambda m: f"{m.group(1)}={{{k:.6g}*({m.group(2)})}}", x) for x in out]
+    return out
+
+
 K2 = "k2=2.115e+00"                      # the vendor model's threshold parameter as written in the library
 L_IDEAL = "Rser=0 Rpar=1e15"             # LTspice gives every inductor 1 mOhm in series (and a parallel damper)
                                          # unless told otherwise; 1 mOhm is twice the plant's whole phase resistance
@@ -125,8 +142,8 @@ def _ctl(rec, j, t0, t1, level0, held0=False):
 def netlist(rec, k, periods=2, rph="match", maxstep=5e-12, r_on_ls=None):
     import p24_ltspice as LT
     c = rec["snap_circuit"]
-    if c["n"] != 4 or c["gate_l_cs"] or c["gate_cg_scale"] != 1.0:
-        raise ValueError("replay: four phases, no L_cs, typical gate capacitance only")
+    if c["n"] != 4 or c["gate_l_cs"]:
+        raise ValueError("replay: four phases, no L_cs")
     if sum((rec.get("gate_stats") or {}).get("il_holds") or [0]) and "gate_holds_last" not in rec:
         raise ValueError("replay: the record has interlock holds but not their times (gate_holds_last)")
     s0, t0, t1 = window(rec, k, periods)
@@ -141,6 +158,8 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12, r_on_ls=None):
     if c["gate_dk2"]:
         assert any(K2 in x for x in pr)
         pr = [x.replace(K2, f"k2={2.115 + c['gate_dk2']:.4f}") for x in pr]
+    if c["gate_cg_scale"] != 1.0:                        # A213: the gate-capacitance spread, as load_device(cg_scale)
+        pr = scale_params(pr, CG_PARAMS, c["gate_cg_scale"])
     lines = [f"* A205 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
     lines.append("Vin vin 0 " + _pwl([(0.0, cp.vin_at(t0))] + [(t - t0 + T_REL, cp.vin_at(t)) for t in brk]))
     g_drv = f"(V({{u}})/{{r_on:.6g}}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
