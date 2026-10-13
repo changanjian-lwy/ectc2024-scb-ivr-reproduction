@@ -175,6 +175,17 @@ handover, four modules.
   scb_vff into phase 1's edge logic; that path's source changes once per period and would take a register stage. The
   per-clock logic of one phase alone is 10 ns in sky130 and 2.4 ns at 45 nm. Estimates good to a factor (plain
   mapping, no wires). The 31.25 ps edge placement, comparators, TDCs and ADC remain model assumptions.
+- **Loss against load, and what shedding modules would save (A211, 2026-10-14; plant V6, 25 °C, one module,
+  ton_min_ns 4.0 ns; figure `A211_p24_loss_against_load/a211_curves.png`).** Semiconductor loss per module in the
+  plant's books at 100 / 75 / 60 / 50 / 40 / 30 % of the load: nominal L0 20.2 / 12.4 / 8.7 / 6.7 / 5.3 / 4.2 W
+  (92.5-95.0 %); nominal 0.75 L0 22.3 / 14.2 / 10.5 / 8.3 / 6.9 / 6.5 W (91.8-93.8 %); slow 0.75 L0 31.9 / 24.4 /
+  20.9 / 20.7 / 19.9 / 17.6 W (88.7 % at full load, 81.0 % at 30 %). The slow board's edges cost 13.5 W at full
+  load (D80's thermal note carried 3.9 W from V5 and is not rerun), and its frequency rises from 2.6 to 5.6 MHz
+  as the load falls. At 50 and 40 % the slow board regulates but its valleys alternate between −17 and −7 A (the
+  two-cycle orbit, wider than at full load). Composed for four equal modules: running two instead of four would
+  save 19 / 31 / 41 % of the loss at 50 / 40 / 30 % of the system's load on slow boards, 7-21 % on nominal ones,
+  and would reach down to 7.5 %. **Not covered: shedding itself. No module leaves or re-enters in any run; the
+  frozen controller cannot do it.** 0 and 125 °C on these rows, the gate drive's loss and the inductors' are not in.
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within

@@ -2224,6 +2224,16 @@ each question:
          edges at 5.5-6.6 MHz), and at 20 % no high-side turn-on
          completes. The specification's minimum load is 30 % per module.
          What shedding modules would save on these boards: A211.
+    115. Loss against load on three boards (2026-10-14, A211; plant V6,
+         25 C, ton_min_ns 4.0 ns). Books per module at 100 / 75 / 60 /
+         50 / 40 / 30 %: N0 20.2 .. 4.2 W (92.5-95.0 %), N75 22.3 .. 6.5 W
+         (91.8-93.8 %), slow 0.75 L0 31.9 .. 17.6 W (88.7 % at full load,
+         81.0 % at 30 %): slow edges at a frequency that rises as the
+         load falls. The slow board misses the valley band at 50 and 40 %
+         (two-cycle orbit, valleys -17 / -7 A). Composed for four modules:
+         two on instead of four would save 19 / 31 / 41 % at 50 / 40 /
+         30 % of the system's load on slow boards, 7-21 % on nominal
+         ones. Shedding itself is not modelled; it needs RTL.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

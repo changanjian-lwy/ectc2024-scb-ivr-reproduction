@@ -113,6 +113,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A207": (TA / "A207_p24_load_range", "a207_analyze.py", "a207_summary.json"),
     "A208": (TA / "A208_p24_ton_lower_limit", "a208_analyze.py", "a208_summary.json"),
     "A210": (TA / "A210_p24_load_range_boards", "a210_analyze.py", "a210_summary.json"),
+    "A211": (TA / "A211_p24_loss_against_load", "a211_analyze.py", "a211_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -578,6 +579,9 @@ EXCEPTIONS["A208"] = {("runs/m20", "r3"): _A208["r3"], ("runs/v20", "r3"): _A208
 _A210 = "nominal 0.75 L0 with 20 % of the load is below its floor: the register sits at the 4.0 ns limit, 65 A are delivered and Vo " \
         "ends at 1.060 V with clean switching - the floor the experiment was run to find (RESULTS 0)"
 EXCEPTIONS["A210"] = {("runs/r_N75_25_20", "r2"): _A210, ("runs/r_N75_25_20", "r3"): _A210}
+_A211 = "the slow board's two-cycle orbit (A195) is wider at 40-50 % of the load: valleys alternate between -17 and -7 A, past the " \
+        "band's -8 A edge; the row regulates with no late fire at its end (RESULTS 0)"
+EXCEPTIONS["A211"] = {("runs/e_S75_25_50", "r4"): _A211, ("runs/e_S75_25_40", "r4"): _A211}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
