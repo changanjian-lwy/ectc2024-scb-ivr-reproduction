@@ -1,0 +1,4 @@
+T0_N75_25_ls0p3
+T0_S75_25_ls0p3
+T0_S75_c0_ls0p3
+T0_S75_hot_ls0p3
