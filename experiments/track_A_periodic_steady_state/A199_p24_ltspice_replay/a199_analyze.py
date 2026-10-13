@@ -8,6 +8,8 @@ Each replay covers two phase-1 periods from its snapshot. Criteria per replay (L
  c2 one period later: phase currents within 1.5 A, flying-capacitor voltages within 20 mV, Vo within 0.5 mV;
  c3 every switch's largest V_DS over the section interval within 1.5 V;
  c4 every hard high-side turn-on: channel start within 0.3 ns and V_DS there within 1.0 V.
+Post hoc diagnostics (no criteria; DIAG): the first three settled snapshots again with the low sides' turn-on
+resistance at 0.3 and 1.0 ohm in LTspice (the plant's commands unchanged), to trace the one-period difference.
   python3 a199_analyze.py identity   the records' sections against A194's N0 record made before the snapshot code
   python3 a199_analyze.py run [--jobs 4]   the missing replays -> replays/<run>_<window>_k<k>_<rph>.json
   python3 a199_analyze.py            -> a199_summary.json"""
@@ -55,13 +57,25 @@ def plan(name, rec):
     return [("T", k, "match") for k in ks]
 
 
+DIAG = (0.3, 1.0)                        # ohm: low-side turn-on resistance in the diagnostic replays
+
+
+def diag_plan(name, rec):
+    g = groups(rec)
+    return [("P", g[1][q], "match", r) for q in range(3) for r in DIAG] if name == "N0_steady" else []
+
+
+def fname(name, label, k, rph, r_ls=None):
+    return f"{name}_{label}_k{k}_{rph}" + ("" if r_ls is None else f"_ls{r_ls:g}".replace(".", "p")) + ".json"
+
+
 def one(arg):
-    name, label, k, rph = arg
+    name, label, k, rph, r_ls = arg
     import p24_replay as R
     rec = R.load(HERE / "cosim" / f"run_{name}.json")
-    o = R.replay(rec, k, PERIODS, rph, tag=f"a199_{name}_{label}")
-    (REP / f"{name}_{label}_k{k}_{rph}.json").write_text(json.dumps(o, indent=1) + "\n")
-    return f"{name} {label} " + R.brief(o)
+    o = R.replay(rec, k, PERIODS, rph, tag=f"a199_{name}_{label}", r_on_ls=r_ls)
+    (REP / fname(name, label, k, rph, r_ls)).write_text(json.dumps(o, indent=1) + "\n")
+    return f"{name} {label} {'' if r_ls is None else f'ls {r_ls} '}" + R.brief(o)
 
 
 def run(jobs):
@@ -70,7 +84,8 @@ def run(jobs):
     for f in sorted((HERE / "cosim").glob("run_*.json")):
         name = f.stem[4:]
         rec = json.loads(f.read_text())
-        todo += [(name, lab, k, rph) for lab, k, rph in plan(name, rec) if not (REP / f"{name}_{lab}_k{k}_{rph}.json").exists()]
+        todo += [(name, lab, k, rph, None) for lab, k, rph in plan(name, rec) if not (REP / fname(name, lab, k, rph)).exists()]
+        todo += [(name, lab, k, rph, r) for lab, k, rph, r in diag_plan(name, rec) if not (REP / fname(name, lab, k, rph, r)).exists()]
     print(len(todo), "replays to run", flush=True)
     with ProcessPoolExecutor(jobs) as ex:
         for line in ex.map(one, todo):
@@ -84,13 +99,31 @@ def judge(o):
     hard = [x for x in o["turnons"] if x["plant_t_act_s"] is not None]
     t_on = [abs(x["lt_t_act_s"] - x["plant_t_act_s"]) if x["lt_t_act_s"] is not None else float("inf") for x in hard]
     v_on = [abs(x["lt_vds_act_v"] - x["plant_vds_act_v"]) if x["lt_vds_act_v"] is not None else float("inf") for x in hard]
+    vsg = [a - b for r in o["vds_max"] if r["plant_v"] for a, b in zip(r["lt_v"], r["plant_v"])]
+    ls, w = o["loss"], lambda uj: sum(uj) * 1e-6 / o["loss"]["period_s"]
+    mean = lambda xs: sum(xs) / len(xs) if xs else None
+    first = {}                                       # each phase's first hard turn-on in the replay (the least drifted)
+    for x in hard:
+        first.setdefault(x["phase"], x)
     m = {"start_v": o["start_err_v_max"], "start_i": o["start_err_i_max"], "peak_max": max(pk, default=None),
          "peak_signed": [x["lt_a"] - x["plant_a"] for x in o["peaks"] if x["plant_a"] is not None],
          "di": s1["di"], "dvcs": s1["dvcs"], "dvo": s1["dv"]["out"], "di_2": o["state"][1]["di"] if len(o["state"]) > 1 else None,
          "valley_signed": [x["lt_a"] - x["plant_a"] for x in o["valleys"]], "vds_max": max(vd, default=None),
          "t_on_max": max(t_on, default=None), "v_on_max": max(v_on, default=None), "hard_turnons": len(hard),
          "turnons": len(o["turnons"]), "plant_peak_max": max((x["plant_a"] for x in o["peaks"] if x["plant_a"] is not None), default=None),
-         "lt_peak_max": max((x["lt_a"] for x in o["peaks"]), default=None)}
+         "lt_peak_max": max((x["lt_a"] for x in o["peaks"]), default=None),
+         "vds_signed_extremes": [min(vsg), max(vsg)] if vsg else None,
+         "vds_lt_max": max((v for r in o["vds_max"] for v in r["lt_v"]), default=None),
+         "vds_plant_max": max((v for r in o["vds_max"] if r["plant_v"] for v in r["plant_v"]), default=None),
+         "first_turn_on": {str(ph): {"dt_ns": 1e9 * (x["lt_t_act_s"] - x["plant_t_act_s"]), "dv_v": x["lt_vds_act_v"] - x["plant_vds_act_v"]}
+                           for ph, x in first.items() if x["lt_t_act_s"] is not None},
+         "loss_w": {"lt_channel": w(ls["lt_channel_uj"]), "lt_high": w(ls["lt_channel_uj"][:4]), "lt_low": w(ls["lt_channel_uj"][4:]),
+                    "lt_rph": w(ls["lt_rph_uj"]), "plant_r": w(ls["plant_r_uj"]),
+                    "plant_edge": w(ls["plant_edge_uj"]) if ls["plant_edge_uj"] else None,
+                    "plant_rev": w(ls["plant_rev_uj"]) if ls["plant_rev_uj"] else None},
+         "ls_turn_on": {"e_uj": mean([x["e_uj"] for x in ls["ls_turn_on"]]), "rev_nvs": mean([x["rev_nvs"] for x in ls["ls_turn_on"]]),
+                        "r_only_nvs": mean([x["r_only_nvs"] for x in ls["ls_turn_on"]]), "i_a": mean([x["i_a"] for x in ls["ls_turn_on"]])},
+         "period_ns": 1e9 * ls["period_s"], "vo_mean_v": ls["vo_mean_v"], "r_on_ls": o.get("r_on_ls")}
     ok = lambda v, lim: v is not None and v <= lim
     m["criteria"] = {"c0": o["start_err_v_max"] <= LIM["v0"] and o["start_err_i_max"] <= LIM["i0"],
                      "c1": ok(m["peak_max"], LIM["peak"]),
@@ -121,20 +154,29 @@ def main():
         rec = json.loads(f.read_text())
         rows = {}
         for lab, k, rph in plan(name, rec):
-            p = REP / f"{name}_{lab}_k{k}_{rph}.json"
+            p = REP / fname(name, lab, k, rph)
             if p.exists():
                 rows[f"{lab}_k{k}_{rph}"] = judge(json.loads(p.read_text()))
+        diag = {}
+        for lab, k, rph, r in diag_plan(name, rec):
+            p = REP / fname(name, lab, k, rph, r)
+            if p.exists():
+                m = judge(json.loads(p.read_text()))
+                m.pop("criteria")                                   # diagnostics are not judged
+                diag[f"{lab}_k{k}_{rph}_ls{r:g}"] = m
         res[name] = {"snapshots": len(rec["snaps"]), "commit": rec["provenance"]["git_commit"][:7],
                      "sources_modified": rec["provenance"]["cosim_sources_modified"], "replays": rows,
-                     "criteria": {k: v["criteria"] for k, v in rows.items()}}
+                     "criteria": {k: v["criteria"] for k, v in rows.items()}, "diagnostics": diag}
     (HERE / "a199_summary.json").write_text(json.dumps(res, indent=1) + "\n")
     f1 = lambda xs: " ".join(f"{x:+.2f}" for x in xs)
     for name, r in res.items():
-        for k, m in r["replays"].items():
+        for k, m in list(r["replays"].items()) + [("diag " + a, b) for a, b in r["diagnostics"].items()]:
             print(f"{name:10s} {k:14s} start {m['start_v'] * 1e3:.2f} mV / {m['start_i']:.3f} A | peaks {f1(m['peak_signed'])} A "
                   f"(plant max {m['plant_peak_max']:.1f}) | 1 period di {f1(m['di'])} A dVcs {f1([x * 1e3 for x in m['dvcs']])} mV "
                   f"dVo {m['dvo'] * 1e3:+.3f} mV | V_DS {m['vds_max']} V | turn-on {m['hard_turnons']}/{m['turnons']} hard, "
-                  f"t {None if m['t_on_max'] is None else round(m['t_on_max'] * 1e9, 3)} ns V {m['v_on_max']} | {m['criteria']}")
+                  f"t {None if m['t_on_max'] is None else round(m['t_on_max'] * 1e9, 3)} ns V {m['v_on_max']} | loss W: LT channel "
+                  f"{m['loss_w']['lt_channel']:.2f} + Rph {m['loss_w']['lt_rph']:.2f}, plant R {m['loss_w']['plant_r']:.2f} + edge "
+                  f"{m['loss_w']['plant_edge']} | {m.get('criteria', '')}")
 
 
 if __name__ == "__main__":

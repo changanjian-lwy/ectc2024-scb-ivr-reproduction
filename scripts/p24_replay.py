@@ -7,7 +7,8 @@ periods) starts LTspice from snapshot k, replays the commands over `periods` pha
 - each high-side turn-off: the plant's physical peak (gate_offs_last) against the largest phase current around it;
 - each low-side turn-off command: the phase current there (lowoffs_last), and LTspice's valley after it;
 - each high-side turn-on: V_DS at the command and at the channel's start, and the start's instant (turnons_last);
-- each switch's largest V_DS over the section intervals inside the window (sections' vds_win_v).
+- each switch's largest V_DS over the section intervals inside the window (sections' vds_win_v);
+- the phase currents at every applied edge, and where the energy goes over the first period (_loss).
 
 LTspice circuit = the plant's (circuit.py: four phases, a loop inductance with damping per high side, flying
 capacitors, output capacitor, load) with n_high / n_low flattened vendor devices per switch. Each gate has its own
@@ -45,6 +46,8 @@ T_REL = 0.2e-9
 TAIL = 30e-9
 ACT_I = 0.01                             # A per device: the plant's start-of-channel level (gate.py)
 K2 = "k2=2.115e+00"                      # the vendor model's threshold parameter as written in the library
+L_IDEAL = "Rser=0 Rpar=1e15"             # LTspice gives every inductor 1 mOhm in series (and a parallel damper)
+                                         # unless told otherwise; 1 mOhm is twice the plant's whole phase resistance
 HOLD_RON = 1e-3                          # ohm, as in D79's edge netlists (LTspice does not start with 1e-5 or less);
                                          # a held node that carries I amps therefore sits I mV off until the release
 
@@ -115,7 +118,7 @@ def _ctl(rec, j, t0, t1, level0, held0=False):
     return _pwl(pc), _pwl(pu)
 
 
-def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
+def netlist(rec, k, periods=2, rph="match", maxstep=5e-12, r_on_ls=None):
     import p24_ltspice as LT
     c = rec["snap_circuit"]
     if c["n"] != 4 or c["gate_l_cs"] or c["gate_cg_scale"] != 1.0:
@@ -136,7 +139,8 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         pr = [x.replace(K2, f"k2={2.115 + c['gate_dk2']:.4f}") for x in pr]
     lines = [f"* A199 replay, snapshot {k}, plant t0 = {t0:.9e} s", f".temp {c['gate_temp']}"] + pr
     lines.append("Vin vin 0 " + _pwl([(0.0, cp.vin_at(t0))] + [(t - t0 + T_REL, cp.vin_at(t)) for t in brk]))
-    g_drv = f"(V({{u}})/{c['gate_r_on']:.6g}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
+    g_drv = f"(V({{u}})/{{r_on:.6g}}+(1-V({{c}}))/{c['gate_r_off']:.6g})*({c['gate_v_on']:.6g}*V({{c}})-V({{g}},{{s}}))"
+    r_on = {"h": c["gate_r_on"], "l": c["gate_r_on"] if r_on_ls is None else r_on_ls}     # r_on_ls: a diagnostic variant
     ic, g = dict(v), s0["gate"]
     del ic["vin"]
 
@@ -149,14 +153,14 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         for m in "abc"[:n_dev]:
             inst, gn = f"{tag}{q}{m}", f"g{tag}{q}{m}"
             lines.extend(LT.instance(el, inst, gn, drain, src))
-            lines.append(f"Bd_{inst} {src} {gn} I=" + g_drv.format(u=f"u{tag}{q}", c=f"c{tag}{q}", g=gn, s=src))
+            lines.append(f"Bd_{inst} {src} {gn} I=" + g_drv.format(u=f"u{tag}{q}", c=f"c{tag}{q}", g=gn, s=src, r_on=r_on[tag]))
             ic[gn] = ic[f"{inst}_g"] = vs + vg
             ic[f"{inst}_d"], ic[f"{inst}_s"] = v[drain], vs
 
     for q in range(1, 5):
         up, h = UP[q - 1], f"h{q}"
         drift = (v[up] - v[h]) / c["loop_l"] * T_REL                       # the hold keeps both ends fixed
-        lines.append(f"Ll{q} {up} {h} {c['loop_l']:.9e} ic={iloop[q - 1] - drift:.9g}")
+        lines.append(f"Ll{q} {up} {h} {c['loop_l']:.9e} ic={iloop[q - 1] - drift:.9g} {L_IDEAL}")
         if c["loop_rp"] > 0:
             lines.append(f"Rl{q} {up} {h} {c['loop_rp']:.9g}")
         switch("h", q, q - 1, h, SRC[q - 1], c["n_high"])
@@ -164,7 +168,7 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
         switch("l", q, 3 + q, f"x{q}", "0", c["n_low"])
         vm = v["out"] + il[q - 1] * rphv
         drift = (v[f"x{q}"] - vm) / c["L"] * T_REL
-        lines.append(f"Lp{q} x{q} m{q} {c['L']:.9e} ic={il[q - 1] - drift:.9g}")
+        lines.append(f"Lp{q} x{q} m{q} {c['L']:.9e} ic={il[q - 1] - drift:.9g} {L_IDEAL}")
         lines.append(f"Rph{q} m{q} out {max(rphv, 1e-9):.9g}")
         ic[f"m{q}"] = vm
     lines.extend(f"Cs{q} a{q} x{q} {c['cs']:.9e}" for q in range(1, 4))
@@ -189,7 +193,7 @@ def netlist(rec, k, periods=2, rph="match", maxstep=5e-12):
     for q in range(1, 5):
         save += [f"V(gh{q}a)", f"V(gl{q}a)", f"I(Bswitch_h{q}a)", f"I(Bswitch_l{q}a)"]
     lines.append(".save " + " ".join(save))
-    return "\n".join(lines) + "\n", {"t0": t0, "t1": t1, "rph_ohm": rphv, "rph": rph, "rds": rinfo}
+    return "\n".join(lines) + "\n", {"t0": t0, "t1": t1, "rph_ohm": rphv, "rph": rph, "rds": rinfo, "r_on_ls": r_on["l"]}
 
 
 def compare(rec, k, periods, names, a, meta):
@@ -251,6 +255,9 @@ def compare(rec, k, periods, names, a, meta):
                    "lt_vds_act_v": at(vds[ph - 1], t_lt) if t_lt is not None else None,
                    "lt_vds_at_plant_act_v": at(vds[ph - 1], x["t_act_s"]) if x.get("t_act_s") else None})
     out["turnons"] = on
+    out["edges"] = [{"t_s": e["t_s"], "j": e["j"], "level": int(e["level"]), "plant_i": e["i"][:4],
+                     "lt_i": [at(ip[r], e["t_s"]) for r in range(4)]} for e in rec["edges_log"] if t0 - 1e-15 <= e["t_s"] <= t1]
+    out["loss"] = _loss(rec, k, t, vn, ip, vds, col, c, meta)
     sec = [s for s in rec["sections"] if t0 <= s["t_s"] <= t1]
     out["vds_max"] = [{"t_a_s": sa["t_s"], "t_b_s": sb["t_s"], "plant_v": sb.get("vds_win_v"),
                        "lt_v": [float(seg(vds[j], sa["t_s"], sb["t_s"]).max()) for j in range(8)]}
@@ -259,16 +266,58 @@ def compare(rec, k, periods, names, a, meta):
     return out
 
 
-def replay(rec, k, periods=2, rph="match", tag="a199", keep_raw=False, maxstep=5e-12):
+def _loss(rec, k, t, vn, ip, vds, col, c, meta):
+    """Where the energy goes in LTspice over the first period after the snapshot (uJ; channel = terminal V_DS times
+    the channel current of one device times the number in parallel), next to what the plant books for a period:
+    R i^2 with its lumped R (on LTspice's currents), its edge energy and its reverse-conduction energy (the section
+    that closes inside the period)."""
+    t0, ta = meta["t0"], rec["snaps"][k + 1]["t_s"]
+    m = (t >= t0) & (t <= ta)
+    tt = t[m]
+    integ = lambda x: float(np.trapezoid(x[m], tt))
+    n = [c["n_high"]] * 4 + [c["n_low"]] * 4
+    ich = [col(f"I(Bswitch_h{q}a)") for q in range(1, 5)] + [col(f"I(Bswitch_l{q}a)") for q in range(1, 5)]
+    e_sw = [1e6 * integ(vds[j] * ich[j] * n[j]) for j in range(8)]
+    e_rph = [1e6 * meta["rph_ohm"] * integ(ip[q] ** 2) for q in range(4)]
+    e_plant_r = [1e6 * c["R"] * integ(ip[q] ** 2) for q in range(4)]
+    sec = [s for s in rec["sections"] if t0 < s["t_s"] <= ta]
+    ls_on, hs_on = [], []
+    ev = [e for e in rec["edges_log"] if t0 - 1e-15 <= e["t_s"] <= ta]
+    for e in ev:                                   # the 40 ns after each high-side turn-off: the low side's turn-on
+        if e["j"] < 4 and not e["level"] and e["t_s"] + 40e-9 <= t[-1]:
+            q = e["j"]
+            w = (t >= e["t_s"]) & (t <= e["t_s"] + 40e-9)
+            ls_on.append({"phase": q + 1, "t_s": e["t_s"], "i_a": e["i"][q],
+                          "e_uj": 1e6 * float(np.trapezoid((vds[4 + q] * ich[4 + q] * n[4 + q])[w], t[w])),
+                          "rev_nvs": 1e9 * float(np.trapezoid(np.maximum(-vds[4 + q][w], 0.0), t[w])),
+                          "r_only_nvs": 1e9 * float(np.trapezoid((ip[q] * c["R"])[w], t[w]))})
+    on_t = {}
+    for e in ev:                                   # each high-side on-time: the channel's drop while it conducts
+        if e["j"] < 4:
+            if e["level"]:
+                on_t[e["j"]] = e["t_s"]
+            elif e["j"] in on_t:
+                q, ts = e["j"], on_t.pop(e["j"])
+                w = (t >= ts) & (t <= e["t_s"])
+                hs_on.append({"phase": q + 1, "t_s": ts, "e_uj": 1e6 * float(np.trapezoid((vds[q] * ich[q] * n[q])[w], t[w])),
+                              "vds_nvs": 1e9 * float(np.trapezoid(vds[q][w], t[w]))})
+    return {"period_s": ta - t0, "lt_channel_uj": e_sw, "lt_rph_uj": e_rph, "plant_r_uj": e_plant_r,
+            "plant_edge_uj": [1e6 * x for x in sec[-1].get("edge_energy_j", [0.0] * 8)] if sec else None,
+            "plant_rev_uj": [1e6 * x for x in sec[-1].get("rev_energy_j", [0.0] * 8)] if sec else None,
+            "i_rms_a": [float(np.sqrt(integ(ip[q] ** 2) / (ta - t0))) for q in range(4)],
+            "vo_mean_v": integ(vn["out"]) / (ta - t0), "ls_turn_on": ls_on, "hs_on_time": hs_on}
+
+
+def replay(rec, k, periods=2, rph="match", tag="a199", keep_raw=False, maxstep=5e-12, r_on_ls=None):
     import p24_ltspice as LT
-    net, meta = netlist(rec, k, periods, rph, maxstep)
-    name = f"{tag}_k{k}_{rph}"
+    net, meta = netlist(rec, k, periods, rph, maxstep, r_on_ls)
+    name = f"{tag}_k{k}_{rph}" + ("" if r_on_ls is None else f"_ls{r_on_ls:g}".replace(".", "p"))
     res = LT.run(name, net, timeout=7200)
     if res["raw"] is None:
         raise RuntimeError("LTspice gave no waveform: " + res["log"][-400:])
     names, a = res["raw"]
     out = compare(rec, k, periods, names, a, meta)
-    out["points"] = int(a.shape[0])
+    out["points"], out["r_on_ls"] = int(a.shape[0]), meta["r_on_ls"]
     if not keep_raw:
         (LT.WORK / f"{name}.raw").unlink(missing_ok=True)
     return out
@@ -297,11 +346,12 @@ def main(argv=None):
     ap.add_argument("--out")
     ap.add_argument("--tag", default="a199")
     ap.add_argument("--keep-raw", action="store_true")
+    ap.add_argument("--r-on-ls", type=float, default=None, help="low-side turn-on resistance, ohm (diagnostic variant)")
     a = ap.parse_args(argv)
     rec = load(a.record)
     res = []
     for k in a.k:
-        o = replay(rec, k, a.periods, a.rph, a.tag, a.keep_raw)
+        o = replay(rec, k, a.periods, a.rph, a.tag, a.keep_raw, r_on_ls=a.r_on_ls)
         res.append(o)
         print(brief(o), flush=True)
     if a.out:
