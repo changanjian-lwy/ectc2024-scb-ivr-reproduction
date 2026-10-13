@@ -87,3 +87,37 @@ Stage 1 and 2, every cosim run (A194's absolute criteria):
   V5's, ton_s is raised by that difference / 28.3 mV per ns (A155) and the E run repeated once, before stage 2.
 - Stage 2: all pass: the binding rows are restated on V6 with their margins. A miss: reported as "the row does not
   hold on V6" with the record; a remedy is a new experiment, not part of A206.
+
+## 5. Addendum, written before the second round (2026-10-13)
+Sections 1-4 stand as registered. This section was written after the first round's 12 runs and 26 replays
+(b110c31 / 2ef2659; kept as cosim_r1/, replays_r1/, a206_summary_r1.json, trims_r1.json) and before any second-round run.
+- First round, replays: c1 19, c2 19, c3 24, c4 21 of 26; c0 0.
+  - Settled mode P, 12 replays at 3.0 / 1.0 / 0.3 ohm: c1-c4 pass, currents within 0.68 A one period later, the loss
+    books within 0.8 % (c5 passes at all three).
+  - c2 misses in mode S on 4 of 4 (LTspice 1.62-1.79 A higher per period, peaks up to 3.6 A higher) and on N75 at the
+    step's peak on 3 of 3 (1.52-1.71 A against 1.5 A).
+  - c0 misses everywhere on capacitor 1's voltage alone: 5.6-9.0 mV against 5 mV. The replay holds every node through
+    1 mOhm while the phase current flows. Currents arrive within 0.003 A, Vo within 0.01 mV.
+- Cause in mode S, from LTspice's waveform of the first round's record (snapshot 0): a low side commanded off at
+  37 A reverse current keeps conducting while its gate discharges (V_DS -0.03 / -0.40 / -1.22 / -1.74 V after
+  1 / 2 / 3 / 4 ns). The plant opens it at once and its fit carries the current at 2.16 V: 18.4 against 12.5 nVs in
+  the 9 ns before the high side's channel starts. V5 has the same simplification; there it offset the missing turn-on,
+  which is why A205's mode-S replays passed.
+- The one model round Section 4 allows: a conducting switch commanded off at reverse current is an edge (same cfg
+  switch, gate "zvs_edge"); its channel conducts until the gate is below 0.1 V. Harness: 12.73 nVs against LTspice's
+  12.50, the high side's channel start 6.96 against 7.0 ns.
+- Second round: the 8 stage-1 runs, the 26 replays and the 4 start-up runs again from the new commit. Criteria and
+  limits unchanged. A second miss of c2 or c5 is reported as the plant's stated error. r_on_ls is chosen again from
+  the second round by the same rule.
+- Corrections to Section 4 (my errors in registering):
+  - "28.3 mV per ns (A155)" is the slope of the earlier start-up (424 ns period). The present start-up runs at
+    200 ns; its measured slope is 53.5 mV per ns on nominal and 54.5 on slow boards (A190 table.json, from A183).
+    These are used.
+  - The rule named the E run (N0) and one direction only. Stage 2 has three boards, each with its own 25 C trim on
+    V5 (A184). Extension: for N0, N75 and S75 at 25 C, Vo half a microsecond before the handover is compared with
+    the board's V5 record; more than 10 mV away, in either direction: ton_s moves by the difference / slope. The
+    board's 25 C figure is used at its other temperatures (A190's cold table stays on top). One start-up run per
+    stage-2 board and temperature with the new trims (T1; N0's is the E run repeated) must pass c6 before stage 2.
+- Predictions for the second round: mode S passes c2 (within 1.0 A); the settled replays move by less than 0.1 A;
+  N75 at the peak ends within 0.5-1.5 A and may still miss; the loss books of settled mode P move by less than
+  0.3 W; mode S's Vo rises 20-35 mV against the first round, so at 0.3 ohm it is 8-22 mV above V5's and ton_s goes down.

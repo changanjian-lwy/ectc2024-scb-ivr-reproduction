@@ -10,8 +10,10 @@ Vo <= 1.05 V up to 300 us and within 1 V +- 50 mV from 20 us after the handover.
 settled numbers, and the plant's loss books over the last WIN_US of a steady run from the record alone (conduction
 rebuilt from the logged currents at every gate command; LS_q also carries phase q + 1 during its high side's on-time).
 Start-up trims (BOUNDARY Section 4; `trims R`): per stage-2 board and temperature, Vo half a microsecond before the
-earlier of the two handovers, V5's record against V6's run with the V5 trim. Below V5's by more than 10 mV: ton_s is
-raised by the difference / the measured start-up slope (A190 table.json: 53.5 mV per ns nominal, 54.5 slow).
+earlier of the two handovers, V5's record against V6's run with the V5 trim. More than 10 mV away: ton_s moves by
+the difference / the measured start-up slope (A190 table.json: 53.5 mV per ns nominal, 54.5 slow). The
+board's 25 C value is applied at all its temperatures (a per-board calibration, as the V5 trims are; the cold table
+of A190 stays on top). Every row's own figure is kept in trims.json.
   python3 a206_analyze.py run [--jobs 3]   the missing replays -> replays/
   python3 a206_analyze.py trims 0.3        -> trims.json (from the T0 runs and stage 1's E run)
   python3 a206_analyze.py                  -> a206_summary.json"""
@@ -155,18 +157,21 @@ def whole(path):
            "after_pk": pk(tp + 25e-6, t_ev if t_ev else te), "post_pk": pk(t_ev, 1.0) if t_ev else None,
            "vds_whole": max(r["vds_max_v"]), "vds_by_switch": r["vds_max_v"],
            "vo_max_to_300us": float(vo[ts <= 300e-6].max()), "vo_at_143p5_v": float(np.interp(T_VO_US * 1e-6, ts, vo)),
-           "vo_dev_max_mv": 1e3 * float(np.abs(vo[ts >= tp + 20e-6] - 1.0).max()), "t_mode_p_us": tp * 1e6,
+           "vo_dev_max_mv": 1e3 * float(np.abs(vo[ts >= tp + 20e-6] - 1.0).max()) if (ts >= tp + 20e-6).any() else None,
+           "t_mode_p_us": tp * 1e6,
            "t_hand_req_us": None if r.get("t_hand_req_s") is None else r["t_hand_req_s"] * 1e6,
            "late_fires": r["late_fires"], "ls_hard_on": gs["on"][4:], "ls_zvs_on": gs["on_zvs"][4:],
            "zvs_edges": gs.get("zvs_edges"), "zvs_waits": gs.get("zvs_waits"), "active_zvs_s": gs.get("active_zvs_s"),
+           "zvs_offs": gs.get("zvs_offs"), "active_zvs_off_s": gs.get("active_zvs_off_s"), "off_rev": gs["off_rev"],
            "delay_on_s": gs["delay_on_s"], "active_on_ls_s": gs.get("active_on_ls_s"), "didt_on_max_a_ns": gs["didt_on_max_a_ns"],
            "gate_steps": gs["steps"], "steps": r["steps"]}
     pks = [x for x in (out["start_pk"], out["hand_pk"], out["after_pk"], out["post_pk"]) if x is not None]
     out["peak_whole"] = max(pks)
     out["criteria"] = {"c6": bool(r["status"] == "COMPLETED" and not out["shoot_on"] and not out["overlaps"] and not out["forced"]
                                   and out["peak_whole"] <= I_LIM and out["vds_whole"] <= V_LIM
-                                  and out["vo_max_to_300us"] <= VO_START and out["vo_dev_max_mv"] <= 1e3 * VO_BAND)}
-    if t_ev is None:                                  # a steady run: the settled window's books
+                                  and out["vo_max_to_300us"] <= VO_START
+                                  and (out["vo_dev_max_mv"] is None or out["vo_dev_max_mv"] <= 1e3 * VO_BAND))}
+    if t_ev is None and r.get("edges_log") and te > 250e-6:   # a steady run with its edge log: the settled window's books
         tb = float(ts[-1]); ta = float(ts[np.searchsorted(ts, tb - WIN_US * 1e-6)])
         m = (ts > ta) & (ts <= tb)
         e_edge = np.sum([q["edge_energy_j"] for q, k in zip(sec, m) if k], axis=0) / (tb - ta)
@@ -209,16 +214,18 @@ def trims(r_ls):
         a, b = startup(ref), startup(p6)
         t_ref = min(a["tp"], b["tp"]) - 0.5e-6
         v5, v6 = float(np.interp(t_ref, a["t"], a["vo"])), float(np.interp(t_ref, b["t"], b["vo"]))
-        d = round((v5 - v6) / SLOPE[key.split("_")[0]], 3) if v5 - v6 > TRIM_MIN_V else 0.0
+        d = round((v5 - v6) / SLOPE[key.split("_")[0]], 3) if abs(v5 - v6) > TRIM_MIN_V else 0.0
         out["rows"][key] = {"v5_record": str(ref.relative_to(TA)), "t_ref_us": t_ref * 1e6, "vo_v5": v5, "vo_v6": v6,
                             "t_mode_p_us": [a["tp"] * 1e6, b["tp"] * 1e6],
                             "t_req_us": [None if x["req"] is None else x["req"] * 1e6 for x in (a, b)],
                             "start_pk": [a["start_pk"], b["start_pk"]], "hand_pk": [a["hand_pk"], b["hand_pk"]],
                             "vo_max": [a["vo_max"], b["vo_max"]], "ton_s_ns": b["ton_s_ns"], "dton_s_ns": d}
-        out["dton_s_ns"][key] = d
-        print(f"{key:8s} t_ref {t_ref * 1e6:7.2f} us Vo V5 {v5:.4f} V6 {v6:.4f} ({1e3 * (v6 - v5):+.1f} mV) -> ton_s +{d} ns | entry "
+        print(f"{key:8s} t_ref {t_ref * 1e6:7.2f} us Vo V5 {v5:.4f} V6 {v6:.4f} ({1e3 * (v6 - v5):+.1f} mV) -> ton_s {d:+} ns | entry "
               f"{a['tp'] * 1e6:.1f} / {b['tp'] * 1e6:.1f} us | start {a['start_pk']:.1f} / {b['start_pk']:.1f} A hand {a['hand_pk']:.1f} / "
               f"{b['hand_pk']:.1f} A | Vo max {a['vo_max']:.4f} / {b['vo_max']:.4f}")
+    for key in V5_REF:                                # the trim is the board's 25 C calibration, at every temperature
+        out["dton_s_ns"][key] = out["rows"][key.split("_")[0] + "_25"]["dton_s_ns"]
+    print("applied:", out["dton_s_ns"])
     (HERE / "trims.json").write_text(json.dumps(out, indent=1) + "\n")
 
 
@@ -253,9 +260,9 @@ def main():
     f1 = lambda xs: " ".join(f"{x:+.2f}" for x in xs)
     for n, m in list(res["v5"].items()) + list(res["runs"].items()):
         s = m.get("settled")
-        print(f"{n:22s} {m['status'][:4]} pk start {m['start_pk']:.1f} hand {m['hand_pk']:.1f} after {m['after_pk']:.1f} post "
+        print(f"{n:22s} {m['status'][:4]} pk start {m['start_pk']:.1f} hand {m['hand_pk']:.1f} after {m['after_pk']} post "
               f"{m['post_pk']} | V_DS {m['vds_whole']:.1f} | Vo max {m['vo_max_to_300us']:.4f} at 143.5 {m['vo_at_143p5_v']:.4f} dev "
-              f"{m['vo_dev_max_mv']:.1f} mV | shoot {m['shoot_on']} forced {m['forced']} holds {m['il_holds']} late {m['late_fires']} | "
+              f"{m['vo_dev_max_mv']} mV | shoot {m['shoot_on']} forced {m['forced']} holds {m['il_holds']} late {m['late_fires']} | "
               f"{m['criteria']}" + (f" | settled: Ton {s['ton_cmd_ns']:.2f} ns T {s['period_ns']:.1f} ns peak {s['peak_a'][0]:.1f}-{s['peak_a'][1]:.1f} A "
                                     f"books {' '.join(f'{k} {v:.2f}' for k, v in s['books_w'].items())} total {s['books_total_w']:.2f} W "
                                     f"eff {100 * s['eff_books']:.2f} %" if s else ""))

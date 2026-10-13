@@ -17,7 +17,10 @@ the gate:
   keeps its channel equation until the gate has charged);
 - turn-off with forward current: conducting while the gate discharges (pending) until the channel needs gate_v_hand
   of V_DS to carry the switch current, then active; open once the channel carries < ACT_I per device;
-- turn-off with zero or reverse current: open at once.
+- turn-off with zero or reverse current: open at once; with gate_zvs_edge (A206) a conducting switch that carries
+  reverse current is an edge instead, active from the command: its channel keeps conducting (third quadrant) while
+  the gate discharges, and the plant's Vf + R fit takes over once the gate is below ZVS_OFF_V. For the interlock it
+  counts as conducting only while its gate is above the channel start.
 Active switches are open in the matrix; their channel current n i_ch(v_gs, V_DS) is a source from drain to source,
 solved with the plant state and each gate's charge balance by Newton on the step (trapezoid, or backward Euler with
 the plant's Euler steps):
@@ -48,6 +51,7 @@ ACT_I = 0.01            # A per device: channel current that starts / ends an ac
 T_ACTIVE_MAX = 200e-9   # an active edge still running then is ended (counted)
 OFF_LOG = 20000         # physical high-side turn-offs kept (the last ones)
 MILLER_DV = 0.05        # V: an idle off gate is updated (gate_miller) when its V_DS has moved this much
+ZVS_OFF_V = 0.1         # V: a reverse-current turn-off edge (gate_zvs_edge) ends when its gate is below this
 
 
 def _sp(x):
@@ -172,8 +176,9 @@ class GateEdges:
         if self.il:
             self.stats.update(il_holds=[0] * n2, il_hold_max_s=0.0)
         if self.zvs_edge:                               # A206: turn-ons at V_DS <= 0 that ran as edges
-            self.stats.update(zvs_edges=[0] * n2, zvs_waits=[0] * n2, e_zvs_j=[0.0] * n2,
-                              active_zvs_s=[[math.inf, 0.0] for _ in range(n2)])
+            self.stats.update(zvs_edges=[0] * n2, zvs_waits=[0] * n2, zvs_offs=[0] * n2, e_zvs_j=[0.0] * n2,
+                              active_zvs_s=[[math.inf, 0.0] for _ in range(n2)],
+                              active_zvs_off_s=[[math.inf, 0.0] for _ in range(n2)])
         self.ls_keys = any(j >= p.n for j in self.sw)    # A169: gate-driven low sides keep their own edge times
         if self.ls_keys:
             self.stats.update({k: [math.inf, 0.0] for k in LS_KEYS})
@@ -183,8 +188,12 @@ class GateEdges:
     def conducts(self, j):
         """Switch j carries channel current: commanded on, or (gate-driven, A169) a turn-off not yet ended."""
         s = self.st.get(j)
-        return bool((self.plant.gh + self.plant.gl)[j]) or (s is not None and s["kind"] == "off"
-                                                             and s["phase"] in ("pending", "active"))
+        if bool((self.plant.gh + self.plant.gl)[j]):
+            return True
+        if s is None or s["kind"] != "off" or s["phase"] not in ("pending", "active"):
+            return False
+        # A206: a reverse-current turn-off conducts (for the interlock) while its gate is above the channel start
+        return (not s.get("zvs")) or self.fd.i_ch(s["vgs"], self.p.gate_v_hand) >= ACT_I
 
     def il_update(self):
         """A170: a held turn-on whose complement stopped conducting starts gate_t_il from now."""
@@ -380,6 +389,9 @@ class GateEdges:
             i_sw = pl.sim.g_sw[j] * vds if conducting_now else 0.0
             if i_sw <= 0.0:
                 self.stats["off_rev"][j] += 1
+                if self.zvs_edge and conducting_now and i_sw < 0.0:    # A206: the channel conducts until the gate
+                    s.update(phase="pending", kind="off", vds=vds, i_s=i_sw / n, t_act=t, zvs=True)   # has discharged
+                    self.stats["zvs_offs"][j] += 1
                 return
             self.stats["off"][j] += 1
             v_act = d.vgs_for(i_sw / n, self.p.gate_v_hand)
@@ -418,9 +430,12 @@ class GateEdges:
                 self._sync(j, pl.t)
                 s["phase"], s["t_act"], s["t_a0"] = "active", math.inf, pl.t
                 vds = float(pl.vds(j))
-                if s.get("zvs"):                      # A206: no gate delay; the device takes over the diode's current
-                    isd = (-vds - self.p.rev_vf) / self.p.rev_r if (self.p.rev_drop and pl.diode[j]) else 0.0
-                    s["i_s"] = -max(isd, 0.0)
+                if s.get("zvs"):                      # A206: no gate delay; the device takes over the current there is
+                    if s["kind"] == "off":
+                        s["i_s"] = pl.sim.g_sw[j] * vds / self.nsw[j]
+                    else:
+                        isd = (-vds - self.p.rev_vf) / self.p.rev_r if (self.p.rev_drop and pl.diode[j]) else 0.0
+                        s["i_s"] = -max(isd, 0.0)
                     done.append(j)
                     cb = self.on_act.pop(j, None)
                     if cb is not None:
@@ -562,15 +577,15 @@ class GateEdges:
                     done = abs(ds1) <= p.gate_v_hand and dev.i_ch(float(v1[a]), p.gate_v_hand) >= ACT_I
             else:
                 done = abs(ich1) < ACT_I * n
-                if self.zvs_edge and ds1 < 0.0 and v1[a] <= 0.02:   # A206: gate back at 0 V in reverse conduction:
-                    done = True                                    # the plant's Vf + R fit takes it from here
+                if self.zvs_edge and ds1 < 0.0 and v1[a] <= ZVS_OFF_V:   # A206: gate discharged in reverse conduction:
+                    done = True                                         # the plant's Vf + R fit takes it from here
             if s.get("zvs"):
                 self.stats["e_zvs_j"][j] += e
             if t1 - s["t_a0"] >= T_ACTIVE_MAX:
                 done = True; self.stats["forced"] += 1
             if done:
                 da = t1 - s["t_a0"]
-                st = self.stats["active_zvs_s"][j] if s.get("zvs") else \
+                st = self.stats["active_zvs_s" if s["drv"] else "active_zvs_off_s"][j] if s.get("zvs") else \
                     self.stats[_key("active_on_s" if s["drv"] else "active_off_s", j, p_n(self))]
                 st[0] = min(st[0], da); st[1] = max(st[1], da)
                 s["phase"], s["zvs"] = "idle", False
@@ -578,15 +593,16 @@ class GateEdges:
                     self.off_log.append(tuple(s["off_rec"]))
                     s["off_rec"] = None
                 ended.append(j)
-        if self.il and ended:                          # A170: an ended turn-off may release its complement
-            self.il_update()
-        return ended
+        if self.il and (ended or (self.zvs_edge and any(self.st[j].get("zvs") and not self.st[j]["drv"] for j in act))):
+            self.il_update()                           # A170: an ended turn-off may release its complement (A206: or
+        return ended                                   # a reverse-current turn-off whose gate passed the channel start)
 
     def summary(self):
         out = dict(self.stats)
         for k in ("delay_on_s", "delay_off_s", "active_on_s", "active_off_s") + (LS_KEYS if self.ls_keys else ()):
             out[k] = [None if math.isinf(x) else x for x in out[k]]
         if self.zvs_edge:
-            out["active_zvs_s"] = [[None if math.isinf(x) else x for x in a] for a in out["active_zvs_s"]]
+            for k in ("active_zvs_s", "active_zvs_off_s"):
+                out[k] = [[None if math.isinf(x) else x for x in a] for a in out[k]]
         out["device"], out["model_sha1"] = self.dev.name, self.dev.sha1
         return out

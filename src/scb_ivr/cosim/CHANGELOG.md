@@ -733,6 +733,10 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
   the reverse current while the gate charges; a turn-on edge then ends at
   |V_DS| <= v_hand with the gate above its channel start. Under an
   interlock, such a turn-on waits while its complement conducts.
+  A conducting switch commanded off at reverse current is an edge too: its
+  channel conducts until the gate has discharged (below 0.1 V), then the
+  Vf + R fit takes over. For the interlock it conducts only while its gate
+  is above the channel start.
 - cfg gate "miller" 1: an idle off gate follows its charge balance with its
   drain's movement (`GateEdges._follow`), after Python steps and at commands.
 - cfg gate "r_on_ls": the low sides' own turn-on resistance.
@@ -742,7 +746,11 @@ and 26.80 V. Each runs 38 906 796 steps and records 1756 sections.
   LTspice with EPC's model. The harness
   (`A206_p24_low_side_zvs_turn_on/a206_edge.py`) is within 3-8 % of LTspice
   on one low-side turn-on at 3.0 / 1.0 / 0.3 ohm with the three parts on.
+  The reverse-current turn-off came in A206's second round: with only the
+  turn-on, mode S ended 1.6-1.8 A per period away from LTspice; the harness
+  is within 2 % of LTspice on that turn-off (12.73 against 12.50 nVs).
 - With all four absent every step is as before.
   - `cosim_regression.py --quick` passes.
-  - A205's N0 record: 751 sections and 7 snapshots to 160 us, bit for bit.
-  - Unit tests: `tests/test_cosim_gate_zvs.py` (6; 4 need the vendor library).
+  - A205's N0 record: 751 sections and 7 snapshots to 160 us, bit for bit
+    (checked again after the second round's change).
+  - Unit tests: `tests/test_cosim_gate_zvs.py` (7; 5 need the vendor library).

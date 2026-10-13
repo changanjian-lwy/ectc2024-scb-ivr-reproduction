@@ -4,6 +4,9 @@ Phase 1's high side conducts i0 and is commanded off at t = 0; its low side is c
 record's 3.03 ns), when the node has swung below zero. The other phases sit on their low sides. Reported for 40 ns
 from the turn-off command: the low side's reverse volt-seconds (int max(-V_DS, 0) dt), its channel-edge and
 diode-fit energies, the time until it conducts, and phase 1's current at the end.
+edge_off (mode S's sequence): every low side conducts; phase 2's, at 37 A reverse current, is commanded off at t = 0
+and its high side on 4.5 ns later. Reported: the low side's reverse volt-seconds over the first 9 ns, the time its
+turn-off edge takes, and the high side's channel start.
   PYTHONPATH=src python3 a206_edge.py            table for zvs off / on and the low-side turn-on resistances
 """
 from __future__ import annotations
@@ -66,6 +69,41 @@ def edge(p, i0=136.4, t_dead=T_DEAD, t_end=T_END, trace=False):
     return out
 
 
+def edge_off(p, i0=37.0, t_hs=4.5e-9, t_end=14e-9, t_int=9e-9, trace=False):
+    n = p.n
+    y0 = np.zeros(4 * n)
+    y0[:3] = [36.0, 24.0, 12.0]; y0[7] = 1.0
+    y0[8:12] = [87.1, i0, 53.7, 70.8]
+    pl = FastPlant(p, y0[:8 + n], [False] * 4, [True] * 4)
+    for j in range(n, 2 * n):
+        pl.gm.st[j].update(vgs=p.gate_v_on, drv=True)
+    pl.integrate_to(T_PRE, lambda: None)
+    for j in range(2 * n):
+        pl.gm.st[j]["vds"] = float(pl.vds(j))
+    log = []
+
+    def on_step():
+        log.append((pl.t - T_PRE, float(pl.vds(n + 1)), float(pl.y[pl.nv + 1]), pl.gm.st[n + 1]["vgs"], pl.gm.st[n + 1]["phase"],
+                    pl.gm.st[1]["phase"], pl.eff(1)))
+
+    pl.set_gate(n + 1, False)
+    pl.integrate_to(T_PRE + t_hs, on_step)
+    pl.set_gate(1, True)
+    pl.integrate_to(T_PRE + t_end, on_step)
+    t = np.array([a[0] for a in log]); v = np.array([a[1] for a in log])
+    dt = np.diff(np.concatenate([[0.0], t]))
+    m = t <= t_int
+    ls_act = [a[0] for a in log if a[4] == "active"]
+    hs_act = [a[0] for a in log if a[5] == "active"]
+    out = {"rev_nvs": float(np.sum((np.maximum(-v, 0.0) * dt)[m]) * 1e9), "ls_edge_ns": (ls_act[-1] * 1e9 if ls_act else 0.0),
+           "hs_start_ns": hs_act[0] * 1e9 if hs_act else None, "i_end": float(log[-1][2]),
+           "e_ls_uj": (pl.edge_e[n + 1] + pl.rev_e[n + 1]) * 1e6, "il_holds": sum(pl.gm.stats["il_holds"]),
+           "v_at_ns": {str(q): float(np.interp(q * 1e-9, t, v)) for q in (1, 2, 3, 4, 6, 8)}}
+    if trace:
+        out["trace"] = [(round(a[0] * 1e9, 3), round(a[1], 3), round(a[2], 2), round(a[3], 3), a[4], a[5]) for a in log[::25]]
+    return out
+
+
 def table():
     rows = {"off (as V5)": params(False)}
     for r in (3.0, 1.0, 0.3):
@@ -79,8 +117,17 @@ def table():
 
 if __name__ == "__main__":
     res = table()
+    sw = (R_TYP / 2, R_TYP / 3)
+    off = {"off (as V5)": edge_off(params(False)),
+           "V6 parts, typ r_sw": edge_off(params(True, r_on_ls=3.0, r_sw=sw, r=0.0, miller=True))}
+    res["reverse_turn_off"] = off
+    for k, o in off.items():
+        print(f"reverse turn-off, {k:20s} rev {o['rev_nvs']:5.2f} nVs over 9 ns  edge {o['ls_edge_ns']:5.2f} ns  V_DS at 1/2/3/4/6/8 ns "
+              f"{' '.join(f'{x:6.2f}' for x in o['v_at_ns'].values())}  high side starts {o['hs_start_ns']:.2f} ns  holds {o['il_holds']}")
     (HERE / "a206_edge.json").write_text(json.dumps(res, indent=1) + "\n")
     for k, o in res.items():
+        if k == "reverse_turn_off":
+            continue
         print(f"{k:34s} V_cmd {o['v_cmd']:6.2f} V  rev {o['rev_nvs']:5.2f} nVs  V_min {o['v_min']:6.2f}  on after "
               f"{o['t_on_ns']:6.2f} ns  i_end {o['i_end']:7.2f} A  edge {o['e_edge_uj']:6.3f} uJ  fit {o['e_rev_uj']:6.3f} uJ  "
               f"steps {o['steps']}  newton {o['newton_max']}")
