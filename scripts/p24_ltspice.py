@@ -111,7 +111,7 @@ def run(name, text, raw=True, timeout=900):
         (WORK / f"{name}{ext}").unlink(missing_ok=True)
     env = dict(os.environ, CX_ROOT=str(CX))
     subprocess.run([str(CX / "bin" / "wine"), "--bottle", "ltspice", "--cx-app", EXE, "-b", _winpath(net)],
-                   cwd=WORK, env=env, capture_output=True, timeout=timeout)
+                   cwd=WORK, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout)
     log_p = WORK / f"{name}.log"
     log = log_p.read_text(errors="replace") if log_p.exists() else ""
     if not log:

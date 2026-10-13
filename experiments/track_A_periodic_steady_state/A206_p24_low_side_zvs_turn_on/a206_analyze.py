@@ -9,7 +9,11 @@ Every cosim run (whole): c6 COMPLETED, 0 shoot-throughs, 0 overlaps, 0 forced ed
 Vo <= 1.05 V up to 300 us and within 1 V +- 50 mV from 20 us after the handover. With it: start-up, handover and
 settled numbers, and the plant's loss books over the last WIN_US of a steady run from the record alone (conduction
 rebuilt from the logged currents at every gate command; LS_q also carries phase q + 1 during its high side's on-time).
+Start-up trims (BOUNDARY Section 4; `trims R`): per stage-2 board and temperature, Vo half a microsecond before the
+earlier of the two handovers, V5's record against V6's run with the V5 trim. Below V5's by more than 10 mV: ton_s is
+raised by the difference / the measured start-up slope (A190 table.json: 53.5 mV per ns nominal, 54.5 slow).
   python3 a206_analyze.py run [--jobs 3]   the missing replays -> replays/
+  python3 a206_analyze.py trims 0.3        -> trims.json (from the T0 runs and stage 1's E run)
   python3 a206_analyze.py                  -> a206_summary.json"""
 from __future__ import annotations
 
@@ -33,6 +37,12 @@ V5_REC = TA / "A205_p24_ltspice_replay" / "cosim"
 LIM0 = {"i0": 0.05, "v0": 5e-3}
 LOSS_TOL, WIN_US, T_VO_US = 0.10, 10.0, 143.5
 I_LIM, V_LIM, VO_START, VO_BAND = 200.0, 40.0, 1.05, 0.050
+V5_REF = {"N0_25": V5_REC / "run_N0_steady.json", "N75_25": V5_REC / "run_N75_step.json",
+          "S75_25": TA / "A192_p24_slow_lead_rows" / "cosim" / "run_S75_25_p48_1us_p0.json",
+          "S75_c0": TA / "A193_p24_slow_lead_cold" / "cosim" / "run_S75_c0_l9p5_p0.json",
+          "S75_hot": TA / "A197_p24_slow_hot_final_handover" / "cosim" / "run_S75_hot_p0.json"}
+SLOPE = {"N0": 0.0535, "N75": 0.0535, "S75": 0.0545}      # V per ns of ton_s at the 200 ns start-up (A190 table.json)
+TRIM_MIN_V = 0.010
 
 
 def parse(name):
@@ -182,6 +192,36 @@ def whole(path):
     return out
 
 
+def startup(path):
+    r = json.loads(Path(path).read_text())
+    ts = np.array([q["t_s"] for q in r["sections"]]); vo = np.array([q["vo"] for q in r["sections"]])
+    tp, g = r["t_mode_p_s"], r["gate_offs_last"]
+    pk = lambda a, b: max((e["i_max_a"] for e in g if a <= e["t_s"] < b), default=None)
+    return {"t": ts, "vo": vo, "tp": tp, "req": r.get("t_hand_req_s"), "start_pk": pk(0.0, tp),
+            "hand_pk": pk(tp, tp + 25e-6), "vo_max": float(vo[ts <= 300e-6].max()), "ton_s_ns": r["cfg"]["ton_s_ns"]}
+
+
+def trims(r_ls):
+    tg = "ls" + f"{r_ls:g}".replace(".", "p")
+    out = {"r_on_ls": r_ls, "slope_v_per_ns": SLOPE, "rows": {}, "dton_s_ns": {}}
+    for key, ref in V5_REF.items():
+        p6 = COS / (f"run_E_N0_steady_{tg}.json" if key == "N0_25" else f"run_T0_{key}_{tg}.json")
+        a, b = startup(ref), startup(p6)
+        t_ref = min(a["tp"], b["tp"]) - 0.5e-6
+        v5, v6 = float(np.interp(t_ref, a["t"], a["vo"])), float(np.interp(t_ref, b["t"], b["vo"]))
+        d = round((v5 - v6) / SLOPE[key.split("_")[0]], 3) if v5 - v6 > TRIM_MIN_V else 0.0
+        out["rows"][key] = {"v5_record": str(ref.relative_to(TA)), "t_ref_us": t_ref * 1e6, "vo_v5": v5, "vo_v6": v6,
+                            "t_mode_p_us": [a["tp"] * 1e6, b["tp"] * 1e6],
+                            "t_req_us": [None if x["req"] is None else x["req"] * 1e6 for x in (a, b)],
+                            "start_pk": [a["start_pk"], b["start_pk"]], "hand_pk": [a["hand_pk"], b["hand_pk"]],
+                            "vo_max": [a["vo_max"], b["vo_max"]], "ton_s_ns": b["ton_s_ns"], "dton_s_ns": d}
+        out["dton_s_ns"][key] = d
+        print(f"{key:8s} t_ref {t_ref * 1e6:7.2f} us Vo V5 {v5:.4f} V6 {v6:.4f} ({1e3 * (v6 - v5):+.1f} mV) -> ton_s +{d} ns | entry "
+              f"{a['tp'] * 1e6:.1f} / {b['tp'] * 1e6:.1f} us | start {a['start_pk']:.1f} / {b['start_pk']:.1f} A hand {a['hand_pk']:.1f} / "
+              f"{b['hand_pk']:.1f} A | Vo max {a['vo_max']:.4f} / {b['vo_max']:.4f}")
+    (HERE / "trims.json").write_text(json.dumps(out, indent=1) + "\n")
+
+
 def main():
     res = {"runs": {}, "replays": {}}
     for f in sorted(COS.glob("run_*.json")):
@@ -232,5 +272,7 @@ def main():
 if __name__ == "__main__":
     if sys.argv[1:2] == ["run"]:
         run(int(sys.argv[3]) if sys.argv[2:3] == ["--jobs"] else 3)
+    elif sys.argv[1:2] == ["trims"]:
+        trims(float(sys.argv[2]))
     else:
         main()
