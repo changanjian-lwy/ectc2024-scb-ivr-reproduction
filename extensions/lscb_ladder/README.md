@@ -22,10 +22,23 @@ a rising line step landing on rail 1 (A124, A148).
   - four 20-60 uF capacitors at 12 V, three clamp switches with floating drives, and a detector per module.
 - The closed-loop cosim (step 2) was not run, by the user's choice on 2026-10-09.
 
+**2026-10-14: A218 + A219, two more open-loop checks of LSCB's other claims** (asked for the EEK5101 video; branch
+a218-lscb, not yet merged).
+- A218, idle state: a single stage cannot be shed, with or without the ladder (P24: rail 4 12 -> 22.3 V in 20 us;
+  ladder: node d1 +3.4 V in 20 us). LSCB's "phase shedding" therefore means whole columns, i.e. our modules. A module
+  restarting after its Cs drifted 4 V peaks at 257 A (151 A without drift); a switched clamp closed through the idle
+  makes it 157 A (clamp pulse ~190 A); a 0.7 V diode 170 A but 33.5 % phase spread afterwards. 5 / 5.
+- A219, pre-charge: with its switches off on a live 48 V bus P24's SH1 sits at 48 V (> 40 V rating). A switched
+  4 x 1 kOhm divider with diodes keeps it at 23.7 V on a 20 ms ramp but not on a 10 us edge (47.9 V); adding the
+  capacitor ladder gives 21.4 V on the edge. A soft start from the pre-charged state peaks at 147 A against P24's own
+  start 169 A, same switch voltages. 2 / 5 as registered (two bounds were set wrong, see RESULTS).
+
 | item | path |
 |---|---|
 | A180: open-loop LTspice power stage, base vs diode / switched clamps and C_DC sizes (RESULTS, figure a180_up1.png; records: release records-a180) | `experiments/A180_lscb_ladder_open_loop/` |
 | A182: the switched clamp opened by a detector (threshold 0.75 / 1.5 V, delay 0.1-1.0 us), two passes (RESULTS; records: release records-a182) | `experiments/A182_lscb_detector_clamp/` |
+| A218: idle state - stage shedding (base / ladder) and restart after a Cs drift (RESULTS; records: release records-a218) | `experiments/A218_lscb_idle_restart_shedding/` |
+| A219: resistor pre-charge on a live bus (fast / slow ramp; none / divider / ladder) and a soft start from it (RESULTS; records: release records-a219) | `experiments/A219_lscb_precharge_startup/` |
 | netlist builder and metrics | `src/scb_ivr/extensions/lscb_ladder.py` |
 | tests | `tests/extensions/test_lscb_ladder.py` |
 
