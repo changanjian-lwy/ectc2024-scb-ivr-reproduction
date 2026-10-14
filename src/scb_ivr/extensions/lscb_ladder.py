@@ -18,6 +18,16 @@ Detector-triggered window (A182): p["win"] = (w0, w1) replaces the fixed window;
 overlap of each SL_k on-interval with [w0, w1] (it may close mid-interval). detect() gives the time a detector of
 threshold vth would fire: the first time max_k |V(d(4-k)) - Vcs_k| reaches vth. p["save_ls"] adds I(SL1..3).
 
+Idle, shedding and pre-charge rows (A218 / A219):
+- "shed": steady start; from t_shed one phase (row k) stops after its last whole period, the others run on.
+- "restart": idle start at full Vin (every switch off, inductors at 0 A, Vout = vo0, Cs from p["cs_ic"]); switching
+  resumes at t_rs with ton0. An active clamp is also closed through the idle part (no power switch is on, so it is
+  safe); it then holds Cs at ladder - Vout, because the switch node rests at Vout through its idle inductor.
+- "pre": every power switch off while Vin ramps 0 -> vin over the row's ramp; variants with cdc None build the ladder
+  nodes from the resistors alone (rbal), so rdiv_pc is a switched resistor divider with diodes to a_k.
+- "soft": start-up at full Vin from p["ic"] (node voltages, e.g. a pre-charged state), on-time ramping 1 ns -> ton0
+  over t_soft from t_soft0; the pre-charge network is not in this netlist (switched out at the start).
+
 Power stage: switches of r_on, linear Coss (c_high / c_low as the cosim's linear default), reverse conduction as a
 diode per switch (EPC2067 Fig. 8 fit 2.089 V + 6.01 mOhm per device / n devices), R per phase in the inductor, the
 cosim's Co and resistive load. Drive (precomputed PWL gates, t_edge transitions): fixed period T, phases interleaved by
@@ -36,6 +46,8 @@ PARAMS = dict(
     r_on=0.1e-3, t_dead=4.5e-9, t_edge=0.2e-9, ton0=38.6e-9, T=452e-9,       # T set by the A180 smoke run
     t_step=40e-6, t_end=80e-6, t_win=20e-6, t_ramp=137.22e-6, t_su_end=150e-6,
     cdc_esr=1e-3, r_bal=1e6, maxstep=0.5e-9, vo0=1.0035, il0=62.7,                        # vo0 / il0 from the smoke run
+    t_shed=10e-6, t_end_shed=40e-6, t_rs=0.5e-6, t_end_rs=30e-6,                            # A218 rows
+    pre_settle=40e-3, pre_maxstep=1e-6, t_soft0=0.5e-6, t_soft=137.22e-6,                  # A219 rows
 )
 
 VARIANTS = {
@@ -46,6 +58,8 @@ VARIANTS = {
     "act_c20": dict(kind="active", vf=3.0, r=5e-3, cdc=20e-6),
     "act_c60": dict(kind="active", vf=3.0, r=5e-3, cdc=60e-6),
     "actall_c20": dict(kind="active", vf=3.0, r=5e-3, cdc=20e-6, always=True),
+    "rdiv_pc": dict(kind="diode", vf=0.7, r=5e-3, cdc=None, rbal=1e3),   # A219: switched 4 x 1 kOhm divider + diodes
+    "lad_pc": dict(kind="diode", vf=0.7, r=5e-3, cdc=20e-6, rbal=1e3),   # A219: the same with the capacitor ladder
 }
 
 ROWS = {
@@ -53,7 +67,17 @@ ROWS = {
     "up5": dict(kind="step", dv=4.8, slew=5e-6),
     "dn1": dict(kind="step", dv=-4.8, slew=1e-6),
     "su": dict(kind="startup"),
+    "shed4": dict(kind="shed", k=4),
+    "rs0": dict(kind="restart"), "rsv": dict(kind="restart"), "rs2": dict(kind="restart"), "rs4": dict(kind="restart"),
+    "pre_fast": dict(kind="pre", ramp=10e-6), "pre_slow": dict(kind="pre", ramp=20e-3),
+    "soft": dict(kind="soft"),
 }
+
+
+def t_end_of(row, p):
+    r = ROWS[row]
+    return {"step": p["t_end"], "startup": p["t_su_end"], "shed": p["t_end_shed"], "restart": p["t_end_rs"],
+            "pre": r.get("ramp", 0.0) + p["pre_settle"], "soft": p["t_su_end"]}[r["kind"]]
 
 
 def _g(x):
@@ -67,6 +91,10 @@ def vin_wave(row, p=None):
     if r["kind"] == "step":
         ts = p["t_step"]
         return [0.0, ts, ts + r["slew"]], [p["vin"], p["vin"], p["vin"] + r["dv"]]
+    if r["kind"] in ("shed", "restart", "soft"):
+        return [0.0, t_end_of(row, p)], [p["vin"], p["vin"]]
+    if r["kind"] == "pre":
+        return [0.0, r["ramp"]], [0.0, p["vin"]]
     return [0.0, p["t_ramp"]], [0.0, p["vin"]]
 
 
@@ -74,16 +102,25 @@ def gate_intervals(row, p=None):
     """Per phase k (1..4): list of (t_on, t_off_hs, t_on_ls, t_off_ls) per period."""
     p = {**PARAMS, **(p or {})}
     T, ton0, td = p["T"], p["ton0"], p["t_dead"]
-    step = ROWS[row]["kind"] == "step"
-    t_end = p["t_end"] if step else p["t_su_end"]
+    r = ROWS[row]
+    step = r["kind"] == "step"
+    t_end = t_end_of(row, p)
     tv, vv = vin_wave(row, p)
+    lead = {"restart": p["t_rs"], "soft": p["t_soft0"]}.get(r["kind"], 0.0)
     res = {}
     for k in range(1, 5):
-        iv, t0 = [], (k - 1) * T / 4 + 5e-9
-        while t0 < t_end:
-            ton = min(max(ton0 * p["vin"] / max(float(np.interp(t0, tv, vv)), 1.0), 0.5 * ton0), 2 * ton0) if step else ton0
+        iv, t0 = [], (k - 1) * T / 4 + 5e-9 + lead
+        while t0 < t_end and r["kind"] != "pre":                         # pre: every power switch stays off
+            if step:
+                ton = min(max(ton0 * p["vin"] / max(float(np.interp(t0, tv, vv)), 1.0), 0.5 * ton0), 2 * ton0)
+            elif r["kind"] == "soft":                                    # 1 ns -> ton0 over t_soft at full Vin
+                ton = min(max(ton0 * (t0 - p["t_soft0"]) / p["t_soft"], 1e-9), ton0)
+            else:
+                ton = ton0
             iv.append((t0, t0 + ton, t0 + ton + td, t0 + T - td))
             t0 += T
+        if r["kind"] == "shed" and k == r["k"]:                         # the shed phase stops after its last whole period
+            iv = [x for x in iv if x[3] <= p["t_shed"]]
         res[k] = iv
     return res
 
@@ -108,7 +145,7 @@ def netlist(var, row, p=None):
     v, r = VARIANTS[var], ROWS[row]
     vin = p["vin"]
     step = r["kind"] == "step"
-    t_end = p["t_end"] if step else p["t_su_end"]
+    t_end = t_end_of(row, p)
     out = [f"* A180 lscb_ladder {var} {row}"]
     tv, vv = vin_wave(row, p)
     out.append("Vin vin 0 PWL(" + " ".join(f"{_g(a)} {_g(b)}" for a, b in zip(tv, vv)) + ")")
@@ -136,12 +173,15 @@ def netlist(var, row, p=None):
     if v is not None:
         c = v["cdc"]
         for k, (hi, lo) in enumerate((("d1", "0"), ("d2", "d1"), ("d3", "d2"), ("vin", "d3")), 1):
-            out += [f"CD{k} {hi} {lo} {_g(c)} Rser={_g(p['cdc_esr'])}", f"RB{k} {hi} {lo} {_g(p['r_bal'])}"]
+            if c is not None:
+                out.append(f"CD{k} {hi} {lo} {_g(c)} Rser={_g(p['cdc_esr'])}")
+            out.append(f"RB{k} {hi} {lo} {_g(v.get('rbal', p['r_bal']))}")
         out.append(f".model DCL D(Ron={_g(v['r'])} Roff=1e9 Vfwd={_g(v['vf'])} epsilon=0.02)")
         if v["kind"] == "active":
             out.append(f".model SWC SW(Ron={_g(v['r'])} Roff=1e7 Vt=0.5 Vh=-0.2)")
             w0, w1 = (-1.0, 1.0) if v.get("always") else \
-                     ((p["t_step"], p["t_step"] + p["t_win"]) if step else (0.0, p["t_ramp"] + 2e-6))
+                     ((p["t_step"], p["t_step"] + p["t_win"]) if step else
+                      (p["t_rs"], p["t_rs"] + p["t_win"]) if r["kind"] == "restart" else (0.0, p["t_ramp"] + 2e-6))
             win = p.get("win")
         for k in (1, 2, 3):
             d = f"d{4 - k}"
@@ -151,20 +191,33 @@ def netlist(var, row, p=None):
                 out.append(f"SC{k} {d} a{k} gc{k} 0 SWC")
                 if win is None:
                     pulses = [(c, e) for _, _, c, e in gates[k] if c >= w0 and e <= w1]
+                    if r["kind"] == "restart":                    # idle: every power switch off, the clamp holds Cs
+                        pulses = [(tr, p["t_rs"] - 2 * tr)] + pulses
                 else:                                         # detector window: overlap with each LS on-interval
                     pulses = [(max(c, win[0]), min(e, win[1])) for _, _, c, e in gates[k] if e > win[0] + tr and c < win[1] - tr]
                 out += _pwl(f"gc{k}", f"gc{k}", pulses, tr)
                 save.append(f"I(SC{k})")
         save += ["V(d1)", "V(d2)", "V(d3)"]
-    if step:                                                  # start near the steady state; the start-up row from zero
+    if step or r["kind"] == "shed":                           # start near the steady state; the start-up row from zero
         ic = [f"V(a1)={_g(0.75 * vin)}", f"V(a2)={_g(0.5 * vin)}", f"V(a3)={_g(0.25 * vin)}", "V(x1)=0", "V(x2)=0",
               "V(x3)=0", f"V(out)={_g(p['vo0'])}"]
         if v is not None:
             ic += [f"V(d1)={_g(0.25 * vin)}", f"V(d2)={_g(0.5 * vin)}", f"V(d3)={_g(0.75 * vin)}"]
         out.append(".ic " + " ".join(ic))
         out.append(".ic " + " ".join(f"I(L{k})={_g(p['il0'])}" for k in (1, 2, 3, 4)))
+    elif r["kind"] == "restart":                              # idle: Cs as given, switch nodes at Vout, no current
+        vo = p["vo0"]
+        ic = [f"V(a{k})={_g(p['cs_ic'][k - 1] + vo)}" for k in (1, 2, 3)] + \
+             [f"V(x{k})={_g(vo)}" for k in (1, 2, 3, 4)] + [f"V(out)={_g(vo)}"]
+        if v is not None and v["cdc"] is not None:
+            ic += [f"V(d1)={_g(0.25 * vin)}", f"V(d2)={_g(0.5 * vin)}", f"V(d3)={_g(0.75 * vin)}"]
+        out.append(".ic " + " ".join(ic))
+        out.append(".ic " + " ".join(f"I(L{k})=0" for k in (1, 2, 3, 4)))
+    elif r["kind"] == "soft":                                 # from given node voltages, no current
+        out.append(".ic " + " ".join(f"V({n})={_g(x)}" for n, x in p["ic"].items()))
+        out.append(".ic " + " ".join(f"I(L{k})=0" for k in (1, 2, 3, 4)))
     out.append(".save " + " ".join(save))
-    out.append(f".tran 0 {_g(t_end)} 0 {_g(p['maxstep'])}")
+    out.append(f".tran 0 {_g(t_end)} 0 {_g(p['pre_maxstep'] if r['kind'] == 'pre' else p['maxstep'])}")
     return "\n".join(out) + "\n"
 
 
@@ -195,7 +248,20 @@ def waves(names, arr):
             clamp.append(i - s if s is not None else i)
     ladder = [c(f"V(d{k})") for k in (1, 2, 3)] if c("V(d1)") is not None else None
     return dict(t=t, vin=vin, vo=c("V(out)"), vcs=vcs, rails=rails, il=il, clamp=clamp, ladder=ladder,
-                pin=-vin * c("I(Vin)"), a=[c(f"V(a{k})") for k in (1, 2, 3)])
+                pin=-vin * c("I(Vin)"), a=[c(f"V(a{k})") for k in (1, 2, 3)], x=[c(f"V(x{k})") for k in (1, 2, 3, 4)])
+
+
+def sw_volts(w):
+    """Voltage across each power switch: SH1-SH4 (along the chain), then SL1-SL4."""
+    a, x = w["a"], w["x"]
+    return [w["vin"] - a[0], a[0] - a[1], a[1] - a[2], a[2] - x[3]] + list(x)
+
+
+def pavg(t, y, T, dt=1e-9):
+    """(grid, y averaged over one period T) on a uniform grid of dt."""
+    g = np.arange(t[0], t[-1], dt)
+    n = max(int(round(T / dt)), 1)
+    return g, np.convolve(np.interp(g, t, y), np.ones(n) / n, mode="same")
 
 
 def deviations(names, arr):
@@ -219,8 +285,14 @@ def metrics(names, arr, row, p=None):
     p = {**PARAMS, **(p or {})}
     w = waves(names, arr)
     t = w["t"]
-    step = ROWS[row]["kind"] == "step"
-    a, b = (p["t_step"] - 10e-6, p["t_step"]) if step else (p["t_ramp"] - 2e-6, p["t_ramp"])
+    kind = ROWS[row]["kind"]
+    if kind == "pre":
+        return dict(row=row, precharge=_precharge(w, p))
+    if kind in ("shed", "restart"):
+        return dict(row=row, **_idle(w, p, row))
+    step = kind == "step"
+    t_r = p["t_soft0"] + p["t_soft"] if kind == "soft" else p["t_ramp"]
+    a, b = (p["t_step"] - 10e-6, p["t_step"]) if step else (t_r - 2e-6, t_r)
     m = (t >= a) & (t < b)
     pre = dict(rails=[_mean(t, r, a, b) for r in w["rails"]], il_avg=[_mean(t, i, a, b) for i in w["il"]],
                il_peak=[float(np.max(i[m])) for i in w["il"]], vo=_mean(t, w["vo"], a, b),
@@ -257,10 +329,60 @@ def metrics(names, arr, row, p=None):
     else:
         res["startup"] = dict(il_peak=[float(np.max(i)) for i in w["il"]], il_min=[float(np.min(i)) for i in w["il"]],
                               rail_dev_end=float(max(abs(x - p["vin"] / 4) for x in pre["rails"])),
-                              rails_mid=[float(np.interp(p["t_ramp"] / 2, t, r)) for r in w["rails"]],
-                              vin_mid=float(np.interp(p["t_ramp"] / 2, t, w["vin"])))
+                              rails_mid=[float(np.interp(t_r / 2, t, r)) for r in w["rails"]],
+                              vin_mid=float(np.interp(t_r / 2, t, w["vin"])),
+                              sw_max=[float(np.max(np.abs(s))) for s in sw_volts(w)],
+                              vo_end=float(w["vo"][-1]), vo_max=float(np.max(w["vo"])))
         if w["clamp"] is not None:
             drops = [w["ladder"][2 - (k - 1)] - w["a"][k - 1] for k in (1, 2, 3)]
             res["startup"]["clamp_energy_uj"] = float(sum(np.trapezoid(dv * i, t) for dv, i in zip(drops, w["clamp"])) * 1e6)
             res["startup"]["clamp_peak_a"] = [float(np.max(np.abs(i))) for i in w["clamp"]]
     return res
+
+
+def _precharge(w, p):
+    """Every switch off while Vin ramps: the largest voltage across each switch, and the state at the end."""
+    t, vin_end = w["t"], float(w["vin"][-1])
+    sw = sw_volts(w)
+    over = np.abs(sw[0]) > 40.0
+    dt = np.diff(t, prepend=t[0])
+    return dict(sw_max=[float(np.max(np.abs(s))) for s in sw], sh1_over_40v_s=float(np.sum(dt[over])),
+                vcs_end=[float(v[-1]) for v in w["vcs"]],
+                vcs_dev_end=[float(v[-1] - f * vin_end) for v, f in zip(w["vcs"], (0.75, 0.5, 0.25))],
+                ladder_end=[float(x[-1]) for x in w["ladder"]] if w["ladder"] is not None else None,
+                x_end=[float(x[-1]) for x in w["x"]], vin_end=vin_end, t_end=float(t[-1]))
+
+
+def _idle(w, p, row):
+    """Shed rows: rails and ladder before and after one phase stops. Restart rows: the first t_end_rs after idle."""
+    t, T, vin = w["t"], p["T"], p["vin"]
+    kind = ROWS[row]["kind"]
+    t0 = p["t_shed"] if kind == "shed" else p["t_rs"]
+    g, _ = pavg(t, w["rails"][0], T)
+    rails = [pavg(t, r, T)[1] for r in w["rails"]]
+    lad = [pavg(t, x, T)[1] for x in w["ladder"]] if w["ladder"] is not None else None
+    edge = (g > t0 + T) & (g < g[-1] - T)                     # skip half a period at both ends of the convolution
+    dev = np.max(np.abs(np.array(rails) - vin / 4), axis=0)
+    out = dict(rail_dev_max=float(np.max(dev[edge])), vo_min=float(np.min(w["vo"][t >= t0])), vo_max=float(np.max(w["vo"][t >= t0])),
+               il_peak=[float(np.max(i[t >= t0])) for i in w["il"]], il_min=[float(np.min(i[t >= t0])) for i in w["il"]])
+    at = [5e-6, 10e-6, 20e-6] + ([30e-6] if kind == "shed" else [])
+    out["rails_at"] = {f"{x * 1e6:.0f}": [float(np.interp(t0 + x - T, g, r)) for r in rails] for x in at if t0 + x - T < g[-1] - T}
+    if lad is not None:
+        ldev = np.max(np.abs(np.array(lad) - np.array([[0.25 * vin], [0.5 * vin], [0.75 * vin]])), axis=0)
+        out["ladder_dev_max"] = float(np.max(ldev[edge]))
+        out["ladder_at"] = {f"{x * 1e6:.0f}": [float(np.interp(t0 + x - T, g, d)) for d in lad] for x in at
+                            if t0 + x - T < g[-1] - T}
+    late = np.nonzero(edge & (dev > 0.5))[0]
+    out["t_settle_us"] = float((g[late[-1]] - t0) * 1e6) if late.size else 0.0      # last time a rail is > 0.5 V off
+    m = t >= t[-1] - 5e-6
+    avg = np.array([float(np.trapezoid(i[m], t[m]) / (t[m][-1] - t[m][0])) for i in w["il"]])
+    act = [k for k in range(4) if not (kind == "shed" and k == ROWS[row]["k"] - 1)]
+    out["il_avg_end"] = avg.tolist()
+    out["spread_end_pct"] = float((avg[act].max() - avg[act].min()) / np.mean(np.abs(avg[act])) * 100)
+    if kind == "shed":
+        m0 = (t >= t0 - 5e-6) & (t < t0)
+        out["rails_before"] = [float(np.trapezoid(r[m0], t[m0]) / (t[m0][-1] - t[m0][0])) for r in w["rails"]]
+    if w["clamp"] is not None:
+        m2 = t >= t0
+        out["clamp_peak_a"] = [float(np.max(np.abs(i[m2]))) for i in w["clamp"]]
+    return out

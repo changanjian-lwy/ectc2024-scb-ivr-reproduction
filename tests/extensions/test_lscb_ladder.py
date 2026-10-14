@@ -89,3 +89,20 @@ def test_detect_first_crossing_and_pre_max():
     t_hit, pre = ll.detect(names, arr, 0.75, 5e-6)
     assert abs(t_hit - 5.75e-6) < 1.1e-8 and 0.19 < pre <= 0.2
     assert ll.detect(names, arr, 9.0, 5e-6)[0] is None
+
+
+def test_a218_a219_rows():
+    """A218 / A219 rows: shedding stops one phase, restart starts idle, pre-charge never switches, soft ramps Ton."""
+    p = ll.PARAMS
+    g = ll.gate_intervals("shed4")
+    assert g[4][-1][3] <= p["t_shed"] and g[3][-1][0] > p["t_shed"] + 20e-6
+    g = ll.gate_intervals("rs2")
+    assert min(iv[0][0] for iv in g.values()) >= p["t_rs"]
+    assert all(not iv for iv in ll.gate_intervals("pre_fast").values())
+    tons = [b - a for a, b, _, _ in ll.gate_intervals("soft")[1]]
+    assert abs(tons[0] - 1e-9) < 1e-15 and abs(tons[-1] - p["ton0"]) < 1e-15 and all(y >= x - 1e-18 for x, y in zip(tons, tons[1:]))
+    txt = ll.netlist("rdiv_pc", "pre_slow")
+    assert "\nCD1" not in txt and "\nRB1 d1 0 1000" in txt and "\nDC1 d3 a1 DCL" in txt and "1e-06\n" in txt
+    txt = ll.netlist("act_c20", "rs4", {"cs_ic": [35.0, 23.0, 11.0]})
+    assert "I(L1)=0" in txt and "V(a1)=36.0035" in txt and "V(x4)=1.0035" in txt
+    assert _pwl_points(txt, "gc1")[2] == (4e-10, 1.0)                  # the clamp is closed through the idle
