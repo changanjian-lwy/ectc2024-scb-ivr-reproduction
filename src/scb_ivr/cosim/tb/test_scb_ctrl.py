@@ -6,7 +6,7 @@ and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
 step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133); the Ton path's multi-cycle
-registers (A215). From A93's tests (history: ../CHANGELOG.md).
+registers (A215); skipped rounds (A216). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -37,7 +37,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             vff_rel=0, vff_rel_lp=0, vff_seed=0,                                 # A135, A136, A137
             vff_vs_kr=0, vff_vs_kt=0,                                            # A148
             ton_s=None,                                                          # A184: None = ton
-            ton_lat=0)                                                           # A215
+            ton_lat=0,                                                           # A215
+            skip=0, skip_hi=10, skip_lo=2)                                       # A216
 
 
 def pack(values, width):
@@ -138,6 +139,7 @@ class Ctrl:
         d.cfg_vff_seed.value = cfg["vff_seed"]                   # A137
         d.cfg_vff_vs_kr.value = cfg["vff_vs_kr"] & 0xFFFF; d.cfg_vff_vs_kt.value = cfg["vff_vs_kt"] & 0xFFFF   # A148
         d.cfg_ton_lat.value = cfg["ton_lat"]                     # A215
+        d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1610,3 +1612,121 @@ async def ton_lat_at_the_handover(dut):
         await ReadOnly()
         seen.append(_ph_ton(dut, 0))
     assert seen == [100, 100, 100, 100, 133, 133], seen
+
+
+SKIP = dict(vloop=1, ton=133, ton_min=133, t0=320, slot=(70, 140, 210), skip=1, skip_hi=10, skip_lo=2)   # A216: Ton at its limit
+
+
+async def _skip_start(dut, **over):
+    """A216 fixture: mode P, the loop's Ton at its lower limit, every low side on at V_DS = 0 and phase 1's current
+    comparator true (its LOW lasts one window), slots 70 / 140 / 210 LSB after the reference."""
+    c = Ctrl(dut)
+    await c.start(**dict(SKIP, **over))
+    await c.set(cmp_zl=0b1111, cmp_i=0b0001)
+    return c
+
+
+def _ons(c, phase, after=-1):
+    return [e[0] + e[1] for e in c.edges if e[2] == "H" and e[3] == 1 and e[4] == phase and e[0] + e[1] > after]
+
+
+@cocotb.test()
+async def skip_off_or_vo_low_runs_every_round(dut):
+    """A216: with Vo at the reference no round is skipped (three phase-1 turn-ons in a row), and the module is not idle."""
+    c = await _skip_start(dut)
+    await ClockCycles(dut.clk, 40)
+    await ReadOnly()
+    assert len(_ons(c, 1)) >= 3 and int(dut.idle.value) == 0 and int(dut.skip1.value) == 0, _ons(c, 1)
+
+
+@cocotb.test()
+async def skip_withholds_the_round_and_ticks(dut):
+    """A216: a Vo sample above vref + hi with Ton at its limit: after phase 1's next low-side turn-on its turn-on is
+    withheld (skip1, then idle); phases 2-4 turn their low sides off at their slots after the skipped instant and make
+    no turn-on either; the ADC's request (smp) repeats every period (cfg_t0 320 LSB = 10 clocks here)."""
+    c = await _skip_start(dut)
+    await c.set(adc_valid=1, adc_code=2000 + 20)
+    await c.set(adc_valid=0)
+    smp, idle_at = [], None
+    for i in range(60):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.smp.value):
+            smp.append(c.cycle)
+        if idle_at is None and int(dut.idle.value):
+            idle_at = int(dut.win_q.value)
+    assert idle_at is not None and int(dut.skip1.value) == 1
+    t_ref = int(dut.t_ref.value)
+    assert _ons(c, 1, after=idle_at - 64) == [], _ons(c, 1)                    # no phase-1 turn-on from the skip on
+    for k, slot in ((2, 70), (3, 140), (4, 210)):
+        off = c.find("L", 0, k, after=t_ref)
+        assert off is not None and off[0] + off[1] == t_ref + slot, (k, off, t_ref)
+        assert _ons(c, k, after=off[0] + off[1]) == [], (k, _ons(c, k))
+        assert field(dut.state.value, k - 1, 2) == 3                            # UP, held
+    assert len(smp) >= 4 and all(b - a == 10 for a, b in zip(smp, smp[1:])), smp
+
+
+@cocotb.test()
+async def skip_resumes_with_the_low_sides(dut):
+    """A216: once a sample is back at the reference, the next tick turns phase 1's low side on (no turn-on first);
+    its current comparator ends that interval and the predictive turn-on follows; phases 2-4 turn their low sides on
+    at the resume's instant + their slots, off at the new reference's slots, and on again after that."""
+    c = await _skip_start(dut)
+    await c.set(adc_valid=1, adc_code=2000 + 20)
+    await c.set(adc_valid=0)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.idle.value) and all(field(dut.state.value, k, 2) == 3 for k in range(4)):
+            break
+    assert int(dut.idle.value) == 1
+    t0 = int(dut.win_q.value)
+    await c.set(cmp_i=0)                             # the resumed low side runs until the comparator
+    await c.set(adc_valid=1, adc_code=2000)
+    await c.set(adc_valid=0)
+    lon = await c.until("L", 1, 1, after=t0)
+    t_res = lon[0] + lon[1]
+    assert _ons(c, 1, after=t0) == []
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+    assert int(dut.idle.value) == 0 and field(dut.state.value, 0, 2) == 2      # phase 1 in LOW
+    await c.set(cmp_i=0b0001)
+    off = await c.until("L", 0, 1, after=t_res)
+    on = await c.until("H", 1, 1, after=t_res)
+    assert on[0] + on[1] == off[0] + off[1] + 85, (off, on)                    # dt_pred of phase 1
+    t_ref = on[0] + on[1]
+    for k, slot in ((2, 70), (3, 140), (4, 210)):
+        a = await c.until("L", 1, k, after=t0)
+        assert a[0] + a[1] == t_res + slot, (k, a, t_res)
+        b = await c.until("L", 0, k, after=a[0] + a[1])
+        assert b[0] + b[1] == t_ref + slot, (k, b, t_ref)
+        h = await c.until("H", 1, k, after=b[0] + b[1])
+        assert h[0] + h[1] == b[0] + b[1] + 80 + (13 if k == 4 else 0), (k, h)  # dt_init 80 / 80 / 93
+    assert int(dut.late_fires.value) == 0
+
+
+@cocotb.test()
+async def skip_keeps_the_period_across_a_pause(dut):
+    """A216: the period measured for the slots (t_per) takes the skipped instant as a turn-on, and is not taken from
+    the first turn-on after the pause."""
+    c = await _skip_start(dut)
+    await ClockCycles(dut.clk, 30)
+    await c.set(adc_valid=1, adc_code=2000 + 20)
+    await c.set(adc_valid=0)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.idle.value):
+            break
+    await ClockCycles(dut.clk, 2)
+    await ReadOnly()
+    per = int(dut.t_per.value)
+    assert 200 < per < 400, per
+    await ClockCycles(dut.clk, 45)                   # four more ticks
+    await c.set(adc_valid=1, adc_code=2000)
+    await c.set(adc_valid=0)
+    t0 = int(dut.win_q.value)
+    await c.until("H", 1, 1, after=t0)
+    await ClockCycles(dut.clk, 2)
+    await ReadOnly()
+    assert int(dut.t_per.value) == per, (int(dut.t_per.value), per)

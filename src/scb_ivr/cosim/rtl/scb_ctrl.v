@@ -40,6 +40,13 @@
 //   a slave's ext_ton), so that arithmetic is a multi-cycle path of M clocks and nothing else in the path between a
 //   phase's registers; a new Ton reaches the phases M + 1 clocks later than with cfg_ton_lat = 0, where they read
 //   the arithmetic directly (the old controller bit for bit).
+// - A216: with cfg_skip, in mode P a round is skipped while the loop's Ton is at its lower limit and the last Vo
+//   sample is above vref + cfg_skip_hi (+ cfg_skip_lo once skipping): skip_q, latched at phase 1's low-side turn-on,
+//   withholds phase 1's next turn-on (scb_phase hold; skip1 tells the front end to make none either). The skipped
+//   turn-on counts as a reference for the slots (t_ref, the period), so phases 2..N turn their low sides off at
+//   their slots and stay off too (idle). Phase 1 then ticks every period (smp: the ADC samples) and, at the first
+//   tick where the condition no longer holds, turns its low side on; phases 2..N follow at that instant plus their
+//   slots, and the next cycle is a normal one from the valley. The period measured across a pause is not taken.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -152,6 +159,12 @@ module scb_ctrl #(
     input  wire signed [15:0]  cfg_vff_vs_kr,  // A148: phase 1's low-side edge offset, rail coefficient (scb_vff)
     input  wire signed [15:0]  cfg_vff_vs_kt,  // A148: its Ton coefficient (0 and 0: no offset)
     input  wire [5:0]          cfg_ton_lat,    // A215: clocks the Ton arithmetic gets before the phases' registers load (0: none)
+    input  wire                cfg_skip,       // A216: skip rounds at the lower Ton limit while Vo is high (mode P)
+    input  wire [AW-1:0]       cfg_skip_hi,    // A216: start above vref + this, ADC codes
+    input  wire [AW-1:0]       cfg_skip_lo,    // A216: continue above vref + this
+    output wire                skip1,          // A216: phase 1's next turn-on is skipped (the front end makes none)
+    output wire                smp,            // A216: a tick of the paused module: the ADC samples (one cycle)
+    output wire                idle,           // A216: the module is paused
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
     input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
@@ -210,6 +223,18 @@ module scb_ctrl #(
     assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton_s; // C2, A184
     wire [TW-1:0] ton_seed = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;  // A184
 
+    // ---- A216: skipped rounds ----
+    reg  [AW-1:0]   vo_q;                      // the last Vo sample
+    reg             skip_q, mod_idle, per_hold;
+    reg  [TW-1:0]   res_t;                     // the last resume's instant (phase 1's low-side turn-on)
+    wire [N-1:0]    sk_p, tk_p, res_p;
+    wire [N*TW-1:0] t_lon_all;
+    wire [AW:0]     skip_th = {1'b0, cfg_vref_code} + {1'b0, (skip_q || mod_idle) ? cfg_skip_lo : cfg_skip_hi};
+    wire            skip_c  = cfg_skip && cfg_vloop && mode_p && (ton_sum <= acc_min) && ({1'b0, vo_q} > skip_th);
+    assign skip1 = skip_q;
+    assign smp   = tk_p[0];
+    assign idle  = mod_idle;
+
     wire [N*TW-1:0] ton_ph_c;                  // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
     wire signed [TW-1:0] lo_add_c;             // A148: phase 1's low-side edge offset
     wire            vff_upd;                   // A215
@@ -265,17 +290,30 @@ module scb_ctrl #(
     reg          per3;                         // A97: three phase-1 turn-ons seen (t_per2 valid)
     wire         use_follow = cfg_slot_avg ? (per_ok && per3) : per_ok;
 
+    wire [TW-1:0] t_von = t_lo1 + dt_pred[TW-1:0];                    // A216: a skipped turn-on's instant
     always @(posedge clk) begin
         if (rst) begin
             t_per   <= {TW{1'b0}};
             n_ref   <= 2'd0;
             t_per2  <= {TW{1'b0}};
             per3    <= 1'b0;
-        end else if (on_pulse[0]) begin
-            t_per   <= t_on_all[TW-1:0] - t_ref;
+        end else if ((on_pulse[0] && !per_hold) || sk_p[0]) begin     // A216: not across a pause
+            t_per   <= (sk_p[0] ? t_von : t_on_all[TW-1:0]) - t_ref;
             if (n_ref != 2'd2) n_ref <= n_ref + 1'b1;
             t_per2  <= t_per;
             if (n_ref == 2'd2) per3 <= 1'b1;
+        end
+    end
+
+    always @(posedge clk) begin                                       // A216
+        if (rst) begin
+            vo_q <= cfg_vref_code; skip_q <= 1'b0; mod_idle <= 1'b0; per_hold <= 1'b0; res_t <= {TW{1'b0}};
+        end else begin
+            if (adc_valid) vo_q <= adc_code;
+            if (gl_ev[0] && gl_lvl[0]) skip_q <= skip_c;              // at phase 1's low-side turn-on
+            if (on_pulse[0]) per_hold <= 1'b0;
+            if (sk_p[0]) begin mod_idle <= 1'b1; per_hold <= 1'b1; end
+            if (res_p[0]) begin mod_idle <= 1'b0; res_t <= t_lon_all[TW-1:0]; end
         end
     end
 
@@ -294,6 +332,8 @@ module scb_ctrl #(
                 t_ref <= t_on_all[TW-1:0];
                 if (!mode_p && hand_req)
                     mode_p <= 1'b1;
+            end else if (sk_p[0]) begin                              // A216: the skipped turn-on is the slots' reference
+                t_ref <= t_von;
             end
             if (adc_valid && cfg_vloop && mode_p) begin
                 ton_acc <= (acc_next < acc_min) ? acc_min : (acc_next > acc_max) ? acc_max : acc_next;
@@ -313,14 +353,17 @@ module scb_ctrl #(
     generate
         for (k = 0; k < N; k = k + 1) begin : g_ph
             wire [TW-1:0] slot_t;
+            wire [TW-1:0] res_tk;                                                      // A216
             wire [TW-1:0] ref_k = (k == 0 && SLAVE) ? ext_ref : t_ref;             // C2
             if (k == 0) begin : g_first
                 assign slot_t = SLAVE ? ext_slot : {TW{1'b0}};                         // C2
+                assign res_tk = {TW{1'b0}};
             end else begin : g_rest
                 wire [TW-1:0] slot_follow = cfg_slot_avg ? (k * (t_per + t_per2)) / (2 * N)  // A97: k * T_avg / N
                                                          : (k * t_per) / N;                  // A93: k * T / N
                 assign slot_t = ((use_follow && cfg_slot_lo) ? t_lo1 : t_ref)                // C02
                                 + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
+                assign res_tk = res_t + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);   // A216
             end
             localparam IS_FIRST = (k == 0 && !SLAVE) ? 1 : 0;                         // C2
             scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(IS_FIRST)) u_ph (
@@ -363,6 +406,9 @@ module scb_ctrl #(
                 .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : (k > 0) ? cfg_ph_floor : 1'b0),   // C06; A133
                 .cfg_floor_late(cfg_floor_late),                                                // A141
                 .lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),                               // A148
+                .hold(IS_FIRST ? skip_q : (k > 0) ? mod_idle : 1'b0),                           // A216
+                .tk_skip(skip_c), .tk_per((n_ref == 2'd2) ? t_per : cfg_t0), .res_time(res_tk),
+                .sk_pulse(sk_p[k]), .tk_pulse(tk_p[k]), .res_pulse(res_p[k]), .t_lon_q(t_lon_all[k * TW +: TW]),
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end
