@@ -4,6 +4,62 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A220) - a pause starts at zero current (RTL, bridge)
+
+**Source:** A217's records. The pause began with every low side turned off at
+its valley (a negative current), so each idle node swung to its rail and rang
+with about 11 V (6-7 A in the inductor; 0.54 mOhm the only damping); at a
+resume each phase started from a different point of that ring, which set its
+first valley (s3 missed). With cfg skip "zcd_a" (needs "async") the pause's
+last low-side intervals end at zero current: scb_phase input zcd (phase 1:
+the timed edge gives way to the front end, no trim, no dlo; a slotted phase
+arms its front end in LOW and is held at its report, its slot not taken, off
+anyway half a tk_per after the slot); scb_ctrl input cfg_zcd and zpend (phase
+k's high side turned off with skip_q high), phases 2..N's reports on A133's
+fa_valid / fa_tlo. The bridge's front-end threshold is zcd_a while skip1 is
+high (phase 1) and for phases 2..N's latches (turn-off only, no turn-on); the
+record gains zcd_fires / zcd_log. scb_multi regenerated; two unit tests.
+**Gate:** zcd_a absent: the old cosim bit for bit (unit tests,
+cosim_regression --quick and --full; A220 BOUNDARY j1).
+
+## 2026-10-14 (A217) - the resume's low-side interval ends at the target (RTL output, bridge)
+
+**Source:** A216. A resume's low-side interval of phase 1 ended about 8 ns
+after its comparator crossed the target (front end and driver), 2.7-4 A too
+deep; phases 2-4 take that interval's length, and the error started a decaying
+two-period alternation of the valleys in every burst (s3 missed). scb_phase
+gets the output res_lo (phase 1: in that interval), scb_ctrl res1. The bridge
+raises the front end's threshold by cfg skip "res_ofs_a" while res1 is high
+(latch_thr; the kernel path now takes latch_thr's value, which is the old one
+whenever neither res1 nor the floor applies). scb_multi regenerated.
+**Gate:** offset absent or 0 and skip absent: the old cosim bit for bit (unit
+tests, cosim_regression --quick and --full; A217 BOUNDARY j1).
+
+## 2026-10-14 (A216) - skipped rounds below the lower Ton limit (RTL, bridge, plant)
+
+**Source:** A207 / A208 / A210: below about 30 % of its load a module's Ton sits
+at its lower limit and Vo runs away upward. scb_ctrl gets cfg_skip, cfg_skip_hi,
+cfg_skip_lo and the outputs skip1 (to the front end), smp (a tick: the ADC
+samples) and idle. With the loop's Ton at its limit and the last Vo sample
+above vref + hi (+ lo once skipping), skip_q (latched at phase 1's low-side
+turn-on) withholds phase 1's next turn-on; the skipped instant is the slots'
+reference, so phases 2..N turn their low sides off and stay off. scb_phase gets
+hold, tk_skip, tk_per, res_time and sk_pulse, tk_pulse, res_pulse, t_lon_q: a
+held phase 1 ticks every period and resumes with its low side, ended by the
+front end at the current target (no trim, dlo untouched); held slotted phases
+turn their low sides on at the resume's instant plus their slots. With
+cfg_ton_lat the condition's three comparisons are read from registers loaded
+with the phases' Ton. scb_multi is regenerated (the slaves do not follow a
+master's pause yet). Bridge: cfg "skip" {"hi_mv", "lo_mv"}; a tick adds a
+record to "sections" (key "tick") and samples Vo and Vin (the record's code is
+now one method, section()); the front end makes no turn-on while skip1 is
+high; the record adds "skip_ticks". Plant: cfg "load_step2", a second load
+event (CircuitParams i_step2 / t_step2, the kernel's run_t and load_at).
+**Gate:** "skip" and "load_step2" absent are the old cosim bit for bit (unit
+tests 100 of 100 with five new ones, cosim_regression --quick and --full; A216
+BOUNDARY i1), and a run that never reaches the limit is the same with skip
+configured (i2).
+
 ## 2026-10-14 (A215 results) - the bridge refuses ton_lat > 30
 
 **Source:** A215 RESULTS 0. The divider's completion, 32 clocks after a

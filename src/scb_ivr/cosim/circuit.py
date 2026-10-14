@@ -120,6 +120,8 @@ class CircuitParams:
     rev_r: float = 0.0           # Ohm per device, from fit_fig8 when rev_drop
     i_step: float = 0.0          # A100: a load current step drawn from the output from t_step on
     t_step: float = float("inf")
+    i_step2: float = 0.0         # A216: a second load current step, added to the first from t_step2 on
+    t_step2: float = float("inf")
     aux_phases: tuple = ()       # A101: phases (1-based) with an auxiliary branch: Lr and a bidirectional switch (BDS)
     aux_l: float = 0.0           #   from a capacitor node m_k (aux_c to ground) to x_k; aux_r = BDS + Lr resistance
     aux_r: float = 0.0
@@ -161,7 +163,7 @@ class CircuitParams:
 
     def load_at(self, t):
         a = self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
-        return a + (self.i_step if t >= self.t_step else 0.0)       # A100: + 0.0 without a step
+        return a + (self.i_step if t >= self.t_step else 0.0) + (self.i_step2 if t >= self.t_step2 else 0.0)   # A100, A216
 
 
 def topology(n, loop=()):

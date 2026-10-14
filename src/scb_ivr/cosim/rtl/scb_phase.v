@@ -44,6 +44,21 @@
 //   earlier, by a step that doubles while the decisions agree (up to cfg_st_smax) and returns to 1 when they differ;
 //   |sofs| <= 1024 LSB.
 //
+// - Skipped rounds (A216, mode P). Phase 1 with hold high at its predictive turn-on makes no turn-on (sk_pulse; both
+//   switches stay off, "held") and then ticks every tk_per (tk_pulse, also at the first skip: the ADC's instants). At
+//   a tick with tk_skip low it resumes with its low side: turn-on at the tick (res_pulse), turn-off by the front
+//   end at the current target as before lo_learn (lo_timed is low for this interval; no trim, dlo and the learn
+//   count untouched), then the predictive turn-on as always. A front-end turn-off with hold high (the floor, or an
+//   untimed phase 1) leaves the phase in UP: the front end made no turn-on. A slotted phase with hold high (the
+//   module is paused) at its slot's turn-off stays held too, takes no slot while held, and when hold is low again
+//   turns its low side on at res_time (scb_ctrl: the resume's instant plus this phase's slot) and waits in LOW for
+//   the next reference's slot. hold low at all times gives the old behaviour.
+// - The pause's last interval at zero current (A220, zcd high: phase 1 with the round to come skipped, a slotted
+//   phase whose last pulse ended after that decision). Phase 1's low side is not timed but ended by the front end
+//   (the bridge's zero-current threshold; no trim, no dlo); a slotted phase arms its front end in LOW and its report
+//   ends the interval and holds the phase, with no turn-on; its slot is not taken, and half a tk_per after the slot
+//   the low side turns off anyway. The phases then idle from zero current. zcd low gives the old behaviour.
+//
 // Correctors (one report per edge):
 // - dt_pred: early -> + cfg_dt_step (capped at cfg_dt_max); flat -> hold; otherwise the measured valley time m_tv, or
 //   with cfg_err_high base - ((m_err - cfg_eh_tgt) >>> cfg_err_shift) clamped to [0, cfg_dt_max], base = dt_pred,
@@ -123,6 +138,16 @@ module scb_phase #(
     input  wire                 cfg_slot_floor,// C06: a slotted phase's front end armed as a floor (slave phase 1)
     input  wire                 cfg_floor_late,// A141: a floor report after the committed turn-off moves t_on
     input  wire signed [TW-1:0] lo_add,        // A148: offset of the timed turn-off (scb_vff), LSB; not learned
+    input  wire                 hold,          // A216: phase 1: skip the next turn-on; a slotted phase: the module is paused
+    input  wire                 tk_skip,       // A216 (phase 1): at a tick, stay paused
+    input  wire [TW-1:0]        tk_per,        // A216 (phase 1): the ticks' period, LSB
+    input  wire [TW-1:0]        res_time,      // A216 (slotted): this phase's low-side turn-on of a resume
+    output reg                  sk_pulse,      // A216 (phase 1): the first skipped turn-on of a pause (one cycle)
+    output reg                  tk_pulse,      // A216 (phase 1): a tick of the paused phase, the first skip included
+    output reg                  res_pulse,     // A216 (phase 1): the resume's low-side turn-on (one cycle)
+    output wire [TW-1:0]        t_lon_q,       // A216: the last low-side turn-on time (t_lon)
+    output wire                 res_lo,        // A217 (phase 1): in LOW after a resume (the front end's threshold moves)
+    input  wire                 zcd,           // A220: this low-side interval ends at zero current (the pause's last)
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -153,6 +178,13 @@ module scb_phase #(
 
     reg [TW-1:0] t_off, t_lon, t_lo, fired_ref;
     assign t_lo_q = t_lo;                                            // C02
+    assign t_lon_q = t_lon;                                          // A216
+    reg          held;                                               // A216: in UP with the turn-on withheld
+    reg          res;                                                // A216 (phase 1): in LOW after a resume
+    assign res_lo = res;                                             // A217
+    reg [TW-1:0] t_tk;                                               // A216 (phase 1): the next tick
+    wire signed [TW-1:0] d_tk  = t_tk - now;
+    wire signed [TW-1:0] d_res = res_time - now;
     reg [TW-1:0] pend_ref;                                           // A93: reference whose slot is awaited
     reg          pend_v;
     reg          skip_pend;                                          // C06: the floor came before its reference
@@ -162,6 +194,7 @@ module scb_phase #(
     wire signed [TW-1:0] d_rs1   = t_lon + cfg_rs_low - now;
     wire          st_on    = !FIRST && cfg_slot_trim && mode_p;                // A109
     wire signed [TW-1:0] d_slot  = slot_time + (st_on ? sofs : {TW{1'b0}}) - now;
+    wire signed [TW-1:0] d_zbk = d_slot + $signed({1'b0, tk_per[TW-1:1]});   // A220: half a period after the slot
     wire signed [TW-1:0] d_pred  = t_lo + dt_pred - now;
     wire signed [TW-1:0] d_rsu   = t_lo + cfg_rs_high - now;
     // mode S
@@ -195,13 +228,15 @@ module scb_phase #(
     wire [FB-1:0] f_lo_s  = fine(d_lo_s, cfg_fine);
     wire [FB-1:0] f_lo_c  = fine(d_lo_c, cfg_fine);
     wire [FB-1:0] f_hon_s = fine(d_hon_s, cfg_fine);
+    wire [FB-1:0] f_tk    = fine(d_tk, cfg_fine);                    // A216
+    wire [FB-1:0] f_res   = fine(d_res, cfg_fine);
 
     wire pred_first = due(d_pred) && !(due(d_rsu) && (d_rsu < d_pred));
     wire async_on   = FIRST && cfg_async && mode_p;
     wire sfloor_on  = !FIRST && cfg_slot_floor && mode_p;            // C06
     wire lo_open    = $signed(now - t_lon) >= $signed(cfg_blank);   // A89: blanking elapsed
     reg  [15:0] lo_n;                                               // A99: learned turn-offs (saturating)
-    assign lo_timed = FIRST && cfg_lo_pred && mode_p && (lo_n >= cfg_lo_learn);
+    assign lo_timed = FIRST && cfg_lo_pred && mode_p && (lo_n >= cfg_lo_learn) && !res && !zcd;   // A216, A220
     wire signed [TW-1:0] d_lo1t = t_lon + dlo + lo_add - now;       // A99: timed turn-off (A148: + lo_add)
     // A100: dlo's next value from the report (step 1, or adaptive) and the Ton feedforward, floored at 0
     reg  [TW-1:0] ton_q;
@@ -226,7 +261,8 @@ module scb_phase #(
     wire [TW-1:0]         dlo_next = dlo_s[TW+11] ? {TW{1'b0}} : dlo_s[TW-1:0];
     wire [FB-1:0] f_lo1t = fine(d_lo1t, cfg_fine);
     assign arm = (async_on && (state == LOW) && lo_open && (!lo_timed || cfg_lo_floor))   // A118: or as the floor
-              || (sfloor_on && (state == LOW) && lo_open);                                // C06: the slot floor
+              || (sfloor_on && (state == LOW) && lo_open)                                 // C06: the slot floor
+              || (!FIRST && zcd && mode_p && (state == LOW) && lo_open);                  // A220: zero current
     // A141: a floor report after the clocked turn-off; fl_lo: the floor's turn-off came first
     wire fl_late    = cfg_floor_late && a_valid && ((lo_timed && cfg_lo_floor && async_on) || sfloor_on);
     wire fl_lo      = $signed(a_tlo - t_lo) < 0;
@@ -257,6 +293,9 @@ module scb_phase #(
         gl_ev    <= 1'b0;
         on_pulse <= 1'b0;
         lo_pulse <= 1'b0;
+        sk_pulse <= 1'b0;                                        // A216
+        tk_pulse <= 1'b0;
+        res_pulse <= 1'b0;
         if (rst) begin
             state       <= FIRST ? HIGH : LOW;
             t_on        <= {TW{1'b0}};
@@ -287,6 +326,9 @@ module scb_phase #(
             st_step     <= 8'd1;
             st_last     <= 1'b0;
             st_seen     <= 1'b0;
+            held        <= 1'b0;                                 // A216
+            res         <= 1'b0;
+            t_tk        <= {TW{1'b0}};
         end else begin
             if (m_valid) begin
                 if (m_early)
@@ -392,8 +434,12 @@ module scb_phase #(
                     end else if (lo_timed) begin                 // A99: timed phase-1 turn-off
                         if (cfg_lo_floor && async_on && a_valid) begin   // A118: the floor came first; its edges made
                             t_lo <= a_tlo; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;   // by the front end; no trim
-                            t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
-                            state <= HIGH;
+                            if (hold) begin                      // A216: the front end made no turn-on
+                                state <= UP;
+                            end else begin
+                                t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
+                                state <= HIGH;
+                            end
                         end else if (due(d_lo1t)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_lo1t;
                             t_lo <= now + f_lo1t; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
@@ -406,30 +452,51 @@ module scb_phase #(
                         end
                     end else if (async_on) begin
                         if (a_valid) begin                       // A81: edges made by the front end
-                            t_lo <= a_tlo; lo_bind_cur <= 1'b1; lo_pulse <= 1'b1;
-                            t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
-                            if (cfg_lo_pred) begin               // A99: learn the on-low interval
+                            t_lo <= a_tlo; lo_bind_cur <= !res && !zcd; lo_pulse <= 1'b1;   // A216, A220: no trim
+                            if (cfg_lo_pred && !res && !zcd) begin   // A99: learn the on-low interval
                                 dlo <= a_tlo - t_lon;
                                 if (lo_n != 16'hFFFF) lo_n <= lo_n + 1'b1;
                             end
-                            state <= HIGH;
+                            res <= 1'b0;
+                            if (hold) begin                      // A216: the front end made no turn-on
+                                state <= UP;
+                            end else begin
+                                t_on <= a_tlo + dt_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;
+                                state <= HIGH;
+                            end
                         end else if (due(d_rs1)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_rs1;
                             t_lo <= now + f_rs1; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            res <= 1'b0;
                             state <= UP;
                         end
                     end else if (FIRST) begin
                         if (c_i && lo_open) begin                // A89: blanking
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= {FB{1'b0}};
-                            t_lo <= now; lo_bind_cur <= 1'b1; lo_pulse <= 1'b1;
-                            if (cfg_lo_pred) begin               // A99: learn the on-low interval
+                            t_lo <= now; lo_bind_cur <= !res; lo_pulse <= 1'b1;     // A216: no trim after a resume
+                            if (cfg_lo_pred && !res) begin       // A99: learn the on-low interval
                                 dlo <= now - t_lon;
                                 if (lo_n != 16'hFFFF) lo_n <= lo_n + 1'b1;
                             end
+                            res <= 1'b0;
                             state <= UP;
                         end else if (due(d_rs1)) begin
                             gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= f_rs1;
                             t_lo <= now + f_rs1; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            res <= 1'b0;
+                            state <= UP;
+                        end
+                    end else if (zcd && mode_p) begin                    // A220: the pause's last interval
+                        if (a_valid) begin                               // the front end turned the low side off
+                            t_lo <= a_tlo; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            if (slot_new && !skip_pend) begin fired_ref <= ref_id; pend_v <= 1'b0; end
+                            held <= 1'b1;
+                            state <= UP;
+                        end else if (slot_new && !skip_pend && due(d_zbk)) begin   // no report: off anyway
+                            gl_ev <= 1'b1; gl_lvl <= 1'b0; gl_fine <= {FB{1'b0}};
+                            t_lo <= now; lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
+                            fired_ref <= ref_id; pend_v <= 1'b0;
+                            held <= 1'b1;
                             state <= UP;
                         end
                     end else if (sfloor_on && a_valid) begin             // C06: the floor came first
@@ -443,6 +510,7 @@ module scb_phase #(
                         t_lo <= now + (slot_miss ? {FB{1'b0}} : f_slot); lo_bind_cur <= 1'b0; lo_pulse <= 1'b1;
                         fired_ref <= ref_id; pend_v <= 1'b0;
                         if (slot_miss || d_slot[TW-1]) late_fires <= late_fires + 1'b1;
+                        if (hold) held <= 1'b1;                  // A216: the module is paused
                         state <= UP;
                     end else if (slot_new && !skip_pend) begin           // A93: waiting for this reference
                         pend_ref <= ref_id; pend_v <= 1'b1;
@@ -455,13 +523,36 @@ module scb_phase #(
                             t_on <= now + f_hon_s; on_how <= HOW_TIMED; on_pulse <= 1'b1;
                             state <= HIGH;
                         end
-                    end else if (fl_late && fl_lo) begin                 // A141: the floor's turn-on comes first
+                    end else if (held) begin                             // A216: the turn-on is withheld
+                        if (FIRST) begin
+                            if (due(d_tk)) begin
+                                if (tk_skip) begin                       // a tick: stay paused
+                                    tk_pulse <= 1'b1; t_tk <= t_tk + tk_per;
+                                end else begin                           // resume with the low side
+                                    gl_ev <= 1'b1; gl_lvl <= 1'b1; gl_fine <= f_tk;
+                                    t_lon <= now + f_tk;
+                                    held <= 1'b0; res <= 1'b1; res_pulse <= 1'b1;
+                                    state <= LOW;
+                                end
+                            end
+                        end else if (hold) begin
+                            fired_ref <= ref_id; pend_v <= 1'b0;         // a paused round's slot is not taken
+                        end else if (due(d_res)) begin                   // the module resumed: the low side on, then
+                            gl_ev <= 1'b1; gl_lvl <= 1'b1; gl_fine <= f_res;   // LOW until the next reference's slot
+                            t_lon <= now + f_res;
+                            held <= 1'b0;
+                            state <= LOW;
+                        end
+                    end else if (fl_late && fl_lo && !hold) begin        // A141: the floor's turn-on comes first
                         t_on <= t_on_fl; on_how <= HOW_PRED; on_pulse <= 1'b1;
                         state <= HIGH;
                     end else if (cfg_zvs_react && c_zh) begin
                         gh_ev <= 1'b1; gh_lvl <= 1'b1; gh_fine <= {FB{1'b0}};
                         t_on <= now; on_how <= HOW_ZVS; on_pulse <= 1'b1;
                         state <= HIGH;
+                    end else if (cfg_pred && pred_first && FIRST && hold) begin   // A216: this turn-on is skipped
+                        held <= 1'b1; sk_pulse <= 1'b1; tk_pulse <= 1'b1;
+                        t_tk <= t_lo + dt_pred + tk_per;
                     end else if (cfg_pred && pred_first) begin
                         gh_ev <= 1'b1; gh_lvl <= 1'b1; gh_fine <= f_pred;
                         t_on <= now + f_pred; on_how <= HOW_PRED; on_pulse <= 1'b1;

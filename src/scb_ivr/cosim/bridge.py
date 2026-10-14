@@ -19,7 +19,13 @@ Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive 
 "t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115; "ton_s_ns", A184: mode S's Ton, while
 "ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit;
 "ton_min_ns", A208: the loop's lower Ton limit (cfg_ton_min) as its own value - absent = 0.5 ton_ns, bit for bit;
-"ton_lat", A215: clocks the Ton arithmetic gets before the phases' registers load (cfg_ton_lat) - absent = 0, bit for bit; "hand_vo_v",
+"ton_lat", A215: clocks the Ton arithmetic gets before the phases' registers load (cfg_ton_lat) - absent = 0, bit for bit;
+"skip" {"hi_mv", "lo_mv", "res_ofs_a"}, A216: rounds are skipped at the lower Ton limit while Vo is above vref + hi (lo once skipping);
+a paused module's ticks add records to "sections" (key "tick") and sample the ADC; A217: res_ofs_a raises phase 1's
+front-end threshold during a resume's low-side interval by that much (the latency of its edges times the current's
+slope); A220: zcd_a ends the pause's last low-side intervals at zero current - phase 1's front end and phases 2..N's
+own (A133's latches) at the threshold zcd_a (the latency times the slope, so the edge lands at 0 A), needs "async" -
+absent = no skipping, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
 absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
@@ -77,7 +83,8 @@ reports it at the turn-off); keys absent from cfg take the values that reproduce
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
-Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
+Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load;
+"load_step2" (A216) the same, added to the first (a release and a later re-application in one run).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -281,6 +288,8 @@ def make_params(cfg, ref):
         extra.update(vin_step=float(ls["dv"]), t_vstep=float(ls["t_us"]) * 1e-6, t_vslew=float(ls.get("slew_us", 0.0)) * 1e-6)
     if cfg.get("load_step"):                                          # A100: a load current step
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
+    if cfg.get("load_step2"):                                         # A216: a second one, added to the first
+        extra.update(i_step2=float(cfg["load_step2"]["i_a"]), t_step2=float(cfg["load_step2"]["t_us"]) * 1e-6)
     aux = cfg.get("aux")                                              # A101: auxiliary commutation branches
     if aux:
         r_bds = 2 * aux.get("rds_on_mohm", 1.3) * 1e-3 / aux["alpha"]
@@ -437,6 +446,16 @@ class ModuleSim:
         if not 0 <= lat <= 30:                                           # from 31 the divider's completion starves the load
             raise ValueError("ton_lat must be in [0, 30] (A215: from 31 the registers load only on periods > 32 + M clocks)")
         c.set("cfg_ton_lat", lat)
+        sk = cfg.get("skip") or {}                                       # A216: skipped rounds at the lower Ton limit
+        self.skip_on, self.fe_inh, self.ticks = bool(sk), False, 0
+        self.res_lo, self.res_ofs = False, float(sk.get("res_ofs_a", 0.0))   # A217: the front end's offset in a resume
+        c.set("cfg_skip", int(self.skip_on))
+        self.zcd_on, self.zcd_thr = "zcd_a" in sk, float(sk.get("zcd_a", 0.0))   # A220: the pause's last intervals
+        if self.zcd_on and not cfg.get("async", 0):
+            raise ValueError("skip zcd_a needs the asynchronous front end (cfg async)")
+        c.set("cfg_zcd", int(self.zcd_on))
+        c.set("cfg_skip_hi", int(round(sk.get("hi_mv", 5.0) * 1e-3 / self.adc_lsb)))
+        c.set("cfg_skip_lo", int(round(sk.get("lo_mv", 0.0) * 1e-3 / self.adc_lsb)))
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
         self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt
         c.set("cfg_dep", int(self.dep_on)); c.set("cfg_dep_wsh", int(dep.get("wsh", 0)))
@@ -541,30 +560,37 @@ class ModuleSim:
 
     def latch_thr(self):
         thr = self.i_tgt + self.trim_now[0] * self.lsb_a
+        if self.res_lo:                                          # A217: a resume's interval ends this much early
+            return thr + self.res_ofs
+        if self.zcd_on and self.fe_inh:                          # A220: the pause's last interval ends at 0 A
+            return self.zcd_thr
         return thr - float(self.cfg.get("lo_floor_a", 2.0)) if self.floor_on() else thr
 
     def latch_fire(self):                                        # A81 latch fires
         lat, lsb = self.lat, self.lsb
         lat["fired"] = True; lat["fires"] += 1
         t_cmd = self.plant.t + self.t_async
-        bind = not self.floor_on()                               # A118: a floor turn-off reports no residual (no trim)
+        bind = not self.floor_on() and not (self.zcd_on and self.fe_inh)   # A118, A220: no residual (no trim)
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": bind})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, self.lead_s(0, 1, True)), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        if not self.fe_inh:                                      # A216: a skipped turn-on is not made here either
+            heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, self.lead_s(0, 1, True)), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
-    def ph_fire(self, k):                                        # A133: phase k's floor fires (as latch_fire's floor)
+    def ph_fire(self, k):                                        # A133: phase k's floor fires; A220: or its zero-current latch
         f, lsb = self.flat[k], self.lsb
         f["fired"] = True; f["fires"] += 1; self.ph_log.append((self.plant.t, k + 1))
         t_cmd = self.plant.t + self.t_async
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + k), self.seq[0], N + k, 0, {"how": None, "bind": False})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, self.lead_s(k, 1, True)), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        if self.ph_floor:                                        # A220: a zero-current turn-off makes no turn-on
+            heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, self.lead_s(k, 1, True)), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         f["report"] = int(round(t_cmd / lsb))
 
     def ph_latches(self):
-        """A133: (state index, threshold, callback) of each armed, unfired phase floor."""
-        if not self.ph_floor:
+        """A133: (state index, threshold, callback) of each armed, unfired phase floor (A220: zero-current latch)."""
+        if not (self.ph_floor or self.zcd_on):
             return []
-        thr = self.i_tgt + self.trim_now[0] * self.lsb_a - float(self.cfg.get("lo_floor_a", 2.0))
+        thr = (self.i_tgt + self.trim_now[0] * self.lsb_a - float(self.cfg.get("lo_floor_a", 2.0))) if self.ph_floor \
+            else self.zcd_thr                                    # A220: phases 2..N's zero-current turn-offs
         return [(self.nv + k, thr, lambda k=k: self.ph_fire(k)) for k in range(1, N)
                 if self.flat[k]["armed"] and not self.flat[k]["fired"]]
 
@@ -591,7 +617,7 @@ class ModuleSim:
                 latch = ([(True, self.i_tgt, self.mlo_fire)] if mlo["armed"] and mlo["t"] is None else []) + \
                         [(True, self.latch_thr(), self.latch_fire)]     # A118: the crossing, then the floor
             else:
-                latch = (lat["armed"] and not lat["fired"], self.i_tgt + self.trim_now[0] * self.lsb_a, self.latch_fire)
+                latch = (lat["armed"] and not lat["fired"], self.latch_thr(), self.latch_fire)   # A217: latch_thr's value
             xl = self.ph_latches()                                       # A133
             plant.integrate_to(t_target, None, monitors=self.mon, latch=latch, **({"xlatch": xl} if xl else {}))
         else:
@@ -621,6 +647,38 @@ class ModuleSim:
         return {"t_s": plant.t, "y": [float(x) for x in plant.y], "vin_v": self.p.vin_at(plant.t),
                 "gh": [bool(x) for x in plant.gh], "gl": [bool(x) for x in plant.gl], "phys_h": [bool(x) for x in gh],
                 "phys_l": [bool(x) for x in gl], "diode": [bool(x) for x in plant.diode], "gate": gate}
+
+    def section(self, tick=False):
+        """The record and the ADC samples (Vo, Vin) at phase 1's turn-on, or at a tick of a paused module (A216)."""
+        plant, p, st, nv, na = self.plant, self.p, self.st, self.nv, self.na
+        vo, vin = float(plant.y[self.i_out]), p.vin_at(plant.t)
+        ia = [plant.sim.idx[f"a{q}"] for q in range(1, N)]; ix = [plant.sim.idx[f"x{q}"] for q in range(1, N)]
+        self.sections.append({"t_s": plant.t, "v": plant.y[:nv].tolist(), "i": plant.y[nv:].tolist(),
+                              "vo": vo, "vin_v": vin, "mode_p": st["mode_p"], "ton_lsb": st["ton"],
+                              "vcs_v": [float(plant.y[a] - plant.y[x]) for a, x in zip(ia, ix)],
+                              "rev_energy_j": list(plant.rev_e), "rev_time_s": list(plant.rev_t)})   # A89
+        plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
+        if plant.edges:                                 # A145: channel energy in the edges since the last section
+            self.sections[-1]["edge_energy_j"] = list(plant.edge_e)
+            plant.edge_e = [0.0] * (2 * N)
+        if self.vds_win:                                # A144: peak V_DS since the last section, then restart
+            vw = plant._vmax
+            self.sections[-1]["vds_win_v"] = vw.tolist()
+            np.maximum(self.vmax_all, vw, out=self.vmax_all)
+            vw[:] = [plant.vds(q) for q in range(2 * N)]
+        if self.late_log:                               # A162: cumulative late fires per phase at this section
+            self.sections[-1]["late"] = [field(self.ctl.get("late_fires"), q, 16) for q in range(N)]
+        if na:                                          # A101: Cm voltages, branch int i^2 dt and extremes
+            self.sections[-1].update(vm_v=[float(plant.y[x]) for x in self.im], aux_i2s=[float(x) for x in plant.aux_e2],
+                                     aux_imax_a=[float(x) for x in plant.aux_imax],
+                                     aux_imin_a=[float(x) for x in plant.aux_imin])
+            plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
+        self.adc.append(min(max(int(round(vo / self.adc_lsb)), 0), self.adc_max))
+        self.adc_vin.append(min(max(int(round(vin / self.vin_lsb)), 0), self.adc_max))   # A128
+        if self.hand_vo is not None and not self.hand["lat"] and vo >= self.hand_vo:   # A186
+            self.hand.update(lat=True, t=plant.t)
+        if tick:
+            self.sections[-1]["tick"] = 1; self.ticks += 1
 
     def apply(self, j, level, meta):
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
@@ -671,32 +729,7 @@ class ModuleSim:
             if self.dep_on and k == 0 and meta["how"] == 0:              # A132: the V_DS comparator at the edge
                 self.meas_v = bool(v > self.v_set)
             if k == 0:
-                vo, vin = float(plant.y[self.i_out]), p.vin_at(plant.t)
-                ia = [plant.sim.idx[f"a{q}"] for q in range(1, N)]; ix = [plant.sim.idx[f"x{q}"] for q in range(1, N)]
-                self.sections.append({"t_s": plant.t, "v": plant.y[:nv].tolist(), "i": plant.y[nv:].tolist(),
-                                      "vo": vo, "vin_v": vin, "mode_p": st["mode_p"], "ton_lsb": st["ton"],
-                                      "vcs_v": [float(plant.y[a] - plant.y[x]) for a, x in zip(ia, ix)],
-                                      "rev_energy_j": list(plant.rev_e), "rev_time_s": list(plant.rev_t)})   # A89
-                plant.rev_e = [0.0] * (2 * N); plant.rev_t = [0.0] * (2 * N)
-                if plant.edges:                                 # A145: channel energy in the edges since the last section
-                    self.sections[-1]["edge_energy_j"] = list(plant.edge_e)
-                    plant.edge_e = [0.0] * (2 * N)
-                if self.vds_win:                                # A144: peak V_DS since the last section, then restart
-                    vw = plant._vmax
-                    self.sections[-1]["vds_win_v"] = vw.tolist()
-                    np.maximum(self.vmax_all, vw, out=self.vmax_all)
-                    vw[:] = [plant.vds(q) for q in range(2 * N)]
-                if self.late_log:                               # A162: cumulative late fires per phase at this section
-                    self.sections[-1]["late"] = [field(self.ctl.get("late_fires"), q, 16) for q in range(N)]
-                if na:                                          # A101: Cm voltages, branch int i^2 dt and extremes
-                    self.sections[-1].update(vm_v=[float(plant.y[x]) for x in self.im], aux_i2s=[float(x) for x in plant.aux_e2],
-                                             aux_imax_a=[float(x) for x in plant.aux_imax],
-                                             aux_imin_a=[float(x) for x in plant.aux_imin])
-                    plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
-                self.adc.append(min(max(int(round(vo / self.adc_lsb)), 0), self.adc_max))
-                self.adc_vin.append(min(max(int(round(vin / self.vin_lsb)), 0), self.adc_max))   # A128
-                if self.hand_vo is not None and not self.hand["lat"] and vo >= self.hand_vo:   # A186
-                    self.hand.update(lat=True, t=plant.t)
+                self.section()
         if j < N and not level:                 # A89: high-side turn-off edge starts the zero-crossing TDC
             if k == 0 and self.snap_win and any(a * 1e-6 <= plant.t <= b * 1e-6 for a, b in self.snap_win):
                 self.snaps.append(self.snapshot())               # A205 (read-only)
@@ -757,7 +790,12 @@ class ModuleSim:
         else:
             lat["armed"] = False; lat["fired"] = False
         lat["dt0"] = field(c.get("dt_pred"), 0, TW)
-        if self.ph_floor:                                        # A133
+        if self.skip_on:                                         # A216
+            self.fe_inh = bool(c.get("skip1"))
+            self.res_lo = bool(c.get("res1"))                    # A217
+            if c.get("smp"):                                     # a tick: the ADC samples where a turn-on would land
+                heapq.heappush(self.pend, (w * lsb + self.t_drv, self.seq[0], -1, 0, None)); self.seq[0] += 1
+        if self.ph_floor or self.zcd_on:                         # A133, A220
             arm, dts = c.get("arm_n"), c.get("dt_pred")
             for k in range(1, N):
                 f = self.flat[k]
@@ -809,7 +847,7 @@ class ModuleSim:
         c.set("a_valid", int(lat["report"] is not None))
         c.set("a_tlo", lat["report"] or 0)
         lat["report"] = None
-        if self.ph_floor:                                        # A133
+        if self.ph_floor or self.zcd_on:                         # A133, A220
             fl = self.flat
             c.set("fa_valid", sum(int(fl[k]["report"] is not None) << k for k in range(N)))
             c.set("fa_tlo", pack([fl[k]["report"] or 0 for k in range(N)], TW))
@@ -832,6 +870,9 @@ class ModuleSim:
         while pend and pend[0][0] < t_win_end:
             ta, _, j, lvl, meta = heapq.heappop(pend)
             self.integrate_to(ta)
+            if j < 0:                                           # A216: a paused module's tick
+                self.section(tick=True)
+                continue
             self.apply(j, lvl, meta)
             if self.gated:
                 self.shoot_check()
@@ -894,6 +935,11 @@ class ModuleSim:
                                            gate_miller=p.gate_miller, r_sw=list(p.r_sw))
         if self.hand_vo is not None:                                 # A186
             out["t_hand_req_s"] = self.hand["t"]
+        if self.skip_on:                                                 # A216
+            out["skip_ticks"] = self.ticks
+        if self.zcd_on:                                                  # A220: (t, phase) of each zero-current turn-off
+            out["zcd_fires"] = [f["fires"] for f in self.flat]
+            out["zcd_log"] = self.ph_log
         if self.gated:                                               # A164
             out["overlaps_cmd"] = ovl["cmd"]
         if self.dep_on:                                              # A132
