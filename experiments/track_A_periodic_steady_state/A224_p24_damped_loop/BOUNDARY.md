@@ -55,3 +55,16 @@ Budget: stage 1 13 runs (about 1.5 h at 10 jobs), stage 2 7 runs (about 2 h).
   does; else neither, stage 2 is not run, and the ring is traced further (A225).
 - Stage 2 at the chosen kd: j1 and e1-e5 pass -> rel_gate 25 and kd join the final configuration; item 9 closes for
   the rows run. A miss is reported with its record, and the final configuration stays as it is.
+
+## 5. Stage 2 additions (written after stage 1, before stage 2's runs)
+- Stage 1 (a224_summary.json): kd 355 passes e1-e4 on its six rows (w rows 152.6 / 163.4 / 158.1 A); kd 530 passes
+  e1 but its S75 125 C start-up reaches 276.6 A at the handover (A223's g25 180.0 A; record
+  cosim/run_k_S75h_d530.json): the derivative term pushes Ton to 52 ns while Vo falls from the 1.045 V request,
+  Vo undershoots to 0.993 V and the valleys are lost (289.7 A at +38 us). By Section 4 kd = 355.
+- Because a kd 1.5 x the chosen one breaks the hottest handover, two start-ups to 200 us are added:
+  h_S75_25_d355 (A222's S75 25 C start-up, reference A222's run_s_S75_25_r2.json; criterion e4) and h_S75h_d440
+  (S75 125 C at kd 440 = 1.24 x 355; information - the margin, not in the decision).
+- Seen in stage 1, reported, not a criterion: kd 355 raises the late fires in the 40 us after the S75 125 C handover
+  from 12 to 74 and after the re-applications (e.g. N0 from 20 %: 104 -> 166).
+- Prediction: h_S75_25_d355 within 2 A of A222's handover (154.0 A on V5; V7 151.3 A); h_S75h_d440 between 180 and
+  230 A at the handover (no basis to place the cliff between 355 and 530).

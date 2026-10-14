@@ -4,7 +4,9 @@
   rows (l_N0_p48, k_S75h) at kd 355 and 530 ns/V (cfg_<row>_d355 / _d530); i_u_N0_g25: A223's u_N0_g25 again on
   A224's code (kd absent; identity);
 - stage 2 (kd chosen by BOUNDARY Section 4): the remaining A223 rows (w0_N0, w30_S75h, u_N0, l_N0_m80) and A221's
-  skipping rows (N0 10 %, N75 10 %, N0 no load; A222's trims) at that kd (cfg_<row>_d<kd>).
+  skipping rows (N0 10 %, N75 10 %, N0 no load; A222's trims) at that kd (cfg_<row>_d<kd>); Section 5's start-ups to
+  200 us: h_S75h_d440 (S75 125 C at kd 440, the margin to stage 1's kd 530 handover) and h_S75_25_d<kd> (A222's S75
+  25 C start-up).
     python3 make_cfgs.py 1          -> cosim/cfg_*.json, cosim/ORDER_S1.txt
     python3 make_cfgs.py 2 <kd>     -> cosim/cfg_*.json, cosim/ORDER_S2.txt"""
 from __future__ import annotations
@@ -61,4 +63,10 @@ if __name__ == "__main__":
         kd = int(sys.argv[2])
         rows = [arm(*M23.ROWS[r], f"{r}_d{kd}", kd) for r in S2_ROWS]
         rows += [arm(*z_row(*v), f"{k}_d{kd}", kd) for k, v in Z_ROWS.items()]
+        c, what = M23.ROWS["k_S75h"]
+        c = dict(copy.deepcopy(c), t_end_us=200.0)
+        c.pop("line_step", None)
+        rows.append(arm(c, "S75 at 125 C, the start-up to 200 us", "h_S75h_d440", 440))
+        c = M23.load("A222_p24_v7_startup_trim/cosim/cfg_s_S75_25_r2.json")
+        rows.append(arm(c, "A222's S75 25 C start-up to 200 us", f"h_S75_25_d{kd}", kd))
         write(rows, "ORDER_S2.txt")
