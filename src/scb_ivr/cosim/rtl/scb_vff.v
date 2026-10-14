@@ -25,6 +25,8 @@
 //   low-pass (>> 8), clamped to +-32767. With vs_kr = vs_kt = g 2^24 vin_lsb / (256 Vo) it is the volt-second balance of
 //   phase 1's inductor, g ((V_rail1 - Vo) ton_1 - (V_rss - Vo) tlp) / Vo; zero at constant Vin up to ton's dither.
 //   Both 0, or outside mode P: lo_add = 0.
+// - A215: upd is high in every clock before an edge at which a register read by ton_ph / lo_add changes (the sample's
+//   clock, the one after it, when m follows g, and the divider's last step), for scb_ctrl's multi-cycle registers.
 module scb_vff #(
     parameter N  = 4,
     parameter TW = 32,
@@ -49,7 +51,8 @@ module scb_vff #(
     input  wire signed [15:0] vs_kr,           // A148: lo_add's rail coefficient (Q24 of LSB per LSB x Q8 code)
     input  wire signed [15:0] vs_kt,           // A148: its Ton coefficient
     output wire [N*TW-1:0] ton_ph,
-    output wire signed [TW-1:0] lo_add         // A148
+    output wire signed [TW-1:0] lo_add,        // A148
+    output wire            upd                  // A215: a register behind ton_ph / lo_add changes at the next clock edge
 );
     localparam LW = AW + 10;                   // signed fixed point, 8 fractional bits
     reg               init;
@@ -64,6 +67,7 @@ module scb_vff #(
     reg               en_q, rpend;             // A137: en's last value, a restart waiting for its sample
     reg  [TW-1:0]     tpre;                    // C10: ton while en is low
     reg  signed [LW+1:0] rail_q, rss_q;        // A148: rail and rss of the last sample
+    reg               vv_q;                    // A215: the clock after a sample (m takes the new g at its end)
     wire              rise = (seed != 2'd0) && en && !en_q;
     wire              rs   = rise || rpend;
     wire              ini  = init && !rs;
@@ -96,9 +100,11 @@ module scb_vff #(
             init <= 1'b0; lp2 <= 0; lp20 <= 0; tlp <= 0; vprev <= 0; en_q <= 1'b0; rpend <= 1'b0; g <= 0; gate <= 1'b0; cap <= 0; cap_on <= 1'b0; dcnt <= 0;
             rail_q <= 0; rss_q <= 0;
             tpre <= tseed;
+            vv_q <= 1'b0;
             for (j = 0; j < N; j = j + 1) m[j] <= 0;
         end else begin
             en_q <= en;                                                       // A137
+            vv_q <= vin_valid;                                                // A215
             if (!en) tpre <= tseed;                                           // C10, A184
             if (rise && !vin_valid) rpend <= 1'b1;
             if (vin_valid) begin
@@ -139,6 +145,8 @@ module scb_vff #(
             assign ton_ph[q * TW +: TW] = en ? tc : ton;
         end
     endgenerate
+
+    assign upd = vin_valid || vv_q || (dcnt == 6'd1);                         // A215
 
     // A148: phase 1's low-side edge offset
     wire signed [TW+1:0]  tref  = $signed({2'b00, tlp[TW+7:8]});

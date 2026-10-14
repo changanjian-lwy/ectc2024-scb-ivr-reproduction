@@ -1,5 +1,6 @@
 """cocotb unit tests of a slave module's controller (scb_ctrl with SLAVE = 1): phase 1 slotted at ext_slot once per
-ext_ref, and C06's slot floor (cfg_slave_floor) with A141's late report. The fixture and LSB units are test_scb_ctrl's (start_s 0: mode P
+ext_ref, C06's slot floor (cfg_slave_floor) with A141's late report, and A215's registers after a change of the
+broadcast Ton. The fixture and LSB units are test_scb_ctrl's (start_s 0: mode P
 from reset; a slave's phase 1 resets LOW; dt_init of phase 1 85, Ton 133)."""
 import cocotb
 from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge
@@ -104,3 +105,23 @@ async def slave_floor_late_report_after_the_slot_moves_t_on(dut):
     assert field(dut.state.value, 0, 2) == 0 and int(dut.t_ref.value) == 375 and int(dut.t_lo1.value) == 300
     off = await c.until("H", 0, 1, after=300)
     assert off[0] + off[1] == 508 and c.find("H", 1, 1) is None
+
+
+@cocotb.test()
+async def slave_ton_lat_follows_the_broadcast(dut):
+    """A215, cfg_ton_lat 3 on a slave: a change of ext_ton (150 -> 170 LSB) is seen in its first clock and reaches
+    the phases 3 edges after that clock's end."""
+    c = Ctrl(dut)
+    await c.start(ext_ton_en=1, ext_ton=150, ext_ref=7, ext_slot=40000, ton_lat=3)
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+    assert field(dut.ton_ph.value, 0, 32) == 150
+    await c.set(ext_ton=170)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 170 and int(dut.lat_ev.value) == 1
+    seen = []
+    for _ in range(5):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        seen.append(field(dut.ton_ph.value, 0, 32))
+    assert seen == [150, 150, 150, 170, 170], seen

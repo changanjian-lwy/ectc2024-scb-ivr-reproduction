@@ -35,6 +35,11 @@
 //   edge an offset from scb_vff (the volt-second law; lo_add, 0 when both are 0).
 // - A184: mode S runs at cfg_ton_s; the loop's reset value (ton_acc) and scb_vff's C10 seed keep cfg_ton, so a short
 //   mode-S period can have its own trim. cfg_ton_s = cfg_ton is the old controller bit for bit.
+// - A215: with cfg_ton_lat = M != 0 the phases read their Ton (and phase 1's lo_add) from registers, loaded M clocks
+//   after the last change of anything the Ton arithmetic reads (the loop's sample, scb_vff's updates, the handover,
+//   a slave's ext_ton), so that arithmetic is a multi-cycle path of M clocks and nothing else in the path between a
+//   phase's registers; a new Ton reaches the phases M + 1 clocks later than with cfg_ton_lat = 0, where they read
+//   the arithmetic directly (the old controller bit for bit).
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -146,6 +151,7 @@ module scb_ctrl #(
     input  wire [AW-1:0]       cfg_vff_vo,     // A128: Vo in Vin codes
     input  wire signed [15:0]  cfg_vff_vs_kr,  // A148: phase 1's low-side edge offset, rail coefficient (scb_vff)
     input  wire signed [15:0]  cfg_vff_vs_kt,  // A148: its Ton coefficient (0 and 0: no offset)
+    input  wire [5:0]          cfg_ton_lat,    // A215: clocks the Ton arithmetic gets before the phases' registers load (0: none)
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
     input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
@@ -204,13 +210,40 @@ module scb_ctrl #(
     assign ton_now = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton_s; // C2, A184
     wire [TW-1:0] ton_seed = (cfg_vloop && mode_p) ? ton_loop : (cfg_ext_ton && mode_p) ? ext_ton : cfg_ton;  // A184
 
-    wire [N*TW-1:0] ton_ph;                    // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
-    wire signed [TW-1:0] lo_add;               // A148: phase 1's low-side edge offset
+    wire [N*TW-1:0] ton_ph_c;                  // A128: each phase's Ton (ton_now unless cfg_vff in mode P)
+    wire signed [TW-1:0] lo_add_c;             // A148: phase 1's low-side edge offset
+    wire            vff_upd;                   // A215
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
         .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now), .tseed(ton_seed),
-        .vs_kr(cfg_vff_vs_kr), .vs_kt(cfg_vff_vs_kt), .ton_ph(ton_ph), .lo_add(lo_add)
+        .vs_kr(cfg_vff_vs_kr), .vs_kt(cfg_vff_vs_kt), .ton_ph(ton_ph_c), .lo_add(lo_add_c), .upd(vff_upd)
     );
+
+    // A215: the phases' registers of the Ton path. lat_ev is high in the clock before an edge that changes one of
+    // the arithmetic's sources (a slave's ext_ton: in the clock after its change); the load comes cfg_ton_lat clocks
+    // after the last such edge. In reset the registers follow the arithmetic, and load once more in the first clock.
+    reg  [N*TW-1:0] ton_ph_r;
+    reg  signed [TW-1:0] lo_add_r;
+    reg  [5:0]      lat_cnt;
+    reg  [TW-1:0]   ext_q;
+    wire            lat_on = (cfg_ton_lat != 6'd0);
+    wire            lat_ev = (adc_valid && cfg_vloop && mode_p) || vff_upd || (on_pulse[0] && !mode_p && hand_req)
+                             || (cfg_ext_ton && (ext_ton != ext_q));
+    wire [N*TW-1:0] ton_ph = lat_on ? ton_ph_r : ton_ph_c;
+    wire signed [TW-1:0] lo_add = lat_on ? lo_add_r : lo_add_c;
+    always @(posedge clk) begin
+        ext_q <= ext_ton;
+        if (rst) begin
+            ton_ph_r <= ton_ph_c; lo_add_r <= lo_add_c; lat_cnt <= 6'd1;
+        end else if (lat_ev) begin
+            lat_cnt <= cfg_ton_lat;
+        end else if (lat_cnt != 6'd0) begin
+            lat_cnt <= lat_cnt - 1'b1;
+            if (lat_cnt == 6'd1) begin
+                ton_ph_r <= ton_ph_c; lo_add_r <= lo_add_c;
+            end
+        end
+    end
 
     scb_dep #(.AW(AW), .DW(8)) u_dep (                                // A132
         .clk(clk), .rst(rst), .en(cfg_dep && mode_p), .v_valid(v_valid), .v_high(v_high), .adc_valid(adc_valid),
@@ -329,7 +362,7 @@ module scb_ctrl #(
                 .cfg_lo_floor(IS_FIRST ? cfg_lo_floor : 1'b0),                                  // A118
                 .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : (k > 0) ? cfg_ph_floor : 1'b0),   // C06; A133
                 .cfg_floor_late(cfg_floor_late),                                                // A141
-                .lo_add(IS_FIRST ? lo_add : {TW{1'b0}}),                                        // A148
+                .lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),                               // A148
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end

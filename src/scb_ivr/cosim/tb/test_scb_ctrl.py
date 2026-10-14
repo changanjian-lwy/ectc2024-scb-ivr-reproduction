@@ -5,7 +5,8 @@ drives every input; option bits default to 0. Groups: phase timing, comparators 
 and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 front end; the timed low side and
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
-step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133). From A93's tests (history: ../CHANGELOG.md).
+step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133); the Ton path's multi-cycle
+registers (A215). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -35,7 +36,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             vff_gth=0,                                                           # A129
             vff_rel=0, vff_rel_lp=0, vff_seed=0,                                 # A135, A136, A137
             vff_vs_kr=0, vff_vs_kt=0,                                            # A148
-            ton_s=None)                                                          # A184: None = ton
+            ton_s=None,                                                          # A184: None = ton
+            ton_lat=0)                                                           # A215
 
 
 def pack(values, width):
@@ -135,6 +137,7 @@ class Ctrl:
         d.cfg_vff_rel_lp.value = cfg["vff_rel_lp"]               # A136
         d.cfg_vff_seed.value = cfg["vff_seed"]                   # A137
         d.cfg_vff_vs_kr.value = cfg["vff_vs_kr"] & 0xFFFF; d.cfg_vff_vs_kt.value = cfg["vff_vs_kt"] & 0xFFFF   # A148
+        d.cfg_ton_lat.value = cfg["ton_lat"]                     # A215
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -1488,3 +1491,122 @@ async def ph_floor_report_is_the_slot(dut):
     while await _win(dut) < 2200:
         pass
     assert c.find("L", 0, 2) is None and field(dut.late_fires.value, 1, 16) == 0
+
+
+def _ph_ton(dut, k):
+    """The Ton phase k + 1 reads (scb_ctrl ton_ph: the registers with cfg_ton_lat, else the arithmetic)."""
+    return field(dut.ton_ph.value, k, TW)
+
+
+async def _lat_invariant(dut, clocks):
+    """Each clock: with no load pending the registers equal the arithmetic; returns the clocks where they differed."""
+    diff = []
+    for i in range(clocks):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        same = int(dut.ton_ph_r.value) == int(dut.ton_ph_c.value) and int(dut.lo_add_r.value) == int(dut.lo_add_c.value)
+        if not same:
+            diff.append(i)
+            assert int(dut.lat_cnt.value) != 0 or int(dut.lat_ev.value) == 1, i
+    return diff
+
+
+@cocotb.test()
+async def ton_lat_loads_m_clocks_after_the_sample(dut):
+    """A215, cfg_ton_lat 3: a sample moves ton_now 133 -> 173 at its clock edge; the phases' Ton follows 3 edges
+    later, and not before."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=65536, ton_lat=3)
+    await ReadOnly()
+    assert [_ph_ton(dut, k) for k in range(4)] == [133] * 4
+    await c.set(adc_valid=1, adc_code=2000 - 40)
+    await c.set(adc_valid=0)                        # the falling edge after the sample's rising edge
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 173 and _ph_ton(dut, 0) == 133
+    seen = []
+    for _ in range(4):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        seen.append([_ph_ton(dut, k) for k in range(4)])
+    assert seen == [[133] * 4, [133] * 4, [173] * 4, [173] * 4], seen
+
+
+@cocotb.test()
+async def ton_lat_zero_reads_the_arithmetic(dut):
+    """A215, cfg_ton_lat 0: the phases read the arithmetic in the sample's own clock (the old controller), and the
+    running pulse ends at the new Ton: 133 -> 100 LSB, window 96, fine 4."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=65536)
+    await c.set(adc_valid=1, adc_code=2000 + 33)
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 100 and _ph_ton(dut, 0) == 100
+    e = await c.until("H", 0, 1)
+    assert (e[0], e[1]) == (96, 4), e
+
+
+@cocotb.test()
+async def ton_lat_keeps_the_running_pulse(dut):
+    """A215, cfg_ton_lat 8: the same sample reaches the phases after phase 1's pulse has ended, so that pulse keeps
+    133 LSB (window 128, fine 5) and phase 1's next one has 100."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=65536, ton_lat=8)
+    await c.set(adc_valid=1, adc_code=2000 + 33)
+    await c.set(adc_valid=0)
+    e = await c.until("H", 0, 1)
+    assert (e[0], e[1]) == (128, 5), e
+    await ClockCycles(dut.clk, 8)
+    await ReadOnly()
+    assert [_ph_ton(dut, k) for k in range(4)] == [100] * 4
+
+
+@cocotb.test()
+async def ton_lat_follows_every_feed_forward_update(dut):
+    """A215, cfg_ton_lat 2 with scb_vff's falling term and cap: over two samples and the divider (32 clocks) the
+    registers differ from the arithmetic only while a load is pending, and end equal to it; the cap (97 LSB on
+    phase 1) reaches the phases 2 edges after the arithmetic has it."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(64, -47, -47, -139), vff_k=100000, ton_lat=2)
+    await _vin(dut, 2400, 4)
+    await _lat_invariant(dut, 6)
+    await c.set(vin_valid=1, vin_code=2640)
+    await c.set(vin_valid=0)
+    first = None
+    for i in range(60):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        same = int(dut.ton_ph_r.value) == int(dut.ton_ph_c.value)
+        assert same or int(dut.lat_cnt.value) != 0 or int(dut.lat_ev.value) == 1, i
+        if first is None and field(dut.ton_ph_c.value, 0, TW) != 133:
+            first = i
+        if first is not None and i < first + 2:
+            assert _ph_ton(dut, 0) == 133, (i, first)
+        if first is not None and i >= first + 2:
+            assert _ph_ton(dut, 0) == field(dut.ton_ph_c.value, 0, TW), (i, first)
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    assert first is not None and _ph_ton(dut, 0) == (100000 << 8) // rail
+    assert int(dut.lat_cnt.value) == 0 and int(dut.ton_ph_r.value) == int(dut.ton_ph_c.value)
+
+
+@cocotb.test()
+async def ton_lat_at_the_handover(dut):
+    """A215, cfg_ton_lat 4: at the handover ton_now goes from mode S's 100 LSB to the loop's 133 with mode_p; the
+    phases keep 100 for 4 more edges."""
+    c = Ctrl(dut)
+    await c.start(start_s=1, vloop=1, ton=133, ton_s=100, ton_lat=4)
+    await ReadOnly()
+    assert _ph_ton(dut, 0) == 100
+    await c.set(hand_req=1)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.mode_p.value):
+            break
+    assert int(dut.mode_p.value) == 1 and int(dut.ton_now.value) == 133
+    seen = [_ph_ton(dut, 0)]
+    for _ in range(5):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        seen.append(_ph_ton(dut, 0))
+    assert seen == [100, 100, 100, 100, 133, 133], seen

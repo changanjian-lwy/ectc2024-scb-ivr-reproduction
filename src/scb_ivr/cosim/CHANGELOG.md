@@ -4,6 +4,21 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A215) - the port expression and the Ton path's registers (RTL unfrozen by the user)
+
+**Source:** A209. (1) scb_ctrl's `.lo_add(IS_FIRST ? lo_add : {TW{1'b0}})` mixes a
+signed wire and an unsigned constant and stops yosys's front end; the constant
+is now `$signed({TW{1'b0}})`. (2) The path from the loop's accumulator through
+scb_vff into the phases is 12 times the clock in sky130. scb_ctrl gets
+cfg_ton_lat (6 bits): when not 0, the phases read ton_ph / lo_add from
+registers (ton_ph_r, lo_add_r) that load cfg_ton_lat clocks after the last
+event that changes a source of the arithmetic (lat_ev: the loop's sample,
+scb_vff's new output upd, the handover, a change of ext_ton). scb_vff gets upd
+(the sample's clock, the clock after it, the divider's last step). scb_multi is
+regenerated. The bridge's cfg "ton_lat" sets cfg_ton_lat; absent = 0.
+**Gate:** cfg_ton_lat = 0 is the old controller bit for bit (unit tests 95 of
+95 with six new ones, cosim_regression --quick and --full; A215 BOUNDARY c1).
+
 ## 2026-10-14 (A208) - the loop's lower Ton limit as its own cfg value (bridge)
 
 **Source:** A207. The bridge set cfg_ton_min to half of cfg ton_ns. ton_ns is

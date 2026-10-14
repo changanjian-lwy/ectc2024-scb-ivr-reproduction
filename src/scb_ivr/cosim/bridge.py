@@ -18,7 +18,8 @@ Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive 
 1 HIGH and phases 2..N LOW, input ramp over t_ramp, load connection at t_load and handover request at t_hand (cfg
 "t_load_us" / "t_hand_us" override them, A103, and "t_ramp_us" the ramp, A115; "ton_s_ns", A184: mode S's Ton, while
 "ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit;
-"ton_min_ns", A208: the loop's lower Ton limit (cfg_ton_min) as its own value - absent = 0.5 ton_ns, bit for bit; "hand_vo_v",
+"ton_min_ns", A208: the loop's lower Ton limit (cfg_ton_min) as its own value - absent = 0.5 ton_ns, bit for bit;
+"ton_lat", A215: clocks the Ton arithmetic gets before the phases' registers load (cfg_ton_lat) - absent = 0, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
 absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
@@ -432,6 +433,7 @@ class ModuleSim:
         kvs = round(g * 2 ** 24 * self.vin_lsb / (256 * cfg["vref_v"])) if g else 0
         c.set("cfg_vff_vs_kr", int(vff.get("vs_kr", kvs)) & 0xFFFF); c.set("cfg_vff_vs_kt", int(vff.get("vs_kt", kvs)) & 0xFFFF)
         c.set("vin_valid", 0); c.set("vin_code", 0)
+        c.set("cfg_ton_lat", int(cfg.get("ton_lat", 0)))                 # A215: clocks for the Ton arithmetic (0: direct)
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
         self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt
         c.set("cfg_dep", int(self.dep_on)); c.set("cfg_dep_wsh", int(dep.get("wsh", 0)))

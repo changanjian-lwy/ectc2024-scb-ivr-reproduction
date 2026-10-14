@@ -89,7 +89,8 @@ def _look(tabs, slew, load):
     return best
 
 
-def sta(netlist_json, top, cells):
+def sta(netlist_json, top, cells, n_groups=12):
+    """n_groups: how many end registers by_end_register lists (A215 reads all of them: None)."""
     mod = json.loads(open(netlist_json).read())["modules"][top]
     names = {}
     for n, d in mod["netnames"].items():
@@ -178,6 +179,6 @@ def sta(netlist_json, top, cells):
             b = prev[b][2]
         return label(b), base(b)
 
-    top_groups = [{"end": g, "delay_ns": round(v[0], 3), "start": origin(v[1])[1]} for g, v in sorted(groups.items(), key=lambda kv: -kv[1][0])[:12]]
+    top_groups = [{"end": g, "delay_ns": round(v[0], 3), "start": origin(v[1])[1]} for g, v in sorted(groups.items(), key=lambda kv: -kv[1][0])[:n_groups]]
     return {"delay_ns": worst[0], "end": worst[2], "start": origin(worst[1])[0] if worst[1] is not None else None, "depth_cells": len(path),
             "cells": len(inst), "flops": len(set(seq_q.values())), "endpoints": len(ends), "unmapped": unknown, "by_end_register": top_groups}
