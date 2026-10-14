@@ -1,0 +1,1224 @@
+{
+ "m_lat": 16,
+ "t_clk_ns": 4.0,
+ "ties": {
+  "cfg_start_s": "1'b1",
+  "cfg_pred": "1'b1",
+  "cfg_zvs_react": "1'b0",
+  "cfg_trim": "1'b1",
+  "cfg_fine": "1'b1",
+  "cfg_vloop": "1'b1",
+  "cfg_ext_ton": "1'b0",
+  "ext_ton": "32'd0",
+  "ext_slot": "32'd0",
+  "ext_ref": "32'd0",
+  "cfg_async": "1'b1",
+  "fa_valid": "4'd0",
+  "fa_tlo": "128'd0",
+  "cfg_low_pred": "1'b1",
+  "cfg_err_low": "1'b1",
+  "cfg_err_high": "1'b1",
+  "cfg_slot_follow": "1'b1",
+  "cfg_slot_guard": "1'b1",
+  "cfg_slot_avg": "1'b1",
+  "cfg_slot_lo": "1'b1",
+  "cfg_slot_trim": "1'b0",
+  "cfg_lo_pred": "1'b1",
+  "cfg_lo_adm": "1'b1",
+  "cfg_lo_ff": "1'b0",
+  "cfg_lo_floor": "1'b1",
+  "cfg_slave_floor": "1'b0",
+  "cfg_ph_floor": "1'b0",
+  "cfg_floor_late": "1'b1",
+  "cfg_vff": "1'b1",
+  "cfg_vff_rel": "10'd320",
+  "cfg_vff_rel_lp": "1'b1",
+  "cfg_vff_seed": "2'd2",
+  "cfg_vff_vs_kr": "16'sd0",
+  "cfg_vff_vs_kt": "16'sd0",
+  "cfg_dep": "1'b0"
+ },
+ "phase_alone_ns": {
+  "sky130": 10.2,
+  "nangate45": 2.44
+ },
+ "runs": {
+  "ctrl_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 126304,
+   "cells_mapped": 126304,
+   "area": null,
+   "top": "scb_ctrl",
+   "library": null,
+   "exit": 0,
+   "wall_s": 48.4
+  },
+  "phase_first_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 16046,
+   "cells_mapped": 16046,
+   "area": null,
+   "top": "scb_phase",
+   "library": null,
+   "exit": 0,
+   "wall_s": 6.3
+  },
+  "phase_rest_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 11996,
+   "cells_mapped": 11996,
+   "area": null,
+   "top": "scb_phase",
+   "library": null,
+   "exit": 0,
+   "wall_s": 5.2
+  },
+  "vff_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 68581,
+   "cells_mapped": 68581,
+   "area": null,
+   "top": "scb_vff",
+   "library": null,
+   "exit": 0,
+   "wall_s": 20.8
+  },
+  "multi_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 220484,
+   "cells_mapped": 220484,
+   "area": null,
+   "top": "scb_multi",
+   "library": null,
+   "exit": 0,
+   "wall_s": 81.4
+  },
+  "final_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 84442,
+   "cells_mapped": 84442,
+   "area": null,
+   "top": "scb_ctrl_final",
+   "library": null,
+   "exit": 0,
+   "wall_s": 30.5
+  },
+  "final_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 84442,
+   "cells_mapped": 89450,
+   "area": 514146.8576,
+   "top": "scb_ctrl_final",
+   "library": "sky130",
+   "exit": 0,
+   "sta": {
+    "delay_ns": 25.081862458786844,
+    "end": "u.u_vff.dnum[1]",
+    "start": "u.ton_acc[0]",
+    "depth_cells": 75,
+    "cells": 89450,
+    "flops": 1931,
+    "endpoints": 3140,
+    "unmapped": {
+     "$scopeinfo": 8
+    }
+   },
+   "delay_ns": 25.081862458786844,
+   "phase_ends": [
+    {
+     "end": "u.g_ph[3].u_ph.t_on",
+     "delay_ns": 13.525,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[3].u_ph.on_how",
+     "delay_ns": 13.507,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[1].u_ph.on_how",
+     "delay_ns": 13.496,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[1].u_ph.t_on",
+     "delay_ns": 13.453,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[2].u_ph.on_how",
+     "delay_ns": 13.306,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[2].u_ph.t_on",
+     "delay_ns": 13.263,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[2].u_ph.t_lo",
+     "delay_ns": 12.804,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[3].u_ph.gh_lvl",
+     "delay_ns": 12.589,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    }
+   ],
+   "reg_ends": [
+    {
+     "end": "u.ton_ph_r",
+     "delay_ns": 23.034,
+     "start": "u.ton_acc",
+     "cls": "reg",
+     "start_cls": "arith"
+    }
+   ],
+   "arith_ends": [
+    {
+     "end": "u.u_vff.dnum",
+     "delay_ns": 25.082,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.u_vff.tlp",
+     "delay_ns": 17.175,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.ton_acc",
+     "delay_ns": 15.883,
+     "start": "cfg_vref_code",
+     "cls": "arith",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.u_vff.dq",
+     "delay_ns": 14.161,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.drem",
+     "delay_ns": 14.161,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dden",
+     "delay_ns": 14.062,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.cap_on",
+     "delay_ns": 13.407,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dcnt",
+     "delay_ns": 13.295,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.g",
+     "delay_ns": 12.366,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.gate",
+     "delay_ns": 12.327,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    }
+   ],
+   "other_ends": [
+    {
+     "end": "u.lat_cnt",
+     "delay_ns": 5.666,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.cyc",
+     "delay_ns": 4.294,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.n_ref",
+     "delay_ns": 3.7,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per",
+     "delay_ns": 3.685,
+     "start": "u.g_ph[0].ref_k",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per2",
+     "delay_ns": 3.482,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "win_q",
+     "delay_ns": 2.457,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.per3",
+     "delay_ns": 1.923,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    }
+   ],
+   "port_ends": [
+    {
+     "end": "ton_now",
+     "delay_ns": 11.824,
+     "start": "u.ton_acc",
+     "cls": "port",
+     "start_cls": "arith"
+    },
+    {
+     "end": "arm1",
+     "delay_ns": 6.643,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "arm_n",
+     "delay_ns": 6.643,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "lo_timed1",
+     "delay_ns": 4.656,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "on_pulse",
+     "delay_ns": 1.324,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "mode_p",
+     "delay_ns": 1.324,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    }
+   ],
+   "arith_starts": 529,
+   "arith_reaches_phase": [],
+   "arith_reaches": {
+    "reg": 1,
+    "arith": 22,
+    "phase": 0,
+    "other": 1
+   },
+   "wall_s": 73.5
+  },
+  "final_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 84442,
+   "cells_mapped": 91750,
+   "area": 102008.606,
+   "top": "scb_ctrl_final",
+   "library": "nangate45",
+   "exit": 0,
+   "sta": {
+    "delay_ns": 5.135830365962894,
+    "end": "u.u_vff.dnum[1]",
+    "start": "u.ton_acc[1]",
+    "depth_cells": 79,
+    "cells": 91750,
+    "flops": 1931,
+    "endpoints": 2541,
+    "unmapped": {
+     "$scopeinfo": 8
+    }
+   },
+   "delay_ns": 5.135830365962894,
+   "phase_ends": [
+    {
+     "end": "u.g_ph[3].u_ph.on_how",
+     "delay_ns": 3.077,
+     "start": "u.t_per",
+     "cls": "phase",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.g_ph[2].u_ph.on_how",
+     "delay_ns": 3.07,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[2].u_ph.t_on",
+     "delay_ns": 3.063,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[3].u_ph.t_on",
+     "delay_ns": 3.061,
+     "start": "u.t_per",
+     "cls": "phase",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.g_ph[1].u_ph.on_how",
+     "delay_ns": 3.024,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[1].u_ph.t_on",
+     "delay_ns": 3.008,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "phase",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.t_lon",
+     "delay_ns": 2.817,
+     "start": "u.cyc",
+     "cls": "phase",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.g_ph[3].u_ph.gh_lvl",
+     "delay_ns": 2.793,
+     "start": "u.t_per",
+     "cls": "phase",
+     "start_cls": "other"
+    }
+   ],
+   "reg_ends": [
+    {
+     "end": "u.ton_ph_r",
+     "delay_ns": 4.797,
+     "start": "u.ton_acc",
+     "cls": "reg",
+     "start_cls": "arith"
+    }
+   ],
+   "arith_ends": [
+    {
+     "end": "u.u_vff.dnum",
+     "delay_ns": 5.136,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.ton_acc",
+     "delay_ns": 3.697,
+     "start": "cfg_vref_code",
+     "cls": "arith",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.u_vff.tlp",
+     "delay_ns": 3.367,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.u_vff.drem",
+     "delay_ns": 3.307,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dq",
+     "delay_ns": 3.288,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dden",
+     "delay_ns": 3.064,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.cap_on",
+     "delay_ns": 2.947,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dcnt",
+     "delay_ns": 2.882,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.g",
+     "delay_ns": 2.479,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.gate",
+     "delay_ns": 2.47,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    }
+   ],
+   "other_ends": [
+    {
+     "end": "u.lat_cnt",
+     "delay_ns": 0.945,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per",
+     "delay_ns": 0.886,
+     "start": "u.g_ph[0].ref_k",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.cyc",
+     "delay_ns": 0.781,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.n_ref",
+     "delay_ns": 0.564,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per2",
+     "delay_ns": 0.539,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "win_q",
+     "delay_ns": 0.397,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.per3",
+     "delay_ns": 0.35,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    }
+   ],
+   "port_ends": [
+    {
+     "end": "ton_now",
+     "delay_ns": 2.172,
+     "start": "u.ton_acc",
+     "cls": "port",
+     "start_cls": "arith"
+    },
+    {
+     "end": "arm1",
+     "delay_ns": 1.239,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "arm_n",
+     "delay_ns": 1.239,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "lo_timed1",
+     "delay_ns": 0.827,
+     "start": "u.g_ph[0].u_ph.lo_n",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "on_pulse",
+     "delay_ns": 0.238,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "mode_p",
+     "delay_ns": 0.238,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    }
+   ],
+   "arith_starts": 529,
+   "arith_reaches_phase": [],
+   "arith_reaches": {
+    "reg": 1,
+    "arith": 22,
+    "phase": 0,
+    "other": 2
+   },
+   "wall_s": 74.9
+  },
+  "final0_generic": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 85108,
+   "cells_mapped": 85108,
+   "area": null,
+   "top": "scb_ctrl_final0",
+   "library": null,
+   "exit": 0,
+   "wall_s": 37.7
+  },
+  "final0_sky130": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 85108,
+   "cells_mapped": 91038,
+   "area": 519229.232,
+   "top": "scb_ctrl_final0",
+   "library": "sky130",
+   "exit": 0,
+   "sta": {
+    "delay_ns": 30.64469424698531,
+    "end": "gl_fine[0]",
+    "start": "u.ton_acc[0]",
+    "depth_cells": 91,
+    "cells": 91038,
+    "flops": 1796,
+    "endpoints": 2877,
+    "unmapped": {
+     "$scopeinfo": 8
+    }
+   },
+   "delay_ns": 30.64469424698531,
+   "phase_ends": [
+    {
+     "end": "u.g_ph[0].u_ph.gl_fine",
+     "delay_ns": 30.645,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.t_lon",
+     "delay_ns": 30.645,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gl_lvl",
+     "delay_ns": 30.574,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.state",
+     "delay_ns": 29.268,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gl_ev",
+     "delay_ns": 29.228,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gh_ev",
+     "delay_ns": 28.784,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.t_off",
+     "delay_ns": 28.751,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.late_fires",
+     "delay_ns": 27.831,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    }
+   ],
+   "reg_ends": [],
+   "arith_ends": [
+    {
+     "end": "u.u_vff.dnum",
+     "delay_ns": 26.309,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.u_vff.tlp",
+     "delay_ns": 18.45,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.ton_acc",
+     "delay_ns": 16.071,
+     "start": "cfg_vref_code",
+     "cls": "arith",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.u_vff.dq",
+     "delay_ns": 14.841,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.drem",
+     "delay_ns": 14.841,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dden",
+     "delay_ns": 14.816,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.cap_on",
+     "delay_ns": 14.083,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dcnt",
+     "delay_ns": 13.957,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.g",
+     "delay_ns": 12.375,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.gate",
+     "delay_ns": 12.336,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    }
+   ],
+   "other_ends": [
+    {
+     "end": "u.cyc",
+     "delay_ns": 4.385,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.n_ref",
+     "delay_ns": 3.7,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per",
+     "delay_ns": 3.684,
+     "start": "u.g_ph[0].ref_k",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per2",
+     "delay_ns": 3.482,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "win_q",
+     "delay_ns": 2.62,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.per3",
+     "delay_ns": 1.923,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    }
+   ],
+   "port_ends": [
+    {
+     "end": "ton_now",
+     "delay_ns": 11.406,
+     "start": "u.ton_acc",
+     "cls": "port",
+     "start_cls": "arith"
+    },
+    {
+     "end": "arm1",
+     "delay_ns": 6.815,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "arm_n",
+     "delay_ns": 6.815,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "lo_timed1",
+     "delay_ns": 4.656,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "on_pulse",
+     "delay_ns": 1.324,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "mode_p",
+     "delay_ns": 1.324,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    }
+   ],
+   "arith_starts": 528,
+   "arith_reaches_phase": [
+    "u.g_ph[0].u_ph.gh_ev",
+    "u.g_ph[0].u_ph.gh_fine",
+    "u.g_ph[0].u_ph.gh_lvl",
+    "u.g_ph[0].u_ph.gl_ev",
+    "u.g_ph[0].u_ph.gl_fine",
+    "u.g_ph[0].u_ph.gl_lvl",
+    "u.g_ph[0].u_ph.late_fires",
+    "u.g_ph[0].u_ph.state",
+    "u.g_ph[0].u_ph.t_lon",
+    "u.g_ph[0].u_ph.t_off",
+    "u.g_ph[1].u_ph.gh_ev",
+    "u.g_ph[1].u_ph.gh_fine",
+    "u.g_ph[1].u_ph.gh_lvl",
+    "u.g_ph[1].u_ph.gl_ev",
+    "u.g_ph[1].u_ph.gl_fine",
+    "u.g_ph[1].u_ph.gl_lvl",
+    "u.g_ph[1].u_ph.late_fires",
+    "u.g_ph[1].u_ph.state",
+    "u.g_ph[1].u_ph.t_off",
+    "u.g_ph[2].u_ph.gh_ev"
+   ],
+   "arith_reaches": {
+    "reg": 0,
+    "arith": 22,
+    "phase": 37,
+    "other": 0
+   },
+   "wall_s": 96.5
+  },
+  "final0_nangate45": {
+   "problems": 0,
+   "error": null,
+   "cells_generic": 85108,
+   "cells_mapped": 93760,
+   "area": 102819.906,
+   "top": "scb_ctrl_final0",
+   "library": "nangate45",
+   "exit": 0,
+   "sta": {
+    "delay_ns": 6.445868206654783,
+    "end": "u.g_ph[0].u_ph.t_lon[0]",
+    "start": "u.ton_acc[22]",
+    "depth_cells": 97,
+    "cells": 93760,
+    "flops": 1796,
+    "endpoints": 2406,
+    "unmapped": {
+     "$scopeinfo": 8
+    }
+   },
+   "delay_ns": 6.445868206654783,
+   "phase_ends": [
+    {
+     "end": "u.g_ph[0].u_ph.t_lon",
+     "delay_ns": 6.446,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gl_lvl",
+     "delay_ns": 6.275,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gl_fine",
+     "delay_ns": 6.275,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.t_off",
+     "delay_ns": 6.22,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.state",
+     "delay_ns": 6.207,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gl_ev",
+     "delay_ns": 6.188,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.gh_ev",
+     "delay_ns": 6.162,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.g_ph[0].u_ph.late_fires",
+     "delay_ns": 6.121,
+     "start": "u.ton_acc",
+     "cls": "phase",
+     "start_cls": "arith"
+    }
+   ],
+   "reg_ends": [],
+   "arith_ends": [
+    {
+     "end": "u.u_vff.dnum",
+     "delay_ns": 5.254,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.ton_acc",
+     "delay_ns": 3.689,
+     "start": "cfg_vref_code",
+     "cls": "arith",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.u_vff.tlp",
+     "delay_ns": 3.618,
+     "start": "u.ton_acc",
+     "cls": "arith",
+     "start_cls": "arith"
+    },
+    {
+     "end": "u.u_vff.drem",
+     "delay_ns": 3.159,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dq",
+     "delay_ns": 3.141,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dden",
+     "delay_ns": 2.98,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.cap_on",
+     "delay_ns": 2.843,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.dcnt",
+     "delay_ns": 2.776,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.g",
+     "delay_ns": 2.401,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.u_vff.gate",
+     "delay_ns": 2.392,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "arith",
+     "start_cls": "phase"
+    }
+   ],
+   "other_ends": [
+    {
+     "end": "u.t_per",
+     "delay_ns": 0.886,
+     "start": "u.g_ph[0].ref_k",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.cyc",
+     "delay_ns": 0.763,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.n_ref",
+     "delay_ns": 0.564,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "u.t_per2",
+     "delay_ns": 0.539,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    },
+    {
+     "end": "win_q",
+     "delay_ns": 0.375,
+     "start": "u.cyc",
+     "cls": "other",
+     "start_cls": "other"
+    },
+    {
+     "end": "u.per3",
+     "delay_ns": 0.35,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "other",
+     "start_cls": "phase"
+    }
+   ],
+   "port_ends": [
+    {
+     "end": "ton_now",
+     "delay_ns": 2.06,
+     "start": "u.ton_acc",
+     "cls": "port",
+     "start_cls": "arith"
+    },
+    {
+     "end": "arm1",
+     "delay_ns": 1.221,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "arm_n",
+     "delay_ns": 1.221,
+     "start": "u.cyc",
+     "cls": "port",
+     "start_cls": "other"
+    },
+    {
+     "end": "lo_timed1",
+     "delay_ns": 0.827,
+     "start": "u.g_ph[0].u_ph.lo_n",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "on_pulse",
+     "delay_ns": 0.238,
+     "start": "u.g_ph[0].u_ph.on_pulse",
+     "cls": "port",
+     "start_cls": "phase"
+    },
+    {
+     "end": "mode_p",
+     "delay_ns": 0.238,
+     "start": "u.g_ph[0].u_ph.async_on",
+     "cls": "port",
+     "start_cls": "phase"
+    }
+   ],
+   "arith_starts": 528,
+   "arith_reaches_phase": [
+    "u.g_ph[0].u_ph.gh_ev",
+    "u.g_ph[0].u_ph.gh_fine",
+    "u.g_ph[0].u_ph.gh_lvl",
+    "u.g_ph[0].u_ph.gl_ev",
+    "u.g_ph[0].u_ph.gl_fine",
+    "u.g_ph[0].u_ph.gl_lvl",
+    "u.g_ph[0].u_ph.late_fires",
+    "u.g_ph[0].u_ph.state",
+    "u.g_ph[0].u_ph.t_lon",
+    "u.g_ph[0].u_ph.t_off",
+    "u.g_ph[1].u_ph.gh_ev",
+    "u.g_ph[1].u_ph.gh_fine",
+    "u.g_ph[1].u_ph.gh_lvl",
+    "u.g_ph[1].u_ph.gl_ev",
+    "u.g_ph[1].u_ph.gl_fine",
+    "u.g_ph[1].u_ph.gl_lvl",
+    "u.g_ph[1].u_ph.late_fires",
+    "u.g_ph[1].u_ph.state",
+    "u.g_ph[1].u_ph.t_off",
+    "u.g_ph[2].u_ph.gh_ev"
+   ],
+   "arith_reaches": {
+    "reg": 0,
+    "arith": 22,
+    "phase": 37,
+    "other": 1
+   },
+   "wall_s": 93.8
+  }
+ },
+ "criteria_synthesis": {
+  "c4": true,
+  "c5_sky130": true,
+  "c6_sky130": true,
+  "numbers_sky130": {
+   "phase_end_ns": 13.525,
+   "register_end_ns": 23.034,
+   "final0_ns": 30.64469424698531,
+   "final0_reaches_phase": 20,
+   "final0_phase_end_ns": 30.645,
+   "arith_end_ns": 25.082
+  },
+  "c5_nangate45": true,
+  "c6_nangate45": true,
+  "numbers_nangate45": {
+   "phase_end_ns": 3.077,
+   "register_end_ns": 4.797,
+   "final0_ns": 6.445868206654783,
+   "final0_reaches_phase": 20,
+   "final0_phase_end_ns": 6.446,
+   "arith_end_ns": 5.136
+  },
+  "c5_45nm_fits_clock": true
+ }
+}

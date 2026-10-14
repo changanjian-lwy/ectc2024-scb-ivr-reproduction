@@ -1,0 +1,1026 @@
+{
+ "runs": {
+  "m16_B_N75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.11559974990814,
+   "hand_pk": 149.4004741163153,
+   "peak_whole": 189.9258135234044,
+   "post_pk": 189.9258135234044,
+   "post_pk_phase": 1,
+   "vds_whole": 32.95694299555088,
+   "vo_max_to_300us": 1.0322552597498298,
+   "vo_min_mv": -9.30530950359254,
+   "vo_max_mv": 11.680427785768499,
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "il_holds": 2,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 3139.0115728378296
+  },
+  "m16_B_S75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.0919003702529,
+   "hand_pk": 155.31106334578047,
+   "peak_whole": 196.94677317750293,
+   "post_pk": 196.94677317750293,
+   "post_pk_phase": 1,
+   "vds_whole": 31.001230915961372,
+   "vo_max_to_300us": 1.0350868793710566,
+   "vo_min_mv": -14.134310066410748,
+   "vo_max_mv": 9.489817057451111,
+   "late_after": [
+    0,
+    3,
+    31,
+    37
+   ],
+   "il_holds": 100,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 7885.3638870716095
+  },
+  "m16_B_S75_hot_p5_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 141.34794425488104,
+   "hand_pk": 181.09972685189967,
+   "peak_whole": 195.17071955480145,
+   "post_pk": 195.17071955480145,
+   "post_pk_phase": 1,
+   "vds_whole": 31.22374545357636,
+   "vo_max_to_300us": 1.0475500159705742,
+   "vo_min_mv": -13.196024656532245,
+   "vo_max_mv": 9.50518244883436,
+   "late_after": [
+    0,
+    1,
+    0,
+    1
+   ],
+   "il_holds": 106,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 7510.780536651611
+  },
+  "m16_m30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 0.9997939150228059,
+   "vo_end_min_v": 0.9997152232543056,
+   "vo_end_max_v": 0.9998707739328442,
+   "vo_after_min_v": 0.9914724102983483,
+   "vo_after_max_v": 1.0448726365659433,
+   "ton_reg_end_ns": [
+    8.031250000000002,
+    8.406250000000002
+   ],
+   "valley_end_a": {
+    "1": [
+     -16.057557195934,
+     -14.855184256860133
+    ],
+    "2": [
+     -15.72929109704584,
+     -14.537065867537462
+    ],
+    "3": [
+     -15.37382195108389,
+     -13.784505482907806
+    ],
+    "4": [
+     -16.003789611536696,
+     -13.698113260567936
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": true,
+   "kind": "light",
+   "criteria": {
+    "r1": true,
+    "r2": true,
+    "r3": true,
+    "r4": true
+   },
+   "wall_s": 2628.7983260154724
+  },
+  "m16_n_l_m48_1us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 148.88838831590607,
+   "peak_whole": 168.67739303400353,
+   "post_pk": 168.67739303400353,
+   "post_pk_phase": 4,
+   "vds_whole": 29.015583420408788,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -8.191616521821988,
+   "vo_after_max_mv": 1.0205853695284262,
+   "vo_end_mv": [
+    -0.6867808370284445,
+    -0.09277289577636072
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 3,
+   "ton_reg_min_after_ns": 32.875,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2941.7432718276978
+  },
+  "m16_n_l_m80_10us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 148.88838831590607,
+   "peak_whole": 164.9588343541802,
+   "post_pk": 164.9588343541802,
+   "post_pk_phase": 4,
+   "vds_whole": 29.015583420408788,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -25.495899647557717,
+   "vo_after_max_mv": 25.19199592016963,
+   "vo_end_mv": [
+    -0.05783491764499438,
+    0.2103455842723534
+   ],
+   "late_after": [
+    0,
+    1,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 19.25,
+   "il_holds": 6,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2954.6471560001373
+  },
+  "m16_n_l_p48_2us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 148.88838831590607,
+   "peak_whole": 182.00532010389085,
+   "post_pk": 182.00532010389085,
+   "post_pk_phase": 1,
+   "vds_whole": 33.47917941317057,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -8.482022677834156,
+   "vo_after_max_mv": 9.342851665324003,
+   "vo_end_mv": [
+    -0.3019426338334297,
+    -0.005355417420194186
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 28.625000000000004,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2917.553313970566
+  },
+  "m16_n_s_p62": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 148.88838831590607,
+   "peak_whole": 181.9074918790721,
+   "post_pk": 181.9074918790721,
+   "post_pk_phase": 4,
+   "vds_whole": 29.015583420408788,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -15.447932601826086,
+   "vo_after_max_mv": 0.3456761632352201,
+   "vo_end_mv": [
+    -0.20277155573111827,
+    0.32206405074086675
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 33.0625,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2871.244306087494
+  },
+  "m16_r_N75_25_30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 1.0001809361057856,
+   "vo_end_min_v": 1.0001559269503095,
+   "vo_end_max_v": 1.0002385003750864,
+   "vo_after_min_v": 0.9965679640665599,
+   "vo_after_max_v": 1.0358064418877002,
+   "ton_reg_end_ns": [
+    5.125,
+    5.125
+   ],
+   "valley_end_a": {
+    "1": [
+     -15.714528083937115,
+     -15.592657995159312
+    ],
+    "2": [
+     -15.66717890014239,
+     -15.532817810249009
+    ],
+    "3": [
+     -15.691821146592682,
+     -15.52718846549629
+    ],
+    "4": [
+     -15.450840297304692,
+     -15.312426134215
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": true,
+   "kind": "light",
+   "criteria": {
+    "r1": true,
+    "r2": true,
+    "r3": true,
+    "r4": true
+   },
+   "wall_s": 5680.134073734283
+  },
+  "m32_B_N75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.11559974990814,
+   "hand_pk": 149.0603010999545,
+   "peak_whole": 202.39898335938534,
+   "post_pk": 202.39898335938534,
+   "post_pk_phase": 3,
+   "vds_whole": 33.19106791860209,
+   "vo_max_to_300us": 1.0322552597498298,
+   "vo_min_mv": -13.044586568739746,
+   "vo_max_mv": 13.158939242309486,
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "il_holds": 1,
+   "kind": "binding",
+   "criteria": {
+    "c6": false
+   },
+   "wall_s": 3155.510572910309
+  },
+  "m32_B_S75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.0919003702529,
+   "hand_pk": 150.35329819110484,
+   "peak_whole": 193.79201336683525,
+   "post_pk": 193.79201336683525,
+   "post_pk_phase": 1,
+   "vds_whole": 31.40519194665491,
+   "vo_max_to_300us": 1.0350868793710566,
+   "vo_min_mv": -13.858681057038691,
+   "vo_max_mv": 9.17670898407641,
+   "late_after": [
+    0,
+    8,
+    31,
+    55
+   ],
+   "il_holds": 109,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 5136.3304789066315
+  },
+  "m32_B_S75_hot_p5_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 141.34794425488104,
+   "hand_pk": 180.92822934374118,
+   "peak_whole": 203.2137781842784,
+   "post_pk": 203.2137781842784,
+   "post_pk_phase": 2,
+   "vds_whole": 31.924935213147023,
+   "vo_max_to_300us": 1.0475500159705742,
+   "vo_min_mv": -17.151793721832732,
+   "vo_max_mv": 10.300602486986055,
+   "late_after": [
+    0,
+    0,
+    3,
+    3
+   ],
+   "il_holds": 108,
+   "kind": "binding",
+   "criteria": {
+    "c6": false
+   },
+   "wall_s": 4981.907407999039
+  },
+  "m32_m30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 0.8728515868423365,
+   "vo_end_min_v": 0.8510591813905249,
+   "vo_end_max_v": 0.8875716578348184,
+   "vo_after_min_v": 0.4235368439537969,
+   "vo_after_max_v": 1.8811025809250541,
+   "ton_reg_end_ns": [
+    88.96875,
+    88.96875
+   ],
+   "valley_end_a": {
+    "1": [
+     -15.697007354681217,
+     -15.549701237383982
+    ],
+    "2": [
+     -14.121069243765998,
+     -13.63287658748129
+    ],
+    "3": [
+     -10.94202703866211,
+     -10.691802875980635
+    ],
+    "4": [
+     -6.016446780605874,
+     -3.2084694950382984
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": false,
+   "kind": "light",
+   "criteria": {
+    "r1": false,
+    "r2": false,
+    "r3": false,
+    "r4": false
+   },
+   "wall_s": 3132.5570471286774
+  },
+  "m32_n_l_m48_1us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 149.9820869089643,
+   "peak_whole": 171.39354398251996,
+   "post_pk": 171.39354398251996,
+   "post_pk_phase": 4,
+   "vds_whole": 28.89992386460475,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -10.510718134895235,
+   "vo_after_max_mv": 5.305317864793047,
+   "vo_end_mv": [
+    -0.8088725073044367,
+    -0.08012422285808007
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 2,
+   "ton_reg_min_after_ns": 32.3125,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 5633.178365945816
+  },
+  "m32_n_l_m80_10us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 149.9820869089643,
+   "peak_whole": 165.39008080292913,
+   "post_pk": 165.39008080292913,
+   "post_pk_phase": 4,
+   "vds_whole": 28.89992386460475,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -27.159315594452394,
+   "vo_after_max_mv": 19.080417765435122,
+   "vo_end_mv": [
+    -0.3449420526214775,
+    0.09906485663702114
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 22.0625,
+   "il_holds": 47,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 5641.308832168579
+  },
+  "m32_n_l_p48_2us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 149.9820869089643,
+   "peak_whole": 181.96686663813108,
+   "post_pk": 181.96686663813108,
+   "post_pk_phase": 1,
+   "vds_whole": 32.96912292870236,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -4.894758479474626,
+   "vo_after_max_mv": 7.896877413007264,
+   "vo_end_mv": [
+    -0.360032463070481,
+    -0.000383806564197009
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 28.78125,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 5590.504232883453
+  },
+  "m32_n_s_p62": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 149.9820869089643,
+   "peak_whole": 181.5520569808255,
+   "post_pk": 181.5520569808255,
+   "post_pk_phase": 4,
+   "vds_whole": 28.89992386460475,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -15.921301363174711,
+   "vo_after_max_mv": 0.39925226405190806,
+   "vo_end_mv": [
+    -0.29487497830626985,
+    0.30665917673711185
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 32.90625000000001,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2985.227554798126
+  },
+  "m32_r_N75_25_30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 1.1512246907804924,
+   "vo_end_min_v": 1.1510383309333447,
+   "vo_end_max_v": 1.1513656853166445,
+   "vo_after_min_v": 1.0035802012274313,
+   "vo_after_max_v": 1.1513656853166445,
+   "ton_reg_end_ns": [
+    4.0,
+    4.0
+   ],
+   "valley_end_a": {
+    "1": [
+     -15.71448779991442,
+     -15.630402949905491
+    ],
+    "2": [
+     -15.88958484751471,
+     -15.803590266283683
+    ],
+    "3": [
+     -15.879279353505805,
+     -15.727661127106922
+    ],
+    "4": [
+     -15.356419765807441,
+     -15.249448832201972
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": false,
+   "kind": "light",
+   "criteria": {
+    "r1": true,
+    "r2": false,
+    "r3": false,
+    "r4": true
+   },
+   "wall_s": 2952.041220188141
+  }
+ },
+ "information": {
+  "k16_n_s_p62": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25194082540764,
+   "hand_pk": 157.5292891084264,
+   "peak_whole": 181.44532751338292,
+   "post_pk": 181.44532751338292,
+   "post_pk_phase": 4,
+   "vds_whole": 29.04706203876615,
+   "vo_max_to_300us": 1.0334793213090705,
+   "vo_after_min_mv": -15.332420698825011,
+   "vo_after_max_mv": 0.2664847706388418,
+   "vo_end_mv": [
+    -0.26340071826203015,
+    -0.0027626283112258676
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 32.875,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 5492.35461306572
+  },
+  "k8_n_l_p48_2us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25294369047893,
+   "hand_pk": 149.46980663519722,
+   "peak_whole": 183.60173118585453,
+   "post_pk": 183.60173118585453,
+   "post_pk_phase": 1,
+   "vds_whole": 33.30736321241441,
+   "vo_max_to_300us": 1.0335013833997406,
+   "vo_after_min_mv": -6.199776568306725,
+   "vo_after_max_mv": 8.363014275869718,
+   "vo_end_mv": [
+    -0.3623051064830518,
+    0.043644749784910175
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 28.8125,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2872.5534179210663
+  },
+  "k8_n_s_p62": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25294369047893,
+   "hand_pk": 149.46980663519722,
+   "peak_whole": 181.93735294169704,
+   "post_pk": 181.93735294169704,
+   "post_pk_phase": 4,
+   "vds_whole": 29.010252153262556,
+   "vo_max_to_300us": 1.0335013833997406,
+   "vo_after_min_mv": -15.499074591821982,
+   "vo_after_max_mv": 0.13650623447736265,
+   "vo_end_mv": [
+    -0.051137204395868,
+    0.019219237003875733
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 32.875,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 5507.069650888443
+  }
+ },
+ "reference": {
+  "n_l_p48_2us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 184.09757238085302,
+   "post_pk": 184.09757238085302,
+   "post_pk_phase": 1,
+   "vds_whole": 33.33975495015662,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -6.558548199692593,
+   "vo_after_max_mv": 7.9996095589347505,
+   "vo_end_mv": [
+    -0.3589070582997733,
+    -0.04339664824248857
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 28.750000000000004,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2966.0634360313416
+  },
+  "n_l_m48_1us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 171.6780923983807,
+   "post_pk": 171.6780923983807,
+   "post_pk_phase": 4,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -9.130924741971524,
+   "vo_after_max_mv": 2.8997651256224,
+   "vo_end_mv": [
+    -0.46213604737932457,
+    -0.03684492528976957
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 3,
+   "ton_reg_min_after_ns": 32.875,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 2290.6162140369415
+  },
+  "n_l_m80_10us": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 169.53095192999112,
+   "post_pk": 169.53095192999112,
+   "post_pk_phase": 4,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -26.52111995153583,
+   "vo_after_max_mv": 21.409846406663434,
+   "vo_end_mv": [
+    -0.2715504353203446,
+    0.16094782390885243
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 20.4375,
+   "il_holds": 21,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 1640.991357088089
+  },
+  "n_s_p62": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 125.25563913565348,
+   "hand_pk": 161.97812711199936,
+   "peak_whole": 181.54272592332518,
+   "post_pk": 181.54272592332518,
+   "post_pk_phase": 4,
+   "vds_whole": 29.829210421406696,
+   "vo_max_to_300us": 1.0335553998699814,
+   "vo_after_min_mv": -15.027296337003616,
+   "vo_after_max_mv": 0.33123900322018507,
+   "vo_end_mv": [
+    -0.2850201110200512,
+    0.3254570510990984
+   ],
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "oracle_new_after": 0,
+   "ton_reg_min_after_ns": 32.875,
+   "il_holds": 0,
+   "kind": "nominal",
+   "criteria": {
+    "c6": true,
+    "c7": true
+   },
+   "wall_s": 1597.1751608848572
+  },
+  "B_S75_hot_p5_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 141.34794425488104,
+   "hand_pk": 182.04614390068286,
+   "peak_whole": 197.56558649746273,
+   "post_pk": 197.56558649746273,
+   "post_pk_phase": 1,
+   "vds_whole": 30.94873734832288,
+   "vo_max_to_300us": 1.0475500159705742,
+   "vo_min_mv": -12.91898394703217,
+   "vo_max_mv": 10.310758781359342,
+   "late_after": [
+    0,
+    0,
+    3,
+    7
+   ],
+   "il_holds": 114,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 3419.3268580436707
+  },
+  "B_N75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.11559974990814,
+   "hand_pk": 150.51426530473736,
+   "peak_whole": 196.242596148884,
+   "post_pk": 196.242596148884,
+   "post_pk_phase": 1,
+   "vds_whole": 33.37356334005115,
+   "vo_max_to_300us": 1.0322552597498298,
+   "vo_min_mv": -8.779133923636717,
+   "vo_max_mv": 8.520583706767892,
+   "late_after": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "il_holds": 0,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 3440.3708050251007
+  },
+  "B_S75_25_p4_ls0p3": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "start_pk": 137.0919003702529,
+   "hand_pk": 154.5081388257305,
+   "peak_whole": 195.80968692860458,
+   "post_pk": 195.80968692860458,
+   "post_pk_phase": 1,
+   "vds_whole": 31.277003187190548,
+   "vo_max_to_300us": 1.0350868793710566,
+   "vo_min_mv": -11.728519802502667,
+   "vo_max_mv": 9.943004165219094,
+   "late_after": [
+    0,
+    8,
+    13,
+    30
+   ],
+   "il_holds": 94,
+   "kind": "binding",
+   "criteria": {
+    "c6": true
+   },
+   "wall_s": 5660.64919090271
+  },
+  "m30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 0.9997791595789826,
+   "vo_end_min_v": 0.9997112025193644,
+   "vo_end_max_v": 0.9998355189473477,
+   "vo_after_min_v": 0.9853789857506007,
+   "vo_after_max_v": 1.0466777744483016,
+   "ton_reg_end_ns": [
+    8.093750000000002,
+    8.4375
+   ],
+   "valley_end_a": {
+    "1": [
+     -16.156839643868516,
+     -14.921268007847695
+    ],
+    "2": [
+     -15.960418660014604,
+     -14.580700200019178
+    ],
+    "3": [
+     -15.915411604438528,
+     -14.07354302237269
+    ],
+    "4": [
+     -16.219088429453443,
+     -13.886362760484944
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": true,
+   "kind": "light",
+   "criteria": {
+    "r1": true,
+    "r2": true,
+    "r3": true,
+    "r4": true
+   },
+   "wall_s": 2176.246476173401
+  },
+  "r_N75_25_30": {
+   "status": "COMPLETED",
+   "sources_modified": false,
+   "vo_end_v": 0.9999889563568966,
+   "vo_end_min_v": 0.9998242447404855,
+   "vo_end_max_v": 1.0000957010822016,
+   "vo_after_min_v": 0.9860330133383318,
+   "vo_after_max_v": 1.0358289162654366,
+   "ton_reg_end_ns": [
+    5.062500000000001,
+    5.062500000000001
+   ],
+   "valley_end_a": {
+    "1": [
+     -15.716510253951252,
+     -15.6155637473347
+    ],
+    "2": [
+     -15.662704427629736,
+     -15.491023073359777
+    ],
+    "3": [
+     -15.348394881256699,
+     -15.161061304930348
+    ],
+    "4": [
+     -14.779512176523955,
+     -14.492275593276128
+    ]
+   },
+   "late_end": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "freq_mhz": null,
+   "works": true,
+   "kind": "light",
+   "criteria": {
+    "r1": true,
+    "r2": true,
+    "r3": true,
+    "r4": true
+   },
+   "wall_s": 3874.4002919197083
+  }
+ },
+ "criteria_c2": {
+  "c2": true,
+  "rows": 9,
+  "failing": []
+ },
+ "criteria_c3": {
+  "c3": false,
+  "rows": 9,
+  "failing": [
+   "m32_B_N75_25_p4_ls0p3",
+   "m32_B_S75_hot_p5_ls0p3",
+   "m32_m30",
+   "m32_r_N75_25_30"
+  ]
+ },
+ "criteria_identity": {
+  "c1": true,
+  "unit_tests": 95,
+  "regression": {
+   "quick": true,
+   "full": true
+  }
+ },
+ "criteria_synthesis": {
+  "c4": true,
+  "c5_sky130": true,
+  "c6_sky130": true,
+  "c5_nangate45": true,
+  "c6_nangate45": true,
+  "c5_45nm_fits_clock": true
+ }
+}

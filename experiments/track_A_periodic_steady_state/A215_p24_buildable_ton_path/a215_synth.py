@@ -3,7 +3,9 @@ both libraries. The build is scb_ctrl inside a wrapper generated here (scb_ctrl_
 final configuration's values, TIES; the numeric settings stay inputs), once with cfg_ton_lat 16 ("final") and once
 with 0 ("final0", the same controller without the registers). Timing: A209's estimate (a209_sta.py), read per end
 register; reach(): which end registers a path from the Ton arithmetic's registers (ton_acc, p_term, scb_vff's)
-arrives at within one clock, read from the netlist's connections. Tools as A209 (tmp/venv_yosys, tmp/a209/*.lib).
+arrives at within one clock, read from the netlist's connections. A flattened net carries every name it had in the
+hierarchy (the new registers are also each phase's input "ton"), so a flip-flop is classified from all the names of
+its output (classify). Tools as A209 (tmp/venv_yosys, tmp/a209/*.lib).
   tmp/venv_yosys/bin/python a215_synth.py [--jobs 2] -> a215_synth.json, logs in tmp/a215/logs/"""
 from __future__ import annotations
 
@@ -67,14 +69,50 @@ def wrapper(src, name, lat):
             + ",\n        ".join(conn) + "\n    );\nendmodule\n")
 
 
-def graph(netlist_json, top, cells):
-    """(names of each bit, per cell: input bits, output bits, sequential?) of a mapped netlist."""
+REGS = ("u.ton_ph_r", "u.lo_add_r")                             # the new registers
+PHASE = "u.g_ph["
+
+
+def aliases(netlist_json, top):
+    """(module, bit -> every net name it has)."""
     mod = json.loads(open(netlist_json).read())["modules"][top]
-    names = {}
+    out = {}
     for n, d in mod["netnames"].items():
         for b in d["bits"]:
-            if isinstance(b, int) and (b not in names or names[b].startswith("$")):
-                names[b] = n
+            if isinstance(b, int):
+                out.setdefault(b, []).append(n)
+    return mod, out
+
+
+def inputs(module):
+    """The input port names of one RTL module (a net named after one of them inside an instance comes from outside)."""
+    src = (S.RTL / f"{module}.v").read_text()
+    return set(re.findall(r"^\s*input\s+wire\s*(?:signed\s*)?(?:\[[^\]]+\])?\s*(\w+)", src, re.M))
+
+
+IN_PHASE, IN_VFF = inputs("scb_phase"), inputs("scb_vff")
+
+
+def classify(names):
+    """(class, name) of a flip-flop output from all its net names: "reg" (the new registers), "arith" (the Ton
+    arithmetic's registers: ton_acc, p_term and those declared in scb_vff), "phase" (declared in a scb_phase), else
+    "other". A name that is an instance's input port does not count for that instance."""
+    ns = [n for n in names if not n.startswith("$")]
+    for n in ns:
+        if n in REGS:
+            return "reg", n
+    for n in ns:
+        if n in ("u.ton_acc", "u.p_term") or (n.startswith("u.u_vff.") and n[8:].split("[")[0] not in IN_VFF):
+            return "arith", n
+    for n in ns:
+        if n.startswith(PHASE) and n.split(".u_ph.")[-1].split("[")[0] not in IN_PHASE:
+            return "phase", n
+    return "other", (min(ns, key=lambda n: (n.count("."), len(n))) if ns else "?")
+
+
+def graph(netlist_json, top, cells):
+    """(every bit's names, per cell: input bits, output bits, sequential?) of a mapped netlist."""
+    mod, al = aliases(netlist_json, top)
     out = []
     for c in mod["cells"].values():
         lc = cells.get(c["type"])
@@ -84,25 +122,24 @@ def graph(netlist_json, top, cells):
         ins = [b for p, bits in c["connections"].items() for b in bits if isinstance(b, int) and dirs.get(p) != "output" and p not in clk]
         outs = [b for p, bits in c["connections"].items() for b in bits if isinstance(b, int) and dirs.get(p) == "output"]
         out.append((ins, outs, seq))
-    return names, out
+    return al, out
 
 
-def reach(netlist_json, top, cells, prefixes=ARITH):
-    """End registers (base names) that a combinational path from a register named with one of the prefixes reaches."""
-    names, cl = graph(netlist_json, top, cells)
+def reach(netlist_json, top, cells):
+    """(arithmetic registers' bits, the classified end registers a combinational path from one of them reaches)."""
+    al, cl = graph(netlist_json, top, cells)
     loads = {}
     for k, (ins, outs, seq) in enumerate(cl):
         for b in ins:
             loads.setdefault(b, []).append(k)
-    hit = lambda n: any(n == p or n.startswith(p) for p in prefixes)
-    todo = [b for ins, outs, seq in cl if seq for b in outs if hit(names.get(b, "?"))]
+    todo = [b for ins, outs, seq in cl if seq for b in outs if classify(al.get(b, []))[0] == "arith"]
     n_start, seen, ends = len(todo), set(todo), set()
     while todo:
         b = todo.pop()
         for k in loads.get(b, []):
             ins, outs, seq = cl[k]
             if seq:
-                ends.update(names.get(x, "?") for x in outs)
+                ends.update(classify(al.get(x, [])) for x in outs)
             else:
                 for x in outs:
                     if x not in seen:
@@ -124,15 +161,16 @@ def one(work, logs, name, lib):
     out = dict(S.parse(log), top=top, library=lib, exit=r.returncode)
     nl = work / f"{top}_{lib}.json"
     if lib and nl.exists():
-        t = STA.sta(nl, top, S.LIBC[lib], n_groups=None)
-        g = t.pop("by_end_register")
-        ph = [x for x in g if x["end"].startswith("u.g_ph[")]
-        rg = [x for x in g if x["end"].startswith(("u.ton_ph_r", "u.lo_add_r"))]
-        other = [x for x in g if x not in ph and x not in rg]
-        n0, ends = reach(nl, top, S.LIBC[lib], tuple("u." + p for p in ARITH))
-        out.update(sta=t, delay_ns=t["delay_ns"], phase_ends=ph[:6], reg_ends=rg, other_ends=other[:14],
-                   arith_starts=n0, arith_reaches_phase=sorted({e for e in ends if e.startswith("u.g_ph[")})[:20],
-                   arith_reaches=len(ends))
+        _, al = aliases(nl, top)
+        t = STA.sta(nl, top, S.LIBC[lib], n_groups=None, group=lambda b: "|".join(classify(al.get(b, []))))
+        g = [dict(x, cls=x["end"].split("|")[0] if "|" in x["end"] else "port", end=x["end"].split("|")[-1], start=x["start"].split("|")[-1],
+                  start_cls=x["start"].split("|")[0] if "|" in x["start"] else "input") for x in t.pop("by_end_register")]
+        by = lambda c: [x for x in g if x["cls"] == c]
+        n0, ends = reach(nl, top, S.LIBC[lib])
+        out.update(sta=t, delay_ns=t["delay_ns"], phase_ends=by("phase")[:8], reg_ends=by("reg"), arith_ends=by("arith")[:10],
+                   other_ends=by("other")[:10], port_ends=by("port")[:6], arith_starts=n0,
+                   arith_reaches_phase=[n for c, n in ends if c == "phase"][:20],
+                   arith_reaches={c: sum(1 for k, _ in ends if k == c) for c in ("reg", "arith", "phase", "other")})
     out["wall_s"] = round(time.time() - t0, 1)
     return tag, out
 
@@ -165,7 +203,9 @@ def main():
         crit[f"c5_{lib}"] = bool(ph is not None and not f.get("arith_reaches_phase") and ph <= 1.5 * PHASE_ALONE_NS[lib])
         crit[f"c6_{lib}"] = bool(rg is not None and rg <= M_LAT * T_CLK_NS)
         crit[f"numbers_{lib}"] = {"phase_end_ns": ph, "register_end_ns": rg, "final0_ns": g(f"final0_{lib}").get("delay_ns"),
-                                  "final0_reaches_phase": len(g(f"final0_{lib}").get("arith_reaches_phase") or [])}
+                                  "final0_reaches_phase": len(g(f"final0_{lib}").get("arith_reaches_phase") or []),
+                                  "final0_phase_end_ns": max((x["delay_ns"] for x in g(f"final0_{lib}").get("phase_ends", [])), default=None),
+                                  "arith_end_ns": max((x["delay_ns"] for x in f.get("arith_ends", [])), default=None)}
     crit["c5_45nm_fits_clock"] = bool((crit["numbers_nangate45"]["phase_end_ns"] or 1e9) <= T_CLK_NS)
     out = {"m_lat": M_LAT, "t_clk_ns": T_CLK_NS, "ties": TIES, "phase_alone_ns": PHASE_ALONE_NS, "runs": res, "criteria_synthesis": crit}
     (HERE / "a215_synth.json").write_text(json.dumps(out, indent=1) + "\n")

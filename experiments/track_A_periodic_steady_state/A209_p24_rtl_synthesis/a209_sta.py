@@ -89,8 +89,10 @@ def _look(tabs, slew, load):
     return best
 
 
-def sta(netlist_json, top, cells, n_groups=12):
-    """n_groups: how many end registers by_end_register lists (A215 reads all of them: None)."""
+def sta(netlist_json, top, cells, n_groups=12, group=None):
+    """n_groups: how many end registers by_end_register lists (A215 reads all of them: None). group: a function
+    bit -> name used for a flip-flop's group and for a path's start instead of the first net name of the bit (A215:
+    a flattened net has several names)."""
     mod = json.loads(open(netlist_json).read())["modules"][top]
     names = {}
     for n, d in mod["netnames"].items():
@@ -123,7 +125,8 @@ def sta(netlist_json, top, cells, n_groups=12):
                 else:
                     loadcap[b] = loadcap.get(b, 0.0) + (lc["cap"].get(p, 0.0) if lc else 0.0)
                     if is_seq and not (lc and p in lc["clock"]) and p not in ("C", "CLK", "CK"):
-                        ends.append((b, label(q) if q is not None else cn, base(q) if q is not None else cn))
+                        ends.append((b, label(q) if q is not None else cn,
+                                     (group(q) if group else base(q)) if q is not None else cn))
     for pn, p in mod["ports"].items():
         if p["direction"] == "output":
             ends += [(b, f"{pn}[{i}]", pn) for i, b in enumerate(p["bits"]) if isinstance(b, int)]
@@ -177,7 +180,7 @@ def sta(netlist_json, top, cells, n_groups=12):
     def origin(b):
         while prev.get(b) is not None:
             b = prev[b][2]
-        return label(b), base(b)
+        return label(b), (group(b) if group else base(b))
 
     top_groups = [{"end": g, "delay_ns": round(v[0], 3), "start": origin(v[1])[1]} for g, v in sorted(groups.items(), key=lambda kv: -kv[1][0])[:n_groups]]
     return {"delay_ns": worst[0], "end": worst[2], "start": origin(worst[1])[0] if worst[1] is not None else None, "depth_cells": len(path),
