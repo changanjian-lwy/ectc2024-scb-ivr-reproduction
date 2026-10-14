@@ -2256,6 +2256,16 @@ each question:
          handover requested on Vo comes at 109-137 us, while Vin is still
          ramping, and mode P takes over. N0 with 30 % reaches 1.0528 V
          (limit 1.05 V). Tested start-up range: 50-100 % of the load.
+    119. The Ton path as a multi-cycle path (2026-10-14, A215; RTL, the
+         first change after the user reopened it). The port expression
+         yosys rejected is rewritten (same bits), and cfg ton_lat M makes
+         the phases read Ton from registers that load M clocks after the
+         arithmetic's inputs last changed (0 = old controller, bit for
+         bit). M = 16 passes all nine V6 rows (peaks -6.3..+1.1 A) and
+         takes the arithmetic off the phases' clock in synthesis (45 nm
+         phase logic 3.08 ns); adopted. M = 32 fails (starved registers
+         at 30 % load, two binding rows 202-203 A): tested bound 17 clocks,
+         the bridge refuses ton_lat > 30.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

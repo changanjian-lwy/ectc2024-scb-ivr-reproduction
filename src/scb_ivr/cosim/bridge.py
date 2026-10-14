@@ -433,7 +433,10 @@ class ModuleSim:
         kvs = round(g * 2 ** 24 * self.vin_lsb / (256 * cfg["vref_v"])) if g else 0
         c.set("cfg_vff_vs_kr", int(vff.get("vs_kr", kvs)) & 0xFFFF); c.set("cfg_vff_vs_kt", int(vff.get("vs_kt", kvs)) & 0xFFFF)
         c.set("vin_valid", 0); c.set("vin_code", 0)
-        c.set("cfg_ton_lat", int(cfg.get("ton_lat", 0)))                 # A215: clocks for the Ton arithmetic (0: direct)
+        lat = int(cfg.get("ton_lat", 0))                                 # A215: clocks for the Ton arithmetic (0: direct)
+        if not 0 <= lat <= 30:                                           # from 31 the divider's completion starves the load
+            raise ValueError("ton_lat must be in [0, 30] (A215: from 31 the registers load only on periods > 32 + M clocks)")
+        c.set("cfg_ton_lat", lat)
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
         self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt
         c.set("cfg_dep", int(self.dep_on)); c.set("cfg_dep_wsh", int(dep.get("wsh", 0)))

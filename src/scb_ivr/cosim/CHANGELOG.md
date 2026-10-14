@@ -4,6 +4,15 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A215 results) - the bridge refuses ton_lat > 30
+
+**Source:** A215 RESULTS 0. The divider's completion, 32 clocks after a
+sample, is a source event and restarts the count; from ton_lat 31 the first
+load after a sample is pre-empted and the registers load only on periods
+longer than 32 + ton_lat clocks (the 30 % rows at ton_lat 32 never load).
+bridge.py raises ValueError outside [0, 30]. Gate: cosim_regression --quick
+(4 of 4 bit for bit).
+
 ## 2026-10-14 (A215) - the port expression and the Ton path's registers (RTL unfrozen by the user)
 
 **Source:** A209. (1) scb_ctrl's `.lo_add(IS_FIRST ? lo_add : {TW{1'b0}})` mixes a

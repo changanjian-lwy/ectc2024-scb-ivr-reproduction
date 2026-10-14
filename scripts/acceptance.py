@@ -117,6 +117,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A212": (TA / "A212_p24_nominal_rows_v6", "a212_analyze.py", "a212_summary.json"),
     "A213": (TA / "A213_p24_binding_row_ltspice", "a213_analyze.py", "a213_summary.json"),
     "A214": (TA / "A214_p24_startup_light_load", "a214_analyze.py", "a214_summary.json"),
+    "A215": (TA / "A215_p24_buildable_ton_path", "a215_analyze.py", "a215_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -363,6 +364,7 @@ NOT_ROWS["A159"] = r"m4_|s150_"
 EXCEPTIONS["A161"] = {("criteria", "c3"): "l_m80_10us late 28 (they follow the loop: 0 / 6 / 16 / 33 / 28 at 50-150 pH), 0 NEW, "
                                            "no consequence; bound 150 pH at 20 A/ns by the registered rule (RESULTS 0)"}
 NOT_ROWS["A161"] = r"m4_|s150_"
+NOT_ROWS["A215"] = r"k(8|16)_"                     # clock rows: the summary's information block
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -597,6 +599,15 @@ EXCEPTIONS["A213"].update({("criteria", f"{r}/c4"): _A213["c4"] for r in ("K_k53
 EXCEPTIONS["A214"] = {("runs/u_N0_25_30", "c6"): "a start into 30 % of the load reaches 1.0528 V, 2.8 mV over the 1.05 V limit, 0.6 us "
                       "after mode P's entry; peaks, V_DS and the end state are inside their limits - the tested start-up range is "
                       "50-100 % (RESULTS 0)"}
+_A215s = ("ton_lat 32 starves the Ton registers at 30 % of the load: the divider's completion restarts the count, so for "
+          "M >= 31 they load only on periods above 32 + M clocks (256 ns); these rows run at 181-232 ns - tested bound 17 "
+          "clocks, the bridge refuses ton_lat > 30 (RESULTS 0)")
+_A215p = "ton_lat 32 on a binding row crosses 200 A (202.40 / 203.21 A), cause not traced - tested bound 17 clocks (RESULTS 0)"
+EXCEPTIONS["A215"] = {("runs/m32_B_N75_25_p4_ls0p3", "c6"): _A215p, ("runs/m32_B_S75_hot_p5_ls0p3", "c6"): _A215p,
+                      ("criteria_c3", "c3"): "M = 32 fails on four rows (two starved 30 % rows, two binding rows over 200 A); "
+                      "the final configuration takes ton_lat 16 (RESULTS 0)"}
+EXCEPTIONS["A215"].update({("runs/m32_m30", c): _A215s for c in ("r1", "r2", "r3", "r4")})
+EXCEPTIONS["A215"].update({("runs/m32_r_N75_25_30", c): _A215s for c in ("r2", "r3")})
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

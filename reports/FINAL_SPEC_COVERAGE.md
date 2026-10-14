@@ -8,7 +8,7 @@ comes from, and says what may be claimed.
 
 | part | setting | source |
 |---|---|---|
-| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit) | A143, C13, A184 |
+| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit). **Since 2026-10-14 the RTL is open again (user decision). A215: the phases read their Ton from registers loaded 16 clocks after the last change of the Ton arithmetic's inputs (cfg ton_lat 16: 68 ns from the sampling instant to the phases); checked on nine V6 rows, every other row ran with 0. Tested bound 17 clocks: at 32 two binding rows cross 200 A and the 30 % rows starve (the bridge refuses ton_lat > 30)** | A143, C13, A184, A215 |
 | loop | 50 pH, ideal parallel damper at ring Q 7 | A168, A157 |
 | devices | EPC2067, EPC's model (vendor library at run time), 2 + 3 per phase; spread corners ff (V_th −0.3 V, driver ×0.8), ss (V_th +1.0 V, Q_G ×1.29, driver ×1.2), hot (125 °C) | D79, A163 |
 | drive | high sides: 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven. **Low sides, since A206 (plant V6): their own turn-on resistance, 0.3 Ω times the board's drive factor (0.36 Ω on slow boards); turn-off 0.3 Ω as before.** They turn on at zero voltage and gain nothing from a slow gate: with 3.0 Ω the semiconductor loss is 29.6 W per module against 20.2 W, and the handover reaches 206.4 A with switches at the datasheet maximum. Up to A205 every switch had 3.0 Ω, and every V5 result in this file was run that way | A164, A169, A205, A206 |
@@ -199,6 +199,13 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   reaches 1.0528 V, 2.8 mV over the limit (record `A214_p24_startup_light_load/cosim/run_u_N0_25_30.json` in
   release records-a214). Tested start-up range: 50-100 % of the load.** Slow boards at 30 %, 0 °C, a load that
   switches on during the start, and four modules are not run.
+- **The Ton path's registers (A215, 2026-10-14; plant V6, ton_lat 16).** A212's four N0 rows, A206's three binding
+  rows and the 30 % rows of A208 / A210 pass their own criteria: post-step peaks -6.3 .. +1.1 A against the
+  ton_lat 0 records (binding row 196.95 A, S75 25 C k 4), Vo before 300 µs unchanged, N0's handover 148.9 A instead
+  of 162.0 A. In synthesis (A209's flow and estimate, not sign-off) no path from the Ton arithmetic reaches a phase
+  register within a clock; at 45 nm the phase logic fits the 4 ns clock (3.08 ns), and the one path still over it is
+  ton_acc -> scb_vff's divider numerator (5.14 ns), a multi-cycle path in operation (read from the RTL). At sky130
+  the phase logic needs about 16 ns; a 16 ns clock with a 9-bit fine delay regulated on one row (+62.5 A, 181.45 A).
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within
