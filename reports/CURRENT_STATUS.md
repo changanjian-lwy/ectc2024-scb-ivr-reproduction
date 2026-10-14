@@ -2266,6 +2266,15 @@ each question:
          phase logic 3.08 ns); adopted. M = 32 fails (starved registers
          at 30 % load, two binding rows 202-203 A): tested bound 17 clocks,
          the bridge refuses ton_lat > 30.
+    120. LSCB's idle state and pre-charge on the P24 module (2026-10-14,
+         A218 / A219, extension lscb_ladder, open-loop LTspice; made for
+         the EEK5101 video, merged later). One SCB phase cannot be shed
+         (its Cs rail drifts 12 -> 22 V in 20 us): shedding = whole
+         modules. A restart after an idle with Cs drifted 4 V peaks at
+         257 A; a switched clamp holding Cs keeps it at 157 A. On a live
+         48 V bus with switches off SH1 sits at 48 V; a 4 x 1 kOhm divider
+         + diodes holds a slow ramp (23.7 V), not a 10 us edge (47.9 V);
+         with LSCB's capacitor ladder as well 21.4 V.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
