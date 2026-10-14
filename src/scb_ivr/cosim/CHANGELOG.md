@@ -4,6 +4,24 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A220) - a pause starts at zero current (RTL, bridge)
+
+**Source:** A217's records. The pause began with every low side turned off at
+its valley (a negative current), so each idle node swung to its rail and rang
+with about 11 V (6-7 A in the inductor; 0.54 mOhm the only damping); at a
+resume each phase started from a different point of that ring, which set its
+first valley (s3 missed). With cfg skip "zcd_a" (needs "async") the pause's
+last low-side intervals end at zero current: scb_phase input zcd (phase 1:
+the timed edge gives way to the front end, no trim, no dlo; a slotted phase
+arms its front end in LOW and is held at its report, its slot not taken, off
+anyway half a tk_per after the slot); scb_ctrl input cfg_zcd and zpend (phase
+k's high side turned off with skip_q high), phases 2..N's reports on A133's
+fa_valid / fa_tlo. The bridge's front-end threshold is zcd_a while skip1 is
+high (phase 1) and for phases 2..N's latches (turn-off only, no turn-on); the
+record gains zcd_fires / zcd_log. scb_multi regenerated; two unit tests.
+**Gate:** zcd_a absent: the old cosim bit for bit (unit tests,
+cosim_regression --quick and --full; A220 BOUNDARY j1).
+
 ## 2026-10-14 (A217) - the resume's low-side interval ends at the target (RTL output, bridge)
 
 **Source:** A216. A resume's low-side interval of phase 1 ended about 8 ns

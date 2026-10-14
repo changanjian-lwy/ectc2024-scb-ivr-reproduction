@@ -23,7 +23,9 @@ Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive 
 "skip" {"hi_mv", "lo_mv", "res_ofs_a"}, A216: rounds are skipped at the lower Ton limit while Vo is above vref + hi (lo once skipping);
 a paused module's ticks add records to "sections" (key "tick") and sample the ADC; A217: res_ofs_a raises phase 1's
 front-end threshold during a resume's low-side interval by that much (the latency of its edges times the current's
-slope) - absent = no skipping, bit for bit; "hand_vo_v",
+slope); A220: zcd_a ends the pause's last low-side intervals at zero current - phase 1's front end and phases 2..N's
+own (A133's latches) at the threshold zcd_a (the latency times the slope, so the edge lands at 0 A), needs "async" -
+absent = no skipping, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
 absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
@@ -445,6 +447,10 @@ class ModuleSim:
         self.skip_on, self.fe_inh, self.ticks = bool(sk), False, 0
         self.res_lo, self.res_ofs = False, float(sk.get("res_ofs_a", 0.0))   # A217: the front end's offset in a resume
         c.set("cfg_skip", int(self.skip_on))
+        self.zcd_on, self.zcd_thr = "zcd_a" in sk, float(sk.get("zcd_a", 0.0))   # A220: the pause's last intervals
+        if self.zcd_on and not cfg.get("async", 0):
+            raise ValueError("skip zcd_a needs the asynchronous front end (cfg async)")
+        c.set("cfg_zcd", int(self.zcd_on))
         c.set("cfg_skip_hi", int(round(sk.get("hi_mv", 5.0) * 1e-3 / self.adc_lsb)))
         c.set("cfg_skip_lo", int(round(sk.get("lo_mv", 0.0) * 1e-3 / self.adc_lsb)))
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
@@ -553,31 +559,35 @@ class ModuleSim:
         thr = self.i_tgt + self.trim_now[0] * self.lsb_a
         if self.res_lo:                                          # A217: a resume's interval ends this much early
             return thr + self.res_ofs
+        if self.zcd_on and self.fe_inh:                          # A220: the pause's last interval ends at 0 A
+            return self.zcd_thr
         return thr - float(self.cfg.get("lo_floor_a", 2.0)) if self.floor_on() else thr
 
     def latch_fire(self):                                        # A81 latch fires
         lat, lsb = self.lat, self.lsb
         lat["fired"] = True; lat["fires"] += 1
         t_cmd = self.plant.t + self.t_async
-        bind = not self.floor_on()                               # A118: a floor turn-off reports no residual (no trim)
+        bind = not self.floor_on() and not (self.zcd_on and self.fe_inh)   # A118, A220: no residual (no trim)
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + 0), self.seq[0], N + 0, 0, {"how": None, "bind": bind})); self.seq[0] += 1
         if not self.fe_inh:                                      # A216: a skipped turn-on is not made here either
             heapq.heappush(self.pend, (self.t_apply(t_cmd + lat["dt0"] * lsb, 0, self.lead_s(0, 1, True)), self.seq[0], 0, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         lat["report"] = int(round(t_cmd / lsb))
 
-    def ph_fire(self, k):                                        # A133: phase k's floor fires (as latch_fire's floor)
+    def ph_fire(self, k):                                        # A133: phase k's floor fires; A220: or its zero-current latch
         f, lsb = self.flat[k], self.lsb
         f["fired"] = True; f["fires"] += 1; self.ph_log.append((self.plant.t, k + 1))
         t_cmd = self.plant.t + self.t_async
         heapq.heappush(self.pend, (self.t_apply(t_cmd, N + k), self.seq[0], N + k, 0, {"how": None, "bind": False})); self.seq[0] += 1
-        heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, self.lead_s(k, 1, True)), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
+        if self.ph_floor:                                        # A220: a zero-current turn-off makes no turn-on
+            heapq.heappush(self.pend, (self.t_apply(t_cmd + f["dt0"] * lsb, k, self.lead_s(k, 1, True)), self.seq[0], k, 1, {"how": 0, "bind": False})); self.seq[0] += 1
         f["report"] = int(round(t_cmd / lsb))
 
     def ph_latches(self):
-        """A133: (state index, threshold, callback) of each armed, unfired phase floor."""
-        if not self.ph_floor:
+        """A133: (state index, threshold, callback) of each armed, unfired phase floor (A220: zero-current latch)."""
+        if not (self.ph_floor or self.zcd_on):
             return []
-        thr = self.i_tgt + self.trim_now[0] * self.lsb_a - float(self.cfg.get("lo_floor_a", 2.0))
+        thr = (self.i_tgt + self.trim_now[0] * self.lsb_a - float(self.cfg.get("lo_floor_a", 2.0))) if self.ph_floor \
+            else self.zcd_thr                                    # A220: phases 2..N's zero-current turn-offs
         return [(self.nv + k, thr, lambda k=k: self.ph_fire(k)) for k in range(1, N)
                 if self.flat[k]["armed"] and not self.flat[k]["fired"]]
 
@@ -782,7 +792,7 @@ class ModuleSim:
             self.res_lo = bool(c.get("res1"))                    # A217
             if c.get("smp"):                                     # a tick: the ADC samples where a turn-on would land
                 heapq.heappush(self.pend, (w * lsb + self.t_drv, self.seq[0], -1, 0, None)); self.seq[0] += 1
-        if self.ph_floor:                                        # A133
+        if self.ph_floor or self.zcd_on:                         # A133, A220
             arm, dts = c.get("arm_n"), c.get("dt_pred")
             for k in range(1, N):
                 f = self.flat[k]
@@ -834,7 +844,7 @@ class ModuleSim:
         c.set("a_valid", int(lat["report"] is not None))
         c.set("a_tlo", lat["report"] or 0)
         lat["report"] = None
-        if self.ph_floor:                                        # A133
+        if self.ph_floor or self.zcd_on:                         # A133, A220
             fl = self.flat
             c.set("fa_valid", sum(int(fl[k]["report"] is not None) << k for k in range(N)))
             c.set("fa_tlo", pack([fl[k]["report"] or 0 for k in range(N)], TW))
@@ -924,6 +934,9 @@ class ModuleSim:
             out["t_hand_req_s"] = self.hand["t"]
         if self.skip_on:                                                 # A216
             out["skip_ticks"] = self.ticks
+        if self.zcd_on:                                                  # A220: (t, phase) of each zero-current turn-off
+            out["zcd_fires"] = [f["fires"] for f in self.flat]
+            out["zcd_log"] = self.ph_log
         if self.gated:                                               # A164
             out["overlaps_cmd"] = ovl["cmd"]
         if self.dep_on:                                              # A132

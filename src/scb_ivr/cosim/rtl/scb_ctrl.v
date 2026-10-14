@@ -47,6 +47,9 @@
 //   their slots and stay off too (idle). Phase 1 then ticks every period (smp: the ADC samples) and, at the first
 //   tick where the condition no longer holds, turns its low side on; phases 2..N follow at that instant plus their
 //   slots, and the next cycle is a normal one from the valley. The period measured across a pause is not taken.
+// - A220: with cfg_zcd (and cfg_async) the pause's last low-side intervals end at zero current: phase 1's while
+//   skip_q is high, phase k's when its high side turned off with skip_q high (zpend); the front ends report the
+//   turn-offs (fa_valid / fa_tlo for phases 2..N, as A133's), and a slotted phase is held from then on.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -166,6 +169,7 @@ module scb_ctrl #(
     output wire                smp,            // A216: a tick of the paused module: the ADC samples (one cycle)
     output wire                idle,           // A216: the module is paused
     output wire                res1,           // A217: phase 1 is in its resume interval (the front end's threshold moves)
+    input  wire                cfg_zcd,        // A220: the pause's last low-side intervals end at zero current
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
     input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
@@ -232,6 +236,8 @@ module scb_ctrl #(
     wire [N*TW-1:0] t_lon_all;
     wire [N-1:0]    res_all;                   // A217
     assign res1 = res_all[0];
+    reg  [N-1:0]    zpend;                     // A220: phase k's last pulse before a pause has ended
+    integer         zk;
     // the three comparisons change with a sample only; with cfg_ton_lat they are read from registers loaded with the
     // phases' Ton (A215), so no path of the Ton arithmetic reaches a phase within a clock
     wire            fl_c = (ton_sum <= acc_min);                                       // Ton at its lower limit
@@ -320,7 +326,11 @@ module scb_ctrl #(
     always @(posedge clk) begin                                       // A216
         if (rst) begin
             vo_q <= cfg_vref_code; skip_q <= 1'b0; mod_idle <= 1'b0; per_hold <= 1'b0; res_t <= {TW{1'b0}};
+            zpend <= {N{1'b0}};
         end else begin
+            for (zk = 1; zk < N; zk = zk + 1)                         // A220: at phase k's high-side turn-off
+                if (gh_ev[zk] && !gh_lvl[zk]) zpend[zk] <= cfg_zcd && cfg_async && mode_p && skip_q;
+            if (res_p[0]) zpend <= {N{1'b0}};
             if (adc_valid) vo_q <= adc_code;
             if (gl_ev[0] && gl_lvl[0]) skip_q <= skip_c;              // at phase 1's low-side turn-on
             if (on_pulse[0]) per_hold <= 1'b0;
@@ -390,8 +400,8 @@ module scb_ctrl #(
                 .c_i(cmp_s[k]), .c_zl(cmp_s[N + k]), .c_zh(cmp_s[2 * N + k]), .c_valley(cmp_s[3 * N + k]),
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
-                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && cfg_ph_floor) ? fa_valid[k] : 1'b0),
-                .a_tlo((k > 0 && cfg_ph_floor) ? fa_tlo[k * TW +: TW] : a_tlo),                  // A133
+                .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_valid[k] : 1'b0),
+                .a_tlo((k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_tlo[k * TW +: TW] : a_tlo),      // A133, A220
                 .arm(arm_all[k]),
                 .gh_ev(gh_ev[k]), .gh_lvl(gh_lvl[k]), .gh_fine(gh_fine[k * FB +: FB]),
                 .gl_ev(gl_ev[k]), .gl_lvl(gl_lvl[k]), .gl_fine(gl_fine[k * FB +: FB]),
@@ -418,7 +428,8 @@ module scb_ctrl #(
                 .cfg_slot_floor((k == 0 && SLAVE) ? cfg_slave_floor : (k > 0) ? cfg_ph_floor : 1'b0),   // C06; A133
                 .cfg_floor_late(cfg_floor_late),                                                // A141
                 .lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),                               // A148
-                .hold(IS_FIRST ? skip_q : (k > 0) ? mod_idle : 1'b0),                           // A216
+                .hold(IS_FIRST ? skip_q : (k > 0) ? (mod_idle || zpend[k]) : 1'b0),             // A216, A220
+                .zcd(IS_FIRST ? (cfg_zcd && cfg_async && skip_q) : (k > 0) ? zpend[k] : 1'b0),   // A220
                 .tk_skip(skip_c), .tk_per((n_ref == 2'd2) ? t_per : cfg_t0), .res_time(res_tk),
                 .sk_pulse(sk_p[k]), .tk_pulse(tk_p[k]), .res_pulse(res_p[k]), .t_lon_q(t_lon_all[k * TW +: TW]), .res_lo(res_all[k]),
                 .sofs(slot_ofs[k * TW +: TW])
