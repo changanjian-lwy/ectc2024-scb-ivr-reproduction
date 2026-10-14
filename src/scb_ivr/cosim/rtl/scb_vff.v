@@ -15,6 +15,9 @@
 //   never binds, whatever L or the load. k is then unused. rss <= 0: no cap.
 // - A136: with rel_lp the relative cap uses ton's low-pass tlp += (ton - tlp) >> sh20 (Q8, updated at each sample, as
 //   lp20) instead of ton, so a loop that raises ton during a transient does not raise the cap with it.
+// - A223: with rgth != 0 the relative cap acts only at samples where rail - rss (Vin's one-step prediction above lp20)
+//   is >= rgth codes; at the other samples phase 1 has no cap and tlp restarts from ton, so a load step at constant Vin
+//   leaves phase 1 at the loop's Ton. rgth = 0: the cap at every sample.
 // - A137: with seed, the first Vin sample after en rises (mode P's entry) restarts lp2, lp20, tlp and the prediction from
 //   that sample, as the very first sample does: the low-passes do not carry the start-up ramp's lag into mode P.
 //   C10: seed 2 restarts tlp from ton's value in the clock before en rose (mode S's Ton) instead of the sample's ton, so
@@ -42,6 +45,7 @@ module scb_vff #(
     input  wire [9:0]      rel,
     input  wire            rel_lp,
     input  wire [1:0]      seed,                // A137: 1 restart at en's rise; C10: 2 ... with tlp from tpre
+    input  wire [AW-1:0]   rgth,                // A223: the relative cap only while Vin rises by >= rgth codes (0: always)
     input  wire [3:0]      sh2,
     input  wire [3:0]      sh20,
     input  wire [AW-1:0]   gth,
@@ -80,9 +84,11 @@ module scb_vff #(
     wire signed [LW+1:0] vpred = ini ? $signed({v8, 1'b0}) - $signed({2'b00, vprev, 8'd0}) : v8;
     wire signed [LW+1:0] rail  = vpred - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
     wire signed [LW+1:0] rss   = $signed({{2{lp20n[LW-1]}}, lp20n}) - ((lp20n * 3) >>> 2) - $signed({4'b0000, vo_code, 8'd0});
+    wire                 rgo   = (rgth == {AW{1'b0}}) || (rail - rss >= $signed({2'b00, rgth, 8'd0}));   // A223
     wire signed [LW+12:0] rssk = (rss * $signed({1'b0, rel})) >>> 8;            // A135: Q8
     wire signed [TW+9:0] ton8  = $signed({2'b00, ton, 8'd0});                    // A136
-    wire signed [TW+9:0] tlpn  = ini ? tlp + ((ton8 - tlp) >>> sh20) : (seed[1] && rs) ? $signed({2'b00, tpre, 8'd0}) : ton8;
+    wire signed [TW+9:0] tlpn  = ini ? (rgo ? tlp + ((ton8 - tlp) >>> sh20) : ton8)
+                                     : (seed[1] && rs) ? $signed({2'b00, tpre, 8'd0}) : ton8;
     wire [TW-1:0]        tnum  = rel_lp ? tlpn[TW+7:8] : ton;
     wire [TW+LW+12:0]    rnum = tnum * rssk[LW+11:0];
     wire [31:0]          rnum32 = (|rnum[TW+LW+12:32]) ? 32'hFFFFFFFF : rnum[31:0];
@@ -111,7 +117,7 @@ module scb_vff #(
                 rpend <= 1'b0;
                 init <= 1'b1; lp2 <= lp2n; lp20 <= lp20n; tlp <= tlpn; vprev <= vin_code; gate <= gaten; g <= gaten ? gn : {LW{1'b0}};
                 rail_q <= rail; rss_q <= rss;                                 // A148
-                if (rail > 0 && rel != 0 && rss > 0) begin                      // A135
+                if (rail > 0 && rel != 0 && rss > 0 && rgo) begin               // A135; A223: rgo
                     dnum <= rnum32; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;
                 end else if (rail > 0 && rel == 0 && k != 0) begin
                     dnum <= {k, 8'd0}; dden <= rail; drem <= 0; dq <= 0; dcnt <= 6'd32;

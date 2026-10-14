@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A223) - phase 1's relative cap only while Vin rises (RTL, bridge)
+
+**Source:** A216's large load re-applications (problem 9): at constant Vin
+scb_vff's relative cap is 1.25 x ton's low-pass, so a step that raises the
+loop's Ton faster than the low-pass follows holds phase 1 alone (rail 1 to
+16.3 V, 249.8 A). scb_vff input rgth (scb_ctrl cfg_vff_rgth, cfg vff
+"rel_gate", Vin codes): the cap acts only at samples where rail - rss is >=
+rgth; elsewhere no cap and tlp restarts from ton. Two unit tests.
+**Gate:** rel_gate absent: the old cosim bit for bit (unit tests 106,
+cosim_regression --quick and --full; A223 BOUNDARY j1).
+
 ## 2026-10-14 (A221) - the inductor's core loss (plant V7) and a zero-current pause keeps the slots' period
 
 **Source:** A220's records and development runs. (1) V6 has no resistance in an

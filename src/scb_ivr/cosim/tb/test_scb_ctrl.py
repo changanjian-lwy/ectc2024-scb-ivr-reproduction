@@ -36,6 +36,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             vff=0, vff_c=(0, 0, 0, 0), vff_k=0, vff_sh2=2, vff_sh20=6, vff_vo=50,  # A128
             vff_gth=0,                                                           # A129
             vff_rel=0, vff_rel_lp=0, vff_seed=0,                                 # A135, A136, A137
+            vff_rgth=0,                                                          # A223
             vff_vs_kr=0, vff_vs_kt=0,                                            # A148
             ton_s=None,                                                          # A184: None = ton
             ton_lat=0,                                                           # A215
@@ -139,6 +140,7 @@ class Ctrl:
         d.cfg_vff_rel.value = cfg["vff_rel"]                     # A135
         d.cfg_vff_rel_lp.value = cfg["vff_rel_lp"]               # A136
         d.cfg_vff_seed.value = cfg["vff_seed"]                   # A137
+        d.cfg_vff_rgth.value = cfg["vff_rgth"]                   # A223
         d.cfg_vff_vs_kr.value = cfg["vff_vs_kr"] & 0xFFFF; d.cfg_vff_vs_kt.value = cfg["vff_vs_kt"] & 0xFFFF   # A148
         d.cfg_ton_lat.value = cfg["ton_lat"]                     # A215
         d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
@@ -1326,6 +1328,48 @@ async def vff_rel_lp_uses_lowpassed_ton(dut):
     rss = lp20 - ((lp20 * 3) >> 2) - 50 * 256
     tlp = 133 * 256 + (((200 - 133) * 256) >> 6)
     cap = ((tlp >> 8) * ((rss * 307) >> 8)) // rail
+    assert [_ton_ph(dut, k) for k in range(4)] == [cap, 200, 200, 200], ([_ton_ph(dut, k) for k in range(4)], cap)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2400, 400)
+    await ReadOnly()
+    assert [_ton_ph(dut, k) for k in range(4)] == [200] * 4
+
+
+@cocotb.test()
+async def vff_rel_gate_frees_phase_1_at_constant_vin(dut):
+    """A223, rel 320 on ton's low-pass with rgth 25: ton steps 133 -> 300 LSB at a steady Vin; the next sample leaves
+    phase 1 at 300 (rail - rss = 0 < 25 codes: no cap), where rgth 0 would cap it at (tlp >> 8) x 1.25 = 168."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=320, vff_rel_lp=1, vff_rgth=25)
+    await _vin(dut, 2400, 4)
+    await c.set(cfg_ton=300)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2400)
+    await ReadOnly()
+    rss = 2400 * 256 - ((2400 * 256 * 3) >> 2) - 50 * 256
+    tlp = 133 * 256 + (((300 - 133) * 256) >> 6)
+    assert ((tlp >> 8) * ((rss * 320) >> 8)) // rss == 168
+    assert [_ton_ph(dut, k) for k in range(4)] == [300] * 4, [_ton_ph(dut, k) for k in range(4)]
+
+
+@cocotb.test()
+async def vff_rel_gate_keeps_the_cap_on_a_rising_vin(dut):
+    """A223: vff_rel_lp_uses_lowpassed_ton's sequence with rgth 25 - the Vin rise 2400 -> 2640 codes (rail - rss = 476
+    codes) opens the gate, tlp low-passes from the last steady sample's ton (133), so phase 1's cap is A136's; the
+    steady Vin after it closes the gate and every phase is at 200."""
+    c = Ctrl(dut)
+    await c.start(vff=1, vff_c=(0, 0, 0, 0), vff_k=0, vff_rel=307, vff_rel_lp=1, vff_rgth=25)
+    await _vin(dut, 2400, 4)
+    await c.set(cfg_ton=200)
+    await RisingEdge(dut.clk)
+    await _vin(dut, 2640)
+    await ReadOnly()
+    lp20 = 2400 * 256 + ((240 * 256) >> 6)
+    rail = 2 * 2640 * 256 - 2400 * 256 - ((lp20 * 3) >> 2) - 50 * 256
+    rss = lp20 - ((lp20 * 3) >> 2) - 50 * 256
+    tlp = 133 * 256 + (((200 - 133) * 256) >> 6)
+    cap = ((tlp >> 8) * ((rss * 307) >> 8)) // rail
+    assert rail - rss >= 25 * 256
     assert [_ton_ph(dut, k) for k in range(4)] == [cap, 200, 200, 200], ([_ton_ph(dut, k) for k in range(4)], cap)
     await RisingEdge(dut.clk)
     await _vin(dut, 2400, 400)

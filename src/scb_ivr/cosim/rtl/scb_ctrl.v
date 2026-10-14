@@ -31,8 +31,9 @@
 // - A128 (extension): with cfg_vff, in mode P each phase's Ton comes from scb_vff (Vin feed-forward); else ton_now.
 //   A135: cfg_vff_rel != 0 makes phase 1's cap relative to ton (scb_vff), so it cannot bind in steady state;
 //   A136: cfg_vff_rel_lp takes ton's low-pass for it; A137: cfg_vff_seed restarts scb_vff's low-passes at mode P's entry;
-//   C10: cfg_vff_seed 2 seeds ton's low-pass with mode S's Ton. A148: cfg_vff_vs_kr / kt give phase 1's timed low-side
-//   edge an offset from scb_vff (the volt-second law; lo_add, 0 when both are 0).
+//   C10: cfg_vff_seed 2 seeds ton's low-pass with mode S's Ton. A223: cfg_vff_rgth limits the relative cap to samples
+//   where Vin rises (scb_vff). A148: cfg_vff_vs_kr / kt give phase 1's timed low-side edge an offset from scb_vff (the
+//   volt-second law; lo_add, 0 when both are 0).
 // - A184: mode S runs at cfg_ton_s; the loop's reset value (ton_acc) and scb_vff's C10 seed keep cfg_ton, so a short
 //   mode-S period can have its own trim. cfg_ton_s = cfg_ton is the old controller bit for bit.
 // - A215: with cfg_ton_lat = M != 0 the phases read their Ton (and phase 1's lo_add) from registers, loaded M clocks
@@ -156,6 +157,7 @@ module scb_ctrl #(
     input  wire [9:0]          cfg_vff_rel,    // A135: relative phase-1 cap, 1 + mu in Q8 (0: the absolute cap, k)
     input  wire                cfg_vff_rel_lp, // A136: the relative cap on ton's low-pass
     input  wire [1:0]          cfg_vff_seed,   // A137: restart the feed-forward's low-passes at mode P's entry (C10: 2)
+    input  wire [AW-1:0]       cfg_vff_rgth,   // A223: the relative cap only while Vin rises by >= this many codes (0: always)
     input  wire [3:0]          cfg_vff_sh2,    // A128
     input  wire [3:0]          cfg_vff_sh20,   // A128
     input  wire [AW-1:0]       cfg_vff_gth,    // A129: falling-term gate, Vin codes (0: always on)
@@ -257,7 +259,7 @@ module scb_ctrl #(
     wire            vff_upd;                   // A215
     scb_vff #(.N(N), .TW(TW), .AW(AW)) u_vff (
         .clk(clk), .rst(rst), .en(cfg_vff && mode_p), .vin_valid(vin_valid), .vin_code(vin_code), .c(cfg_vff_c),
-        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now), .tseed(ton_seed),
+        .k(cfg_vff_k), .rel(cfg_vff_rel), .rel_lp(cfg_vff_rel_lp), .seed(cfg_vff_seed), .rgth(cfg_vff_rgth), .sh2(cfg_vff_sh2), .sh20(cfg_vff_sh20), .gth(cfg_vff_gth), .vo_code(cfg_vff_vo), .ton(ton_now), .tseed(ton_seed),
         .vs_kr(cfg_vff_vs_kr), .vs_kt(cfg_vff_vs_kt), .ton_ph(ton_ph_c), .lo_add(lo_add_c), .upd(vff_upd)
     );
 

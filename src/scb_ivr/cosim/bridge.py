@@ -439,6 +439,7 @@ class ModuleSim:
         c.set("cfg_vff_rel", int(vff.get("rel_q8", 0)))                 # A135: relative phase-1 cap, 1 + mu in Q8 (0: k)
         c.set("cfg_vff_rel_lp", int(vff.get("rel_lp", 0)))              # A136: ... on ton's low-pass
         c.set("cfg_vff_seed", int(vff.get("seed", 0)))                  # A137: restart the low-passes at mode P; C10: 2
+        c.set("cfg_vff_rgth", int(vff.get("rel_gate", 0)))              # A223: the relative cap only while Vin rises (codes)
         g = vff.get("vs_g")                                              # A148: phase 1's edge offset, volt-second law
         kvs = round(g * 2 ** 24 * self.vin_lsb / (256 * cfg["vref_v"])) if g else 0
         c.set("cfg_vff_vs_kr", int(vff.get("vs_kr", kvs)) & 0xFFFF); c.set("cfg_vff_vs_kt", int(vff.get("vs_kt", kvs)) & 0xFFFF)
