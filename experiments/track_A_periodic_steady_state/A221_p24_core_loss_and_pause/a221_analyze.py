@@ -6,7 +6,8 @@
   resume low-side turn-on (edge log) <= 1.5 A; A220's z1 (the ring at the pauses' ticks) as information; the ladder
   at the end; the slots of the first rounds after each resume in the edge log.
 - core loss, both kinds: sum over the edge log of (rail_k - Vo)^2 over high-side intervals and Vo^2 over low-side
-  intervals, divided by r_core and the log's span (dead times and idle intervals left out).
+  intervals, divided by r_core and the log's span (dead times and idle intervals left out); a record without an edge
+  log (k rows): the high-side duty of the last 20 us from the turn-on / turn-off records (added after the runs).
   python3 a221_analyze.py -> a221_summary.json"""
 from __future__ import annotations
 
@@ -60,8 +61,10 @@ def core_loss(r):
     """Watts in the core resistors over the edge log's span (high-side intervals at rail - Vo, low-side at Vo)."""
     rc = r["cfg"]["circuit"].get("r_core", 0.0)
     E = r.get("edges_log") or []
-    if not rc or len(E) < 2:
+    if not rc:
         return None
+    if len(E) < 2:                                       # no edge log: high-side duty from the turn-on / turn-off records
+        return core_loss_duty(r, rc)
     t0, t1 = E[0]["t_s"], E[-1]["t_s"]
     sec = [q for q in r["sections"] if t0 <= q["t_s"] <= t1] or r["sections"][-1:]
     vin = np.mean([q["vin_v"] for q in sec]); vc = np.mean([q["vcs_v"] for q in sec], axis=0); vo = np.mean([q["vo"] for q in sec])
@@ -95,6 +98,26 @@ def resume_i0(r):
         if e["j"] in (0, N):
             last = ("H" if e["j"] == 0 else "L", e["level"])
     return out
+
+
+def core_loss_duty(r, rc, win=20e-6):
+    """Without an edge log: each phase's high-side duty over the record's last 20 us (turn-ons paired with the next
+    turn-off of that phase), the low side taken as the rest of the time (dead times left out)."""
+    te = r["sections"][-1]["t_s"]
+    sec = [q for q in r["sections"] if q["t_s"] >= te - win]
+    vin = np.mean([q["vin_v"] for q in sec]); vc = np.mean([q["vcs_v"] for q in sec], axis=0); vo = np.mean([q["vo"] for q in sec])
+    rails = [vin - vc[0], vc[0] - vc[1], vc[1] - vc[2], vc[2]]
+    offs = {}
+    for g in r["gate_offs_last"]:
+        offs.setdefault(g["phase"], []).append(g["t_s"])
+    p = 0.0
+    for k in range(1, N + 1):
+        ts = sorted(offs.get(k, []))
+        on = sum((ts[i] - h["t_s"]) for h in r["turnons_last"] if h["phase"] == k and h["t_s"] >= te - win
+                 for i in [bisect.bisect_right(ts, h["t_s"])] if i < len(ts) and ts[i] - h["t_s"] < 200e-9)
+        d = on / win
+        p += ((rails[k - 1] - vo) ** 2 * d + vo ** 2 * (1 - d)) / rc
+    return p
 
 
 def ladder_end(r, win=20e-6):
