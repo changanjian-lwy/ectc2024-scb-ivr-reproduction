@@ -20,8 +20,10 @@ Plant (cfg): the circuit of the run named by "init_run" (A79 r1: P24, resistive 
 "ton_ns" keeps the loop's reset value, scb_vff's seed and the 0.5x / 2x clamps - absent = ton_ns, bit for bit;
 "ton_min_ns", A208: the loop's lower Ton limit (cfg_ton_min) as its own value - absent = 0.5 ton_ns, bit for bit;
 "ton_lat", A215: clocks the Ton arithmetic gets before the phases' registers load (cfg_ton_lat) - absent = 0, bit for bit;
-"skip" {"hi_mv", "lo_mv"}, A216: rounds are skipped at the lower Ton limit while Vo is above vref + hi (lo once skipping);
-a paused module's ticks add records to "sections" (key "tick") and sample the ADC - absent = no skipping, bit for bit; "hand_vo_v",
+"skip" {"hi_mv", "lo_mv", "res_ofs_a"}, A216: rounds are skipped at the lower Ton limit while Vo is above vref + hi (lo once skipping);
+a paused module's ticks add records to "sections" (key "tick") and sample the ADC; A217: res_ofs_a raises phase 1's
+front-end threshold during a resume's low-side interval by that much (the latency of its edges times the current's
+slope) - absent = no skipping, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
 absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
@@ -441,6 +443,7 @@ class ModuleSim:
         c.set("cfg_ton_lat", int(cfg.get("ton_lat", 0)))                 # A215: clocks for the Ton arithmetic (0: direct)
         sk = cfg.get("skip") or {}                                       # A216: skipped rounds at the lower Ton limit
         self.skip_on, self.fe_inh, self.ticks = bool(sk), False, 0
+        self.res_lo, self.res_ofs = False, float(sk.get("res_ofs_a", 0.0))   # A217: the front end's offset in a resume
         c.set("cfg_skip", int(self.skip_on))
         c.set("cfg_skip_hi", int(round(sk.get("hi_mv", 5.0) * 1e-3 / self.adc_lsb)))
         c.set("cfg_skip_lo", int(round(sk.get("lo_mv", 0.0) * 1e-3 / self.adc_lsb)))
@@ -548,6 +551,8 @@ class ModuleSim:
 
     def latch_thr(self):
         thr = self.i_tgt + self.trim_now[0] * self.lsb_a
+        if self.res_lo:                                          # A217: a resume's interval ends this much early
+            return thr + self.res_ofs
         return thr - float(self.cfg.get("lo_floor_a", 2.0)) if self.floor_on() else thr
 
     def latch_fire(self):                                        # A81 latch fires
@@ -599,7 +604,7 @@ class ModuleSim:
                 latch = ([(True, self.i_tgt, self.mlo_fire)] if mlo["armed"] and mlo["t"] is None else []) + \
                         [(True, self.latch_thr(), self.latch_fire)]     # A118: the crossing, then the floor
             else:
-                latch = (lat["armed"] and not lat["fired"], self.i_tgt + self.trim_now[0] * self.lsb_a, self.latch_fire)
+                latch = (lat["armed"] and not lat["fired"], self.latch_thr(), self.latch_fire)   # A217: latch_thr's value
             xl = self.ph_latches()                                       # A133
             plant.integrate_to(t_target, None, monitors=self.mon, latch=latch, **({"xlatch": xl} if xl else {}))
         else:
@@ -774,6 +779,7 @@ class ModuleSim:
         lat["dt0"] = field(c.get("dt_pred"), 0, TW)
         if self.skip_on:                                         # A216
             self.fe_inh = bool(c.get("skip1"))
+            self.res_lo = bool(c.get("res1"))                    # A217
             if c.get("smp"):                                     # a tick: the ADC samples where a turn-on would land
                 heapq.heappush(self.pend, (w * lsb + self.t_drv, self.seq[0], -1, 0, None)); self.seq[0] += 1
         if self.ph_floor:                                        # A133

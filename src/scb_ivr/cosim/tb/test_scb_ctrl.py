@@ -6,7 +6,8 @@ and trim; restarts; mode S, handover and voltage loop; the asynchronous phase-1 
 blanking; the error-based correctors; the period-following slots, their two-period average and the missed-slot
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
 step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133); the Ton path's multi-cycle
-registers (A215); skipped rounds (A216). From A93's tests (history: ../CHANGELOG.md).
+registers (A215); skipped rounds (A216) and the resume
+interval's flag for the front end (A217). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -1754,3 +1755,31 @@ async def skip_with_ton_lat_reads_the_registers(dut):
         if int(dut.idle.value):
             break
     assert int(dut.idle.value) == 1
+
+
+@cocotb.test()
+async def skip_resume_flags_its_low_interval(dut):
+    """A217: res1 is high from phase 1's resume low-side turn-on until its comparator ends that interval, and only
+    then (the bridge raises the front end's threshold by cfg "res_ofs_a" while it is high)."""
+    c = await _skip_start(dut)
+    await c.set(adc_valid=1, adc_code=2000 + 20)
+    await c.set(adc_valid=0)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.idle.value):
+            break
+    assert int(dut.res1.value) == 0
+    t0 = int(dut.win_q.value)
+    await c.set(cmp_i=0)
+    await c.set(adc_valid=1, adc_code=2000)
+    await c.set(adc_valid=0)
+    lon = await c.until("L", 1, 1, after=t0)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.res1.value) == 1
+    await c.set(cmp_i=0b0001)
+    await c.until("L", 0, 1, after=lon[0] + lon[1])
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.res1.value) == 0

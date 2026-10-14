@@ -141,6 +141,7 @@ module scb_phase #(
     output reg                  tk_pulse,      // A216 (phase 1): a tick of the paused phase, the first skip included
     output reg                  res_pulse,     // A216 (phase 1): the resume's low-side turn-on (one cycle)
     output wire [TW-1:0]        t_lon_q,       // A216: the last low-side turn-on time (t_lon)
+    output wire                 res_lo,        // A217 (phase 1): in LOW after a resume (the front end's threshold moves)
     output wire                 arm,           // A81: front end armed (phase 1 LOW in mode P)
     output reg                  gh_ev,
     output reg                  gh_lvl,
@@ -174,6 +175,7 @@ module scb_phase #(
     assign t_lon_q = t_lon;                                          // A216
     reg          held;                                               // A216: in UP with the turn-on withheld
     reg          res;                                                // A216 (phase 1): in LOW after a resume
+    assign res_lo = res;                                             // A217
     reg [TW-1:0] t_tk;                                               // A216 (phase 1): the next tick
     wire signed [TW-1:0] d_tk  = t_tk - now;
     wire signed [TW-1:0] d_res = res_time - now;

@@ -4,6 +4,19 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A217) - the resume's low-side interval ends at the target (RTL output, bridge)
+
+**Source:** A216. A resume's low-side interval of phase 1 ended about 8 ns
+after its comparator crossed the target (front end and driver), 2.7-4 A too
+deep; phases 2-4 take that interval's length, and the error started a decaying
+two-period alternation of the valleys in every burst (s3 missed). scb_phase
+gets the output res_lo (phase 1: in that interval), scb_ctrl res1. The bridge
+raises the front end's threshold by cfg skip "res_ofs_a" while res1 is high
+(latch_thr; the kernel path now takes latch_thr's value, which is the old one
+whenever neither res1 nor the floor applies). scb_multi regenerated.
+**Gate:** offset absent or 0 and skip absent: the old cosim bit for bit (unit
+tests, cosim_regression --quick and --full; A217 BOUNDARY j1).
+
 ## 2026-10-14 (A216) - skipped rounds below the lower Ton limit (RTL, bridge, plant)
 
 **Source:** A207 / A208 / A210: below about 30 % of its load a module's Ton sits

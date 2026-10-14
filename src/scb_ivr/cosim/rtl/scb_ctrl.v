@@ -165,6 +165,7 @@ module scb_ctrl #(
     output wire                skip1,          // A216: phase 1's next turn-on is skipped (the front end makes none)
     output wire                smp,            // A216: a tick of the paused module: the ADC samples (one cycle)
     output wire                idle,           // A216: the module is paused
+    output wire                res1,           // A217: phase 1 is in its resume interval (the front end's threshold moves)
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
     input  wire [7:0]          cfg_dep_smax,   // A132: largest step, codes
@@ -229,6 +230,8 @@ module scb_ctrl #(
     reg  [TW-1:0]   res_t;                     // the last resume's instant (phase 1's low-side turn-on)
     wire [N-1:0]    sk_p, tk_p, res_p;
     wire [N*TW-1:0] t_lon_all;
+    wire [N-1:0]    res_all;                   // A217
+    assign res1 = res_all[0];
     // the three comparisons change with a sample only; with cfg_ton_lat they are read from registers loaded with the
     // phases' Ton (A215), so no path of the Ton arithmetic reaches a phase within a clock
     wire            fl_c = (ton_sum <= acc_min);                                       // Ton at its lower limit
@@ -417,7 +420,7 @@ module scb_ctrl #(
                 .lo_add(IS_FIRST ? lo_add : $signed({TW{1'b0}})),                               // A148
                 .hold(IS_FIRST ? skip_q : (k > 0) ? mod_idle : 1'b0),                           // A216
                 .tk_skip(skip_c), .tk_per((n_ref == 2'd2) ? t_per : cfg_t0), .res_time(res_tk),
-                .sk_pulse(sk_p[k]), .tk_pulse(tk_p[k]), .res_pulse(res_p[k]), .t_lon_q(t_lon_all[k * TW +: TW]),
+                .sk_pulse(sk_p[k]), .tk_pulse(tk_p[k]), .res_pulse(res_p[k]), .t_lon_q(t_lon_all[k * TW +: TW]), .res_lo(res_all[k]),
                 .sofs(slot_ofs[k * TW +: TW])
             );
         end
