@@ -90,7 +90,8 @@ valley stops at its first V_DS <= 0, so the predictive turn-on is corrected towa
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
 Line step (cfg "line_step" {"t_us", "dv", "slew_us" 0}, A106): the input changes by dv from t_us, linearly over slew_us.
 Circuit values (cfg "circuit" {name: value in SI units}, A107): any of CIRCUIT_KEYS (vin, L, R, c_high, c_low, cs, co,
-r_load, i_load, g_on) replaces the init run's value; other names are refused.
+r_load, i_load, g_on, coss_scale, r_core) replaces the init run's value; other names are refused. r_core (A221): ohm
+across each phase's inductor, the core's loss and the damping of an idle phase's ring (circuit.py).
 Auxiliary commutation branches (cfg "aux" {"lr_nh", "alpha", "rds_on_mohm" 1.3, "r_lr_mohm" 0.2, "cm_uf" 1.0,
 "vm0_v" 0.0 (or one per branch), "phases" 1..N, "valley_zero" 0, "t_en_us" 0}, A101, A102): per phase Lr and a
 bidirectional switch (2 dies of alpha x EPC2067 in series, 2 RDS(on) / alpha) from Cm (precharged to vm0_v) to x_k,
@@ -153,7 +154,7 @@ from scb_ivr.cosim.circuit import PROJECT, fit_fig8  # noqa: E402
 from scb_ivr.cosim.circuit import CircuitParams as Params  # noqa: E402
 from scb_ivr.cosim.plant import FastPlant, KernelPlant, KernelPlant2, Monitors, ReferencePlant, join_nodes  # noqa: E402
 CIRCUIT_KEYS = ("vin", "L", "R", "c_high", "c_low", "cs", "co", "r_load", "i_load", "g_on",
-                "coss_scale")   # A107: cfg "circuit"; A132: coss_scale
+                "coss_scale", "r_core")   # A107: cfg "circuit"; A132: coss_scale; A221: r_core
 PLANTS = {"kernel": KernelPlant, "kernel2": KernelPlant2, "fast": FastPlant, "reference": ReferencePlant}
 
 N, TW, CW = 4, 32, 8

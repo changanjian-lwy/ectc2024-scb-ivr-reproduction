@@ -25,6 +25,8 @@ Circuit (N phases):
 - optional switch resistances (r_sw, A206): a conducting high / low side is r_sw[0] / r_sw[1] ohm (the whole position)
   instead of g_on, so an on-time's path holds its own switches; R is then what is left in series with the inductor.
   () = g_on, every matrix as before.
+- optional core loss (r_core, A221): a resistor r_core across each phase's inductor (x_k to out), the parallel model of
+  a magnetic core's loss (D76); it also damps an idle phase's ring. 0 = none, every matrix as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -154,6 +156,7 @@ class CircuitParams:
                                  #   charges); False: it conducts at once
     gate_miller: bool = False    # A206: an idle off gate follows its drain's movement (charge through C_GD)
     r_sw: tuple = ()             # A206: (high side, low side) ohm of a conducting switch position; (): g_on
+    r_core: float = 0.0          # A221: ohm across each phase's inductor (core loss, D76); 0: none
 
     def vin_at(self, t):
         v = self.vin * min(t / self.t_ramp, 1.0) if self.t_ramp > 0 else self.vin
@@ -265,6 +268,11 @@ class Sim:
                 G[idd, iss] -= g; G[iss, idd] -= g
         if load_on and p.load_kind == "r":
             G[self.idx["out"], self.idx["out"]] += 1.0 / p.r_load
+        if p.r_core > 0.0:                                     # A221: core loss across each inductor
+            gc, io = 1.0 / p.r_core, self.idx["out"]
+            for k in range(1, p.n + 1):
+                ix = self.idx[f"x{k}"]
+                G[ix, ix] += gc; G[io, io] += gc; G[ix, io] -= gc; G[io, ix] -= gc
         if self.nlp and p.loop_rp > 0:                         # A144: damping resistors across the loop inductances
             gd = 1.0 / p.loop_rp
             for k in self.lp:

@@ -49,7 +49,8 @@
 //   slots, and the next cycle is a normal one from the valley. The period measured across a pause is not taken.
 // - A220: with cfg_zcd (and cfg_async) the pause's last low-side intervals end at zero current: phase 1's while
 //   skip_q is high, phase k's when its high side turned off with skip_q high (zpend); the front ends report the
-//   turn-offs (fa_valid / fa_tlo for phases 2..N, as A133's), and a slotted phase is held from then on.
+//   turn-offs (fa_valid / fa_tlo for phases 2..N, as A133's), and a slotted phase is held from then on. Such a
+//   pause leaves the slots' period as it was (A221): its skipped instant, from a zero-current turn-off, is early.
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
@@ -315,7 +316,7 @@ module scb_ctrl #(
             n_ref   <= 2'd0;
             t_per2  <= {TW{1'b0}};
             per3    <= 1'b0;
-        end else if ((on_pulse[0] && !per_hold) || sk_p[0]) begin     // A216: not across a pause
+        end else if ((on_pulse[0] && !per_hold) || (sk_p[0] && !cfg_zcd)) begin   // A216; A221: zcd keeps it
             t_per   <= (sk_p[0] ? t_von : t_on_all[TW-1:0]) - t_ref;
             if (n_ref != 2'd2) n_ref <= n_ref + 1'b1;
             t_per2  <= t_per;

@@ -4,6 +4,20 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-14 (A221) - the inductor's core loss (plant V7) and a zero-current pause keeps the slots' period
+
+**Source:** A220's records and development runs. (1) V6 has no resistance in an
+idle phase (circuit R 0, an off switch has none): an inductor's ring against
+the switches' capacitance never decays, and the phases resume from different
+points of it. circuit.py gets r_core, a resistor across each inductor (x_k to
+out, always in the circuit): the parallel model of a magnetic core's loss, D76
+(cfg circuit "r_core"; bridge CIRCUIT_KEYS). (2) A220's zero-current turn-off
+made the pause's skipped instant early, so the slots' period was measured short
+and the first two rounds after a resume had short slots: with cfg_zcd the pause
+no longer updates t_per (scb_ctrl). One unit test, three plant tests.
+**Gate:** r_core and zcd absent: the old cosim bit for bit (unit tests 104,
+cosim_regression --quick and --full; A221 BOUNDARY j1).
+
 ## 2026-10-14 (A220) - a pause starts at zero current (RTL, bridge)
 
 **Source:** A217's records. The pause began with every low side turned off at

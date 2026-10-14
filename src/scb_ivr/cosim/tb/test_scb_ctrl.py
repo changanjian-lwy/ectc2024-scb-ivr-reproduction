@@ -1787,9 +1787,10 @@ async def skip_resume_flags_its_low_interval(dut):
     assert int(dut.res1.value) == 0
 
 
-async def _front_end(c, phases=0b1111, delay=4):
+async def _front_end(c, phases=0b1111, delay=4, zdelay=None):
     """A220 test front end: a front end of `phases` armed for `delay` clocks reports (a_valid for phase 1, fa_valid
-    for phases 2..N, one cycle) at that window's start; a low-side interval then lasts `delay` clocks."""
+    for phases 2..N, one cycle) at that window's start; a low-side interval then lasts `delay` clocks (phase 1's
+    `zdelay` while skip1 is high: a zero-current turn-off comes earlier than the valley)."""
     d = c.dut
     n = [0] * N
     while True:
@@ -1798,7 +1799,8 @@ async def _front_end(c, phases=0b1111, delay=4):
         rep = 0
         for k in range(N):
             n[k] = n[k] + 1 if (arm >> k) & 1 else 0
-            if n[k] == delay and (phases >> k) & 1:
+            dk = zdelay if (k == 0 and zdelay and int(d.skip1.value)) else delay
+            if n[k] == dk and (phases >> k) & 1:
                 rep |= 1 << k
         d.a_valid.value = rep & 1
         d.a_tlo.value = t
@@ -1806,14 +1808,14 @@ async def _front_end(c, phases=0b1111, delay=4):
         d.fa_tlo.value = pack([t] * N, TW)
 
 
-async def _zcd_pause(dut, phases=0b1111, **over):
+async def _zcd_pause(dut, phases=0b1111, zdelay=None, **over):
     c = await _skip_start(dut, async_=1, zcd=1, **over)
-    cocotb.start_soon(_front_end(c, phases))
+    cocotb.start_soon(_front_end(c, phases, zdelay=zdelay))
     await ClockCycles(dut.clk, 40)
     assert int(dut.idle.value) == 0
     await c.set(adc_valid=1, adc_code=2000 + 20)
     await c.set(adc_valid=0)
-    seen = {"timed_in_low": [], "arm1": 0, "t_skip": None, "dlo": None}
+    seen = {"timed_in_low": [], "arm1": 0, "t_skip": None, "dlo": None, "t_per": None}
     for _ in range(600):
         await RisingEdge(dut.clk)
         await ReadOnly()
@@ -1821,7 +1823,7 @@ async def _zcd_pause(dut, phases=0b1111, **over):
             seen["timed_in_low"].append(int(dut.lo_timed1.value))
             seen["arm1"] += int(dut.arm1.value)
             if seen["t_skip"] is None:
-                seen["t_skip"], seen["dlo"] = int(dut.win_q.value), int(dut.dlo1.value)
+                seen["t_skip"], seen["dlo"], seen["t_per"] = int(dut.win_q.value), int(dut.dlo1.value), int(dut.t_per.value)
         if int(dut.idle.value) and all(field(dut.state.value, k, 2) == 3 for k in range(N)):
             break
     return c, seen
@@ -1862,3 +1864,11 @@ async def zcd_without_a_report_turns_off_after_half_a_period(dut):
         assert off is not None and target - WIN < off[0] + off[1] <= target, (k, off, target)
         assert _ons(c, k, after=last) == [] and field(dut.state.value, k - 1, 2) == 3
 
+
+@cocotb.test()
+async def zcd_keeps_the_slots_period_across_the_pause(dut):
+    """A221: phase 1's zero-current turn-off comes earlier than its valley would (here 2 clocks against 4), so the
+    skipped instant (its t_lo + dt_pred) is early; with cfg_zcd the pause leaves t_per at the last measured period."""
+    c, seen = await _zcd_pause(dut, zdelay=2)
+    assert int(dut.idle.value) == 1 and seen["t_per"] is not None
+    assert int(dut.t_per.value) == seen["t_per"], (int(dut.t_per.value), seen["t_per"])
