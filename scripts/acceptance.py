@@ -118,6 +118,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A213": (TA / "A213_p24_binding_row_ltspice", "a213_analyze.py", "a213_summary.json"),
     "A214": (TA / "A214_p24_startup_light_load", "a214_analyze.py", "a214_summary.json"),
     "A215": (TA / "A215_p24_buildable_ton_path", "a215_analyze.py", "a215_summary.json"),
+    "A216": (TA / "A216_p24_skipped_rounds", "a216_analyze.py", "a216_summary.json"),
+    "A217": (TA / "A217_p24_resume_offset", "a217_analyze.py", "a217_summary.json"),
+    "A220": (TA / "A220_p24_zero_current_pause", "a220_analyze.py", "a220_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -365,6 +368,7 @@ EXCEPTIONS["A161"] = {("criteria", "c3"): "l_m80_10us late 28 (they follow the l
                                            "no consequence; bound 150 pH at 20 A/ns by the registered rule (RESULTS 0)"}
 NOT_ROWS["A161"] = r"m4_|s150_"
 NOT_ROWS["A215"] = r"k(8|16)_"                     # clock rows: the summary's information block
+NOT_ROWS["A216"] = r"(w_|f_|i_)"                  # information rows and the identity row (summary's own blocks)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -608,6 +612,22 @@ EXCEPTIONS["A215"] = {("runs/m32_B_N75_25_p4_ls0p3", "c6"): _A215p, ("runs/m32_B
                       "the final configuration takes ton_lat 16 (RESULTS 0)"}
 EXCEPTIONS["A215"].update({("runs/m32_m30", c): _A215s for c in ("r1", "r2", "r3", "r4")})
 EXCEPTIONS["A215"].update({("runs/m32_r_N75_25_30", c): _A215s for c in ("r2", "r3")})
+_A216 = ("skipping regulates (s1, s2, s4 pass) but the valleys after each resume leave the band by more than 5 A: the "
+         "resume's first valleys (an undamped idle ring in V6) and the alternation they start - not adopted, the resume "
+         "reworked in A217 / A220 / A221 (RESULTS 0)")
+EXCEPTIONS["A216"] = {("runs/z_N0_25_0", "s3"): _A216, ("runs/z_N0_25_10", "s3"): _A216, ("runs/z_N75_25_10", "s3"): _A216}
+_A217 = ("phase 1's first valley is on target, phases 2-4 still start from the idle ring (V6 has no resistance in an idle "
+         "phase) and alternate - not adopted (RESULTS 0)")
+EXCEPTIONS["A217"] = {("runs/z_N0_25_10", "s3"): _A217, ("runs/z_N75_25_10", "s3"): _A217}
+_A220v = ("the zero-current turn-offs are in place, but the valleys stay outside the band: the undamped idle ring and a "
+          "short slots' period after the pause (A220's own flaw, found later); s3 / s3w also count the zero-current "
+          "turn-offs as valleys - not adopted (RESULTS 0, A221)")
+_A220z = "the idle ring stays at 5.1-5.7 A: V6 has no resistance in an idle phase (circuit R 0) - not adopted (RESULTS 0)"
+_A220n = "no pause tick in the last 60 us (the row does not skip there): not measured, scored false (RESULTS 1)"
+EXCEPTIONS["A220"] = {("runs/z_N0_25_10", "s3"): _A220v, ("runs/z_N75_25_10", "s3"): _A220v,
+                      ("runs/z_N0_25_0", "s3w"): _A220v, ("runs/z_N0_25_10", "s3w"): _A220v, ("runs/z_N75_25_10", "s3w"): _A220v,
+                      ("runs/z_N0_25_0", "z1"): _A220z, ("runs/z_N0_25_10", "z1"): _A220z, ("runs/z_N75_25_10", "z1"): _A220z,
+                      ("runs/u_N0_25_5_s62", "z1"): _A220n, ("runs/z_S75_25_10", "z1"): _A220n, ("runs/z_S75_hot_10", "z1"): _A220n}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
