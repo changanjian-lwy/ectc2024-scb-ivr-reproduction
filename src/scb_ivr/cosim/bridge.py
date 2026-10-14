@@ -396,6 +396,8 @@ class ModuleSim:
         # ki in ns of Ton per V -> Ton LSB per ADC LSB, 16 fractional bits
         c.set("cfg_ki", int(round(cfg["ki_ns_per_v"] * self.adc_lsb / (self.lsb * 1e9) * 65536)))
         c.set("cfg_kp", int(round(cfg.get("kp_ns_per_v", 0.0) * self.adc_lsb / (self.lsb * 1e9) * 65536)))   # A104
+        c.set("cfg_kd", int(round(cfg.get("kd_ns_per_v", 0.0) * self.adc_lsb / (self.lsb * 1e9) * 65536)))   # A224: per V of change
+        c.set("cfg_kd_db", int(cfg.get("kd_db", 2)))                     # A224: dead band, ADC codes
         c.set("cfg_ext_ton", 0); c.set("ext_ton", 0); c.set("ext_slot", 0); c.set("ext_ref", 0)   # C2: set per module
         c.set("adc_valid", 0)
         c.set("adc_code", 0)

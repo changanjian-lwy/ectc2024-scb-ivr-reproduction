@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-15 (A224) - a derivative term in the voltage loop (RTL, bridge)
+
+**Source:** A223's records: after a large load re-application Vo rings with
+about 3 us (the timed low-side edge lets the current integrate Ton's excess,
+and the P term around it is undamped). scb_ctrl cfg_kd / cfg_kd_db (cfg
+"kd_ns_per_v", "kd_db"): d_term = -kd x (the ADC code's change since the
+last sample), held like p_term, zero while the change is below the dead band.
+One unit test.
+**Gate:** kd absent: the old cosim bit for bit (unit tests 107,
+cosim_regression --quick and --full; A224 BOUNDARY j1).
+
 ## 2026-10-14 (A223) - phase 1's relative cap only while Vin rises (RTL, bridge)
 
 **Source:** A216's large load re-applications (problem 9): at constant Vin

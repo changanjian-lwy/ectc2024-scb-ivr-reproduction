@@ -14,7 +14,9 @@
 // - Voltage loop (mode P, cfg_vloop): at each ADC sample of Vo (taken at phase 1's turn-on), e = vref - adc_code;
 //   ton_acc += ki * e (clamped) and the proportional term p_term = kp * e (A104), both with FRAC fractional bits;
 //   Ton is the rounded integer part of ton_acc + p_term, clamped to [cfg_ton_min, cfg_ton_max]; otherwise
-//   Ton = cfg_ton. With cfg_kp = 0 the loop is A79's integral loop.
+//   Ton = cfg_ton. With cfg_kp = 0 the loop is A79's integral loop. A224: with cfg_kd, a derivative term
+//   d_term = -kd * (adc_code - the previous sample) is added while |the change| >= cfg_kd_db codes (else 0), held to
+//   the next sample like p_term; cfg_kd = 0: none.
 // - Comparators (current, low/high V_DS = 0, valley) pass a 2-flip-flop synchroniser; measurement reports
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses.
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
@@ -90,6 +92,8 @@ module scb_ctrl #(
     input  wire [AW-1:0]       cfg_vref_code,
     input  wire [KW-1:0]       cfg_ki,
     input  wire [KPW-1:0]      cfg_kp,         // A104: proportional gain
+    input  wire [KPW-1:0]      cfg_kd,         // A224: derivative gain on the Vo sample's change (0: none)
+    input  wire [3:0]          cfg_kd_db,      // A224: ... only while |the change| >= this many ADC codes
     input  wire                cfg_ext_ton,    // C2: in mode P, Ton = ext_ton (the master's, broadcast)
     input  wire [TW-1:0]       ext_ton,        // C2
     input  wire [TW-1:0]       ext_slot,       // C2 (SLAVE): phase 1's low-side turn-off slot
@@ -224,7 +228,8 @@ module scb_ctrl #(
     wire signed [AW1-1:0] acc_max  = $signed({cfg_ton_max, {FRAC{1'b0}}});
     reg  signed [AW1-1:0] p_term;                                  // A104
     wire signed [AW+KPW+1:0] pstep = err * $signed({1'b0, cfg_kp});
-    wire signed [AW1-1:0] ton_sum  = ton_acc + p_term;
+    reg  signed [AW1-1:0] d_term;                                  // A224
+    wire signed [AW1-1:0] ton_sum  = ton_acc + p_term + d_term;
     wire signed [AW1-1:0] ton_cl   = (ton_sum < acc_min) ? acc_min : (ton_sum > acc_max) ? acc_max : ton_sum;
     wire signed [AW1-1:0] acc_rnd  = ton_cl + (1 <<< (FRAC - 1));
     wire [TW-1:0] ton_loop = acc_rnd[AW1-1:FRAC];
@@ -233,6 +238,9 @@ module scb_ctrl #(
 
     // ---- A216: skipped rounds ----
     reg  [AW-1:0]   vo_q;                      // the last Vo sample
+    wire signed [AW:0]       dcode = $signed({1'b0, adc_code}) - $signed({1'b0, vo_q});          // A224
+    wire [AW:0]              dmag  = dcode[AW] ? -dcode : dcode;
+    wire signed [AW+KPW+1:0] dstep = -dcode * $signed({1'b0, cfg_kd});
     reg             skip_q, mod_idle, per_hold;
     reg  [TW-1:0]   res_t;                     // the last resume's instant (phase 1's low-side turn-on)
     wire [N-1:0]    sk_p, tk_p, res_p;
@@ -350,6 +358,7 @@ module scb_ctrl #(
             mode_p  <= !cfg_start_s;
             ton_acc <= $signed({cfg_ton, {FRAC{1'b0}}});
             p_term  <= {AW1{1'b0}};
+            d_term  <= {AW1{1'b0}};
         end else begin
             cyc   <= cyc + 1'b1;
             win_q <= now;
@@ -363,6 +372,7 @@ module scb_ctrl #(
             if (adc_valid && cfg_vloop && mode_p) begin
                 ton_acc <= (acc_next < acc_min) ? acc_min : (acc_next > acc_max) ? acc_max : acc_next;
                 p_term  <= {{(AW1 - AW - KPW - 2){pstep[AW+KPW+1]}}, pstep};
+                d_term  <= (dmag >= {{(AW - 3){1'b0}}, cfg_kd_db}) ? {{(AW1 - AW - KPW - 2){dstep[AW+KPW+1]}}, dstep} : {AW1{1'b0}};   // A224
             end
         end
     end

@@ -6,7 +6,8 @@ start when a valley moves past the threshold I_th, where the node clamps at the 
 turn-on loses its target. D63 keeps the valleys as states. One step is one phase-1 period:
 - the loop: D59's sampled PI on Ton (ADC sample of Vo at phase 1's turn-on), Ton quantised to the LSB, clamped to
   [ton_min, ton_max]; every phase on in the period uses it, phase 1 included (scb_phase's turn-off compares with the
-  live ton: the new value arrives within phase 1's on-time);
+  live ton: the new value arrives within phase 1's on-time); A224: kd_ns adds scb_ctrl's derivative term on the
+  sample's change (dead band kd_db codes);
 - rails from the series capacitors: V_rail,1 = Vin - V_1, V_rail,k = V_(k-1) - V_k, V_rail,N = V_(N-1);
 - each phase starts its high side from its previous valley v: at ~0 A when -v <= I_th(rail) (the valley turn-on).
   When v >= 0 the node falls and the low side's reverse conduction (v_rev) ramps the current down at (Vo + v_rev) / L
@@ -60,6 +61,8 @@ class Design:
     floor_a: float = 2.0
     kp_ns: float = 574.46
     ki_ns: float = 47.9264
+    kd_ns: float = 0.0                # A224: derivative gain (ns per V of the sample's change); 0: none
+    kd_db: int = 2                    # A224: ... only while |the change| >= this many ADC codes
     adc_lsb: float = 0.5e-3
     ton_cfg_ns: float = 88.75         # mode S Ton: the clamps are 0.5x and 2x
     smax: int = 160
@@ -188,7 +191,9 @@ class ValleyMap:
         code = round(s["vo"] / d.adc_lsb)
         e = d.vref - code * d.adc_lsb
         s["acc"] = min(max(s["acc"] + d.ki_ns * 1e-9 * e, self.ton_min), self.ton_max)
-        ton_new = min(max(s["acc"] + d.kp_ns * 1e-9 * e, self.ton_min), self.ton_max)
+        de, s["code_prev"] = code - s.get("code_prev", code), code
+        d_term = -d.kd_ns * 1e-9 * d.adc_lsb * de if (d.kd_ns and abs(de) >= d.kd_db) else 0.0   # A224 (scb_ctrl d_term)
+        ton_new = min(max(s["acc"] + d.kp_ns * 1e-9 * e + d_term, self.ton_min), self.ton_max)
         ton_new = round(ton_new / LSB) * LSB
         rails = [vin - s["vc"][0]] + [s["vc"][j - 1] - s["vc"][j] for j in range(1, n - 1)] + [s["vc"][-1]]
         rails_tab = self._ith[0]

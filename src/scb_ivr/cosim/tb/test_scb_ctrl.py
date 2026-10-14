@@ -26,6 +26,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
             kp=0,                                                                # A104
+            kd=0, kd_db=2,                                                       # A224
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -95,6 +96,7 @@ class Ctrl:
         d.cfg_vref_code.value = cfg["vref"]
         d.cfg_ki.value = cfg["ki"]
         d.cfg_kp.value = cfg["kp"]                               # A104
+        d.cfg_kd.value = cfg["kd"]; d.cfg_kd_db.value = cfg["kd_db"]   # A224
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -480,6 +482,31 @@ async def voltage_loop_pi(dut):
     await c.set(adc_valid=0)
     await ReadOnly()
     assert int(dut.ton_now.value) == 143, int(dut.ton_now.value)
+
+
+@cocotb.test()
+async def voltage_loop_derivative(dut):
+    """A224: d_term = -kd x (code - the previous sample), held to the next sample, 0 while the change is below the dead
+    band (2 codes); with ki = kp = 0 Ton is cfg_ton + d_term."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=0, kd=65536, kd_db=2)          # 1 LSB of Ton per ADC LSB of change
+    await c.set(adc_valid=1, adc_code=2000)        # no change from vo_q's reset value (vref)
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 133, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 - 30)   # Vo falls 30 codes: +30 LSB while the sample holds
+    await c.set(adc_valid=0)
+    await ClockCycles(dut.clk, 5)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 163, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 - 31)   # 1 code: inside the dead band
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 133, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 - 26)   # Vo rises 5 codes: -5 LSB
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 128, int(dut.ton_now.value)
 
 
 @cocotb.test()

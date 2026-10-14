@@ -1,0 +1,96 @@
+"""A224 analysis (BOUNDARY Section 2). Pair rows: a223_analyze.one on the kd run and on its reference d0 (A223's g25
+record of the same row), plus Vo's maximum before 300 us; e1-e4 per run. Skipping rows: a221_analyze.skip_row (s1,
+s2, s3t, z1r, true valleys). j1 from the unit and regression logs and i_u_N0_g25 against A223's record.
+  python3 a224_analyze.py -> a224_summary.json"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import re
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+TA = HERE.parent
+PROJECT = HERE.parents[2]
+
+
+def _load(name, rel):
+    s = importlib.util.spec_from_file_location(name, TA / rel)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+A23 = _load("a223_analyze", "A223_p24_cap_on_rising_vin/a223_analyze.py")
+A21 = _load("a221_analyze", "A221_p24_core_loss_and_pause/a221_analyze.py")
+COS, REF = HERE / "cosim", TA / "A223_p24_cap_on_rising_vin" / "cosim"
+NOLOAD_MIN_A, TOL_HAND = -21.2 - 1.0, 2.0
+
+
+def vo_max_300(path):
+    sec = json.loads(Path(path).read_text())["sections"]
+    return float(max(q["vo"] for q in sec if q["t_s"] <= 300e-6))
+
+
+def pair(row, f):
+    m, d0 = A23.one(f), A23.one(REF / f"run_{row}_g25.json")
+    m["vo_max_300_v"], d0["vo_max_300_v"] = vo_max_300(f), vo_max_300(REF / f"run_{row}_g25.json")
+    c = {"e4": bool(m["start_pk"] <= d0["start_pk"] + TOL_HAND and m["hand_pk"] <= d0["hand_pk"] + TOL_HAND
+                    and m["vo_max_300_v"] <= 1.05)}
+    if row in A23.W_ROWS:
+        c["e1"] = bool(m["status"] == "COMPLETED" and m["peak_whole"] <= A23.I_LIM and not m["overlaps"] and not m["shoot_on"]
+                       and m["vds_whole"] <= A23.V_LIM and abs(m["vo_last_min_v"] - 1) <= A23.VO_BAND
+                       and abs(m["vo_last_max_v"] - 1) <= A23.VO_BAND)
+    else:
+        ok = m["post_pk"] <= d0["post_pk"] + A23.TOL_A and abs(m["vo_ext_mv"]) <= abs(d0["vo_ext_mv"]) + A23.TOL_MV
+        c["e2" if row in A23.LOAD_ROWS else "e3"] = bool(ok and (row in A23.LOAD_ROWS or m["post_pk"] <= A23.I_LIM))
+    return {"kd": m, "d0": d0, "d_post_pk_a": m["post_pk"] - d0["post_pk"], "d_vo_ext_mv": m["vo_ext_mv"] - d0["vo_ext_mv"],
+            "criteria": c}
+
+
+def identity():
+    logs = PROJECT / "tmp" / "logs"
+    u = re.findall(r"TESTS=(\d+) PASS=(\d+) FAIL=(\d+)", (logs / "a224_unit.log").read_text())
+    n_pass, n_fail = sum(int(p) for _, p, _ in u), sum(int(f) for _, _, f in u)
+    reg = {k: bool(re.search(rf"REGRESSION {k} PASS", (logs / f"a224_reg_{k}.log").read_text())) for k in ("quick", "full")}
+    f = COS / "run_i_u_N0_g25.json"
+    same = None
+    if f.exists():
+        x, y = json.loads(f.read_text()), json.loads((REF / "run_u_N0_g25.json").read_text())
+        same = {k: x.get(k) == y.get(k) for k in A23.ID_KEYS}
+    return {"unit_pass": n_pass, "unit_fail": n_fail, "regression": reg, "i_u_N0_g25_vs_A223": same,
+            "j1": bool(n_pass == 107 and n_fail == 0 and all(reg.values()) and same and all(same.values()))}
+
+
+def main():
+    res = {"identity": identity(), "pairs": {}, "skip": {}}
+    for f in sorted(COS.glob("run_*.json")):
+        name = f.stem[4:]
+        if name.startswith("i_"):
+            continue
+        row, kd = name.rsplit("_d", 1)
+        if name.startswith("z_"):
+            v = A21.skip_row(f)
+            va = [y for p in v["true_valleys_a"].values() for y in p]
+            if row == "z_N0_0":
+                v["criteria"]["s3t_vs_A221"] = bool(va) and min(va) >= NOLOAD_MIN_A
+            res["skip"][name] = v
+        else:
+            res["pairs"][name] = pair(row, f)
+    (HERE / "a224_summary.json").write_text(json.dumps(A23.A16.clean(res), indent=1) + "\n")
+    print("j1", res["identity"])
+    for n, p in res["pairs"].items():
+        m, d0 = p["kd"], p["d0"]
+        print(f"{n:13s} whole {d0['peak_whole']:6.1f} -> {m['peak_whole']:6.1f} | post {d0['post_pk']:6.1f} -> {m['post_pk']:6.1f} A | "
+              f"Vo {d0['vo_ext_mv']:+6.1f} -> {m['vo_ext_mv']:+6.1f} mV | last {m['vo_last_min_v']:.4f}..{m['vo_last_max_v']:.4f} | "
+              f"hand {d0['hand_pk']:.1f} -> {m['hand_pk']:.1f} | late {sum(d0['late_after'])} -> {sum(m['late_after'])} | {p['criteria']}")
+    for n, v in res["skip"].items():
+        va = [y for p in v["true_valleys_a"].values() for y in p]
+        print(f"{n:13s} Vo {v['vo_end_min_v']:.4f}..{v['vo_end_max_v']:.4f} valleys {min(va):.1f}..{max(va):.1f} resume "
+              f"{v['resume_i0_max_a']} | {v['criteria']}")
+
+
+if __name__ == "__main__":
+    main()
