@@ -121,6 +121,8 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A216": (TA / "A216_p24_skipped_rounds", "a216_analyze.py", "a216_summary.json"),
     "A217": (TA / "A217_p24_resume_offset", "a217_analyze.py", "a217_summary.json"),
     "A220": (TA / "A220_p24_zero_current_pause", "a220_analyze.py", "a220_summary.json"),
+    "A221": (TA / "A221_p24_core_loss_and_pause", "a221_analyze.py", "a221_summary.json"),
+    "A222": (TA / "A222_p24_v7_startup_trim", "a222_analyze.py", "a222_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -628,6 +630,15 @@ EXCEPTIONS["A220"] = {("runs/z_N0_25_10", "s3"): _A220v, ("runs/z_N75_25_10", "s
                       ("runs/z_N0_25_0", "s3w"): _A220v, ("runs/z_N0_25_10", "s3w"): _A220v, ("runs/z_N75_25_10", "s3w"): _A220v,
                       ("runs/z_N0_25_0", "z1"): _A220z, ("runs/z_N0_25_10", "z1"): _A220z, ("runs/z_N75_25_10", "z1"): _A220z,
                       ("runs/u_N0_25_5_s62", "z1"): _A220n, ("runs/z_S75_25_10", "z1"): _A220n, ("runs/z_S75_hot_10", "z1"): _A220n}
+_A221v = "N0 with no load: valleys down to -21.2 A over the last 60 us, 1.2 A outside the band (RESULTS 0); stated as measured"
+_A221n = "no resume in the 20 us edge log (the row does not pause there): not measured, scored false (RESULTS 1)"
+EXCEPTIONS["A221"] = {("skip/z_N0_25_0", "s3t"): _A221v, ("criteria_main", "z_N0_25_0/s3t"): _A221v,
+                      ("skip/z_N0_25_0", "z1r"): _A221n, ("criteria_main", "z_N0_25_0/z1r"): _A221n,
+                      ("skip/u_N0_25_5_s62", "z1r"): _A221n,
+                      ("check/k_n_s_p62", "k1"): "Vo before 300 us 2.14 mV low on V7 (tolerance 2): mode S's trim set on V6; "
+                      "retrimmed and passed in A222 (RESULTS 0)"}
+EXCEPTIONS["A222"] = {("startup/s_S75_25", "t1"): "round 1 kept S75's trim (wrong premise: its 25 C handover is at 144 us); "
+                      "-4.96 mV; round 2 with +3 steps passes (RESULTS 0)"}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -660,6 +671,9 @@ def flat(c, prefix=""):
     return out
 
 
+RUN_GROUPS = ("runs", "rows", "skip", "check", "startup")   # summaries' per-run groups (A221 / A222: by kind of row)
+
+
 def criteria_sets(d, prefix=""):
     """(row, {criterion: bool}) for every criteria block of a summary."""
     for k, v in d.items():
@@ -671,7 +685,7 @@ def criteria_sets(d, prefix=""):
             yield prefix + k, flat(v)
         elif k in ("part_a", "part_b"):
             yield from criteria_sets(v, prefix + k + "/")
-        elif k in ("runs", "rows"):                                  # one entry per run, each possibly with its criteria
+        elif k in RUN_GROUPS:                                       # one entry per run, each possibly with its criteria
             yield from criteria_sets(v, prefix + k + "/")
 
 
@@ -680,7 +694,7 @@ def summary_rows(d):
     for k, v in d.items():
         if k in ("part_a", "part_b") and isinstance(v, dict):
             rows |= set(v)
-        elif k in ("runs", "rows") and isinstance(v, dict):
+        elif k in RUN_GROUPS and isinstance(v, dict):
             rows |= set(v)
         elif not k.startswith("criteria"):
             rows.add(k)

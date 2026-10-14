@@ -2275,6 +2275,20 @@ each question:
          48 V bus with switches off SH1 sits at 48 V; a 4 x 1 kOhm divider
          + diodes holds a slow ramp (23.7 V), not a 10 us edge (47.9 V);
          with LSCB's capacitor ladder as well 21.4 V.
+    121. Light load by skipped rounds (2026-10-14, A216-A222; RTL,
+         bridge, plant). Below its lower Ton limit a module pauses (all
+         switches off, its last low-side intervals ending at zero current)
+         and resumes with its low sides. Adopted on nominal boards with
+         plant V7 (V6 + the inductor's core loss, D76): N0 / N75 at 10 %
+         keep every valley in -20..-12 A, N0 no load regulates with
+         valleys to -21.2 A. On V6 the idle ring never decayed (no
+         resistance in an idle phase), which set the resumes' valleys.
+         V7 books 15.5 W of core loss per module at full load (N0) and
+         needed mode S retrimmed by 1-3 steps of 31.25 ps (A222). Slow
+         boards do not skip and keep a 30 % minimum. Found on the way:
+         large load re-applications (+200 A) reach 250 A because scb_vff's
+         relative cap holds phase 1 while phases 2-4 follow the loop
+         (controller item 9, open).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
