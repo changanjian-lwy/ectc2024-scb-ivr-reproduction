@@ -34,3 +34,15 @@ Budget: 3 runs, about 2.5 h for the N0 row, 40 min for the others.
   outside the band) is stated as measured. Earlier rows stay results of the plant version they ran on.
 - k1 or t1 fails: the trim is moved once more by the same rule and the failing row repeated; a second miss is reported
   and V7 is not adopted.
+
+## 5. Round 2 (added after round 1, before its runs)
+- Round 1: k1 passes on N0 (Vo before 300 us -0.49 mV, post-step peak 181.30 A), t1 on N75 (+0.98 / +0.95 mV); t1
+  misses on S75 25 C: -4.96 mV. My premise was wrong: S75's handover is requested by Vo only when hot (A221's row,
+  134 us); at 25 C it is at 144 us, as on V6.
+- Section 4: the trim moves once more by the same rule, S75 +4.96 mV / 54.5 mV per ns = +0.091 ns, 3 steps
+  (35.84375 ns, about +5.1 mV), and the failing row is repeated (s_S75_25_r2, criterion t1).
+- Added as a check (reported, not in the decision rule's text): the S75 125 C start-up with the same trim
+  (s_S75_hot_r2), because A206 uses the 25 C trim at every temperature and A221's hot start-up reached 1.0481 V of
+  A206's 1.05 V limit. If it misses A206's c6, the trim is not adopted for S75 and V7 is not adopted.
+- Prediction: s_S75_25_r2 +0.2 mV from V6 (t1 passes); the hot start-up's maximum 1.0481-1.0490 V (its handover is
+  requested by Vo; a faster rise brings the request earlier, and the overshoot past 1.045 V grows little).

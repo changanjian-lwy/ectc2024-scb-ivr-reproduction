@@ -25,7 +25,8 @@ A21 = _load("a221_analyze", "A221_p24_core_loss_and_pause/a221_analyze.py")
 A6 = A21.A15.A6
 COS = HERE / "cosim"
 TOL_V, T_CUT = 2e-3, 200e-6
-REF = {"s_N75_25": "m16_B_N75_25_p4_ls0p3", "s_S75_25": "m16_B_S75_25_p4_ls0p3"}
+REF = {"s_N75_25": "m16_B_N75_25_p4_ls0p3", "s_S75_25": "m16_B_S75_25_p4_ls0p3", "s_S75_25_r2": "m16_B_S75_25_p4_ls0p3",
+       "s_S75_hot_r2": "m16_B_S75_hot_p5_ls0p3"}                # round 2: S75 retrimmed; the hot start-up a check
 
 
 def startup(path):
