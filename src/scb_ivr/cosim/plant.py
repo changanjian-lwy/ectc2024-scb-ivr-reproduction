@@ -720,7 +720,8 @@ class _Run(ctypes.Structure):
                [(nm, ctypes.c_void_p) for nm in ("aux_cmd", "aux_on", "aux_idx", "aux_e2", "aux_imax", "aux_imin")] + \
                [(nm, ctypes.c_double) for nm in ("vin_step", "t_vstep", "t_vslew")] + \
                [("n_xl", ctypes.c_int32), ("xl_hit", ctypes.c_int32), ("xl_idx", ctypes.c_int32 * 4),
-                ("xl_thr", ctypes.c_double * 4)]                                   # A101; A106; A133
+                ("xl_thr", ctypes.c_double * 4)] + \
+               [("i_step2", ctypes.c_double), ("t_step2", ctypes.c_double)]        # A101; A106; A133; A216
 
 
 class KernelPlant2(KernelPlant):
@@ -756,6 +757,7 @@ class KernelPlant2(KernelPlant):
         r.rev_vf, r.rev_r, r.vin, r.t_ramp = float(p.rev_vf), float(p.rev_r), float(p.vin), float(p.t_ramp)
         r.i_load, r.t_load = float(p.i_load), float(p.t_load)
         r.i_step, r.t_step = float(p.i_step), float(p.t_step)
+        r.i_step2, r.t_step2 = float(p.i_step2), float(p.t_step2)                                  # A216
         r.vin_step, r.t_vstep, r.t_vslew = float(p.vin_step), float(p.t_vstep), float(p.t_vslew)   # A106
         r.rev_drop, r.load_cc = int(bool(p.rev_drop)), int(p.load_kind == "cc")
         self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32),

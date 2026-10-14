@@ -1730,3 +1730,27 @@ async def skip_keeps_the_period_across_a_pause(dut):
     await ClockCycles(dut.clk, 2)
     await ReadOnly()
     assert int(dut.t_per.value) == per, (int(dut.t_per.value), per)
+
+
+@cocotb.test()
+async def skip_with_ton_lat_reads_the_registers(dut):
+    """A216 with A215's registers (cfg_ton_lat 6): the skip condition follows a sample only after the registers have
+    loaded (7 edges after the sample's), so a low-side turn-on of phase 1 before that still latches no skip."""
+    c = await _skip_start(dut, ton_lat=6)
+    await ClockCycles(dut.clk, 20)
+    await c.set(adc_valid=1, adc_code=2000 + 20)
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.hi_c.value) == 1 and int(dut.hi_r.value) == 0 and int(dut.skip_c.value) == 0
+    seen = []
+    for _ in range(8):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        seen.append(int(dut.skip_c.value))
+    assert seen == [0, 0, 0, 0, 0, 1, 1, 1], seen
+    for _ in range(100):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.idle.value):
+            break
+    assert int(dut.idle.value) == 1

@@ -79,7 +79,8 @@ reports it at the turn-off); keys absent from cfg take the values that reproduce
 Output (cfg "out"): sections at every phase-1 turn-on (state, Vo, Ton, flying-capacitor voltages, reverse energy),
 the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final registers, peak V_DS and current,
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
-Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load.
+Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load;
+"load_step2" (A216) the same, added to the first (a release and a later re-application in one run).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -283,6 +284,8 @@ def make_params(cfg, ref):
         extra.update(vin_step=float(ls["dv"]), t_vstep=float(ls["t_us"]) * 1e-6, t_vslew=float(ls.get("slew_us", 0.0)) * 1e-6)
     if cfg.get("load_step"):                                          # A100: a load current step
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
+    if cfg.get("load_step2"):                                         # A216: a second one, added to the first
+        extra.update(i_step2=float(cfg["load_step2"]["i_a"]), t_step2=float(cfg["load_step2"]["t_us"]) * 1e-6)
     aux = cfg.get("aux")                                              # A101: auxiliary commutation branches
     if aux:
         r_bds = 2 * aux.get("rds_on_mohm", 1.3) * 1e-3 / aux["alpha"]

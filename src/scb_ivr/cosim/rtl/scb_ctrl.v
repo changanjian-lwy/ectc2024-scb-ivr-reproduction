@@ -229,8 +229,15 @@ module scb_ctrl #(
     reg  [TW-1:0]   res_t;                     // the last resume's instant (phase 1's low-side turn-on)
     wire [N-1:0]    sk_p, tk_p, res_p;
     wire [N*TW-1:0] t_lon_all;
-    wire [AW:0]     skip_th = {1'b0, cfg_vref_code} + {1'b0, (skip_q || mod_idle) ? cfg_skip_lo : cfg_skip_hi};
-    wire            skip_c  = cfg_skip && cfg_vloop && mode_p && (ton_sum <= acc_min) && ({1'b0, vo_q} > skip_th);
+    // the three comparisons change with a sample only; with cfg_ton_lat they are read from registers loaded with the
+    // phases' Ton (A215), so no path of the Ton arithmetic reaches a phase within a clock
+    wire            fl_c = (ton_sum <= acc_min);                                       // Ton at its lower limit
+    wire            hi_c = ({1'b0, vo_q} > {1'b0, cfg_vref_code} + {1'b0, cfg_skip_hi});
+    wire            lo_c = ({1'b0, vo_q} > {1'b0, cfg_vref_code} + {1'b0, cfg_skip_lo});
+    reg             fl_r, hi_r, lo_r;
+    wire            lat_sk = (cfg_ton_lat != 6'd0);
+    wire            skip_c = cfg_skip && cfg_vloop && mode_p && (lat_sk ? fl_r : fl_c)
+                             && ((skip_q || mod_idle) ? (lat_sk ? lo_r : lo_c) : (lat_sk ? hi_r : hi_c));
     assign skip1 = skip_q;
     assign smp   = tk_p[0];
     assign idle  = mod_idle;
@@ -260,12 +267,14 @@ module scb_ctrl #(
         ext_q <= ext_ton;
         if (rst) begin
             ton_ph_r <= ton_ph_c; lo_add_r <= lo_add_c; lat_cnt <= 6'd1;
+            fl_r <= 1'b0; hi_r <= 1'b0; lo_r <= 1'b0;                 // A216
         end else if (lat_ev) begin
             lat_cnt <= cfg_ton_lat;
         end else if (lat_cnt != 6'd0) begin
             lat_cnt <= lat_cnt - 1'b1;
             if (lat_cnt == 6'd1) begin
                 ton_ph_r <= ton_ph_c; lo_add_r <= lo_add_c;
+                fl_r <= fl_c; hi_r <= hi_c; lo_r <= lo_c;             // A216
             end
         end
     end

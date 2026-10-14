@@ -229,6 +229,7 @@ typedef struct {
     int32_t n_xl, xl_hit;                             /* A133: extra latches (phases 2..N floors), the one that held */
     int32_t xl_idx[4];                                /* A133: state index of each latch's current */
     double xl_thr[4];                                 /* A133: its threshold */
+    double i_step2, t_step2;                          /* A216: a second load current step (0, inf without one) */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
@@ -246,6 +247,7 @@ static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
 static double load_at(const run_t *r, double t) {     /* CircuitParams.load_at */
     double a = (r->load_cc && t >= r->t_load) ? r->i_load : 0.0;
     double b = (t >= r->t_step) ? r->i_step : 0.0;
+    if (t >= r->t_step2) b += r->i_step2;             /* A216 */
     return a + b;
 }
 
