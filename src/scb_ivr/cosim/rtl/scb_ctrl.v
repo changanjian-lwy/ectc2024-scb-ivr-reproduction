@@ -16,7 +16,8 @@
 //   Ton is the rounded integer part of ton_acc + p_term, clamped to [cfg_ton_min, cfg_ton_max]; otherwise
 //   Ton = cfg_ton. With cfg_kp = 0 the loop is A79's integral loop. A224: with cfg_kd, a derivative term
 //   d_term = -kd * (adc_code - the previous sample) is added while |the change| >= cfg_kd_db codes (else 0), held to
-//   the next sample like p_term; cfg_kd = 0: none.
+//   the next sample like p_term; cfg_kd = 0: none. A227: with cfg_kd_hold, d_term is 0 at a sample whose PI output
+//   (ton_acc + p_term after the sample) is at or below the lower Ton limit (the light-load / skipping regime).
 // - Comparators (current, low/high V_DS = 0, valley) pass a 2-flip-flop synchroniser; measurement reports
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses.
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
@@ -94,6 +95,7 @@ module scb_ctrl #(
     input  wire [KPW-1:0]      cfg_kp,         // A104: proportional gain
     input  wire [KPW-1:0]      cfg_kd,         // A224: derivative gain on the Vo sample's change (0: none)
     input  wire [3:0]          cfg_kd_db,      // A224: ... only while |the change| >= this many ADC codes
+    input  wire                cfg_kd_hold,    // A227: ... and not while the PI output is at the lower Ton limit
     input  wire                cfg_ext_ton,    // C2: in mode P, Ton = ext_ton (the master's, broadcast)
     input  wire [TW-1:0]       ext_ton,        // C2
     input  wire [TW-1:0]       ext_slot,       // C2 (SLAVE): phase 1's low-side turn-off slot
@@ -228,6 +230,9 @@ module scb_ctrl #(
     wire signed [AW1-1:0] acc_max  = $signed({cfg_ton_max, {FRAC{1'b0}}});
     reg  signed [AW1-1:0] p_term;                                  // A104
     wire signed [AW+KPW+1:0] pstep = err * $signed({1'b0, cfg_kp});
+    wire signed [AW1-1:0] acc_cl   = (acc_next < acc_min) ? acc_min : (acc_next > acc_max) ? acc_max : acc_next;
+    wire signed [AW1-1:0] pi_next  = acc_cl + {{(AW1 - AW - KPW - 2){pstep[AW+KPW+1]}}, pstep};   // A227
+    wire                  d_hold   = cfg_kd_hold && (pi_next <= acc_min);
     reg  signed [AW1-1:0] d_term;                                  // A224
     wire signed [AW1-1:0] ton_sum  = ton_acc + p_term + d_term;
     wire signed [AW1-1:0] ton_cl   = (ton_sum < acc_min) ? acc_min : (ton_sum > acc_max) ? acc_max : ton_sum;
@@ -370,9 +375,10 @@ module scb_ctrl #(
                 t_ref <= t_von;
             end
             if (adc_valid && cfg_vloop && mode_p) begin
-                ton_acc <= (acc_next < acc_min) ? acc_min : (acc_next > acc_max) ? acc_max : acc_next;
+                ton_acc <= acc_cl;
                 p_term  <= {{(AW1 - AW - KPW - 2){pstep[AW+KPW+1]}}, pstep};
-                d_term  <= (dmag >= {{(AW - 3){1'b0}}, cfg_kd_db}) ? {{(AW1 - AW - KPW - 2){dstep[AW+KPW+1]}}, dstep} : {AW1{1'b0}};   // A224
+                d_term  <= (dmag >= {{(AW - 3){1'b0}}, cfg_kd_db} && !d_hold) ? {{(AW1 - AW - KPW - 2){dstep[AW+KPW+1]}}, dstep}
+                                                                            : {AW1{1'b0}};   // A224, A227
             end
         end
     end

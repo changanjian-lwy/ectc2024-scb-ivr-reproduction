@@ -1,6 +1,8 @@
 """A224 analysis (BOUNDARY Section 2). Pair rows: a223_analyze.one on the kd run and on its reference d0 (A223's g25
 record of the same row), plus Vo's maximum before 300 us; e1-e4 per run. Skipping rows: a221_analyze.skip_row (s1,
-s2, s3t, z1r, true valleys). Start-up rows (h_, Section 5): start-up and handover peaks, Vo's maximum, late fires to 40 us
+s2, s3t, z1r, true valleys; the skipping cfgs carry no snapshot, so the circuit parameters that a206 / a207_analyze
+read from "snap_circuit" come from A221's record of the same row - same board, plant V7, same r_core - in a copy
+under tmp/a224_skip/). Start-up rows (h_, Section 5): start-up and handover peaks, Vo's maximum, late fires to 40 us
 after mode P's entry, against A223's g25 record (S75 125 C) or A222's (S75 25 C). j1 from the unit and regression logs and i_u_N0_g25 against A223's record.
   python3 a224_analyze.py -> a224_summary.json"""
 from __future__ import annotations
@@ -71,6 +73,24 @@ def h_row(row, f):
                                                  and m["vo_max_v"] <= 1.05 and not m["overlaps"])}}
 
 
+Z_SRC = {"z_N0_10": "z_N0_25_10", "z_N75_10": "z_N75_25_10", "z_N0_0": "z_N0_25_0"}
+
+
+def with_snap(f):
+    """A copy of record f with A221's "snap_circuit" for the same row (the circuit, not the state)."""
+    r = json.loads(Path(f).read_text())
+    if "snap_circuit" in r:
+        return f
+    src = TA / "A221_p24_core_loss_and_pause" / "cosim" / f"run_{Z_SRC[Path(f).stem[4:].rsplit('_d', 1)[0]]}.json"
+    s21 = json.loads(src.read_text())
+    assert s21["cfg"]["circuit"] == r["cfg"]["circuit"] and s21["cfg"]["gate"] == r["cfg"]["gate"]
+    r["snap_circuit"] = s21["snap_circuit"]
+    out = PROJECT / "tmp" / "a224_skip" / Path(f).name
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(r))
+    return out
+
+
 def identity():
     logs = PROJECT / "tmp" / "logs"
     u = re.findall(r"TESTS=(\d+) PASS=(\d+) FAIL=(\d+)", (logs / "a224_unit.log").read_text())
@@ -96,7 +116,7 @@ def main():
             res["startup"][name] = h_row(row, f)
             continue
         if name.startswith("z_"):
-            v = A21.skip_row(f)
+            v = A21.skip_row(with_snap(f))
             va = [y for p in v["true_valleys_a"].values() for y in p]
             if row == "z_N0_0":
                 v["criteria"]["s3t_vs_A221"] = bool(va) and min(va) >= NOLOAD_MIN_A

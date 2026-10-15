@@ -4,6 +4,16 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-15 (A227) - the derivative term held at the lower Ton limit (RTL, bridge)
+
+**Source:** A224's N0 10 % skipping row: the derivative term lifted Ton off
+its 4 ns limit between pauses (up to 4.91 ns, A221 4.41 ns) and the true
+valleys missed the band by 0.4 A. scb_ctrl cfg_kd_hold (cfg "kd_hold"):
+d_term = 0 at a sample whose PI output is at or below the lower limit.
+One unit test.
+**Gate:** kd_hold absent: the old cosim bit for bit (unit tests 108,
+cosim_regression --quick and --full; A227 BOUNDARY j1).
+
 ## 2026-10-15 (A224) - a derivative term in the voltage loop (RTL, bridge)
 
 **Source:** A223's records: after a large load re-application Vo rings with
