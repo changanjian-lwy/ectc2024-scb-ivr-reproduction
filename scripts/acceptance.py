@@ -131,6 +131,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A228": (TA / "A228_p24_damped_loop_adoption", "a228_analyze.py", "a228_summary.json"),
     "A229": (TA / "A229_p24_kd_band", "a229_analyze.py", "a229_summary.json"),
     "A230": (TA / "A230_p24_handover_slope_lead", "a230_analyze.py", "a230_summary.json"),
+    "A231": (TA / "A231_p24_lead_per_corner", "a231_analyze.py", "a231_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -385,6 +386,7 @@ NOT_ROWS["A227"] = r"w\d"                         # the w group, judged through 
 NOT_ROWS["A228"] = r".*"                          # judged per row and arm through ADAPT (q1 / q2 per skipping row, q3 per row)
 NOT_ROWS["A229"] = r".*"                          # judged through its criteria_main block (j1, q1-q4 over all rows)
 NOT_ROWS["A230"] = r".*"                          # judged through its criteria_main block (j1, v1-v3 over all rows)
+NOT_ROWS["A231"] = r".*"                          # judged through its criteria_main block (x1, x2 over all rows)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {

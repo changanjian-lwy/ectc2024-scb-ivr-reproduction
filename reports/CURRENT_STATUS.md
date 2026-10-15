@@ -2324,6 +2324,14 @@ each question:
          rows stay in -20..-12 A over four release instants (A228 found
          the term without the band lifted their upper valley 1.4-2.8 A).
          Not run with it: four modules, corners, L x 0.7 / 1.3.
+    125. Start-ups into light load (2026-10-16, A230 / A231; bridge,
+         plant V7, one module). The Vo-requested handover now compares
+         Vo + 0.7 us x its slope with 1.045 V on nominal boards (cfg
+         hand_lead_us); slow boards keep the plain request, because the
+         earlier handover dips S75 at 125 C / 30 % to 0.983 V. N0 / N75
+         into 20-100 % and S75 into 30-100 % stay <= 1.05 V at 25 / 125 C;
+         item 6 closes. Open: N0 into 10 % (1.0518 V), and a true no load:
+         a paused module cannot sink, so an overshoot stays (item 6b).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

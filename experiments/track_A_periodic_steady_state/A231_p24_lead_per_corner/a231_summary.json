@@ -1,0 +1,275 @@
+{
+ "rows": {
+  "N0h_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 118.604,
+    "t_hand_req_us": 118.41,
+    "vin_at_entry_v": 41.488062964582426,
+    "start_pk": 81.35563942337558,
+    "hand_pk": 110.71569508291081,
+    "peak_whole": 110.71569508291081,
+    "vo_max_v": 1.051680120731091,
+    "vo_min_after_entry_v": 0.9931274918377216,
+    "vo_last": [
+     0.9997461318604546,
+     1.000063601596058
+    ],
+    "vds_v": 28.242842205478347,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 117.80400000000002,
+    "t_hand_req_us": 117.61000000000001,
+    "vin_at_entry_v": 41.20822037603848,
+    "start_pk": 80.97447670204981,
+    "hand_pk": 111.25131245914577,
+    "peak_whole": 111.25131245914577,
+    "vo_max_v": 1.0469412998967869,
+    "vo_min_after_entry_v": 0.995409547277239,
+    "vo_last": [
+     0.9998763291069859,
+     1.0001992237961514
+    ],
+    "vds_v": 28.6850647063269,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "criteria": {
+    "x1": true
+   }
+  },
+  "N75h_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 113.004,
+    "t_hand_req_us": 112.81,
+    "vin_at_entry_v": 39.52916484477482,
+    "start_pk": 95.68412282688378,
+    "hand_pk": 120.19712709301339,
+    "peak_whole": 120.19712709301339,
+    "vo_max_v": 1.0495797349020675,
+    "vo_min_after_entry_v": 0.9926004765292296,
+    "vo_last": [
+     0.9997463850349614,
+     1.0002545200735258
+    ],
+    "vds_v": 28.156595264208047,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 112.20400000000001,
+    "t_hand_req_us": 112.01,
+    "vin_at_entry_v": 39.24932225623088,
+    "start_pk": 95.12652411406341,
+    "hand_pk": 116.24583640686012,
+    "peak_whole": 116.24583640686012,
+    "vo_max_v": 1.0420526144646427,
+    "vo_min_after_entry_v": 0.9951260375261646,
+    "vo_last": [
+     1.0001150127201182,
+     1.000152190584948
+    ],
+    "vds_v": 27.754080167657072,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "criteria": {
+    "x1": true
+   }
+  },
+  "N0h_100": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 124.81224701507067,
+    "hand_pk": 149.76817769250144,
+    "peak_whole": 149.76817769250144,
+    "vo_max_v": 1.0269925610041102,
+    "vo_min_after_entry_v": 1.0000693576679907,
+    "vo_last": [
+     1.0000693576679907,
+     1.0009733625062502
+    ],
+    "vds_v": 28.11406958377791,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 124.81224701507067,
+    "hand_pk": 149.76817769250144,
+    "peak_whole": 149.76817769250144,
+    "vo_max_v": 1.0269925610041102,
+    "vo_min_after_entry_v": 1.0000693576679907,
+    "vo_last": [
+     1.0000693576679907,
+     1.0009733625062502
+    ],
+    "vds_v": 28.11406958377791,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "criteria": {
+    "x2": true
+   }
+  },
+  "N75h_100": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 137.218473303042,
+    "hand_pk": 151.03829832990823,
+    "peak_whole": 151.03829832990823,
+    "vo_max_v": 1.0291046181142005,
+    "vo_min_after_entry_v": 1.000081532555105,
+    "vo_last": [
+     1.000081532555105,
+     1.0005462145771915
+    ],
+    "vds_v": 26.995554184415624,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 137.218473303042,
+    "hand_pk": 151.03829832990823,
+    "peak_whole": 151.03829832990823,
+    "vo_max_v": 1.0291046181142005,
+    "vo_min_after_entry_v": 1.000081532555105,
+    "vo_last": [
+     1.000081532555105,
+     1.0005462145771915
+    ],
+    "vds_v": 26.995554184415624,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "criteria": {
+    "x2": true
+   }
+  },
+  "N0_20": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 112.80400000000002,
+    "t_hand_req_us": 112.61000000000001,
+    "vin_at_entry_v": 39.45920419763884,
+    "start_pk": 74.40330308547827,
+    "hand_pk": 97.79011202219297,
+    "peak_whole": 97.79011202219297,
+    "vo_max_v": 1.0545162875241259,
+    "vo_min_after_entry_v": 0.9932986526951991,
+    "vo_last": [
+     0.9997772297950135,
+     1.0002516752465969
+    ],
+    "vds_v": 28.09012224004476,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 112.004,
+    "t_hand_req_us": 111.81,
+    "vin_at_entry_v": 39.17936160909489,
+    "start_pk": 74.05019038023885,
+    "hand_pk": 105.86483623967925,
+    "peak_whole": 105.86483623967925,
+    "vo_max_v": 1.048867319937046,
+    "vo_min_after_entry_v": 0.9938424897394267,
+    "vo_last": [
+     0.9998312620183375,
+     1.0002522348686556
+    ],
+    "vds_v": 28.19617903529089,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": true
+   },
+   "criteria": {}
+  },
+  "N75_20": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 107.004,
+    "t_hand_req_us": 106.81,
+    "vin_at_entry_v": 37.43034543069524,
+    "start_pk": 89.94875262010383,
+    "hand_pk": 105.21862018967249,
+    "peak_whole": 105.21862018967249,
+    "vo_max_v": 1.050144189052141,
+    "vo_min_after_entry_v": 0.9903383281126733,
+    "vo_last": [
+     0.9973802174261214,
+     1.005986167580631
+    ],
+    "vds_v": 28.83426946264954,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 2,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 106.40400000000001,
+    "t_hand_req_us": 106.21000000000001,
+    "vin_at_entry_v": 37.220463489287276,
+    "start_pk": 89.563771512688,
+    "hand_pk": 96.041115967073,
+    "peak_whole": 96.041115967073,
+    "vo_max_v": 1.04424622858201,
+    "vo_min_after_entry_v": 0.991086015894931,
+    "vo_last": [
+     0.997330199413755,
+     1.005876659777363
+    ],
+    "vds_v": 29.43168588251111,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 3,
+    "f6": true
+   },
+   "criteria": {}
+  }
+ },
+ "criteria_main": {
+  "x1": true,
+  "x2": true
+ },
+ "adopt": true
+}
