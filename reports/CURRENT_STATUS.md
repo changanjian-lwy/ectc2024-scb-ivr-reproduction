@@ -2314,6 +2314,16 @@ each question:
          loses on copper; one layer of 2 x 41 units needs 1.2-4.2 cm² per
          phase. V7's r_core stays (a damping resistor; its books are not
          the core loss). P24's 12 x 183 nH units have no HBS1 unit in [10].
+    124. Large load re-applications damped (2026-10-16, A223-A229; RTL,
+         bridge; plant V7, one module). Item 9 closes. scb_vff's relative
+         cap acts only while Vin rises (rel_gate 25 codes); the loop gets a
+         derivative term (kd 355 ns/V, dead band 2 codes), held at zero
+         while the PI output is within 4 ns of the lower Ton limit
+         (kd_hold, kd_band_ns 4.0). N0 from 0 / 5 / 20 % to full load and
+         N75 from 5 %: 149.3-159.8 A (was 214-248 A); the 10 % skipping
+         rows stay in -20..-12 A over four release instants (A228 found
+         the term without the band lifted their upper valley 1.4-2.8 A).
+         Not run with it: four modules, corners, L x 0.7 / 1.3.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

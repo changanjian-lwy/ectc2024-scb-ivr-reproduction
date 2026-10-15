@@ -8,7 +8,7 @@ comes from, and says what may be claimed.
 
 | part | setting | source |
 |---|---|---|
-| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit). **Since 2026-10-14 the RTL is open again (user decision). A215: the phases read their Ton from registers loaded 16 clocks after the last change of the Ton arithmetic's inputs (cfg ton_lat 16: 68 ns from the sampling instant to the phases); checked on nine V6 rows, every other row ran with 0. Tested bound 17 clocks: at 32 two binding rows cross 200 A and the 30 % rows starve (the bridge refuses ton_lat > 30)** **Skipped rounds below the lower Ton limit on nominal boards (A216-A222, plant V7): cfg skip {hi 5 mV, lo 1 mV, res_ofs_a and zcd_a = 8 ns × Vo / L}: a module pauses with every low side turned off at zero current, resumes with its low sides, phase 1 ending its interval at the target; the slots keep their period across a pause** | A143, C13, A184, A215, A216, A217, A220, A221 |
+| controller | frozen RTL: one module A143 (lo_learn 4) on A129 g125 + vff {rel_q8 320, rel_lp 1, seed 2} + floor_late; four modules C12 + lo_learn 4 (C13). One register added by user decision on 2026-10-09: cfg_ton_s, mode S's own Ton (A184; scb_vff's C10 seed and the loop's reset value keep cfg_ton; equal values = the old controller bit for bit). **Since 2026-10-14 the RTL is open again (user decision). A215: the phases read their Ton from registers loaded 16 clocks after the last change of the Ton arithmetic's inputs (cfg ton_lat 16: 68 ns from the sampling instant to the phases); checked on nine V6 rows, every other row ran with 0. Tested bound 17 clocks: at 32 two binding rows cross 200 A and the 30 % rows starve (the bridge refuses ton_lat > 30)** **Skipped rounds below the lower Ton limit on nominal boards (A216-A222, plant V7): cfg skip {hi 5 mV, lo 1 mV, res_ofs_a and zcd_a = 8 ns × Vo / L}: a module pauses with every low side turned off at zero current, resumes with its low sides, phase 1 ending its interval at the target; the slots keep their period across a pause** **A damped loop for large load steps (A223-A229, plant V7, adopted 2026-10-16): scb_vff's relative cap on phase 1 acts only while Vin rises by ≥ 0.5 V (vff rel_gate 25 codes), and the loop gets a derivative term on the Vo sample's change (kd 355 ns/V, dead band 2 codes, held to the next sample), which is 0 while the PI output is within 4 ns above the lower Ton limit (kd_hold 1, kd_band_ns 4.0) so it stays out of the skipping bursts. Run on one module only (A223-A229's rows); the other columns of Section 3 and four modules ran without it** | A143, C13, A184, A215, A216, A217, A220, A221, A223, A224, A228, A229 |
 | loop | 50 pH, ideal parallel damper at ring Q 7 | A168, A157 |
 | devices | EPC2067, EPC's model (vendor library at run time), 2 + 3 per phase; spread corners ff (V_th −0.3 V, driver ×0.8), ss (V_th +1.0 V, Q_G ×1.29, driver ×1.2), hot (125 °C) | D79, A163 |
 | drive | high sides: 3.0 Ω turn-on / 0.3 Ω turn-off per device, ±20 %; R_G 0.3 Ω; every switch gate-driven. **Low sides, since A206 (plant V6): their own turn-on resistance, 0.3 Ω times the board's drive factor (0.36 Ω on slow boards); turn-off 0.3 Ω as before.** They turn on at zero voltage and gain nothing from a slow gate: with 3.0 Ω the semiconductor loss is 29.6 W per module against 20.2 W, and the handover reaches 206.4 A with switches at the datasheet maximum. Up to A205 every switch had 3.0 Ω, and every V5 result in this file was run that way | A164, A169, A205, A206 |
@@ -230,10 +230,20 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   N0's ladder, unbalanced by a large release (3.7 V between rails 4 and 1, also without skipping), settles with
   about 125 µs. Not covered: four modules (the slaves do not follow a pause), the slow board (it does not skip),
   temperatures other than 25 °C, line steps while paused, the copper's resistance (D72).
-- **Large load re-applications are out of range (A216, information rows, V6).** +200 A from 20 % reaches 249.8 A and
-  +237.5 A from 5 % 235.4 A (records `A216_p24_skipped_rounds/cosim/run_w_N0_25_20_up_ns.json`,
-  `run_w_N0_25_5_up.json`): phase 1's Ton is held by scb_vff's relative cap while phases 2-4 follow the loop, rail 1
-  rises to 16.3 V and phase 4's valley to +165 A. The specified load step stays 62.5 A; open, controller item 9.
+- **Large load re-applications (controller item 9; closed 2026-10-16 by A223-A229, plant V7, one module).** Found in
+  A216 (V6): +200 A from 20 % reached 249.8 A and +237.5 A from 5 % 235.4 A (records
+  `A216_p24_skipped_rounds/cosim/run_w_N0_25_20_up_ns.json`, `run_w_N0_25_5_up.json`). Two mechanisms: phase 1's Ton
+  held by scb_vff's relative cap (rail 1 to 16.3 V; A223 gates the cap to rising Vin), and a ring of about 2.9 µs that
+  the loop's P term and Co form around the current that integrates Ton's excess while phase 1's low-side learner moves
+  at most 2 ns per period (figure `A223_p24_cap_on_rising_vin/a223_w20.png`; A224's derivative term damps it). The
+  derivative term first moved the 10 % skipping rows' upper valley end by 1.4-2.8 A (A228, four release instants each;
+  the final configuration agrees within 0.6 A), so it is held within 4 ns above the lower Ton limit (A229). With the
+  adopted controller: N0 from 0 / 5 / 20 % to full load 153.9 / 159.8 / 149.3 A, N75 from 5 % 159.6 A (without: 223.6
+  / 248.3 / 214.0 / 232.1 A, A223), S75 at 125 °C +175 A from 30 % 153.7 A after the step; the 10 % skipping rows keep
+  every valley in −20..−12 A (8 of 8 runs), no load −21.3..−21.7 A as before (records
+  `A229_p24_kd_band/cosim/run_*_b.json`, release records-a229). Margin of the derivative gain: S75 at 125 °C hands over
+  at 178.9 / 187.0 / 276.6 A with kd 355 / 440 / 530 (A224). Not run with the damped loop: four modules, the device
+  corners, L × 0.7 / 1.3, other temperatures for the re-applications.
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within

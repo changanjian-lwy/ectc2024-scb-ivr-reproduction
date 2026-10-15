@@ -129,6 +129,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     # A226: a reference measurement without registered criteria (RESULTS only)
     "A227": (TA / "A227_p24_kd_held_at_the_limit", "a227_analyze.py", "a227_summary.json"),
     "A228": (TA / "A228_p24_damped_loop_adoption", "a228_analyze.py", "a228_summary.json"),
+    "A229": (TA / "A229_p24_kd_band", "a229_analyze.py", "a229_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -381,6 +382,7 @@ NOT_ROWS["A224"] = r"i_"                          # the identity row (summary's 
 NOT_ROWS["A225"] = r"[aus]_"                      # judged through ADAPT (groups a / u / s)
 NOT_ROWS["A227"] = r"w\d"                         # the w group, judged through ADAPT
 NOT_ROWS["A228"] = r".*"                          # judged per row and arm through ADAPT (q1 / q2 per skipping row, q3 per row)
+NOT_ROWS["A229"] = r".*"                          # judged through its criteria_main block (j1, q1-q4 over all rows)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
