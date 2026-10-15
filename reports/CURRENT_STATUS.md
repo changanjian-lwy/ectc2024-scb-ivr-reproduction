@@ -2332,6 +2332,12 @@ each question:
          into 20-100 % and S75 into 30-100 % stay <= 1.05 V at 25 / 125 C;
          item 6 closes. Open: N0 into 10 % (1.0518 V), and a true no load:
          a paused module cannot sink, so an overshoot stays (item 6b).
+    126. The fast falling step on V7 (2026-10-16, A232; -4.8 V / 1 us,
+         three positions, one module). N0 and S75 no longer show the
+         phases 2-4 restarts and spikes V6 had (3 + 3 on N0); N75 keeps
+         one phase-3 restart ~21 us after the step and an 18-20 A spike
+         at one or two positions, with and without the damped loop.
+         Peaks 154-166 A. Item 3 stays open within the limits.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

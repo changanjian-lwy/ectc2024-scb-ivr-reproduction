@@ -139,7 +139,11 @@ The misses are regulation or oracle events, none on voltage. Current misses:
 The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
-  step position per variant, so "none" on a variant is one sample);
+  step position per variant, so "none" on a variant is one sample). **On V7 (A232, 2026-10-16; −4.8 V / 1 µs at three
+  positions, one module, 25 °C):** N0 and S75 show no restart and no NEW spike with either controller (V6: 3 + 3 on
+  N0); N75 keeps one phase-3 restart ~21 µs after the step and a 17.5-19.8 A spike (151-153 A) at one or two of three
+  positions, with and without the damped loop. All post-step peaks 153.7-165.5 A. Item 3 stays open, inside the limits
+  (records `A232_p24_fast_falling_step_v7/cosim/`, release records-a232);
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 

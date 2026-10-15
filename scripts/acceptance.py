@@ -132,6 +132,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A229": (TA / "A229_p24_kd_band", "a229_analyze.py", "a229_summary.json"),
     "A230": (TA / "A230_p24_handover_slope_lead", "a230_analyze.py", "a230_summary.json"),
     "A231": (TA / "A231_p24_lead_per_corner", "a231_analyze.py", "a231_summary.json"),
+    "A232": (TA / "A232_p24_fast_falling_step_v7", "a232_analyze.py", "a232_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -686,6 +687,9 @@ EXCEPTIONS["A230"] = {("rows/N0_10", "v1"): "N0 10 %: 1.0518 V with the lead (ba
                       ("criteria_main", "v1"): "the lead fixes 30 % on N0 / N75 but deepens S75 125 C 30 %'s dip to "
                       "0.9827 V, is not enough at 10 % (1.0518 V), and a true no load does not come back down (the module "
                       "cannot sink while paused) - not adopted (RESULTS 0)"}
+_A232 = ("N75 -4.8 V / 1 us: phase 3 restarts ~21 us after the step and its next peak is 17.5-19.8 A high (151-153 A), "
+         "in both controller arms - item 3 stays open, within the limits (RESULTS 0)")
+EXCEPTIONS["A232"] = {("runs/f_N75_k4_b", "z1"): _A232, ("criteria_main", "z1"): _A232}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
