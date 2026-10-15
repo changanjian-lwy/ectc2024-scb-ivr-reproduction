@@ -2289,6 +2289,18 @@ each question:
          large load re-applications (+200 A) reach 250 A because scb_vff's
          relative cap holds phase 1 while phases 2-4 follow the loop
          (controller item 9, open).
+    122. Start-up items on V7 (2026-10-15, A225; one module, run with
+         A224's candidate gate + kd). Item 5, the slow board's two-cycle
+         orbit, is closed: mean valley change per period <= 0.25 A on
+         S75 at 100 / 50 % (V6: 4-8 A), <= 0.38 A with half the core's
+         damping - it came from plants V2-V6, which had no damping in an
+         idle inductor. Item 2 stays: S75 at 125 C, +4.8 V / 1 us 2 / 10 /
+         20 us after the entry gives 211.2 / 210.3 / 207.8 A (25 C and N0
+         pass), so the 40 us hold-off stays for slow boards. Item 6
+         narrows: N0 into 30 % reaches 1.0510 V (V6: 1.0528 V), 1.0 mV
+         over; S75 into 30 % passes at 25 and 125 C. The final
+         configuration with A222's trim gives -22.8 A at no load (A226;
+         the -21.2 A above had the V6 trim).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

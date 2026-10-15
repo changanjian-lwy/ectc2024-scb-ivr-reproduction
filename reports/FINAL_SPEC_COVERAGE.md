@@ -122,7 +122,10 @@ The misses are regulation or oracle events, none on voltage. Current misses:
   −40..125 °C is 197.8 A, a 2.2 A margin.
 - A181's slow L × 0.75 start-up miss (202-207 A open loop, a 278 A handover) is fixed by the A188 start-up.
 - +4.8 V / 1 µs within the first 40 µs after the handover on slow boards with L × 0.75: up to 217.3 A at 125 °C and
-  206.1 A at 25 °C (A198). Not fixed: stated as a hold-off (Section 5).
+  206.1 A at 25 °C (A198). Not fixed: stated as a hold-off (Section 5). **On V7 (A225, with A224's candidate gate +
+  kd): 211.2 / 210.3 / 207.8 A at 2 / 10 / 20 µs after the entry on S75 at 125 °C; S75 at 25 °C 199.6 / 197.0 /
+  190.3 A and N0 at 2 µs 182.8 A pass (records `A225_p24_startup_items_recheck/cosim/run_a_*.json`). The hold-off
+  stays for slow boards; controller item 2 stays open.**
 The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
@@ -202,7 +205,11 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   at 109-137 µs instead of 144 µs, while Vin is still at 38-48 V, and mode P takes over. **Nominal L0 with 30 %
   reaches 1.0528 V, 2.8 mV over the limit (record `A214_p24_startup_light_load/cosim/run_u_N0_25_30.json` in
   release records-a214). Tested start-up range: 50-100 % of the load.** Slow boards at 30 %, 0 °C, a load that
-  switches on during the start, and four modules are not run.
+  switches on during the start, and four modules are not run. **On V7 (A225, run with A224's candidate gate + kd):**
+  nominal L0 into 30 % reaches 1.0510 V, 1.0 mV over, 0.7 µs after mode P's entry, where gate and kd already act
+  (the final configuration without them was not run on this row); slow 0.75 L0 into 30 % at 25 / 125 °C passes
+  (1.0483 / 1.0491 V, peaks ≤ 115.0 A). Records `A225_p24_startup_items_recheck/cosim/run_u_*_30.json`, release
+  records-a225. Controller item 6 (the loop's seed is set for the full load) stays open.
 - **The Ton path's registers (A215, 2026-10-14; plant V6, ton_lat 16).** A212's four N0 rows, A206's three binding
   rows and the 30 % rows of A208 / A210 pass their own criteria: post-step peaks -6.3 .. +1.1 A against the
   ton_lat 0 records (binding row 196.95 A, S75 25 C k 4), Vo before 300 µs unchanged, N0's handover 148.9 A instead
@@ -217,6 +224,9 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   measured a short period for the slots (fixed in A221). On V7 (core loss, which damps the ring) N0 and N75 at 10 %
   keep every valley in −20..−12 A, every phase resumes within 0.3 A of zero, also with half the damping; N0 with no
   load reaches −21.2 A (records `A221_p24_core_loss_and_pause/cosim/run_z_N0_25_0.json`, release records-a221).
+  **That figure had the V6 trim. With A222's V7 trim the final configuration reaches −22.8 A at no load, 2.8 A
+  below the band (A226, record `A226_p24_noload_valley_reference/cosim/run_z_N0_0_d0.json`, release records-a226),
+  and N0 at 10 % keeps −16.2..−13.6 A (A227, `run_z_N0_10_d0.json`, release records-a227).**
   N0's ladder, unbalanced by a large release (3.7 V between rails 4 and 1, also without skipping), settles with
   about 125 µs. Not covered: four modules (the slaves do not follow a pause), the slow board (it does not skip),
   temperatures other than 25 °C, line steps while paused, the copper's resistance (D72).
@@ -274,6 +284,12 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   194.7 A at 0 / 25 °C (reference 197.8 / 197.1 A), but raise its handover to 177.5-177.7 A (reference 150.7-154.0 A),
   and the 125 °C handover is already 184.5 A (A194). **Not adopted (A196, fails as registered).** The handover and the steady
   state want different corrector settings; a setting that changes after the handover is not run.
+  **On V7 the orbit is gone (A225, 2026-10-15; S75 at 25 °C, run with A224's candidate gate + kd):** mean |valley
+  change| per period 0.04 A at 100 % and 0.04-0.25 A at 50 % (V6, A211: 4.2-5.1 and 5.1-7.7 A), and with half the
+  core's damping 0.27-0.38 / 0.05-0.10 A (records `A225_p24_startup_items_recheck/cosim/run_s_S75_*.json`, release
+  records-a225). The orbit belonged to plants V2-V6, which had no damping in an idle inductor; controller item 5 is
+  closed on V7. The slow-corner margins above that were measured on V2-V6 include it. Seen on the way and not
+  traced: at 50 % phases 3 and 4 settle at −33.9 / −33.1 A against −15.6 A on phases 1-2.
 
 ## 5. How to state the results
 
