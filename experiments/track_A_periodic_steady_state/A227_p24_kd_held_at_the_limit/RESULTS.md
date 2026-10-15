@@ -16,6 +16,9 @@ Boundary: 3341c47 (code + boundary). Records: release records-a227 (7 cosim reco
 - **The missing reference**: the final configuration (new trim, no gate, no kd) at N0 10 % gives -16.2..-13.6 A
   (s3t passes): A224's 0.4 A miss on that row was the derivative term's.
 
+- **Correction (A228, 2026-10-15):** the scatter bullet above is wrong. Over four release instants d0's 10 % rows
+  agree within 0.6 A, and the derivative term (with or without the hold) moves their upper valley end by 1.4-2.8 A.
+
 ## 1. Criteria
 | row | result |
 |---|---|

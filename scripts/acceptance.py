@@ -128,6 +128,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A225": (TA / "A225_p24_startup_items_recheck", "a225_analyze.py", "a225_summary.json"),
     # A226: a reference measurement without registered criteria (RESULTS only)
     "A227": (TA / "A227_p24_kd_held_at_the_limit", "a227_analyze.py", "a227_summary.json"),
+    "A228": (TA / "A228_p24_damped_loop_adoption", "a228_analyze.py", "a228_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -377,6 +378,7 @@ NOT_ROWS["A161"] = r"m4_|s150_"
 NOT_ROWS["A215"] = r"k(8|16)_"                     # clock rows: the summary's information block
 NOT_ROWS["A216"] = r"(w_|f_|i_)"                  # information rows and the identity row (summary's own blocks)
 NOT_ROWS["A224"] = r"i_"                          # the identity row (summary's identity block)
+NOT_ROWS["A228"] = r".*"                          # judged per row and arm through ADAPT (q1 / q2 per skipping row, q3 per row)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -657,8 +659,8 @@ EXCEPTIONS["A224"] = {
     ("skip/z_N0_0_d355", "s3t"): _A224b, ("skip/z_N0_0_d355", "z1r"): _A224n,
     ("skip/z_N0_0_d355", "s3t_vs_A221"): "the reference (A221's -21.2 A) had the old N0 trim; against A226's -22.8 A the row passes",
     ("skip/z_N0_10_d355", "s3t"): "-16.8..-11.6 A, 0.4 A above the band's edge - one run; the scatter is A228's"}
-_A227s = ("N75 10 %: -18.5..-11.2 A, 0.8 A above the band's edge, within one run's scatter of about 1 A (RESULTS 0); "
-          "measured over four instants in A228")
+_A227s = ("N75 10 %: -18.5..-11.2 A, 0.8 A above the band's edge. RESULTS 0 called it one run's scatter; A228 measured "
+          "four instants: d0 within 0.6 A, the derivative term moves the upper end by 1.4-2.8 A")
 EXCEPTIONS["A227"] = {("skip/z_N0_0_h", "s3t"): _A224b, ("skip/z_N0_0_h", "z1r"): _A224n,
                       ("skip/z_N75_10_h", "s3t"): _A227s, ("skip/z_N75_10_h", "h1"): _A227s,
                       ("w/w5_N0_h", "h2"): "h2 was written two-sided: 163.4 -> 153.1 A is 10.3 A lower, outside +-5 A (RESULTS 0)"}
@@ -666,6 +668,9 @@ _A225 = ("S75 at 125 C: +4.8 V / 1 us 2 / 10 / 20 us after the entry gives 211.2
          "40 us hold-off stays for slow boards (RESULTS 0)")
 EXCEPTIONS["A225"] = {("criteria", f"a/a_S75h_d{d}/f2"): _A225 for d in (2, 10, 20)}
 EXCEPTIONS["A225"][("criteria", "u/u_N0_30/f6")] = "N0 into 30 %: Vo 1.0510 V, 1.0 mV over 1.05 V - item 6 narrows (RESULTS 0)"
+_A228 = ("the derivative term moves the 10 % rows' upper valley end by 1.4-2.8 A against d0 (mean over four release "
+         "instants; d0 within 0.6 A): Ton kicks inside bursts - not adopted (RESULTS 0)")
+EXCEPTIONS["A228"] = {("criteria", f"skip_rows/{z}/{a}/q2"): _A228 for z in ("z_N0_10", "z_N75_10") for a in ("k", "h")}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -674,6 +679,8 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     # (A145 lists the inductances that pass per di/dt; the criterion passes for a di/dt with any)
     "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
     "A225": lambda d: {g: {n: {k: r[k] for k in ("f2", "f5", "f6") if k in r} for n, r in d[g].items()} for g in ("a", "u", "s")},
+    "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
+                       "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
     "A163": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items() if "cmd" not in s},
     "A164": lambda d: {s: {f"c{k}": not v for k, v in c.items()} for s, c in d["verdict"].items()},
