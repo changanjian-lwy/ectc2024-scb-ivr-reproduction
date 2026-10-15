@@ -133,6 +133,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A230": (TA / "A230_p24_handover_slope_lead", "a230_analyze.py", "a230_summary.json"),
     "A231": (TA / "A231_p24_lead_per_corner", "a231_analyze.py", "a231_summary.json"),
     "A232": (TA / "A232_p24_fast_falling_step_v7", "a232_analyze.py", "a232_summary.json"),
+    "A233": (TA / "A233_p24_faster_low_side_learner", "a233_analyze.py", "a233_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -388,6 +389,7 @@ NOT_ROWS["A228"] = r".*"                          # judged per row and arm throu
 NOT_ROWS["A229"] = r".*"                          # judged through its criteria_main block (j1, q1-q4 over all rows)
 NOT_ROWS["A230"] = r".*"                          # judged through its criteria_main block (j1, v1-v3 over all rows)
 NOT_ROWS["A231"] = r".*"                          # judged through its criteria_main block (x1, x2 over all rows)
+NOT_ROWS["A233"] = r".*"                          # judged per row and arm in its rows / criteria_main blocks
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -690,6 +692,10 @@ EXCEPTIONS["A230"] = {("rows/N0_10", "v1"): "N0 10 %: 1.0518 V with the lead (ba
 _A232 = ("N75 -4.8 V / 1 us: phase 3 restarts ~21 us after the step and its next peak is 17.5-19.8 A high (151-153 A), "
          "in both controller arms - item 3 stays open, within the limits (RESULTS 0)")
 EXCEPTIONS["A232"] = {("runs/f_N75_k4_b", "z1"): _A232, ("criteria_main", "z1"): _A232}
+_A233r = ("a faster phase-1 learner raises the rising-step peaks (item 2 up to 232.1 A, binding row 198.2 / 201.2 A, "
+          "+4.8 V / 2 us 186.7 / 191.4 A): the slow learner protects the rising step - lo_smax stays 64 (RESULTS 0)")
+EXCEPTIONS["A233"] = {("criteria_main", f"s{x}/{m}"): _A233r for x in (128, 255) for m in ("m1", "m2", "m4")}
+EXCEPTIONS["A233"][("criteria_main", "s255/m3")] = "s255: w20_N0 / w5_N75 dips 5 mV deeper than allowed (RESULTS 1)"
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

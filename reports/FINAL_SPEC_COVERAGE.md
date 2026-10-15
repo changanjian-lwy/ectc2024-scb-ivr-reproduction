@@ -135,7 +135,11 @@ The misses are regulation or oracle events, none on voltage. Current misses:
   about 14 µs, but lower (−1..+4 A in 2 µs means), and peaks at 193.0 A (A223 `run_k_S75h_g25.json`): early after the
   handover the valley sits 3-6 A higher, on on-times the handover has already raised (phases 2-4 at 41-47 ns over the 20 µs after the step, against 39-45 ns at 500 µs). Why
   phase 1's timed low-side edge loses the valley for ~14 µs after a rising step, and why it sits higher in the first
-  ~25 µs (the 9.5 ns lead's 20 µs ramp, A167, is one suspect), is not traced.
+  ~25 µs (the 9.5 ns lead's 20 µs ramp, A167, is one suspect), is not traced. Phase 1's low-side reports are "early"
+  every period from 4 to 22 µs after the entry (A225 d2) while its learner moves at most 2 ns per decision; letting it
+  move 4 or 8 ns (lo_smax 128 / 255, A233) raises these peaks to 226.7 / 232.1 A and the binding row to 198.2 / 201.2
+  A, so the slow learner protects the rising step and lo_smax stays 64 (records `A233_p24_faster_low_side_learner/`,
+  release records-a233).
 The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one

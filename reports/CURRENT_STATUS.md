@@ -2338,6 +2338,12 @@ each question:
          one phase-3 restart ~21 us after the step and an 18-20 A spike
          at one or two positions, with and without the damped loop.
          Peaks 154-166 A. Item 3 stays open within the limits.
+    127. Phase 1's low-side learner speed (2026-10-16, A233, cfg only).
+         Item 2's early-step excess comes with phase 1's valley lost for
+         ~14 us while its learner moves 2 ns per decision; letting it move
+         4 / 8 ns raises the rising-step peaks (item 2 to 232 A, the
+         binding row 192.9 -> 198.2 / 201.2 A). lo_smax stays 64; the
+         40 us hold-off after the handover stays.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
