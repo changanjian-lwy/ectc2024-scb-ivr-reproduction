@@ -378,6 +378,8 @@ NOT_ROWS["A161"] = r"m4_|s150_"
 NOT_ROWS["A215"] = r"k(8|16)_"                     # clock rows: the summary's information block
 NOT_ROWS["A216"] = r"(w_|f_|i_)"                  # information rows and the identity row (summary's own blocks)
 NOT_ROWS["A224"] = r"i_"                          # the identity row (summary's identity block)
+NOT_ROWS["A225"] = r"[aus]_"                      # judged through ADAPT (groups a / u / s)
+NOT_ROWS["A227"] = r"w\d"                         # the w group, judged through ADAPT
 NOT_ROWS["A228"] = r".*"                          # judged per row and arm through ADAPT (q1 / q2 per skipping row, q3 per row)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
@@ -663,7 +665,7 @@ _A227s = ("N75 10 %: -18.5..-11.2 A, 0.8 A above the band's edge. RESULTS 0 call
           "four instants: d0 within 0.6 A, the derivative term moves the upper end by 1.4-2.8 A")
 EXCEPTIONS["A227"] = {("skip/z_N0_0_h", "s3t"): _A224b, ("skip/z_N0_0_h", "z1r"): _A224n,
                       ("skip/z_N75_10_h", "s3t"): _A227s, ("skip/z_N75_10_h", "h1"): _A227s,
-                      ("w/w5_N0_h", "h2"): "h2 was written two-sided: 163.4 -> 153.1 A is 10.3 A lower, outside +-5 A (RESULTS 0)"}
+                      ("criteria", "w/w5_N0_h/h2"): "h2 was written two-sided: 163.4 -> 153.1 A is 10.3 A lower, outside +-5 A (RESULTS 0)"}
 _A225 = ("S75 at 125 C: +4.8 V / 1 us 2 / 10 / 20 us after the entry gives 211.2 / 210.3 / 207.8 A - item 2 stays, the "
          "40 us hold-off stays for slow boards (RESULTS 0)")
 EXCEPTIONS["A225"] = {("criteria", f"a/a_S75h_d{d}/f2"): _A225 for d in (2, 10, 20)}
@@ -679,6 +681,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     # (A145 lists the inductances that pass per di/dt; the criterion passes for a di/dt with any)
     "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
     "A225": lambda d: {g: {n: {k: r[k] for k in ("f2", "f5", "f6") if k in r} for n, r in d[g].items()} for g in ("a", "u", "s")},
+    "A227": lambda d: {"w": {n: v["criteria"] for n, v in d["w"].items()}},
     "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
                        "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
@@ -706,7 +709,7 @@ def flat(c, prefix=""):
     return out
 
 
-RUN_GROUPS = ("runs", "rows", "skip", "check", "startup", "pairs", "w", "a", "u", "s")   # summaries' per-run groups (A221-A227: by kind of row)
+RUN_GROUPS = ("runs", "rows", "skip", "check", "startup", "pairs")   # summaries' per-run groups (A221-A224: by kind of row)
 
 
 def criteria_sets(d, prefix=""):
