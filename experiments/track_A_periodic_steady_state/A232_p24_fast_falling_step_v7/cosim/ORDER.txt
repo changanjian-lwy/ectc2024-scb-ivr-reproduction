@@ -1,0 +1,14 @@
+f_N0_k0_d0
+f_N0_k0_b
+f_N0_k2_d0
+f_N0_k2_b
+f_N0_k4_d0
+f_N0_k4_b
+f_N75_k0_d0
+f_N75_k0_b
+f_N75_k2_d0
+f_N75_k2_b
+f_N75_k4_d0
+f_N75_k4_b
+f_S75_k0_d0
+f_S75_k0_b
