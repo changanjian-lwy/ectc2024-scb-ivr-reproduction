@@ -125,7 +125,17 @@ The misses are regulation or oracle events, none on voltage. Current misses:
   206.1 A at 25 °C (A198). Not fixed: stated as a hold-off (Section 5). **On V7 (A225, with A224's candidate gate +
   kd): 211.2 / 210.3 / 207.8 A at 2 / 10 / 20 µs after the entry on S75 at 125 °C; S75 at 25 °C 199.6 / 197.0 /
   190.3 A and N0 at 2 µs 182.8 A pass (records `A225_p24_startup_items_recheck/cosim/run_a_*.json`). The hold-off
-  stays for slow boards; controller item 2 stays open.**
+  stays for slow boards; controller item 2 stays open.** These rows ran with A224's gate + kd (arm k); the adopted
+  controller (A229) differs from arm k only while the PI output is within 4 ns of the lower Ton limit, and their Ton
+  register stays above 35 ns, so the numbers stand for it. **What the records show (2026-10-16):** after the step phase 1's
+  valley turns positive (+2..+7 A, no reversed current for its turn-on) and stays there 8-14 µs - 6-18 / 12-20 / 20-26 µs
+  after the entry for steps at 2 / 10 / 20 µs - and its peaks run at 196-200 A for that whole stretch; the largest peak
+  comes 17.5-22 µs after the entry in all three. Without the step the same window keeps valleys of −14..−18 A and peaks
+  of 157-163 A (A230 `run_u_S75h_100_base.json`). The same step at 500 µs also holds phase 1's valley near zero for
+  about 14 µs, but lower (−1..+4 A in 2 µs means), and peaks at 193.0 A (A223 `run_k_S75h_g25.json`): early after the
+  handover the valley sits 3-6 A higher, on on-times the handover has already raised (phases 2-4 at 41-47 ns over the 20 µs after the step, against 39-45 ns at 500 µs). Why
+  phase 1's timed low-side edge loses the valley for ~14 µs after a rising step, and why it sits higher in the first
+  ~25 µs (the 9.5 ns lead's 20 µs ramp, A167, is one suspect), is not traced.
 The rest:
 - falling steps (nom −4.8 V / 1 µs, ff −8 V / 10 µs): A148's valley loss on phases 2-4 turns into K3 restarts and
   10-20 A spikes, which V2 does not show (A176 supports the lead plus the gate-driven low sides as the cause; one
