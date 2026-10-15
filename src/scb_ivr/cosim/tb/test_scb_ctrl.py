@@ -26,7 +26,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             lo_pred=0, lo_learn=0, lo_tgt=0,                                     # A99
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
             kp=0,                                                                # A104
-            kd=0, kd_db=2, kd_hold=0,                                            # A224, A227
+            kd=0, kd_db=2, kd_hold=0, kd_band=0,                                 # A224, A227, A229
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -97,6 +97,7 @@ class Ctrl:
         d.cfg_ki.value = cfg["ki"]
         d.cfg_kp.value = cfg["kp"]                               # A104
         d.cfg_kd.value = cfg["kd"]; d.cfg_kd_db.value = cfg["kd_db"]; d.cfg_kd_hold.value = cfg["kd_hold"]   # A224, A227
+        d.cfg_kd_band.value = cfg["kd_band"]                     # A229
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -527,6 +528,22 @@ async def voltage_loop_derivative_held_at_the_lower_limit(dut):
     await c.set(adc_valid=0)
     await ReadOnly()
     assert int(dut.ton_now.value) == 266, int(dut.ton_now.value)
+
+
+@cocotb.test()
+async def voltage_loop_derivative_held_within_a_band(dut):
+    """A229: with kd_hold and kd_band 20, d_term is 0 while the PI output is at most 67 + 20 = 87 (here 77; with band 0
+    it would act: 77 + 8 x 10 = 157); above the band (97) it acts again: 97 + 8 x 20 = 257."""
+    c = Ctrl(dut)
+    await c.start(vloop=1, ki=0, kp=65536, kd=8 * 65536, kd_db=2, kd_hold=1, kd_band=20, ton=67)
+    await c.set(adc_valid=1, adc_code=2000 - 10)   # 10 codes below vref: PI 77 <= 87, d_term +80 held at 0
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 77, int(dut.ton_now.value)
+    await c.set(adc_valid=1, adc_code=2000 - 30)   # falling 20 more codes: PI 97 > 87, d_term +160
+    await c.set(adc_valid=0)
+    await ReadOnly()
+    assert int(dut.ton_now.value) == 257, int(dut.ton_now.value)
 
 
 @cocotb.test()

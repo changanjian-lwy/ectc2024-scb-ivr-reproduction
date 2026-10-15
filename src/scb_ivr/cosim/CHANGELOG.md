@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-15 (A229) - the derivative term held within a band above the limit (RTL, bridge)
+
+**Source:** A228: with the hold at the limit the derivative term still moves
+the 10 % skipping rows' upper valley end by 1.8-2.3 A (d0 within 0.6 A over
+four release instants); inside a burst the PI output sits up to about 2 ns
+above the limit and the term kicks Ton there. scb_ctrl cfg_kd_band (cfg
+"kd_band_ns"): with cfg_kd_hold, d_term = 0 while the PI output is at most
+the limit + the band. One unit test.
+**Gate:** kd_band absent: the old cosim bit for bit (unit tests 109,
+cosim_regression --quick and --full; A229 BOUNDARY j1).
+
 ## 2026-10-15 (A227) - the derivative term held at the lower Ton limit (RTL, bridge)
 
 **Source:** A224's N0 10 % skipping row: the derivative term lifted Ton off
