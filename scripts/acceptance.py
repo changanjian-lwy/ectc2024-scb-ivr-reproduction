@@ -130,6 +130,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A227": (TA / "A227_p24_kd_held_at_the_limit", "a227_analyze.py", "a227_summary.json"),
     "A228": (TA / "A228_p24_damped_loop_adoption", "a228_analyze.py", "a228_summary.json"),
     "A229": (TA / "A229_p24_kd_band", "a229_analyze.py", "a229_summary.json"),
+    "A230": (TA / "A230_p24_handover_slope_lead", "a230_analyze.py", "a230_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -383,6 +384,7 @@ NOT_ROWS["A225"] = r"[aus]_"                      # judged through ADAPT (groups
 NOT_ROWS["A227"] = r"w\d"                         # the w group, judged through ADAPT
 NOT_ROWS["A228"] = r".*"                          # judged per row and arm through ADAPT (q1 / q2 per skipping row, q3 per row)
 NOT_ROWS["A229"] = r".*"                          # judged through its criteria_main block (j1, q1-q4 over all rows)
+NOT_ROWS["A230"] = r".*"                          # judged through its criteria_main block (j1, v1-v3 over all rows)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -675,6 +677,13 @@ EXCEPTIONS["A225"][("criteria", "u/u_N0_30/f6")] = "N0 into 30 %: Vo 1.0510 V, 1
 _A228 = ("the derivative term moves the 10 % rows' upper valley end by 1.4-2.8 A against d0 (mean over four release "
          "instants; d0 within 0.6 A): Ton kicks inside bursts - not adopted (RESULTS 0)")
 EXCEPTIONS["A228"] = {("criteria", f"skip_rows/{z}/{a}/q2"): _A228 for z in ("z_N0_10", "z_N75_10") for a in ("k", "h")}
+EXCEPTIONS["A230"] = {("rows/N0_10", "v1"): "N0 10 %: 1.0518 V with the lead (base 1.0565 V) - the lead takes off about 5 mV (RESULTS 0)",
+                      ("rows/N0_0", "v1"): "true no load (1 kOhm): Vo 1.0218 V at 300 us, a paused module cannot sink (RESULTS 0, item 6b)",
+                      ("rows/N75_0", "v1"): "true no load (1 kOhm): Vo 1.0252 V at 300 us, a paused module cannot sink (RESULTS 0, item 6b)",
+                      ("rows/S75h_30", "v1"): "S75 125 C 30 %: the earlier handover dips to 0.9827 V against the 0.99 V floor (RESULTS 0)",
+                      ("criteria_main", "v1"): "the lead fixes 30 % on N0 / N75 but deepens S75 125 C 30 %'s dip to "
+                      "0.9827 V, is not enough at 10 % (1.0518 V), and a true no load does not come back down (the module "
+                      "cannot sink while paused) - not adopted (RESULTS 0)"}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

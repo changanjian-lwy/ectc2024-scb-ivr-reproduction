@@ -1,0 +1,455 @@
+{
+ "identity": {
+  "regression": {
+   "quick": true,
+   "full": true
+  },
+  "j1": true
+ },
+ "rows": {
+  "N0_0": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 100.604,
+    "t_hand_req_us": 100.41,
+    "vin_at_entry_v": 35.19160472234368,
+    "start_pk": 62.88985680337729,
+    "hand_pk": 88.6353060250207,
+    "peak_whole": 88.6353060250207,
+    "vo_max_v": 1.0588744921012296,
+    "vo_min_after_entry_v": 1.0132237319728783,
+    "vo_last": [
+     1.0181447324222423,
+     1.0181490655965415
+    ],
+    "vds_v": 23.501722863720392,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 100.004,
+    "t_hand_req_us": 99.80999999999999,
+    "vin_at_entry_v": 34.981722780935726,
+    "start_pk": 62.658751930397415,
+    "hand_pk": 97.19774151707558,
+    "peak_whole": 97.19774151707558,
+    "vo_max_v": 1.0534215244314427,
+    "vo_min_after_entry_v": 1.0135988533528508,
+    "vo_last": [
+     1.0217985968165948,
+     1.0218029551531636
+    ],
+    "vds_v": 23.491556132996333,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1
+   },
+   "criteria": {
+    "v1": false
+   }
+  },
+  "N0_10": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 106.60400000000001,
+    "t_hand_req_us": 106.41000000000001,
+    "vin_at_entry_v": 37.29042413642327,
+    "start_pk": 68.62126732237046,
+    "hand_pk": 93.39773263346872,
+    "peak_whole": 93.39773263346872,
+    "vo_max_v": 1.0565327291360007,
+    "vo_min_after_entry_v": 0.9907414588625179,
+    "vo_last": [
+     0.9989071702651238,
+     1.0067767437317996
+    ],
+    "vds_v": 28.378932550063883,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 106.004,
+    "t_hand_req_us": 105.81,
+    "vin_at_entry_v": 37.08054219501531,
+    "start_pk": 68.33970726657608,
+    "hand_pk": 102.41477906187119,
+    "peak_whole": 102.41477906187119,
+    "vo_max_v": 1.0517874347517142,
+    "vo_min_after_entry_v": 0.9907065516362659,
+    "vo_last": [
+     0.9989275561814593,
+     1.0065012301111669
+    ],
+    "vds_v": 29.431734248097374,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 3
+   },
+   "criteria": {
+    "v1": false
+   }
+  },
+  "N0_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 119.004,
+    "t_hand_req_us": 118.81,
+    "vin_at_entry_v": 41.6279842588544,
+    "start_pk": 81.06211368168708,
+    "hand_pk": 108.99064546251316,
+    "peak_whole": 108.99064546251316,
+    "vo_max_v": 1.050971991818455,
+    "vo_min_after_entry_v": 0.9999068714527373,
+    "vo_last": [
+     0.9999352575994267,
+     1.000071612282083
+    ],
+    "vds_v": 28.393489542217196,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 118.20400000000001,
+    "t_hand_req_us": 118.01,
+    "vin_at_entry_v": 41.348141670310454,
+    "start_pk": 80.6863866365943,
+    "hand_pk": 110.51255618414221,
+    "peak_whole": 110.51255618414221,
+    "vo_max_v": 1.0464592448308812,
+    "vo_min_after_entry_v": 0.9908912125126138,
+    "vo_last": [
+     1.00005845655129,
+     1.0002418114816907
+    ],
+    "vds_v": 27.951868793404994,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0
+   },
+   "criteria": {
+    "v1": true
+   }
+  },
+  "N75_0": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 96.804,
+    "t_hand_req_us": 96.61,
+    "vin_at_entry_v": 33.862352426759955,
+    "start_pk": 77.17261110000469,
+    "hand_pk": 83.38833150722408,
+    "peak_whole": 83.38833150722408,
+    "vo_max_v": 1.0542104335245002,
+    "vo_min_after_entry_v": 1.042778378533707,
+    "vo_last": [
+     1.042778378533707,
+     1.0427828396624461
+    ],
+    "vds_v": 23.103842176963376,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 96.20400000000001,
+    "t_hand_req_us": 96.00999999999999,
+    "vin_at_entry_v": 33.65247048535199,
+    "start_pk": 76.86589761257667,
+    "hand_pk": 82.79294698331186,
+    "peak_whole": 82.79294698331186,
+    "vo_max_v": 1.048738796942365,
+    "vo_min_after_entry_v": 1.0251853147944716,
+    "vo_last": [
+     1.0252346088347475,
+     1.0252389878562167
+    ],
+    "vds_v": 22.954121834828264,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1
+   },
+   "criteria": {
+    "v1": false
+   }
+  },
+  "N75_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 113.004,
+    "t_hand_req_us": 112.81,
+    "vin_at_entry_v": 39.52916484477482,
+    "start_pk": 95.44311313613711,
+    "hand_pk": 117.06076904908807,
+    "peak_whole": 117.06076904908807,
+    "vo_max_v": 1.0501054249037922,
+    "vo_min_after_entry_v": 0.9935812904701734,
+    "vo_last": [
+     0.9997477678308131,
+     0.9999702499929142
+    ],
+    "vds_v": 30.030643439665134,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "f6": false
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 112.20400000000001,
+    "t_hand_req_us": 112.01,
+    "vin_at_entry_v": 39.24932225623088,
+    "start_pk": 94.9086255233259,
+    "hand_pk": 118.38542615755122,
+    "peak_whole": 118.38542615755122,
+    "vo_max_v": 1.0425941172283861,
+    "vo_min_after_entry_v": 0.9918552101050141,
+    "vo_last": [
+     1.0000107985545155,
+     1.0000411682930817
+    ],
+    "vds_v": 28.66003332027279,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 2
+   },
+   "criteria": {
+    "v1": true
+   }
+  },
+  "S75_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 99.40400000000001,
+    "t_hand_req_us": 99.21000000000001,
+    "vin_at_entry_v": 34.771840839527776,
+    "start_pk": 104.60032995371226,
+    "hand_pk": 114.958945794865,
+    "peak_whole": 114.958945794865,
+    "vo_max_v": 1.0483330943275102,
+    "vo_min_after_entry_v": 0.9976231749766503,
+    "vo_last": [
+     0.9997585818034687,
+     0.9999588298184774
+    ],
+    "vds_v": 32.35938286309691,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 67,
+    "f6": true
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 98.80400000000002,
+    "t_hand_req_us": 98.61,
+    "vin_at_entry_v": 34.56195889811981,
+    "start_pk": 104.02660324968103,
+    "hand_pk": 129.59870898013793,
+    "peak_whole": 129.59870898013793,
+    "vo_max_v": 1.040204487726591,
+    "vo_min_after_entry_v": 0.9903110913864779,
+    "vo_last": [
+     1.0000107169392793,
+     1.000097914109381
+    ],
+    "vds_v": 32.007200540959694,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 144
+   },
+   "criteria": {
+    "v1": true
+   }
+  },
+  "S75h_30": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 95.604,
+    "t_hand_req_us": 95.41,
+    "vin_at_entry_v": 33.442588543944034,
+    "start_pk": 103.6342468386017,
+    "hand_pk": 108.97680490463232,
+    "peak_whole": 121.01399562070233,
+    "vo_max_v": 1.0490882162725645,
+    "vo_min_after_entry_v": 0.9902689138001428,
+    "vo_last": [
+     0.9997428963471646,
+     1.0001336294953203
+    ],
+    "vds_v": 31.320532307100343,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 59,
+    "f6": true
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 95.004,
+    "t_hand_req_us": 94.81,
+    "vin_at_entry_v": 33.232706602536076,
+    "start_pk": 103.02832361395309,
+    "hand_pk": 118.96538534946791,
+    "peak_whole": 126.00790072747243,
+    "vo_max_v": 1.0408063562721226,
+    "vo_min_after_entry_v": 0.9826656750435198,
+    "vo_last": [
+     0.9997448171328019,
+     1.0000015939500908
+    ],
+    "vds_v": 31.381504526751343,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 65
+   },
+   "criteria": {
+    "v1": false
+   }
+  },
+  "S75h_100": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 133.404,
+    "t_hand_req_us": 133.21,
+    "vin_at_entry_v": 46.66515085264539,
+    "start_pk": 141.14552420188397,
+    "hand_pk": 178.9185910473773,
+    "peak_whole": 178.9185910473773,
+    "vo_max_v": 1.047352786201187,
+    "vo_min_after_entry_v": 0.9997395155686037,
+    "vo_last": [
+     0.9997395155686037,
+     1.0003413323950296
+    ],
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 74
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 132.804,
+    "t_hand_req_us": 132.60999999999999,
+    "vin_at_entry_v": 46.45526891123744,
+    "start_pk": 140.5804591585768,
+    "hand_pk": 179.21024638684761,
+    "peak_whole": 179.21024638684761,
+    "vo_max_v": 1.04202439144108,
+    "vo_min_after_entry_v": 0.999707458569808,
+    "vo_last": [
+     0.999707458569808,
+     1.0004554490256685
+    ],
+    "vds_v": 30.368623063406943,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 86
+   },
+   "criteria": {
+    "v2": true
+   }
+  },
+  "N0_100": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 125.17924634567652,
+    "hand_pk": 148.33485190131856,
+    "peak_whole": 148.33485190131856,
+    "vo_max_v": 1.0330664696528569,
+    "vo_min_after_entry_v": 1.0000891482833738,
+    "vo_last": [
+     1.0000891482833738,
+     1.00094017921473
+    ],
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 125.17924634567652,
+    "hand_pk": 148.33485190131856,
+    "peak_whole": 148.33485190131856,
+    "vo_max_v": 1.0330664696528569,
+    "vo_min_after_entry_v": 1.0000891482833738,
+    "vo_last": [
+     1.0000891482833738,
+     1.00094017921473
+    ],
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0
+   },
+   "criteria": {
+    "v3": true
+   }
+  },
+  "S75_100": {
+   "base": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 136.94708926358365,
+    "hand_pk": 153.15143944571994,
+    "peak_whole": 153.15143944571994,
+    "vo_max_v": 1.035076104545627,
+    "vo_min_after_entry_v": 0.9997366461041223,
+    "vo_last": [
+     0.9997366461041223,
+     1.0006156830286475
+    ],
+    "vds_v": 29.831075590961813,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 41
+   },
+   "lead": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 136.94708926358365,
+    "hand_pk": 153.15143944571994,
+    "peak_whole": 153.15143944571994,
+    "vo_max_v": 1.035076104545627,
+    "vo_min_after_entry_v": 0.9997366461041223,
+    "vo_last": [
+     0.9997366461041223,
+     1.0006156830286475
+    ],
+    "vds_v": 29.831075590961813,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 41
+   },
+   "criteria": {
+    "v3": true
+   }
+  }
+ },
+ "criteria_main": {
+  "j1": true,
+  "v1": false,
+  "v2": true,
+  "v3": true
+ },
+ "adopt": false
+}
