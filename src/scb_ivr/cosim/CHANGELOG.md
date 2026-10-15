@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-16 (A230) - the handover request with a slope lead (bridge)
+
+**Source:** A214 / A225: a start-up into 30 % of the load reaches 1.0510-1.0528 V
+(limit 1.05 V) because Vo still rises at 8-14 mV/us when the 1.045 V request fires
+and the current turns round only about 0.7 us after mode P's entry. cfg
+"hand_lead_us": the sequencer compares Vo + lead x (Vo's change since the previous
+sample / the time between them) with hand_vo_v - a comparator behind a lead network.
+**Gate:** hand_lead_us absent: the old comparison bit for bit (the slope term is
+0.0; A230's full-load rows bit for bit their base arm; cosim_regression --quick and
+--full).
+
 ## 2026-10-15 (A229) - the derivative term held within a band above the limit (RTL, bridge)
 
 **Source:** A228: with the hold at the limit the derivative term still moves

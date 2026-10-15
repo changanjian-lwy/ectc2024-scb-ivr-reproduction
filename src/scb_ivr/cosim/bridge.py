@@ -27,7 +27,8 @@ slope); A220: zcd_a ends the pause's last low-side intervals at zero current - p
 own (A133's latches) at the threshold zcd_a (the latency times the slope, so the edge lands at 0 A), needs "async" -
 absent = no skipping, bit for bit; "hand_vo_v",
 A186: the handover is also requested once a phase-1 Vo sample (the ADC's instant) reaches it, for every module at once;
-absent = t_hand only); "nonlinear_coss" (datasheet Coss(V),
+absent = t_hand only; "hand_lead_us", A230: the sample plus this lead times Vo's slope since the previous sample,
+a comparator behind a lead network; absent = the sample alone); "nonlinear_coss" (datasheet Coss(V),
 A86) and "rev_drop" (Fig. 8 reverse conduction Vf + R per device, A87; reverse energy and time recorded per section).
 
 Controller-side analog functions modelled here:
@@ -495,7 +496,8 @@ class ModuleSim:
         self.adc = []                               # pending ADC sample of Vo (taken at phase 1's turn-on)
         self.adc_vin = []                           # A128: pending Vin sample (same instant)
         self.hand_vo = cfg.get("hand_vo_v")         # A186: request the handover once a phase-1 Vo sample reaches this
-        self.hand = {"lat": False, "t": None}       #   (or at t_hand, whichever is first); shared by a run's modules
+        self.hand = {"lat": False, "t": None, "vo": None, "ts": None}   # (or at t_hand); shared by a run's modules
+        self.hand_lead = cfg.get("hand_lead_us", 0.0) * 1e-6   # A230: compare Vo + this lead x its slope
         self.st = {"mode_p": 0, "ton": 0, "t_mode_p": None}
         self.lat = {"armed": False, "fired": False, "dt0": 0, "report": None, "fires": 0}   # A81 front end of phase 1
         self.ph_floor = bool(cfg.get("ph_floor", 0))                                      # A133: phases 2..N's floors
@@ -681,8 +683,13 @@ class ModuleSim:
             plant.aux_e2 = [0.0] * na; plant.aux_imax = [0.0] * na; plant.aux_imin = [0.0] * na
         self.adc.append(min(max(int(round(vo / self.adc_lsb)), 0), self.adc_max))
         self.adc_vin.append(min(max(int(round(vin / self.vin_lsb)), 0), self.adc_max))   # A128
-        if self.hand_vo is not None and not self.hand["lat"] and vo >= self.hand_vo:   # A186
-            self.hand.update(lat=True, t=plant.t)
+        if self.hand_vo is not None and not self.hand["lat"]:                        # A186
+            h = self.hand
+            slope = ((vo - h["vo"]) / (plant.t - h["ts"]) if self.hand_lead and h["ts"] is not None and plant.t > h["ts"]
+                     else 0.0)                                                     # A230
+            if vo + self.hand_lead * slope >= self.hand_vo:
+                h.update(lat=True, t=plant.t)
+            h.update(vo=vo, ts=plant.t)
         if tick:
             self.sections[-1]["tick"] = 1; self.ticks += 1
 
