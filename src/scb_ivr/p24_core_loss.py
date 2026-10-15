@@ -5,6 +5,9 @@ below ~5 MHz (Murali et al., ECTC 2022, Fig. 8; Alvarez Barros et al., TCPMT 202
 loss of an inductance L carrying a ripple of rms I_ac is kappa R_acx L I_ac^2, where kappa >= 1 converts the small-signal
 metric to large signal ("over four times" in the MHz range, Alvarez Barros et al. 2021). For an array of N parallel
 units of N L each carrying I / N the loss is the same, so the core loss of a phase does not depend on the unit count.
+The ripple here is the rms of the triangle, (peak - valley)^2 / 12: one third of [10] Eq. (1), whose R_acx (Eq. (2)) is
+normalised to the half peak-to-peak ripple. This module reproduces D76's numbers with that factor; the design's core
+loss with the embedded HBS1 data and [10]'s normalisation is D83's (scripts/p24_hbs1_units.py).
 
 RACX_HBS1: the HBS1 (black) curves of Murali et al. Fig. 8(e) (discrete toroid, small signal), digitised from the page
 rendered at 500 dpi with the axes calibrated on the gridlines (0-6 mOhm/nH, 119.7 px per unit; D 0-1, 1300 px per unit);
@@ -41,7 +44,8 @@ def exponent(d, f_lo=2e6, f_hi=8e6):
 
 
 def phase_core_loss(valley, peak, ton, period, l_phase, kappa=1.0, alpha_low=None):
-    """Core loss (W) of one phase: triangular ripple valley -> peak over ton, back over the rest of the period."""
+    """Core loss (W) of one phase with D76's rms ripple (one third of [10] Eq. (1), see the module note): triangular
+    ripple valley -> peak over ton, back over the rest of the period."""
     i_ac2 = (peak - valley) ** 2 / 12.0
     return kappa * racx(1.0 / period, ton / period, alpha_low) * l_phase * i_ac2
 

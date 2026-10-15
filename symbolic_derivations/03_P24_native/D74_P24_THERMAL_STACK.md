@@ -1,5 +1,7 @@
 # D74 - the module stack as a 3D conduction model: the inductor layer and the via copper in glass 1
 
+**Erratum (2026-10-15, D83).** The inductor layer's heat here is D72's copper plus D76's core loss; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). The inductor-layer temperatures and the via-copper requirement are lower bounds; not rerun.
+
 2026-10-07. D73 closed the electrothermal loop with one lumped node per module and named the inductor array (inside
 glass 2, away from the dies' heat spreader) as the binding path, from a one-line estimate. This note replaces the
 node with a steady 3D conduction model of the stack in Fig. 5c-d, verified against closed forms, with a convective

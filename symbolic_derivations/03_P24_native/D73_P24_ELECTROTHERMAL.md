@@ -1,5 +1,7 @@
 # D73 - an electrothermal closure of the module, in the team's framework form
 
+**Erratum (2026-10-15, D83).** This document's heat per module uses D72's array copper; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). Its temperatures and heat requirements are therefore lower bounds; not rerun.
+
 2026-10-07. D72 left heat as a requirement (39-58 W per 10 × 10 mm module, no thermal path in P24) and the hot
 efficiency at an assumed 125 °C. This note takes the method of the team's design framework: losses → temperature →
 temperature-dependent losses, iterated to a fixed point (Krishnakumar et al. 2026, arXiv, with P24's first author

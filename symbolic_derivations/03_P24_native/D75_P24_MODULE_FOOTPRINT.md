@@ -1,5 +1,7 @@
 # D75 - the module footprint: a 250 W module takes two of P24's sites
 
+**Erratum (2026-10-15, D83).** The package-inclusive efficiencies here use D72's arrays (86.6-87.7 % before package and core loss). D83: 84.0 % before core loss at 2.5 MHz, 25 °C; with D75's package 70.5-74.6 % at κ 1 and 56.1-61.5 % at [10]'s κ. A single-layer array of real units needs 1.2-4.2 cm² per phase (D83), above this document's 0.5 cm² site share.
+
 2026-10-07. Found while building D74's thermal model. Script: `scripts/p24_footprint.py` →
 `diagnostics/D75_footprint.json` (no new runs; D65's currents, D73's converter losses).
 

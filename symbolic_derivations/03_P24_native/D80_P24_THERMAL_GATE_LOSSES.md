@@ -1,5 +1,7 @@
 # D80 - the thermal model with the final gate-level losses
 
+**Erratum (2026-10-15, D83).** The inductor copper and core terms here are D72 / D76's; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). The temperatures here were computed with too little inductor heat and are lower bounds; not rerun.
+
 Script: `scripts/p24_thermal_gate.py` -> `diagnostics/D80_thermal_gate.json`. Records: release records-a171.
 Written 2026-10-08 after an external review. The review found that the thermal model (D74 / D77) still took its die
 losses from D73 and its loop at 150 pH, not from the final gate-level plant (A171 / A172, 50 pH).

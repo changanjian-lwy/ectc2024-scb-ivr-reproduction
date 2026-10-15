@@ -2301,6 +2301,19 @@ each question:
          over; S75 into 30 % passes at 25 and 125 C. The final
          configuration with A222's trim gives -22.8 A at no load (A226;
          the -21.2 A above had the V6 trim).
+    123. The inductor with the HBS1 units [10] measured (2026-10-15, D83;
+         derivation, no co-simulation). D62's "500 nH / 39.3 mOhm HBS1"
+         unit is winding IND037 in HPE1, a flake material that saturates
+         at ~100 mA; D72's power law joined it to a real HBS1 unit, so its
+         85-117 nH units do not exist (HBS1: 18.8-71 nH, best IND048 at
+         376 uOhm/nH). D76 priced the core with a toroid's r_acx, kappa
+         1-4 and the rms ripple, one third of [10] Eq. (1). Redone at
+         25 C without package: 2.5 MHz 84.0 % before core loss, 73.2-75.3 %
+         at kappa 1, 57.7-62.0 % at [10]'s kappa 3.07 (was 86.6-87.7 /
+         84.4-85.4 / 78.4-79.3 %); 2.5 MHz still leads or ties, 1 MHz now
+         loses on copper; one layer of 2 x 41 units needs 1.2-4.2 cm² per
+         phase. V7's r_core stays (a damping resistor; its books are not
+         the core loss). P24's 12 x 183 nH units have no HBS1 unit in [10].
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

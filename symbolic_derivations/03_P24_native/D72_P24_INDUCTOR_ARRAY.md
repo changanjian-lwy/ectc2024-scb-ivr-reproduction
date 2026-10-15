@@ -1,5 +1,11 @@
 # D72 - the inductor as a buildable array: unit count, R/L and the frequency choice
 
+**Erratum (2026-10-15, D83).** The array and efficiencies here are wrong. "The largest HBS1 unit" (500 nH / 39.3 mΩ) is winding IND037 in HPE1, a flake material that saturates
+at ~100 mA; the power law from IND046-HBS1 to it crosses two materials, and the 85-117 nH (2.5 MHz) and 213-293 nH (1 MHz) units do not exist in HBS1
+(real units 18.8-71 nH; best R/L 376 µΩ/nH, IND048, against the 208-258 µΩ/nH used here). Corrected (D83, 25 °C, no package, no core loss): arrays of
+41 / 82 / 132 IND048 units per phase at 5 / 2.5 / 1 MHz, copper 14.7 / 27.3 / 66.3 W per module, efficiency 86.5 / 84.0 / 75.0 %, not 86.6-87.7 % at
+2.5 MHz. 2.5 MHz leads from 5 MHz only at Table V kappa; with no core loss 5 MHz leads, and 1 MHz loses on copper. See D83.
+
 2026-10-07. Closes the external review's point on the inductor (D70 Section 1: core loss, saturation and fit were
 open). No new runs: D62's budget on the existing design records (A112 p20_n0 at 5 MHz, A124 p125_n0 at 2.5 MHz,
 A118 f6_n0 at 1 MHz) with the inductor R/L each array implies.

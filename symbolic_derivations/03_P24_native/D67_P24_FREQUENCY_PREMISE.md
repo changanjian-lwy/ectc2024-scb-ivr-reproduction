@@ -1,5 +1,11 @@
 # D67 - the premise behind 2.5 MHz: the inductor's R/L, checked against P24's own inductor
 
+**Erratum (2026-10-15, D83).** The "MPC-class R/L 79 µΩ/nH" premise (Sections 1, 3, 4, 5.1, 6-7) is the 500 nH / 39.3 mΩ winding IND037 in HPE1, a flake
+material that saturates at ~100 mA, not HBS1; real HBS1 units are 18.8-71 nH, best R/L 376 µΩ/nH (IND048), and P24's 12 x 183 nH
+units per phase have no basis in [10]. So the 90.61 % of A124, the "R/L <= ~80 µΩ/nH" condition and the Section 6 / 7 updates
+(86.6-87.7 %; "1 MHz ties 2.5 MHz") are superseded. Corrected (D83, 25 °C, no package): converter 84.0 % at 2.5 MHz without core loss,
+73.2-75.3 % at kappa 1, 57.7-62.0 % at [10] Table V kappa; 2.5 MHz leads or ties at every kappa, and 1 MHz loses on copper (75.0 % without core loss). See D83.
+
 2026-10-05. Method: math (no new co-simulation). Script: `scripts/p24_frequency_premise.py` (D64's script at
 2.5 MHz and at Fig. 5's footprint) → `diagnostics/D67_frequency_premise.json`. Inputs: A124, D62, D64, P24 text.
 

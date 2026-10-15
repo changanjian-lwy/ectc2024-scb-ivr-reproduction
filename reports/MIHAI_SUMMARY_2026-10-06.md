@@ -1,5 +1,15 @@
 # SCB-IVR reproduction: progress since 14 September
 
+**Erratum (2026-10-15, D83).** The inductor and core-loss numbers in this report are superseded; the text below is unchanged. (1) The "500 nH / 79 µΩ/nH" unit
+behind 90.6 % / 90.2 % / 89.0 % and the 170 units per phase is winding IND037 in HPE1, a flake material that saturates at about 100 mA, not HBS1; the 29-40
+"HBS1-class" units (85-117 nH, 213-293 nH) behind 86.6-87.7 % do not exist in HBS1 (real units 18.8-71 nH, best R/L 376 µΩ/nH). (2) The core loss
+(7.5-30 W per module, 78-85 %, 75-85 % with the package, "5 MHz falls 1.4-4.5 points behind, 1 MHz ties") used the rms ripple (one third of [10] Eq. (1)),
+a discrete toroid's r_acx and an assumed kappa 1-4. Corrected (D83; 2.5 MHz, 25 °C, 250 W per module, no package, IND048-HBS1 arrays of 82 units per
+phase): 84.0 % without core loss; with core loss 34.5-44.1 W per module and 73.2-75.3 % at kappa 1, 106-136 W and 57.7-62.0 % at [10] Table V kappa (3.07);
+D75's package costs 0.3-2.8 points more. Inductor copper per module 14.7 / 27.3 / 66.3 W at 5 / 2.5 / 1 MHz (D72 and the "2.6 to 13.8 W" above: 15.2-12.8 /
+18.6-15.0 / 24.5-19.8 W). Frequency: with no core loss 5 > 2.5 > 1 MHz (86.5 / 84.0 / 75.0 %); 2.5 MHz leads or ties at every kappa and 1 MHz loses on copper.
+P24's own 12 x 183 nH units per phase have no basis in [10] (largest HBS1 unit 71 nH). See D83.
+
 Changan Jian · 9 October 2026 ·
 [github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction](https://github.com/changanjian-lwy/ectc2024-scb-ivr-reproduction)
 

@@ -1,5 +1,7 @@
 # D78 - the IVR's processor-side face: a heat source or a second path
 
+**Erratum (2026-10-15, D83).** The stack's heat here uses D76's core loss (κ 1 / 4) and D72's copper; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). Its results were computed with too little core heat (4.6-5.9 × at κ 1; 3.5-4.5 × against D76's κ 4 bound) (more heat in the IVR makes the processor-side limits stricter); not rerun.
+
 2026-10-07. D74 kept the face above glass 2 adiabatic. In P24 Fig. 6 the IVR sits on the back of the processor
 package, under the processor; that face is joined through the package substrate to whatever temperature the processor's
 own cooling holds. Script: `scripts/p24_processor_side.py` → `diagnostics/D78_processor_side.json` (D74's model).
