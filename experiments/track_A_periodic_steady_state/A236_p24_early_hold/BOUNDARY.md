@@ -57,3 +57,14 @@ about 2.5 h at 10 jobs (two four-module runs set the wall time).
 - e0-e4 pass: early_hold_a 0 joins the final configuration (one and four modules); item 3 closes on V7 for the tested
   boards; A235's N13 c1 miss is item 3's and the L x 1.3 column moves to V7 with A236's option.
 - e1 passes, e3 or e4 misses: the miss is traced before any adoption. e1 misses: item 3 stays open; trace.
+
+## 5. Amendment (2026-10-16 11:50, before any run produced a record)
+- The boundary commit 050441c crashed every run at t = 0 (bridge: configure() read early_hold, set later in start();
+  all 26 runs FAILED in 1 s, no record). Its claim "regression quick and full bit for bit" was false: the regression
+  compared outputs left in tmp/regression/ by an earlier session, because a cocotb process exits 0 when its test fails
+  and the stale file looked like a result. Earlier experiments are not affected in their claims: the stale path only
+  hides a run that produces no output, and their own runs completed with the same code.
+- Fix (this commit): early_hold is set in ModuleSim.__init__; run.py removes an existing output before its run, so a
+  failed run leaves none (this also makes the regression honest). Then: regression quick and full PASS with fresh outputs
+  (wall 18-21 s / 66-70 s per case); a 3 us smoke of h_f_N75_k4 and h_m4_s_p250 completes. Unit tests (RTL only) stand.
+  Rows, criteria, predictions and decision rule unchanged; all 26 runs start from this commit.

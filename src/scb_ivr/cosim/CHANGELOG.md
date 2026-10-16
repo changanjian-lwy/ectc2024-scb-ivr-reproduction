@@ -15,6 +15,11 @@ value; scb_phase cfg_early_hold leaves dt_pred on an early report with m_pos.
 **Gate:** early_hold_a absent: cfg_early_hold 0, m_pos 0, no record field added
 (tb 111 / 111 with two new tests; cosim_regression --quick and --full bit for bit;
 A236 e0 reruns A232's f_N75_k4_b).
+**Fix (A236 amendment):** the first commit read early_hold in configure() before
+start() set it (every run crashed at t = 0) and the regression passed on stale
+outputs. early_hold now set in ModuleSim.__init__; run.py removes an existing output
+before its run (a cocotb process exits 0 when its test fails; success = the output
+exists). Regression quick and full then PASS on fresh outputs.
 
 ## 2026-10-16 (A230) - the handover request with a slope lead (bridge)
 

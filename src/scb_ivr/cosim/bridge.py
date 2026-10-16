@@ -337,6 +337,7 @@ class ModuleSim:
 
     def __init__(self, cfg, p, ctl, first_high=True):
         self.cfg, self.p, self.ctl = cfg, p, ctl
+        self.early_hold = cfg.get("early_hold_a")                    # A236: read by configure()
         t_clk = cfg["t_clk_ns"] * 1e-9
         self.fb = int(cfg["fb"])
         self.lsb = t_clk / (1 << self.fb)
@@ -480,7 +481,7 @@ class ModuleSim:
         """After the reset: the plant-side bookkeeping for the comparators and the measurements."""
         cfg, p, plant, na = self.cfg, self.p, self.plant, self.na
         self.v_lo = [None] * N; self.t_lo_act = [None] * N
-        self.i_lo_act = [0.0] * N; self.early_hold = cfg.get("early_hold_a")   # A236
+        self.i_lo_act = [0.0] * N                                       # A236
         aux = cfg.get("aux")
         vz = int(aux.get("valley_zero", 0)) if aux else int(cfg.get("valley_zero", 0))  # A111: also without a branch
         self.mon = Monitors(N, vmin_zero=vz)                     # zero-crossing TDC and valley tracking

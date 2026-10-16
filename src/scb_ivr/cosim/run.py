@@ -8,7 +8,8 @@ single-module and ~30% more four-module throughput than 4); configurations are s
 the decisive ones first. When fewer configurations run at once than there are cores, an M-module run integrates its
 plants in parallel threads (COSIM_THREADS = cores // runs at once, at most M; an explicit COSIM_THREADS wins): a
 four-module run alone is ~1.7 times faster. Threads and jobs change only the wall time, never a result. Output: cfg["out"] next to the configuration, or the same file name in --out-dir; the log
-log_<stem>.txt next to the output. --t-end-us stops earlier (regression smoke runs). Every output carries
+log_<stem>.txt next to the output. An existing output is removed before its run, so a run that fails leaves no
+output (the cocotb process exits 0 even when its test fails; success = the output exists). --t-end-us stops earlier (regression smoke runs). Every output carries
 "provenance": the git commit, whether src/scb_ivr/cosim had uncommitted changes, the configuration's sha256, the
 Python / numpy / scipy versions and the plant implementation. Build directories go to tmp/cosim_build/.
 """
@@ -84,6 +85,7 @@ def run_single(cfg_path: Path, out: Path | None, t_end_us: float | None) -> None
 def launch(cfg_path: Path, out_dir: Path | None, t_end_us: float | None, threads: int = 1) -> tuple[Path, int, float]:
     out = out_path(cfg_path, out_dir)
     out.parent.mkdir(parents=True, exist_ok=True)
+    out.unlink(missing_ok=True)                                         # a failed run must not leave an old file
     log = out.parent / f"log_{cfg_path.stem}.txt"
     env = dict(os.environ)
     env["PATH"] = f"{OSS_BIN}:{env.get('PATH', '')}"
