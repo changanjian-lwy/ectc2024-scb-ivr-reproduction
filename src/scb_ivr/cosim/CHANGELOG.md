@@ -15,6 +15,7 @@ or below vref + sink_lo; while set no round is skipped. Bridge cfg "sink" {hi_mv
 lo_mv, i_a}: every use of the target is i_a while sink is set; record "sink_log".
 **Gate:** cfg "sink" absent: cfg_sink 0, sink stays low, skip_c as before
 (cosim_regression --quick and --full PASS on fresh outputs); tb 117 / 117 (six new).
+**Result:** not adopted (latches on N75, A238 RESULTS); the option stays, off by default.
 
 ## 2026-10-16 (A237) - the resistive load can disconnect (bridge)
 

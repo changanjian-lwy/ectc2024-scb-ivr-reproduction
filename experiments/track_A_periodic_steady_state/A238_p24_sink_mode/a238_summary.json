@@ -1,0 +1,843 @@
+{
+ "rows": {
+  "s_c0_N0": {
+   "sink": {
+    "episodes_us": [
+     [
+      303.528,
+      311.97200000000004
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -57.64709740087723,
+    "valley_max_a": -1.2405936456905682,
+    "peak_min_a": 7.133921177934673,
+    "peak_max_a": 41.534151949553646,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.696804440939514,
+      11.911678308789922,
+      11.588146055318587,
+      12.803371194951977
+     ],
+     0.8033711966005566
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.919217336866843,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 57.263408859675955,
+    "t_rel_peak_us": 3.658000000000025,
+    "back_us": 10.740597500002027,
+    "t_above_vrd_us": 2.305521250003202,
+    "t_last_above_vrd_us": 4.932367500001702,
+    "vo_before_re_v": 1.0093867699849501,
+    "vo_end_v": [
+     1.0093867699849501,
+     1.0093867704293382
+    ],
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.919217336866843,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 57.57474007633334,
+    "t_rel_peak_us": 3.8620000000000387,
+    "back_us": null,
+    "t_above_vrd_us": 447.0977449999996,
+    "t_last_above_vrd_us": 449.95800000000014,
+    "vo_before_re_v": 1.05757388769995,
+    "vo_end_v": [
+     1.05757388769995,
+     1.05757388769995
+    ],
+    "limits": true,
+    "vo_end_in": false
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c0_N0.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t1": true
+   }
+  },
+  "s_c0_N75": {
+   "sink": {
+    "episodes_us": [
+     [
+      302.37600000000003,
+      null
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": false,
+    "valley_min_a": -155.9822131330278,
+    "valley_max_a": -1.596791565220738,
+    "peak_min_a": -10.097143900041065,
+    "peak_max_a": 67.8291945966456,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      10.016309885138181,
+      10.043632801426003,
+      13.620220630001748,
+      14.319836683434056
+     ],
+     3.5598034317378744
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 148.90073755831548,
+    "vds_v": 35.31684232155337,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 276.52893626205844,
+    "t_rel_peak_us": 68.14296875000002,
+    "back_us": null,
+    "t_above_vrd_us": 134.17356124999822,
+    "t_last_above_vrd_us": 149.89403125,
+    "vo_before_re_v": 1.2232949803951605,
+    "vo_end_v": [
+     1.1308317590218862,
+     1.2232949803951605
+    ],
+    "limits": true,
+    "vo_end_in": false
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 148.90073755831548,
+    "vds_v": 29.261601864495333,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 46.0348574248195,
+    "t_rel_peak_us": 2.6780000000000443,
+    "back_us": null,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.0460345148602817,
+    "vo_end_v": [
+     1.0460345148602324,
+     1.0460345148602817
+    ],
+    "limits": true,
+    "vo_end_in": false
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c0_N75.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t1": false
+   }
+  },
+  "s_c2_N0": {
+   "sink": {
+    "episodes_us": [
+     [
+      303.76000000000005,
+      311.72
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -54.92877925437714,
+    "valley_max_a": -1.236604658854097,
+    "peak_min_a": 11.111610208171534,
+    "peak_max_a": 39.82572616720021,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.764511353873695,
+      11.807064834648584,
+      11.91007012702715,
+      12.51835368445058
+     ],
+     0.5501011931860589
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.906668302424883,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 56.57615252576353,
+    "t_rel_peak_us": 3.890000000000046,
+    "back_us": 10.483588750000562,
+    "t_above_vrd_us": 2.270311249998611,
+    "t_last_above_vrd_us": 4.927621250000501,
+    "vo_before_re_v": 1.0057239826963578,
+    "vo_end_v": [
+     1.0007067108872647,
+     1.00874793491462
+    ],
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.906668302424883,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 56.63237066888405,
+    "t_rel_peak_us": 4.082000000000033,
+    "back_us": 47.46200000000007,
+    "t_above_vrd_us": 7.390653749995079,
+    "t_last_above_vrd_us": 10.086000000000025,
+    "vo_before_re_v": 1.0070614096736292,
+    "vo_end_v": [
+     1.0007061858829869,
+     1.0087518700402032
+    ],
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c2_N0.json",
+   "criteria": {
+    "t7": true,
+    "t2": true,
+    "t3": true
+   }
+  },
+  "s_c10_N0": {
+   "sink": {
+    "episodes_us": [
+     [
+      304.392,
+      307.132
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -112.88344289672101,
+    "valley_max_a": -1.2092924586178884,
+    "peak_min_a": 8.756761628263485,
+    "peak_max_a": 63.20910851938628,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.7948354319336,
+      11.838851125577902,
+      11.897794479758229,
+      12.46851896273028
+     ],
+     0.4973111061409057
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 30.528313166121652,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 49.33717710165509,
+    "t_rel_peak_us": 4.189216250001884,
+    "back_us": 14.006000000000055,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.004198987623664,
+    "vo_end_v": [
+     0.9989053962865097,
+     1.0067428565118546
+    ],
+    "limits": true,
+    "vo_end_in": true,
+    "skip": {
+     "vmin_a": -15.843785292948459,
+     "vmax_a": -13.48748905483196,
+     "in_band": true,
+     "q1_run": true
+    }
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.7103296870285,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 49.33717710165509,
+    "t_rel_peak_us": 4.189216250001884,
+    "back_us": 11.746000000000032,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.0006017616055192,
+    "vo_end_v": [
+     0.9989683280195372,
+     1.0067162520653266
+    ],
+    "limits": true,
+    "vo_end_in": true,
+    "skip": {
+     "vmin_a": -16.001540212508562,
+     "vmax_a": -13.520404221918717,
+     "in_band": true,
+     "q1_run": true
+    }
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c10_N0.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t3": true
+   }
+  },
+  "s_c10_N75": {
+   "sink": {
+    "episodes_us": [
+     [
+      302.692,
+      307.084
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -63.19217824132086,
+    "valley_max_a": -19.192823812251618,
+    "peak_min_a": 26.238262985504548,
+    "peak_max_a": 56.351551107080056,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.942878172819732,
+      11.931199126223989,
+      12.092929035031968,
+      12.0329936659243
+     ],
+     0.1001414438056969
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 148.90073755831548,
+    "vds_v": 29.033664586193012,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 40.91872988600764,
+    "t_rel_peak_us": 2.9108287500002232,
+    "back_us": 8.954000000000036,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.0046644089402281,
+    "vo_end_v": [
+     0.9992123902457654,
+     1.008298000431931
+    ],
+    "limits": true,
+    "vo_end_in": true,
+    "skip": {
+     "vmin_a": -16.382062875528742,
+     "vmax_a": -12.617345654979378,
+     "in_band": true,
+     "q1_run": true
+    }
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 148.90073755831548,
+    "vds_v": 28.62890122666177,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 41.36107018979285,
+    "t_rel_peak_us": 2.822000000000035,
+    "back_us": 8.570000000000062,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.0029209564439328,
+    "vo_end_v": [
+     0.9991872908970376,
+     1.0084693897870063
+    ],
+    "limits": true,
+    "vo_end_in": true,
+    "skip": {
+     "vmin_a": -16.5017448066822,
+     "vmax_a": -13.652873291489419,
+     "in_band": true,
+     "q1_run": true
+    }
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c10_N75.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t3": true
+   }
+  },
+  "s_cw5_N0": {
+   "sink": {
+    "episodes_us": [
+     [
+      304.03600000000006,
+      306.932
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -133.68103554823912,
+    "valley_max_a": -1.2205664842320774,
+    "peak_min_a": 7.363190935376525,
+    "peak_max_a": 50.40828668551118,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.78407671760861,
+      12.02089092500556,
+      11.994047808231535,
+      12.200984549154287
+     ],
+     0.6400586355257829
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 170.46894573452911,
+    "vds_v": 31.706703696868704,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 52.40684095884607,
+    "t_rel_peak_us": 4.1660000000000545,
+    "back_us": 14.13800000000002,
+    "t_above_vrd_us": 1.0958774999999654,
+    "t_last_above_vrd_us": 4.48019625000042,
+    "vo_before_re_v": 1.0052551480022156,
+    "vo_end_v": [
+     0.9990631676883494,
+     1.0007194875112062
+    ],
+    "post_pk": 170.46894573452911,
+    "vo_re_min_mv": -27.258272205501477,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 161.4778341073854,
+    "vds_v": 29.79647202311523,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 52.40684095884607,
+    "t_rel_peak_us": 4.1660000000000545,
+    "back_us": 20.09000000000006,
+    "t_above_vrd_us": 1.6711737499958548,
+    "t_last_above_vrd_us": 5.114000000000019,
+    "vo_before_re_v": 1.0073277578992421,
+    "vo_end_v": [
+     0.9991989988168571,
+     0.9998984872085389
+    ],
+    "post_pk": 161.4778341073854,
+    "vo_re_min_mv": -40.655975300838534,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_cw5_N0.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t4": true
+   }
+  },
+  "s_cw5_N75": {
+   "sink": {
+    "episodes_us": [
+     [
+      302.44,
+      308.136
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -64.23036926356188,
+    "valley_max_a": -1.5779574460262162,
+    "peak_min_a": 25.877385131207813,
+    "peak_max_a": 54.89072888561033,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      11.969645074897606,
+      11.888113488562725,
+      12.067296719577342,
+      12.07494471696233
+     ],
+     0.17562276194199633
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 155.59178619452703,
+    "vds_v": 29.657887429093535,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 42.872844920008426,
+    "t_rel_peak_us": 2.566000000000016,
+    "back_us": 7.200038750001158,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.0056274178451123,
+    "vo_end_v": [
+     0.9992126728201228,
+     0.9998635614165
+    ],
+    "post_pk": 155.59178619452703,
+    "vo_re_min_mv": -21.601500427796626,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 171.08485074082822,
+    "vds_v": 28.91812427667071,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 42.872844920008426,
+    "t_rel_peak_us": 2.566000000000016,
+    "back_us": 14.802000000000065,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 1.005207830733472,
+    "vo_end_v": [
+     0.9995992507261806,
+     0.9999132877659187
+    ],
+    "post_pk": 171.08485074082822,
+    "vo_re_min_mv": -30.157309499685205,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_cw5_N75.json",
+   "criteria": {
+    "t7": false,
+    "t2": true,
+    "t4": true
+   }
+  },
+  "s_c30_S75h": {
+   "sink": {
+    "episodes_us": [],
+    "n_episodes": 0,
+    "low_at_end": true,
+    "valley_min_a": null,
+    "valley_max_a": null,
+    "peak_min_a": null,
+    "peak_max_a": null,
+    "records_from_us": 0.059999999999998485,
+    "ladder_end": [
+     [
+      12.026233832029915,
+      11.910464100399986,
+      12.038487992375087,
+      12.02481407519501
+     ],
+     0.11603940488939202
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "peak_whole": 178.9185910473773,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 30.318788695257393,
+    "t_rel_peak_us": 1.6565175000055206,
+    "back_us": 6.959927500005034,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 0.9998861949461336,
+    "vo_end_v": [
+     0.9996632513133756,
+     0.9999334894911598
+    ],
+    "post_pk": 152.64289600274145,
+    "vo_re_min_mv": -24.912822553596502,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "peak_whole": 178.9185910473773,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "vo_rel_peak_mv": 30.318788695257393,
+    "t_rel_peak_us": 1.6565175000055206,
+    "back_us": 6.959927500005034,
+    "t_above_vrd_us": 0.0,
+    "t_last_above_vrd_us": 0.0,
+    "vo_before_re_v": 0.9998861949461336,
+    "vo_end_v": [
+     0.9996632513133756,
+     0.9999334894911598
+    ],
+    "post_pk": 152.64289600274145,
+    "vo_re_min_mv": -24.912822553596502,
+    "limits": true,
+    "vo_end_in": true
+   },
+   "ref_record": "A237_p24_true_light_load/cosim/run_c30_S75h.json",
+   "criteria": {
+    "t7": true,
+    "t2": true,
+    "t4": true
+   }
+  },
+  "s_u_N0_0": {
+   "sink": {
+    "episodes_us": [
+     [
+      117.25200000000001,
+      120.86800000000001
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -50.8413188365298,
+    "valley_max_a": -1.104728092612148,
+    "peak_min_a": 5.487276488481584,
+    "peak_max_a": 36.336790999402716,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      17.687757844654854,
+      10.09952503662077,
+      9.849326116732417,
+      10.363391001991964
+     ],
+     5.6877578493023755
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 100.004,
+    "t_hand_req_us": 99.80999999999999,
+    "vin_at_entry_v": 34.981722780935726,
+    "start_pk": 62.658751930397415,
+    "hand_pk": 97.19774151707558,
+    "peak_whole": 97.19774151707558,
+    "vo_max_v": 1.0534215244314427,
+    "vo_min_after_entry_v": 0.9988381480545996,
+    "vo_last": [
+     1.007861886227403,
+     1.0078661919848377
+    ],
+    "vds_v": 25.717244502266407,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 100.004,
+    "t_hand_req_us": 99.80999999999999,
+    "vin_at_entry_v": 34.981722780935726,
+    "start_pk": 62.658751930397415,
+    "hand_pk": 97.19774151707558,
+    "peak_whole": 97.19774151707558,
+    "vo_max_v": 1.0534215244314427,
+    "vo_min_after_entry_v": 1.0135988533528508,
+    "vo_last": [
+     1.0217985968165948,
+     1.0218029551531636
+    ],
+    "vds_v": 23.491556132996333,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "ladder_end": [
+     [
+      18.844494389245444,
+      9.353799832218037,
+      9.658809120254958,
+      10.14289665828156
+     ],
+     6.844494393744803
+    ]
+   },
+   "ref_record": "A230_p24_handover_slope_lead/cosim/run_u_N0_0_lead.json",
+   "criteria": {
+    "t7": true,
+    "t2": true,
+    "t5": false
+   }
+  },
+  "s_u_N75_0": {
+   "sink": {
+    "episodes_us": [
+     [
+      100.98400000000001,
+      103.01200000000001
+     ]
+    ],
+    "n_episodes": 1,
+    "low_at_end": true,
+    "valley_min_a": -50.29379855084037,
+    "valley_max_a": -1.4902409488529524,
+    "peak_min_a": -7.211562349811842,
+    "peak_max_a": 16.447955579500178,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      23.321282537053936,
+      8.170135906100581,
+      7.720390680840769,
+      8.78819087600472
+     ],
+     11.321282540975542
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 96.20400000000001,
+    "t_hand_req_us": 96.00999999999999,
+    "vin_at_entry_v": 33.65247048535199,
+    "start_pk": 76.86589761257667,
+    "hand_pk": 82.79294698331186,
+    "peak_whole": 82.79294698331186,
+    "vo_max_v": 1.048738796942365,
+    "vo_min_after_entry_v": 0.9995581904584857,
+    "vo_last": [
+     1.0076081386815399,
+     1.0076124485071072
+    ],
+    "vds_v": 22.977940254131557,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 96.20400000000001,
+    "t_hand_req_us": 96.00999999999999,
+    "vin_at_entry_v": 33.65247048535199,
+    "start_pk": 76.86589761257667,
+    "hand_pk": 82.79294698331186,
+    "peak_whole": 82.79294698331186,
+    "vo_max_v": 1.048738796942365,
+    "vo_min_after_entry_v": 1.0251853147944716,
+    "vo_last": [
+     1.0252346088347475,
+     1.0252389878562167
+    ],
+    "vds_v": 22.954121834828264,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "ladder_end": [
+     [
+      23.979139752442993,
+      7.516065357386489,
+      8.057137959727346,
+      8.44765693044317
+     ],
+     11.979139756303656
+    ]
+   },
+   "ref_record": "A230_p24_handover_slope_lead/cosim/run_u_N75_0_lead.json",
+   "criteria": {
+    "t7": true,
+    "t2": true,
+    "t5": true
+   }
+  },
+  "s_u_N0_100": {
+   "sink": {
+    "episodes_us": [],
+    "n_episodes": 0,
+    "low_at_end": true,
+    "valley_min_a": null,
+    "valley_max_a": null,
+    "peak_min_a": null,
+    "peak_max_a": null,
+    "records_from_us": 0.05999999999999621,
+    "ladder_end": [
+     [
+      12.240297937116832,
+      11.893761783259995,
+      11.90023656547593,
+      11.965703714147239
+     ],
+     0.24488579977315794
+    ]
+   },
+   "with_sink": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 125.17924634567652,
+    "hand_pk": 148.33485190131856,
+    "peak_whole": 148.33485190131856,
+    "vo_max_v": 1.0330664696528569,
+    "vo_min_after_entry_v": 1.0000891482833738,
+    "vo_last": [
+     1.0000891482833738,
+     1.00094017921473
+    ],
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "same_as_ref": true
+   },
+   "ref": {
+    "status": "COMPLETED",
+    "t_mode_p_us": 144.00400000000002,
+    "t_hand_req_us": null,
+    "vin_at_entry_v": 48.0,
+    "start_pk": 125.17924634567652,
+    "hand_pk": 148.33485190131856,
+    "peak_whole": 148.33485190131856,
+    "vo_max_v": 1.0330664696528569,
+    "vo_min_after_entry_v": 1.0000891482833738,
+    "vo_last": [
+     1.0000891482833738,
+     1.00094017921473
+    ],
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "ladder_end": [
+     [
+      12.240297937116832,
+      11.893761783259995,
+      11.90023656547593,
+      11.965703714147239
+     ],
+     0.24488579977315794
+    ]
+   },
+   "ref_record": "A230_p24_handover_slope_lead/cosim/run_u_N0_100_lead.json",
+   "criteria": {
+    "t7": true,
+    "t2": true,
+    "t6": true
+   }
+  }
+ },
+ "identity": {
+  "quick": true,
+  "full": true,
+  "unit_117": true
+ },
+ "criteria_main": {
+  "t0": true,
+  "t1": false,
+  "t2": true,
+  "t3": true,
+  "t4": true,
+  "t5": false,
+  "t6": true,
+  "t7": false
+ }
+}

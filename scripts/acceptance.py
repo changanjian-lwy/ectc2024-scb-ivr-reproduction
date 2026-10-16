@@ -138,6 +138,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A235": (TA / "A235_p24_v7_corner_boards", "a235_analyze.py", "a235_summary.json"),
     "A236": (TA / "A236_p24_early_hold", "a236_analyze.py", "a236_summary.json"),
     "A237": (TA / "A237_p24_true_light_load", "a237_analyze.py", "a237_summary.json"),
+    "A238": (TA / "A238_p24_sink_mode", "a238_analyze.py", "a238_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -718,6 +719,15 @@ _A237g4 = ("N75 from 12.5 A: 171.1 A against 159.6 A, the worst period of the sa
            "turn-on delay 16 -> 0-4 ns, A143); the current load does not ease, dip 6.7 mV deeper; 29 A under 200 A")
 EXCEPTIONS["A237"] = {("rows/c0_N0", "g0"): _A237g0, ("rows/c0_N75", "g0"): _A237g0, ("criteria_main", "g0"): _A237g0,
                       ("rows/cw5_N75", "g4"): _A237g4, ("criteria_main", "g4"): _A237g4}
+_A238t1 = ("not adopted: on N75 the sink mode latches (phases 2-4 slotted, do not follow phase 1's -40 A; ripple 90-110 A "
+           "at the Ton limit, mean current positive; the pause is suppressed) and Vo rises to 1.28 V - traced, 2 % minimum stands")
+_A238t5 = "N0's 1.0534 V is the start-up's own overshoot before mode P, as A230's record (registered without checking it)"
+_A238t7 = ("not adopted: phases do not share the reverse current (N0 phase 4 ratchets to -134 A while sink is set; N75 "
+           "never clears) - traced (RESULTS 0)")
+EXCEPTIONS["A238"] = {("rows/s_c0_N75", "t1"): _A238t1, ("criteria_main", "t1"): _A238t1,
+                      ("rows/s_u_N0_0", "t5"): _A238t5, ("criteria_main", "t5"): _A238t5,
+                      ("criteria_main", "t7"): _A238t7, **{(f"rows/{r}", "t7"): _A238t7 for r in
+                      ("s_c0_N0", "s_c0_N75", "s_c10_N0", "s_c10_N75", "s_cw5_N0", "s_cw5_N75")}}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

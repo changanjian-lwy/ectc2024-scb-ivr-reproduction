@@ -2398,6 +2398,13 @@ each question:
          (valleys in the band). Re-applications 152.6-171.1 A (N75 +11.5 A
          over the base: the same post-step swing, deeper dip). Next: a
          way to sink at near-zero load, or a stated minimum load.
+    134. A sink mode at the lower Ton limit (2026-10-16, A238; RTL option
+         cfg_sink, off bit-identical). With Vo above +20 mV at the Ton
+         limit the module does not pause and its valley target is -40 A.
+         N0 returns from 0 / 5 A in 10.7 / 10.5 us, start-ups into 1 kOhm
+         end at 1.008 V, but on N75 it latches and Vo rises to 1.28 V:
+         phases 2-4 (slotted) do not follow phase 1's target in reverse.
+         Not adopted; the ~2 % minimum load stands.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
