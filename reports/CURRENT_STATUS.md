@@ -2367,8 +2367,16 @@ each question:
          Item 3's mechanism is traced: while the rails re-share a falling
          step, the highest-rail slotted phase's valley stays positive, its
          early reports ratchet dt_pred past the restart guard, and the
-         restored valley meets a delay ~8 ns too long. A236 (RTL option
-         early_hold_a) is running.
+         restored valley meets a delay ~8 ns too long.
+    131. Holding the turn-on delay when the valley did not reverse
+         (2026-10-16, A236; RTL option early_hold_a, off bit-identical).
+         It removes item 3's restart and spike on every falling row (N75
+         k4 162.8 -> 151.6 A) but costs a 3 mV deeper undershoot on four
+         modules' -8 V / 10 us and changes an item-2 trajectory into a
+         two-period alternation; N13's other NEW (a step-window peak 2 ns
+         past K4) is untouched. Not adopted as registered; item 3 stays,
+         traced, within the limits. Also fixed: run.py now deletes an old
+         output before a run (the regression had passed on stale files).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

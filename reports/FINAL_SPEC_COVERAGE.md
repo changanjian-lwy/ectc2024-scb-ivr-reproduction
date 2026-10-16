@@ -162,7 +162,9 @@ The rest:
   side off at +1..+5 A (no reversed current) for 25-30 µs, every hard turn-on reports "early" and dt_pred climbs
   0.28 ns per period past cfg_rs_high (the restart); when the valley is negative again the delay is ~8 ns too long and
   the high side's body diode conducts first (the spike). The same positive-valley "early" reports occur on every
-  falling step (N0: 68-75 per run) without reaching the restart. A236 tests holding dt_pred on such reports;
+  falling step (N0: 68-75 per run) without reaching the restart. Holding dt_pred on such reports (A236) removes the
+  restart and the spike on every falling row but deepens four modules' −8 V / 10 µs undershoot by 3 mV and perturbs
+  an item-2 row: not adopted, item 3 stays inside the limits (release records-a236);
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 

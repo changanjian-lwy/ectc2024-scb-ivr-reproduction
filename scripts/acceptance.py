@@ -136,8 +136,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A233": (TA / "A233_p24_faster_low_side_learner", "a233_analyze.py", "a233_summary.json"),
     "A234": (TA / "A234_p24_four_modules_v7", "a234_analyze.py", "a234_summary.json"),
     "A235": (TA / "A235_p24_v7_corner_boards", "a235_analyze.py", "a235_summary.json"),
+    "A236": (TA / "A236_p24_early_hold", "a236_analyze.py", "a236_summary.json"),
 }
-ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
+ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
     "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
     "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
@@ -393,6 +394,7 @@ NOT_ROWS["A230"] = r".*"                          # judged through its criteria_
 NOT_ROWS["A231"] = r".*"                          # judged through its criteria_main block (x1, x2 over all rows)
 NOT_ROWS["A233"] = r".*"                          # judged per row and arm in its rows / criteria_main blocks
 NOT_ROWS["A235"] = r"t_"                          # stage-1 start-ups: the summary's trims block
+NOT_ROWS["A236"] = r"o_"                          # the identity row: the summary's identity block (e0)
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -702,6 +704,13 @@ EXCEPTIONS["A233"][("criteria_main", "s255/m3")] = "s255: w20_N0 / w5_N75 dips 5
 _A235 = ("N13 -4.8 V / 1 us: a step-window swing peak 2 ns after the K4 window and item 3 (phase 4 restart 34.7 us after "
          "the step, then 157.6 A; dt_pred ratchet while the valley stays positive), within the limits - traced (RESULTS 0)")
 EXCEPTIONS["A235"] = {("runs/r_N13_lm48", "c1"): _A235, ("criteria_main", "c1"): _A235}
+_A236e1 = ("N13's remaining NEW is the step-window swing peak at 502.0 us (2 ns after the K4 window), identical in both "
+           "arms; item 3's restart and spike are gone on every falling row (RESULTS 0)")
+_A236e3 = ("the hold's cost: four modules -8 V / 10 us undershoot 3.0 mV deeper and +2.6 A; S75 125 C item 2 row (inside "
+           "the hold-off) three 10-12 A spikes after the trajectory departs - not adopted (RESULTS 0)")
+EXCEPTIONS["A236"] = {("rows/r_N13_lm48", "e1"): _A236e1, ("criteria_main", "e1"): _A236e1,
+                      ("rows/a_S75h_d2", "e3"): _A236e3, ("rows/m4_l_m80_10us", "e3"): _A236e3,
+                      ("criteria_main", "e3"): _A236e3}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

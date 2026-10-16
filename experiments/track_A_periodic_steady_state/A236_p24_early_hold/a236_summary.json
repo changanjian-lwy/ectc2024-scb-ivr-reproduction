@@ -1,0 +1,1707 @@
+{
+ "identity": {
+  "unit_pass": 111,
+  "unit_fail": 0,
+  "regression": {
+   "quick": true,
+   "full": true
+  },
+  "o_rows": {
+   "f_N75_k4": {
+    "sections": true,
+    "highoffs_last": true,
+    "lowoffs_last": true,
+    "turnons_last": true,
+    "late_fires": true,
+    "overlaps": true,
+    "ipk_a": true
+   }
+  },
+  "e0": true
+ },
+ "rows": {
+  "f_N0_k0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 164.10938621506406,
+    "peak_whole": 164.10938621506406,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -6.487427889574016,
+    "vo_end_v": [
+     0.9997319790142611,
+     0.9999217879540067
+    ],
+    "oracle_after": {
+     "K4": 2
+    },
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 15.17246013002096,
+    "held": 52
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 164.03568865282043,
+    "peak_whole": 164.03568865282043,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -6.487427889574016,
+    "vo_end_v": [
+     0.9997417351928234,
+     0.9999239622707141
+    ],
+    "oracle_after": {
+     "K4": 2
+    },
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 15.170769230739616,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_N0_k0_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "f_N0_k4": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 163.78027677222946,
+    "peak_whole": 163.78027677222946,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -6.759391282639471,
+    "vo_end_v": [
+     0.9997365846466372,
+     0.9999709809499325
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.959033977466607,
+    "held": 46
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 164.19691806692612,
+    "peak_whole": 164.19691806692612,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -6.707017122557946,
+    "vo_end_v": [
+     0.9997189214596632,
+     0.999921740809575
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 15.100917454941275,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_N0_k4_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "f_N75_k0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 156.7087885421297,
+    "peak_whole": 156.7087885421297,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -4.608004999206661,
+    "vo_end_v": [
+     0.9997327342599102,
+     0.9999406363798735
+    ],
+    "oracle_after": {
+     "K1": 1
+    },
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.629830790318351,
+    "held": 28
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 156.2409370273319,
+    "peak_whole": 156.2409370273319,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -4.547361537870387,
+    "vo_end_v": [
+     0.9997359633579455,
+     0.9999440447751826
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.645773618509548,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_N75_k0_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "f_N75_k2": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 155.61117286963008,
+    "peak_whole": 155.61117286963008,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -4.862351646831131,
+    "vo_end_v": [
+     0.9997359965752134,
+     0.9999408035150575
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.650635434478833,
+    "held": 30
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 153.6653909769547,
+    "peak_whole": 153.6653909769547,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -4.862351646831131,
+    "vo_end_v": [
+     0.9997443725758787,
+     0.9999428232539166
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.540956277501325,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_N75_k2_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "f_N75_k4": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 151.63427317146034,
+    "peak_whole": 151.63427317146034,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -5.1650899459644295,
+    "vo_end_v": [
+     0.9996943952213939,
+     0.9999749910021503
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.52028758516197,
+    "held": 58
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 162.83590768723124,
+    "peak_whole": 162.83590768723124,
+    "vds_v": 27.89070050749891,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.23361800878056
+    ],
+    "vo_ext_mv": -5.19452847655788,
+    "vo_end_v": [
+     0.9997113059687787,
+     0.9999309316297698
+    ],
+    "oracle_after": {
+     "K3": 1,
+     "NEW": 1
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 1,
+    "new_after": 1,
+    "on_vds_max_after_v": 14.490175486349592,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_N75_k4_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "f_S75_k0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 128.25151901451227,
+    "hand_pk": 144.25454212743068,
+    "post_pk": 158.80187691848198,
+    "peak_whole": 158.80187691848198,
+    "vds_v": 29.831075590961813,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 34,
+    "rail1_max_v": [
+     12.246177029120815
+    ],
+    "vo_ext_mv": -8.346841502508418,
+    "vo_end_v": [
+     0.9996881832021955,
+     0.9999771769185225
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 12.533704028748497,
+    "held": 33
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 128.25151901451227,
+    "hand_pk": 144.71520394642337,
+    "post_pk": 160.26283457970857,
+    "peak_whole": 160.26283457970857,
+    "vds_v": 29.831075590961813,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 43,
+    "rail1_max_v": [
+     12.231595664661143
+    ],
+    "vo_ext_mv": -8.682859740809068,
+    "vo_end_v": [
+     0.99970042041853,
+     0.9999421149825011
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 12.611142949314013,
+    "held": 0
+   },
+   "ref_record": "A232_p24_fast_falling_step_v7/cosim/run_f_S75_k0_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "r_N13_lm48": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 110.48409937644172,
+    "hand_pk": 145.78094908935964,
+    "post_pk": 162.40540128331,
+    "peak_whole": 162.40540128331,
+    "vds_v": 29.0237515942427,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.385288995751665
+    ],
+    "vo_ext_mv": -7.735981001746661,
+    "vo_end_v": [
+     0.9996573463095162,
+     0.9999355715812285
+    ],
+    "oracle_after": {
+     "K4": 1,
+     "NEW": 1
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 1,
+    "on_vds_max_after_v": 15.247258547288343,
+    "held": 34
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 110.48409937644172,
+    "hand_pk": 145.78094908935964,
+    "post_pk": 163.62256082419103,
+    "peak_whole": 163.62256082419103,
+    "vds_v": 29.0237515942427,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.385288995751665
+    ],
+    "vo_ext_mv": -7.707558267935899,
+    "vo_end_v": [
+     0.9996602925663058,
+     0.9999094522538278
+    ],
+    "oracle_after": {
+     "K4": 1,
+     "NEW": 2,
+     "K3": 1
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 1,
+    "new_after": 2,
+    "on_vds_max_after_v": 15.245769419115618,
+    "held": 0
+   },
+   "ref_record": "A235_p24_v7_corner_boards/cosim/run_r_N13_lm48.json",
+   "criteria": {
+    "e2": true,
+    "e1": false,
+    "e3": true
+   }
+  },
+  "r_F0_lm48": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.49020454492992,
+    "hand_pk": 139.53918435113889,
+    "post_pk": 164.5224397555141,
+    "peak_whole": 164.5224397555141,
+    "vds_v": 31.810480790126345,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.227551062342833
+    ],
+    "vo_ext_mv": -4.648750185752837,
+    "vo_end_v": [
+     0.9997399629683701,
+     0.9999485755949091
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 15.067018818915665,
+    "held": 38
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.49020454492992,
+    "hand_pk": 139.53918435113889,
+    "post_pk": 164.47274640174547,
+    "peak_whole": 164.47274640174547,
+    "vds_v": 31.810480790126345,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.227551062342833
+    ],
+    "vo_ext_mv": -4.717674639200586,
+    "vo_end_v": [
+     0.9997352653105206,
+     0.9999365793604951
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 15.058906148521078,
+    "held": 0
+   },
+   "ref_record": "A235_p24_v7_corner_boards/cosim/run_r_F0_lm48.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "r_F0_lm80": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.49020454492992,
+    "hand_pk": 139.53918435113889,
+    "post_pk": 160.15914615730742,
+    "peak_whole": 160.15914615730742,
+    "vds_v": 31.810480790126345,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.227551062342833
+    ],
+    "vo_ext_mv": 27.023475084434256,
+    "vo_end_v": [
+     0.9997450489332159,
+     1.0000499620396235
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.49669361900845,
+    "held": 9
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.49020454492992,
+    "hand_pk": 139.53918435113889,
+    "post_pk": 159.54097829084412,
+    "peak_whole": 159.54097829084412,
+    "vds_v": 31.810480790126345,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "rail1_max_v": [
+     12.227551062342833
+    ],
+    "vo_ext_mv": 26.173071671925506,
+    "vo_end_v": [
+     0.9997499468009511,
+     0.9999582488583957
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.432686151891891,
+    "held": 0
+   },
+   "ref_record": "A235_p24_v7_corner_boards/cosim/run_r_F0_lm80.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "l_N0_m80": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 165.7764688123371,
+    "peak_whole": 165.7764688123371,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": 21.955024371674625,
+    "vo_end_v": [
+     0.999743205405985,
+     0.9999735852138361
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.50017871714483,
+    "held": 10
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 165.27284635343463,
+    "peak_whole": 165.27284635343463,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": 22.14605541139192,
+    "vo_end_v": [
+     0.9997330611827343,
+     0.9999516967135996
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.490812472380721,
+    "held": 0
+   },
+   "ref_record": "A228_p24_damped_loop_adoption/cosim/run_l_N0_m80_h.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": true
+   }
+  },
+  "l_N0_p48": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 178.47334109145612,
+    "peak_whole": 178.47334109145612,
+    "vds_v": 32.73026936454279,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": 7.254321385770757,
+    "vo_end_v": [
+     0.999722811939989,
+     0.999969862346599
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 18.806026505712893,
+    "held": 13
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 179.27720575779483,
+    "peak_whole": 179.27720575779483,
+    "vds_v": 32.68603292214546,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": 6.878955827301247,
+    "vo_end_v": [
+     0.9997311135911195,
+     0.9999752767579865
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 18.790242084248355,
+    "held": 0
+   },
+   "ref_record": "A228_p24_damped_loop_adoption/cosim/run_l_N0_p48_h.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "a_S75h_d2": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 199.95995572289,
+    "post_pk": 210.9572137789572,
+    "peak_whole": 210.9572137789572,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 95,
+    "rail1_max_v": [
+     12.516701828311362
+    ],
+    "vo_ext_mv": 11.7372246898515,
+    "vo_end_v": [
+     1.0002320356212755,
+     1.0070779146012458
+    ],
+    "oracle_after": {
+     "K5": 1,
+     "NEW": 3
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 3,
+    "on_vds_max_after_v": 18.19309537817044,
+    "held": 5
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 199.70453008361324,
+    "post_pk": 211.21518070101897,
+    "peak_whole": 211.21518070101897,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 103,
+    "rail1_max_v": [
+     12.516701828311362
+    ],
+    "vo_ext_mv": 12.340843557772097,
+    "vo_end_v": [
+     1.0001140677005846,
+     1.0047410815453721
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 18.315921352883755,
+    "held": 0
+   },
+   "ref_record": "A225_p24_startup_items_recheck/cosim/run_a_S75h_d2.json",
+   "criteria": {
+    "e2": true,
+    "e3": false
+   }
+  },
+  "a_S75h_d20": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 195.48144843594793,
+    "post_pk": 207.78436564226374,
+    "peak_whole": 207.78436564226374,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 77,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": 12.557950105052562,
+    "vo_end_v": [
+     0.9999573161223951,
+     1.0007673808887239
+    ],
+    "oracle_after": {
+     "K1": 1
+    },
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 17.19135658872878,
+    "held": 3
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 195.48144843594793,
+    "post_pk": 207.78436564226374,
+    "peak_whole": 207.78436564226374,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 77,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": 12.557950105052562,
+    "vo_end_v": [
+     0.9997364159660734,
+     1.0007404703142917
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 17.19135658872878,
+    "held": 0
+   },
+   "ref_record": "A225_p24_startup_items_recheck/cosim/run_a_S75h_d20.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "a_S75_d20": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 128.25151901451227,
+    "hand_pk": 178.1666971784062,
+    "post_pk": 190.06147480641198,
+    "peak_whole": 190.06147480641198,
+    "vds_v": 30.902930118925287,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 69,
+    "rail1_max_v": [
+     12.15932177804872
+    ],
+    "vo_ext_mv": 10.624587616608006,
+    "vo_end_v": [
+     1.0002158808415245,
+     1.004727646697104
+    ],
+    "oracle_after": {
+     "NEW": 1
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 1,
+    "on_vds_max_after_v": 16.930231666328027,
+    "held": 21
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 128.25151901451227,
+    "hand_pk": 179.00496374008455,
+    "post_pk": 190.34574943367525,
+    "peak_whole": 190.34574943367525,
+    "vds_v": 30.284785638832606,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 89,
+    "rail1_max_v": [
+     12.160963680215126
+    ],
+    "vo_ext_mv": 10.833990768658985,
+    "vo_end_v": [
+     1.0001178005026496,
+     1.0059367088402442
+    ],
+    "oracle_after": {
+     "K4": 1,
+     "NEW": 1
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 1,
+    "on_vds_max_after_v": 16.916032450978484,
+    "held": 0
+   },
+   "ref_record": "A225_p24_startup_items_recheck/cosim/run_a_S75_d20.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "k_N0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 181.22934257522633,
+    "peak_whole": 181.22934257522633,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -12.795155024468151,
+    "vo_end_v": [
+     0.9998355266983948,
+     1.0002600565565742
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 13.320152993796274,
+    "held": 13
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 181.3097432058546,
+    "peak_whole": 181.3097432058546,
+    "vds_v": 28.1066152737936,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -12.772444436948248,
+    "vo_end_v": [
+     0.9997448941845368,
+     1.0002552680423227
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 13.320152993796274,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_k_N0_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "k_S75h": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 169.3707910680272,
+    "post_pk": 193.59682629724725,
+    "peak_whole": 193.59682629724725,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 76,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": 9.154145903297106,
+    "vo_end_v": [
+     0.9996903166162746,
+     1.0001736563848487
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 17.420202166772654,
+    "held": 9
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 169.3707910680272,
+    "post_pk": 192.90129246752804,
+    "peak_whole": 192.90129246752804,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 77,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": -8.814102997502182,
+    "vo_end_v": [
+     0.9997119445547564,
+     1.0001397325214885
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 17.447165139729066,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_k_S75h_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "u_N0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 58.59370316942562,
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.785901258272546,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 6,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -9.293846065089873,
+    "vo_end_v": [
+     0.9997478000866287,
+     0.9999278037312834
+    ],
+    "oracle_after": {
+     "NEW": 13
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 13,
+    "on_vds_max_after_v": 10.528780029991882,
+    "held": 0
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 58.59370316942562,
+    "peak_whole": 148.33485190131856,
+    "vds_v": 29.785901258272546,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 6,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -9.293846065089873,
+    "vo_end_v": [
+     0.9997478000866287,
+     0.9999278037312834
+    ],
+    "oracle_after": {
+     "NEW": 13
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 13,
+    "on_vds_max_after_v": 10.528780029991882,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_u_N0_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "w5_N0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 162.43792260945182,
+    "peak_whole": 162.43792260945182,
+    "vds_v": 29.785901258272546,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 83,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -33.90617529094742,
+    "vo_end_v": [
+     0.9986312962296624,
+     1.0011066704861078
+    ],
+    "oracle_after": {
+     "NEW": 13
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 13,
+    "on_vds_max_after_v": 15.305941467823203,
+    "held": 20
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 159.75708595663838,
+    "peak_whole": 159.75708595663838,
+    "vds_v": 29.785901258272546,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 74,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -33.90617529094742,
+    "vo_end_v": [
+     0.9988979973803873,
+     1.0001694892059607
+    ],
+    "oracle_after": {
+     "NEW": 13
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 13,
+    "on_vds_max_after_v": 15.068700265535952,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_w5_N0_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "w20_N0": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 154.08711555845298,
+    "peak_whole": 154.08711555845298,
+    "vds_v": 29.57151495900863,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 121,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -28.301498060539497,
+    "vo_end_v": [
+     0.9989874821937925,
+     1.0005221606278987
+    ],
+    "oracle_after": {
+     "NEW": 6
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 6,
+    "on_vds_max_after_v": 15.326961601931359,
+    "held": 20
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.75786768716138,
+    "hand_pk": 139.7745879026207,
+    "post_pk": 149.3036782363976,
+    "peak_whole": 149.3036782363976,
+    "vds_v": 29.432100028093718,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 153,
+    "rail1_max_v": [
+     12.244885799773158
+    ],
+    "vo_ext_mv": -28.368323203175283,
+    "vo_end_v": [
+     0.9991110469348026,
+     1.0008958924960385
+    ],
+    "oracle_after": {
+     "NEW": 6
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 6,
+    "on_vds_max_after_v": 14.31034034321555,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_w20_N0_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "w5_N75": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 159.3775523984558,
+    "peak_whole": 159.3775523984558,
+    "vds_v": 29.621343279980948,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 115,
+    "rail1_max_v": [
+     12.232942700053755
+    ],
+    "vo_ext_mv": -23.463888158327116,
+    "vo_end_v": [
+     0.999206995027701,
+     0.9998831927984267
+    ],
+    "oracle_after": {
+     "NEW": 6
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 6,
+    "on_vds_max_after_v": 16.032292799839023,
+    "held": 22
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 126.24857847182473,
+    "hand_pk": 138.1823328124161,
+    "post_pk": 159.5577920057793,
+    "peak_whole": 159.5577920057793,
+    "vds_v": 29.772726734713572,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 112,
+    "rail1_max_v": [
+     12.232942700053755
+    ],
+    "vo_ext_mv": -23.526265994157637,
+    "vo_end_v": [
+     0.999294123812189,
+     0.9998912312553168
+    ],
+    "oracle_after": {
+     "NEW": 6
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 6,
+    "on_vds_max_after_v": 15.565878725386181,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_w5_N75_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "w30_S75h": {
+   "h": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 169.3707910680272,
+    "post_pk": 154.50945010929925,
+    "peak_whole": 178.9185910473773,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 224,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": -24.252262988716744,
+    "vo_end_v": [
+     0.9996869177608901,
+     0.9999201773415968
+    ],
+    "oracle_after": {
+     "NEW": 7
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 7,
+    "on_vds_max_after_v": 15.031377152597766,
+    "held": 10
+   },
+   "ref": {
+    "status": [
+     "COMPLETED"
+    ],
+    "n_mod": 1,
+    "t_mode_p_us": 133.404,
+    "start_pk": 132.39081997030635,
+    "hand_pk": 169.3707910680272,
+    "post_pk": 153.7110702520383,
+    "peak_whole": 178.9185910473773,
+    "vds_v": 30.865189600154164,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 226,
+    "rail1_max_v": [
+     13.130387701027146
+    ],
+    "vo_ext_mv": -24.252262988716744,
+    "vo_end_v": [
+     0.9996435124869149,
+     0.9999416046516648
+    ],
+    "oracle_after": {
+     "NEW": 7
+    },
+    "f1": false,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 7,
+    "on_vds_max_after_v": 15.031377152597766,
+    "held": 0
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_w30_S75h_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  },
+  "z_N0_10_t0": {
+   "h": {
+    "vmin_a": -15.92574533789488,
+    "vmax_a": -14.321203373541078,
+    "in_band": true,
+    "q1_run": true,
+    "vo_end_v": [
+     0.9989175618312366,
+     1.0065895188576153
+    ]
+   },
+   "ref": {
+    "vmin_a": -15.92574533789488,
+    "vmax_a": -14.321203373541078,
+    "in_band": true,
+    "q1_run": true,
+    "vo_end_v": [
+     0.9989175618312366,
+     1.0065895188576153
+    ]
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_z_N0_10_t0_b.json",
+   "criteria": {
+    "e4": true
+   }
+  },
+  "z_N75_10_t0": {
+   "h": {
+    "vmin_a": -16.179085207077343,
+    "vmax_a": -14.647499051554759,
+    "in_band": true,
+    "q1_run": true,
+    "vo_end_v": [
+     0.9993154048556165,
+     1.0082375991924737
+    ]
+   },
+   "ref": {
+    "vmin_a": -16.214811336945594,
+    "vmax_a": -14.67864535972945,
+    "in_band": true,
+    "q1_run": true,
+    "vo_end_v": [
+     0.9993391038512602,
+     1.0082400431107559
+    ]
+   },
+   "ref_record": "A229_p24_kd_band/cosim/run_z_N75_10_t0_b.json",
+   "criteria": {
+    "e4": true
+   }
+  },
+  "m4_l_m80_10us": {
+   "h": {
+    "status": [
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED"
+    ],
+    "n_mod": 4,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.77958585365684,
+    "hand_pk": 140.22015876079448,
+    "post_pk": 169.51634048820327,
+    "peak_whole": 169.51634048820327,
+    "vds_v": 28.278469589672728,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.232653429415556,
+     12.232625863019877,
+     12.232602356649785,
+     12.234198159228121
+    ],
+    "vo_ext_mv": -24.138149823482724,
+    "vo_end_v": [
+     0.9997066553078898,
+     0.9999948447847508
+    ],
+    "oracle_after": {
+     "K1": 1
+    },
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.501613224656605,
+    "held": 44
+   },
+   "ref": {
+    "status": [
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED"
+    ],
+    "n_mod": 4,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.77958585365684,
+    "hand_pk": 140.22015876079448,
+    "post_pk": 166.88862668361668,
+    "peak_whole": 166.88862668361668,
+    "vds_v": 28.278469589672728,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 1,
+    "rail1_max_v": [
+     12.232653429415556,
+     12.232625863019877,
+     12.232602356649785,
+     12.234198159228121
+    ],
+    "vo_ext_mv": 22.848467465075295,
+    "vo_end_v": [
+     0.9997163347619782,
+     0.9999158040366728
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 14.542341180327558,
+    "held": 0
+   },
+   "ref_record": "A234_p24_four_modules_v7/cosim/run_m4_l_m80_10us_b.json",
+   "criteria": {
+    "e2": true,
+    "e1": true,
+    "e3": false
+   }
+  },
+  "m4_s_p250": {
+   "h": {
+    "status": [
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED"
+    ],
+    "n_mod": 4,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.77958585365684,
+    "hand_pk": 140.22015876079448,
+    "post_pk": 181.27440924693084,
+    "peak_whole": 181.27440924693084,
+    "vds_v": 28.278469589672728,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.232653429415556,
+     12.232625863019877,
+     12.232602356649785,
+     12.234198159228121
+    ],
+    "vo_ext_mv": -12.852999463314084,
+    "vo_end_v": [
+     0.9997416487929857,
+     0.9999028566438797
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 13.163323006094567,
+    "held": 49
+   },
+   "ref": {
+    "status": [
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED",
+     "COMPLETED"
+    ],
+    "n_mod": 4,
+    "t_mode_p_us": 144.00400000000002,
+    "start_pk": 116.77958585365684,
+    "hand_pk": 140.22015876079448,
+    "post_pk": 181.41215705720109,
+    "peak_whole": 181.41215705720109,
+    "vds_v": 28.278469589672728,
+    "overlaps": 0,
+    "shoot_on": 0,
+    "late": 0,
+    "rail1_max_v": [
+     12.232653429415556,
+     12.232625863019877,
+     12.232602356649785,
+     12.234198159228121
+    ],
+    "vo_ext_mv": -12.860140993701696,
+    "vo_end_v": [
+     0.999773880764029,
+     1.0002768031944307
+    ],
+    "oracle_after": {},
+    "f1": true,
+    "f3": true,
+    "k3_after": 0,
+    "new_after": 0,
+    "on_vds_max_after_v": 13.043104310108939,
+    "held": 0
+   },
+   "ref_record": "A234_p24_four_modules_v7/cosim/run_m4_s_p250_b.json",
+   "criteria": {
+    "e2": true,
+    "e3": true
+   }
+  }
+ },
+ "criteria_main": {
+  "e1": false,
+  "e2": true,
+  "e3": false,
+  "e4": true,
+  "e0": true
+ }
+}
