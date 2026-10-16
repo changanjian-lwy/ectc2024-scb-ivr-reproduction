@@ -4,6 +4,18 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-16 (A236) - hold the turn-on delay when the valley did not reverse (RTL, bridge)
+
+**Source:** A235 run_r_N13_lm48 / A232 run_f_N75_k4_b: after a -4.8 V / 1 us step a
+slotted phase turns its low side off at +1..+5 A for 25-30 us; each hard turn-on
+reports "early" and dt_pred climbs 0.28 ns per period past cfg_rs_high (K3), then
+the restored valley meets a delay ~8 ns too long (NEW spike). cfg "early_hold_a":
+m_pos per valley report = the current at the actual low-side turn-off above this
+value; scb_phase cfg_early_hold leaves dt_pred on an early report with m_pos.
+**Gate:** early_hold_a absent: cfg_early_hold 0, m_pos 0, no record field added
+(tb 111 / 111 with two new tests; cosim_regression --quick and --full bit for bit;
+A236 e0 reruns A232's f_N75_k4_b).
+
 ## 2026-10-16 (A230) - the handover request with a slope lead (bridge)
 
 **Source:** A214 / A225: a start-up into 30 % of the load reaches 1.0510-1.0528 V

@@ -27,6 +27,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             lo_adm=0, lo_smax=0, lo_ff=0, lo_kff=0,                              # A100
             kp=0,                                                                # A104
             kd=0, kd_db=2, kd_hold=0, kd_band=0,                                 # A224, A227, A229
+            early_hold=0,                                                        # A236
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -98,6 +99,7 @@ class Ctrl:
         d.cfg_kp.value = cfg["kp"]                               # A104
         d.cfg_kd.value = cfg["kd"]; d.cfg_kd_db.value = cfg["kd_db"]; d.cfg_kd_hold.value = cfg["kd_hold"]   # A224, A227
         d.cfg_kd_band.value = cfg["kd_band"]                     # A229
+        d.cfg_early_hold.value = cfg["early_hold"]               # A236
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -148,7 +150,7 @@ class Ctrl:
         d.cfg_ton_lat.value = cfg["ton_lat"]                     # A215
         d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
         d.cfg_zcd.value = cfg["zcd"]                             # A220
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
         await ClockCycles(d.clk, 3)
@@ -290,6 +292,35 @@ async def predictive_correction(dut):
     await c.set(m_valid=0, m_early=0)
     await ReadOnly()
     assert dtp(3) == 278
+
+
+@cocotb.test()
+async def predictive_correction_held_without_reversal(dut):
+    """A236: with early_hold, an early report whose low-side turn-off current had not reversed (m_pos) leaves dt_pred;
+    an early report without m_pos still steps; without early_hold m_pos is ignored."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 80, 80, 80), early_hold=1)
+    dtp = lambda k: field(dut.dt_pred.value, k, TW)
+    await c.set(m_valid=0b0011, m_early=0b0011, m_pos=0b0001)
+    await c.set(m_valid=0, m_early=0, m_pos=0)
+    await ReadOnly()
+    assert (dtp(0), dtp(1)) == (85, 82)
+    await c.set(m_valid=0b0001, m_pos=0b0001, m_tv=pack((77, 0, 0, 0), TW))
+    await c.set(m_valid=0, m_pos=0)
+    await ReadOnly()
+    assert dtp(0) == 77
+
+
+@cocotb.test()
+async def predictive_correction_ignores_reversal_bit_when_off(dut):
+    """A236: without early_hold an early report steps dt_pred whatever m_pos says."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 80, 80, 80))
+    dtp = lambda k: field(dut.dt_pred.value, k, TW)
+    await c.set(m_valid=0b0001, m_early=0b0001, m_pos=0b0001)
+    await c.set(m_valid=0, m_early=0, m_pos=0)
+    await ReadOnly()
+    assert dtp(0) == 87
 
 
 @cocotb.test()

@@ -37,7 +37,8 @@ Controller-side analog functions modelled here:
   t + t_async (a_valid, a_tlo);
 - the predictive-valley measurement at each predictive turn-on (and at restart turn-ons with "learn_at_restart"):
   early / flat / valley time after the actual low-side turn-off (m_valid, m_early, m_flat, m_tv) and the error of
-  the actual edge against the valley (m_err);
+  the actual edge against the valley (m_err); with "early_hold_a" (A236) also m_pos, the current at that low-side
+  turn-off above this value (a comparator sampled there; the RTL then holds dt_pred on an early report with it);
 - the zero-crossing TDC of the timed low side ("low_pred", mode P): at each low-side turn-on, early or the crossing
   time after the actual high-side turn-off (ml_valid, ml_early, ml_tv) and the edge's error against the crossing
   (ml_err);
@@ -382,7 +383,7 @@ class ModuleSim:
         c.set("cfg_fine", int(cfg["fine"]))
         c.set("dt_init", pack(self.dt_init, TW))
         c.set("trim_init", pack(self.trim_init, CW))
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "r_valid", "r_below"):
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below"):
             c.set(s, 0)
         c.set("m_tv", 0)
         c.set("cfg_start_s", 1)
@@ -411,6 +412,7 @@ class ModuleSim:
         c.set("ml_valid", 0); c.set("ml_early", 0); c.set("ml_tv", 0)
         c.set("cfg_err_low", int(cfg.get("err_low", 0)))               # A92
         c.set("cfg_err_high", int(cfg.get("err_high", 0)))
+        c.set("cfg_early_hold", int(self.early_hold is not None))     # A236
         c.set("cfg_el_tgt", to_lsb(cfg.get("el_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_eh_tgt", to_lsb(cfg.get("eh_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_err_shift", int(cfg.get("err_shift", 0)))
@@ -478,6 +480,7 @@ class ModuleSim:
         """After the reset: the plant-side bookkeeping for the comparators and the measurements."""
         cfg, p, plant, na = self.cfg, self.p, self.plant, self.na
         self.v_lo = [None] * N; self.t_lo_act = [None] * N
+        self.i_lo_act = [0.0] * N; self.early_hold = cfg.get("early_hold_a")   # A236
         aux = cfg.get("aux")
         vz = int(aux.get("valley_zero", 0)) if aux else int(cfg.get("valley_zero", 0))  # A111: also without a branch
         self.mon = Monitors(N, vmin_zero=vz)                     # zero-crossing TDC and valley tracking
@@ -728,8 +731,11 @@ class ModuleSim:
                     early = abs(tv - plant.t) < 1e-15 and tv > self.t_lo_act[k]
                     dip = vm < self.v_lo[k] - self.v_hys and tv > self.t_lo_act[k]
                     err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
-                    self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err)
+                    pos = self.early_hold is not None and self.i_lo_act[k] > self.early_hold    # A236
+                    self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err, pos)
                     rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
+                    if self.early_hold is not None:
+                        rec["lo_pos"] = bool(pos)
                 if deferred:                                     # A163: taken at the physical turn-on
                     rec["t_act_s"] = plant.t; rec["vds_act_v"] = float(plant.vds(k))
                 mon.vmin_set[k] = 0
@@ -775,7 +781,7 @@ class ModuleSim:
             self.lowoffs.append({"t_s": plant.t, "phase": k + 1, "i_a": i_e, "bind_cur": meta["bind"]})
             if meta["bind"] or self.cfg.get("slot_trim", 0):    # A109: also at the slots' turn-offs
                 self.meas_r[k] = i_e < self.i_tgt
-            self.v_lo[k] = plant.vds(k); self.t_lo_act[k] = plant.t
+            self.v_lo[k] = plant.vds(k); self.t_lo_act[k] = plant.t; self.i_lo_act[k] = i_e
             mon.vmin_set[k] = 1; mon.vmin[k] = self.v_lo[k]; mon.t_vmin[k] = self.t_lo_act[k]
         plant.set_gate(j, level)
 
@@ -835,9 +841,9 @@ class ModuleSim:
         """After the falling edge: one-cycle measurement pulses from the previous window, the ADC sample, the handover
         request, the load and the branch arming."""
         c, cfg, lat, mlo, p, plant = self.ctl, self.cfg, self.lat, self.mlo, self.p, self.plant
-        mv = me = mf = rv = rb = 0; mtv = [0] * N; merr = [0] * N
-        for k, (early, flat, tv, err) in self.meas_m.items():
-            mv |= 1 << k; me |= int(early) << k; mf |= int(flat) << k; mtv[k] = tv; merr[k] = err
+        mv = me = mf = mp = rv = rb = 0; mtv = [0] * N; merr = [0] * N
+        for k, (early, flat, tv, err, pos) in self.meas_m.items():
+            mv |= 1 << k; me |= int(early) << k; mf |= int(flat) << k; mp |= int(pos) << k; mtv[k] = tv; merr[k] = err
         for k, below in self.meas_r.items():
             rv |= 1 << k; rb |= int(below) << k
         ml_v = ml_e = 0; ml_t = [0] * N; ml_r = [0] * N             # A89: zero-crossing reports (A92: + error)
@@ -853,6 +859,7 @@ class ModuleSim:
             c.set("mlo_err", rep[1] if rep else 0)
         self.meas_m.clear(); self.meas_r.clear()
         c.set("m_valid", mv); c.set("m_early", me); c.set("m_flat", mf); c.set("m_tv", pack(mtv, TW))
+        c.set("m_pos", mp)                                             # A236
         c.set("r_valid", rv); c.set("r_below", rb)
         if self.dep_on:                                              # A132: one-cycle V_DS comparator report
             c.set("v_valid", int(self.meas_v is not None)); c.set("v_high", int(bool(self.meas_v)))

@@ -62,7 +62,8 @@
 // Correctors (one report per edge):
 // - dt_pred: early -> + cfg_dt_step (capped at cfg_dt_max); flat -> hold; otherwise the measured valley time m_tv, or
 //   with cfg_err_high base - ((m_err - cfg_eh_tgt) >>> cfg_err_shift) clamped to [0, cfg_dt_max], base = dt_pred,
-//   or cfg_rs_high after a restart turn-on;
+//   or cfg_rs_high after a restart turn-on; A236: with cfg_early_hold an early report with m_pos (the current at the
+//   low-side turn-off had not reversed, so a longer wait cannot complete the swing) leaves dt_pred;
 // - dtl (cfg_low_pred): early -> + cfg_dtl_step; otherwise the measured crossing time ml_tv, or with cfg_err_low
 //   dtl - ((ml_err - cfg_el_tgt) >>> cfg_err_shift); both clamped to [0, cfg_dtl_max];
 // - trim: +1 / -1 per current-decided low-side turn-off from the residual-current sign (cfg_trim).
@@ -100,6 +101,8 @@ module scb_phase #(
     input  wire                 m_valid,
     input  wire                 m_early,
     input  wire                 m_flat,
+    input  wire                 m_pos,         // A236: the current at the low-side turn-off had not reversed
+    input  wire                 cfg_early_hold,// A236: an early report with m_pos leaves dt_pred
     input  wire [TW-1:0]        m_tv,
     input  wire                 r_valid,
     input  wire                 r_below,
@@ -331,9 +334,10 @@ module scb_phase #(
             t_tk        <= {TW{1'b0}};
         end else begin
             if (m_valid) begin
-                if (m_early)
-                    dt_pred <= (dt_next > cfg_dt_max) ? cfg_dt_max : dt_next;
-                else if (!m_flat)
+                if (m_early) begin
+                    if (!(cfg_early_hold && m_pos))                  // A236
+                        dt_pred <= (dt_next > cfg_dt_max) ? cfg_dt_max : dt_next;
+                end else if (!m_flat)
                     dt_pred <= cfg_err_high ? dtp_err : m_tv;          // A92: error-based when set
             end
             if (ml_valid && cfg_low_pred) begin                  // A89: zero-crossing correction
