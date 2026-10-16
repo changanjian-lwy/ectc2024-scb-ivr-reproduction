@@ -1,6 +1,6 @@
 # D77 - a microchannel coolant in place of h: flow, pressure and the coolant's own temperature rise
 
-**Erratum (2026-10-15, D83).** The heat this coolant carries uses D72 / D76's inductor losses; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). Flow and temperature-rise requirements are lower bounds; not rerun.
+**Erratum (2026-10-15, D83).** The heat this coolant carries uses D72 / D76's inductor losses; D83 (2.5 MHz design, 25 °C, per module): array copper 27.3 W with real IND048-HBS1 units (D72: 18.6 W) and core loss 34.5-44.1 W at κ 1 / 106-136 W at [10]'s measured κ 3.07 (D76: 7.5 W at κ 1, 29.9 W at κ 4). Flow and temperature-rise requirements are lower bounds; not rerun. **Rerun in D84 (2026-10-16):** at κ 1 the lowest flow for 85 °C is 3.39 g/s per module (low end of the core band, 25 °C inlet; was 0.44 g/s); every other case needs more than 4 g/s.
 
 2026-10-07. D74 cooled the spreader face with a uniform heat transfer coefficient. This note puts the team's cooler
 behind it (substrate-embedded parallel microchannels next to the GaN layer, Choi et al. 2025; 1.6 g/s for a 1 kW DVPD

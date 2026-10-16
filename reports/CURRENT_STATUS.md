@@ -2351,6 +2351,14 @@ each question:
          140.2 A, no module locks (rail 1 12.23 V). The four-module design
          of record moves to V7 for these rows; spread between modules is
          not in them.
+    129. The thermal results with D83's inductor losses (2026-10-16, D84;
+         derivation). Inductor heat per module 26 / 49 W -> 62-71 W (kappa 1)
+         / 133-163 W ([10]'s kappa). No old design point keeps the module at
+         85 C: D74's headline 96.6 -> 184.5-206.8 C at kappa 1; 85 C needs
+         h >= 5e4 and 1.5-2.7 % glass-1 via fill at kappa 1 (25 C coolant),
+         and nothing tested meets it at [10]'s kappa. Converter at 85 C
+         70.9-72.9 % / 56.3-60.3 %. With HBS1 at this ripple the module is
+         not thermally feasible in P24's footprint; the material decides.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
@@ -2379,6 +2387,7 @@ P24 transfer remains a separately declared topology/sequence branch.
    热（D74，三维导热、解析解验证）：电感层就是最热处，玻璃 1 是瓶颈（κ 1、h 2×10⁴、不加铜时电感比结温高约 54 K）；
    玻璃 1 里约 2 % 的铜过孔（每模块约 5,700 个 30 µm 孔，落在铜层上、ABF 有 1–2 % 微孔）能解决，κ 4 要约 4 %。
    冷却液（D77，微通道）：h 不再是限制，冷却液温升才是；每模块 ≥ 0.44 g/s（25 °C 进口）/ 1.1 g/s（45 °C），泵功不到 0.5 W。
+   **（2026-10-16 更正，D83 / D84）以上效率和热的数都用了错误的电感数据（D62 的 500 nH 单元其实是 HPE1，D76 磁芯损耗少算 3 倍）。改正后 2.5 MHz、25 °C、不含封装：不含磁芯 84.0 %，κ 1 时 73.2–75.3 %，按原文 κ 57.7–62.0 %；热：κ 1 时原主案例 96.6 °C → 184.5–206.8 °C，守 85 °C 要 h ≥ 5×10⁴ 加 1.5–2.7 % 过孔，按原文 κ 守不住。**
    处理器面（D78）：比 IVR 顶面冷时是第二条散热路径，热时是热源；κ 1 时不构成限制，κ 4 加 45 °C 冷却液时要求处理器侧 ≤ 55–83 °C。
 5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
    问题；动态模型里还没有模块输出路径的 R / L（D70 的清单）；磁芯损耗只有基于 R_acx 指标的估算（κ 未实测）；热场有 D74 / D77 /
