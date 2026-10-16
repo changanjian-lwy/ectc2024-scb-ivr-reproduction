@@ -59,6 +59,15 @@ Cell = physical post-step peak (A), A168's criteria (a168_analyze.judge) against
 At nominal devices the final plant has run all 13 rows of A152's matrix: 12 pass, −4.8 V / 1 µs misses on oracle
 events only.
 
+**On plant V7 with the final configuration (A235, 2026-10-16; one module, 25 °C unless named, events at 500 µs,
+gate-level whole-run peaks):** ff (F0) +4.8 V / 1 µs 187.3, −4.8 V / 1 µs 164.5, +62.5 A 180.9, −8 V / 10 µs 159.5 A ✓;
+ss at L0 (S0) 183.8 / 167.9 / 182.7 / 163.7 A ✓, at 125 °C start-up 127.9 A, handover 172.0 A, Vo ≤ 1.0474 V,
++4.8 V / 1 µs 184.7 A ✓; L × 1.3 (N13) 187.9 / **163.6 ✗** / 180.4 / 164.5 A. N13's −4.8 V / 1 µs row has item 3 (a
+phase-4 restart 34.7 µs after the step, then 157.6 A) and a step-window swing peak 2 ns past the K4 window. Mode-S trims
+on V7 from V5: F0 −0.2825, S0 +0.3275, N13 −0.22 ns (Vo(143.5 µs) 1.0360 / 1.0345 / 1.0352 V). V_DS ≤ 37.6 V, Vo within
+1 % at the end of every run. These are the record for the ff, ss (L0) and L × 1.3 columns on V7; the cells above stay
+V5's (records `A235_p24_v7_corner_boards/cosim/`, release records-a235).
+
 Start-up / handover peaks (open loop, per-board trim): nom 162.1 / 149.7, ff 161.6 / 146.4, hot 161.8 / 150.3,
 ss 188.8 / 188.8, L × 0.7 200.2 / 190.2 (limit ref + 3 = 205.5), L × 1.3 146.5 / 137.2, four modules nom 162.1 /
 149.7, ss 193.0 / 193.0, ±5 % 169.1 / 161.9 A (400 ns start-up).
@@ -147,7 +156,13 @@ The rest:
   positions, one module, 25 °C):** N0 and S75 show no restart and no NEW spike with either controller (V6: 3 + 3 on
   N0); N75 keeps one phase-3 restart ~21 µs after the step and a 17.5-19.8 A spike (151-153 A) at one or two of three
   positions, with and without the damped loop. All post-step peaks 153.7-165.5 A. Item 3 stays open, inside the limits
-  (records `A232_p24_fast_falling_step_v7/cosim/`, release records-a232);
+  (records `A232_p24_fast_falling_step_v7/cosim/`, release records-a232). **N13 (L × 1.3, A235) shows it on phase 4
+  (restart 34.7 µs after the step, 157.6 A). Mechanism (records, figure `A236_p24_early_hold/a236_item3.png`):** the
+  step lands on rail 1 and the rails take ~80 µs to share it; the slotted phase with the highest rail turns its low
+  side off at +1..+5 A (no reversed current) for 25-30 µs, every hard turn-on reports "early" and dt_pred climbs
+  0.28 ns per period past cfg_rs_high (the restart); when the valley is negative again the delay is ~8 ns too long and
+  the high side's body diode conducts first (the spike). The same positive-valley "early" reports occur on every
+  falling step (N0: 68-75 per run) without reaching the restart. A236 tests holding dt_pred on such reports;
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 

@@ -2359,6 +2359,16 @@ each question:
          and nothing tested meets it at [10]'s kappa. Converter at 85 C
          70.9-72.9 % / 56.3-60.3 %. With HBS1 at this ripple the module is
          not thermally feasible in P24's footprint; the material decides.
+    130. The final configuration on V7 for F0, S0 and N13 (2026-10-16,
+         A235). Trims by the registered rule (Vo(143.5 us) 1.0360 /
+         1.0345 / 1.0352 V); 13 of 14 rows pass, peaks 159.5-187.9 A at
+         25 C, S0 at 125 C 184.7 A. The ff and ss (L0) columns move to V7;
+         L x 1.3 too except -4.8 V / 1 us, where item 3 appears on phase 4.
+         Item 3's mechanism is traced: while the rails re-share a falling
+         step, the highest-rail slotted phase's valley stays positive, its
+         early reports ratchet dt_pred past the restart guard, and the
+         restored valley meets a delay ~8 ns too long. A236 (RTL option
+         early_hold_a) is running.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

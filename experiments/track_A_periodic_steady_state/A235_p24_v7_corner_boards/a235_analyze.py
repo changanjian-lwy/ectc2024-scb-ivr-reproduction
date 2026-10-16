@@ -1,6 +1,6 @@
 """A235 analysis (BOUNDARY Section 2).
   python3 a235_analyze.py 1   -> a235_trims.json (stage 1: Vo(143.5 us) and the trim rule)
-  python3 a235_analyze.py 2   -> a235_summary.json (stage 2: c1 per run, c2 per 25 C start-up)"""
+  python3 a235_analyze.py [2] -> a235_summary.json (stage 2: c1 per run, c2 per 25 C start-up; the default)"""
 from __future__ import annotations
 
 import importlib.util
@@ -86,4 +86,4 @@ def stage2():
 
 
 if __name__ == "__main__":
-    stage1() if sys.argv[1] == "1" else stage2()
+    stage1() if sys.argv[1:] == ["1"] else stage2()

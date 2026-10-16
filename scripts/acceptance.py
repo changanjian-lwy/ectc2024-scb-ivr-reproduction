@@ -135,6 +135,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A232": (TA / "A232_p24_fast_falling_step_v7", "a232_analyze.py", "a232_summary.json"),
     "A233": (TA / "A233_p24_faster_low_side_learner", "a233_analyze.py", "a233_summary.json"),
     "A234": (TA / "A234_p24_four_modules_v7", "a234_analyze.py", "a234_summary.json"),
+    "A235": (TA / "A235_p24_v7_corner_boards", "a235_analyze.py", "a235_summary.json"),
 }
 ROW_PREFIX = {"A137": "s"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -391,6 +392,7 @@ NOT_ROWS["A229"] = r".*"                          # judged through its criteria_
 NOT_ROWS["A230"] = r".*"                          # judged through its criteria_main block (j1, v1-v3 over all rows)
 NOT_ROWS["A231"] = r".*"                          # judged through its criteria_main block (x1, x2 over all rows)
 NOT_ROWS["A233"] = r".*"                          # judged per row and arm in its rows / criteria_main blocks
+NOT_ROWS["A235"] = r"t_"                          # stage-1 start-ups: the summary's trims block
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -697,6 +699,9 @@ _A233r = ("a faster phase-1 learner raises the rising-step peaks (item 2 up to 2
           "+4.8 V / 2 us 186.7 / 191.4 A): the slow learner protects the rising step - lo_smax stays 64 (RESULTS 0)")
 EXCEPTIONS["A233"] = {("criteria_main", f"s{x}/{m}"): _A233r for x in (128, 255) for m in ("m1", "m2", "m4")}
 EXCEPTIONS["A233"][("criteria_main", "s255/m3")] = "s255: w20_N0 / w5_N75 dips 5 mV deeper than allowed (RESULTS 1)"
+_A235 = ("N13 -4.8 V / 1 us: a step-window swing peak 2 ns after the K4 window and item 3 (phase 4 restart 34.7 us after "
+         "the step, then 157.6 A; dt_pred ratchet while the valley stays positive), within the limits - traced (RESULTS 0)")
+EXCEPTIONS["A235"] = {("runs/r_N13_lm48", "c1"): _A235, ("criteria_main", "c1"): _A235}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
