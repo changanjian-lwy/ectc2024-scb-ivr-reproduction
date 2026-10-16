@@ -1,0 +1,14 @@
+r_F0_lp48
+r_F0_lm48
+r_F0_sp62
+r_F0_lm80
+r_S0_lp48
+r_S0_lm48
+r_S0_sp62
+r_S0_lm80
+r_N13_lp48
+r_N13_lm48
+r_N13_sp62
+r_N13_lm80
+r_S0h_start
+r_S0h_lp48
