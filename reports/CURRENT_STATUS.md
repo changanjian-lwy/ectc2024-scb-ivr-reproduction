@@ -2344,6 +2344,13 @@ each question:
          4 / 8 ns raises the rising-step peaks (item 2 to 232 A, the
          binding row 192.9 -> 198.2 / 201.2 A). lo_smax stays 64; the
          40 us hold-off after the handover stays.
+    128. Four modules on plant V7 (2026-10-16, A234; first four-module
+         runs since V5). Four identical N0 modules with the one-module
+         final controller (no skipping) pass +4.8 V / 1 us, +250 A and
+         -8 V / 10 us: 169.1 / 173.3 / 159.2 A, start-up 116.8 A, handover
+         140.2 A, no module locks (rail 1 12.23 V). The four-module design
+         of record moves to V7 for these rows; spread between modules is
+         not in them.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

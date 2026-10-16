@@ -34,7 +34,8 @@ kept as Appendix A.
   normalisation, 2.5 MHz at 25 °C without package is 84.0 % before core loss, 73.2-75.3 % at κ 1 and 57.7-62.0 % at
   [10]'s measured κ (3.07). Was: 86.6-87.7 % (D72), 90.61 % (D62 middle R/L).
 - **Four modules, frozen:** C12 + lo_learn 4 (C13); passive sharing needs inductor matching within about ±5 %
-  (D66, C14).
+  (D66, C14). **Since A234 (2026-10-16) on plant V7 with the one-module final controller (no skipping): +4.8 V / 1 µs,
+  +250 A, −8 V / 10 µs at 169.1 / 173.3 / 159.2 A, identical modules.**
 - **Package, gate level (D79, A163-A172, 2026-10-08):** with EPC's EPC2067 model on all eight switches and the
   datasheet spread, the drive is resistances plus a driver interlock.
   - Turn-on ~3.0 Ω ± 20 % and turn-off ≤ 0.3 Ω per device; ±30 % has no single-resistor window.
