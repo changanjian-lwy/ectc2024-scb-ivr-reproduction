@@ -58,6 +58,9 @@ Controller-side analog functions modelled here:
 - the depth loop (cfg "dep" {von_set_v, wsh, smax, dmin, dmax, ehold}, A132): at phase 1's predictive turn-on a
   V_DS comparator reports V_DS > von_set_v (v_valid, v_high); scb_dep's code moves every use of the target:
   i_target - dep x trim_lsb_a ("dep_log" records its changes);
+- the sink mode (cfg "sink" {hi_mv, lo_mv, i_a}, A238): while scb_ctrl's sink is set (a sample above vref + hi_mv at
+  the lower Ton limit, until one at or below vref + lo_mv) every use of the target is i_a instead of i_target
+  ("sink_log" records (t, sink) at each change);
 
 Driver model ("driver", optional): low-side edges m later than high-side ones, plus independent Gaussian jitter of
 sigma per edge (seeded), on every edge or, with "jitter_edges" "high" / "low", on that side's edges only; a turn-on
@@ -473,6 +476,13 @@ class ModuleSim:
         dep = cfg.get("dep") or {}                                       # A132: slow loop on the target (scb_dep)
         self.dep_on, self.v_set, self.i_tgt0 = bool(dep), float(dep.get("von_set_v", 0.0)), self.i_tgt
         c.set("cfg_dep", int(self.dep_on)); c.set("cfg_dep_wsh", int(dep.get("wsh", 0)))
+        snk = cfg.get("sink") or {}                                      # A238: sink mode at the lower Ton limit
+        self.sink_on, self.i_sink, self.sink_now, self.sink_log = bool(snk), float(snk.get("i_a", 0.0)), False, []
+        if self.sink_on and self.dep_on:
+            raise ValueError("sink and dep both move the target")
+        c.set("cfg_sink", int(self.sink_on))
+        c.set("cfg_sink_hi", int(round(snk.get("hi_mv", 20.0) * 1e-3 / self.adc_lsb)))
+        c.set("cfg_sink_lo", int(round(snk.get("lo_mv", 0.0) * 1e-3 / self.adc_lsb)))
         c.set("cfg_dep_smax", int(dep.get("smax", 1))); c.set("cfg_dep_ehold", int(dep.get("ehold", 0)))
         c.set("cfg_dep_min", int(dep.get("dmin", 0)) & 0xFF); c.set("cfg_dep_max", int(dep.get("dmax", 0)) & 0xFF)
         c.set("v_valid", 0); c.set("v_high", 0)
@@ -801,6 +811,11 @@ class ModuleSim:
             self.i_tgt = self.i_tgt0 - d * self.lsb_a
             if not self.dep_log or self.dep_log[-1][1] != d:
                 self.dep_log.append((w * lsb, d))
+        if self.sink_on:                                                 # A238: the sink target while sink is set
+            snk = bool(c.get("sink"))
+            self.i_tgt = self.i_sink if snk else self.i_tgt0
+            if snk != self.sink_now:
+                self.sink_log.append((w * lsb, int(snk))); self.sink_now = snk
         st["ton"] = c.get("ton_now")
         if c.get("mode_p") and not st["mode_p"]:
             st["t_mode_p"] = w * lsb
@@ -969,6 +984,8 @@ class ModuleSim:
             out["overlaps_cmd"] = ovl["cmd"]
         if self.dep_on:                                              # A132
             out["dep_log"] = self.dep_log
+        if self.sink_on:                                             # A238
+            out["sink_log"] = self.sink_log
         if self.ph_floor:                                            # A133
             out["ph_floor_fires"] = [f["fires"] for f in self.flat]
             out["ph_floor_log"] = self.ph_log

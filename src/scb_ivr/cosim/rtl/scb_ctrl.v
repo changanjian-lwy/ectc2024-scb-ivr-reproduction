@@ -60,6 +60,10 @@
 // - A132: with cfg_dep, in mode P scb_dep moves the negative-current target (dep) from phase 1's V_DS reports.
 // - A133: with cfg_ph_floor, phases 2..N's front ends are armed in LOW as floors before their slots (scb_phase
 //   cfg_slot_floor, C06's form); arm_n reports every phase's arm, fa_valid / fa_tlo carry phases 2..N's TDC reports.
+// - A238: with cfg_sink, in mode P a Vo sample above vref + cfg_sink_hi with the loop's Ton at its lower limit sets
+//   sink, and it stays set until a sample at or below vref + cfg_sink_lo; while it is set no round is skipped (a
+//   paused module resumes at its next tick) and the front ends use the sink target instead of i_target (the bridge),
+//   so that at the lower Ton limit each phase's mean current turns negative and the module sinks.
 // From A93's rtl (history: CHANGELOG.md).
 module scb_ctrl #(
     parameter N    = 4,
@@ -183,6 +187,10 @@ module scb_ctrl #(
     output wire                smp,            // A216: a tick of the paused module: the ADC samples (one cycle)
     output wire                idle,           // A216: the module is paused
     output wire                res1,           // A217: phase 1 is in its resume interval (the front end's threshold moves)
+    input  wire                cfg_sink,       // A238: sink mode at the lower Ton limit while Vo is high (mode P)
+    input  wire [AW-1:0]       cfg_sink_hi,    // A238: start above vref + this, ADC codes
+    input  wire [AW-1:0]       cfg_sink_lo,    // A238: continue above vref + this
+    output wire                sink,           // A238: the front ends use the sink target
     input  wire                cfg_zcd,        // A220: the pause's last low-side intervals end at zero current
     input  wire                cfg_dep,        // A132: slow loop on the negative-current target (scb_dep), mode P
     input  wire [3:0]          cfg_dep_wsh,    // A132: window of 2^wsh phase-1 reports
@@ -267,8 +275,12 @@ module scb_ctrl #(
     wire            lo_c = ({1'b0, vo_q} > {1'b0, cfg_vref_code} + {1'b0, cfg_skip_lo});
     reg             fl_r, hi_r, lo_r;
     wire            lat_sk = (cfg_ton_lat != 6'd0);
-    wire            skip_c = cfg_skip && cfg_vloop && mode_p && (lat_sk ? fl_r : fl_c)
+    reg             sink_q;                    // A238
+    wire            skip_c = cfg_skip && cfg_vloop && mode_p && (lat_sk ? fl_r : fl_c) && !sink_q
                              && ((skip_q || mod_idle) ? (lat_sk ? lo_r : lo_c) : (lat_sk ? hi_r : hi_c));
+    wire            snk_hi = ({1'b0, adc_code} > {1'b0, cfg_vref_code} + {1'b0, cfg_sink_hi});   // A238: this sample
+    wire            snk_lo = ({1'b0, adc_code} > {1'b0, cfg_vref_code} + {1'b0, cfg_sink_lo});
+    assign sink  = sink_q;
     assign skip1 = skip_q;
     assign smp   = tk_p[0];
     assign idle  = mod_idle;
@@ -348,12 +360,14 @@ module scb_ctrl #(
     always @(posedge clk) begin                                       // A216
         if (rst) begin
             vo_q <= cfg_vref_code; skip_q <= 1'b0; mod_idle <= 1'b0; per_hold <= 1'b0; res_t <= {TW{1'b0}};
-            zpend <= {N{1'b0}};
+            zpend <= {N{1'b0}}; sink_q <= 1'b0;
         end else begin
             for (zk = 1; zk < N; zk = zk + 1)                         // A220: at phase k's high-side turn-off
                 if (gh_ev[zk] && !gh_lvl[zk]) zpend[zk] <= cfg_zcd && cfg_async && mode_p && skip_q;
             if (res_p[0]) zpend <= {N{1'b0}};
             if (adc_valid) vo_q <= adc_code;
+            if (adc_valid)                                            // A238: the previous sample's Ton limit
+                sink_q <= cfg_sink && cfg_vloop && mode_p && (sink_q ? snk_lo : (snk_hi && (lat_sk ? fl_r : fl_c)));
             if (gl_ev[0] && gl_lvl[0]) skip_q <= skip_c;              // at phase 1's low-side turn-on
             if (on_pulse[0]) per_hold <= 1'b0;
             if (sk_p[0]) begin mod_idle <= 1'b1; per_hold <= 1'b1; end

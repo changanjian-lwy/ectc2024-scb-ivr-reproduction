@@ -4,6 +4,18 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-16 (A238) - a sink mode at the lower Ton limit (RTL + bridge)
+
+**Source:** A237: below the lower Ton limit a module pauses and cannot sink, so a
+release to a true no load stays high (item 6b). Dell US 9467052 B2 enters FCCM on an
+overshoot; with P24's held valley the equivalent is a deeper valley target.
+scb_ctrl cfg_sink / cfg_sink_hi / cfg_sink_lo, output sink: set by a Vo sample above
+vref + sink_hi with the loop's Ton at its lower limit (mode P), cleared by a sample at
+or below vref + sink_lo; while set no round is skipped. Bridge cfg "sink" {hi_mv,
+lo_mv, i_a}: every use of the target is i_a while sink is set; record "sink_log".
+**Gate:** cfg "sink" absent: cfg_sink 0, sink stays low, skip_c as before
+(cosim_regression --quick and --full PASS on fresh outputs); tb 117 / 117 (six new).
+
 ## 2026-10-16 (A237) - the resistive load can disconnect (bridge)
 
 **Source:** every light-load row since A216 kept the 4 mOhm load and added a current

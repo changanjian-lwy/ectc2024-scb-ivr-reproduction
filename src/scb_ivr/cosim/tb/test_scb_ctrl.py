@@ -7,7 +7,7 @@ blanking; the error-based correctors; the period-following slots, their two-peri
 guard, their reference at phase 1's low-side turn-off (C02) and their valley trim (A109); the timed phase-1 turn-off and its adaptive
 step and Ton feedforward, and its floor (A118) and the floor's late report (A141); phases 2-4's floors (A133); the Ton path's multi-cycle
 registers (A215); skipped rounds (A216) and the resume
-interval's flag for the front end (A217). From A93's tests (history: ../CHANGELOG.md).
+interval's flag for the front end (A217); the sink mode (A238). From A93's tests (history: ../CHANGELOG.md).
 """
 import cocotb
 from cocotb.clock import Clock
@@ -43,7 +43,8 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             ton_s=None,                                                          # A184: None = ton
             ton_lat=0,                                                           # A215
             skip=0, skip_hi=10, skip_lo=2,                                       # A216
-            zcd=0)                                                               # A220
+            zcd=0,                                                               # A220
+            sink=0, sink_hi=40, sink_lo=6)                                       # A238
 
 
 def pack(values, width):
@@ -150,6 +151,7 @@ class Ctrl:
         d.cfg_ton_lat.value = cfg["ton_lat"]                     # A215
         d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
         d.cfg_zcd.value = cfg["zcd"]                             # A220
+        d.cfg_sink.value = cfg["sink"]; d.cfg_sink_hi.value = cfg["sink_hi"]; d.cfg_sink_lo.value = cfg["sink_lo"]   # A238
         for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -2011,3 +2013,87 @@ async def zcd_keeps_the_slots_period_across_the_pause(dut):
     c, seen = await _zcd_pause(dut, zdelay=2)
     assert int(dut.idle.value) == 1 and seen["t_per"] is not None
     assert int(dut.t_per.value) == seen["t_per"], (int(dut.t_per.value), seen["t_per"])
+
+
+async def _sample(c, code):
+    await c.set(adc_valid=1, adc_code=code)
+    await c.set(adc_valid=0)
+    await ReadOnly()
+
+
+@cocotb.test()
+async def sink_stays_low_below_its_threshold(dut):
+    """A238: at the lower Ton limit a sample above vref + skip_hi but not above vref + sink_hi leaves sink low, and the
+    round is skipped as A216's."""
+    c = await _skip_start(dut, sink=1)
+    await _sample(c, 2000 + 20)
+    assert int(dut.sink.value) == 0
+    for _ in range(60):
+        await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.idle.value) == 1 and int(dut.sink.value) == 0
+
+
+@cocotb.test()
+async def sink_sets_above_its_threshold_and_holds_the_rounds(dut):
+    """A238: at the lower Ton limit a sample above vref + sink_hi sets sink, and no round is skipped while it is set."""
+    c = await _skip_start(dut, sink=1)
+    await _sample(c, 2000 + 50)
+    assert int(dut.sink.value) == 1
+    t0 = int(dut.win_q.value)
+    await ClockCycles(dut.clk, 40)
+    await ReadOnly()
+    assert int(dut.idle.value) == 0 and int(dut.skip1.value) == 0 and len(_ons(c, 1, after=t0)) >= 3, _ons(c, 1)
+
+
+@cocotb.test()
+async def sink_holds_down_to_its_lower_threshold(dut):
+    """A238: once set, sink stays set for a sample above vref + sink_lo and clears at a sample at or below it."""
+    c = await _skip_start(dut, sink=1)
+    await _sample(c, 2000 + 50)
+    await _sample(c, 2000 + 7)
+    assert int(dut.sink.value) == 1
+    await _sample(c, 2000 + 6)
+    assert int(dut.sink.value) == 0
+
+
+@cocotb.test()
+async def sink_resumes_a_paused_module(dut):
+    """A238: a paused module (A216) whose next sample is above vref + sink_hi resumes at its next tick: phase 1's low
+    side turns on and the module is no longer idle."""
+    c = await _skip_start(dut, sink=1)
+    await _sample(c, 2000 + 20)
+    for _ in range(400):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        if int(dut.idle.value) and all(field(dut.state.value, k, 2) == 3 for k in range(4)):
+            break
+    assert int(dut.idle.value) == 1
+    t0 = int(dut.win_q.value)
+    await c.set(cmp_i=0)
+    await _sample(c, 2000 + 50)
+    assert int(dut.sink.value) == 1
+    await c.until("L", 1, 1, after=t0)
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+    assert int(dut.idle.value) == 0 and field(dut.state.value, 0, 2) == 2      # phase 1 in LOW
+
+
+@cocotb.test()
+async def sink_needs_the_ton_limit(dut):
+    """A238: a sample above vref + sink_hi sets nothing while the loop's Ton is above its lower limit."""
+    c = await _skip_start(dut, sink=1, ton=200)
+    await _sample(c, 2000 + 50)
+    assert int(dut.sink.value) == 0
+
+
+@cocotb.test()
+async def sink_off_skips_as_before(dut):
+    """A238: with the option off a sample above vref + sink_hi sets nothing and the round is skipped (A216)."""
+    c = await _skip_start(dut)
+    await _sample(c, 2000 + 50)
+    assert int(dut.sink.value) == 0
+    for _ in range(60):
+        await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert int(dut.idle.value) == 1 and int(dut.sink.value) == 0
