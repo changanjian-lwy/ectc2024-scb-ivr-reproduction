@@ -2377,6 +2377,17 @@ each question:
          past K4) is untouched. Not adopted as registered; item 3 stays,
          traced, within the limits. Also fixed: run.py now deletes an old
          output before a run (the regression had passed on stale files).
+    132. The loss ledger item by item (2026-10-16, D85; derivation, at the
+         interview-prep session's request). A124's budget, D83's
+         efficiencies and A206's books reproduced bit for bit. With the
+         gate-level books in place of the ideal-switch terms, the final
+         point (N0, 25 C, no package) is 82.4 % without core, 71.9-74.0 %
+         at kappa 1, 56.9-61.0 % at [10]'s kappa; 85 C 79.2 / 69.5-71.4 /
+         55.4-59.3 %. Each loss once (seven overlaps checked); the items
+         rose one by one (conduction +2.5, edges +3.6 W); the only
+         offsets are the loop moving from package to dies and D80's loop
+         -5.2 W against edges +1.7 W. Slow corner S75: +12.9 W of
+         semiconductor loss.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

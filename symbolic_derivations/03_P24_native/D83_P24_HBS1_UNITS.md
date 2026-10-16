@@ -1,5 +1,7 @@
 # D83 - the inductor array and its core loss with the HBS1 units [10] actually measured
 
+**Note (2026-10-16, D85):** the efficiencies here keep A124's ideal-switch semiconductor terms; D85's item ledger uses the gate-level plant's books and gives 82.4 % / 71.9-74.0 % / 56.9-61.0 % at 25 °C (no package).
+
 2026-10-15. Corrects D72 and D76. [10] = Alvarez Barros et al., IEEE TCPMT 11(12), 2021, pp. 2183-2192 (P24's ref. [10]);
 pages are journal pages. D72's power law ran from IND046-HBS1 (20 nH / 13.6 mΩ) to "500 nH / 39.3 mΩ", which is
 winding IND037 in material HPE1 ([10] Table II p. 2186, Fig. 7 p. 2187). The flake materials (HPE1 among them) saturate

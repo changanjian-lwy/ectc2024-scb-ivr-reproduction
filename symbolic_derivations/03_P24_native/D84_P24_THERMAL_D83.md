@@ -1,5 +1,7 @@
 # D84 - the thermal results rerun with D83's inductor losses (D73 / D74 / D77 / D78 / D80)
 
+**Note (2026-10-16, D85):** the die layer here carries D80's dies (V5 edges); the gate-level books (V6) put ~4.5 W more at the dies (conduction +2.5 W, low-side edges and reverse +2.1 W), small against the inductor's 62-163 W. Not rerun.
+
 2026-10-16. D73 / D74 / D77 / D78 / D80 carry D83's erratum (inductor heat from D72's copper and D76's core: lower bounds, not
 rerun). Their key cases are rerun here with D83's values, nothing else changed. Script: `scripts/p24_thermal_d83.py` →
 `diagnostics/D84_thermal_d83.json`; no co-simulation, no existing file edited.

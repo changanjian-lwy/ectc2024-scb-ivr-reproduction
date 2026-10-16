@@ -395,6 +395,7 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
 - Converter efficiency with the inductor array (D83, 2026-10-15, corrects D72 / D76): at 2.5 MHz, 25 °C, 250 W per module, no package, with real IND048-HBS1 units,
   84.0 % without core loss, 73.2-75.3 % with core loss at kappa 1, 57.7-62.0 % at [10] Table V kappa. The earlier 86.6-87.7 % (D72), 84.4-85.4 % and 78.4-79.3 % (D76)
   and 90.6 % (A124 / D62) rested on inductor units that [10] does not have as HBS1 and on a core loss one third too low; they may not be quoted.
+  **D85 (2026-10-16, the item-by-item ledger): D83 kept A124's ideal-switch semiconductor terms; with the gate-level plant's books (V6, LTspice-checked) plus gate drive, capacitor ESR and the loop damper, the same point is 82.4 % without core, 71.9-74.0 % at kappa 1, 56.9-61.0 % at [10]'s kappa (25 °C, no package); 79.2 / 69.5-71.4 / 55.4-59.3 % at 85 °C (isothermal). Quote these with their conditions (D85 Section 4).**
 - The drive specification "3.0 Ω ± 20 % on / ≤ 0.3 Ω off per device" was derived for hard high-side turn-ons. For
   the low sides, which turn on at zero voltage, it is not a specification but an oversight: they need their own,
   small turn-on resistance (A205). A206 set it to 0.3 Ω: the low sides' hard turn-ons are at most 77 per run, all

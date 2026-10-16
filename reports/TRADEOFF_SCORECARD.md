@@ -32,7 +32,7 @@ kept as Appendix A.
   lo_learn 4 (A124, A129, A136, A137, A141, A143). **Efficiency superseded by D83 (2026-10-15):** with the HBS1 units
   [10] actually measured (IND048, 376 µΩ/nH; D72's power law joined HBS1 to an HPE1 unit) and [10]'s core-loss
   normalisation, 2.5 MHz at 25 °C without package is 84.0 % before core loss, 73.2-75.3 % at κ 1 and 57.7-62.0 % at
-  [10]'s measured κ (3.07). Was: 86.6-87.7 % (D72), 90.61 % (D62 middle R/L).
+  [10]'s measured κ (3.07). Was: 86.6-87.7 % (D72), 90.61 % (D62 middle R/L). **D85 (2026-10-16): with the gate-level semiconductor books in place of A124's ideal-switch terms, 82.4 % / 71.9-74.0 % / 56.9-61.0 % at 25 °C (no package), 79.2 / 69.5-71.4 / 55.4-59.3 % at 85 °C; the items rose one by one, no offset hid behind D83's total.**
 - **Four modules, frozen:** C12 + lo_learn 4 (C13); passive sharing needs inductor matching within about ±5 %
   (D66, C14). **Since A234 (2026-10-16) on plant V7 with the one-module final controller (no skipping): +4.8 V / 1 µs,
   +250 A, −8 V / 10 µs at 169.1 / 173.3 / 159.2 A, identical modules.**
