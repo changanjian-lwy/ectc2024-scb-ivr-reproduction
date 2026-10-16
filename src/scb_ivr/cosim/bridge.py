@@ -87,6 +87,8 @@ the last 1000 turn-ons, low-side turn-offs and turn-ons, the controller's final 
 plant steps and wall time, driver/overlap status (cfg "records_last", default 1000, sets the record lengths).
 Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output from t_us on, on top of the load;
 "load_step2" (A216) the same, added to the first (a release and a later re-application in one run).
+"t_load_off_us" (A237): the resistive load (r_load) disconnects at that time, so the load steps alone remain: a
+release to a constant-current load (a true no load with no step), without r_load's 1 / r_load A/V.
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -338,6 +340,8 @@ class ModuleSim:
     def __init__(self, cfg, p, ctl, first_high=True):
         self.cfg, self.p, self.ctl = cfg, p, ctl
         self.early_hold = cfg.get("early_hold_a")                    # A236: read by configure()
+        off = cfg.get("t_load_off_us")                               # A237: the resistive load disconnects
+        self.t_load_off = None if off is None else float(off) * 1e-6
         t_clk = cfg["t_clk_ns"] * 1e-9
         self.fb = int(cfg["fb"])
         self.lsb = t_clk / (1 << self.fb)
@@ -881,7 +885,7 @@ class ModuleSim:
         c.set("vin_code", self.adc_vin[-1] if self.adc_vin else 0)
         self.adc_vin.clear()
         c.set("hand_req", int(plant.t >= p.t_hand or self.hand["lat"]))   # A186: or the Vo-triggered request
-        plant.load_on = plant.t >= p.t_load
+        plant.load_on = plant.t >= p.t_load and (self.t_load_off is None or plant.t < self.t_load_off)   # A237
         if self.en["t"] is None and plant.t >= self.t_en:        # A102: arm the branches (each starts at its
             plant.aux_armed = [True] * self.na; self.en["t"] = plant.t   # next low-side turn-off)
 

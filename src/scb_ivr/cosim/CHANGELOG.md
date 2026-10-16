@@ -4,6 +4,15 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-16 (A237) - the resistive load can disconnect (bridge)
+
+**Source:** every light-load row since A216 kept the 4 mOhm load and added a current
+step, so a "10 %" or "no load" row still had 250 A/V and sank current above 1 V.
+cfg "t_load_off_us": r_load disconnects at that time (plant.load_on false), leaving
+the load steps alone - a release to a constant-current load.
+**Gate:** t_load_off_us absent: load_on as before (cosim_regression --quick and
+--full PASS on fresh outputs).
+
 ## 2026-10-16 (A236) - hold the turn-on delay when the valley did not reverse (RTL, bridge)
 
 **Source:** A235 run_r_N13_lm48 / A232 run_f_N75_k4_b: after a -4.8 V / 1 us step a
