@@ -2388,6 +2388,16 @@ each question:
          offsets are the loop moving from package to dies and D80's loop
          -5.2 W against edges +1.7 W. Slow corner S75: +12.9 W of
          semiconductor loss.
+    133. Light load as a true current (2026-10-16, A237; bridge option
+         t_load_off_us, off bit-identical). Every light-load row since
+         A216 kept the 4 mOhm base and so sank current above 1 V. With a
+         constant-current load: a release from full load to 0 A never
+         comes back (N0 1.0576 V, N75 1.0460 V at the end), so item 6b
+         covers every overshoot at a near-zero load, not only the
+         start-up; 5 A returns within 1 % in 47.5 us; 25 A is as before
+         (valleys in the band). Re-applications 152.6-171.1 A (N75 +11.5 A
+         over the base: the same post-step swing, deeper dip). Next: a
+         way to sink at near-zero load, or a stated minimum load.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

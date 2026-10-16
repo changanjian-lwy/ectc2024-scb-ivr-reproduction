@@ -137,6 +137,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A234": (TA / "A234_p24_four_modules_v7", "a234_analyze.py", "a234_summary.json"),
     "A235": (TA / "A235_p24_v7_corner_boards", "a235_analyze.py", "a235_summary.json"),
     "A236": (TA / "A236_p24_early_hold", "a236_analyze.py", "a236_summary.json"),
+    "A237": (TA / "A237_p24_true_light_load", "a237_analyze.py", "a237_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -711,6 +712,12 @@ _A236e3 = ("the hold's cost: four modules -8 V / 10 us undershoot 3.0 mV deeper 
 EXCEPTIONS["A236"] = {("rows/r_N13_lm48", "e1"): _A236e1, ("criteria_main", "e1"): _A236e1,
                       ("rows/a_S75h_d2", "e3"): _A236e3, ("rows/m4_l_m80_10us", "e3"): _A236e3,
                       ("criteria_main", "e3"): _A236e3}
+_A237g0 = ("the registered question: a release to a true no load pauses below the lower Ton limit and nothing discharges "
+           "Co (N0 1.0576 V, N75 1.0460 V at the end); item 6b widened, coverage corrected")
+_A237g4 = ("N75 from 12.5 A: 171.1 A against 159.6 A, the worst period of the same post-step swing in both arms (phase 2's "
+           "turn-on delay 16 -> 0-4 ns, A143); the current load does not ease, dip 6.7 mV deeper; 29 A under 200 A")
+EXCEPTIONS["A237"] = {("rows/c0_N0", "g0"): _A237g0, ("rows/c0_N75", "g0"): _A237g0, ("criteria_main", "g0"): _A237g0,
+                      ("rows/cw5_N75", "g4"): _A237g4, ("criteria_main", "g4"): _A237g4}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
