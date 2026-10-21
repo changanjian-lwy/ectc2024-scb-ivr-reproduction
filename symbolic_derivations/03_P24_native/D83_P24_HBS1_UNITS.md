@@ -1,6 +1,8 @@
 # D83 - the inductor array and its core loss with the HBS1 units [10] actually measured
 
-**Note (2026-10-16, D85):** the efficiencies here keep A124's ideal-switch semiconductor terms; D85's item ledger uses the gate-level plant's books and gives 82.4 % / 71.9-74.0 % / 56.9-61.0 % at 25 °C (no package).
+**Note (2026-10-16, D85):** the efficiencies here keep A124's ideal-switch semiconductor terms; D85's item ledger uses the gate-level plant's books and gives 82.4 % / 73.9-76.1 % / 58.2-62.5 % at 25 °C (no package; corrected 2026-10-21).
+
+**Erratum (2026-10-21, D85 Section 3 item 6 and Section 5):** every efficiency with a core term below counts the inductor ripple at R_DC twice: in the copper (R_DC x mean square) and inside [10]'s r_acx, which holds a flat R_DC as R_DC / (3 L) (Section 5's identity). Counted once: 5 / 2.5 / 1 MHz at κ 1 75.0-76.6 / 75.2-77.5 / 70.4-73.4 %, at Table V κ 47.7-50.8 / 59.0-63.4 / 56.1-62.4 % (ripple share 5.83 / 9.38 / 21.78 W; `D85_loss_ledger.json` d83_corrected). 2.5 MHz still leads or ties; the no-core column is unchanged. The values below are left as published (they match D83_hbs1_units.json).
 
 2026-10-15. Corrects D72 and D76. [10] = Alvarez Barros et al., IEEE TCPMT 11(12), 2021, pp. 2183-2192 (P24's ref. [10]);
 pages are journal pages. D72's power law ran from IND046-HBS1 (20 nH / 13.6 mΩ) to "500 nH / 39.3 mΩ", which is

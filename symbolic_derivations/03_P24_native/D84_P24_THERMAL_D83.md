@@ -2,6 +2,8 @@
 
 **Note (2026-10-16, D85):** the die layer here carries D80's dies (V5 edges); the gate-level books (V6) put ~4.5 W more at the dies (conduction +2.5 W, low-side edges and reverse +2.1 W), small against the inductor's 62-163 W. Not rerun.
 
+**Note (2026-10-21, D85 Section 3 item 6):** the inductor heat below counts the ripple at R_DC (9.38 W at 25 °C) twice, in the copper and inside the core term. Counted once, it is 52.4-62.0 / 123.9-153.5 W. Cases far from 85 °C keep their verdicts; the 19.6 % fill at κ 1 (81.3-88.6 °C, coolant 25 °C) sits on the threshold and may fall below it. Not rerun.
+
 2026-10-16. D73 / D74 / D77 / D78 / D80 carry D83's erratum (inductor heat from D72's copper and D76's core: lower bounds, not
 rerun). Their key cases are rerun here with D83's values, nothing else changed. Script: `scripts/p24_thermal_d83.py` →
 `diagnostics/D84_thermal_d83.json`; no co-simulation, no existing file edited.

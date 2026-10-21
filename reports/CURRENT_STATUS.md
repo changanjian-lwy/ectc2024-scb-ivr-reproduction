@@ -2308,8 +2308,8 @@ each question:
          85-117 nH units do not exist (HBS1: 18.8-71 nH, best IND048 at
          376 uOhm/nH). D76 priced the core with a toroid's r_acx, kappa
          1-4 and the rms ripple, one third of [10] Eq. (1). Redone at
-         25 C without package: 2.5 MHz 84.0 % before core loss, 73.2-75.3 %
-         at kappa 1, 57.7-62.0 % at [10]'s kappa 3.07 (was 86.6-87.7 /
+         25 C without package: 2.5 MHz 84.0 % before core loss, 75.2-77.5 %
+         at kappa 1, 59.0-63.4 % at [10]'s kappa 3.07 (was 86.6-87.7 /
          84.4-85.4 / 78.4-79.3 %); 2.5 MHz still leads or ties, 1 MHz now
          loses on copper; one layer of 2 x 41 units needs 1.2-4.2 cm² per
          phase. V7's r_core stays (a damping resistor; its books are not
@@ -2381,9 +2381,9 @@ each question:
          interview-prep session's request). A124's budget, D83's
          efficiencies and A206's books reproduced bit for bit. With the
          gate-level books in place of the ideal-switch terms, the final
-         point (N0, 25 C, no package) is 82.4 % without core, 71.9-74.0 %
-         at kappa 1, 56.9-61.0 % at [10]'s kappa; 85 C 79.2 / 69.5-71.4 /
-         55.4-59.3 %. Each loss once (seven overlaps checked); the items
+         point (N0, 25 C, no package) is 82.4 % without core, 73.9-76.1 %
+         at kappa 1, 58.2-62.5 % at [10]'s kappa; 85 C 79.2 / 71.4-73.4 /
+         56.6-60.7 % (corrected 2026-10-21, item 135). Each loss once (seven overlaps checked); the items
          rose one by one (conduction +2.5, edges +3.6 W); the only
          offsets are the loop moving from package to dies and D80's loop
          -5.2 W against edges +1.7 W. Slow corner S75: +12.9 W of
@@ -2405,6 +2405,14 @@ each question:
          end at 1.008 V, but on N75 it latches and Vo rises to 1.28 V:
          phases 2-4 (slotted) do not follow phase 1's target in reverse.
          Not adopted; the ~2 % minimum load stands.
+    135. The loss ledger's one double count (2026-10-21, D85 corrected;
+         found by an outside review via the interview-prep session).
+         [10]'s r_acx contains a flat R_DC as R_DC / (3 L), so the
+         inductor ripple at R_DC (9.38 W) was in both the copper and the
+         core term. Counted once: N0, 25 C, no package 82.4 % without
+         core, 73.9-76.1 % at kappa 1, 58.2-62.5 % at [10]'s kappa, i.e.
+         58-76 % (was 57-74 %); 85 C 79.2 / 71.4-73.4 / 56.6-60.7 %. D83's
+         three designs move the same way; 2.5 MHz still leads or ties.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
@@ -2433,7 +2441,7 @@ P24 transfer remains a separately declared topology/sequence branch.
    热（D74，三维导热、解析解验证）：电感层就是最热处，玻璃 1 是瓶颈（κ 1、h 2×10⁴、不加铜时电感比结温高约 54 K）；
    玻璃 1 里约 2 % 的铜过孔（每模块约 5,700 个 30 µm 孔，落在铜层上、ABF 有 1–2 % 微孔）能解决，κ 4 要约 4 %。
    冷却液（D77，微通道）：h 不再是限制，冷却液温升才是；每模块 ≥ 0.44 g/s（25 °C 进口）/ 1.1 g/s（45 °C），泵功不到 0.5 W。
-   **（2026-10-16 更正，D83 / D84）以上效率和热的数都用了错误的电感数据（D62 的 500 nH 单元其实是 HPE1，D76 磁芯损耗少算 3 倍）。改正后 2.5 MHz、25 °C、不含封装：不含磁芯 84.0 %，κ 1 时 73.2–75.3 %，按原文 κ 57.7–62.0 %；热：κ 1 时原主案例 96.6 °C → 184.5–206.8 °C，守 85 °C 要 h ≥ 5×10⁴ 加 1.5–2.7 % 过孔，按原文 κ 守不住。**
+   **（2026-10-16 更正，D83 / D84）以上效率和热的数都用了错误的电感数据（D62 的 500 nH 单元其实是 HPE1，D76 磁芯损耗少算 3 倍）。改正后 2.5 MHz、25 °C、不含封装：不含磁芯 84.0 %，κ 1 时 75.2–77.5 %，按原文 κ 59.0–63.4 %（2026-10-21 更正：纹波铜损只算一次；开关项用门级账本时 73.9–76.1 / 58.2–62.5 %，D85）；热：κ 1 时原主案例 96.6 °C → 184.5–206.8 °C，守 85 °C 要 h ≥ 5×10⁴ 加 1.5–2.7 % 过孔，按原文 κ 守不住。**
    处理器面（D78）：比 IVR 顶面冷时是第二条散热路径，热时是热源；κ 1 时不构成限制，κ 4 加 45 °C 冷却液时要求处理器侧 ≤ 55–83 °C。
 5. **边界和缺口：** 没有硬件；封装数值（回路 L、阻尼、铜厚、电感工艺）P24 没给，用扫描和公式覆盖，真实值是要问 Mihai 的
    问题；动态模型里还没有模块输出路径的 R / L（D70 的清单）；磁芯损耗只有基于 R_acx 指标的估算（κ 未实测）；热场有 D74 / D77 /

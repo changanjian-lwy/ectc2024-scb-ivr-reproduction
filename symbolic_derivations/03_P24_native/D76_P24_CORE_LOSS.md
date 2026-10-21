@@ -3,7 +3,7 @@
 **Erratum (2026-10-15, D83).** The core loss here is too low and its efficiencies are wrong. (1) It used the rms ripple, one third of [10] Eq. (1)'s value (whose ripple is the half
 peak-to-peak). (2) Its r_acx is a discrete toroid's (Murali Fig. 8(e)); the embedded HBS1's ([10] Fig. 8) is 1.5-2.0 x higher at 2.5 MHz. (3) kappa 1 / 2 / 4 were assumed,
 where [10] Table V measured 3.07-5.07 at 2-5 MHz. (4) The array copper comes from D72 (see its erratum). Corrected (D83, 2.5 MHz, 25 °C, no package): core loss
-34.5-44.1 W per module at kappa 1 (D76: 7.5 W) and 106-136 W at Table V kappa; efficiency 73.2-75.3 % at kappa 1 and 57.7-62.0 % at Table V kappa, against
+34.5-44.1 W per module at kappa 1 (D76: 7.5 W) and 106-136 W at Table V kappa; efficiency 73.2-75.3 % at kappa 1 and 57.7-62.0 % at Table V kappa, against **Corrected 2026-10-21 (D85 Section 5: the inductor ripple at R_DC was counted in both the copper and the core term): 2.5 MHz 75.2-77.5 % at kappa 1, 59.0-63.4 % at Table V kappa; with the gate-level semiconductor books (D85) 73.9-76.1 / 58.2-62.5 %.**
 84.4-85.4 % and 78.4-79.3 % here. The ranking claims ("1 MHz ties or leads 2.5 MHz", f^0.55) fail: 2.5 MHz leads or ties at every kappa. See D83.
 
 2026-10-07. D70 / D72 left core loss "not modelled"; D67 named it a limit of the 2.5 MHz choice. This note prices it

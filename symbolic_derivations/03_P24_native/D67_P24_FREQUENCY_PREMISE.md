@@ -4,7 +4,7 @@
 material that saturates at ~100 mA, not HBS1; real HBS1 units are 18.8-71 nH, best R/L 376 µΩ/nH (IND048), and P24's 12 x 183 nH
 units per phase have no basis in [10]. So the 90.61 % of A124, the "R/L <= ~80 µΩ/nH" condition and the Section 6 / 7 updates
 (86.6-87.7 %; "1 MHz ties 2.5 MHz") are superseded. Corrected (D83, 25 °C, no package): converter 84.0 % at 2.5 MHz without core loss,
-73.2-75.3 % at kappa 1, 57.7-62.0 % at [10] Table V kappa; 2.5 MHz leads or ties at every kappa, and 1 MHz loses on copper (75.0 % without core loss). See D83.
+73.2-75.3 % at kappa 1, 57.7-62.0 % at [10] Table V kappa; 2.5 MHz leads or ties at every kappa, and 1 MHz loses on copper (75.0 % without core loss). See D83. **Corrected 2026-10-21 (D85 Section 5: the inductor ripple at R_DC was counted in both the copper and the core term): 2.5 MHz 75.2-77.5 % at kappa 1, 59.0-63.4 % at Table V kappa; with the gate-level semiconductor books (D85) 73.9-76.1 / 58.2-62.5 %.**
 
 2026-10-05. Method: math (no new co-simulation). Script: `scripts/p24_frequency_premise.py` (D64's script at
 2.5 MHz and at Fig. 5's footprint) → `diagnostics/D67_frequency_premise.json`. Inputs: A124, D62, D64, P24 text.

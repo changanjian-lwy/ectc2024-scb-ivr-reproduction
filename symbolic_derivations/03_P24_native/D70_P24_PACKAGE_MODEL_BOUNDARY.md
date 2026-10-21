@@ -3,7 +3,7 @@
 **Erratum (2026-10-15, D83).** The statements that rest on the "500 nH HBS1 unit" and its 79 µΩ/nH (the table row "MPC-class R/L 79 µΩ/nH in D62 only"; the
 D72 paragraph "90.61 % ... 86.6-87.7 %, package-inclusive ~81-86 %"; "~83-87 % before core loss"; D76's "7.5-30 W per module, kappa 1-4") are wrong:
 that unit is IND037 in HPE1, not HBS1, and D76's core loss was too low. Corrected (D83, 2.5 MHz, 25 °C, no package): 84.0 % without core loss,
-73.2-75.3 % at kappa 1, 57.7-62.0 % at Table V kappa (core 34.5-44.1 W / 106-136 W per module); D75's package costs 0.3-2.8 points more. See D83.
+73.2-75.3 % at kappa 1, 57.7-62.0 % at Table V kappa (core 34.5-44.1 W / 106-136 W per module); D75's package costs 0.3-2.8 points more. See D83. **Corrected 2026-10-21 (D85 Section 5: the inductor ripple at R_DC was counted in both the copper and the core term): 2.5 MHz 75.2-77.5 % at kappa 1, 59.0-63.4 % at Table V kappa; with the gate-level semiconductor books (D85) 73.9-76.1 / 58.2-62.5 %.**
 
 2026-10-07. An audit after an external review of the package layer (D65-D69, A144-A162); no new runs. It fixes what the
 package conclusions may claim and checks the one-way loss estimates, the damper's physical meaning and double counting.

@@ -7,9 +7,11 @@ A124 record) and D83's efficiencies (D73's split + D83's copper + D83's core + D
 ledger: the semiconductor terms from the gate-level plant's books (V6, A206 run_E_N0_steady_ls0p3, settled, switches at
 the datasheet maximum, 50 pH loop with its damper; LTspice within 0.5-0.7 %), the terms the books do not hold (gate
 drive, series-capacitor ESR, the loop damper's dissipation, D80), D83's inductor copper and core, D75's lateral copper.
-Overlaps are resolved by replacement (each physical loss once; the doc's Section 2). Temperature as D73 / D84: switch
-conduction x (1 + A_SW (T - 25)), copper x (1 + A_CU (T - 25)), everything else held. Writes
-symbolic_derivations/03_P24_native/diagnostics/D85_loss_ledger.json.
+Overlaps are resolved by replacement (each physical loss once; the doc's Section 3). [10] Eq. (2) puts a flat R_DC into
+r_acx as R_DC / (3 L), so a core term from r_acx already holds R_DC x the ripple's mean square: with a core term the
+ripple's share of the copper (25 C, as the core is held at 25 C) is taken out once (2026-10-21 correction; also applied
+to D83's three designs, d83_corrected). Temperature as D73 / D84: switch conduction x (1 + A_SW (T - 25)), copper x
+(1 + A_CU (T - 25)), everything else held. Writes symbolic_derivations/03_P24_native/diagnostics/D85_loss_ledger.json.
 """
 from __future__ import annotations
 
@@ -45,6 +47,33 @@ def _mod(name, path):
 
 def eff(p_out, p):
     return 100.0 * p_out / (p_out + p)
+
+
+def ripple_share(design):
+    """Ripple's share of R_DC x mean square for triangular phase currents (I_dc^2 + dI_pp^2 / 12 per phase)."""
+    ms_r = sum(x * x / 12.0 for x in design["di_pp_a"])
+    return ms_r / (sum(x * x for x in design["i_dc_a"]) + ms_r)
+
+
+def d83_corrected():
+    """D83's efficiencies of its three designs ([10] Eq. (1) core, steady array) with the ripple's R_DC share counted once."""
+    d83 = json.loads((DIAG / "D83_hbs1_units.json").read_text())["designs"]
+    d75 = json.loads((DIAG / "D75_footprint.json").read_text())
+    out = {}
+    for name, d in d83.items():
+        st = d["cases"]["steady"]
+        p_out = lb.measure(json.loads(H.DESIGNS[name][0].read_text()))["p_out_w"]
+        assert eff(p_out, st["p25_w"]) == st["eff_no_core"], name                 # the published no-core value
+        rip = st["copper_w"] * ripple_share(d)
+        e = {"eff_no_core": st["eff_no_core"], "copper_w": st["copper_w"], "copper_ripple_w": rip}
+        for tag in ("lo", "hi"):
+            for kn, kv in (("k1", 1.0), ("kV", d["kappa_nearest"])):
+                w = kv * d["core"][tag]["k1_eq1_w"] - rip
+                e[f"{tag}_{kn}_eq1"] = eff(p_out, st["p25_w"] + w)
+                for pk, (cu_key, loop) in H.PKG.items():
+                    e[f"{tag}_{kn}_eq1_{pk}"] = eff(p_out, st["p25_w"] + w + d75["lateral"][cu_key]["w_20mm"] + loop)
+        out[name] = e
+    return out
 
 
 def reproduce():
@@ -104,11 +133,13 @@ def ledger(board, rep, temp=25.0):
         "edges_high": bw["edges_high"], "edges_low": bw["edges_low"], "reverse_dead_time": bw["rev_fit"],
         "gate_drive": N_DEV * lb.QG_TYP * lb.VGS * f, "series_caps_esr": rep["old_semis_w"]["series_caps"],
         "loop_damper_50pH": d80["damper50_w"], "inductor_copper": d83["cases"]["steady"]["copper_w"] * kcu}
-    core = {f"{e}_{kn}": kv * d83["core"][e]["k1_eq1_w"] for e in ("lo", "hi") for kn, kv in (("k1", 1.0), ("kV", d83["kappa_nearest"]))}
+    rip = d83["cases"]["steady"]["copper_w"] * ripple_share(d83)                 # inside the core term (25 C)
+    core = {f"{e}_{kn}": kv * d83["core"][e]["k1_eq1_w"] - rip for e in ("lo", "hi") for kn, kv in (("k1", 1.0), ("kV", d83["kappa_nearest"]))}
     lat = {k: d75[k]["w_20mm"] * kcu for k in ("429um", "86um")}
     e = d80["edges_w_per_module"]
     hot = sum(e["hot"]["edge_w"]) + sum(e["hot"]["rev_w"]) - sum(e["nom"]["edge_w"]) - sum(e["nom"]["rev_w"])
     return {"board": board, "temp_c": temp, "f_hz": f, "items_w": it, "core_w": core, "lateral_w": lat, "books": bk,
+            "copper_ripple_25c_w": rip, "core_note": "core_w = kappa x Eq. (1) at r_acx minus copper_ripple_25c_w",
             "loop_150pH_extra_w": ET.PKG["86um_150pH"]["loop"] - ET.PKG["429um_50pH"]["loop"],
             "gate_drive_zvs_low_sides_w": (4 * lb.N_H * lb.QG_TYP + 4 * lb.N_L * (lb.QG_TYP - lb.QGD)) * lb.VGS * f,
             "edges_hot_sensitivity_w": hot * (temp - 25.0) / 100.0}   # D80: nominal -> 125 C devices, linear in T
@@ -129,7 +160,7 @@ def efficiencies(L, p_out=250.0):
 
 def main():
     rep = reproduce()
-    res = {"reproduction": rep, "ledgers": {}}
+    res = {"reproduction": rep, "ledgers": {}, "d83_corrected": d83_corrected()}
     for board in ("N0", "N75", "S75"):
         for t in (25.0, T_HOT):
             L = ledger(board, rep, t)
@@ -154,6 +185,9 @@ def main():
               f"kV {e['hi_kV']['chip']:.2f}-{e['lo_kV']['chip']:.2f} / {e['hi_kV']['pkg_429um_50pH']:.2f}-{e['lo_kV']['pkg_429um_50pH']:.2f} %")
     for k, (a, b) in res["old_vs_new_n0_25c"].items():
         print(f"  {k:18s} {a:7.2f} -> {b:7.2f} W ({b - a:+.2f})")
+    for name, e in res["d83_corrected"].items():
+        print(f"D83 {name} corrected (ripple {e['copper_ripple_w']:.2f} W): no core {e['eff_no_core']:.2f}; k1 {e['hi_k1_eq1']:.2f}-"
+              f"{e['lo_k1_eq1']:.2f}; kV {e['hi_kV_eq1']:.2f}-{e['lo_kV_eq1']:.2f} %")
 
 
 if __name__ == "__main__":

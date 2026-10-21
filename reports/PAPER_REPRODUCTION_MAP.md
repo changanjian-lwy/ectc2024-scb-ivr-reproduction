@@ -29,7 +29,7 @@ vias and thermal are named future work).
 | 10 | Figs. 5-6 package (8 modules of 10 × 10 mm, 12 dies each) | geometry transcribed; a 250 W module's 20 dies (185 mm²) do not fit 10 × 10 mm → 10 × 20 mm (D75). The conclusion's "40 cm × 25 cm" is Fig. 6's 40 × 25 mm | ≠ |
 | + | controller, start-up, load / line transients | frozen RTL controller; zero start; ±62.5 A load step +15.3 / −11.9 mV (V0) | + |
 | + | current sharing ("the primary challenge", no method in P24) | one common on-time; sharing is an inductor-matching spec (±5 %, C14 / D66) | + |
-| + | losses and efficiency | (D85, item ledger with gate-level semiconductor books: 82.4 % / 71.9-74.0 % / 56.9-61.0 %; 85 °C 79.2 / 69.5-71.4 / 55.4-59.3 %) at 2.5 MHz, 25 °C, no package: 84.0 % before core loss, 73.2-75.3 % with it at kappa 1, 57.7-62.0 % at [10] Table V kappa (loss model on V0 waveforms; D83, which corrects D62, D72, D76; D75's package costs 0.3-2.8 points more) | + |
+| + | losses and efficiency | (D85, item ledger with gate-level semiconductor books: 82.4 % / 73.9-76.1 % / 58.2-62.5 %; 85 °C 79.2 / 71.4-73.4 / 56.6-60.7 %; corrected 2026-10-21, the inductor ripple at R_DC counted once) at 2.5 MHz, 25 °C, no package: 84.0 % before core loss, 75.2-77.5 % with it at kappa 1, 59.0-63.4 % at [10] Table V kappa (loss model on V0 waveforms; D83, which corrects D62, D72, D76; D75's package costs 0.3-2.8 points more) | + |
 | + | package parasitics, gate drive, thermal | loop ≤ 50 pH, 3.0 / 0.3 Ω ±20 % drive, driver interlock (V5, FINAL_SPEC_COVERAGE); thermal D73-D80 | + |
 | – | 6 / 8 / 16 phases, 10-100 MHz, the 8-module Fig. 5 system, 12 V → 1 V, mechanics / CTE / EMI | Table I recomputed only; four modules simulated | – |
 
