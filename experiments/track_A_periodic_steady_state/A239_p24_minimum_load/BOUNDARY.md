@@ -43,3 +43,10 @@ Cheaper check done first: the return time of a paused module is the load's disch
   (start-up and 125 C included), return time Co (V_pk - 1.01 V) / I; item 6b closes. The scorecard's T35 follows.
 - m3 misses: the formula is not stated; the measured times are.
 - m1 / m2 / m4 / m5 miss on a row: the condition excludes that row's case, traced first.
+
+## 5. Note added after the commit, before any result (2026-10-22)
+Lesson 8's threshold check was done late, on A230's records: at start-up the overshoot is brief and the module itself
+pulls it down (N0 into 0 %: 1.0534 V, 1.017 V 5 us later, then 1.0218 V paused), and N0 into 10 % hovers near 1.01 V
+with its last exit from 1 % 62.5 us after its maximum. So m5's 60 us sits on that reference, and the start-up's return
+is not the load's discharge from the peak. The criteria and predictions stay as registered; RESULTS will state m5
+against this.
