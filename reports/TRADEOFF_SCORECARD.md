@@ -401,7 +401,9 @@ four-module design (C13) and the package drive (A152). What is left rests on val
   **Superseded by D84 (2026-10-16), which reruns these cases with D83's inductor losses (61.8-71.4 W per module at κ 1,
   133.3-162.9 W at [10]'s κ):** the headline case reaches 184.5-206.8 °C at κ 1; 85 °C needs h ≥ 5·10⁴ and 1.5-2.7 %
   glass-1 fill (25 °C coolant) and ≥ 3.4 g/s per module; nothing tested meets it at [10]'s κ; the processor side binds
-  at κ 1 (≤ 53-77 °C).
+  at κ 1 (≤ 53-77 °C). **Rerun 2026-10-23 with the core counted once (D85; 52.4-62.0 / 123.9-153.6 W):** headline
+  162.8-185.1 °C at κ 1; 85 °C needs 2.6-7.1 % fill at h 2·10⁴ or 0.6-1.6 % at h ≥ 5·10⁴ (25 °C coolant) and 1.6-3.5 g/s;
+  still nothing at [10]'s κ; the processor side binds at κ 1 (≤ 67-82 °C).
 - **Coss spread and per-module driver delay** (C04 Section 3).
 - **Losses not modelled:** saturation (core loss: D76, bounded by κ 1-4), Coss hysteresis, AC resistance, driver quiescent power,
   output-capacitor ESR; Cs ESL.

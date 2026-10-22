@@ -2443,7 +2443,12 @@ each question:
          follow and rail 1 takes the rest of the ramp (5 A: 18.5-22.5 V;
          adopted S75 into 30 %: 17.4-18.7 V, 4.6-5.2 V off at 300 us).
          Item 6c, open.
-    140. D84's thermal rerun with the core term counted once (2026-10-23).
+    140. D84's thermal rerun with the core term counted once (2026-10-23;
+         D85's 9.38 W). Inductor heat 52.4-62.0 / 123.9-153.6 W. The
+         borderline cell flips: 19.6 % fill, kappa 1, 25 C coolant, h 2e4
+         74.3-81.5 C (was 81.3-88.6). Others stay: headline 162.8-185.1 C,
+         85 C needs 2.6-7.1 % fill at h 2e4 (25 C coolant), none at 45 C
+         or at [10]'s kappa; converter at 85 C 70-75 % / 56-62 %.
     141. A typical point of load (A240, registered): P24 Fig. 6's 1 kW
          accelerator as repeated constant-current steps, 250 <-> 25 A per
          module at 1250 A/us, 10 kHz-1 MHz; the plant gained cfg

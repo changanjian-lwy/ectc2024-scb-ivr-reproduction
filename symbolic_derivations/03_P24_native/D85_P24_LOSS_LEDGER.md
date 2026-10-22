@@ -130,10 +130,11 @@ L0) has no gate-level books (A235's S0 runs log no edges); one steady run with t
   75.2-77.5 / 59.0-63.4 %). At κ 1 the net core (25.1-34.8 W) and the inductor copper (27.3 W) are about equal; at
   [10]'s κ the core leads by far. Then switch conduction, then edges. D83's conclusion stands: the material decides.
 - D84's inductor heat (61.8-71.4 / 133.3-162.9 W) also held the 9.38 W twice. Most of its conclusions are far from
-  85 °C, but its 19.6 % fill case at κ 1 (81.3-88.6 °C at coolant 25 °C) sits on the threshold and may move below it.
-  Not rerun here.
+  85 °C, but its 19.6 % fill case at κ 1 (81.3-88.6 °C at coolant 25 °C) sat on the threshold. Rerun 2026-10-23 with the
+  core counted once (D84 updated): 52.4-62.0 / 123.9-153.6 W; that case is now 74.3-81.5 °C, under 85 °C; the other
+  verdicts stay, with lower fills and flows.
 - D84's die-layer heat used D80's dies (V5 edges). The books add ~4.5 W at the dies (conduction +2.5 W, low-side
-  edges + reverse +2.1 W). That is small against the inductor's 62-163 W; noted, not rerun.
+  edges + reverse +2.1 W). That is small against the inductor's 52-154 W; noted, not rerun.
 
 ## 7. Limits
 - One operating point (full load). The 85 °C column comes from the D73 laws, with edges and core held. S75 / N75 are
