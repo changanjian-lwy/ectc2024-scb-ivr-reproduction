@@ -18,6 +18,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+
+import numpy as np
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +33,9 @@ import scb_ivr.p24_loss_budget as lb  # noqa: E402
 DIAG = ROOT / "symbolic_derivations" / "03_P24_native" / "diagnostics"
 TA = ROOT / "experiments" / "track_A_periodic_steady_state"
 A124_REC = TA / "A124_p24_two_point_five_mhz" / "cosim" / "run_p125_n0.json"
+WAVE_RECS = {"A124 (V0-type: ideal switches)": (A124_REC, None),             # D83 / D85's waveforms
+             "V6 (A206 E_N0_steady_ls0p3)": (TA / "A206_p24_low_side_zvs_turn_on" / "cosim" / "run_E_N0_steady_ls0p3.json", None),
+             "V7 (A229 k_N0_b, before its 500 us step)": (TA / "A229_p24_kd_band" / "cosim" / "run_k_N0_b.json", 500e-6)}
 BOOKS = {"N0": ("A206_p24_low_side_zvs_turn_on", "a206_summary.json", ("runs", "E_N0_steady_ls0p3"), "run_E_N0_steady_ls0p3.json"),
          "N75": ("A211_p24_loss_against_load", "a211_summary.json", ("runs", "e_N75_25_100"), "run_e_N75_25_100.json"),
          "S75": ("A211_p24_loss_against_load", "a211_summary.json", ("runs", "e_S75_25_100"), "run_e_S75_25_100.json")}
@@ -73,6 +78,41 @@ def d83_corrected():
                 for pk, (cu_key, loop) in H.PKG.items():
                     e[f"{tag}_{kn}_eq1_{pk}"] = eff(p_out, st["p25_w"] + w + d75["lateral"][cu_key]["w_20mm"] + loop)
         out[name] = e
+    return out
+
+
+def inductor_waveforms():
+    """The inductor terms on each plant's own N0 full-load waveform (2026-10-22). DC per phase = the load current / 4
+    (fixed by the load; the triangle's (peak + valley) / 2 is not); ripple = peak - valley, the peak taken at the high-side
+    turn-off command (i_a) and, on the gate-level plants, at the edge's maximum (gate_offs i_max_a). Copper = D83's
+    array R x the mean square; core = D83's A124 value x sum(dI^2) / sum(dI_A124^2), i.e. r_acx held at A124's f and D.
+    With a core term the total holds the DC copper plus the core (the ripple's copper is inside the core, Section 3)."""
+    d83 = json.loads((DIAG / "D83_hbs1_units.json").read_text())["designs"]["2.5MHz"]
+    st = d83["cases"]["steady"]
+    r_ph = st["l_nh"] * 1e-9 * H.UNITS[st["unit"]][1] / H.UNITS[st["unit"]][0] * 1e6     # Ohm per phase
+    ref_di2 = sum(x * x for x in d83["di_pp_a"])
+    out = {}
+    for name, (path, t1) in WAVE_RECS.items():
+        r = json.loads(Path(path).read_text())
+        m = lb.measure(r, t1=t1)
+        secs = [q for q in r["sections"] if t1 is None or q["t_s"] < t1][-200:]
+        t0, te = secs[0]["t_s"], secs[-1]["t_s"]
+        idc = float(np.mean([q["vo"] for q in secs])) / 4e-3 / 4                      # 4 mOhm load, four phases
+        rows = {}
+        for how in ("command", "gate"):
+            di = []
+            for k, ph in enumerate(m["phases"]):
+                g = [e["i_max_a"] for e in r.get("gate_offs_last", []) if e["phase"] == k + 1 and t0 <= e["t_s"] <= te]
+                if how == "gate" and not g:
+                    break
+                di.append((float(np.mean(g)) if how == "gate" else ph["peak"]) - ph["valley"])
+            if len(di) < 4:
+                continue
+            di2 = sum(x * x for x in di)
+            rows[how] = {"di_pp_a": di, "copper_dc_w": 4 * idc ** 2 * r_ph, "copper_ripple_w": di2 / 12 * r_ph,
+                         "core_k1_w": {e: d83["core"][e]["k1_eq1_w"] * di2 / ref_di2 for e in ("lo", "hi")}}
+        out[name] = {"f_hz": 1.0 / m["period_s"], "i_dc_load_a": idc,
+                     "i_dc_triangle_a": [(p["peak"] + p["valley"]) / 2 for p in m["phases"]], "rows": rows}
     return out
 
 
@@ -160,7 +200,7 @@ def efficiencies(L, p_out=250.0):
 
 def main():
     rep = reproduce()
-    res = {"reproduction": rep, "ledgers": {}, "d83_corrected": d83_corrected()}
+    res = {"reproduction": rep, "ledgers": {}, "d83_corrected": d83_corrected(), "inductor_waveforms": inductor_waveforms()}
     for board in ("N0", "N75", "S75"):
         for t in (25.0, T_HOT):
             L = ledger(board, rep, t)
@@ -185,6 +225,18 @@ def main():
               f"kV {e['hi_kV']['chip']:.2f}-{e['lo_kV']['chip']:.2f} / {e['hi_kV']['pkg_429um_50pH']:.2f}-{e['lo_kV']['pkg_429um_50pH']:.2f} %")
     for k, (a, b) in res["old_vs_new_n0_25c"].items():
         print(f"  {k:18s} {a:7.2f} -> {b:7.2f} W ({b - a:+.2f})")
+    n0 = res["ledgers"]["N0_25C"]
+    rest = sum(n0["items_w"].values()) - n0["items_w"]["loop_damper_50pH"] - n0["items_w"]["inductor_copper"]
+    kv = json.loads((DIAG / "D83_hbs1_units.json").read_text())["designs"]["2.5MHz"]["kappa_nearest"]
+    for name, w in res["inductor_waveforms"].items():
+        for how, x in w["rows"].items():
+            e = {f"{kn}_{ed}": eff(250.0, rest + x["copper_dc_w"] + k * x["core_k1_w"][ed]) for kn, k in (("k1", 1.0), ("kV", kv)) for ed in ("lo", "hi")}
+            x["eff_chip_25c_pct"] = e
+            print(f"{name} [{how}]: I_dc {w['i_dc_load_a']:.2f} A (triangle {np.mean(w['i_dc_triangle_a']):.2f}), dI p-p "
+                  f"{np.mean(x['di_pp_a']):.1f} A; copper DC {x['copper_dc_w']:.2f} + ripple {x['copper_ripple_w']:.2f} W; core k1 "
+                  f"{x['core_k1_w']['lo']:.1f}-{x['core_k1_w']['hi']:.1f} W; chip 25 C k1 {e['k1_hi']:.2f}-{e['k1_lo']:.2f}, kV "
+                  f"{e['kV_hi']:.2f}-{e['kV_lo']:.2f} %")
+    (DIAG / "D85_loss_ledger.json").write_text(json.dumps(res, indent=1, default=float) + "\n")
     for name, e in res["d83_corrected"].items():
         print(f"D83 {name} corrected (ripple {e['copper_ripple_w']:.2f} W): no core {e['eff_no_core']:.2f}; k1 {e['hi_k1_eq1']:.2f}-"
               f"{e['lo_k1_eq1']:.2f}; kV {e['hi_kV_eq1']:.2f}-{e['lo_kV_eq1']:.2f} %")

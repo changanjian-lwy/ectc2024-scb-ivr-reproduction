@@ -142,3 +142,32 @@ L0) has no gate-level books (A235's S0 runs log no edges); one steady run with t
 - r_acx's content (Section 3, item 6): Fig. 8 does not name the winding behind its band. IND048 has the lowest
   R_DC / (3 L) of the six (0.125 mΩ/nH), so if Fig. 8's winding had a higher R_DC, the band still holds that difference,
   and the core term may still be slightly high for IND048. Not corrected.
+
+## 8. The inductor terms on each plant's own waveform (2026-10-22)
+
+Asked by the interview-prep session: the inductor rows above use A124's waveform (ideal switches). `inductor_waveforms`
+in the script recomputes them on the gate-level plants' N0 full-load records, with r_acx held at A124's f and D (the
+records run at 1.96-1.98 MHz), so only the waveform changes. DC per phase is the load's 62.5 A; the ripple is peak
+minus valley, the peak read at the high-side turn-off command or at the edge's maximum (the current keeps rising
+through a gate-driven turn-off).
+
+| record (N0, full load, 25 °C, chip) | ripple p-p | copper DC + ripple | core κ 1 | κ 1 | κ 3.074 |
+|---|---|---|---|---|---|
+| A124, ideal switches | 159.0 A | 17.38 + 9.38 W | 34.5-44.1 W | 74.0-76.2 % | 58.2-62.6 % |
+| V6 (A206 E_N0_steady_ls0p3), peak at the command | 153.5 A | 17.37 + 8.74 W | 32.1-41.1 W | 74.7-76.7 % | 59.5-63.7 % |
+| V6, peak at the edge's maximum | 161.9 A | 17.37 + 9.72 W | 35.7-45.7 W | 73.7-75.9 % | 57.6-62.0 % |
+| V7 (A229 k_N0_b before 500 us), command | 153.7 A | 17.37 + 8.76 W | 32.2-41.2 W | 74.7-76.7 % | 59.5-63.7 % |
+| V7, edge's maximum | 162.1 A | 17.37 + 9.74 W | 35.8-45.8 W | 73.7-75.9 % | 57.5-61.9 % |
+
+- **The waveform moves the result by −0.6 to +1.3 points; the headline 58-76 % holds.** The edge's maximum is the more
+  physical reading (the gate-level turn-off lets the current rise about 8 A after the command), so the gate-level
+  ripple is about 2 % larger than A124's and the core term about 4 % larger: −0.2 to −0.6 points against Section 4.
+- **D83's triangle DC is 1.6 % high.** (peak + valley) / 2 on A124 gives 63.5 A per phase against the load's 62.5 A, so
+  D83 / D85's DC copper is 0.57 W high (+0.1 point when corrected). Section 4 keeps D83's convention so that Section 1's
+  reproduction stays bit for bit.
+- **Not done: the inductor losses inside the closed loop.** In every plant version the inductor is ideal apart from V7's
+  damping resistor; with 52-154 W of inductor loss in the circuit the loop would raise Ton, and the ripple and the
+  input current would move. A cfg-only run is possible (series R per phase plus r_core sized to the κ 1 / κ 3.074
+  core), but a parallel resistor is a crude core model at κ 3.074 (0.3-0.4 Ω across 3 nH carries tens of amperes
+  during the on-time), so it is listed, not run.
+
