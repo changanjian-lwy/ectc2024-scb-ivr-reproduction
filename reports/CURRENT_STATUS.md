@@ -2413,6 +2413,14 @@ each question:
          core, 73.9-76.1 % at kappa 1, 58.2-62.5 % at [10]'s kappa, i.e.
          58-76 % (was 57-74 %); 85 C 79.2 / 71.4-73.4 / 56.6-60.7 %. D83's
          three designs move the same way; 2.5 MHz still leads or ties.
+    136. The other core materials (2026-10-22, D86; from Murali et al.,
+         ECTC 2022, never evaluated before). Per nH, HBS1 and Panasonic
+         XVSZ2-4 lose about the same at 2 MHz, D 0.075 (small signal
+         0.35-0.44, large signal 1.97-2.39 mOhm/nH). On the design point
+         XVSZ4 in Murali's IND 1 is best: 58.3 % on Murali's large-signal
+         data (HBS1 56.5 %), 79-80 % at kappa 1 for all four, mainly
+         through lower R_DC per nH (136 vs 376 uOhm/nH) at 6.8-9.2 cm2 per
+         phase. 80 % needs a 5-6 x lower large-signal loss.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

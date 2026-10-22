@@ -100,7 +100,9 @@ fewest-unit array for every winding (for example 5 MHz: IND047 1 × 36, at 555 �
   Section 7) does not survive real units, because copper decides it. The 2.5 MHz design keeps its other reasons (3 ×
   the 1 MHz valley margin, the frozen controller).
 - **The material is what fails.** [10] reaches the same conclusion for 12-1 V and asks for a new material (Sec. IX,
-  p. 2190: μr 45-65, κ 4).
+  p. 2190: μr 45-65, κ 4). D86 (2026-10-22) checks the group's other measured materials (Murali et al., ECTC 2022:
+  XVSZ2-4): per nH none is markedly better; XVSZ4 gains about 2 points over HBS1 on the same data, mostly through its
+  windings' lower R_DC per nH (Murali's windings: 136-201 µΩ/nH, against IND048's 376, at several times the area).
 
 ## 3. r_core of plant V7 with the embedded data
 

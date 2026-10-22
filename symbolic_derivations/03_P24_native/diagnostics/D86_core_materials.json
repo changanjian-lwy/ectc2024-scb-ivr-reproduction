@@ -1,0 +1,125 @@
+{
+ "conditions": "N0, 2.5 MHz design (1.98 MHz, D 0.075), A124's waveform, 25 C, chip; per 250 W module",
+ "rest_w": 26.245780660518665,
+ "w_per_mohm_per_nh": 74.19295513301404,
+ "materials": {
+  "HBS1": {
+   "winding": "IND2",
+   "l_unit_nh": 350.0,
+   "r_unit_mohm": 70.5,
+   "r_per_l_uohm_per_nh": 201.42857142857142,
+   "units_per_phase": 118,
+   "l_phase_nh": 2.9661016949152543,
+   "area_cm2_per_phase": 8.26,
+   "unit_dc_a": 0.5296610169491526,
+   "unit_peak_a": 1.2199811778966616,
+   "unit_half_pp_a": 0.6763745986962713,
+   "copper_dc_w": 9.335275423728813,
+   "racx_ss_075": 0.369,
+   "kappa_murali_015": 5.716663694191784,
+   "m_large_signal_075": 2.109448903156768,
+   "core_w": {
+    "kappa1": 27.37720044408218,
+    "murali_large_signal": 156.50624782729577
+   },
+   "eff_pct": {
+    "kappa1": 79.88285810806511,
+    "murali_large_signal": 56.549916224244754
+   },
+   "core_allowed_80pct_w": 26.918943915752525,
+   "m_allowed_80pct": 0.3628234495780888
+  },
+  "XVSZ2": {
+   "winding": "IND2",
+   "l_unit_nh": 350.0,
+   "r_unit_mohm": 70.5,
+   "r_per_l_uohm_per_nh": 201.42857142857142,
+   "units_per_phase": 118,
+   "l_phase_nh": 2.9661016949152543,
+   "area_cm2_per_phase": 8.26,
+   "unit_dc_a": 0.5296610169491526,
+   "unit_peak_a": 1.2199811778966616,
+   "unit_half_pp_a": 0.6763745986962713,
+   "copper_dc_w": 9.335275423728813,
+   "racx_ss_075": 0.348,
+   "kappa_murali_015": 6.865282233896273,
+   "m_large_signal_075": 2.3891182173959025,
+   "core_w": {
+    "kappa1": 25.819148386288884,
+    "murali_large_signal": 177.25574071072066
+   },
+   "eff_pct": {
+    "kappa1": 80.28254201857922,
+    "murali_large_signal": 54.01472003332254
+   },
+   "core_allowed_80pct_w": 26.918943915752525,
+   "m_allowed_80pct": 0.3628234495780888
+  },
+  "XVSZ3": {
+   "winding": "IND2",
+   "l_unit_nh": 391.0,
+   "r_unit_mohm": 70.5,
+   "r_per_l_uohm_per_nh": 180.306905370844,
+   "units_per_phase": 132,
+   "l_phase_nh": 2.962121212121212,
+   "area_cm2_per_phase": 9.24,
+   "unit_dc_a": 0.4734848484848485,
+   "unit_peak_a": 1.0905892347864097,
+   "unit_half_pp_a": 0.6046378988345454,
+   "copper_dc_w": 8.345170454545455,
+   "racx_ss_075": 0.427,
+   "kappa_murali_015": 5.023678929765885,
+   "m_large_signal_075": 2.1451109030100333,
+   "core_w": {
+    "kappa1": 31.680391841796993,
+    "murali_large_signal": 159.15211698236263
+   },
+   "eff_pct": {
+    "kappa1": 79.04604877024839,
+    "murali_large_signal": 56.338908249742126
+   },
+   "core_allowed_80pct_w": 27.909048884935885,
+   "m_allowed_80pct": 0.3761684493480574
+  },
+  "XVSZ4": {
+   "winding": "IND1",
+   "l_unit_nh": 367.0,
+   "r_unit_mohm": 49.8,
+   "r_per_l_uohm_per_nh": 135.69482288828337,
+   "units_per_phase": 124,
+   "l_phase_nh": 2.9596774193548385,
+   "area_cm2_per_phase": 6.7456000000000005,
+   "unit_dc_a": 0.5040322580645161,
+   "unit_peak_a": 1.160949830579081,
+   "unit_half_pp_a": 0.6436467955335484,
+   "copper_dc_w": 6.275201612903226,
+   "racx_ss_075": 0.436,
+   "kappa_murali_015": 4.5204359673024515,
+   "m_large_signal_075": 1.970910081743869,
+   "core_w": {
+    "kappa1": 32.34812843799412,
+    "murali_large_signal": 146.2276432660279
+   },
+   "eff_pct": {
+    "kappa1": 79.39807097468194,
+    "murali_large_signal": 58.30922482502446
+   },
+   "core_allowed_80pct_w": 29.979017726578114,
+   "m_allowed_80pct": 0.4040682524753376
+  }
+ },
+ "d83_ind048": {
+  "r_per_l_uohm_per_nh": 375.6177924217463,
+  "units_per_phase": 82,
+  "area_cm2_per_phase": {
+   "drawn": 1.241275,
+   "table_vi_cell": 4.15125
+  },
+  "copper_dc_w": 17.37804878048781,
+  "racx_10_band_075": [
+   0.4647363080186292,
+   0.5947175454132411
+  ],
+  "kappa_10": 3.074
+ }
+}
