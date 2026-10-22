@@ -11,6 +11,7 @@ import build_a58_results as B  # noqa: E402
 
 B.HERE = HERE
 B.OUT = HERE / "results.json"
+B.EXPERIMENT = "A59_nonlinear_coss_epc2067"
 
 if __name__ == "__main__":
     B.main()

@@ -12,8 +12,10 @@ curves), a139_summary.json, cosim/cfg_*.json (raw records: GitHub release record
 - **A minimum slew is not a spec for this design (both directions are non-monotone in slew):**
   - rising at L x 0.7, +4.8 V: 185.2 A at 1 us, 188.6 A at 5 us, **205.9 A at 20 us** (+5.6 V / 20 us 207.4 A) -
     slower is worse at low L, as D63 predicted in A138;
-  - falling at nominal L / Cs, -4.8 V: 173.5 A at 1 us, **192.2 A at 2.3 us**, 172.2 A at 5.1 us - the worst case is
-    at 2-4 us, between the two slews A130 tested (1 and 5 us);
+  - falling, -4.8 V: 173.5 A at 1 us and 172.2 A at 5.1 us at nominal L / Cs, **192.2 A at 2.26 us at L x 0.9, Cs x 1.05**
+    (A138's active point af032, a neighbour of the nominal cell; corrected 2026-10-21, it was written as nominal). The
+    nominal cell's GP upper bound peaks at 3.9 us (201.4 A), so the worst case still sits at 2-4 us, between the two
+    slews A130 tested (1 and 5 us);
   - nominal +8 V: the mean sits at 197-209 A at every slew 1-20 us (A130's 10 us: 198.3 A, marginal); with ~5 A
     scatter no slew is certified.
 - Certified table (mean + 1.645 sd <= 200 A from that slew up; '-' none <= 20 us), |dv| 4.8 / 6.4 / 8.0 V:

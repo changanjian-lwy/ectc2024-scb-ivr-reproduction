@@ -115,6 +115,12 @@ contract. No new simulation or controller change accompanies that audit.
    — P24 four-phase topology with each P25-derived supplement labelled.
 8. `03_P24_primary_P25_supplement/01_...md` through `29_...md` — the detailed
    derivation and numerical-audit sequence in chronological order.
+9. `03_P24_native/` — the P24-native four-phase model and everything built on it, D43 to D85 (41 notes; machine
+   outputs in `03_P24_native/diagnostics/`). It starts at
+   [`D43_P24_FOUR_PHASE_EXACT_EVENT_MAP.md`](03_P24_native/D43_P24_FOUR_PHASE_EXACT_EVENT_MAP.md), where the event
+   map and the circuit simulation were first checked against each other on P24's own four-phase module. Later notes
+   cover the event model used for design screening (D63), losses and efficiency (D62, D72, D76, D83, D85), the package
+   (D65, D68, D70, D75), thermal (D73, D74, D77, D78, D80, D84) and the inductor data (D83).
 
 ## Branch boundaries
 
@@ -166,6 +172,7 @@ all remain blocked at the same M5/i3 boundary, with no global infeasibility clai
 | Branch | Topology and timing source | Limitation |
 |---|---|---|
 | `01_P24_native` | P24 native structure and stated operations | Unreported states remain unknown |
+| `03_P24_native` | P24 four-phase event model (D43 onward), design, losses, package, thermal | Each note states its plant version and conditions |
 | `02_P25_native` | P25 native three-phase structure and six modes | Never presented as a P24 result |
 | `03_P24_primary_P25_supplement` | P24 four-phase structure; missing details explicitly supplemented from P25 | Four-phase extension is an assumption under test |
 

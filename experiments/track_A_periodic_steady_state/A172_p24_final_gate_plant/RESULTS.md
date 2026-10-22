@@ -1,5 +1,11 @@
 # A172 - the final gate-level plant: L x 0.7 re-trimmed and four modules (RESULTS)
 Boundary: 41e0b51. Records: release records-a172 (run_*.json, run log). Analysis: a172_analyze.py -> a172_summary.json.
+Provenance note (2026-10-22, found by the interview-prep session's audit of all 2,094 gated runs): run_m4_nom_l_p48_1us
+records git_commit 977a840 (17:43:41), 75 s before this boundary's commit 41e0b51 (17:44:56); it was launched from
+the working tree just before the commit. Between the two commits only this folder changed (BOUNDARY.md, the analysis,
+ORDER.txt, make_cfgs.py, two cfgs), src/ did not, cosim_sources_modified is False, and the run's cfg_sha256 (518489...)
+equals the cfg committed in 41e0b51. The criteria were written before any result (results commit fdbb4f1, about three
+hours later); the verdict is unaffected. The other 2,093 gated runs start from or after their boundary commit.
 
 ## 0. Verdict
 - **PASS, 2 of 2.** The package spec is A167's drive with gate-driven low sides and a threshold-form driver

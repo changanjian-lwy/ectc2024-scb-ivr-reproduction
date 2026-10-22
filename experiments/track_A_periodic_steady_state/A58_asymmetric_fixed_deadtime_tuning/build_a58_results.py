@@ -10,6 +10,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "results.json"
+EXPERIMENT = "A58_asymmetric_fixed_deadtime_tuning"   # A59's builder sets its own name
 MODELS = ("fig8_25C", "fig8_125C", "table_floor_1p2V")
 SCREEN_A = 250.0
 
@@ -95,7 +96,7 @@ def main():
     if OUT.exists() and "--replace" not in sys.argv:
         print("results.json exists; pass --replace to rebuild it")
     else:
-        OUT.write_text(json.dumps(dict(experiment="A58_asymmetric_fixed_deadtime_tuning",
+        OUT.write_text(json.dumps(dict(experiment=EXPERIMENT,
                                        classification="SENSITIVITY_ONLY", points=table, best=best,
                                        tuned_comparison=comparison, equal_fall_timing_error=tolerance), indent=1) + "\n")
     for design in ("zvs", "baseline"):
