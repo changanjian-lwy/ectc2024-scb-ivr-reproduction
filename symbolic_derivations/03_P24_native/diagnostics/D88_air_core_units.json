@@ -1,0 +1,572 @@
+{
+ "units": {
+  "FIVR package, Burton 2014 [17]": {
+   "l_nh": 1.2,
+   "r_dc_mohm": 7.0,
+   "rating_a": 8.0,
+   "q": null,
+   "f_q_hz": null,
+   "footprint_mm2": null,
+   "height_mm": null,
+   "source": "P24 Table 2: in-package air core, 8 A, 140 MHz (Haswell FIVR)"
+  },
+  "FIVR package, Lambert 2016 [11]": {
+   "l_nh": 2.5,
+   "r_dc_mohm": 40.7,
+   "rating_a": 5.0,
+   "q": null,
+   "f_q_hz": null,
+   "footprint_mm2": null,
+   "height_mm": null,
+   "source": "P24 Table 2: 3DL, 5 A, 140 MHz (40.7 mOhm repeats [13]'s; unverified)"
+  },
+  "InFO 3D, Chen 2016 [15]": {
+   "l_nh": 2.5,
+   "r_dc_mohm": 12.0,
+   "rating_a": 8.0,
+   "q": null,
+   "f_q_hz": null,
+   "footprint_mm2": null,
+   "height_mm": null,
+   "source": "P24 Table 2: TSMC InFO, 8 A, 90 MHz"
+  },
+  "InFO, Yu 2015 [16]": {
+   "l_nh": 1.2,
+   "r_dc_mohm": 7.1,
+   "rating_a": 0.6,
+   "q": null,
+   "f_q_hz": null,
+   "footprint_mm2": null,
+   "height_mm": null,
+   "source": "P24 Table 2: InFO substrate, 0.6 A, 140 MHz"
+  },
+  "PCB embedded, Dou 2018 [13]": {
+   "l_nh": 685.0,
+   "r_dc_mohm": 40.7,
+   "rating_a": 1.0,
+   "q": null,
+   "f_q_hz": null,
+   "footprint_mm2": null,
+   "height_mm": null,
+   "source": "P24 Table 2: PCB air, 1 A, 2 MHz (same numbers as its MPC-spiral row; unverified)"
+  },
+  "Coilcraft 1515SQ-47N": {
+   "l_nh": 47.0,
+   "r_dc_mohm": 6.35,
+   "rating_a": 4.9,
+   "q": 230.0,
+   "f_q_hz": 400000000.0,
+   "footprint_mm2": 14.44,
+   "height_mm": null,
+   "source": "Doc 720-1 (2021): Irms = 20 K rise"
+  },
+  "Coilcraft 2222SQ-111": {
+   "l_nh": 110.0,
+   "r_dc_mohm": 6.5,
+   "rating_a": 5.7,
+   "q": 140.0,
+   "f_q_hz": 50000000.0,
+   "footprint_mm2": 31.359999999999996,
+   "height_mm": null,
+   "source": "Doc 720-1 (2021): Irms = 20 K rise"
+  },
+  "Coilcraft 2929SQ-501": {
+   "l_nh": 500.0,
+   "r_dc_mohm": 16.5,
+   "rating_a": 4.3,
+   "q": 180.0,
+   "f_q_hz": 50000000.0,
+   "footprint_mm2": 54.2276,
+   "height_mm": null,
+   "source": "Doc 720-1 (2021): Irms = 20 K rise"
+  },
+  "Wurth WE-ACHC 7449152022": {
+   "l_nh": 22.0,
+   "r_dc_mohm": 0.55,
+   "rating_a": 40.0,
+   "q": 280.0,
+   "f_q_hz": 100000000.0,
+   "footprint_mm2": 138.0,
+   "height_mm": 6.6,
+   "source": "we-online.com: L at 1 MHz, Q min at 100 MHz, IR = 40 K rise"
+  },
+  "Wurth WE-ACHC 7449150023": {
+   "l_nh": 23.0,
+   "r_dc_mohm": 1.2,
+   "rating_a": 30.0,
+   "q": 191.0,
+   "f_q_hz": 100000000.0,
+   "footprint_mm2": 100.0,
+   "height_mm": 4.0,
+   "source": "as above, 1010 size"
+  },
+  "Wurth WE-ACHC 7449152066": {
+   "l_nh": 66.0,
+   "r_dc_mohm": 0.99,
+   "rating_a": 32.0,
+   "q": 245.0,
+   "f_q_hz": 100000000.0,
+   "footprint_mm2": 138.0,
+   "height_mm": 8.8,
+   "source": "as above"
+  },
+  "Wurth WE-ACHC 7449152090": {
+   "l_nh": 90.0,
+   "r_dc_mohm": 1.21,
+   "rating_a": 30.0,
+   "q": 226.0,
+   "f_q_hz": 100000000.0,
+   "footprint_mm2": 138.0,
+   "height_mm": null,
+   "source": "as above"
+  }
+ },
+ "designs": {
+  "2.5MHz": {
+   "design": {
+    "f_hz": 1979402.1571380498,
+    "duty": 0.07478428774937194,
+    "l_phase_nh": 2.93333332,
+    "di_pp_a": [
+     158.79854945792715,
+     158.86379159634512,
+     158.86339304464474,
+     159.62440529232
+    ]
+   },
+   "semis_w": [
+    26.245780660518665,
+    26.245780660518665
+   ],
+   "units": {
+    "FIVR package, Burton 2014 [17]": {
+     "s": 24,
+     "p": 10,
+     "units_per_phase": 240,
+     "l_phase_nh": 2.88,
+     "r_per_l_uohm_per_nh": 5833.333333333334,
+     "unit_rms_a": 7.76503652947658,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 262.50000000000006,
+     "copper_ac_w": 141.64109210338728,
+     "eff_pct": [
+      36.743801211865815,
+      36.743801211865815
+     ]
+    },
+    "FIVR package, Lambert 2016 [11]": {
+     "s": 19,
+     "p": 16,
+     "units_per_phase": 304,
+     "l_phase_nh": 2.96875,
+     "r_per_l_uohm_per_nh": 16280.0,
+     "unit_rms_a": 4.853147830922863,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 755.1757812500001,
+     "copper_ac_w": 407.4816090905856,
+     "eff_pct": [
+      17.374344920378807,
+      17.374344920378807
+     ]
+    },
+    "InFO 3D, Chen 2016 [15]": {
+     "s": 13,
+     "p": 11,
+     "units_per_phase": 143,
+     "l_phase_nh": 2.9545454545454546,
+     "r_per_l_uohm_per_nh": 4800.0,
+     "unit_rms_a": 7.0591241177059825,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 221.5909090909091,
+     "copper_ac_w": 119.56715567169057,
+     "eff_pct": [
+      40.49213522936034,
+      40.49213522936034
+     ]
+    },
+    "InFO, Yu 2015 [16]": {
+     "s": 312,
+     "p": 130,
+     "units_per_phase": 40560,
+     "l_phase_nh": 2.88,
+     "r_per_l_uohm_per_nh": 5916.666666666667,
+     "unit_rms_a": 0.5973105022674293,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 266.25,
+     "copper_ac_w": 143.66453627629284,
+     "eff_pct": [
+      36.434633981175345,
+      36.434633981175345
+     ]
+    },
+    "PCB embedded, Dou 2018 [13]": {
+     "s": 1,
+     "p": 234,
+     "units_per_phase": 234,
+     "l_phase_nh": 2.927350427350427,
+     "r_per_l_uohm_per_nh": 59.416058394160586,
+     "unit_rms_a": 0.3318391679263496,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 2.7176816239316244,
+     "copper_ac_w": 1.466420545535171,
+     "eff_pct": [
+      89.14884443736902,
+      89.14884443736902
+     ]
+    },
+    "Coilcraft 1515SQ-47N": {
+     "s": 1,
+     "p": 16,
+     "units_per_phase": 16,
+     "l_phase_nh": 2.9375,
+     "r_per_l_uohm_per_nh": 135.10638297872342,
+     "unit_rms_a": 4.853147830922863,
+     "r_ac_over_r_dc_at_f": 5.689487927847107,
+     "area_cm2_per_phase": 2.3104,
+     "height_mm": null,
+     "copper_dc_w": 6.201171875,
+     "copper_ac_w": 22.981111943868722,
+     "eff_pct": [
+      81.85233417437706,
+      81.85233417437706
+     ]
+    },
+    "Coilcraft 2222SQ-111": {
+     "s": 1,
+     "p": 38,
+     "units_per_phase": 38,
+     "l_phase_nh": 2.8947368421052633,
+     "r_per_l_uohm_per_nh": 59.09090909090909,
+     "unit_rms_a": 2.043430665651732,
+     "r_ac_over_r_dc_at_f": 7.555847482943011,
+     "area_cm2_per_phase": 11.916799999999999,
+     "height_mm": null,
+     "copper_dc_w": 2.672697368421053,
+     "copper_ac_w": 13.153976400458598,
+     "eff_pct": [
+      85.59519948172027,
+      85.59519948172027
+     ]
+    },
+    "Coilcraft 2929SQ-501": {
+     "s": 1,
+     "p": 170,
+     "units_per_phase": 170,
+     "l_phase_nh": 2.9411764705882355,
+     "r_per_l_uohm_per_nh": 33.0,
+     "unit_rms_a": 0.456766854675093,
+     "r_ac_over_r_dc_at_f": 10.523142346920935,
+     "area_cm2_per_phase": 92.18692000000001,
+     "height_mm": null,
+     "copper_dc_w": 1.5165441176470589,
+     "copper_ac_w": 10.395002146529968,
+     "eff_pct": [
+      86.758161823639,
+      86.758161823639
+     ]
+    },
+    "Wurth WE-ACHC 7449152022": {
+     "s": 2,
+     "p": 15,
+     "units_per_phase": 30,
+     "l_phase_nh": 2.933333333333333,
+     "r_per_l_uohm_per_nh": 25.0,
+     "unit_rms_a": 5.176691019651054,
+     "r_ac_over_r_dc_at_f": 12.628415073891638,
+     "area_cm2_per_phase": 41.4,
+     "height_mm": 6.6,
+     "copper_dc_w": 1.1458333333333333,
+     "copper_ac_w": 9.42528279116318,
+     "eff_pct": [
+      87.16362348323871,
+      87.16362348323871
+     ]
+    },
+    "Wurth WE-ACHC 7449150023": {
+     "s": 1,
+     "p": 8,
+     "units_per_phase": 8,
+     "l_phase_nh": 2.875,
+     "r_per_l_uohm_per_nh": 52.17391304347826,
+     "unit_rms_a": 9.706295661845726,
+     "r_ac_over_r_dc_at_f": 8.870745318047792,
+     "area_cm2_per_phase": 8.0,
+     "height_mm": 4.0,
+     "copper_dc_w": 2.34375,
+     "copper_ac_w": 13.542395252652952,
+     "eff_pct": [
+      85.57777422598645,
+      85.57777422598645
+     ]
+    },
+    "Wurth WE-ACHC 7449152066": {
+     "s": 2,
+     "p": 45,
+     "units_per_phase": 90,
+     "l_phase_nh": 2.933333333333333,
+     "r_per_l_uohm_per_nh": 15.0,
+     "unit_rms_a": 1.7255636732170179,
+     "r_ac_over_r_dc_at_f": 24.05412395026979,
+     "area_cm2_per_phase": 124.2,
+     "height_mm": 8.8,
+     "copper_dc_w": 0.6875,
+     "copper_ac_w": 10.77175176132935,
+     "eff_pct": [
+      86.89455234604205,
+      86.89455234604205
+     ]
+    },
+    "Wurth WE-ACHC 7449152090": {
+     "s": 1,
+     "p": 31,
+     "units_per_phase": 31,
+     "l_phase_nh": 2.903225806451613,
+     "r_per_l_uohm_per_nh": 13.444444444444445,
+     "unit_rms_a": 2.504850493379542,
+     "r_ac_over_r_dc_at_f": 29.09347435292816,
+     "area_cm2_per_phase": 42.78,
+     "height_mm": null,
+     "copper_dc_w": 0.6098790322580645,
+     "copper_ac_w": 11.557486099770594,
+     "eff_pct": [
+      86.68120841475877,
+      86.68120841475877
+     ]
+    }
+   }
+  },
+  "5MHz": {
+   "design": {
+    "f_hz": 3518319.5162310624,
+    "duty": 0.07028392971095959,
+    "l_phase_nh": 1.4666667,
+    "di_pp_a": [
+     176.91454248766522,
+     177.09915175146946,
+     177.09685754704032,
+     178.23483456896162
+    ]
+   },
+   "semis_w": [
+    30.187090928688903,
+    34.85305961432864
+   ],
+   "units": {
+    "FIVR package, Burton 2014 [17]": {
+     "s": 16,
+     "p": 13,
+     "units_per_phase": 208,
+     "l_phase_nh": 1.4769230769230768,
+     "r_per_l_uohm_per_nh": 5833.333333333334,
+     "unit_rms_a": 6.227232941318034,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 134.6153846153846,
+     "copper_ac_w": 90.3135070060874,
+     "eff_pct": [
+      49.493583382144024,
+      49.04057497405631
+     ]
+    },
+    "FIVR package, Lambert 2016 [11]": {
+     "s": 10,
+     "p": 17,
+     "units_per_phase": 170,
+     "l_phase_nh": 1.4705882352941178,
+     "r_per_l_uohm_per_nh": 16280.0,
+     "unit_rms_a": 4.762001661007908,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 374.0808823529413,
+     "copper_ac_w": 250.97099031996243,
+     "eff_pct": [
+      27.617017169184535,
+      27.475397827724027
+     ]
+    },
+    "InFO 3D, Chen 2016 [15]": {
+     "s": 7,
+     "p": 12,
+     "units_per_phase": 84,
+     "l_phase_nh": 1.4583333333333333,
+     "r_per_l_uohm_per_nh": 4800.0,
+     "unit_rms_a": 6.746169019761203,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 109.375,
+     "copper_ac_w": 73.379724442446,
+     "eff_pct": [
+      54.00246676778981,
+      53.46360957277098
+     ]
+    },
+    "InFO, Yu 2015 [16]": {
+     "s": 162,
+     "p": 135,
+     "units_per_phase": 21870,
+     "l_phase_nh": 1.44,
+     "r_per_l_uohm_per_nh": 5916.666666666667,
+     "unit_rms_a": 0.599659468423218,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 133.125,
+     "copper_ac_w": 89.31360746423428,
+     "eff_pct": [
+      49.738801816011545,
+      49.28131412836378
+     ]
+    },
+    "PCB embedded, Dou 2018 [13]": {
+     "s": 1,
+     "p": 467,
+     "units_per_phase": 467,
+     "l_phase_nh": 1.4668094218415417,
+     "r_per_l_uohm_per_nh": 59.416058394160586,
+     "unit_rms_a": 0.17334909686752556,
+     "r_ac_over_r_dc_at_f": null,
+     "area_cm2_per_phase": null,
+     "height_mm": null,
+     "copper_dc_w": 1.3617505353319062,
+     "copper_ac_w": 0.9135988940983644,
+     "eff_pct": [
+      88.50734266936101,
+      87.06905765005634
+     ]
+    },
+    "Coilcraft 1515SQ-47N": {
+     "s": 1,
+     "p": 32,
+     "units_per_phase": 32,
+     "l_phase_nh": 1.46875,
+     "r_per_l_uohm_per_nh": 135.10638297872342,
+     "unit_rms_a": 2.529813382410451,
+     "r_ac_over_r_dc_at_f": 7.585318119834186,
+     "area_cm2_per_phase": 4.6208,
+     "height_mm": null,
+     "copper_dc_w": 3.1005859375,
+     "copper_ac_w": 19.16940454546365,
+     "eff_pct": [
+      82.65635535236254,
+      81.40059820348993
+     ]
+    },
+    "Coilcraft 2222SQ-111": {
+     "s": 1,
+     "p": 75,
+     "units_per_phase": 75,
+     "l_phase_nh": 1.4666666666666666,
+     "r_per_l_uohm_per_nh": 59.09090909090909,
+     "unit_rms_a": 1.0793870431617925,
+     "r_ac_over_r_dc_at_f": 10.073579125205821,
+     "area_cm2_per_phase": 23.519999999999996,
+     "height_mm": null,
+     "copper_dc_w": 1.3541666666666667,
+     "copper_ac_w": 11.11851974609965,
+     "eff_pct": [
+      85.42342315401861,
+      84.08286310234895
+     ]
+    },
+    "Coilcraft 2929SQ-501": {
+     "s": 1,
+     "p": 341,
+     "units_per_phase": 341,
+     "l_phase_nh": 1.466275659824047,
+     "r_per_l_uohm_per_nh": 33.0,
+     "unit_rms_a": 0.23740184233763764,
+     "r_ac_over_r_dc_at_f": 14.02962504428726,
+     "area_cm2_per_phase": 184.916116,
+     "height_mm": null,
+     "copper_dc_w": 0.7560483870967742,
+     "copper_ac_w": 8.645432131731264,
+     "eff_pct": [
+      86.32937368707877,
+      84.96045630659412
+     ]
+    },
+    "Wurth WE-ACHC 7449152022": {
+     "s": 1,
+     "p": 15,
+     "units_per_phase": 15,
+     "l_phase_nh": 1.4666666666666666,
+     "r_per_l_uohm_per_nh": 25.0,
+     "unit_rms_a": 5.396935215808963,
+     "r_ac_over_r_dc_at_f": 16.836408987869035,
+     "area_cm2_per_phase": 20.7,
+     "height_mm": 6.6,
+     "copper_dc_w": 0.5729166666666666,
+     "copper_ac_w": 7.861980709223591,
+     "eff_pct": [
+      86.61848720139025,
+      85.24045875103472
+     ]
+    },
+    "Wurth WE-ACHC 7449150023": {
+     "s": 1,
+     "p": 16,
+     "units_per_phase": 16,
+     "l_phase_nh": 1.4375,
+     "r_per_l_uohm_per_nh": 52.17391304347826,
+     "unit_rms_a": 5.059626764820902,
+     "r_ac_over_r_dc_at_f": 11.826622369314638,
+     "area_cm2_per_phase": 16.0,
+     "height_mm": 4.0,
+     "copper_dc_w": 1.171875,
+     "copper_ac_w": 11.29621811802414,
+     "eff_pct": [
+      85.42476389555276,
+      84.08416209291673
+     ]
+    },
+    "Wurth WE-ACHC 7449152066": {
+     "s": 1,
+     "p": 45,
+     "units_per_phase": 45,
+     "l_phase_nh": 1.4666666666666666,
+     "r_per_l_uohm_per_nh": 15.0,
+     "unit_rms_a": 1.7989784052696542,
+     "r_ac_over_r_dc_at_f": 32.06935045308388,
+     "area_cm2_per_phase": 62.1,
+     "height_mm": 8.8,
+     "copper_dc_w": 0.34375,
+     "copper_ac_w": 8.985120810541247,
+     "eff_pct": [
+      86.35102482714835,
+      84.98142616677359
+     ]
+    },
+    "Wurth WE-ACHC 7449152090": {
+     "s": 1,
+     "p": 61,
+     "units_per_phase": 61,
+     "l_phase_nh": 1.4754098360655739,
+     "r_per_l_uohm_per_nh": 13.444444444444445,
+     "unit_rms_a": 1.3271152170022038,
+     "r_ac_over_r_dc_at_f": 38.787894618435956,
+     "area_cm2_per_phase": 84.18,
+     "height_mm": null,
+     "copper_dc_w": 0.3099385245901639,
+     "copper_ac_w": 9.79857268931102,
+     "eff_pct": [
+      86.11911381185949,
+      84.75680384330029
+     ]
+    }
+   }
+  }
+ }
+}

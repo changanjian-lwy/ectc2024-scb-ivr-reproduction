@@ -2428,6 +2428,12 @@ each question:
          gives 83.9 % at 2.5 MHz with the same L and controller, 82.9-84.2 %
          at 5 MHz in half the area (against 54-62 % with measured cores).
          Unbuilt; P24 gives no gap or copper; light-load damping to recheck.
+    138. Existing air-core inductors on the design (2026-10-22, D88). The
+         published package-embedded ones (Intel FIVR, TSMC InFO; 1.2-2.5
+         nH, 0.6-8 A, 4.8-16 mOhm/nH) give 17-54 %: worse than the cores.
+         Board-level catalogue coils (Wurth WE-ACHC, Coilcraft SQ; 13-135
+         uOhm/nH) give 82-87 % but need 8-185 cm2 per phase against P24's
+         0.25-0.63. No existing air-core unit fits the package.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

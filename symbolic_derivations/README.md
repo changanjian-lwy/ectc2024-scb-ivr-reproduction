@@ -115,12 +115,12 @@ contract. No new simulation or controller change accompanies that audit.
    — P24 four-phase topology with each P25-derived supplement labelled.
 8. `03_P24_primary_P25_supplement/01_...md` through `29_...md` — the detailed
    derivation and numerical-audit sequence in chronological order.
-9. `03_P24_native/` — the P24-native four-phase model and everything built on it, D43 to D87 (43 notes; machine
+9. `03_P24_native/` — the P24-native four-phase model and everything built on it, D43 to D88 (44 notes; machine
    outputs in `03_P24_native/diagnostics/`). It starts at
    [`D43_P24_FOUR_PHASE_EXACT_EVENT_MAP.md`](03_P24_native/D43_P24_FOUR_PHASE_EXACT_EVENT_MAP.md), where the event
    map and the circuit simulation were first checked against each other on P24's own four-phase module. Later notes
    cover the event model used for design screening (D63), losses and efficiency (D62, D72, D76, D83, D85), the package
-   (D65, D68, D70, D75), thermal (D73, D74, D77, D78, D80, D84) the inductor data (D83), the core materials (D86) and an air-core alternative (D87).
+   (D65, D68, D70, D75), thermal (D73, D74, D77, D78, D80, D84) the inductor data (D83), the core materials (D86) and the air-core alternative (D87 designed, D88 existing units).
 
 ## Branch boundaries
 
