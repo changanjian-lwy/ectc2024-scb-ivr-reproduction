@@ -6,7 +6,9 @@
 Inputs changed (2.5 MHz design A124 p125_n0, per 250 W module, 25 C values; diagnostics/D83_hbs1_units.json):
   inductor copper 27.33 W (IND048 2 x 41 per phase; D72 N29: 18.57 W), with D73's copper law (+0.393 %/K);
   core loss kappa x [10] Eq. (1) small-signal value at the embedded r_acx band edge lo / hi (34.48 / 44.12 W), kappa 1 or
-  [10] Table V's 3.074 (2 MHz), held constant in temperature (as D74 / D76 / D83). D76 had 7.47 W x kappa 1 / 4.
+  [10] Table V's 3.074 (2 MHz), less the ripple's R_DC share that the copper already carries (9.38 W at 25 C, D85
+  Section 3 item 6), held constant in temperature (as D74 / D76 / D83). D76 had 7.47 W x kappa 1 / 4.
+  (2026-10-22: the core term counted that 9.38 W twice before.)
 Unchanged: die map, gate, Cs, loop, lateral copper (D73 / D75), the stack (scb_ivr.p24_thermal.STACK: 10 x 20 mm module,
 phase columns 2.5 x 20 mm = 0.5 cm^2 per phase, glass 2 inductor body 300 um), h, coolers, coolant, processor-side
 scenarios, the 85 C threshold. The copper and the core are split equally over the four phase columns (coupled()).
@@ -49,12 +51,18 @@ CORES = {"k1_lo": (1.0, "lo"), "k1_hi": (1.0, "hi"), "kV_lo": (KAPPA_V, "lo"), "
 AREA_PHASE_CM2 = {"stack_column": 2.5e-3 * 20e-3 * 1e4, **D83["cases"]["steady"]["area_cm2_per_phase"]}
 T_LIMIT = 85.0
 _ORIG_SOURCES = S.sources
+RIP_25C = json.loads((DIAG / "D85_loss_ledger.json").read_text())["ledgers"]["N0_25C"]["copper_ripple_25c_w"]
+
+
+def core_w(kappa, edge):
+    """kappa x D83's Eq. (1) core at edge, less the ripple's R_DC share already in the copper (D85); 0 without a core."""
+    return kappa * CORE_D83[edge] - RIP_25C if kappa else 0.0
 
 
 def d83_sources(design="2.5MHz_N29", pkg="86um_150pH", scale=1.0, kappa=1.0, edge="hi"):
-    """D74's sources() with the inductor copper = D83's array and the core = kappa x D83's Eq. (1) value at edge."""
+    """D74's sources() with the inductor copper = D83's array and the core = core_w(kappa, edge)."""
     src, a_sw, a_cu = _ORIG_SOURCES(design, pkg, scale, 0.0)
-    return dict(src, inductor=scale * CU_D83, core=scale * kappa * CORE_D83[edge]), a_sw, a_cu
+    return dict(src, inductor=scale * CU_D83, core=scale * core_w(kappa, edge)), a_sw, a_cu
 
 
 TASKS = {"d74": S.run, "d74_refine": lambda j: S.refine(*j), "d77": C.run, "d78": P.run, "d80_stack": G.stack,
@@ -98,7 +106,7 @@ def lumped():
     cases = {"k0": (0.0, "hi"), **CORES}
     for cn, (kap, edge) in cases.items():
         for pk, pkg in pkgs.items():
-            c = lumped_case(l25, CU_D83, kap * CORE_D83[edge], pkg)
+            c = lumped_case(l25, CU_D83, core_w(kap, edge), pkg)
             l = c.pop("_l")
             # the fixed point at the R_th that held 85 C with the old losses (D76: kappa 1 for k0 / k1, kappa 4 for kV)
             old = out["old"][f"k{4 if cn.startswith('kV') else 1}_{pk}"]
@@ -143,7 +151,8 @@ def main():
     for c in edges:
         assert edges[c] == old80["inputs"]["edges_w_per_module"][c], c
     out = {"inputs": {"copper_w_25c": CU_D83, "copper_w_25c_d72_n29": None, "core_k1_eq1_w": CORE_D83,
-                      "kappa_table_v": KAPPA_V, "core_cases_w": {k: kap * CORE_D83[e] for k, (kap, e) in CORES.items()},
+                      "kappa_table_v": KAPPA_V, "core_cases_w": {k: core_w(kap, e) for k, (kap, e) in CORES.items()},
+                      "copper_ripple_25c_w": RIP_25C,
                       "d76_core_k1_w": D83["d76_core_w"]["k1"], "area_cm2_per_phase": AREA_PHASE_CM2,
                       "footprint_note": "all stack runs keep D74's 0.5 cm^2 phase column and one 300 um glass-2 body"},
            "lumped_d73": lumped()}
@@ -300,7 +309,8 @@ def main():
     # ------------------------------------------------------------ report
     L = out["lumped_d73"]
     print(f"copper {CU_D83:.2f} W (D72 N29 {out['inputs']['copper_w_25c_d72_n29']:.2f}); core k1 "
-          f"{CORE_D83['lo']:.2f}-{CORE_D83['hi']:.2f} W, kV {KAPPA_V * CORE_D83['lo']:.1f}-{KAPPA_V * CORE_D83['hi']:.1f} W")
+          f"{CORE_D83['lo']:.2f}-{CORE_D83['hi']:.2f} W less {RIP_25C:.2f} W: " + ", ".join(
+              f"{k} {v:.1f}" for k, v in out["inputs"]["core_cases_w"].items()) + " W")
     print(f"solver: {out['solver']['n_solves']} solves, max it {out['solver']['max_iterations']}, not converged "
           f"{len(nc)}, |energy| <= {out['solver']['max_abs_energy_rel']:.1e}; reproduction ok")
     for pk in ("converter", "429um_50pH", "86um_150pH"):
