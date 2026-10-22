@@ -2434,6 +2434,20 @@ each question:
          Board-level catalogue coils (Wurth WE-ACHC, Coilcraft SQ; 13-135
          uOhm/nH) give 82-87 % but need 8-185 cm2 per phase against P24's
          0.25-0.63. No existing air-core unit fits the package.
+    139. The minimum load checked (2026-10-23, A239, plant V7). After a
+         full-load release to 5 A (2 %) Vo returns within 1 % in Co
+         (V_pk - 1.01 V) / I on N0 / N75 at 25-125 C (within 0.2 us of the
+         record); item 6b closes for operation at >= 5 A per module
+         (valleys to -22.7 A on N75). Found: a start-up below full load
+         hands over inside the input ramp; the module pauses or cannot
+         follow and rail 1 takes the rest of the ramp (5 A: 18.5-22.5 V;
+         adopted S75 into 30 %: 17.4-18.7 V, 4.6-5.2 V off at 300 us).
+         Item 6c, open.
+    140. D84's thermal rerun with the core term counted once (2026-10-23).
+    141. A typical point of load (A240, registered): P24 Fig. 6's 1 kW
+         accelerator as repeated constant-current steps, 250 <-> 25 A per
+         module at 1250 A/us, 10 kHz-1 MHz; the plant gained cfg
+         load_pulse (off = bit for bit).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

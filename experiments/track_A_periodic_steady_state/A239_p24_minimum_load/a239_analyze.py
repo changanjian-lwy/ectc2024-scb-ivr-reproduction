@@ -61,7 +61,7 @@ def main():
                    and not v["overlaps"] and not v["shoot_on"])
         v["pred_back_us"] = 1e6 * CO * (v["v_pk"] - 1 - BAND) / (0.5 * (v["v_pk"] + 1 + BAND) / MC.R_MIN)
         c = {"m0": not v["sources_modified"], "m1": lim, "m2": all(abs(x - 1) <= BAND for x in v["vo_last"]),
-             "m5": v["back_from_pk_us"] is not None and v["back_from_pk_us"] <= M5_US}
+             "m5": bool(v["back_from_pk_us"] is not None and v["back_from_pk_us"] <= M5_US)}
         res["rows"][row] = {"m": v, "criteria": c}
     for row, (_, i_cc, _) in MC.RELEASE.items():
         f = COS / f"run_{row}.json"
@@ -73,8 +73,8 @@ def main():
         v["valleys"] = valleys(r)
         b, p = v["back_from_pk_us"], v["pred_back_us"]
         c = {"m0": not v["sources_modified"], "m1": v["limits"], "m2": v["vo_end_in"],
-             "m3": b is not None and abs(b - p) <= M3_REL * p + M3_ABS,
-             "m4": v["valleys"]["min_a"] is not None and VALLEY[0] <= v["valleys"]["min_a"] and v["valleys"]["max_a"] <= VALLEY[1]}
+             "m3": bool(b is not None and abs(b - p) <= M3_REL * p + M3_ABS),
+             "m4": bool(v["valleys"]["min_a"] is not None and VALLEY[0] <= v["valleys"]["min_a"] and v["valleys"]["max_a"] <= VALLEY[1])}
         res["rows"][row] = {"m": v, "criteria": c}
     res["criteria_main"] = {k: all(x["criteria"][k] for x in res["rows"].values() if k in x["criteria"])
                             for k in ("m0", "m1", "m2", "m3", "m4", "m5")}

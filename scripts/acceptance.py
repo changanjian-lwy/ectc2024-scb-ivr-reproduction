@@ -139,6 +139,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A236": (TA / "A236_p24_early_hold", "a236_analyze.py", "a236_summary.json"),
     "A237": (TA / "A237_p24_true_light_load", "a237_analyze.py", "a237_summary.json"),
     "A238": (TA / "A238_p24_sink_mode", "a238_analyze.py", "a238_summary.json"),
+    "A239": (TA / "A239_p24_minimum_load", "a239_analyze.py", "a239_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -728,6 +729,15 @@ EXCEPTIONS["A238"] = {("rows/s_c0_N75", "t1"): _A238t1, ("criteria_main", "t1"):
                       ("rows/s_u_N0_0", "t5"): _A238t5, ("criteria_main", "t5"): _A238t5,
                       ("criteria_main", "t7"): _A238t7, **{(f"rows/{r}", "t7"): _A238t7 for r in
                       ("s_c0_N0", "s_c0_N75", "s_c10_N0", "s_c10_N75", "s_cw5_N0", "s_cw5_N75")}}
+_A239m4 = ("the skipping valleys at 5 A on N75 (-22.6 / -22.7 A) and at 2.5 A on N0 (-21.0 A) leave the -20..-12 A band, "
+           "as A226's no-load -22.8 A on N0; Vo, peaks and the return time hold - stated with the 5 A minimum (RESULTS 0)")
+_A239m5 = ("not the return: Vo is first back within 1 % 15-30 us after the maximum; the 5 A skipping sawtooth peaks at "
+           "1.0100-1.0108 V and sets the last exit. The start-ups expose item 6c instead (the ladder after a handover "
+           "inside the input ramp, rail 1 to 22.5 V) - traced (RESULTS 0)")
+EXCEPTIONS["A239"] = {**{(f"rows/{r}", "m4"): _A239m4 for r in ("c2_N75", "c2_N75h", "c1_N0")},
+                      ("criteria_main", "m4"): _A239m4,
+                      **{(f"rows/{r}", "m5"): _A239m5 for r in ("u5_N75", "u5_N0h", "u5_N75h")},
+                      ("criteria_main", "m5"): _A239m5}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
