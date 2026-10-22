@@ -2421,6 +2421,13 @@ each question:
          data (HBS1 56.5 %), 79-80 % at kappa 1 for all four, mainly
          through lower R_DC per nH (136 vs 376 uOhm/nH) at 6.8-9.2 cm2 per
          phase. 80 % needs a 5-6 x lower large-signal loss.
+    137. An air-core inductor instead (2026-10-22, D87; extends D64). One
+         single-turn parallel plate per phase: the loss is set by the gap
+         h and the copper. 80 % needs h >= ~0.6 mm (300 um copper) or
+         0.75-0.8 mm (105 um) on the 2.5 or 5 MHz design; 1 mm / 300 um
+         gives 83.9 % at 2.5 MHz with the same L and controller, 82.9-84.2 %
+         at 5 MHz in half the area (against 54-62 % with measured cores).
+         Unbuilt; P24 gives no gap or copper; light-load damping to recheck.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
