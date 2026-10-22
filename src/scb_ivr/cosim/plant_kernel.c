@@ -230,6 +230,7 @@ typedef struct {
     int32_t xl_idx[4];                                /* A133: state index of each latch's current */
     double xl_thr[4];                                 /* A133: its threshold */
     double i_step2, t_step2;                          /* A216: a second load current step (0, inf without one) */
+    double pulse_t0, pulse_t1, pulse_lo, pulse_hi, pulse_T, pulse_th, pulse_tr;   /* A240: periodic load (t0 inf: none) */
 } run_t;
 
 static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
@@ -244,11 +245,22 @@ static double vin_at(const run_t *r, double t) {      /* CircuitParams.vin_at */
     return v;
 }
 
+static double pulse_at(const run_t *r, double t) {    /* CircuitParams.pulse_at (A240) */
+    if (t >= r->pulse_t1) return r->pulse_hi;
+    double tau = fmod(t - r->pulse_t0, r->pulse_T), d = r->pulse_hi - r->pulse_lo;
+    if (tau < r->pulse_th) return r->pulse_hi;
+    if (tau < r->pulse_th + r->pulse_tr) return r->pulse_hi - d * (tau - r->pulse_th) / r->pulse_tr;
+    if (tau < r->pulse_T - r->pulse_tr) return r->pulse_lo;
+    return r->pulse_lo + d * (tau - (r->pulse_T - r->pulse_tr)) / r->pulse_tr;
+}
+
 static double load_at(const run_t *r, double t) {     /* CircuitParams.load_at */
     double a = (r->load_cc && t >= r->t_load) ? r->i_load : 0.0;
     double b = (t >= r->t_step) ? r->i_step : 0.0;
     if (t >= r->t_step2) b += r->i_step2;             /* A216 */
-    return a + b;
+    b = a + b;
+    if (t >= r->pulse_t0) b += pulse_at(r, t);        /* A240 */
+    return b;
 }
 
 static void vds_all(const run_t *r, const double *y, double vin, double *vd) {  /* FastSim.vds_all */

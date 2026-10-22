@@ -4,6 +4,19 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-22 (A240) - a periodic load current (plant + bridge)
+
+**Source:** every load step so far was one or two instantaneous events; a processor
+load repeats its steps at a finite slew (P24 Fig. 6's 1 kW processor). CircuitParams
+pulse_t0 ... pulse_tr, CircuitParams.pulse_at and the C kernel's pulse_at: a trapezoid
+current added in load_at from pulse_t0 (high, down over pulse_tr, low, up over the
+period's last pulse_tr; pulse_hi from pulse_t1 on). Bridge cfg "load_pulse" {t_us,
+t_stop_us, i_lo_a, i_hi_a, f_khz, duty, slew_a_us}; with modules > 1 the currents and
+the slew are shared alike.
+**Gate:** load_pulse absent: pulse_t0 = inf, load_at's arithmetic as before
+(cosim_regression --quick and --full PASS on fresh outputs); test_cosim_plants: the
+Python and C plants step bit for bit alike through every part of the trapezoid.
+
 ## 2026-10-16 (A238) - a sink mode at the lower Ton limit (RTL + bridge)
 
 **Source:** A237: below the lower Ton limit a module pauses and cannot sink, so a

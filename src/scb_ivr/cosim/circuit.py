@@ -27,6 +27,9 @@ Circuit (N phases):
   () = g_on, every matrix as before.
 - optional core loss (r_core, A221): a resistor r_core across each phase's inductor (x_k to out), the parallel model of
   a magnetic core's loss (D76); it also damps an idle phase's ring. 0 = none, every matrix as before.
+- optional periodic load (pulse_t0 ... pulse_tr, A240): load_at adds a trapezoid current from pulse_t0 to pulse_t1
+  (pulse_hi after it); each period pulse_T holds pulse_hi for pulse_th, falls to pulse_lo over pulse_tr, holds
+  pulse_lo and rises back over the period's last pulse_tr. pulse_t0 = inf = none, load_at as before.
 
 Derived from A88's a88_transient.py (Params, topology, EPC2067Coss, fit_fig8, Sim), whose arithmetic it keeps line
 for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md).
@@ -34,6 +37,7 @@ for line; only the parameters the co-simulation uses are kept (see CHANGELOG.md)
 from __future__ import annotations
 
 import csv
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -124,6 +128,13 @@ class CircuitParams:
     t_step: float = float("inf")
     i_step2: float = 0.0         # A216: a second load current step, added to the first from t_step2 on
     t_step2: float = float("inf")
+    pulse_t0: float = float("inf")  # A240: periodic trapezoid load current from pulse_t0 (inf: none) to pulse_t1
+    pulse_t1: float = float("inf")  #   (pulse_hi after it); per period pulse_T: pulse_hi for pulse_th, down to
+    pulse_lo: float = 0.0           #   pulse_lo over pulse_tr, pulse_lo, up again over the period's last pulse_tr
+    pulse_hi: float = 0.0
+    pulse_T: float = 1.0
+    pulse_th: float = 0.0
+    pulse_tr: float = 0.0
     aux_phases: tuple = ()       # A101: phases (1-based) with an auxiliary branch: Lr and a bidirectional switch (BDS)
     aux_l: float = 0.0           #   from a capacitor node m_k (aux_c to ground) to x_k; aux_r = BDS + Lr resistance
     aux_r: float = 0.0
@@ -166,7 +177,23 @@ class CircuitParams:
 
     def load_at(self, t):
         a = self.i_load if (self.load_kind == "cc" and t >= self.t_load) else 0.0
-        return a + (self.i_step if t >= self.t_step else 0.0) + (self.i_step2 if t >= self.t_step2 else 0.0)   # A100, A216
+        b = a + (self.i_step if t >= self.t_step else 0.0) + (self.i_step2 if t >= self.t_step2 else 0.0)   # A100, A216
+        if t >= self.pulse_t0:                                                                         # A240
+            b += self.pulse_at(t)
+        return b
+
+    def pulse_at(self, t):
+        """A240's periodic load current at t >= pulse_t0 (the trapezoid; pulse_hi from pulse_t1 on)."""
+        if t >= self.pulse_t1:
+            return self.pulse_hi
+        tau, d = math.fmod(t - self.pulse_t0, self.pulse_T), self.pulse_hi - self.pulse_lo
+        if tau < self.pulse_th:
+            return self.pulse_hi
+        if tau < self.pulse_th + self.pulse_tr:
+            return self.pulse_hi - d * (tau - self.pulse_th) / self.pulse_tr
+        if tau < self.pulse_T - self.pulse_tr:
+            return self.pulse_lo
+        return self.pulse_lo + d * (tau - (self.pulse_T - self.pulse_tr)) / self.pulse_tr
 
 
 def topology(n, loop=()):

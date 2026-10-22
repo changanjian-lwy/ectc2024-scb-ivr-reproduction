@@ -706,6 +706,9 @@ class Monitors:
                     self.vmin[k] = v; self.t_vmin[k] = t
 
 
+PULSE = ("pulse_t0", "pulse_t1", "pulse_lo", "pulse_hi", "pulse_T", "pulse_th", "pulse_tr")   # A240, run_t's order
+
+
 class _Run(ctypes.Structure):
     _fields_ = [("n", ctypes.c_int), ("m", ctypes.c_int), ("N", ctypes.c_int), ("nv", ctypes.c_int)] + \
                [(nm, ctypes.c_void_p) for nm in ("y", "t", "rev_e", "rev_t", "vmax", "ipk", "vd", "gh", "gl", "diode",
@@ -721,7 +724,8 @@ class _Run(ctypes.Structure):
                [(nm, ctypes.c_double) for nm in ("vin_step", "t_vstep", "t_vslew")] + \
                [("n_xl", ctypes.c_int32), ("xl_hit", ctypes.c_int32), ("xl_idx", ctypes.c_int32 * 4),
                 ("xl_thr", ctypes.c_double * 4)] + \
-               [("i_step2", ctypes.c_double), ("t_step2", ctypes.c_double)]        # A101; A106; A133; A216
+               [("i_step2", ctypes.c_double), ("t_step2", ctypes.c_double)] + \
+               [(nm, ctypes.c_double) for nm in PULSE]                              # A101; A106; A133; A216; A240
 
 
 class KernelPlant2(KernelPlant):
@@ -758,6 +762,8 @@ class KernelPlant2(KernelPlant):
         r.i_load, r.t_load = float(p.i_load), float(p.t_load)
         r.i_step, r.t_step = float(p.i_step), float(p.t_step)
         r.i_step2, r.t_step2 = float(p.i_step2), float(p.t_step2)                                  # A216
+        for nm in PULSE:                                                                            # A240
+            setattr(r, nm, float(getattr(p, nm)))
         r.vin_step, r.t_vstep, r.t_vslew = float(p.vin_step), float(p.t_vstep), float(p.t_vslew)   # A106
         r.rev_drop, r.load_cc = int(bool(p.rev_drop)), int(p.load_kind == "cc")
         self._consts = dict(nsw=np.array(sim.nsw, dtype=float), dsel=np.asarray(sim.dsel, np.int32), ssel=np.asarray(sim.ssel, np.int32),

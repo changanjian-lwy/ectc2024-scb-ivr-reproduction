@@ -92,6 +92,9 @@ Load step (cfg "load_step" {"t_us", "i_a"}, A100): i_a drawn from the output fro
 "load_step2" (A216) the same, added to the first (a release and a later re-application in one run).
 "t_load_off_us" (A237): the resistive load (r_load) disconnects at that time, so the load steps alone remain: a
 release to a constant-current load (a true no load with no step), without r_load's 1 / r_load A/V.
+Periodic load (cfg "load_pulse" {"t_us", "t_stop_us", "i_lo_a", "i_hi_a", "f_khz", "duty", "slew_a_us"}, A240): from
+t_us a trapezoid current on top of the load, starting at i_hi_a: i_hi_a for duty of each period, down to i_lo_a and
+back up at slew_a_us (A/us); i_hi_a again from t_stop_us on. With t_load_off_us = t_us it is the whole load.
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -298,6 +301,14 @@ def make_params(cfg, ref):
         extra.update(i_step=float(cfg["load_step"]["i_a"]), t_step=float(cfg["load_step"]["t_us"]) * 1e-6)
     if cfg.get("load_step2"):                                         # A216: a second one, added to the first
         extra.update(i_step2=float(cfg["load_step2"]["i_a"]), t_step2=float(cfg["load_step2"]["t_us"]) * 1e-6)
+    if cfg.get("load_pulse"):                                         # A240: a periodic trapezoid load current
+        lp = cfg["load_pulse"]
+        lo, hi, per = float(lp["i_lo_a"]), float(lp["i_hi_a"]), 1e-3 / float(lp["f_khz"])
+        tr, th = (hi - lo) / (float(lp["slew_a_us"]) * 1e6), float(lp["duty"]) * per
+        if not (hi > lo and tr > 0.0 and th + 2 * tr <= per):
+            raise ValueError(f"cfg 'load_pulse': needs i_hi_a > i_lo_a and duty x period + 2 edges <= period: {lp}")
+        extra.update(pulse_t0=float(lp["t_us"]) * 1e-6, pulse_t1=float(lp["t_stop_us"]) * 1e-6, pulse_lo=lo,
+                     pulse_hi=hi, pulse_T=per, pulse_th=th, pulse_tr=tr)
     aux = cfg.get("aux")                                              # A101: auxiliary commutation branches
     if aux:
         r_bds = 2 * aux.get("rds_on_mohm", 1.3) * 1e-3 / aux["alpha"]
@@ -1050,6 +1061,9 @@ async def cosim_multi(dut, cfg_path, cfg, ref):
         cm["circuit"] = circ
         if cfg.get("load_step"):
             cm["load_step"] = dict(cfg["load_step"], i_a=float(cfg["load_step"]["i_a"]) / n_mod)
+        if cfg.get("load_pulse"):                                 # A240: shared alike
+            lp = cfg["load_pulse"]
+            cm["load_pulse"] = dict(lp, **{k: float(lp[k]) / n_mod for k in ("i_lo_a", "i_hi_a", "slew_a_us")})
         if m > 0:
             cm["vloop"] = 0
             if cm.get("driver"):                                  # each module its own jitter sequence

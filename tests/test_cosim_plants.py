@@ -144,6 +144,30 @@ class CosimPlantLineStep(CosimPlantEquivalence):
         self.assertAlmostEqual(self.p.vin_at(t0 + 20e-9), 43.2)
 
 
+class CosimPlantLoadPulse(CosimPlantEquivalence):
+    """A240: the same lockstep with a periodic load from 2 ns into the window (period 12 ns: 200 A for 3 ns, down to
+    20 A over 2 ns, up again over the period's last 2 ns), 200 A from 26 ns on: every part of the trapezoid is crossed."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        t0 = cls.s["t_s"] + 2e-9
+        cls.p = replace(cls.p, pulse_t0=t0, pulse_t1=t0 + 24e-9, pulse_lo=20.0, pulse_hi=200.0, pulse_T=12e-9,
+                        pulse_th=3e-9, pulse_tr=2e-9)
+
+    def test_the_trapezoid(self):
+        p, t0 = self.p, self.p.pulse_t0
+        base = p.load_at(t0 - 1e-12)
+        for dt, want in ((0.0, 200.0), (2.9e-9, 200.0), (4e-9, 110.0), (6e-9, 20.0), (9e-9, 20.0), (11e-9, 110.0),
+                         (12.5e-9, 200.0), (17e-9, 20.0), (30e-9, 200.0)):
+            self.assertAlmostEqual(p.load_at(t0 + dt) - base, want, places=6, msg=f"{dt}")
+
+    def test_absent_is_the_old_load(self):
+        p = params()
+        self.assertEqual(p.pulse_t0, float("inf"))
+        self.assertEqual(p.load_at(self.s["t_s"]), replace(p, i_step=0.0).load_at(self.s["t_s"]))
+
+
 class CosimPlantAuxEquivalence(unittest.TestCase):
     """A101: the same lockstep with an auxiliary branch on every phase (Lr 0.75 nH, Cm 1 uF at 9 V), whose switches
     follow the low sides and open at zero current; the C loop with the high side's minimum stopped at V_DS <= 0."""
