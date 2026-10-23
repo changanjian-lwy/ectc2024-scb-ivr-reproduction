@@ -140,6 +140,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A237": (TA / "A237_p24_true_light_load", "a237_analyze.py", "a237_summary.json"),
     "A238": (TA / "A238_p24_sink_mode", "a238_analyze.py", "a238_summary.json"),
     "A239": (TA / "A239_p24_minimum_load", "a239_analyze.py", "a239_summary.json"),
+    "A240": (TA / "A240_p24_accelerator_load", "a240_analyze.py", "a240_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -738,6 +739,21 @@ EXCEPTIONS["A239"] = {**{(f"rows/{r}", "m4"): _A239m4 for r in ("c2_N75", "c2_N7
                       ("criteria_main", "m4"): _A239m4,
                       **{(f"rows/{r}", "m5"): _A239m5 for r in ("u5_N75", "u5_N0h", "u5_N75h")},
                       ("criteria_main", "m5"): _A239m5}
+_A240q1 = ("the repeated load sets off A143's turn-on-delay swing on a slotted phase: valleys -92..-128 A, delay 1.0-7.3 "
+           "ns, then turn-on at +70..+112 A (N75 100 / 200 kHz 210.3 / 203.3 A, N75 / S75 1 MHz 237.5 / 221.9 A; V_DS, "
+           "overlaps and shoot-throughs pass) - traced, controller item 10 (RESULTS 0)")
+_A240q3 = ("our bound, no source: N0 at 30 / 60 kHz 0.941 / 0.937 V; after a short skip phase 1's timed edge is still "
+           "14 ns late, the floor holds its valley at -12 A and the period stretches 0.19 -> 0.37 us (10 kHz: -30 mV) - "
+           "stated as a limit (RESULTS 0)")
+_A240q4 = ("the same swing as q1; N0 at 60 / 100 kHz 196.5 / 195.7 A, under 200 A, against 161.5 A for one re-application "
+           "- traced, controller item 10 (RESULTS 0)")
+EXCEPTIONS["A240"] = {**{(f"rows/{r}", "q1"): _A240q1 for r in ("p_N75_100k", "p_N75_200k", "p_N75_1000k", "p_S75h_1000k")},
+                      ("criteria_main", "q1"): _A240q1,
+                      **{(f"rows/{r}", "q3"): _A240q3 for r in ("p_N0_30k", "p_N0_60k")},
+                      ("criteria_main", "q3"): _A240q3,
+                      **{(f"rows/{r}", "q4"): _A240q4 for r in ("p_N0_60k", "p_N0_100k", "p_N75_100k", "p_N75_200k",
+                                                                 "p_N75_1000k", "p_S75h_1000k")},
+                      ("criteria_main", "q4"): _A240q4}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

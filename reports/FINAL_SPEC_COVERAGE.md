@@ -291,6 +291,32 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   `A229_p24_kd_band/cosim/run_*_b.json`, release records-a229). **With a true constant-current load before the step (A237): N0 from 5 % 161.5 A, N75 from 5 % 171.1 A, S75 at 125 °C from 30 % 152.6 A; the load does not ease as Vo falls (N75 dip −30.2 against −23.5 mV), and N75's extra 11.5 A is the worst period of the same post-step swing (phase 2's turn-on delay 16 → 0-4 ns; figure `A237_p24_true_light_load/a237_light_load.png`, records `A237_p24_true_light_load/cosim/run_cw5_*.json`, release records-a237).** Margin of the derivative gain: S75 at 125 °C hands over
   at 178.9 / 187.0 / 276.6 A with kd 355 / 440 / 530 (A224). Not run with the damped loop: four modules, the device
   corners, L × 0.7 / 1.3, other temperatures for the re-applications.
+- **Repeated load steps: a 1 kW accelerator as the point of load (controller item 10, open; A240, 2026-10-23, plant V7,
+  final configuration, one module).**
+  - **Load and sources:** P24 Fig. 6 places the IVR under a 1 kW processor package, so one of the four modules carries
+    a quarter. That quarter is modelled as a constant current (the die as a current source: Smith, Sandler and
+    Bogatin), 250 <-> 25 A (S75 at 125 °C: 250 <-> 75 A), 1250 A/µs per module, 50 % duty, at 10 kHz-1 MHz. The
+    slew is from a US patent on AI/ML ASIC regulators (> 5000 A/µs for the system, no test conditions). The
+    frequencies are ours: no source gives an accelerator's repetition spectrum. The steps act at Co, with no package
+    or die capacitance.
+  - **Peaks break 200 A:**
+    - N75: 210.3 / 203.3 A at 100 / 200 kHz.
+    - N75 and S75 at 1 MHz: 237.5 / 221.9 A.
+    - N0 stays under 200 A, at 196.5 / 195.7 A at 60 / 100 kHz, against 161.5 A for one re-application.
+  - **Mechanism:** each is A143's turn-on-delay swing, set off by every release. A slotted phase runs valleys of
+    −72..−128 A, its turn-on delay falls to 1.0-7.7 ns, and it then turns on at +70..+112 A.
+  - **Vo:** never above 1.05 V. On N0 it dips to 0.941 / 0.937 V at 30 / 60 kHz (−40.7 mV for one re-application;
+    0.95 V is our bound, no source). After a short skip, phase 1's timed low-side edge is still 14 ns late. The
+    floor then holds its valley at −12 A and the current builds over 37 instead of 63 turn-ons in 3 µs.
+  - **Late fires at 10 kHz:** a 50 µs light half moves that edge onto the light-load crossing, and each
+    re-application then costs 118-190 late fires and about 30 µs of hard turn-ons on N0 (one re-application: 0). This
+    is T33's learner trade-off; no limit is touched.
+  - **Limits held:** V_DS ≤ 33.7 V, rail 1 ≤ 12.79 V, every row back within 1 %.
+  - **Coverage:** under 200 A for one module are N0 at every frequency (up to 196.5 A), N75 at 10-60 kHz and S75 at
+    10-200 kHz. Not covered: N75 at 100 kHz-1 MHz and S75 at 1 MHz. N0 also falls below our 0.95 V at 30-60 kHz.
+  - **Not run:** four modules, 85 °C, the package's capacitance, line steps at the same time.
+  - **Evidence:** figure `A240_p24_accelerator_load/a240_accelerator_load.png`, record
+    `A240_p24_accelerator_load/cosim/run_p_N75_100k.json`, release records-a240.
 - **The plant against a second simulator (A205, 2026-10-13).** LTspice with EPC's model on all 20 switches, started
   from the plant's state and given the plant's gate commands for two periods (23 replays, nominal devices, 25 °C,
   one module: mode S, settled, and +4.8 V / 1 µs on N0 and N75). It reproduces the plant's largest peaks within

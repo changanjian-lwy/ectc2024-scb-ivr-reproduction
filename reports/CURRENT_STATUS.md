@@ -2449,10 +2449,15 @@ each question:
          74.3-81.5 C (was 81.3-88.6). Others stay: headline 162.8-185.1 C,
          85 C needs 2.6-7.1 % fill at h 2e4 (25 C coolant), none at 45 C
          or at [10]'s kappa; converter at 85 C 70-75 % / 56-62 %.
-    141. A typical point of load (A240, registered): P24 Fig. 6's 1 kW
-         accelerator as repeated constant-current steps, 250 <-> 25 A per
-         module at 1250 A/us, 10 kHz-1 MHz; the plant gained cfg
-         load_pulse (off = bit for bit).
+    141. A typical point of load (A240, 2026-10-23, plant V7, one module):
+         P24 Fig. 6's 1 kW accelerator as repeated constant-current steps,
+         250 <-> 25 A per module at 1250 A/us, 10 kHz-1 MHz; the plant
+         gained cfg load_pulse (off = bit for bit). Peaks break 200 A on
+         N75 at 100 / 200 kHz (210.3 / 203.3 A) and at 1 MHz (N75 237.5,
+         S75 221.9 A): A143's turn-on-delay swing, set off by every release.
+         N0 dips to 0.937 V at 60 kHz (phase 1's edge after a short skip).
+         Vo never above 1.05 V. Accepted 99 pass / 15 documented; item 10
+         (repeated load steps) opens, scorecard T37.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
