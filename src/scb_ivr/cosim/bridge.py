@@ -39,6 +39,7 @@ Controller-side analog functions modelled here:
   early / flat / valley time after the actual low-side turn-off (m_valid, m_early, m_flat, m_tv) and the error of
   the actual edge against the valley (m_err); with "early_hold_a" (A236) also m_pos, the current at that low-side
   turn-off above this value (a comparator sampled there; the RTL then holds dt_pred on an early report with it);
+  "dt_fall_ns" (A241, RTL cfg_dt_fall; absent or 0 = no limit) caps how far one report lowers dt_pred;
 - the zero-crossing TDC of the timed low side ("low_pred", mode P): at each low-side turn-on, early or the crossing
   time after the actual high-side turn-off (ml_valid, ml_early, ml_tv) and the edge's error against the crossing
   (ml_err);
@@ -432,6 +433,7 @@ class ModuleSim:
         c.set("cfg_err_low", int(cfg.get("err_low", 0)))               # A92
         c.set("cfg_err_high", int(cfg.get("err_high", 0)))
         c.set("cfg_early_hold", int(self.early_hold is not None))     # A236
+        c.set("cfg_dt_fall", to_lsb(cfg.get("dt_fall_ns", 0.0) * 1e-9))   # A241: dt_pred's largest fall per report
         c.set("cfg_el_tgt", to_lsb(cfg.get("el_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_eh_tgt", to_lsb(cfg.get("eh_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_err_shift", int(cfg.get("err_shift", 0)))

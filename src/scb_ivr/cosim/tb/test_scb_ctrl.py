@@ -28,6 +28,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             kp=0,                                                                # A104
             kd=0, kd_db=2, kd_hold=0, kd_band=0,                                 # A224, A227, A229
             early_hold=0,                                                        # A236
+            dt_fall=0,                                                           # A241
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -101,6 +102,7 @@ class Ctrl:
         d.cfg_kd.value = cfg["kd"]; d.cfg_kd_db.value = cfg["kd_db"]; d.cfg_kd_hold.value = cfg["kd_hold"]   # A224, A227
         d.cfg_kd_band.value = cfg["kd_band"]                     # A229
         d.cfg_early_hold.value = cfg["early_hold"]               # A236
+        d.cfg_dt_fall.value = cfg["dt_fall"]                     # A241
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -823,6 +825,31 @@ async def err_high_update(dut):
     assert await _report_high(c, dut, 0, flat=1, err=50, tv=10) == 75
     assert await _report_high(c, dut, 0, early=1) == 77
     assert await _report_high(c, dut, 0, err=0, tv=10) == 79
+
+
+@cocotb.test()
+async def err_high_fall_limit(dut):
+    """A241: cfg_dt_fall 4, target 3, gain 1/2, dt_pred 85: late error 23 (-> 75) is held to 85 - 4 = 81; error 5
+    (-> 80) is inside the limit; error 15 (-> 74) is held to 76; early still steps (+2 -> 78); a rise is not limited
+    (error 0 -> 80); phase 2 at 80 with error 400 (-> 0) is held to 76."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, dt_fall=4)
+    assert await _report_high(c, dut, 0, err=23, tv=10) == 81
+    assert await _report_high(c, dut, 0, err=5, tv=10) == 80
+    assert await _report_high(c, dut, 0, err=15, tv=10) == 76
+    assert await _report_high(c, dut, 0, early=1) == 78
+    assert await _report_high(c, dut, 0, err=0, tv=10) == 80
+    assert await _report_high(c, dut, 1, err=400, tv=10) == 76
+
+
+@cocotb.test()
+async def tv_fall_limit(dut):
+    """A241: without err_high the valley time m_tv is the new value, lowered by at most cfg_dt_fall (4): dt_pred 85,
+    m_tv 10 -> 81; m_tv 90 -> 90 (a rise is not limited)."""
+    c = Ctrl(dut)
+    await c.start(dt_fall=4)
+    assert await _report_high(c, dut, 0, tv=10) == 81
+    assert await _report_high(c, dut, 0, tv=90) == 90
 
 
 @cocotb.test()

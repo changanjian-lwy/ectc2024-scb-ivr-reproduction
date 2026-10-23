@@ -4,6 +4,16 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-23 (A241) - a fall limit on the turn-on delay (RTL + bridge)
+
+**Source:** A240 (item 10): every load re-application drives a slotted phase's dt_pred to 0-4 ns, and it climbs
+back at one dt_step per early report (25-30 us); a repeated load meets it there and the swing builds (A143's open
+candidate). scb_phase cfg_dt_fall (TW bits; scb_ctrl passes it to every phase; scb_multi regenerated): a report that
+is neither early nor flat sets dt_pred to at least dt_pred - cfg_dt_fall (floor 0), on the error-based and the m_tv
+path alike; rises are not limited. Bridge cfg "dt_fall_ns" (absent or 0 = no limit).
+**Gate:** cfg_dt_fall 0 leaves the update unchanged: unit tests 119 / 119 (two new: err_high_fall_limit,
+tv_fall_limit), cosim_regression --quick and --full PASS on fresh outputs.
+
 ## 2026-10-22 (A240) - a periodic load current (plant + bridge)
 
 **Source:** every load step so far was one or two instantaneous events; a processor
