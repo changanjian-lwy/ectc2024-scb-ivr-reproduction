@@ -64,7 +64,8 @@
 //   with cfg_err_high base - ((m_err - cfg_eh_tgt) >>> cfg_err_shift) clamped to [0, cfg_dt_max], base = dt_pred,
 //   or cfg_rs_high after a restart turn-on; A236: with cfg_early_hold an early report with m_pos (the current at the
 //   low-side turn-off had not reversed, so a longer wait cannot complete the swing) leaves dt_pred; A241: with
-//   cfg_dt_fall, a report that is neither early nor flat lowers dt_pred by at most cfg_dt_fall (0: no limit);
+//   cfg_dt_fall, a report that is neither early nor flat lowers dt_pred by at most cfg_dt_fall (0: no limit); A242:
+//   with cfg_late_hold a late report with m_pos leaves dt_pred (no reversal, so its dip is the edge's ring, not a swing);
 // - dtl (cfg_low_pred): early -> + cfg_dtl_step; otherwise the measured crossing time ml_tv, or with cfg_err_low
 //   dtl - ((ml_err - cfg_el_tgt) >>> cfg_err_shift); both clamped to [0, cfg_dtl_max];
 // - trim: +1 / -1 per current-decided low-side turn-off from the residual-current sign (cfg_trim).
@@ -105,6 +106,7 @@ module scb_phase #(
     input  wire                 m_pos,         // A236: the current at the low-side turn-off had not reversed
     input  wire                 cfg_early_hold,// A236: an early report with m_pos leaves dt_pred
     input  wire [TW-1:0]        cfg_dt_fall,   // A241: a report lowers dt_pred by at most this (0: no limit)
+    input  wire                 cfg_late_hold, // A242: a late report with m_pos leaves dt_pred
     input  wire [TW-1:0]        m_tv,
     input  wire                 r_valid,
     input  wire                 r_below,
@@ -343,7 +345,7 @@ module scb_phase #(
                 if (m_early) begin
                     if (!(cfg_early_hold && m_pos))                  // A236
                         dt_pred <= (dt_next > cfg_dt_max) ? cfg_dt_max : dt_next;
-                end else if (!m_flat)
+                end else if (!m_flat && !(cfg_late_hold && m_pos))    // A242
                     dt_pred <= dt_lim;                                 // A92 error-based when set; A241 fall limit
             end
             if (ml_valid && cfg_low_pred) begin                  // A89: zero-crossing correction

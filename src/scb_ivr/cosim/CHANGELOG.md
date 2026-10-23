@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-23 (A242) - hold the turn-on delay on a late report without reversal (RTL + bridge)
+
+**Source:** A241's records: 54 % of dt_pred's falls over 0.5 ns on A240's and A237's re-application rows (63 % of
+the total fall) come from reports whose low-side turn-off current had not reversed. The node cannot swing there; the
+dip the valley monitor finds is the edge's ring, read as a late valley. scb_phase cfg_late_hold (scb_ctrl passes it;
+scb_multi regenerated): a late report with m_pos leaves dt_pred; early reports as before (A236's cfg_early_hold
+unchanged). Bridge cfg "late_hold_a" sets A236's m_pos comparator (threshold in A; with "early_hold_a" also set the
+two must be equal) and cfg_late_hold; turn-on records carry "lo_pos" whenever the comparator is set.
+**Gate:** late_hold_a absent: cfg_late_hold 0 and m_pos as before; unit tests 121 / 121 (two new: err_high_late_hold,
+err_high_late_hold_off), cosim_regression --quick and --full PASS on fresh outputs.
+
 ## 2026-10-23 (A241) - a fall limit on the turn-on delay (RTL + bridge)
 
 **Source:** A240 (item 10): every load re-application drives a slotted phase's dt_pred to 0-4 ns, and it climbs

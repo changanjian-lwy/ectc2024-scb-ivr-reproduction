@@ -29,6 +29,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             kd=0, kd_db=2, kd_hold=0, kd_band=0,                                 # A224, A227, A229
             early_hold=0,                                                        # A236
             dt_fall=0,                                                           # A241
+            late_hold=0,                                                         # A242
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -103,6 +104,7 @@ class Ctrl:
         d.cfg_kd_band.value = cfg["kd_band"]                     # A229
         d.cfg_early_hold.value = cfg["early_hold"]               # A236
         d.cfg_dt_fall.value = cfg["dt_fall"]                     # A241
+        d.cfg_late_hold.value = cfg["late_hold"]                 # A242
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -782,11 +784,11 @@ async def _report_low(c, dut, k, early=0, err=0, tv=0):
     return field(dut.dtl.value, k, TW)
 
 
-async def _report_high(c, dut, k, early=0, flat=0, err=0, tv=0):
-    await c.set(m_valid=1 << k, m_early=early << k, m_flat=flat << k,
+async def _report_high(c, dut, k, early=0, flat=0, err=0, tv=0, pos=0):
+    await c.set(m_valid=1 << k, m_early=early << k, m_flat=flat << k, m_pos=pos << k,
                 m_err=pack([err if q == k else 0 for q in range(N)], TW),
                 m_tv=pack([tv if q == k else 0 for q in range(N)], TW))
-    await c.set(m_valid=0, m_early=0, m_flat=0)
+    await c.set(m_valid=0, m_early=0, m_flat=0, m_pos=0)
     await ReadOnly()
     return field(dut.dt_pred.value, k, TW)
 
@@ -840,6 +842,25 @@ async def err_high_fall_limit(dut):
     assert await _report_high(c, dut, 0, early=1) == 78
     assert await _report_high(c, dut, 0, err=0, tv=10) == 80
     assert await _report_high(c, dut, 1, err=400, tv=10) == 76
+
+
+@cocotb.test()
+async def err_high_late_hold(dut):
+    """A242: with late_hold, a late report with m_pos leaves dt_pred (85, error 23); without m_pos it updates
+    (85 - 10 = 75); an early report with m_pos still steps (+2 -> 77) unless early_hold is also set."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, late_hold=1)
+    assert await _report_high(c, dut, 0, err=23, tv=10, pos=1) == 85
+    assert await _report_high(c, dut, 0, err=23, tv=10) == 75
+    assert await _report_high(c, dut, 0, early=1, pos=1) == 77
+
+
+@cocotb.test()
+async def err_high_late_hold_off(dut):
+    """A242: without late_hold, m_pos on a late report is ignored: 85, error 23 -> 75."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1)
+    assert await _report_high(c, dut, 0, err=23, tv=10, pos=1) == 75
 
 
 @cocotb.test()

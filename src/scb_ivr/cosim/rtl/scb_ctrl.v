@@ -22,7 +22,8 @@
 // - Comparators (current, low/high V_DS = 0, valley) pass a 2-flip-flop synchroniser; measurement reports
 //   (m_*, ml_*, r_*, a_*) arrive as one-cycle pulses. A236: m_pos with each valley report (the current at the
 //   low-side turn-off had not reversed); with cfg_early_hold an early report with it leaves that phase's dt_pred.
-//   A241: cfg_dt_fall goes to every phase (a report lowers dt_pred by at most that much; 0: no limit).
+//   A241: cfg_dt_fall goes to every phase (a report lowers dt_pred by at most that much; 0: no limit). A242: with
+//   cfg_late_hold a late valley report with m_pos also leaves that phase's dt_pred.
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
 //   SLAVE = 1, phase 1 is a slotted phase like phases 2..N, its low-side turn-off at ext_slot once per reference
 //   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off,
@@ -105,6 +106,7 @@ module scb_ctrl #(
     input  wire                cfg_kd_hold,    // A227: ... and not while the PI output is at the lower Ton limit
     input  wire                cfg_early_hold, // A236: an early valley report with m_pos leaves dt_pred
     input  wire [TW-1:0]       cfg_dt_fall,    // A241: a valley report lowers dt_pred by at most this (0: no limit)
+    input  wire                cfg_late_hold,  // A242: a late valley report with m_pos leaves dt_pred
     input  wire [TW-1:0]       cfg_kd_band,    // A229: ... or within this many Ton LSB above it (0: at the limit)
     input  wire                cfg_ext_ton,    // C2: in mode P, Ton = ext_ton (the master's, broadcast)
     input  wire [TW-1:0]       ext_ton,        // C2
@@ -441,7 +443,7 @@ module scb_ctrl #(
                 .c_i(cmp_s[k]), .c_zl(cmp_s[N + k]), .c_zh(cmp_s[2 * N + k]), .c_valley(cmp_s[3 * N + k]),
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .m_pos(m_pos[k]), .cfg_early_hold(cfg_early_hold),                              // A236
-                .cfg_dt_fall(cfg_dt_fall),                                                       // A241
+                .cfg_dt_fall(cfg_dt_fall), .cfg_late_hold(cfg_late_hold),                        // A241, A242
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
                 .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_valid[k] : 1'b0),
                 .a_tlo((k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_tlo[k * TW +: TW] : a_tlo),      // A133, A220
