@@ -25,10 +25,13 @@ a240_figure.py -> a240_accelerator_load.png. Plant V7, final configuration, one 
   - At 30 kHz the edge is still 13.9-14.0 ns late, as in A237's cw5_N0. Phase 1 turns on at -12 A every period, the
     period stretches from 0.19 to 0.37 us, and there are 37 turn-ons in 3 us (records `run_p_N0_10k.json` and
     `run_p_N0_30k.json` at 500 us).
-- **The 10 kHz edge costs late fires** (figure, lower right): 118-190 per re-application on N0 (cw5_N0: 0), 62-134 on
-  N75 (cw5_N75: 53) and 152-159 on S75 (c30_S75h: 162).
-  - They fall in the first 20-40 % of the high half, while phase 1 reports early with +1..+77 A for about 30 us and
-    relearns at most 2 ns per decision (T33). On N0 at 406-407 us phases 1 and 2 turn on at +17..+51 A.
+- **Late fires at 10 kHz** (figure, lower right): 118-190 per re-application on N0 (cw5_N0: 0), 62-134 on N75
+  (cw5_N75: 53) and 152-159 on S75 (c30_S75h: 162).
+  - They fall in the first 20-40 % of the high half. On N0 at 406-407 us phases 1 and 2 turn on at +17..+51 A.
+  - **Corrected 2026-10-23 (A241):** they are phases 2-4's late fires. The record's counters give phase 1 none (N0 at
+    10 kHz: 0 / 266 / 90 / 140). A241's limit on how fast dt_pred falls removes them (N0 496 -> 11, N75 325 -> 7). So
+    they belong to the collapsed turn-on delay, not to phase 1's learner (T33), as this bullet first said; phase 1's
+    early reports at +1..+77 A for about 30 us happen at the same time.
   - No limit is touched: peaks <= 166.1 A, V_DS <= 30.9 V.
   - On S75, 30 kHz also gives 160 per re-application. From 60 kHz up they spread into the low halves.
 
