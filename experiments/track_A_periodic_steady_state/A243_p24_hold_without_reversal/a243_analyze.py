@@ -1,7 +1,8 @@
 """A243 analysis (BOUNDARY Section 2), A241's measures on arm b: stage 1 = A240's rows against A240's records
 (a240_analyze.one), stage 2 = A236's rows and A237's re-applications against their references (a236_analyze.row and
 its criteria); each row's shortest predictive turn-on delay per phase after the event and the reports the holds kept
-(turn-ons with lo_pos, late and early). g0: no change under src/ since A242's code commit, and A242's g0.
+(turn-ons with lo_pos, late and early). g0: no change under src/ since A242's code commit, and A242's g0. The
+control's c1 per row (a243_control.py -> a243_control.json, BOUNDARY Section 5) is folded in when present.
   python3 a243_analyze.py -> a243_summary.json"""
 from __future__ import annotations
 
@@ -97,6 +98,11 @@ def main():
             have = [x["criteria"][k] for x in done if k in x["criteria"]]
             main_c[k] = all(have) if have else None
         res[f"{st}_complete"] = len(done) == len(res[st])
+    ctl = HERE / "a243_control.json"
+    if ctl.exists():
+        c = json.loads(ctl.read_text())
+        res["control"] = {r: {"criteria": {"c1": x["c1"]}} for r, x in c.items() if isinstance(x, dict)}
+        main_c["c1"] = c["all_scatter"]
     res["criteria_main"] = main_c
     (HERE / "a243_summary.json").write_text(json.dumps(res, indent=1, default=float) + "\n")
     for row, x in res["stage1"].items():

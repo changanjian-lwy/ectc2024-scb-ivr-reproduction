@@ -141,6 +141,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A238": (TA / "A238_p24_sink_mode", "a238_analyze.py", "a238_summary.json"),
     "A239": (TA / "A239_p24_minimum_load", "a239_analyze.py", "a239_summary.json"),
     "A240": (TA / "A240_p24_accelerator_load", "a240_analyze.py", "a240_summary.json"),
+    "A241": (TA / "A241_p24_dt_pred_fall_limit", "a241_analyze.py", "a241_summary.json"),
+    "A242": (TA / "A242_p24_late_report_hold", "a242_analyze.py", "a242_summary.json"),
+    "A243": (TA / "A243_p24_hold_without_reversal", "a243_analyze.py", "a243_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -399,6 +402,11 @@ NOT_ROWS["A231"] = r".*"                          # judged through its criteria_
 NOT_ROWS["A233"] = r".*"                          # judged per row and arm in its rows / criteria_main blocks
 NOT_ROWS["A235"] = r"t_"                          # stage-1 start-ups: the summary's trims block
 NOT_ROWS["A236"] = r"o_"                          # the identity row: the summary's identity block (e0)
+NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243")})   # judged through ADAPT (stage 1 / stage 2 rows)
+STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
+    "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
+             "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
+}
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
 EXCEPTIONS["A163"] = {
@@ -754,6 +762,36 @@ EXCEPTIONS["A240"] = {**{(f"rows/{r}", "q1"): _A240q1 for r in ("p_N75_100k", "p
                       **{(f"rows/{r}", "q4"): _A240q4 for r in ("p_N0_60k", "p_N0_100k", "p_N75_100k", "p_N75_200k",
                                                                  "p_N75_1000k", "p_S75h_1000k")},
                       ("criteria_main", "q4"): _A240q4}
+_MHZ = ("1 MHz: the load (about two switching periods) beats against the slots on the ladder (phase 4's rail to "
+        "16.3 V), not the delay; excepted by the rule (BOUNDARY 4)")
+_A241 = "not adopted: the fall limit ratchets the delay up where the valley stays positive (RESULTS 0)"
+_A241g4 = "not adopted: S75 60 / 100 kHz dips 5.3 / 5.0 mV deeper, the loop's Ton lower when the load returns (RESULTS 0)"
+EXCEPTIONS["A241"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
+                      ("criteria_main", "g1"): _MHZ, ("criteria_main", "g2"): _MHZ,
+                      **{("criteria", f"stage1/{r}/g4"): _A241g4 for r in ("p_S75h_60k", "p_S75h_100k")},
+                      ("criteria_main", "g4"): _A241g4,
+                      **{("criteria", f"stage2/{r}"): _A241 for r in ("f_N75_k0/g6", "f_N75_k2/g6", "a_S75h_d2/g5",
+                                                                       "a_S75h_d2/g6", "a_S75h_d20/g5", "a_S75h_d20/g6", "cw5_N75/g6")},
+                      ("criteria_main", "g5"): _A241, ("criteria_main", "g6"): _A241}
+_A242 = ("not adopted: holding only late reports leaves item 3's climb unopposed (f_N75_k2 173.7 A, K3 + NEW); item 2 "
+         "and release rows part from the reference at the handover (RESULTS 0)")
+EXCEPTIONS["A242"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
+                      ("criteria_main", "g1"): _MHZ, ("criteria_main", "g2"): _MHZ,
+                      **{("criteria", f"stage2/{r}"): _A242 for r in ("f_N75_k0/g6", "f_N75_k2/g6", "f_N75_k4/g6",
+                         "a_S75h_d2/g5", "a_S75h_d2/g6", "a_S75h_d20/g5", "a_S75h_d20/g6", "a_S75_d20/g6", "u_N0/g6",
+                         "w5_N0/g6", "w20_N0/g6")},
+                      ("criteria_main", "g5"): _A242, ("criteria_main", "g6"): _A242}
+_A243 = ("not adopted: the holds at the handover leave C1 0.2-0.5 V lower, so item 2's step 20 us later meets rail 1 "
+         "+0.3 V (213.4 / 205.8 / 212.3 against 207.8 / 203.8 / 207.1 A at three positions), and the release rows' NEW "
+         "counts follow the state carried from the handover (RESULTS 0); A244 delays the holds")
+_A243s = "step-position scatter: the control's c1 passes on this row (RESULTS 0, a243_control.json)"
+EXCEPTIONS["A243"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
+                      ("criteria_main", "g1"): _MHZ, ("criteria_main", "g2"): _MHZ,
+                      **{("criteria", f"stage2/{r}/g6"): _A243s for r in ("f_N75_k0", "r_F0_lm48", "r_F0_lm80", "a_S75_d20")},
+                      **{("criteria", f"stage2/{r}"): _A243 for r in ("a_S75h_d20/g5", "a_S75h_d20/g6", "u_N0/g6",
+                                                                       "w5_N0/g6", "w20_N0/g6")},
+                      **{("criteria", f"control/{r}/c1"): _A243 for r in ("a_S75h_d20", "u_N0", "w5_N0", "w20_N0")},
+                      ("criteria_main", "g5"): _A243, ("criteria_main", "g6"): _A243, ("criteria_main", "c1"): _A243}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -763,6 +801,8 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A152": lambda d: {"S50": d["points"]["50"], "S100": d["points"]["100"], "6_300pH": d["c6"]},
     "A225": lambda d: {g: {n: {k: r[k] for k in ("f2", "f5", "f6") if k in r} for n, r in d[g].items()} for g in ("a", "u", "s")},
     "A227": lambda d: {"w": {n: v["criteria"] for n, v in d["w"].items()}},
+    **{e: (lambda d: {g: {n: v["criteria"] for n, v in d[g].items() if v} for g in ("stage1", "stage2", "control") if g in d})
+       for e in ("A241", "A242", "A243")},
     "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
                        "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
@@ -828,7 +868,11 @@ def check(name, reanalyse):
         run = folder / "cosim" / json.loads(cfg.read_text())["out"]
         runs.append(run.stem[4:])
         if not run.exists():
-            out["MISSING"].append(f"run {run.name}")
+            st = STOPPED.get(name)
+            if st and re.match(st[0], run.stem[4:]):
+                out["DOCUMENTED"].append(f"run {run.name} not run - {st[1]}")
+            else:
+                out["MISSING"].append(f"run {run.name}")
     if reanalyse:
         r = subprocess.run([sys.executable, str(folder / script)], cwd=PROJECT, capture_output=True, text=True)
         if r.returncode:

@@ -16202,6 +16202,48 @@
  },
  "stage1_complete": true,
  "stage2_complete": true,
+ "control": {
+  "f_N75": {
+   "criteria": {
+    "c1": true
+   }
+  },
+  "r_F0_lm48": {
+   "criteria": {
+    "c1": true
+   }
+  },
+  "r_F0_lm80": {
+   "criteria": {
+    "c1": true
+   }
+  },
+  "a_S75h_d20": {
+   "criteria": {
+    "c1": false
+   }
+  },
+  "a_S75_d20": {
+   "criteria": {
+    "c1": true
+   }
+  },
+  "u_N0": {
+   "criteria": {
+    "c1": false
+   }
+  },
+  "w5_N0": {
+   "criteria": {
+    "c1": false
+   }
+  },
+  "w20_N0": {
+   "criteria": {
+    "c1": false
+   }
+  }
+ },
  "criteria_main": {
   "g0": true,
   "g1": false,
@@ -16210,6 +16252,7 @@
   "g4": true,
   "g5": false,
   "g6": false,
-  "g7": true
+  "g7": true,
+  "c1": false
  }
 }
