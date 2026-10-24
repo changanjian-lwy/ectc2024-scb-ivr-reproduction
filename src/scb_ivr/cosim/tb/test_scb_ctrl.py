@@ -30,6 +30,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             early_hold=0,                                                        # A236
             dt_fall=0,                                                           # A241
             late_hold=0,                                                         # A242
+            hold_wait=0,                                                         # A244
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -105,6 +106,7 @@ class Ctrl:
         d.cfg_early_hold.value = cfg["early_hold"]               # A236
         d.cfg_dt_fall.value = cfg["dt_fall"]                     # A241
         d.cfg_late_hold.value = cfg["late_hold"]                 # A242
+        d.cfg_hold_wait.value = cfg["hold_wait"]                 # A244
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -861,6 +863,46 @@ async def err_high_late_hold_off(dut):
     c = Ctrl(dut)
     await c.start(err_high=1, eh_tgt=3, err_shift=1)
     assert await _report_high(c, dut, 0, err=23, tv=10, pos=1) == 75
+
+
+async def _after_on(c, dut, prev=None):
+    """Phase 1's next high-side turn-on after prev, then two clocks."""
+    e = await c.until("H", 1, 1, after=-1 if prev is None else prev[0] + prev[1])
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    return e
+
+
+@cocotb.test()
+async def hold_wait_counts_phase1_turn_ons(dut):
+    """A244: with hold_wait 2 both holds act only from phase 1's second turn-on in mode P. Before it a late report
+    with m_pos on phase 2 updates (80 - 10 = 70); after it a late and an early report with m_pos leave 70, and a late
+    report without m_pos still updates (60)."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1, hold_wait=2)
+    assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 70
+    e = await _after_on(c, dut)
+    assert int(dut.hold_n.value) == 1
+    await _after_on(c, dut, e)
+    assert int(dut.hold_n.value) == 2
+    assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 70
+    assert await _report_high(c, dut, 1, early=1, pos=1) == 70
+    assert await _report_high(c, dut, 1, err=23, tv=10) == 60
+
+
+@cocotb.test()
+async def hold_wait_starts_at_mode_p(dut):
+    """A244: phase 1's turn-ons in mode S are not counted; the count starts after the handover turn-on."""
+    c = Ctrl(dut)
+    await c.start(start_s=1, late_hold=1, hold_wait=1)
+    e = await _after_on(c, dut)
+    assert int(dut.mode_p.value) == 0 and int(dut.hold_n.value) == 0
+    await c.set(hand_req=1)
+    e = await _after_on(c, dut, e)
+    assert int(dut.mode_p.value) == 1 and int(dut.hold_n.value) == 0
+    await _after_on(c, dut, e)
+    assert int(dut.hold_n.value) == 1
 
 
 @cocotb.test()

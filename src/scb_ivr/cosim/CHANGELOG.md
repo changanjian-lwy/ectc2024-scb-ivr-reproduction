@@ -4,6 +4,17 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-24 (A244) - the holds wait after the handover (RTL + bridge)
+
+**Source:** A243: with A236's and A242's holds both on, every row's holds before its disturbance act only 0.07-2.58 us
+after mode P's entry, and there they only move the ladder (C1 0.2-0.5 V lower; an item-2 step 20 us later +2..+5.6 A).
+scb_ctrl cfg_hold_wait (8 bits; scb_multi regenerated): a counter of phase 1's turn-ons in mode P (cleared outside
+it, saturating at cfg_hold_wait) gates cfg_early_hold and cfg_late_hold to the phases. Bridge cfg "hold_wait" (0-255,
+absent = 0).
+**Gate:** hold_wait absent: cfg_hold_wait 0 and the gate always open, so A243's arm b is unchanged; unit tests
+123 / 123 (two new: hold_wait_counts_phase1_turn_ons, hold_wait_starts_at_mode_p), cosim_regression --quick and
+--full PASS on fresh outputs.
+
 ## 2026-10-23 (A242) - hold the turn-on delay on a late report without reversal (RTL + bridge)
 
 **Source:** A241's records: 54 % of dt_pred's falls over 0.5 ns on A240's and A237's re-application rows (63 % of

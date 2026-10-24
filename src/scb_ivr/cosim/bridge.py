@@ -40,7 +40,8 @@ Controller-side analog functions modelled here:
   the actual edge against the valley (m_err); with "early_hold_a" (A236) also m_pos, the current at that low-side
   turn-off above this value (a comparator sampled there; the RTL then holds dt_pred on an early report with it);
   "late_hold_a" (A242, RTL cfg_late_hold) sets the same comparator and holds dt_pred on a late report with m_pos
-  (with both keys set they must be equal);
+  (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
+  act only from that many phase-1 turn-ons after mode P's entry;
   "dt_fall_ns" (A241, RTL cfg_dt_fall; absent or 0 = no limit) caps how far one report lowers dt_pred;
 - the zero-crossing TDC of the timed low side ("low_pred", mode P): at each low-side turn-on, early or the crossing
   time after the actual high-side turn-off (ml_valid, ml_early, ml_tv) and the edge's error against the crossing
@@ -361,6 +362,9 @@ class ModuleSim:
         if self.early_hold is not None and self.late_hold is not None and self.early_hold != self.late_hold:
             raise ValueError("early_hold_a and late_hold_a set one comparator: they must be equal")
         self.pos_a = self.early_hold if self.early_hold is not None else self.late_hold   # m_pos threshold, None = off
+        self.hold_wait = int(cfg.get("hold_wait", 0))                # A244
+        if not 0 <= self.hold_wait <= 255:
+            raise ValueError("hold_wait is an 8-bit count of phase-1 turn-ons")
         off = cfg.get("t_load_off_us")                               # A237: the resistive load disconnects
         self.t_load_off = None if off is None else float(off) * 1e-6
         t_clk = cfg["t_clk_ns"] * 1e-9
@@ -440,6 +444,7 @@ class ModuleSim:
         c.set("cfg_err_high", int(cfg.get("err_high", 0)))
         c.set("cfg_early_hold", int(self.early_hold is not None))     # A236
         c.set("cfg_late_hold", int(self.late_hold is not None))       # A242
+        c.set("cfg_hold_wait", self.hold_wait)                        # A244
         c.set("cfg_dt_fall", to_lsb(cfg.get("dt_fall_ns", 0.0) * 1e-9))   # A241: dt_pred's largest fall per report
         c.set("cfg_el_tgt", to_lsb(cfg.get("el_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_eh_tgt", to_lsb(cfg.get("eh_tgt_ps", 0.0) * 1e-12))
