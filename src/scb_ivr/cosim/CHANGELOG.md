@@ -4,6 +4,24 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-25 (A245) - a turn-on delay that keeps finding the swing finished is lowered (RTL + bridge)
+
+**Source:** A245's pilot of the Ton trims below (S75 at 125 C into 30 %, records in release records-a245): the trims
+move the low rail back, but the low rail's phase holds a long delay until the rail is nearly back, then drops it in a
+few periods, and the trims left over swing the ladder the other way (Vo +-1 %). In every unbalanced start-up record
+(A230 S75 / S75h at 30 %, A239 at 5 A) the low rail's phase turns on with V_DS <= 0 at the command on 69-946
+consecutive reports (the node had finished its swing and the switch conducts in reverse); in A244's rows phases
+2-4 do so at most 6 times in a row and phase 1 at most 35 (47 records, learned reports). Its valley report is then on target: the minimum of a node
+that creeps towards the reverse-conduction voltage is always the last sample. TI's Predictive Gate Drive (SLUA281,
+2003) and Sun et al. (Microelectronics 54(4), 2024, GaN) shorten the delay while reverse conduction is detected.
+scb_phase m_rev / cfg_rev_n and a per-phase count of m_rev reports in a row (8 bits, saturating): from the
+cfg_rev_n-th such report, each lowers dt_pred by cfg_dt_step (floor 0), before the early / flat / late rules; any
+other report restarts the count. scb_ctrl passes m_rev and cfg_rev_n to every phase (scb_multi regenerated). Bridge
+cfg "rev_n" (0-255, absent = 0); m_rev = V_DS <= 0 at the turn-on command.
+**Gate:** rev_n absent: cfg_rev_n 0, the count changes nothing; unit tests 130 / 130 (three new:
+rev_lowers_from_the_nth_report, rev_counts_per_phase, rev_off), cosim_regression --quick and --full PASS on fresh
+outputs.
+
 ## 2026-10-25 (A245) - ladder balance by Ton trims (RTL + bridge)
 
 **Source:** A239's item 6c: a start-up into a light load leaves the series-capacitor ladder off balance (S75 into 30 %:

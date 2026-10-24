@@ -25,6 +25,8 @@
 //   A241: cfg_dt_fall goes to every phase (a report lowers dt_pred by at most that much; 0: no limit). A242: with
 //   cfg_late_hold a late valley report with m_pos also leaves that phase's dt_pred. A244: both holds act only from
 //   cfg_hold_wait phase-1 turn-ons after mode P's entry (0: at once), so the handover keeps the learner as before.
+//   A245: m_rev with each valley report (V_DS <= 0 at the turn-on command) and cfg_rev_n go to every phase: from
+//   cfg_rev_n such reports in a row, each lowers that phase's dt_pred by cfg_dt_step (0: off).
 // - A245 (ladder balance): with cfg_bal, each phase's rail report at its low-side turn-off (b_valid; b_hi / b_lo: the
 //   rail above Vin / 4 + band or below Vin / 4 - band) moves the Ton trims of phases 2..N by cfg_bal_step / 16 LSB:
 //   a phase's own report up when high, down when low, phase 1's report every other phase the other way. The trims
@@ -113,6 +115,7 @@ module scb_ctrl #(
     input  wire [TW-1:0]       cfg_dt_fall,    // A241: a valley report lowers dt_pred by at most this (0: no limit)
     input  wire                cfg_late_hold,  // A242: a late valley report with m_pos leaves dt_pred
     input  wire [7:0]          cfg_hold_wait,  // A244: the holds act from this many phase-1 turn-ons in mode P
+    input  wire [7:0]          cfg_rev_n,      // A245: m_rev reports in a row from which each lowers dt_pred (0: off)
     input  wire                cfg_bal,        // A245: ladder balance on phases 2..N's Ton
     input  wire [7:0]          cfg_bal_step,   // A245: ... this many 1/16 LSB per report outside the band
     input  wire [TW-1:0]       cfg_bal_max,    // A245: ... trims clamped to +-this many LSB
@@ -131,6 +134,7 @@ module scb_ctrl #(
     input  wire [N-1:0]        m_early,
     input  wire [N-1:0]        m_flat,
     input  wire [N-1:0]        m_pos,          // A236: the current at the low-side turn-off had not reversed
+    input  wire [N-1:0]        m_rev,          // A245: V_DS <= 0 at the turn-on command (the swing had finished)
     input  wire [N-1:0]        b_valid,        // A245: a rail report at the phase's low-side turn-off
     input  wire [N-1:0]        b_hi,           // A245: ... its rail above Vin / 4 + band
     input  wire [N-1:0]        b_lo,           // A245: ... below Vin / 4 - band
@@ -488,6 +492,7 @@ module scb_ctrl #(
                 .m_valid(m_valid[k]), .m_early(m_early[k]), .m_flat(m_flat[k]), .m_tv(m_tv[k * TW +: TW]),
                 .m_pos(m_pos[k]), .cfg_early_hold(cfg_early_hold && hold_ok),                   // A236, A244
                 .cfg_dt_fall(cfg_dt_fall), .cfg_late_hold(cfg_late_hold && hold_ok),             // A241, A242, A244
+                .m_rev(m_rev[k]), .cfg_rev_n(cfg_rev_n),                                        // A245
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
                 .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_valid[k] : 1'b0),
                 .a_tlo((k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_tlo[k * TW +: TW] : a_tlo),      // A133, A220

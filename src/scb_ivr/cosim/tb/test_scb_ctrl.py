@@ -31,6 +31,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             dt_fall=0,                                                           # A241
             late_hold=0,                                                         # A242
             hold_wait=0,                                                         # A244
+            rev_n=0,                                                             # A245
             bal=0, bal_step=0, bal_max=0,                                        # A245
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
@@ -108,6 +109,7 @@ class Ctrl:
         d.cfg_dt_fall.value = cfg["dt_fall"]                     # A241
         d.cfg_late_hold.value = cfg["late_hold"]                 # A242
         d.cfg_hold_wait.value = cfg["hold_wait"]                 # A244
+        d.cfg_rev_n.value = cfg["rev_n"]                         # A245
         d.cfg_bal.value = cfg["bal"]; d.cfg_bal_step.value = cfg["bal_step"]; d.cfg_bal_max.value = cfg["bal_max"]   # A245
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
@@ -160,7 +162,7 @@ class Ctrl:
         d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
         d.cfg_zcd.value = cfg["zcd"]                             # A220
         d.cfg_sink.value = cfg["sink"]; d.cfg_sink_hi.value = cfg["sink_hi"]; d.cfg_sink_lo.value = cfg["sink_lo"]   # A238
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below",
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "m_rev", "r_valid", "r_below",
                   "b_valid", "b_hi", "b_lo"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
@@ -789,11 +791,11 @@ async def _report_low(c, dut, k, early=0, err=0, tv=0):
     return field(dut.dtl.value, k, TW)
 
 
-async def _report_high(c, dut, k, early=0, flat=0, err=0, tv=0, pos=0):
-    await c.set(m_valid=1 << k, m_early=early << k, m_flat=flat << k, m_pos=pos << k,
+async def _report_high(c, dut, k, early=0, flat=0, err=0, tv=0, pos=0, rev=0):
+    await c.set(m_valid=1 << k, m_early=early << k, m_flat=flat << k, m_pos=pos << k, m_rev=rev << k,
                 m_err=pack([err if q == k else 0 for q in range(N)], TW),
                 m_tv=pack([tv if q == k else 0 for q in range(N)], TW))
-    await c.set(m_valid=0, m_early=0, m_flat=0, m_pos=0)
+    await c.set(m_valid=0, m_early=0, m_flat=0, m_pos=0, m_rev=0)
     await ReadOnly()
     return field(dut.dt_pred.value, k, TW)
 
@@ -892,6 +894,41 @@ async def hold_wait_counts_phase1_turn_ons(dut):
     assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 70
     assert await _report_high(c, dut, 1, early=1, pos=1) == 70
     assert await _report_high(c, dut, 1, err=23, tv=10) == 60
+
+
+@cocotb.test()
+async def rev_lowers_from_the_nth_report(dut):
+    """A245: with rev_n 3, phase 2's m_rev reports on target (error 3) leave 80 twice, then lower it one step each
+    (78, 76); the third and later one also overrides an early report (74, not + 2). A report without m_rev updates as
+    before (on target: 74) and restarts the count: the next m_rev report leaves 74."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, rev_n=3)
+    assert [await _report_high(c, dut, 1, err=3, tv=10, rev=1) for _ in range(4)] == [80, 80, 78, 76]
+    assert await _report_high(c, dut, 1, early=1, rev=1) == 74
+    assert await _report_high(c, dut, 1, err=3, tv=10) == 74
+    assert await _report_high(c, dut, 1, err=3, tv=10, rev=1) == 74
+
+
+@cocotb.test()
+async def rev_counts_per_phase(dut):
+    """A245: with rev_n 2, m_rev reports alternating between phases 3 and 4 count per phase: each phase's second
+    one lowers only that phase (80 -> 78, 93 -> 91); phase 2's dt_pred is untouched."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, rev_n=2)
+    assert await _report_high(c, dut, 2, err=3, tv=10, rev=1) == 80
+    assert await _report_high(c, dut, 3, err=3, tv=10, rev=1) == 93
+    assert await _report_high(c, dut, 2, err=3, tv=10, rev=1) == 78
+    assert await _report_high(c, dut, 3, err=3, tv=10, rev=1) == 91
+    assert field(dut.dt_pred.value, 1, TW) == 80
+
+
+@cocotb.test()
+async def rev_off(dut):
+    """A245: rev_n 0: m_rev is ignored; on-target reports leave 80 and an early one steps (+2 -> 82)."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1)
+    assert [await _report_high(c, dut, 1, err=3, tv=10, rev=1) for _ in range(4)] == [80, 80, 80, 80]
+    assert await _report_high(c, dut, 1, early=1, rev=1) == 82
 
 
 async def _rail(c, dut, k, hi=0, lo=0):

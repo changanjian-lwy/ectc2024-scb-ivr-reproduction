@@ -41,7 +41,8 @@ Controller-side analog functions modelled here:
   turn-off above this value (a comparator sampled there; the RTL then holds dt_pred on an early report with it);
   "late_hold_a" (A242, RTL cfg_late_hold) sets the same comparator and holds dt_pred on a late report with m_pos
   (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
-  act only from that many phase-1 turn-ons after mode P's entry;
+  act only from that many phase-1 turn-ons after mode P's entry; m_rev (A245) is V_DS <= 0 at the turn-on command,
+  and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers dt_pred one step per m_rev report from that many in a row;
 - the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
   phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
   b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");
@@ -368,6 +369,9 @@ class ModuleSim:
         self.hold_wait = int(cfg.get("hold_wait", 0))                # A244
         if not 0 <= self.hold_wait <= 255:
             raise ValueError("hold_wait is an 8-bit count of phase-1 turn-ons")
+        self.rev_n = int(cfg.get("rev_n", 0))                        # A245
+        if not 0 <= self.rev_n <= 255:
+            raise ValueError("rev_n is an 8-bit count of valley reports")
         self.bal = cfg.get("bal")                                    # A245
         if self.bal is not None and set(self.bal) - {"band_v", "step_q4", "max_ns"}:
             raise ValueError(f"cfg 'bal': unknown keys {sorted(set(self.bal) - {'band_v', 'step_q4', 'max_ns'})}")
@@ -419,7 +423,7 @@ class ModuleSim:
         c.set("cfg_fine", int(cfg["fine"]))
         c.set("dt_init", pack(self.dt_init, TW))
         c.set("trim_init", pack(self.trim_init, CW))
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below",
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "m_rev", "r_valid", "r_below",
                   "b_valid", "b_hi", "b_lo"):
             c.set(s, 0)
         c.set("m_tv", 0)
@@ -452,6 +456,7 @@ class ModuleSim:
         c.set("cfg_early_hold", int(self.early_hold is not None))     # A236
         c.set("cfg_late_hold", int(self.late_hold is not None))       # A242
         c.set("cfg_hold_wait", self.hold_wait)                        # A244
+        c.set("cfg_rev_n", self.rev_n)                                # A245
         c.set("cfg_bal", int(self.bal is not None))                   # A245
         c.set("cfg_bal_step", int(self.bal.get("step_q4", 4)) if self.bal is not None else 0)
         c.set("cfg_bal_max", to_lsb(self.bal.get("max_ns", 8.0) * 1e-9) if self.bal is not None else 0)
@@ -790,7 +795,8 @@ class ModuleSim:
                     dip = vm < self.v_lo[k] - self.v_hys and tv > self.t_lo_act[k]
                     err = 0 if early else max(0, to_lsb(plant.t - tv))      # A92: edge - valley
                     pos = self.pos_a is not None and self.i_lo_act[k] > self.pos_a    # A236, A242
-                    self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err, pos)
+                    rev = rec["vds_v"] <= 0.0                                     # A245: at the command
+                    self.meas_m[k] = (early, not early and not dip, max(0, to_lsb(tv - self.t_lo_act[k])), err, pos, rev)
                     rec["early"] = bool(early); rec["err_s"] = None if early else plant.t - tv
                     if self.pos_a is not None:
                         rec["lo_pos"] = bool(pos)
@@ -907,9 +913,10 @@ class ModuleSim:
         """After the falling edge: one-cycle measurement pulses from the previous window, the ADC sample, the handover
         request, the load and the branch arming."""
         c, cfg, lat, mlo, p, plant = self.ctl, self.cfg, self.lat, self.mlo, self.p, self.plant
-        mv = me = mf = mp = rv = rb = 0; mtv = [0] * N; merr = [0] * N
-        for k, (early, flat, tv, err, pos) in self.meas_m.items():
+        mv = me = mf = mp = mr = rv = rb = 0; mtv = [0] * N; merr = [0] * N
+        for k, (early, flat, tv, err, pos, rev) in self.meas_m.items():
             mv |= 1 << k; me |= int(early) << k; mf |= int(flat) << k; mp |= int(pos) << k; mtv[k] = tv; merr[k] = err
+            mr |= int(rev) << k                                                   # A245
         for k, below in self.meas_r.items():
             rv |= 1 << k; rb |= int(below) << k
         ml_v = ml_e = 0; ml_t = [0] * N; ml_r = [0] * N             # A89: zero-crossing reports (A92: + error)
@@ -931,6 +938,7 @@ class ModuleSim:
             c.set("b_valid", bv); c.set("b_hi", bh); c.set("b_lo", bl)
         c.set("m_valid", mv); c.set("m_early", me); c.set("m_flat", mf); c.set("m_tv", pack(mtv, TW))
         c.set("m_pos", mp)                                             # A236
+        c.set("m_rev", mr)                                             # A245
         c.set("r_valid", rv); c.set("r_below", rb)
         if self.dep_on:                                              # A132: one-cycle V_DS comparator report
             c.set("v_valid", int(self.meas_v is not None)); c.set("v_high", int(bool(self.meas_v)))

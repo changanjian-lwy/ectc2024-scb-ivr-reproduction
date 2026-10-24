@@ -66,6 +66,8 @@
 //   low-side turn-off had not reversed, so a longer wait cannot complete the swing) leaves dt_pred; A241: with
 //   cfg_dt_fall, a report that is neither early nor flat lowers dt_pred by at most cfg_dt_fall (0: no limit); A242:
 //   with cfg_late_hold a late report with m_pos leaves dt_pred (no reversal, so its dip is the edge's ring, not a swing);
+//   A245: with cfg_rev_n, a report with m_rev (V_DS <= 0 at the command: the swing had finished) that is the
+//   cfg_rev_n-th or later in a row lowers dt_pred by cfg_dt_step (floor 0) instead; any other report restarts the count;
 // - dtl (cfg_low_pred): early -> + cfg_dtl_step; otherwise the measured crossing time ml_tv, or with cfg_err_low
 //   dtl - ((ml_err - cfg_el_tgt) >>> cfg_err_shift); both clamped to [0, cfg_dtl_max];
 // - trim: +1 / -1 per current-decided low-side turn-off from the residual-current sign (cfg_trim).
@@ -107,6 +109,8 @@ module scb_phase #(
     input  wire                 cfg_early_hold,// A236: an early report with m_pos leaves dt_pred
     input  wire [TW-1:0]        cfg_dt_fall,   // A241: a report lowers dt_pred by at most this (0: no limit)
     input  wire                 cfg_late_hold, // A242: a late report with m_pos leaves dt_pred
+    input  wire                 m_rev,         // A245: V_DS <= 0 at the turn-on command
+    input  wire [7:0]           cfg_rev_n,     // A245: from this many m_rev reports in a row, each lowers dt_pred (0: off)
     input  wire [TW-1:0]        m_tv,
     input  wire                 r_valid,
     input  wire                 r_below,
@@ -277,6 +281,9 @@ module scb_phase #(
     wire slot_new   = (fired_ref != ref_id);
     wire slot_miss  = cfg_slot_guard && pend_v && (pend_ref != ref_id);   // A93: the awaited slot was passed
     wire [TW-1:0] dt_next = dt_pred + cfg_dt_step;
+    reg  [7:0]    rev_c;                                   // A245: m_rev reports in a row (saturates at 255)
+    wire          rev_lo  = (cfg_rev_n != 8'd0) && m_rev && (rev_c >= cfg_rev_n - 8'd1);
+    wire [TW-1:0] dt_prv  = (dt_pred > cfg_dt_step) ? dt_pred - cfg_dt_step : {TW{1'b0}};
     // A89: timed low side. The chained target counts from the placed turn-off (window start + f_off).
     wire lp_on = mode_p && cfg_low_pred;
     wire signed [TW-1:0] d_lpred = t_off + dtl - now;
@@ -325,6 +332,7 @@ module scb_phase #(
             lo_bind_cur <= 1'b0;
             trim        <= trim_init;
             dt_pred     <= dt_init;
+            rev_c       <= 8'd0;                                 // A245
             late_fires  <= 16'd0;
             dtl         <= dtl_init;
             dlo         <= {TW{1'b0}};
@@ -342,7 +350,10 @@ module scb_phase #(
             t_tk        <= {TW{1'b0}};
         end else begin
             if (m_valid) begin
-                if (m_early) begin
+                rev_c <= !m_rev ? 8'd0 : (rev_c == 8'hFF) ? rev_c : rev_c + 8'd1;   // A245
+                if (rev_lo)
+                    dt_pred <= dt_prv;                               // A245
+                else if (m_early) begin
                     if (!(cfg_early_hold && m_pos))                  // A236
                         dt_pred <= (dt_next > cfg_dt_max) ? cfg_dt_max : dt_next;
                 end else if (!m_flat && !(cfg_late_hold && m_pos))    // A242
