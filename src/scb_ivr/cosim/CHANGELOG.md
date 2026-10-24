@@ -10,9 +10,9 @@ result.
 move the low rail back, but the low rail's phase holds a long delay until the rail is nearly back, then drops it in a
 few periods, and the trims left over swing the ladder the other way (Vo +-1 %). In every unbalanced start-up record
 (A230 S75 / S75h at 30 %, A239 at 5 A) the low rail's phase turns on with V_DS <= 0 at the command on 69-946
-consecutive reports (the node had finished its swing and the switch conducts in reverse); in A244's rows phases
-2-4 do so at most 6 times in a row and phase 1 at most 35 (47 records, learned reports). Its valley report is then on target: the minimum of a node
-that creeps towards the reverse-conduction voltage is always the last sample. TI's Predictive Gate Drive (SLUA281,
+consecutive reports (the node had finished its swing and the switch conducts in reverse); in A244's 47 records
+phases 2-4 do so at most 6 times in a row and phase 1 at most 35. Its valley report is then on target: the minimum
+of a node that creeps towards the reverse-conduction voltage is always the last sample. TI's Predictive Gate Drive (SLUA281,
 2003) and Sun et al. (Microelectronics 54(4), 2024, GaN) shorten the delay while reverse conduction is detected.
 scb_phase m_rev / cfg_rev_n and a per-phase count of m_rev reports in a row (8 bits, saturating): from the
 cfg_rev_n-th such report, each lowers dt_pred by cfg_dt_step (floor 0), before the early / flat / late rules; any
