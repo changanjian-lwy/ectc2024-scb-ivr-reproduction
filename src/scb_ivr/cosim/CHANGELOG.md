@@ -4,6 +4,20 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-25 (A245) - ladder balance by Ton trims (RTL + bridge)
+
+**Source:** A239's item 6c: a start-up into a light load leaves the series-capacitor ladder off balance (S75 into 30 %:
+4.6-5.2 V at 300 us), and light-load operation does not restore it; releases from full load stay balanced. In every
+unbalanced record the low rail's phase has a long turn-on delay (S75h 30 %: 18.7 against 11.4-12.6 ns), so it gets
+more volt-seconds. Wei, Ramadass and Ma (JSSC 2021) rebalance a flying capacitor by sensing the switch node against
+Vin / 4 and trimming the on-times. scb_ctrl cfg_bal / cfg_bal_step / cfg_bal_max, inputs b_valid / b_hi / b_lo, output
+bal: per-phase Ton trims on phases 2..N in 1/16 LSB (a phase's own rail report moves it, phase 1's moves the others the
+other way), clamped, 0 outside mode P (scb_multi regenerated). Bridge cfg "bal" {"band_v", "step_q4", "max_ns"}: at
+each low-side turn-off the phase's rail against Vin / 4 +- band; record "bal_final_ns".
+**Gate:** cfg "bal" absent: cfg_bal 0, Ton as before and no report pulses; unit tests 127 / 127 (four new:
+bal_trims_slotted_phases, bal_fractional_steps, bal_off, bal_held_in_mode_s), cosim_regression --quick and --full
+PASS on fresh outputs.
+
 ## 2026-10-24 (A244) - the holds wait after the handover (RTL + bridge)
 
 **Source:** A243: with A236's and A242's holds both on, every row's holds before its disturbance act only 0.07-2.58 us

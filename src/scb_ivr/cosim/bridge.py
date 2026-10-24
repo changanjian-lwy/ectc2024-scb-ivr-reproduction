@@ -42,6 +42,9 @@ Controller-side analog functions modelled here:
   "late_hold_a" (A242, RTL cfg_late_hold) sets the same comparator and holds dt_pred on a late report with m_pos
   (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
   act only from that many phase-1 turn-ons after mode P's entry;
+- the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
+  phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
+  b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");
   "dt_fall_ns" (A241, RTL cfg_dt_fall; absent or 0 = no limit) caps how far one report lowers dt_pred;
 - the zero-crossing TDC of the timed low side ("low_pred", mode P): at each low-side turn-on, early or the crossing
   time after the actual high-side turn-off (ml_valid, ml_early, ml_tv) and the edge's error against the crossing
@@ -365,6 +368,9 @@ class ModuleSim:
         self.hold_wait = int(cfg.get("hold_wait", 0))                # A244
         if not 0 <= self.hold_wait <= 255:
             raise ValueError("hold_wait is an 8-bit count of phase-1 turn-ons")
+        self.bal = cfg.get("bal")                                    # A245
+        if self.bal is not None and set(self.bal) - {"band_v", "step_q4", "max_ns"}:
+            raise ValueError(f"cfg 'bal': unknown keys {sorted(set(self.bal) - {'band_v', 'step_q4', 'max_ns'})}")
         off = cfg.get("t_load_off_us")                               # A237: the resistive load disconnects
         self.t_load_off = None if off is None else float(off) * 1e-6
         t_clk = cfg["t_clk_ns"] * 1e-9
@@ -413,7 +419,8 @@ class ModuleSim:
         c.set("cfg_fine", int(cfg["fine"]))
         c.set("dt_init", pack(self.dt_init, TW))
         c.set("trim_init", pack(self.trim_init, CW))
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below"):
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below",
+                  "b_valid", "b_hi", "b_lo"):
             c.set(s, 0)
         c.set("m_tv", 0)
         c.set("cfg_start_s", 1)
@@ -445,6 +452,9 @@ class ModuleSim:
         c.set("cfg_early_hold", int(self.early_hold is not None))     # A236
         c.set("cfg_late_hold", int(self.late_hold is not None))       # A242
         c.set("cfg_hold_wait", self.hold_wait)                        # A244
+        c.set("cfg_bal", int(self.bal is not None))                   # A245
+        c.set("cfg_bal_step", int(self.bal.get("step_q4", 4)) if self.bal is not None else 0)
+        c.set("cfg_bal_max", to_lsb(self.bal.get("max_ns", 8.0) * 1e-9) if self.bal is not None else 0)
         c.set("cfg_dt_fall", to_lsb(cfg.get("dt_fall_ns", 0.0) * 1e-9))   # A241: dt_pred's largest fall per report
         c.set("cfg_el_tgt", to_lsb(cfg.get("el_tgt_ps", 0.0) * 1e-12))
         c.set("cfg_eh_tgt", to_lsb(cfg.get("eh_tgt_ps", 0.0) * 1e-12))
@@ -535,6 +545,7 @@ class ModuleSim:
         self.pend = []                              # heap of (t_apply, seq, j, level, meta)
         self.seq = [0]
         self.meas_m = {}; self.meas_r = {}          # phase -> measurement to deliver
+        self.meas_b = {}                            # A245: phase -> (rail high, rail low)
         self.meas_v = None; self.dep_log = []       # A132: phase 1's V_DS > V_set at its predictive turn-on; (t, dep)
         self.adc = []                               # pending ADC sample of Vo (taken at phase 1's turn-on)
         self.adc_vin = []                           # A128: pending Vin sample (same instant)
@@ -699,6 +710,13 @@ class ModuleSim:
                 "gh": [bool(x) for x in plant.gh], "gl": [bool(x) for x in plant.gl], "phys_h": [bool(x) for x in gh],
                 "phys_l": [bool(x) for x in gl], "diode": [bool(x) for x in plant.diode], "gate": gate}
 
+    def rails(self):
+        """Each phase's rail now: Vin - vcs1, vcs1 - vcs2, ..., vcs(N-1) (the flying capacitors' voltages)."""
+        plant = self.plant
+        v = [self.p.vin_at(plant.t)] + [float(plant.y[plant.sim.idx[f"a{q}"]] - plant.y[plant.sim.idx[f"x{q}"]])
+                                        for q in range(1, N)] + [0.0]
+        return [v[q] - v[q + 1] for q in range(N)]
+
     def section(self, tick=False):
         """The record and the ADC samples (Vo, Vin) at phase 1's turn-on, or at a tick of a paused module (A216)."""
         plant, p, st, nv, na = self.plant, self.p, self.st, self.nv, self.na
@@ -822,6 +840,9 @@ class ModuleSim:
             if meta["bind"] or self.cfg.get("slot_trim", 0):    # A109: also at the slots' turn-offs
                 self.meas_r[k] = i_e < self.i_tgt
             self.v_lo[k] = plant.vds(k); self.t_lo_act[k] = plant.t; self.i_lo_act[k] = i_e
+            if self.bal is not None:                                    # A245: the rail comparators
+                r, band = self.rails()[k] - self.p.vin_at(plant.t) / N, float(self.bal.get("band_v", 1.0))
+                self.meas_b[k] = (r > band, r < -band)
             mon.vmin_set[k] = 1; mon.vmin[k] = self.v_lo[k]; mon.t_vmin[k] = self.t_lo_act[k]
         plant.set_gate(j, level)
 
@@ -902,7 +923,12 @@ class ModuleSim:
             c.set("mlo_valid", int(rep is not None))
             c.set("mlo_early", int(rep[0]) if rep else 0)
             c.set("mlo_err", rep[1] if rep else 0)
-        self.meas_m.clear(); self.meas_r.clear()
+        bv = bh = bl = 0
+        for k, (hi, lo) in self.meas_b.items():                       # A245
+            bv |= 1 << k; bh |= int(hi) << k; bl |= int(lo) << k
+        self.meas_m.clear(); self.meas_r.clear(); self.meas_b.clear()
+        if self.bal is not None:
+            c.set("b_valid", bv); c.set("b_hi", bh); c.set("b_lo", bl)
         c.set("m_valid", mv); c.set("m_early", me); c.set("m_flat", mf); c.set("m_tv", pack(mtv, TW))
         c.set("m_pos", mp)                                             # A236
         c.set("r_valid", rv); c.set("r_below", rb)
@@ -983,6 +1009,8 @@ class ModuleSim:
                "ipk_a": plant.ipk, "async_fires": lat["fires"],
                "sections": self.sections, "turnons_last": self.turnons[-keep_n:], "lowoffs_last": self.lowoffs[-keep_n:],
                "dtl_final_ns": [field(c.get("dtl"), k, TW) * lsb * 1e9 for k in range(N)],     # A89
+               **({"bal_final_ns": [signed(field(c.get("bal"), k, TW), TW) * lsb * 1e9 for k in range(N)]}
+                  if self.bal is not None else {}),                                            # A245
                "edges_log": self.edges_log, "driver": self.drv, "overlaps": ovl["count"], "first_overlap": ovl["first"],
                "status": "OVERLAP_STOP" if ovl["stop"] else "COMPLETED", "lowons_last": self.lowons[-keep_n:],
                "plant_flags": {"nonlinear_coss": p.nonlinear_coss, "rev_drop": p.rev_drop, "rev_vf": p.rev_vf, "rev_r": p.rev_r}}

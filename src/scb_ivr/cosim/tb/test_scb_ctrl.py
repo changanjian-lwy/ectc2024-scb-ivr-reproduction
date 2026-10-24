@@ -31,6 +31,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             dt_fall=0,                                                           # A241
             late_hold=0,                                                         # A242
             hold_wait=0,                                                         # A244
+            bal=0, bal_step=0, bal_max=0,                                        # A245
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
             slot_trim=0, st_smax=1,                                              # A109
@@ -107,6 +108,7 @@ class Ctrl:
         d.cfg_dt_fall.value = cfg["dt_fall"]                     # A241
         d.cfg_late_hold.value = cfg["late_hold"]                 # A242
         d.cfg_hold_wait.value = cfg["hold_wait"]                 # A244
+        d.cfg_bal.value = cfg["bal"]; d.cfg_bal_step.value = cfg["bal_step"]; d.cfg_bal_max.value = cfg["bal_max"]   # A245
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
         d.adc_valid.value = 0
@@ -158,7 +160,8 @@ class Ctrl:
         d.cfg_skip.value = cfg["skip"]; d.cfg_skip_hi.value = cfg["skip_hi"]; d.cfg_skip_lo.value = cfg["skip_lo"]   # A216
         d.cfg_zcd.value = cfg["zcd"]                             # A220
         d.cfg_sink.value = cfg["sink"]; d.cfg_sink_hi.value = cfg["sink_hi"]; d.cfg_sink_lo.value = cfg["sink_lo"]   # A238
-        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below"):
+        for s in ("cmp_i", "cmp_zl", "cmp_zh", "cmp_valley", "m_valid", "m_early", "m_flat", "m_pos", "r_valid", "r_below",
+                  "b_valid", "b_hi", "b_lo"):
             getattr(d, s).value = 0
         d.m_tv.value = 0
         await ClockCycles(d.clk, 3)
@@ -889,6 +892,70 @@ async def hold_wait_counts_phase1_turn_ons(dut):
     assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 70
     assert await _report_high(c, dut, 1, early=1, pos=1) == 70
     assert await _report_high(c, dut, 1, err=23, tv=10) == 60
+
+
+async def _rail(c, dut, k, hi=0, lo=0):
+    """A245: one rail report on phase k; returns every phase's trim (LSB, signed)."""
+    await c.set(b_valid=1 << k, b_hi=hi << k, b_lo=lo << k)
+    await c.set(b_valid=0, b_hi=0, b_lo=0)
+    await ReadOnly()
+    return [signed(field(dut.bal.value, q, TW), TW) for q in range(N)]
+
+
+async def _on_time(c, phase, after):
+    """A slotted phase's next high-side on-time after `after` (LSB)."""
+    lo = await c.until("L", 0, phase, after=after)
+    hi = await c.until("H", 1, phase, after=lo[0] + lo[1])
+    off = await c.until("H", 0, phase, after=hi[0] + hi[1])
+    return off[0] + off[1] - hi[0] - hi[1], off[0] + off[1]
+
+
+@cocotb.test()
+async def bal_trims_slotted_phases(dut):
+    """A245: bal, step 16 (one LSB per report), max 3. Phase 2's rail high four times -> +3 (clamped); low once -> +2;
+    phase 1's rail high moves phases 2-4 down: 1 / -1 / -1; phase 1 is never trimmed. Phase 2's next high side then
+    stays on 133 + 1 LSB, phase 3's 133 - 1."""
+    c = Ctrl(dut)
+    await c.start(bal=1, bal_step=16, bal_max=3)
+    for _ in range(4):
+        b = await _rail(c, dut, 1, hi=1)
+    assert b == [0, 3, 0, 0], b
+    assert await _rail(c, dut, 1, lo=1) == [0, 2, 0, 0]
+    assert await _rail(c, dut, 0, hi=1) == [0, 1, -1, -1]
+    t2, _ = await _on_time(c, 2, 1600)
+    t3, _ = await _on_time(c, 3, 1600)
+    assert (t2, t3) == (134, 132), (t2, t3)
+
+
+@cocotb.test()
+async def bal_fractional_steps(dut):
+    """A245: step 4 (a quarter LSB): three high reports leave the trim at 0, the fourth makes it 1; a low report on
+    phase 4 makes its trim -1 (-0.25 LSB rounds towards minus infinity)."""
+    c = Ctrl(dut)
+    await c.start(bal=1, bal_step=4, bal_max=8)
+    for _ in range(3):
+        b = await _rail(c, dut, 2, hi=1)
+    assert b[2] == 0, b
+    assert (await _rail(c, dut, 2, hi=1))[2] == 1
+    assert (await _rail(c, dut, 3, lo=1))[3] == -1
+
+
+@cocotb.test()
+async def bal_off(dut):
+    """A245: without cfg_bal a report leaves every trim at 0 and phase 2 keeps 133 LSB."""
+    c = Ctrl(dut)
+    await c.start(bal_step=16, bal_max=3)
+    assert await _rail(c, dut, 1, hi=1) == [0, 0, 0, 0]
+    t2, _ = await _on_time(c, 2, 1600)
+    assert t2 == 133, t2
+
+
+@cocotb.test()
+async def bal_held_in_mode_s(dut):
+    """A245: with cfg_bal in mode S (start_s) a report leaves the trims at 0."""
+    c = Ctrl(dut)
+    await c.start(start_s=1, bal=1, bal_step=16, bal_max=3)
+    assert await _rail(c, dut, 1, hi=1) == [0, 0, 0, 0]
 
 
 @cocotb.test()

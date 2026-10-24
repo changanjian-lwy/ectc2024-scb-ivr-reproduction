@@ -25,6 +25,10 @@
 //   A241: cfg_dt_fall goes to every phase (a report lowers dt_pred by at most that much; 0: no limit). A242: with
 //   cfg_late_hold a late valley report with m_pos also leaves that phase's dt_pred. A244: both holds act only from
 //   cfg_hold_wait phase-1 turn-ons after mode P's entry (0: at once), so the handover keeps the learner as before.
+// - A245 (ladder balance): with cfg_bal, each phase's rail report at its low-side turn-off (b_valid; b_hi / b_lo: the
+//   rail above Vin / 4 + band or below Vin / 4 - band) moves the Ton trims of phases 2..N by cfg_bal_step / 16 LSB:
+//   a phase's own report up when high, down when low, phase 1's report every other phase the other way. The trims
+//   (output bal, LSB) are clamped to +-cfg_bal_max LSB and held at 0 outside mode P; without cfg_bal Ton is as before.
 // - C2 (multi-module): with cfg_ext_ton, Ton in mode P is ext_ton (the master's, broadcast); with the parameter
 //   SLAVE = 1, phase 1 is a slotted phase like phases 2..N, its low-side turn-off at ext_slot once per reference
 //   ext_ref (the master's t_ref), and it resets LOW; phase 1's front end, timed turn-off and their reports are off,
@@ -109,6 +113,9 @@ module scb_ctrl #(
     input  wire [TW-1:0]       cfg_dt_fall,    // A241: a valley report lowers dt_pred by at most this (0: no limit)
     input  wire                cfg_late_hold,  // A242: a late valley report with m_pos leaves dt_pred
     input  wire [7:0]          cfg_hold_wait,  // A244: the holds act from this many phase-1 turn-ons in mode P
+    input  wire                cfg_bal,        // A245: ladder balance on phases 2..N's Ton
+    input  wire [7:0]          cfg_bal_step,   // A245: ... this many 1/16 LSB per report outside the band
+    input  wire [TW-1:0]       cfg_bal_max,    // A245: ... trims clamped to +-this many LSB
     input  wire [TW-1:0]       cfg_kd_band,    // A229: ... or within this many Ton LSB above it (0: at the limit)
     input  wire                cfg_ext_ton,    // C2: in mode P, Ton = ext_ton (the master's, broadcast)
     input  wire [TW-1:0]       ext_ton,        // C2
@@ -124,6 +131,9 @@ module scb_ctrl #(
     input  wire [N-1:0]        m_early,
     input  wire [N-1:0]        m_flat,
     input  wire [N-1:0]        m_pos,          // A236: the current at the low-side turn-off had not reversed
+    input  wire [N-1:0]        b_valid,        // A245: a rail report at the phase's low-side turn-off
+    input  wire [N-1:0]        b_hi,           // A245: ... its rail above Vin / 4 + band
+    input  wire [N-1:0]        b_lo,           // A245: ... below Vin / 4 - band
     input  wire [N*TW-1:0]     m_tv,
     input  wire [N-1:0]        r_valid,
     input  wire [N-1:0]        r_below,
@@ -226,6 +236,7 @@ module scb_ctrl #(
     output wire [N-1:0]        lo_bind_cur,
     output wire [N*CW-1:0]     trim,
     output wire [N*TW-1:0]     dt_pred,
+    output wire [N*TW-1:0]     bal,            // A245: each phase's Ton trim, LSB (signed)
     output wire [16*N-1:0]     late_fires,
     output reg  [TW-1:0]       win_q,
     output reg  [TW-1:0]       t_ref,
@@ -441,9 +452,31 @@ module scb_ctrl #(
                                 + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);
                 assign res_tk = res_t + (use_follow ? slot_follow : cfg_slot[(k - 1) * TW +: TW]);   // A216
             end
+            wire [TW-1:0] ton_k;                                                       // A245
+            if (k == 0) begin : g_bal0
+                assign ton_k = ton_ph[TW-1:0];
+                assign bal[TW-1:0] = {TW{1'b0}};
+            end else begin : g_bal
+                reg  signed [TW+5:0] bal_q;                                            // 1/16 LSB
+                wire signed [TW+5:0] st = $signed({{(TW-2){1'b0}}, cfg_bal_step});
+                wire signed [TW+5:0] mx = $signed({2'b00, cfg_bal_max, 4'b0000});
+                wire signed [TW+5:0] dk = (b_valid[k] && b_hi[k]) ? st : (b_valid[k] && b_lo[k]) ? -st : 0;
+                wire signed [TW+5:0] d1 = (b_valid[0] && b_hi[0]) ? -st : (b_valid[0] && b_lo[0]) ? st : 0;
+                wire signed [TW+5:0] nx = bal_q + dk + d1;
+                always @(posedge clk) begin
+                    if (rst || !mode_p || !cfg_bal)
+                        bal_q <= 0;
+                    else
+                        bal_q <= (nx > mx) ? mx : (nx < -mx) ? -mx : nx;
+                end
+                wire signed [TW+5:0] bal_l = bal_q >>> 4;
+                wire signed [TW+5:0] sum = $signed({6'b000000, ton_ph[k * TW +: TW]}) + bal_l;
+                assign ton_k = !cfg_bal ? ton_ph[k * TW +: TW] : (sum < 1) ? {{(TW-1){1'b0}}, 1'b1} : sum[TW-1:0];
+                assign bal[k * TW +: TW] = bal_l[TW-1:0];
+            end
             localparam IS_FIRST = (k == 0 && !SLAVE) ? 1 : 0;                         // C2
             scb_phase #(.TW(TW), .FB(FB), .CW(CW), .FIRST(IS_FIRST)) u_ph (
-                .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_ph[k * TW +: TW]),
+                .clk(clk), .rst(rst), .now(now), .mode_p(mode_p), .ton(ton_k),
                 .cfg_t0(cfg_t0), .cfg_tdead(cfg_tdead),
                 .cfg_rs_high(cfg_rs_high), .cfg_rs_low(cfg_rs_low),
                 .cfg_dt_step(cfg_dt_step), .cfg_dt_max(cfg_dt_max),
