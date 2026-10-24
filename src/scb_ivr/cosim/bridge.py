@@ -42,8 +42,8 @@ Controller-side analog functions modelled here:
   "late_hold_a" (A242, RTL cfg_late_hold) sets the same comparator and holds dt_pred on a late report with m_pos
   (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
   act only from that many phase-1 turn-ons after mode P's entry; m_rev (A245) is V_DS <= 0 at the turn-on command,
-  and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers a slotted phase's dt_pred one step per m_rev report from
-  that many in a row (not the master's phase 1);
+  and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers the dt_pred of phases 2..N one step per m_rev report from
+  that many in a row;
 - the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
   phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
   b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");

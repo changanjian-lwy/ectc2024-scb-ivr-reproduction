@@ -5,7 +5,7 @@ from reset; a slave's phase 1 resets LOW; dt_init of phase 1 85, Ton 133)."""
 import cocotb
 from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge
 
-from test_scb_ctrl import Ctrl, field
+from test_scb_ctrl import Ctrl, _report_high, field
 
 
 async def _now(dut):
@@ -125,3 +125,13 @@ async def slave_ton_lat_follows_the_broadcast(dut):
         await ReadOnly()
         seen.append(field(dut.ton_ph.value, 0, 32))
     assert seen == [150, 150, 150, 170, 170], seen
+
+
+@cocotb.test()
+async def slave_rev_skips_phase1(dut):
+    """A245 on a slave: rev_n 2 leaves phase 1's dt_pred (85) after three m_rev reports, as on a master; phase 2's
+    second one lowers it (80 -> 78)."""
+    c = Ctrl(dut)
+    await c.start(ext_ref=7, ext_slot=40000, err_high=1, eh_tgt=3, err_shift=1, rev_n=2)
+    assert [await _report_high(c, dut, 0, err=3, tv=10, rev=1) for _ in range(3)] == [85, 85, 85]
+    assert [await _report_high(c, dut, 1, err=3, tv=10, rev=1) for _ in range(2)] == [80, 78]
