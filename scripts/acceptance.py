@@ -795,7 +795,8 @@ EXCEPTIONS["A243"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_
                       ("criteria_main", "g5"): _A243, ("criteria_main", "g6"): _A243, ("criteria_main", "c1"): _A243}
 _A244g2 = ("not adopted as registered: on N0 at 100 kHz a release valley that did reverse (-61 A) lowers phase 4's delay "
            "15 -> 8 ns at about 490 us, and the holds keep it there while the phase runs with positive current (178-190 A at "
-           "every re-application); A240 locks the same way from 340 us (195.7 A) (RESULTS 0)")
+           "every re-application); A240 locks the same way from 340 us (195.7 A) (RESULTS 0); adopted anyway by user decision "
+           "on 2026-10-24")
 _A244s = "step-position scatter: the control's c1 passes on this row (RESULTS 0, a244_control.json)"
 EXCEPTIONS["A244"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
                       ("criteria_main", "g1"): _MHZ, ("criteria", "stage1/p_N0_100k/g2"): _A244g2,

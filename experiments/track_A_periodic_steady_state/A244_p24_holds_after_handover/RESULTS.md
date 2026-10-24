@@ -5,6 +5,8 @@ a244_summary.json, a244_control.py -> a244_control.json; figure a244_figure.py -
 Plant V7, final configuration; arm w = early_hold_a and late_hold_a 0.0, hold_wait 32.
 
 ## 0. Verdict
+- **Adopted by user decision on 2026-10-24, after these results** (early_hold_a 0, late_hold_a 0, hold_wait 32; one
+  module and four modules). Item 3 closes; item 10 stays open for the lock below and for 1 MHz.
 - **Not adopted as registered: g2 misses on N0 at 100 kHz** (190.5 A against the board's single re-application +
   10 A = 171.5 A). This row is a second part of item 10, which the holds do not fix (below). The current final
   configuration misses it too: A240 195.7 A.

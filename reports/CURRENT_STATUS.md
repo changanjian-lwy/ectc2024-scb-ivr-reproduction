@@ -2474,7 +2474,10 @@ each question:
          3 fixed, N0 <= 1.0498 V, stage 2's misses scatter (control). Not
          adopted as registered: on N0 at 100 kHz a reversed -61 A valley
          collapses phase 4's delay and the holds keep it (190.5 A; A240
-         195.7 A). Accepted 174 / 11; adoption put to the user.
+         195.7 A). Accepted 174 / 11. ADOPTED by user decision on
+         2026-10-24 (early_hold_a 0, late_hold_a 0, hold_wait 32): item 3
+         closed; item 10 open for the lock after a reversed collapse and
+         for 1 MHz (the ladder).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
