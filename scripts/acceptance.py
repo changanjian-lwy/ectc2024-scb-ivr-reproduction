@@ -144,6 +144,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A241": (TA / "A241_p24_dt_pred_fall_limit", "a241_analyze.py", "a241_summary.json"),
     "A242": (TA / "A242_p24_late_report_hold", "a242_analyze.py", "a242_summary.json"),
     "A243": (TA / "A243_p24_hold_without_reversal", "a243_analyze.py", "a243_summary.json"),
+    "A244": (TA / "A244_p24_holds_after_handover", "a244_analyze.py", "a244_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -402,7 +403,7 @@ NOT_ROWS["A231"] = r".*"                          # judged through its criteria_
 NOT_ROWS["A233"] = r".*"                          # judged per row and arm in its rows / criteria_main blocks
 NOT_ROWS["A235"] = r"t_"                          # stage-1 start-ups: the summary's trims block
 NOT_ROWS["A236"] = r"o_"                          # the identity row: the summary's identity block (e0)
-NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243")})   # judged through ADAPT (stage 1 / stage 2 rows)
+NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243", "A244")})   # judged through ADAPT (stage 1 / stage 2 rows)
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
@@ -792,6 +793,15 @@ EXCEPTIONS["A243"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_
                                                                        "w5_N0/g6", "w20_N0/g6")},
                       **{("criteria", f"control/{r}/c1"): _A243 for r in ("a_S75h_d20", "u_N0", "w5_N0", "w20_N0")},
                       ("criteria_main", "g5"): _A243, ("criteria_main", "g6"): _A243, ("criteria_main", "c1"): _A243}
+_A244g2 = ("not adopted as registered: on N0 at 100 kHz a release valley that did reverse (-61 A) lowers phase 4's delay "
+           "15 -> 8 ns at about 490 us, and the holds keep it there while the phase runs with positive current (178-190 A at "
+           "every re-application); A240 locks the same way from 340 us (195.7 A) (RESULTS 0)")
+_A244s = "step-position scatter: the control's c1 passes on this row (RESULTS 0, a244_control.json)"
+EXCEPTIONS["A244"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
+                      ("criteria_main", "g1"): _MHZ, ("criteria", "stage1/p_N0_100k/g2"): _A244g2,
+                      ("criteria_main", "g2"): _A244g2 + "; 1 MHz: " + _MHZ,
+                      **{("criteria", f"stage2/{r}/g6"): _A244s for r in ("f_N75_k2", "a_S75_d20", "m4_l_m80_10us")},
+                      ("criteria_main", "g6"): _A244s}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -802,7 +812,7 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A225": lambda d: {g: {n: {k: r[k] for k in ("f2", "f5", "f6") if k in r} for n, r in d[g].items()} for g in ("a", "u", "s")},
     "A227": lambda d: {"w": {n: v["criteria"] for n, v in d["w"].items()}},
     **{e: (lambda d: {g: {n: v["criteria"] for n, v in d[g].items() if v} for g in ("stage1", "stage2", "control") if g in d})
-       for e in ("A241", "A242", "A243")},
+       for e in ("A241", "A242", "A243", "A244")},
     "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
                        "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)

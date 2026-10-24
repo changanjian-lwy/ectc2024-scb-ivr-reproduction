@@ -2468,6 +2468,13 @@ each question:
          positions, control 06d71ff). 1 MHz stays the ladder's. Accepted
          A241 91 / 31, A242 115 / 19, A243 121 / 22; next A244 (holds
          after N phase-1 periods in mode P).
+    143. A244 (2026-10-24, V7): the holds act only from phase 1's 32nd
+         turn-on in mode P (RTL cfg_hold_wait, unit 123). Every run equals
+         its reference before its disturbance; 10-200 kHz <= 190.5 A, item
+         3 fixed, N0 <= 1.0498 V, stage 2's misses scatter (control). Not
+         adopted as registered: on N0 at 100 kHz a reversed -61 A valley
+         collapses phase 4's delay and the holds keep it (190.5 A; A240
+         195.7 A). Accepted 174 / 11; adoption put to the user.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

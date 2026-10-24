@@ -168,7 +168,9 @@ The rest:
   configuration) holds dt_pred on early and late reports without reversal:** no restart or NEW spike on any falling
   row (N75 −4.8 V / 1 µs at k 4 162.8 → 153.1 A, N13 163.6 → 156.7 A) and no four-module cost. But the holds also act
   at the handover and leave rail 1 0.3 V higher 20 µs later, so it is not adopted either (item 10 below; figure
-  `A243_p24_hold_without_reversal/a243_hold_without_reversal.png`, release records-a243);
+  `A243_p24_hold_without_reversal/a243_hold_without_reversal.png`, release records-a243). A244 delays the holds
+  until 32 phase-1 turn-ons after the handover: no restart on any falling row (f_N75_k4 153.4 A, N13 162.4 A), and
+  every run equals its reference before the step (item 10 below, release records-a244);
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 
@@ -328,7 +330,17 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
       mode P's entry and leave C1 0.2-0.5 V lower. S75 at 125 °C with +4.8 V / 1 µs 20 µs after the handover then
       peaks 2-5.6 A higher at three step positions (213.4 A against 207.8 A; inside item 2's 40 µs hold-off). On the
       release rows, NEW counts of the reference's own kinds rise by 1-4 (≤ 95 A).
-    - **Next:** A244 enables the holds only after a number of phase-1 periods in mode P.
+    - **A244, the same holds acting only from phase 1's 32nd turn-on in mode P.** Every run equals its reference
+      before its disturbance (47 / 47), so A243's handover costs are gone: item 2 rows as the reference, N0 ≤ 1.0498 V.
+      - 10-200 kHz: every row ≤ 190.5 A (N75 100 / 200 kHz 152.1 / 149.5 A; N0 60 kHz 159.8 A).
+      - Item 3 fixed; stage 2's three misses are step-position scatter by the control.
+      - What it leaves: on N0 at 100 kHz, a release valley that did reverse (−61 A) lowers phase 4's delay
+        15 → 8 ns at about 490 µs. The holds then keep it while the phase runs with positive current, which gives
+        178-190 A at every re-application. A240 locks the same way from 340 µs (195.7 A).
+      - This misses the registered g2 (single re-application + 10 A), so it is not adopted as registered. Adoption is
+        put to the user (records-a244, figure `A244_p24_holds_after_handover/a244_holds_after_handover.png`).
+    - **Still open:** a delay that a reversed valley has collapsed has to return to the phase's settled value. That
+      value differs by board (9.6-18.8 ns), so it would have to be learned.
   - **Limits held:** V_DS ≤ 33.7 V, rail 1 ≤ 12.79 V, every row back within 1 %.
   - **Coverage:** under 200 A for one module are N0 at every frequency (up to 196.5 A), N75 at 10-60 kHz and S75 at
     10-200 kHz. Not covered: N75 at 100 kHz-1 MHz and S75 at 1 MHz. N0 also falls below our 0.95 V at 30-60 kHz.
