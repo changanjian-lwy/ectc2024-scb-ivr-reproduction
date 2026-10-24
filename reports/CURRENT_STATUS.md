@@ -2458,6 +2458,16 @@ each question:
          N0 dips to 0.937 V at 60 kHz (phase 1's edge after a short skip).
          Vo never above 1.05 V. Accepted 99 pass / 15 documented; item 10
          (repeated load steps) opens, scorecard T37.
+    142. Fixes for item 10 (A241-A243, 2026-10-23/24, V7, A240's 18 rows
+         + A236's 25 + A237's 3; none adopted). Each fixes 10-200 kHz
+         (<= 161.1 A). A241 (fall limit) ratchets the delay up where the
+         valley stays positive; A242 (hold late reports without reversal)
+         leaves item 3's climb (173.7 A); A243 (hold every report without
+         reversal) clears item 3 too, but its holds at the handover leave
+         rail 1 +0.3 V for an item-2 step 20 us later (+2..+5.6 A at three
+         positions, control 06d71ff). 1 MHz stays the ladder's. Accepted
+         A241 91 / 31, A242 115 / 19, A243 121 / 22; next A244 (holds
+         after N phase-1 periods in mode P).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

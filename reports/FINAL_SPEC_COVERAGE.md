@@ -164,7 +164,11 @@ The rest:
   the high side's body diode conducts first (the spike). The same positive-valley "early" reports occur on every
   falling step (N0: 68-75 per run) without reaching the restart. Holding dt_pred on such reports (A236) removes the
   restart and the spike on every falling row but deepens four modules' −8 V / 10 µs undershoot by 3 mV and perturbs
-  an item-2 row: not adopted, item 3 stays inside the limits (release records-a236);
+  an item-2 row: not adopted, item 3 stays inside the limits (release records-a236). **A243 (2026-10-24, V7, final
+  configuration) holds dt_pred on early and late reports without reversal:** no restart or NEW spike on any falling
+  row (N75 −4.8 V / 1 µs at k 4 162.8 → 153.1 A, N13 163.6 → 156.7 A) and no four-module cost. But the holds also act
+  at the handover and leave rail 1 0.3 V higher 20 µs later, so it is not adopted either (item 10 below; figure
+  `A243_p24_hold_without_reversal/a243_hold_without_reversal.png`, release records-a243);
 - slow corner: Vo dips 3-5 mV deeper than V2 after line ramps (the low sides' turn-off delay plus holds);
 - four modules ss: 10-16 A spikes, four of them A160's K4-window artefact.
 
@@ -308,9 +312,23 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
   - **Vo:** never above 1.05 V. On N0 it dips to 0.941 / 0.937 V at 30 / 60 kHz (−40.7 mV for one re-application;
     0.95 V is our bound, no source). After a short skip, phase 1's timed low-side edge is still 14 ns late. The
     floor then holds its valley at −12 A and the current builds over 37 instead of 63 turn-ons in 3 µs.
-  - **Late fires at 10 kHz:** a 50 µs light half moves that edge onto the light-load crossing, and each
-    re-application then costs 118-190 late fires and about 30 µs of hard turn-ons on N0 (one re-application: 0). This
-    is T33's learner trade-off; no limit is touched.
+  - **Late fires at 10 kHz:** each re-application costs 118-190 late fires and about 30 µs of hard turn-ons on N0
+    (one re-application: 0). No limit is touched. They are on phases 2-4 and come from the same collapsed turn-on
+    delay: they go whenever the delay is kept up (A241-A243: N0 496 → 11-12). A240 first put them on phase 1's
+    learner (T33); that was wrong and is corrected in A240's RESULTS.
+  - **Fixes tried (A241-A243, 2026-10-23/24, same rows; none adopted).** On A240's and A237's re-application rows, 54 %
+    of the turn-on delay's falls over 0.5 ns (63 % of the total fall) come from reports whose low-side turn-off current
+    had not reversed: the edge's ring read as a late valley (records-a240, records-a237).
+    - **A241, a fall limit of one step per report.** Fixes 10-200 kHz (≤ 161.1 A). But the delay ratchets up where
+      the valley stays positive (N75 −4.8 V: 6 restarts and spikes; item 2 +5 / +11 A), and the overshoot rises 4-6 mV.
+    - **A242, holding late reports without reversal.** Fixes 10-200 kHz (≤ 159.7 A). But it leaves item 3's climb
+      unopposed (173.7 A against 153.7 A).
+    - **A243, holding every report without reversal.** Fixes 10-200 kHz (≤ 159.6 A) and item 3. N0's overshoot rises
+      to 1.0513 V for ≤ 0.92 µs (A240 1.0498 V). The cost comes from the handover: the holds act 0.07-2.58 µs after
+      mode P's entry and leave C1 0.2-0.5 V lower. S75 at 125 °C with +4.8 V / 1 µs 20 µs after the handover then
+      peaks 2-5.6 A higher at three step positions (213.4 A against 207.8 A; inside item 2's 40 µs hold-off). On the
+      release rows, NEW counts of the reference's own kinds rise by 1-4 (≤ 95 A).
+    - **Next:** A244 enables the holds only after a number of phase-1 periods in mode P.
   - **Limits held:** V_DS ≤ 33.7 V, rail 1 ≤ 12.79 V, every row back within 1 %.
   - **Coverage:** under 200 A for one module are N0 at every frequency (up to 196.5 A), N75 at 10-60 kHz and S75 at
     10-200 kHz. Not covered: N75 at 100 kHz-1 MHz and S75 at 1 MHz. N0 also falls below our 0.95 V at 30-60 kHz.
