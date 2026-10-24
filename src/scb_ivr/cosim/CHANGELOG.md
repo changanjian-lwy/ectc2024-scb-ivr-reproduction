@@ -16,11 +16,12 @@ of a node that creeps towards the reverse-conduction voltage is always the last 
 2003) and Sun et al. (Microelectronics 54(4), 2024, GaN) shorten the delay while reverse conduction is detected.
 scb_phase m_rev / cfg_rev_n and a per-phase count of m_rev reports in a row (8 bits, saturating): from the
 cfg_rev_n-th such report, each lowers dt_pred by cfg_dt_step (floor 0), before the early / flat / late rules; any
-other report restarts the count. scb_ctrl passes m_rev and cfg_rev_n to every phase (scb_multi regenerated). Bridge
-cfg "rev_n" (0-255, absent = 0); m_rev = V_DS <= 0 at the turn-on command.
-**Gate:** rev_n absent: cfg_rev_n 0, the count changes nothing; unit tests 130 / 130 (three new:
-rev_lowers_from_the_nth_report, rev_counts_per_phase, rev_off), cosim_regression --quick and --full PASS on fresh
-outputs.
+other report restarts the count. scb_ctrl passes m_rev to every phase and cfg_rev_n to the slotted ones (the
+master's phase 1 gets 0: it never locked, and its runs reach 35 in A244's falling-line rows); scb_multi regenerated.
+Bridge cfg "rev_n" (0-255, absent = 0); m_rev = V_DS <= 0 at the turn-on command.
+**Gate:** rev_n absent: cfg_rev_n 0, the count changes nothing; unit tests 131 / 131 (four new:
+rev_lowers_from_the_nth_report, rev_counts_per_phase, rev_skips_phase1, rev_off), cosim_regression --quick and --full
+PASS on fresh outputs.
 
 ## 2026-10-25 (A245) - ladder balance by Ton trims (RTL + bridge)
 

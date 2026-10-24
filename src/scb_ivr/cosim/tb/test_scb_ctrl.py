@@ -923,6 +923,14 @@ async def rev_counts_per_phase(dut):
 
 
 @cocotb.test()
+async def rev_skips_phase1(dut):
+    """A245: rev_n goes to the slotted phases only: three m_rev reports on phase 1 leave its 85 (rev_n 2)."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, rev_n=2)
+    assert [await _report_high(c, dut, 0, err=3, tv=10, rev=1) for _ in range(3)] == [85, 85, 85]
+
+
+@cocotb.test()
 async def rev_off(dut):
     """A245: rev_n 0: m_rev is ignored; on-target reports leave 80 and an early one steps (+2 -> 82)."""
     c = Ctrl(dut)
