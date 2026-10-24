@@ -59,3 +59,24 @@ because there is no code change.
   peak 2-7 A) are shown against that scatter with a run that moves the step. Adoption is then put to the user with
   the evidence, not taken here.
 - **Stage 1 g1 fails at 100-200 kHz:** stage 2 is stopped.
+
+## 5. Control (added 2026-10-24 after the 46 runs, before the control runs)
+- **Misses:** g0-g4 and g7 pass (g1 / g2 miss only at 1 MHz); g5 misses on a_S75h_d20; g6 on f_N75_k0, r_F0_lm48,
+  r_F0_lm80, a_S75h_d20 (peaks +2.1..+5.6 A), a_S75_d20, u_N0, w5_N0, w20_N0 (NEW +1 / +3 / +3 / +4).
+- **Traced:** on every one of these rows the run parts from its reference at the handover (133.9 us or 144.4-144.5 us,
+  the first held reports), 20-356 us before the disturbance. The peak is on the same phase within 0.9 us of the
+  reference's. The extra NEW events are the reference's own kinds: order hits and 10.2-24.9 A spikes at <= 94 A,
+  1.4-3 us after a release (outside K4's 1 us), and two spikes of 138 / 153 A on a_S75_d20.
+- **f_N75_k0 needs no run:** f_N75_k0 / k2 / k4 are one step at k T / 6 (A232). Reference 156.2 / 153.7 / 162.8 A,
+  arm b 159.5 / 153.6 / 153.1 A.
+- **Runs (28, make_ctrl_cfgs.py):** the other seven rows with the disturbance moved by k T / 6, k 2 and 4 (T = the
+  reference's settled period, 0.389-0.511 us; both steps of a re-application move). Arm r = reference cfg, arm b =
+  holds 0.0; k 0 = the existing records.
+- **Criterion c1, per row, over k 0 / 2 / 4:**
+  - arm b's highest post-event peak <= arm r's highest + 2 A (+ 10 A on re-applications);
+  - on item 2 rows, arm b's highest whole-run peak <= arm r's highest + 2 A;
+  - arm b's most NEW events <= arm r's most;
+  - |Vo extreme| <= arm r's largest + 1 mV, except on re-applications.
+- **Decision:** a row that passes c1 counts as step-position scatter.
+  - Every miss is scatter: adoption is put to the user with this evidence.
+  - Otherwise: not adopted, and the failing rows are traced.
