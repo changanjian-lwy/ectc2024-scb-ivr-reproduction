@@ -146,6 +146,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A243": (TA / "A243_p24_hold_without_reversal", "a243_analyze.py", "a243_summary.json"),
     "A244": (TA / "A244_p24_holds_after_handover", "a244_analyze.py", "a244_summary.json"),
     "A245": (TA / "A245_p24_reverse_conduction_delay", "a245_analyze.py", "a245_summary.json"),
+    "A246": (TA / "A246_p24_held_report_floor", "a246_analyze.py", "a246_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -406,6 +407,7 @@ NOT_ROWS["A235"] = r"t_"                          # stage-1 start-ups: the summa
 NOT_ROWS["A236"] = r"o_"                          # the identity row: the summary's identity block (e0)
 NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243", "A244")})   # judged through ADAPT (stage 1 / stage 2 rows)
 NOT_ROWS["A245"] = r".*"                          # judged through ADAPT (stage 1 rows, identity block with stage 2)
+NOT_ROWS["A246"] = r".*"                          # judged through ADAPT (stage 1 / stage 2 rows, c1 rows)
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
@@ -809,6 +811,20 @@ _A245g2 = ("not adopted as registered: one oracle order hit inside the release w
            "phase 3 (as in arm f of the 5 A rows and A244's skipping rows); Vo >= 0.9969 V, peak <= 96 A; adoption to the "
            "user (RESULTS 0); adopted by user decision on 2026-10-25")
 EXCEPTIONS["A245"] = {("criteria", f"stage1/{r}/g2"): _A245g2 for r in ("u_N0_10", "u_N0_20")}
+_A246g8 = ("not adopted as registered: the floor acted below 8 ns, which the registered detector does not count (phase 4 "
+           "4.56 -> 4.81 / 3.94 -> 4.44 ns); post hoc every row that leaves A244's record starts with a lift to the floor "
+           "exactly (RESULTS 0); adopted by user decision on 2026-10-25")
+_A246g9 = ("not adopted as registered: S75h at 100 kHz dips 1.5-2.1 mV deeper wherever the floor acts, because A244's "
+           "collapsed phase 4 gave the step extra volt-seconds, the imbalance behind N0's lock; c1 fails too (RESULTS 0); "
+           "adopted by user decision on 2026-10-25")
+_A246g6 = "equal to A244's record bit for bit: A244's own miss, step-position scatter by A244's c1 (RESULTS 1)"
+EXCEPTIONS["A246"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_1000k", "p_S75h_1000k") for g in ("g1", "g2")},
+                      **{("criteria", f"stage1/{r}/g8"): _A246g8 for r in ("p_S75h_60k", "p_S75h_200k")},
+                      ("criteria_main", "g8"): _A246g8,
+                      ("criteria", "stage1/p_S75h_100k/g9"): _A246g9, ("criteria_main", "g9"): _A246g9,
+                      ("criteria", "c1/p_S75h_100k/c1"): _A246g9, ("criteria_main", "c1"): _A246g9,
+                      **{("criteria", f"stage2/{r}/g6"): _A246g6 for r in ("f_N75_k2", "a_S75_d20", "m4_l_m80_10us")},
+                      ("criteria_main", "g6"): _A246g6}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -822,6 +838,9 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
        for e in ("A241", "A242", "A243", "A244")},
     "A245": lambda d: {"stage1": {n: v["criteria"] for n, v in d["stage1"].items() if v},
                        "identity": {"g0": d["identity"]["g0"]}},
+    "A246": lambda d: {**{g: {n: {k: c for k, c in v["criteria"].items() if k != "g1_g2_excepted"}
+                              for n, v in d[g].items() if v} for g in ("stage1", "stage2")},
+                       "c1": {r: {"c1": v["c1"]} for r, v in d["c1"].items() if v}},
     "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
                        "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)

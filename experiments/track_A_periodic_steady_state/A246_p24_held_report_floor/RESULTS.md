@@ -5,6 +5,8 @@ a246_analyze.py -> a246_summary.json; figure a246_figure.py -> a246_held_report_
 also four modules); arm w = A244's record (final configuration), arm h = final configuration + rev_n 16 + hold_floor_ns 3.0.
 
 ## 0. Verdict
+- **Adopted by user decision on 2026-10-25, after these results** (hold_floor_ns 3.0 in the final configuration, one
+  and four modules). Item 10 closes at 10-200 kHz; 1 MHz stays the ladder's limit (A244).
 - **Not adopted as registered: g8 misses on 2 rows (the detector), and g9 on S75h at 100 kHz fails c1 (Vo's minimum
   1.3 mV below arm w's worst).** Put to the user with the evidence below.
 - **The lock is gone (g10 pass; figure, top row).** N0 at 100 kHz: 190.5 -> 150.9 A (records A244
@@ -48,6 +50,6 @@ also four modules); arm w = A244's record (final configuration), arm h = final c
   dips, not foreseen.
 
 ## 3. Limits
-- Not tested: bands other than 3 / 4 ns; start-ups with the floor beyond A244's rows; four modules under the accelerator
-  load. 1 MHz stays the ladder's limit (A244).
+- Not tested: bands other than 3 / 4 ns; start-ups into a light load (A245's rows; A244's rows all start at full load,
+  and the floor can act from phase 1's 32nd turn-on in mode P); four modules under the accelerator load. 1 MHz stays the ladder's limit (A244).
 - The detector registered for g8 misses lifts below 8 ns; the post hoc divergence check covers every changed row instead.

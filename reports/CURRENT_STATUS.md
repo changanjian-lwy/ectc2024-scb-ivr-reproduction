@@ -2489,6 +2489,18 @@ each question:
          skipping-pause order hit on N0 10 / 20 % inside the release
          window). Accepted 79 / 2. ADOPTED by user decision on 2026-10-25:
          item 6c closed for >= 5 A (N0 / N75) and 30 % (S75), 25 / 125 C.
+    145. A246 (2026-10-25, V7, item 10): the lock after a reversed
+         collapse. hold_floor_ns 3.0 (RTL cfg_hold_floor / cfg_floor_band,
+         unit 137): a report with positive low-side current that leaves
+         dt_pred (held or flat) lifts it to the other phases 2..N's least
+         minus 3 ns. N0 100 kHz 190.5 -> 150.9 A (k 0 / 2 / 4: 150.9 /
+         156.4 / 156.3 A; arm w locks at two of three); 36 / 46 rows equal
+         A244 bit for bit, each of the other 10 starts with a lift to the
+         floor exactly. Not adopted as registered: g8 (the detector misses
+         lifts below 8 ns) and g9 / c1 (S75h 100 kHz dips 1.5-2.1 mV
+         deeper: A244's collapsed phase 4 helped that step). Accepted
+         217 / 15. ADOPTED by user decision on 2026-10-25: item 10 closed
+         at 10-200 kHz; 1 MHz stays the ladder's.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
