@@ -28,7 +28,8 @@
 //   A245: m_rev with each valley report (V_DS <= 0 at the turn-on command) goes to every phase, cfg_rev_n to phases
 //   2..N (phase 1 gets 0, in a slave too): from cfg_rev_n such reports in a row, each lowers that phase's dt_pred by
 //   cfg_dt_step (0: off). A246: with cfg_hold_floor, phases 2..N get dt_floor = the smallest dt_pred of the other
-//   phases 2..N minus cfg_floor_band (floor 0), and a report held by A236 / A242 raises dt_pred to it.
+//   phases 2..N minus cfg_floor_band (floor 0), and a report with m_pos that leaves dt_pred (held by A236 / A242, or
+//   flat) raises dt_pred to it.
 // - A245 (ladder balance): with cfg_bal, each phase's rail report at its low-side turn-off (b_valid; b_hi / b_lo: the
 //   rail above Vin / 4 + band or below Vin / 4 - band) moves the Ton trims of phases 2..N by cfg_bal_step / 16 LSB:
 //   a phase's own report up when high, down when low, phase 1's report every other phase the other way. The trims

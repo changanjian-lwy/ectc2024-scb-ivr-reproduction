@@ -956,6 +956,17 @@ async def hold_floor_raises_a_held_report(dut):
 
 
 @cocotb.test()
+async def hold_floor_lifts_a_flat_report_with_m_pos(dut):
+    """A246, band 4: a flat report with m_pos (no swing: positive current) raises phase 2 from 60 to the floor 76;
+    a flat report without m_pos leaves 60."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1,
+                  hold_floor=1, floor_band=4)
+    assert await _report_high(c, dut, 1, flat=1, err=3, tv=10) == 60
+    assert await _report_high(c, dut, 1, flat=1, err=3, tv=10, pos=1) == 76
+
+
+@cocotb.test()
 async def hold_floor_leaves_reports_not_held(dut):
     """A246: a report without m_pos updates as before even below the floor (60, error 23 -> 50)."""
     c = Ctrl(dut)

@@ -68,7 +68,8 @@
 //   with cfg_late_hold a late report with m_pos leaves dt_pred (no reversal, so its dip is the edge's ring, not a swing);
 //   A245: with cfg_rev_n, a report with m_rev (V_DS <= 0 at the command: the swing had finished) that is the
 //   cfg_rev_n-th or later in a row lowers dt_pred by cfg_dt_step (floor 0) instead; any other report restarts the count;
-//   A246: a report held by A236 / A242 raises dt_pred to dt_floor when it is below it (dt_floor 0: off);
+//   A246: a report with m_pos that leaves dt_pred (early or late, held by A236 / A242 while either hold is on, or flat)
+//   raises dt_pred to dt_floor when it is below it (dt_floor 0: off);
 // - dtl (cfg_low_pred): early -> + cfg_dtl_step; otherwise the measured crossing time ml_tv, or with cfg_err_low
 //   dtl - ((ml_err - cfg_el_tgt) >>> cfg_err_shift); both clamped to [0, cfg_dtl_max];
 // - trim: +1 / -1 per current-decided low-side turn-off from the residual-current sign (cfg_trim).
@@ -112,7 +113,7 @@ module scb_phase #(
     input  wire                 cfg_late_hold, // A242: a late report with m_pos leaves dt_pred
     input  wire                 m_rev,         // A245: V_DS <= 0 at the turn-on command
     input  wire [7:0]           cfg_rev_n,     // A245: from this many m_rev reports in a row, each lowers dt_pred (0: off)
-    input  wire [TW-1:0]        dt_floor,      // A246: a held report raises dt_pred to this (0: off)
+    input  wire [TW-1:0]        dt_floor,      // A246: a held report with m_pos raises dt_pred to this (0: off)
     input  wire [TW-1:0]        m_tv,
     input  wire                 r_valid,
     input  wire                 r_below,
@@ -362,7 +363,7 @@ module scb_phase #(
                         dt_pred <= dt_floor;
                 end else if (!m_flat && !(cfg_late_hold && m_pos))    // A242
                     dt_pred <= dt_lim;                                 // A92 error-based when set; A241 fall limit
-                else if (!m_flat && dt_pred < dt_floor)              // A246: a held late report
+                else if (m_pos && (cfg_early_hold || cfg_late_hold) && dt_pred < dt_floor)   // A246: held late or flat
                     dt_pred <= dt_floor;
             end
             if (ml_valid && cfg_low_pred) begin                  // A89: zero-crossing correction

@@ -14,11 +14,13 @@ current each period (170-182 A). With positive current the node cannot swing, so
 only gives the phase more volt-seconds. In A244's 47 records a held report on phases 2-4 with dt_pred more than 3 ns
 below both other slotted phases occurs 210 / 538 times on N0 100 kHz / N75 1 MHz, 1-11 times on seven rows, never on
 37. scb_ctrl cfg_hold_floor / cfg_floor_band: phases 2..N get dt_floor = the other phases 2..N's smallest dt_pred
-minus the band (floor 0; 0 when off); scb_phase input dt_floor: a report held by A236 / A242 raises dt_pred to it when
-below. scb_multi regenerated. Bridge cfg "hold_floor_ns" (the band; absent = off). No source for the rule.
-**Gate:** hold_floor_ns absent: dt_floor 0, the held branches as before; unit tests 136 / 136 (four new:
-hold_floor_raises_a_held_report, hold_floor_leaves_reports_not_held, hold_floor_needs_the_holds, hold_floor_off),
-cosim_regression --quick and --full PASS on fresh outputs.
+minus the band (floor 0; 0 when off); scb_phase input dt_floor: a report with m_pos that leaves dt_pred (early or
+late, held by A236 / A242 while either hold is on, or flat: with positive current the node often shows no dip) raises
+dt_pred to it when below. scb_multi regenerated. Bridge cfg "hold_floor_ns" (the band; absent = off). No source for
+the rule.
+**Gate:** hold_floor_ns absent: dt_floor 0, the held branches as before; unit tests 137 / 137 (five new:
+hold_floor_raises_a_held_report, hold_floor_lifts_a_flat_report_with_m_pos, hold_floor_leaves_reports_not_held,
+hold_floor_needs_the_holds, hold_floor_off), cosim_regression --quick and --full PASS on fresh outputs.
 
 ## 2026-10-25 (A245) - a turn-on delay that keeps finding the swing finished is lowered (RTL + bridge)
 

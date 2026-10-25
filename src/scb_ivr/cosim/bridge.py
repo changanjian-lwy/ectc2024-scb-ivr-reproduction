@@ -43,8 +43,9 @@ Controller-side analog functions modelled here:
   (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
   act only from that many phase-1 turn-ons after mode P's entry; m_rev (A245) is V_DS <= 0 at the turn-on command,
   and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers the dt_pred of phases 2..N one step per m_rev report from
-  that many in a row; "hold_floor_ns" (A246, RTL cfg_hold_floor / cfg_floor_band; absent = off): a report held by
-  A236 / A242 on phases 2..N raises dt_pred to the other phases' smallest dt_pred minus this band;
+  that many in a row; "hold_floor_ns" (A246, RTL cfg_hold_floor / cfg_floor_band; absent = off): on phases 2..N a
+  report with m_pos that leaves dt_pred (held by A236 / A242, or flat) raises it to the other phases' smallest dt_pred
+  minus this band;
 - the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
   phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
   b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");
