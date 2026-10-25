@@ -1,7 +1,7 @@
 """A247 physics: D57's free node after a low-side turn-off at i_off (A, + into the inductor), no turn-on, as the whole
 trace V_DS(t) = rail - x(t) on 0-40 ns (EPC2067 Coss, both sides' reverse conduction; the same model and solver settings
-as p24_valley_map.von_point, A148). Boards by L: N0 2.933 nH, N75 / S75h 2.2 nH. Node: phases 2-3 carry the next
-phase's high side biased at the rail times D63's ratio (EdgeCircuit dv_cs / v_rail); phase 4 has none (last).
+as p24_valley_map.von_point, A148). Boards by L: N0 2.933 nH, N75 / S75h 2.2 nH, L x 1.3 3.813 nH. Node: phases 2-3
+carry the next phase's high side biased at the rail times D63's ratio (EdgeCircuit dv_cs / v_rail); phase 4 has none.
 Windows on the grid: the delays with V_DS <= V_SOFT (and <= 0), the valley's time and V_DS.
   python3 a247_window.py [--jobs 10] [--smoke] -> tmp/a247_window.npz (traces), a247_window.json (windows)"""
 from __future__ import annotations
@@ -16,7 +16,7 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[2]
-LF = (2.9333333e-9, 2.2e-9)                      # N0; N75 / S75h
+LF = (2.9333333e-9, 2.2e-9, 3.8133333e-9)        # N0; N75 / S75h; L x 1.3 (A235's corners, in the records)
 LAST = (False, True)                             # phases 2-3; phase 4
 RAILS = np.arange(6.0, 20.01, 1.0)
 CURRENTS = np.arange(-100.0, 30.01, 2.0)
