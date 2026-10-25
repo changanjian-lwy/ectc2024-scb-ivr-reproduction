@@ -1,13 +1,15 @@
 """A246 cfgs (BOUNDARY Section 1). Arm h on A244's 46 rows: A244's cfg_w_<row> (the final configuration; rev_n 16 added,
 A245) + "hold_floor_ns" BAND (out run_h_<row>.json). Control (g10): CTRL_ROW with the load train and the end moved by
 k T / 6 (k 2, 4; T the switching period, from phase 1's turn-ons in A244's record before the train) in arm h and in
-arm w (A244's cfg + rev_n 16, no floor): run_ch_ / run_cw_<row>_k<k>.json. FIRST: queue order.
-  python3 make_cfgs.py"""
+arm w (A244's cfg + rev_n 16, no floor): run_ch_ / run_cw_<row>_k<k>.json. FIRST: queue order. --c1 ROW writes the
+same pair for a g9 miss (BOUNDARY Section 4, A243's c1).
+  python3 make_cfgs.py [--c1 ROW]"""
 from __future__ import annotations
 
 import importlib.util
 import json
 import statistics
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -39,20 +41,29 @@ def moved(c, dt_us):
                 t_end_us=round(c["t_end_us"] + dt_us, 4))
 
 
+def controls(row):
+    t = period_us(row)
+    for k in KS:
+        m = moved(w_cfg(row), k * t / 6)
+        w = dict(m, out=f"run_cw_{row}_k{k}.json",
+                 note=f"A246 control arm w: A244 w_{row} + rev_n {REV_N}, train moved by {k} T / 6 (T {t:.4f} us)")
+        h = dict(m, hold_floor_ns=BAND, out=f"run_ch_{row}_k{k}.json", note=w["note"].replace("arm w", "arm h")
+                 + f" + hold_floor_ns {BAND}")
+        (COS / f"cfg_cw_{row}_k{k}.json").write_text(json.dumps(w, indent=1) + "\n")
+        (COS / f"cfg_ch_{row}_k{k}.json").write_text(json.dumps(h, indent=1) + "\n")
+    return t
+
+
 def main():
+    if sys.argv[1:2] == ["--c1"]:
+        t = controls(sys.argv[2])
+        print("c1 cfgs for", sys.argv[2], "T", round(t, 4), "us")
+        return
     for row in STAGE1 + STAGE2:
         h = dict(w_cfg(row), hold_floor_ns=BAND, out=f"run_h_{row}.json",
                  note=f"A246 arm h: A244 w_{row} + rev_n {REV_N} + hold_floor_ns {BAND}")
         (COS / f"cfg_h_{row}.json").write_text(json.dumps(h, indent=1) + "\n")
-    t = period_us(CTRL_ROW)
-    for k in KS:
-        m = moved(w_cfg(CTRL_ROW), k * t / 6)
-        w = dict(m, out=f"run_cw_{CTRL_ROW}_k{k}.json",
-                 note=f"A246 control arm w: A244 w_{CTRL_ROW} + rev_n {REV_N}, train moved by {k} T / 6 (T {t:.4f} us)")
-        h = dict(m, hold_floor_ns=BAND, out=f"run_ch_{CTRL_ROW}_k{k}.json", note=w["note"].replace("arm w", "arm h")
-                 + f" + hold_floor_ns {BAND}")
-        (COS / f"cfg_cw_{CTRL_ROW}_k{k}.json").write_text(json.dumps(w, indent=1) + "\n")
-        (COS / f"cfg_ch_{CTRL_ROW}_k{k}.json").write_text(json.dumps(h, indent=1) + "\n")
+    t = controls(CTRL_ROW)
     print(len(list(COS.glob("cfg_*.json"))), "cfgs, T", round(t, 4), "us")
 
 
