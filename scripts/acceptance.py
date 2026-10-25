@@ -807,7 +807,7 @@ EXCEPTIONS["A244"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_
                       ("criteria_main", "g6"): _A244s}
 _A245g2 = ("not adopted as registered: one oracle order hit inside the release window, a skipping pause that begins after "
            "phase 3 (as in arm f of the 5 A rows and A244's skipping rows); Vo >= 0.9969 V, peak <= 96 A; adoption to the "
-           "user (RESULTS 0)")
+           "user (RESULTS 0); adopted by user decision on 2026-10-25")
 EXCEPTIONS["A245"] = {("criteria", f"stage1/{r}/g2"): _A245g2 for r in ("u_N0_10", "u_N0_20")}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],

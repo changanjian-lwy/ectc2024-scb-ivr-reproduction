@@ -2478,6 +2478,17 @@ each question:
          2026-10-24 (early_hold_a 0, late_hold_a 0, hold_wait 32): item 3
          closed; item 10 open for the lock after a reversed collapse and
          for 1 MHz (the ladder).
+    144. A245 (2026-10-25, V7, item 6c): a light-load start-up can lock
+         the ladder: the low rail's phase turns on after its node has
+         finished swinging (V_DS <= 0 at the command, reverse conduction)
+         and its learner reads the valley on target. rev_n 16 (RTL
+         cfg_rev_n, unit 132; phases 2..N lower dt_pred one step per such
+         report from the 16th in a row): 20 / 20 start-ups end within 1 V
+         (S75 4.6-5.4 -> 0.1 V), Vo >= 0.9931 V, peaks <= 125 A, full load
+         and A244's rows bit for bit. Not adopted as registered (g2: one
+         skipping-pause order hit on N0 10 / 20 % inside the release
+         window). Accepted 79 / 2. ADOPTED by user decision on 2026-10-25:
+         item 6c closed for >= 5 A (N0 / N75) and 30 % (S75), 25 / 125 C.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

@@ -5,6 +5,9 @@ figure a245_figure.py -> a245_reverse_conduction.png. Plant V7, one module (stag
 configuration, arm r = f + rev_n 16.
 
 ## 0. Verdict
+- **Adopted by user decision on 2026-10-25, after these results** (rev_n 16 in the final configuration, one and four
+  modules; four modules checked for identity only). Item 6c closes for start-ups into >= 5 A on N0 / N75 and into 30 %
+  on S75, 25 / 125 C.
 - **Not adopted as registered: g2 misses on N0 at 10 % and 20 %, one oracle NEW event each, inside the release window.**
   Both are a skipping pause that begins after phase 3 (phase 4's pulse withheld), read as an order hit at the resume
   (150.6 / 153.9 us; records `cosim/run_r_u_N0_10.json`, `run_r_u_N0_20.json`). Vo there >= 0.9969 V, peaks <= 96 A.
