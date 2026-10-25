@@ -32,6 +32,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             late_hold=0,                                                         # A242
             hold_wait=0,                                                         # A244
             rev_n=0,                                                             # A245
+            hold_floor=0, floor_band=0,                                          # A246
             bal=0, bal_step=0, bal_max=0,                                        # A245
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
@@ -110,6 +111,7 @@ class Ctrl:
         d.cfg_late_hold.value = cfg["late_hold"]                 # A242
         d.cfg_hold_wait.value = cfg["hold_wait"]                 # A244
         d.cfg_rev_n.value = cfg["rev_n"]                         # A245
+        d.cfg_hold_floor.value = cfg["hold_floor"]; d.cfg_floor_band.value = cfg["floor_band"]   # A246
         d.cfg_bal.value = cfg["bal"]; d.cfg_bal_step.value = cfg["bal_step"]; d.cfg_bal_max.value = cfg["bal_max"]   # A245
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
@@ -937,6 +939,46 @@ async def rev_off(dut):
     await c.start(err_high=1, eh_tgt=3, err_shift=1)
     assert [await _report_high(c, dut, 1, err=3, tv=10, rev=1) for _ in range(4)] == [80, 80, 80, 80]
     assert await _report_high(c, dut, 1, early=1, rev=1) == 82
+
+
+@cocotb.test()
+async def hold_floor_raises_a_held_report(dut):
+    """A246, band 4: phase 2 at 60 with phases 3 / 4 at 80 / 93 has floor 76. A late report with m_pos (held) raises
+    it to 76, an early one with m_pos leaves 76; a held report never lowers (phase 3 at 80 is above its floor
+    min(76, 93) - 4 = 72 and stays); phase 1 has no floor (a held report leaves 85)."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1,
+                  hold_floor=1, floor_band=4)
+    assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 76
+    assert await _report_high(c, dut, 1, early=1, pos=1) == 76
+    assert await _report_high(c, dut, 2, err=23, tv=10, pos=1) == 80
+    assert await _report_high(c, dut, 0, err=23, tv=10, pos=1) == 85
+
+
+@cocotb.test()
+async def hold_floor_leaves_reports_not_held(dut):
+    """A246: a report without m_pos updates as before even below the floor (60, error 23 -> 50)."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1,
+                  hold_floor=1, floor_band=4)
+    assert await _report_high(c, dut, 1, err=23, tv=10) == 50
+
+
+@cocotb.test()
+async def hold_floor_needs_the_holds(dut):
+    """A246: with the holds off m_pos holds nothing, so the floor does nothing (60, error 23 -> 50)."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, hold_floor=1, floor_band=4)
+    assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 50
+
+
+@cocotb.test()
+async def hold_floor_off(dut):
+    """A246: hold_floor 0: a held report leaves 60 (A242 / A236 as before)."""
+    c = Ctrl(dut)
+    await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1)
+    assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 60
+    assert await _report_high(c, dut, 1, early=1, pos=1) == 60
 
 
 async def _rail(c, dut, k, hi=0, lo=0):

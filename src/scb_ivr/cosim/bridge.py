@@ -43,7 +43,8 @@ Controller-side analog functions modelled here:
   (with both keys set they must be equal); "hold_wait" (A244, RTL cfg_hold_wait, 0-255, absent = 0) lets both holds
   act only from that many phase-1 turn-ons after mode P's entry; m_rev (A245) is V_DS <= 0 at the turn-on command,
   and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers the dt_pred of phases 2..N one step per m_rev report from
-  that many in a row;
+  that many in a row; "hold_floor_ns" (A246, RTL cfg_hold_floor / cfg_floor_band; absent = off): a report held by
+  A236 / A242 on phases 2..N raises dt_pred to the other phases' smallest dt_pred minus this band;
 - the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
   phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
   b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");
@@ -371,6 +372,9 @@ class ModuleSim:
         if not 0 <= self.hold_wait <= 255:
             raise ValueError("hold_wait is an 8-bit count of phase-1 turn-ons")
         self.rev_n = int(cfg.get("rev_n", 0))                        # A245
+        self.hold_floor = cfg.get("hold_floor_ns")                   # A246: None = off
+        if self.hold_floor is not None and self.hold_floor < 0:
+            raise ValueError("hold_floor_ns is a band >= 0")
         if not 0 <= self.rev_n <= 255:
             raise ValueError("rev_n is an 8-bit count of valley reports")
         self.bal = cfg.get("bal")                                    # A245
@@ -458,6 +462,8 @@ class ModuleSim:
         c.set("cfg_late_hold", int(self.late_hold is not None))       # A242
         c.set("cfg_hold_wait", self.hold_wait)                        # A244
         c.set("cfg_rev_n", self.rev_n)                                # A245
+        c.set("cfg_hold_floor", int(self.hold_floor is not None))     # A246
+        c.set("cfg_floor_band", to_lsb(self.hold_floor * 1e-9) if self.hold_floor is not None else 0)
         c.set("cfg_bal", int(self.bal is not None))                   # A245
         c.set("cfg_bal_step", int(self.bal.get("step_q4", 4)) if self.bal is not None else 0)
         c.set("cfg_bal_max", to_lsb(self.bal.get("max_ns", 8.0) * 1e-9) if self.bal is not None else 0)

@@ -4,6 +4,22 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-25 (A246) - a held report lifts a delay far below the other phases' (RTL + bridge)
+
+**Source:** A244's remaining item-10 lock (N0 at 100 kHz, record A244 `run_w_p_N0_100k.json`): in a light half the
+slotted phase 4's valleys reach -40..-70 A, its node finishes the swing before the gate turns on, and its reversed
+reports lower dt_pred 0.3-1.1 ns each, 13.3 -> 7.7 ns (phases 2-3 stay at 16-17 ns). In the next full-load half its
+low-side turn-off current is positive, A236 / A242 hold every report, and the phase turns on early with positive
+current each period (170-182 A). With positive current the node cannot swing, so a delay shorter than the other phases'
+only gives the phase more volt-seconds. In A244's 47 records a held report on phases 2-4 with dt_pred more than 3 ns
+below both other slotted phases occurs 210 / 538 times on N0 100 kHz / N75 1 MHz, 1-11 times on seven rows, never on
+37. scb_ctrl cfg_hold_floor / cfg_floor_band: phases 2..N get dt_floor = the other phases 2..N's smallest dt_pred
+minus the band (floor 0; 0 when off); scb_phase input dt_floor: a report held by A236 / A242 raises dt_pred to it when
+below. scb_multi regenerated. Bridge cfg "hold_floor_ns" (the band; absent = off). No source for the rule.
+**Gate:** hold_floor_ns absent: dt_floor 0, the held branches as before; unit tests 136 / 136 (four new:
+hold_floor_raises_a_held_report, hold_floor_leaves_reports_not_held, hold_floor_needs_the_holds, hold_floor_off),
+cosim_regression --quick and --full PASS on fresh outputs.
+
 ## 2026-10-25 (A245) - a turn-on delay that keeps finding the swing finished is lowered (RTL + bridge)
 
 **Source:** A245's pilot of the Ton trims below (S75 at 125 C into 30 %, records in release records-a245): the trims
