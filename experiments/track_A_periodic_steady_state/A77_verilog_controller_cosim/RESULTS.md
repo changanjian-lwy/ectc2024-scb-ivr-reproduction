@@ -131,3 +131,12 @@ python3 a77_analyze.py
 
 The toolchain is outside this repository (`~/tools/oss-cad-suite`, OSS CAD
 Suite 2026-09-29). The datasheet and paper PDFs are not in this repository.
+
+## Correction (2026-10-26)
+Two texts disagree with this experiment's records; the conclusions, code and records are unchanged.
+- **Notes on the table, "Restart-equivalent":** phase 4's edge is labelled restart, not predictive. In
+  a77_summary.json (turnon_how_last50) phase 4 is "restart" in c1 (50 of 50) and c2 (51 of 51). Its dt_pred learnt
+  20.25 ns = 162 LSB, above rs_high (160 LSB), so the restart branch comes first.
+- **rtl/scb_phase.v line 54:** the comment on `r_below` ("edge current below target: trip later next time") has the
+  direction reversed. On r_below the trim goes up by one, which raises the threshold, so the falling current reaches
+  it earlier next time. The RTL file stays as it ran; src/scb_ivr/cosim/rtl/scb_phase.v no longer has this comment.
