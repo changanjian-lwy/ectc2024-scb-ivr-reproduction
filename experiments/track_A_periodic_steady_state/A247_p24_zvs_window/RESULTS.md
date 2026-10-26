@@ -5,6 +5,11 @@ a247_analyze.py -> a247_summary.json. Figure: a247_figure.py -> a247_zvs_window.
 extracted table and the traces. Changes made after the first run are listed in Section 2.
 
 ## 0. Verdict
+- **Re-read by A248 (2026-10-26).** The 0.92 V offset below is mostly not physics. The plant's blocks give 1.65 ns and
+  0.28 V (the low side's gate and r_core). The rest is the rail I fed in: the sections sample the ladder at another
+  instant than the swing, and the Cs ripple puts the rail at the swing 0.30-0.64 V higher. The c1 miss on N13 is that
+  artifact (+0.64 V there). With each edge's rail taken from its own command V_DS, the plant's single edge predicts
+  the records within 0.064 V RMS. The nesting and the one-delay-per-board result hold on the plant's own physics.
 - **c1 fails as registered on one board: L x 1.3** (3.813 nH, A235's corner rows, 14,341 rows): median 1.10 V,
   agreement 70.1 %. It passes on the other four boards: median 0.50-0.89 V, agreement 93.3-98.0 %. By the rule, D57
   misses a block, which has to be added before step 2.
