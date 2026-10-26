@@ -25,7 +25,7 @@ run_ch_; A245 run_r_u_S75h_30).
       559 LSB there, not 242.
     - The first dip is 978.2 against 968.8 mV. The learner's own deepest dip comes two pulses later (971.3 mV).
     - From pulse 4 on, the two arms are within 1.2 mV pulse by pulse. The whole 2.5 mV comes from the first release.
-  - **S75h 30 A start-up (c2 passes: 0.54 V at the end, still falling).** Both runs enter mode P with phases 2-4
+  - **S75h 75 A start-up (30 % load) (c2 passes: 0.54 V at the end, still falling).** Both runs enter mode P with phases 2-4
     turning on a clamped node (V_DS -2.2 V) and the ladder off by about 3 V.
     - Fixed: once the driver's lead has ramped in (112 us), the commands are deferred. Phases 2-4 turn on 13.4-14.1 ns
       after t_lo, on a clamped node, with valleys of -48 to -60 A.

@@ -1,7 +1,7 @@
 """A249 figure (records: cosim/run_[so]_*.json, A246 run_h_p_S75h_100k, A245 run_r_u_S75h_30; release records-a249):
 (a) p_S75h_100k, A240's train: Vo, fixed delay (arms s / o) against the learner (the final configuration);
 (b) the same window: actual delay (t_act - t_lo) of phases 3-4's learned turn-ons;
-(c) u_S75h_30, light-load start-up: the ladder's deviation max |rail - Vin / 4| after mode P;
+(c) u_S75h_30, 75 A start-up (30 % load): the ladder's deviation max |rail - Vin / 4| after mode P;
 (d) the same run: actual delay of phases 2-4's learned turn-ons (a turn-on that was not deferred: its command;
     the slope at 96-112 us is the driver lead ramping in over 20 us after mode P).
   python3 a249_figure.py -> a249_fixed_delay_oracle.png"""
@@ -73,7 +73,7 @@ def main():
     ax[2].axhline(1.0, color="0.6", lw=0.8, ls=":")
     ax[2].text(290, 1.1, "c2: 1 V at the end", fontsize=8, color="0.3", ha="right")
     ax[2].set(xlabel="time (us)", ylabel="max |rail - Vin / 4| (V)",
-              title="(c) S75h, 30 A start-up (Vin 48 V from 140 us): ladder deviation after mode P")
+              title="(c) S75h, 75 A start-up (30 % load; Vin 48 V from 140 us): ladder deviation after mode P")
     ax[2].legend(fontsize=8, loc="upper right")
 
     for k in ("ref", "s"):
