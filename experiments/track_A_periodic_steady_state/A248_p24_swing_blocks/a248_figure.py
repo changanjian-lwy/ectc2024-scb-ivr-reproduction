@@ -1,6 +1,7 @@
 """A248 figure (harness tmp/a248_swing.npz; A247's records tmp/a247_records.npz; release records-a248):
-(a) h2: each variant's shift and offset against D57 (full, one block dropped, bare); (b) h1: the full harness's V_DS at
-the actual delay minus the record's, the rail from the sections against the rail from the edge's own command V_DS;
+(a) h2: each variant's shift and offset against D57 as a fraction of the full plant's (full, one block dropped, bare);
+(b) h1: the full harness's V_DS at the actual delay minus the record's, the rail from the sections against the rail
+from the edge's own command V_DS;
 (c) the full harness's soft windows (V_DS <= 2 V) at 12 V, phases 2-3, N0 / N75 / N13, with one delay per board;
 (d) where the learner's delay is more than 2 ns off that delay: recorded V_DS against the harness's at it.
   python3 a248_figure.py -> a248_swing_blocks.png"""
@@ -31,13 +32,13 @@ def main():
     var = d["h2"]["variants"]
     names = ["full", "gate", "miller", "r_core", "loop", "edge", "bare"]
     x = np.arange(len(names))
-    a2 = ax[0].twinx()
-    ax[0].bar(x - 0.18, [var[n]["shift_ns"] for n in names], 0.34, color=REC, label="shift (ns), left")
-    a2.bar(x + 0.18, [var[n]["offset_v"] for n in names], 0.34, color=MODEL, label="offset (V), right")
+    fs, fo = var["full"]["shift_ns"], var["full"]["offset_v"]
+    ax[0].bar(x - 0.18, [var[n]["shift_ns"] / fs for n in names], 0.34, color=REC, label=f"shift (full: {fs:.2f} ns)")
+    ax[0].bar(x + 0.18, [var[n]["offset_v"] / fo for n in names], 0.34, color=MODEL, label=f"offset (full: {fo:.2f} V)")
+    ax[0].axhline(0, color="k", lw=0.5)
     ax[0].set_xticks(x); ax[0].set_xticklabels(["full"] + [f"no {n}" for n in names[1:-1]] + ["bare"], fontsize=8)
-    ax[0].set(ylabel="shift against D57 (ns)", title="(a) h2: which block makes the swing late and shallow")
-    a2.set_ylabel("offset against D57 (V)")
-    ax[0].legend(loc="upper center", fontsize=8); a2.legend(loc="upper right", fontsize=8)
+    ax[0].set(ylabel="against D57, as a fraction of the full plant's", title="(a) h2: which block makes the swing late and shallow")
+    ax[0].legend(fontsize=8)
     rows, rails, va, key = AN.own_rail(H, R, n=20000)
     bl = list(H["boards"])
     vs = np.array([AN.trilinear(H, bl.index(key[j]), 0, int(R["phase"][j] == 4), R["rail_v"][j:j + 1],
