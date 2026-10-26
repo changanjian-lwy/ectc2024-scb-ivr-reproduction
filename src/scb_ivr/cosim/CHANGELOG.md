@@ -4,6 +4,18 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-26 (A251) - the slotted phases keep their learnt delay after the start-up (RTL + bridge)
+
+**Source:** A249: a fixed delay per board removes the N0 100 kHz lock, but at the start-up the learner's per-period
+adaptation kept the ladder near balance while Vin ramped (A250: D63 does not carry that phase). A251 lets the learner
+run through the start-up and then holds what it learnt. scb_ctrl cfg_dt_hold_n (16 bits): a counter of phase 1's
+turn-ons in mode P (reset outside mode P); from cfg_dt_hold_n on, phases 2..N get cfg_dt_fix's gate (phase 1 gets 0,
+in a slave too), so their dt_pred stays at its value. scb_multi regenerated. Bridge cfg "dt_hold_periods" (0-65535;
+absent = 0 = off).
+**Gate:** dt_hold_periods absent: cfg_dt_hold_n 0, the counter stays at 0 and the gate is cfg_dt_fix alone; unit tests
+144 / 144 (three new: dt_hold_keeps_the_learnt_value, dt_hold_skips_phase1, dt_hold_off), cosim_regression --quick
+and --full PASS on fresh outputs.
+
 ## 2026-10-26 (A249) - a fixed turn-on delay for the slotted phases (RTL + bridge)
 
 **Source:** A247 / A248: the soft turn-on windows nest, so one delay per board serves every negative low-side turn-off

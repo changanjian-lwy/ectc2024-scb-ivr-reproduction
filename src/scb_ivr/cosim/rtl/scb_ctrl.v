@@ -30,7 +30,8 @@
 //   cfg_dt_step (0: off). A246: with cfg_hold_floor, phases 2..N get dt_floor = the smallest dt_pred of the other
 //   phases 2..N minus cfg_floor_band (floor 0), and a report with m_pos that leaves dt_pred (held by A236 / A242, or
 //   flat) raises dt_pred to it. A249: with cfg_dt_fix, phases 2..N (phase 1 gets 0, in a slave too) keep dt_pred at
-//   dt_init: no report changes it.
+//   dt_init: no report changes it. A251: with cfg_dt_hold_n > 0, from that many phase-1 turn-ons in mode P on, phases
+//   2..N keep the dt_pred they have learnt (cfg_dt_fix's gate; it reopens when mode P ends).
 // - A245 (ladder balance): with cfg_bal, each phase's rail report at its low-side turn-off (b_valid; b_hi / b_lo: the
 //   rail above Vin / 4 + band or below Vin / 4 - band) moves the Ton trims of phases 2..N by cfg_bal_step / 16 LSB:
 //   a phase's own report up when high, down when low, phase 1's report every other phase the other way. The trims
@@ -123,6 +124,7 @@ module scb_ctrl #(
     input  wire                cfg_hold_floor, // A246: a held report raises dt_pred to the other phases' least - band
     input  wire [TW-1:0]       cfg_floor_band, // A246: ... that band, LSB
     input  wire                cfg_dt_fix,     // A249: phases 2..N keep dt_pred at dt_init
+    input  wire [15:0]         cfg_dt_hold_n,  // A251: from this many phase-1 turn-ons in mode P, phases 2..N keep dt_pred (0: off)
     input  wire                cfg_bal,        // A245: ladder balance on phases 2..N's Ton
     input  wire [7:0]          cfg_bal_step,   // A245: ... this many 1/16 LSB per report outside the band
     input  wire [TW-1:0]       cfg_bal_max,    // A245: ... trims clamped to +-this many LSB
@@ -379,6 +381,15 @@ module scb_ctrl #(
             hold_n <= hold_n + 1'b1;
     end
 
+    reg  [15:0]  dth_n;                        // A251: phase-1 turn-ons in mode P (saturates at cfg_dt_hold_n)
+    wire         dt_held = (cfg_dt_hold_n != 16'd0) && (dth_n >= cfg_dt_hold_n);
+    always @(posedge clk) begin
+        if (rst || !mode_p)
+            dth_n <= 16'd0;
+        else if (on_pulse[0] && !dt_held && cfg_dt_hold_n != 16'd0)
+            dth_n <= dth_n + 1'b1;
+    end
+
     wire [TW-1:0] t_von = t_lo1 + dt_pred[TW-1:0];                    // A216: a skipped turn-on's instant
     always @(posedge clk) begin
         if (rst) begin
@@ -515,7 +526,7 @@ module scb_ctrl #(
                 .cfg_dt_fall(cfg_dt_fall), .cfg_late_hold(cfg_late_hold && hold_ok),             // A241, A242, A244
                 .m_rev(m_rev[k]), .cfg_rev_n((k == 0) ? 8'd0 : cfg_rev_n),                      // A245
                 .dt_floor(floor_k),                                                             // A246
-                .cfg_dt_fix((k == 0) ? 1'b0 : cfg_dt_fix),                                      // A249
+                .cfg_dt_fix((k == 0) ? 1'b0 : (cfg_dt_fix || dt_held)),                         // A249, A251
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
                 .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_valid[k] : 1'b0),
                 .a_tlo((k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_tlo[k * TW +: TW] : a_tlo),      // A133, A220
