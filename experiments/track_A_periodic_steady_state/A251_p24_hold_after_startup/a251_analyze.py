@@ -79,11 +79,15 @@ def start_crit(x, ref):
 
 def start(row):
     fz, fh, fr = COS / f"run_z_{row}.json", COS / f"run_h_{row}.json", R45 / f"run_r_{row}.json"
-    if not (fz.exists() and fh.exists()):
+    if not fh.exists():
         return None
-    z, h, r = A45.one(fz), A45.one(fh), A45.one(fr)
+    h, r = A45.one(fh), A45.one(fr)
     keep = ("dev_end_v", "t_in_band_us", "peak_a", "vds_max_v", "vo_min", "vo_max", "late", "new", "dt_final_ns")
-    cz, ch = start_crit(z, r), start_crit(h, r)
+    ch = start_crit(h, r)
+    if not fz.exists():                                   # arm z stopped (RESULTS): arm h alone, against A245's run_r_
+        return {"h": {k: h[k] for k in keep} | {"crit": ch}, "r": {k: r[k] for k in keep}, "criteria": {"h_ok": all(ch.values())}}
+    z = A45.one(fz)
+    cz = start_crit(z, r)
     c = {"z2": bool(all(cz.values()) or not all(ch.values())) and bool(z["peak_a"] <= h["peak_a"] + PK_TOL
                                                                       and z["dev_end_v"] <= max(h["dev_end_v"] + 0.2, A45.BAND_V)),
          "h_ok": all(ch.values())}
@@ -128,17 +132,18 @@ def main():
     for k in ("z1", "z2", "z4", "h_ok"):
         v = [x["criteria"][k] for x in rows if k in x["criteria"]]
         crit[k] = all(v) if v else None
-    crit["z3"] = all(x["identity"]["z3"] for x in rows)
+    crit["z3"] = all(x["identity"]["z3"] for x in rows if "identity" in x)
     crit["complete"] = len(rows) == len(res["matrix"]) + len(res["start"])
+    crit["z_rows"] = sum("z" in x for x in rows)
     res["criteria"] = crit
     (HERE / "a251_summary.json").write_text(json.dumps(res, indent=1, default=float) + "\n")
     for name, x in list(res["matrix"].items()) + list(res["start"].items()):
         if not x:
             continue
-        bad = [k for k, v in x["criteria"].items() if v is False] + ([] if x["identity"]["z3"] else ["z3"])
-        z, h = x["z"], x["h"]
-        key = next(k for k in ("peak_after_t0", "post_pk", "dev_end_v", "vmin_a") if k in z)
-        print(f"{name:20s} {key} {z[key]:.4g} (h {h[key]:.4g}) " + " ".join(bad))
+        bad = [k for k, v in x["criteria"].items() if v is False] + ([] if x.get("identity", {}).get("z3", True) else ["z3"])
+        h, key = x["h"], next(k for k in ("peak_after_t0", "post_pk", "dev_end_v", "vmin_a") if k in x["h"])
+        z = f"{x['z'][key]:.4g}" if "z" in x else "-"
+        print(f"{name:20s} {key} {z} (h {h[key]:.4g}) " + " ".join(bad))
     print("criteria", crit)
 
 
