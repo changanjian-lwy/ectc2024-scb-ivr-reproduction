@@ -1,5 +1,5 @@
-"""A253: the peak-current limit's crossing time (bridge.ocp_cross) and its state at the start (ModuleSim.start with cfg
-"ocp"). The bridge imports cocotb, so these skip without it (CI)."""
+"""A253: the peak-current limit's crossing time (bridge.ocp_cross), its state at the start (ModuleSim.start with cfg
+"ocp") and a pending limit turn-off in run_window. The bridge imports cocotb, so these skip without it (CI)."""
 import importlib.util
 import json
 import unittest
@@ -43,6 +43,27 @@ class OcpStart(unittest.TestCase):
 
     def test_slave_starts_low(self):
         self.assertEqual(self.module(False).hs_on, [False] * 4)
+
+    def window(self, on):
+        """One limit turn-off pending at 1 ns on phase 1 (high side on or not); the plant's steps recorded."""
+        import heapq
+        m = self.module(True)
+        steps = []
+        m.integrate_to = steps.append
+        m.hs_on[0] = on
+        heapq.heappush(m.pend, (1e-9, 0, 0, 0, {"how": None, "bind": False, "ocp": True}))
+        m.run_window(2e-9)
+        return m, steps
+
+    def test_stale_turn_off_leaves_the_steps_alone(self):
+        m, steps = self.window(False)
+        self.assertEqual(steps, [2e-9])
+        self.assertEqual(m.ocp_log, [])
+
+    def test_live_turn_off_acts(self):
+        m, steps = self.window(True)
+        self.assertEqual(steps, [1e-9, 2e-9])
+        self.assertEqual((len(m.ocp_log), m.hs_on[0], m.ocp_done[0]), (1, False, True))
 
 
 if __name__ == "__main__":

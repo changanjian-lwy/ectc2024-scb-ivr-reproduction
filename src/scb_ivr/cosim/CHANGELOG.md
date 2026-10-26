@@ -33,6 +33,12 @@ skips without cocotb (CI has none; its import had turned CI red). Smoke runs to 
 (turn-offs <= 122 A, no late fire or overlap); A253's own cfg (130 A) does not act and equals A246's record edge for
 edge.
 
+**Fix 2 (after A253's runs, its o1):** a stale limit turn-off (the on-time had ended) was dropped only after the plant
+had stepped to its time. That split the integrator's step, so rows where the limit never acted still left their
+reference at float level (currents differ from the first crossing on; p_N75_100k at 148.94 us). The smoke check above
+had compared edge times and phases only. run_window now drops it before the step; apply() no longer checks. Two new
+tests: a stale turn-off leaves the steps alone, a live one acts. tests 721, cosim_regression --quick and --full PASS.
+
 ## 2026-10-26 (A251) - the slotted phases keep their learnt delay after the start-up (RTL + bridge)
 
 **Source:** A249: a fixed delay per board removes the N0 100 kHz lock, but at the start-up the learner's per-period

@@ -110,9 +110,10 @@ t_us a trapezoid current on top of the load, starting at i_hi_a: i_hi_a for duty
 back up at slew_a_us (A/us); i_hi_a again from t_stop_us on. With t_load_off_us = t_us it is the whole load.
 Cycle-by-cycle peak current limit (cfg "ocp" {"i_a", "t_ns" 0}, A253; absent = off): a comparator in the driver's
 path, outside the controller. While a high side is on, the first window end that finds its phase current >= i_a
-schedules that high side's turn-off at the crossing (linear between the window ends, ocp_cross) + t_ns + t_drv; it is
-dropped if the on-time ended first. The controller's own turn-off of that pulse is then skipped. Record "ocp_fires"
-(t_s, phase, i_a at each limited turn-off).
+schedules that high side's turn-off at the crossing (linear between the window ends, ocp_cross) + t_ns + t_drv. If the
+on-time ended first it is dropped before the plant steps to its time, so a run in which the limit never acts is the
+same bit for bit. Otherwise the controller's own turn-off of that pulse is skipped. Record "ocp_fires" (t_s, phase,
+i_a at each limited turn-off).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -805,9 +806,7 @@ class ModuleSim:
         to_lsb, na = self.to_lsb, self.na
         k = j % N
         if self.ocp is not None and j < N:                        # A253
-            if meta.get("ocp"):
-                if not self.hs_on[k]:
-                    return                                       # the on-time ended first
+            if meta.get("ocp"):                                  # (run_window drops it if the on-time ended first)
                 self.ocp_done[k] = True
                 self.ocp_log.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k])})
             elif not level and self.ocp_done[k]:
@@ -1020,6 +1019,8 @@ class ModuleSim:
         pend = self.pend
         while pend and pend[0][0] < t_win_end:
             ta, _, j, lvl, meta = heapq.heappop(pend)
+            if meta and meta.get("ocp") and not self.hs_on[j]:   # A253: the on-time ended first; no step to its time
+                continue
             self.integrate_to(ta)
             if j < 0:                                           # A216: a paused module's tick
                 self.section(tick=True)
