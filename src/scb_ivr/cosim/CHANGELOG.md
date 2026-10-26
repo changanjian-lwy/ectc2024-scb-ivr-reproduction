@@ -26,6 +26,13 @@ Bridge cfg "ocp" {"i_a", "t_ns" 0}:
 acts is the same bit for bit. cosim_regression --quick and --full PASS on fresh outputs. tests 717 (three new in
 test_cosim_ocp: ocp_cross).
 
+**Fix (same day):** with "ocp" set, start() read the constructor's argument first_high, out of scope (NameError at
+the first run; the regression has no "ocp" case). The module now keeps it as self.first_high. Two new tests build a
+module with "ocp" and call start() (master: phase 1 high; slave: all low); they fail before the fix. test_cosim_ocp
+skips without cocotb (CI has none; its import had turned CI red). Smoke runs to 160 us: a 60 A limit acts 401 times
+(turn-offs <= 122 A, no late fire or overlap); A253's own cfg (130 A) does not act and equals A246's record edge for
+edge.
+
 ## 2026-10-26 (A251) - the slotted phases keep their learnt delay after the start-up (RTL + bridge)
 
 **Source:** A249: a fixed delay per board removes the N0 100 kHz lock, but at the start-up the learner's per-period

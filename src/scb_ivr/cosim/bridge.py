@@ -408,6 +408,7 @@ class ModuleSim:
         y0 = [0.0] * (2 * N) + self.vm0 + [0.0] * nlp + [0.0] * N + [0.0] * na + [0.0] * nlp   # 2N node voltages (+ Cm, h
         # nodes), N currents (+ branches, loops)
         g1 = bool(first_high)                                          # C3: a slave resets with phase 1 LOW
+        self.first_high = g1                                           # A253: the high sides' reset state
         self.slave_floor = (not g1) and bool(cfg.get("slave_floor", 0))  # C06
         self.plant = PLANTS[cfg.get("plant_impl", "kernel2")](p, y0, gh=[g1] + [False] * (N - 1), gl=[not g1] + [True] * (N - 1))
         self.nv = self.plant.nv
@@ -601,7 +602,7 @@ class ModuleSim:
             if set(self.ocp) - {"i_a", "t_ns"}:
                 raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns'})}")
             self.ocp_thr, self.ocp_t = float(self.ocp["i_a"]), float(self.ocp.get("t_ns", 0.0)) * 1e-9
-            self.hs_on = [bool(first_high)] + [False] * (N - 1)       # the high sides as commanded
+            self.hs_on = [self.first_high] + [False] * (N - 1)       # the high sides as commanded
             self.ocp_armed = list(self.hs_on); self.ocp_done = [False] * N
             self.ocp_prev, self.ocp_log = None, []
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
