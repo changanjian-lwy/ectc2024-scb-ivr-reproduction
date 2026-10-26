@@ -147,8 +147,12 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A244": (TA / "A244_p24_holds_after_handover", "a244_analyze.py", "a244_summary.json"),
     "A245": (TA / "A245_p24_reverse_conduction_delay", "a245_analyze.py", "a245_summary.json"),
     "A246": (TA / "A246_p24_held_report_floor", "a246_analyze.py", "a246_summary.json"),
+    "A249": (TA / "A249_p24_fixed_delay_oracle", "a249_analyze.py", "a249_summary.json"),
+    "A251": (TA / "A251_p24_hold_after_startup", "a251_analyze.py", "a251_summary.json"),
+    "A252": (TA / "A252_p24_short_delay_1mhz", "a252_analyze.py", "a252_summary.json"),
+    "A253": (TA / "A253_p24_peak_current_limit", "a253_analyze.py", "a253_summary.json"),
 }
-ROW_PREFIX = {"A137": "s", "A236": "h_"}                # run file stem -> summary row: the run name carries this leading letter
+ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
     "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
     "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
@@ -408,9 +412,11 @@ NOT_ROWS["A236"] = r"o_"                          # the identity row: the summar
 NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243", "A244")})   # judged through ADAPT (stage 1 / stage 2 rows)
 NOT_ROWS["A245"] = r".*"                          # judged through ADAPT (stage 1 rows, identity block with stage 2)
 NOT_ROWS["A246"] = r".*"                          # judged through ADAPT (stage 1 / stage 2 rows, c1 rows)
+NOT_ROWS.update({e: r".*" for e in ("A249", "A251", "A252")})   # judged per arm and row through ADAPT
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
+    "A251": (r"c?z_", "arm z stopped after its 15 decision rows: z2 / z4 had fixed the decision (RESULTS 0)"),
 }
 _DEF163 = "physical peak against A152's command-time peak; physical vs physical -1.9..+1.8 A, command vs command lower (RESULTS 0)"
 _LATE163 = "the valley-timing limit (gate delay vs dt_pred >= 0), mechanism 2 (RESULTS 0)"
@@ -825,6 +831,27 @@ EXCEPTIONS["A246"] = {**{("criteria", f"stage1/{r}/{g}"): _MHZ for r in ("p_N75_
                       ("criteria", "c1/p_S75h_100k/c1"): _A246g9, ("criteria_main", "c1"): _A246g9,
                       **{("criteria", f"stage2/{r}/g6"): _A246g6 for r in ("f_N75_k2", "a_S75_d20", "m4_l_m80_10us")},
                       ("criteria_main", "g6"): _A246g6}
+_A249 = ("an oracle, not a design: the learner's collapse lowered the first release's dip (5.8 / 3.8 ns against 11.3 / "
+         "10.7 ns fixed); Vo minimum 968.8 against 971.3 mV (RESULTS 0)")
+EXCEPTIONS["A249"] = {("criteria", "s/p_S75h_100k/c2"): _A249, ("criteria", "o/p_S75h_100k/c2"): _A249,
+                      ("criteria", "o/f_N75_k4/c2"): "arm o: +2.5 A against 2 A allowed; A248's window centre does "
+                      "not carry into the closed loop (RESULTS 0)"}
+_A251 = "not adopted: the hold removes the learner's per-period adaptation the fast transients use (RESULTS 0)"
+EXCEPTIONS["A251"] = {**{("criteria", f"matrix/{r}/z2"): _A251 for r in ("p_N0_10k", "p_N75_1000k", "p_S75h_100k",
+                                                                       "p_S75h_1000k", "p_S75h_100k_k2", "p_S75h_100k_k4")},
+                      **{("criteria", f"matrix/{r}/z4"): _A251 + "; 1 MHz over 200 A in both arms"
+                         for r in ("p_N75_1000k", "p_S75h_1000k")}}
+EXCEPTIONS["A252"] = {(a, "k1"): "a held short delay leaves 1 MHz over 200 A (206.5-214.1 A) and turns phases 2-4 on "
+                      "hard at 12 V in steady state; item 10 at 1 MHz goes to A253's current limit (RESULTS 0)"
+                      for a in ("s4", "n5", "n9")}
+_A253o1 = ("wiring: a stale limit turn-off split the integrator's step, so no-fire rows left their reference at float "
+           "level; traced and fixed in f4657c3, A254 reruns with the fix (RESULTS 0)")
+_A253o2 = ("the registered cap was low: the current rose 49-69 A in the 11 ns path and the gate added 8-14 A, so 130 A "
+           "capped N75 1 MHz at 212.1 A; A254 re-registers the level (RESULTS 0)")
+_A253o3 = "item 2's S75h 125 C rows were over 200 A before the limit (207.8 / 211.2 A); the same latency (RESULTS 0)"
+EXCEPTIONS["A253"] = {("rows/p_N75_100k", "o1"): _A253o1, ("criteria", "o1"): _A253o1,
+                      ("rows/p_N75_1000k", "o2"): _A253o2, ("criteria", "o2"): _A253o2,
+                      ("rows/a_S75h_d2", "o3"): _A253o3, ("rows/a_S75h_d20", "o3"): _A253o3, ("criteria", "o3"): _A253o3}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
@@ -841,6 +868,10 @@ ADAPT = {   # summaries written before this gate's format: map their registered 
     "A246": lambda d: {**{g: {n: {k: c for k, c in v["criteria"].items() if k != "g1_g2_excepted"}
                               for n, v in d[g].items() if v} for g in ("stage1", "stage2")},
                        "c1": {r: {"c1": v["c1"]} for r, v in d["c1"].items() if v}},
+    "A249": lambda d: {a: {r: {k: x for k, x in v.items() if isinstance(x, bool)} for r, v in d[a].items()} for a in ("s", "o")},
+    "A251": lambda d: {"g0": d["g0"]["g0"],
+                       **{g: {r: v["criteria"] | ({"z3": v["identity"]["z3"]} if "identity" in v else {})
+                              for r, v in d[g].items() if v} for g in ("matrix", "start")}},
     "A228": lambda d: {"skip_rows": {z: {a: {q: v[a][q] for q in ("q1", "q2")} for a in ("k", "h")} for z, v in d["skip_rows"].items()},
                        "part_r": {r: {"q3": v["q3"]} for r, v in d["part_r"].items()}},
     # A163 lists misses per run; part C (s50cmd_) is a diagnostic, not judged (BOUNDARY 1)
