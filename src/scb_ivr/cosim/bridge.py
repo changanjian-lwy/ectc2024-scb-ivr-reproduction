@@ -108,6 +108,11 @@ release to a constant-current load (a true no load with no step), without r_load
 Periodic load (cfg "load_pulse" {"t_us", "t_stop_us", "i_lo_a", "i_hi_a", "f_khz", "duty", "slew_a_us"}, A240): from
 t_us a trapezoid current on top of the load, starting at i_hi_a: i_hi_a for duty of each period, down to i_lo_a and
 back up at slew_a_us (A/us); i_hi_a again from t_stop_us on. With t_load_off_us = t_us it is the whole load.
+Cycle-by-cycle peak current limit (cfg "ocp" {"i_a", "t_ns" 0}, A253; absent = off): a comparator in the driver's
+path, outside the controller. While a high side is on, the first window end that finds its phase current >= i_a
+schedules that high side's turn-off at the crossing (linear between the window ends, ocp_cross) + t_ns + t_drv; it is
+dropped if the on-time ended first. The controller's own turn-off of that pulse is then skipped. Record "ocp_fires"
+(t_s, phase, i_a at each limited turn-off).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -196,6 +201,13 @@ def field(value, k, width):
 
 def signed(v, width):
     return v - (1 << width) if v & (1 << (width - 1)) else v
+
+
+def ocp_cross(t0, i0, t1, i1, thr):
+    """A253: when a rising current crosses thr between (t0, i0) and (t1, i1), linear; t0 if it was there already."""
+    if i0 >= thr or i1 <= i0:
+        return t0
+    return t0 + (thr - i0) / (i1 - i0) * (t1 - t0)
 
 
 class Ctl:
@@ -584,6 +596,14 @@ class ModuleSim:
         self.ph_log = []                                                                 # A133: (t, phase) of each fire
         self.sections, self.turnons, self.lowoffs = [], [], []
         self.highoffs = []                                       # A101: phase (and branch) currents at high-side turn-offs
+        self.ocp = cfg.get("ocp")                                 # A253: cycle-by-cycle peak current limit
+        if self.ocp is not None:
+            if set(self.ocp) - {"i_a", "t_ns"}:
+                raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns'})}")
+            self.ocp_thr, self.ocp_t = float(self.ocp["i_a"]), float(self.ocp.get("t_ns", 0.0)) * 1e-9
+            self.hs_on = [bool(first_high)] + [False] * (N - 1)       # the high sides as commanded
+            self.ocp_armed = list(self.hs_on); self.ocp_done = [False] * N
+            self.ocp_prev, self.ocp_log = None, []
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
         if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
@@ -783,6 +803,17 @@ class ModuleSim:
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
         to_lsb, na = self.to_lsb, self.na
         k = j % N
+        if self.ocp is not None and j < N:                        # A253
+            if meta.get("ocp"):
+                if not self.hs_on[k]:
+                    return                                       # the on-time ended first
+                self.ocp_done[k] = True
+                self.ocp_log.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k])})
+            elif not level and self.ocp_done[k]:
+                return                                           # the controller's own turn-off, after the limit's
+            elif level:
+                self.ocp_done[k] = False; self.ocp_armed[k] = True
+            self.hs_on[k] = bool(level)
         if level and j in self.gated and plant.gl[k]:            # A164: counted at the channel's start (shoot_check)
             ovl["cmd"] += 1
         elif level and (plant.gl[k] if j < N else plant.gh[k]):   # A91: turn-on against a conducting complement
@@ -1023,6 +1054,18 @@ class ModuleSim:
             if mon.vmin_set[k]:
                 cva |= int(plant.vds(k) >= float(mon.vmin[k]) + self.v_hys) << k
         c.set("cmp_i", ci); c.set("cmp_zl", czl); c.set("cmp_zh", czh); c.set("cmp_valley", cva)
+        if self.ocp is not None:                                     # A253: the limit's comparator
+            t1, i1 = plant.t, [float(plant.y[nv + k]) for k in range(N)]
+            if self.ocp_prev is not None:
+                t0, i0 = self.ocp_prev
+                for k in range(N):
+                    if self.hs_on[k] and self.ocp_armed[k] and i1[k] >= self.ocp_thr:
+                        tx = ocp_cross(t0, i0[k], t1, i1[k], self.ocp_thr)
+                        heapq.heappush(self.pend, (tx + self.ocp_t + self.t_drv, self.seq[0], k, 0,
+                                                   {"how": None, "bind": False, "ocp": True}))
+                        self.seq[0] += 1
+                        self.ocp_armed[k] = False
+            self.ocp_prev = (t1, i1)
 
     def result(self, wall_s):
         """The run record."""
@@ -1045,6 +1088,8 @@ class ModuleSim:
         if cfg.get("lo_pred", 0):                                    # A99
             out.update(t_lo_timed_s=mlo["t_timed"], dlo1_final_lsb=c.get("dlo1"), lo_reports_last=self.lo_reports[-keep_n:])
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
+        if self.ocp is not None:
+            out["ocp_fires"] = self.ocp_log                          # A253
         if self.snap_win:                                            # A205: the snapshots and the circuit they belong to
             out["snaps"] = self.snaps
             out["snap_circuit"] = {k: getattr(p, k) for k in (

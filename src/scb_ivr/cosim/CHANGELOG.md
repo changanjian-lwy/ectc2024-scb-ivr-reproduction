@@ -4,6 +4,28 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-26 (A253) - a cycle-by-cycle peak current limit in the driver's path (bridge)
+
+**Source:** item 10's open part. On A240's 1 MHz train, a slotted phase starts its on-time with a positive valley
+(+40 A) while the loop's Ton is still the full load's, so it peaks at 232 A (N75; 3 of 5073 turn-offs over 200 A).
+A251 / A252: the turn-on delay does not remove it. Multiphase controllers limit each phase's current cycle by cycle:
+- a valley limit that delays the next pulse (TI TPS53647, MPS MP2888A);
+- a pulse-by-pulse peak limit (Infineon XDPE, Renesas ISL68233).
+
+Here the current falls at only Vo / L, and adjacent phases may not overlap in an SCB, so the limit is a peak limit. It
+acts in the driver's path, outside the controller.
+
+Bridge cfg "ocp" {"i_a", "t_ns" 0}:
+- while a high side is on, the first window end that finds its current >= i_a schedules a turn-off at the crossing
+  (linear between window ends, ocp_cross) + t_ns + t_drv;
+- the turn-off is dropped if the on-time ended first;
+- the controller's own turn-off of that pulse is then skipped;
+- record "ocp_fires".
+
+**Gate:** "ocp" absent: no code path runs. A dropped turn-off changes no state, so a run in which the limit never
+acts is the same bit for bit. cosim_regression --quick and --full PASS on fresh outputs. tests 717 (three new in
+test_cosim_ocp: ocp_cross).
+
 ## 2026-10-26 (A251) - the slotted phases keep their learnt delay after the start-up (RTL + bridge)
 
 **Source:** A249: a fixed delay per board removes the N0 100 kHz lock, but at the start-up the learner's per-period
