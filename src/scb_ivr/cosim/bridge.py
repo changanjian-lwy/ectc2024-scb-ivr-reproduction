@@ -45,7 +45,8 @@ Controller-side analog functions modelled here:
   and "rev_n" (RTL cfg_rev_n, 0-255, absent = 0) lowers the dt_pred of phases 2..N one step per m_rev report from
   that many in a row; "hold_floor_ns" (A246, RTL cfg_hold_floor / cfg_floor_band; absent = off): on phases 2..N a
   report with m_pos that leaves dt_pred (held by A236 / A242, or flat) raises it to the other phases' smallest dt_pred
-  minus this band;
+  minus this band; "dt_fix_ns" (A249, RTL cfg_dt_fix; absent = off): phases 2..N start at these N - 1 delays (ns, in
+  place of dt_init_ns) and no report changes them;
 - the rail comparators (A245, cfg "bal" {"band_v", "step_q4", "max_ns"}; absent = off): at each low-side turn-off, the
   phase's rail (the voltage across its switch pair) above Vin / 4 + band_v or below Vin / 4 - band_v (b_valid, b_hi,
   b_lo); RTL cfg_bal trims phases 2..N's Ton by step_q4 / 16 LSB per report, up to +-max_ns (record "bal_final_ns");
@@ -407,6 +408,11 @@ class ModuleSim:
         # Controller initial registers: the predictive delay starts at half the node resonance period, as in
         # the Python rule; the trim codes start at 0 (threshold = target).
         self.dt_init = [self.to_lsb(cfg["dt_init_ns"] * 1e-9)] * N
+        self.dt_fix = cfg.get("dt_fix_ns")                           # A249: phases 2..N keep these delays
+        if self.dt_fix is not None:
+            if len(self.dt_fix) != N - 1:
+                raise ValueError("dt_fix_ns has one delay per phase 2..N")
+            self.dt_init[1:] = [self.to_lsb(float(x) * 1e-9) for x in self.dt_fix]
         self.trim_init = [0] * N
         self.t_async = cfg.get("t_async_ns", 1.0) * 1e-9
 
@@ -465,6 +471,7 @@ class ModuleSim:
         c.set("cfg_rev_n", self.rev_n)                                # A245
         c.set("cfg_hold_floor", int(self.hold_floor is not None))     # A246
         c.set("cfg_floor_band", to_lsb(self.hold_floor * 1e-9) if self.hold_floor is not None else 0)
+        c.set("cfg_dt_fix", int(self.dt_fix is not None))             # A249
         c.set("cfg_bal", int(self.bal is not None))                   # A245
         c.set("cfg_bal_step", int(self.bal.get("step_q4", 4)) if self.bal is not None else 0)
         c.set("cfg_bal_max", to_lsb(self.bal.get("max_ns", 8.0) * 1e-9) if self.bal is not None else 0)

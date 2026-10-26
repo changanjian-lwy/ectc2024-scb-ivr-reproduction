@@ -4,6 +4,16 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-26 (A249) - a fixed turn-on delay for the slotted phases (RTL + bridge)
+
+**Source:** A247 / A248: the soft turn-on windows nest, so one delay per board serves every negative low-side turn-off
+current; the learner drifts to either end of the window, because a full swing clamps the node and its valley is flat.
+A249 tests a fixed delay in the closed loop. scb_ctrl cfg_dt_fix, wired to phases 2..N (phase 1 gets 0, in a slave
+too); scb_phase input cfg_dt_fix: no report changes dt_pred, which stays at dt_init. scb_multi regenerated. Bridge cfg
+"dt_fix_ns" (N - 1 delays for phases 2..N, in place of dt_init_ns there; absent = off).
+**Gate:** dt_fix_ns absent: cfg_dt_fix 0, dt_init as before; unit tests 141 / 141 (four new: dt_fix_keeps_dt_init,
+dt_fix_skips_phase1, dt_fix_off, slave_dt_fix_skips_phase1), cosim_regression --quick and --full PASS on fresh outputs.
+
 ## 2026-10-25 (A246) - a held report lifts a delay far below the other phases' (RTL + bridge)
 
 **Source:** A244's remaining item-10 lock (N0 at 100 kHz, record A244 `run_w_p_N0_100k.json`): in a light half the

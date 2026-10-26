@@ -128,6 +128,15 @@ async def slave_ton_lat_follows_the_broadcast(dut):
 
 
 @cocotb.test()
+async def slave_dt_fix_skips_phase1(dut):
+    """A249 on a slave: dt_fix leaves phase 1 learning (early: 85 -> 87) and holds phase 2 at 80, as on a master."""
+    c = Ctrl(dut)
+    await c.start(ext_ref=7, ext_slot=40000, err_high=1, eh_tgt=3, err_shift=1, dt_fix=1)
+    assert await _report_high(c, dut, 0, early=1) == 87
+    assert await _report_high(c, dut, 1, early=1) == 80
+
+
+@cocotb.test()
 async def slave_rev_skips_phase1(dut):
     """A245 on a slave: rev_n 2 leaves phase 1's dt_pred (85) after three m_rev reports, as on a master; phase 2's
     second one lowers it (80 -> 78)."""

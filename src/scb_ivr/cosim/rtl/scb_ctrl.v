@@ -29,7 +29,8 @@
 //   2..N (phase 1 gets 0, in a slave too): from cfg_rev_n such reports in a row, each lowers that phase's dt_pred by
 //   cfg_dt_step (0: off). A246: with cfg_hold_floor, phases 2..N get dt_floor = the smallest dt_pred of the other
 //   phases 2..N minus cfg_floor_band (floor 0), and a report with m_pos that leaves dt_pred (held by A236 / A242, or
-//   flat) raises dt_pred to it.
+//   flat) raises dt_pred to it. A249: with cfg_dt_fix, phases 2..N (phase 1 gets 0, in a slave too) keep dt_pred at
+//   dt_init: no report changes it.
 // - A245 (ladder balance): with cfg_bal, each phase's rail report at its low-side turn-off (b_valid; b_hi / b_lo: the
 //   rail above Vin / 4 + band or below Vin / 4 - band) moves the Ton trims of phases 2..N by cfg_bal_step / 16 LSB:
 //   a phase's own report up when high, down when low, phase 1's report every other phase the other way. The trims
@@ -121,6 +122,7 @@ module scb_ctrl #(
     input  wire [7:0]          cfg_rev_n,      // A245: phases 2..N: m_rev reports in a row from which each lowers dt_pred
     input  wire                cfg_hold_floor, // A246: a held report raises dt_pred to the other phases' least - band
     input  wire [TW-1:0]       cfg_floor_band, // A246: ... that band, LSB
+    input  wire                cfg_dt_fix,     // A249: phases 2..N keep dt_pred at dt_init
     input  wire                cfg_bal,        // A245: ladder balance on phases 2..N's Ton
     input  wire [7:0]          cfg_bal_step,   // A245: ... this many 1/16 LSB per report outside the band
     input  wire [TW-1:0]       cfg_bal_max,    // A245: ... trims clamped to +-this many LSB
@@ -513,6 +515,7 @@ module scb_ctrl #(
                 .cfg_dt_fall(cfg_dt_fall), .cfg_late_hold(cfg_late_hold && hold_ok),             // A241, A242, A244
                 .m_rev(m_rev[k]), .cfg_rev_n((k == 0) ? 8'd0 : cfg_rev_n),                      // A245
                 .dt_floor(floor_k),                                                             // A246
+                .cfg_dt_fix((k == 0) ? 1'b0 : cfg_dt_fix),                                      // A249
                 .r_valid(r_valid[k]), .r_below(r_below[k]),
                 .cfg_async(IS_FIRST ? cfg_async : 1'b0), .a_valid((IS_FIRST || (k == 0 && SLAVE)) ? a_valid : (k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_valid[k] : 1'b0),
                 .a_tlo((k > 0 && (cfg_ph_floor || cfg_zcd)) ? fa_tlo[k * TW +: TW] : a_tlo),      // A133, A220

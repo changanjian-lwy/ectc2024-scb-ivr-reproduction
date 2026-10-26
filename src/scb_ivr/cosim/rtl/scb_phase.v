@@ -69,7 +69,8 @@
 //   A245: with cfg_rev_n, a report with m_rev (V_DS <= 0 at the command: the swing had finished) that is the
 //   cfg_rev_n-th or later in a row lowers dt_pred by cfg_dt_step (floor 0) instead; any other report restarts the count;
 //   A246: a report with m_pos that leaves dt_pred (early or late, held by A236 / A242 while either hold is on, or flat)
-//   raises dt_pred to dt_floor when it is below it (dt_floor 0: off);
+//   raises dt_pred to dt_floor when it is below it (dt_floor 0: off); A249: with cfg_dt_fix no report changes dt_pred,
+//   which stays at dt_init (a fixed delay);
 // - dtl (cfg_low_pred): early -> + cfg_dtl_step; otherwise the measured crossing time ml_tv, or with cfg_err_low
 //   dtl - ((ml_err - cfg_el_tgt) >>> cfg_err_shift); both clamped to [0, cfg_dtl_max];
 // - trim: +1 / -1 per current-decided low-side turn-off from the residual-current sign (cfg_trim).
@@ -114,6 +115,7 @@ module scb_phase #(
     input  wire                 m_rev,         // A245: V_DS <= 0 at the turn-on command
     input  wire [7:0]           cfg_rev_n,     // A245: from this many m_rev reports in a row, each lowers dt_pred (0: off)
     input  wire [TW-1:0]        dt_floor,      // A246: a held report with m_pos raises dt_pred to this (0: off)
+    input  wire                 cfg_dt_fix,    // A249: reports leave dt_pred (it stays at dt_init)
     input  wire [TW-1:0]        m_tv,
     input  wire                 r_valid,
     input  wire                 r_below,
@@ -352,7 +354,7 @@ module scb_phase #(
             res         <= 1'b0;
             t_tk        <= {TW{1'b0}};
         end else begin
-            if (m_valid) begin
+            if (m_valid && !cfg_dt_fix) begin                    // A249
                 rev_c <= !m_rev ? 8'd0 : (rev_c == 8'hFF) ? rev_c : rev_c + 8'd1;   // A245
                 if (rev_lo)
                     dt_pred <= dt_prv;                               // A245

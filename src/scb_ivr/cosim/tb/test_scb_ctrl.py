@@ -33,6 +33,7 @@ BASE = dict(ton=133, rs_high=160, rs_low=3200, dt_step=2, dt_max=278,
             hold_wait=0,                                                         # A244
             rev_n=0,                                                             # A245
             hold_floor=0, floor_band=0,                                          # A246
+            dt_fix=0,                                                            # A249
             bal=0, bal_step=0, bal_max=0,                                        # A245
             ext_ton_en=0, ext_ton=0, ext_slot=0, ext_ref=0,                      # C2
             slot_lo=0,                                                           # C02
@@ -112,6 +113,7 @@ class Ctrl:
         d.cfg_hold_wait.value = cfg["hold_wait"]                 # A244
         d.cfg_rev_n.value = cfg["rev_n"]                         # A245
         d.cfg_hold_floor.value = cfg["hold_floor"]; d.cfg_floor_band.value = cfg["floor_band"]   # A246
+        d.cfg_dt_fix.value = cfg["dt_fix"]                       # A249
         d.cfg_bal.value = cfg["bal"]; d.cfg_bal_step.value = cfg["bal_step"]; d.cfg_bal_max.value = cfg["bal_max"]   # A245
         d.cfg_ext_ton.value = cfg["ext_ton_en"]; d.ext_ton.value = cfg["ext_ton"]   # C2
         d.ext_slot.value = cfg["ext_slot"]; d.ext_ref.value = cfg["ext_ref"]
@@ -990,6 +992,38 @@ async def hold_floor_off(dut):
     await c.start(dt_init=(85, 60, 80, 93), err_high=1, eh_tgt=3, err_shift=1, late_hold=1, early_hold=1)
     assert await _report_high(c, dut, 1, err=23, tv=10, pos=1) == 60
     assert await _report_high(c, dut, 1, early=1, pos=1) == 60
+
+
+@cocotb.test()
+async def dt_fix_keeps_dt_init(dut):
+    """A249: with dt_fix no report moves phase 2's dt_pred from 80: an early one, a late one with error 23, a flat one
+    with m_pos (A246's floor on), and three m_rev reports in a row (rev_n 2)."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, rev_n=2, late_hold=1, early_hold=1, hold_floor=1, floor_band=4,
+                  dt_fix=1)
+    assert await _report_high(c, dut, 1, early=1) == 80
+    assert await _report_high(c, dut, 1, err=23, tv=10) == 80
+    assert await _report_high(c, dut, 1, flat=1, err=3, tv=10, pos=1) == 80
+    assert [await _report_high(c, dut, 1, err=3, tv=10, rev=1) for _ in range(3)] == [80, 80, 80]
+
+
+@cocotb.test()
+async def dt_fix_skips_phase1(dut):
+    """A249: phase 1 keeps learning under dt_fix: an early report raises 85 by the step (87), a late one with error 23
+    lowers it to 87 - (20 >> 1) = 77."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1, dt_fix=1)
+    assert await _report_high(c, dut, 0, early=1) == 87
+    assert await _report_high(c, dut, 0, err=23, tv=10) == 77
+
+
+@cocotb.test()
+async def dt_fix_off(dut):
+    """A249: dt_fix 0: phase 2 learns as before (early: 80 -> 82; late, error 23: 82 - 10 = 72)."""
+    c = Ctrl(dut)
+    await c.start(err_high=1, eh_tgt=3, err_shift=1)
+    assert await _report_high(c, dut, 1, early=1) == 82
+    assert await _report_high(c, dut, 1, err=23, tv=10) == 72
 
 
 async def _rail(c, dut, k, hi=0, lo=0):
