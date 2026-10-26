@@ -31,6 +31,11 @@ turn-on loses its target. D63 keeps the valleys as states. One step is one phase
   conduction), and phase 1's timed edge can take an offset lo_add that is not learned;
 - (A149, optional) each high side SH_k (k >= 2) rings to its blocking voltage rail_(k-1) + rail_k plus f(V_DS at phase
   k-1's turn-on): A144's mechanism B, f tabulated per loop inductance and edge rate from the cosim (Design.sh).
+- (A250, optional) t_val separates the node's own swing (valley time t_val, starting t_sw0 after the low side's
+  turn-off) from the turn-on t_tr: a crossing reaches the rail at t_sw0 + (2 t_val / pi) asin(I_th / -v) and clamps
+  until the turn-on (clamp_q: the clamp's reverse charge through the high side enters the ladder); a turn-on before
+  that is hard on the swinging node; t_evt turns a crossing phase on that long after the node reaches the rail (a
+  V_DS comparator), t_tr then the backstop.
 The transitions take t_tr (high side, D57's valley time) and t_dn (low side). What the map does not model: the
 controller's timing after a crossing (it reports the crossing's depth and duration, the trigger), the comparator's
 delay and trim (phase 1 at the target), the driver.
@@ -75,6 +80,10 @@ class Design:
     von: tuple = field(default=None)  # A148: (currents, rails, V_DS phases 1-3, phase 4) at the turn-on, see von_table()
     floor_keeps_dlo: bool = False     # A148: a floor turn-off leaves dlo to the report's step (as scb_phase does)
     sh: tuple = field(default=None)   # A149: (V_DS grid, excess) of the SH_k overshoot block; needs von
+    t_val: tuple = field(default=None)  # A250: the free node's valley time per phase, apart from the turn-on t_tr (None: t_tr)
+    t_sw0: float = 0.0                # A250: the swing starts this long after the low side's turn-off (needs t_val)
+    clamp_q: bool = False             # A250: the clamp's reverse charge through the high side enters the ladder
+    t_evt: float = None               # A250: a crossing phase turns on this long after the node reaches the rail, if before t_tr
 
 
 def seg_end(v, r, lf, i0, t):
@@ -203,19 +212,41 @@ class ValleyMap:
         if ton_scale is not None or ton_cap is not None:
             sc, cap = ton_scale or [1.0] * n, ton_cap or [math.inf] * n
             tons = [max(round(min(ton_new * f, c) / LSB), 0) * LSB for f, c in zip(sc, cap)]
+        t_on, q_lad = list(d.t_tr), [0.0] * n
         for k in range(n):
             v, th = s["valley"][k], self.ith(k, rails[k])
+            q_cl = 0.0
             if v >= 0:
                 i0 = max(0.0, v - (vo + d.v_rev) / d.lf * d.t_tr[k])
-            elif -v <= th:
-                i0 = 0.0
-            else:
-                t_reach = 2 * d.t_tr[k] / math.pi * math.asin(th / -v)
-                i0 = min(0.0, -math.sqrt(v * v - th * th) + (rails[k] + d.v_rev - vo) / d.lf * (d.t_tr[k] - t_reach))
-                depth[k] = -v - th
+            elif d.t_val is None:
+                if -v <= th:
+                    i0 = 0.0
+                else:
+                    t_reach = 2 * d.t_tr[k] / math.pi * math.asin(th / -v)
+                    i0 = min(0.0, -math.sqrt(v * v - th * th) + (rails[k] + d.v_rev - vo) / d.lf * (d.t_tr[k] - t_reach))
+                    depth[k] = -v - th
+            else:                                  # A250: the delay t_on apart from the node's own swing
+                tv = d.t_val[k]
+                w = math.pi / (2 * tv)
+                t_reach = d.t_sw0 + math.asin(th / -v) / w if -v > th else math.inf
+                if d.t_evt is not None and t_reach + d.t_evt < t_on[k]:
+                    t_on[k] = t_reach + d.t_evt
+                ts = t_on[k] - d.t_sw0
+                if -v > th:
+                    depth[k] = -v - th
+                if ts <= 0:
+                    i0 = v
+                elif ts < t_reach - d.t_sw0 or -v <= th:
+                    i0 = v * math.cos(w * min(ts, 2 * tv))     # the node still swinging (or back below the rail)
+                else:
+                    i_r, sl, tc = -math.sqrt(v * v - th * th), (rails[k] + d.v_rev - vo) / d.lf, ts - (t_reach - d.t_sw0)
+                    i0 = min(0.0, i_r + sl * tc)
+                    tz = min(tc, -i_r / sl) if sl > 0 else tc
+                    q_cl = i_r * tz + 0.5 * sl * tz * tz       # the clamp's reverse charge through the high side
             i_on[k] = i0
             pk[k], q_on[k] = seg_end(rails[k] - vo, d.r, d.lf, i0, tons[k])
-            q_tot[k] = q_on[k] + 0.5 * (v + i0) * d.t_tr[k] + pk[k] * d.t_dn
+            q_lad[k] = q_on[k] + (q_cl if d.clamp_q else 0.0)
+            q_tot[k] = q_on[k] + 0.5 * (v + i0) * t_on[k] + pk[k] * d.t_dn
         # phase 1's low side
         flags = set()
         if any(not rails_tab[0] <= x <= rails_tab[-1] for x in rails):
@@ -244,7 +275,7 @@ class ValleyMap:
             s["last_up"] = up
             keep = lo_add is not None or d.floor_keeps_dlo
             s["dlo"] = (base if keep else t_ls1) + (1 if up else -1) * s["step"] * LSB
-        t1 = d.t_tr[0] + tons[0] + d.t_dn + t_ls1
+        t1 = t_on[0] + tons[0] + d.t_dn + t_ls1
         th_ = s["t_hist"]
         t_avg_prev = (th_[0] + th_[1]) / 2 if th_[1] is not None else t1
         th_ = [t1, th_[0] if th_[0] is not None else t1]
@@ -255,7 +286,7 @@ class ValleyMap:
         late = [False] * n
         for k in range(1, n):
             p_k = t1 + k / n * (t_avg - t_avg_prev)
-            t_ls = p_k - d.t_tr[k] - tons[k] - d.t_dn
+            t_ls = p_k - t_on[k] - tons[k] - d.t_dn
             if t_ls <= 0:
                 late[k] = True
                 t_ls = 0.0
@@ -266,7 +297,7 @@ class ValleyMap:
         target = (i_sum - i_step) * d.r_load
         s["vo"] = target + (vo - target) * math.exp(-t1 / tau)
         for j in range(n - 1):
-            s["vc"][j] += (q_on[j] - q_on[j + 1]) / d.cs
+            s["vc"][j] += (q_lad[j] - q_lad[j + 1]) / d.cs
         s["valley"] = valleys
         s["ton_ph1"] = ton_new
         rec = {"t": s["t"], "vo": vo, "ton": ton_new, "valley": list(valleys), "peak": list(pk), "i_on": list(i_on),

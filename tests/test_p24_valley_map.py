@@ -154,5 +154,44 @@ class Validity(unittest.TestCase):              # D81: the map says when it leav
         self.assertFalse(steady_check(ms, fresh, D.vin, n=16)["settled"])
 
 
+
+class DelayBlock(unittest.TestCase):
+    """A250: t_val apart from the turn-on t_tr, the clamp's charge in the ladder (clamp_q), and the event turn-on."""
+
+    def _state(self, d, valley):
+        m = ValleyMap(d)
+        s = m.init_state(steady_ton(D))
+        s["valley"] = list(valley)
+        return m, s
+
+    def test_t_val_equal_t_tr_matches_default(self):
+        deep = [-12.5, -40.0, -12.5, -12.5]                               # phase 2 crosses, the others do not
+        m0, s0 = self._state(D, deep)
+        m1, s1 = self._state(replace(D, t_val=D.t_tr), deep)
+        for _ in range(50):
+            r0, r1 = m0.period(s0, 48.0, 0.0), m1.period(s1, 48.0, 0.0)
+        for a, b in zip(r0["valley"] + r0["rails"], r1["valley"] + r1["rails"]):
+            self.assertAlmostEqual(a, b, delta=1e-9)
+
+    def test_clamp_charge_enters_the_ladder(self):
+        d = replace(D, t_val=D.t_tr, t_tr=(16.904e-9, 22.0e-9, 16.904e-9, 15.082e-9))   # phase 2 clamps for longer
+        deep = [-12.5, -40.0, -12.5, -12.5]
+        m0, s0 = self._state(d, deep)
+        m1, s1 = self._state(replace(d, clamp_q=True), deep)
+        m0.period(s0, 48.0, 0.0); m1.period(s1, 48.0, 0.0)
+        self.assertEqual(s0["valley"], s1["valley"])                     # the currents are the same
+        self.assertGreater(s1["vc"][0], s0["vc"][0])                     # less charge out of Cs_1 through phase 2
+
+    def test_event_bounds_the_clamp(self):
+        d = replace(D, t_val=D.t_tr, t_tr=(16.904e-9, 30e-9, 16.904e-9, 15.082e-9), t_evt=1e-9)
+        m, s = self._state(d, [-12.5, -40.0, -12.5, -12.5])
+        r = m.period(s, 48.0, 0.0)
+        th = m.ith(1, r["rails"][1])
+        t_reach = 2 * D.t_tr[1] / math.pi * math.asin(th / 40.0)
+        self.assertAlmostEqual(r["i_on"][1], -math.sqrt(40.0 ** 2 - th ** 2)
+                               + (r["rails"][1] + D.v_rev - 1.0) / D.lf * 1e-9, delta=0.05)
+        self.assertLess(t_reach + 1e-9, 30e-9)
+
+
 if __name__ == "__main__":
     unittest.main()
