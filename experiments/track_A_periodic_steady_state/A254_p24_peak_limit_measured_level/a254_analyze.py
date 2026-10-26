@@ -37,7 +37,7 @@ def ref_of(row):
 
 
 def stage1(row, f, r):
-    base = row.split("_k")[0] if row[-3:-1] == "_k" else row
+    base = row[:-3] if row[-3:-1] == "_k" else row         # a position row: p_<board>_<f>k_k<k>
     (v, q), (h, qh) = A46.one1(f, base), A46.one1(r, base)
     c = {"p4": bool(v["peak_after_t0"] <= max(h["peak_after_t0"], I_LIM) + PK_TOL
                     and v["vo_min_v"] >= h["vo_min_v"] - (VO_TOL_MHZ if base.endswith("_1000k") else VO_TOL)
@@ -79,7 +79,7 @@ def one(row):
     if row in MC.IDENT:
         out["criteria"] = {"p1": bool(same and not fl)}
         return out
-    kind = stage1 if (row in A51.MC.STAGE1 or row[-3:-1] == "_k") else start if row in A51.MC.START else stage2
+    kind = stage1 if row.startswith("p_") else start if row in A51.MC.START else stage2
     out |= kind(row, f, r)
     out["criteria"]["p1"] = bool(same or fl)                 # no fire: the reference bit for bit
     return out
