@@ -11,7 +11,7 @@ References: A246 run_h_ (the final configuration).
   - The currents part at float level from the first crossing (p_N75_100k at 148.94 us, k_S75h at 134.38 us; turn-on
     times still equal). The runs then drift: a_S75h_d20 peak 207.78 A in both, k_S75h within 0.01 A.
   - p_N0_100k (145 A on 2.933 nH) is equal: its current never reaches the level there.
-  - The fix drops a stale turn-off before the step (next commit), so a run with no fire is the reference bit for bit.
+  - The fix drops a stale turn-off before the step (f4657c3), so a run with no fire is the reference bit for bit.
 - **o2: S75h 1 MHz passes, N75 1 MHz misses with fires** (the rule's "cap estimate is wrong"):
   - S75h 1 MHz: 199.1 A against 211.1 A, 4 fires; Vo minimum 980.3 against 976.4 mV.
   - N75 1 MHz: 212.1 A against 244.6 A, 13 fires; Vo minimum 980.0 against 981.7 mV (o4 passes).
