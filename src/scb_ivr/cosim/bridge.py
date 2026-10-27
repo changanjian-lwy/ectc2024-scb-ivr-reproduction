@@ -117,7 +117,8 @@ i_a at each limited turn-off). With "n_susp" n (A256; 0 = never): each phase kee
 for a limited one and -1 for a clean one (floor 0). When a count reaches n, the limit stops cutting pulses on every
 phase and hands the overload to the loop: a per-phase limit that keeps setting the on-time unbalances the series
 capacitors (A254). While it is suspended, a pulse the limit would have cut still counts +1; it acts again when every
-count is back at 0. Record "ocp_susp" (t_s, phase, on).
+count is back at 0. With "n_cap" m (A258; absent = no cap) a count stops at m, so the limit acts again m clean pulses
+after an overload ends, however long it lasted. Record "ocp_susp" (t_s, phase, on).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -604,13 +605,14 @@ class ModuleSim:
         self.highoffs = []                                       # A101: phase (and branch) currents at high-side turn-offs
         self.ocp = cfg.get("ocp")                                 # A253: cycle-by-cycle peak current limit
         if self.ocp is not None:
-            if set(self.ocp) - {"i_a", "t_ns", "n_susp"}:
-                raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns', 'n_susp'})}")
+            if set(self.ocp) - {"i_a", "t_ns", "n_susp", "n_cap"}:
+                raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns', 'n_susp', 'n_cap'})}")
             self.ocp_thr, self.ocp_t = float(self.ocp["i_a"]), float(self.ocp.get("t_ns", 0.0)) * 1e-9
             self.hs_on = [self.first_high] + [False] * (N - 1)       # the high sides as commanded
             self.ocp_armed = list(self.hs_on); self.ocp_done = [False] * N
             self.ocp_prev, self.ocp_log = None, []
             self.ocp_n = int(self.ocp.get("n_susp", 0))                  # A256: suspend after a run of limited pulses
+            self.ocp_cap = int(self.ocp["n_cap"]) if "n_cap" in self.ocp else None   # A258: the count's ceiling
             self.ocp_cnt, self.ocp_probe, self.ocp_susp, self.ocp_susp_log = [0] * N, [None] * N, False, []
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
@@ -808,10 +810,13 @@ class ModuleSim:
             self.sections[-1]["tick"] = 1; self.ticks += 1
 
     def ocp_count(self, k, hit):
-        """A256: phase k's up/down count of limited pulses; n_susp suspends the limit, all counts at 0 re-arm it."""
+        """A256: phase k's up/down count of limited pulses; n_susp suspends the limit, all counts at 0 re-arm it.
+        A258: n_cap, when set, is the count's ceiling."""
         if not self.ocp_n:
             return
         self.ocp_cnt[k] = self.ocp_cnt[k] + 1 if hit else max(self.ocp_cnt[k] - 1, 0)
+        if self.ocp_cap is not None:
+            self.ocp_cnt[k] = min(self.ocp_cnt[k], self.ocp_cap)
         if not self.ocp_susp and self.ocp_cnt[k] >= self.ocp_n:
             self.ocp_susp = True
             self.ocp_susp_log.append({"t_s": self.plant.t, "phase": k + 1, "on": 1})

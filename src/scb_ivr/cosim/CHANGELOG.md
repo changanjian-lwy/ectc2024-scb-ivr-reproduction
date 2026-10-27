@@ -4,6 +4,18 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-28 (A258) - a ceiling on the limit's count (bridge)
+
+**Source:** A256's count has no ceiling. While the limit is suspended, every pulse it would have cut counts +1, so a
+125 % overload drives the counts to 159-201 in 120 us (replay on A254's records). After the overload ends, the limit
+stays off for about as many clean pulses (80-100 us), and a 1 MHz train in that window is unprotected (A246: 231.7 A).
+
+Bridge cfg "ocp" gains "n_cap" (absent = no ceiling): a count stops at n_cap, so the limit acts again n_cap clean
+pulses after any overload ends.
+
+**Gate:** "n_cap" absent leaves ocp_count as A256's: tests 726 (test_cosim_ocp: the ceiling bounds the count and
+re-arms after n_cap clean pulses; no ceiling by default). cosim_regression --quick and --full PASS.
+
 ## 2026-10-27 (A256) - the peak current limit suspends itself after a run of limited pulses (bridge)
 
 **Source:** A254. At 110 / 125 A the limit takes item 10's 1 MHz peaks under 200 A. But under a 125 % load on N0 it
