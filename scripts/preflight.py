@@ -61,7 +61,10 @@ def main():
             shutil.copy2(f, tmp / "cosim" / f.name)
         for n, f in used.items():
             (tmp / "cosim" / n).symlink_to(f)
-        print(f"stand-ins {len(used)} of {len(names)} runs; without: {', '.join(n for n in names if n not in used) or 'none'}")
+        miss = [n for n in names if n not in used]
+        print(f"stand-ins {len(used)} of {len(names)} runs; without: {', '.join(miss) or 'none'}")
+        if miss:                                                  # A258: t3's path first ran on the real record
+            print("WARNING: the criteria on these runs do not run; borrow a record with the same event kind")
         env = dict(os.environ, PYTHONPATH=str(PROJECT / "src"))
         r = subprocess.run(["python3", str(tmp / script.name)], cwd=tmp, env=env, capture_output=True, text=True)
         print((r.stdout + r.stderr).strip()[-3000:])
