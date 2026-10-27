@@ -52,7 +52,10 @@ existed. train_row() takes the same quantities from the train's start; it passes
 
 ## 3. Limits
 - N75's margin after an overload is 2.0 A (198.0 A), and it was tested only with a train 10 us after the release.
-  A train that starts sooner meets a loop that is still recovering; that case was not run.
+  A train that starts sooner meets a loop that is still recovering; that case was not run. The re-arm cannot come
+  sooner than 6 clean pulses on every phase, about 2.4 us at 2.5 MHz, because a ceiling below n_susp would stop the
+  limit from ever suspending (the bridge now refuses it, fae6272). A train inside that window starts unprotected;
+  A246's unprotected N75 train first passed 200 A 3.9 us after its start.
 - With lows too short for A256's count to recover, the ceiling re-arms the limit where A256 would not. Each re-arm
   then costs at most 6 cuts per phase before the next suspension (n_susp 6), each with A256's hand-back kick
   (+11-14 A on S75h). This bound comes from the mechanism, not from a run: in ro_S75h both arms re-armed in every
