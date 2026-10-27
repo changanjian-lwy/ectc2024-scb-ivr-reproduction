@@ -113,7 +113,11 @@ path, outside the controller. While a high side is on, the first window end that
 schedules that high side's turn-off at the crossing (linear between the window ends, ocp_cross) + t_ns + t_drv. If the
 on-time ended first it is dropped before the plant steps to its time, so a run in which the limit never acts is the
 same bit for bit. Otherwise the controller's own turn-off of that pulse is skipped. Record "ocp_fires" (t_s, phase,
-i_a at each limited turn-off).
+i_a at each limited turn-off). With "n_susp" n (A256; 0 = never): each phase keeps an up/down count of its pulses, +1
+for a limited one and -1 for a clean one (floor 0). When a count reaches n, the limit stops cutting pulses on every
+phase and hands the overload to the loop: a per-phase limit that keeps setting the on-time unbalances the series
+capacitors (A254). While it is suspended, a pulse the limit would have cut still counts +1; it acts again when every
+count is back at 0. Record "ocp_susp" (t_s, phase, on).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -600,12 +604,14 @@ class ModuleSim:
         self.highoffs = []                                       # A101: phase (and branch) currents at high-side turn-offs
         self.ocp = cfg.get("ocp")                                 # A253: cycle-by-cycle peak current limit
         if self.ocp is not None:
-            if set(self.ocp) - {"i_a", "t_ns"}:
-                raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns'})}")
+            if set(self.ocp) - {"i_a", "t_ns", "n_susp"}:
+                raise ValueError(f"cfg 'ocp': unknown keys {sorted(set(self.ocp) - {'i_a', 't_ns', 'n_susp'})}")
             self.ocp_thr, self.ocp_t = float(self.ocp["i_a"]), float(self.ocp.get("t_ns", 0.0)) * 1e-9
             self.hs_on = [self.first_high] + [False] * (N - 1)       # the high sides as commanded
             self.ocp_armed = list(self.hs_on); self.ocp_done = [False] * N
             self.ocp_prev, self.ocp_log = None, []
+            self.ocp_n = int(self.ocp.get("n_susp", 0))                  # A256: suspend after a run of limited pulses
+            self.ocp_cnt, self.ocp_probe, self.ocp_susp, self.ocp_susp_log = [0] * N, [None] * N, False, []
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
         if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
@@ -801,6 +807,18 @@ class ModuleSim:
         if tick:
             self.sections[-1]["tick"] = 1; self.ticks += 1
 
+    def ocp_count(self, k, hit):
+        """A256: phase k's up/down count of limited pulses; n_susp suspends the limit, all counts at 0 re-arm it."""
+        if not self.ocp_n:
+            return
+        self.ocp_cnt[k] = self.ocp_cnt[k] + 1 if hit else max(self.ocp_cnt[k] - 1, 0)
+        if not self.ocp_susp and self.ocp_cnt[k] >= self.ocp_n:
+            self.ocp_susp = True
+            self.ocp_susp_log.append({"t_s": self.plant.t, "phase": k + 1, "on": 1})
+        elif self.ocp_susp and not any(self.ocp_cnt):
+            self.ocp_susp = False
+            self.ocp_susp_log.append({"t_s": self.plant.t, "phase": k + 1, "on": 0})
+
     def apply(self, j, level, meta):
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
         to_lsb, na = self.to_lsb, self.na
@@ -809,10 +827,13 @@ class ModuleSim:
             if meta.get("ocp"):                                  # (run_window drops it if the on-time ended first)
                 self.ocp_done[k] = True
                 self.ocp_log.append({"t_s": plant.t, "phase": k + 1, "i_a": float(plant.y[nv + k])})
+                self.ocp_count(k, True)
             elif not level and self.ocp_done[k]:
                 return                                           # the controller's own turn-off, after the limit's
             elif level:
-                self.ocp_done[k] = False; self.ocp_armed[k] = True
+                self.ocp_done[k] = False; self.ocp_armed[k] = True; self.ocp_probe[k] = None
+            else:                                                # the controller's own: clean unless a suspended
+                self.ocp_count(k, self.ocp_probe[k] is not None and self.ocp_probe[k] <= plant.t)   # limit would cut it
             self.hs_on[k] = bool(level)
         if level and j in self.gated and plant.gl[k]:            # A164: counted at the channel's start (shoot_check)
             ovl["cmd"] += 1
@@ -1019,8 +1040,10 @@ class ModuleSim:
         pend = self.pend
         while pend and pend[0][0] < t_win_end:
             ta, _, j, lvl, meta = heapq.heappop(pend)
-            if meta and meta.get("ocp") and not self.hs_on[j]:   # A253: the on-time ended first; no step to its time
-                continue
+            if meta and meta.get("ocp") and (not self.hs_on[j] or self.ocp_susp):   # A253: ended first; A256: suspended
+                if self.hs_on[j]:
+                    self.ocp_probe[j] = ta                       # suspended after it was scheduled: counted only
+                continue                                         # (no step to its time)
             self.integrate_to(ta)
             if j < 0:                                           # A216: a paused module's tick
                 self.section(tick=True)
@@ -1062,10 +1085,12 @@ class ModuleSim:
                 t0, i0 = self.ocp_prev
                 for k in range(N):
                     if self.hs_on[k] and self.ocp_armed[k] and i1[k] >= self.ocp_thr:
-                        tx = ocp_cross(t0, i0[k], t1, i1[k], self.ocp_thr)
-                        heapq.heappush(self.pend, (tx + self.ocp_t + self.t_drv, self.seq[0], k, 0,
-                                                   {"how": None, "bind": False, "ocp": True}))
-                        self.seq[0] += 1
+                        ta = ocp_cross(t0, i0[k], t1, i1[k], self.ocp_thr) + self.ocp_t + self.t_drv
+                        if self.ocp_susp:
+                            self.ocp_probe[k] = ta                       # A256: suspended, the pulse is only counted
+                        else:
+                            heapq.heappush(self.pend, (ta, self.seq[0], k, 0, {"how": None, "bind": False, "ocp": True}))
+                            self.seq[0] += 1
                         self.ocp_armed[k] = False
             self.ocp_prev = (t1, i1)
 
@@ -1092,6 +1117,8 @@ class ModuleSim:
         out["highoffs_last"] = self.highoffs[-keep_n:]               # A101
         if self.ocp is not None:
             out["ocp_fires"] = self.ocp_log                          # A253
+            if self.ocp_n:
+                out["ocp_susp"] = self.ocp_susp_log                  # A256
         if self.snap_win:                                            # A205: the snapshots and the circuit they belong to
             out["snaps"] = self.snaps
             out["snap_circuit"] = {k: getattr(p, k) for k in (

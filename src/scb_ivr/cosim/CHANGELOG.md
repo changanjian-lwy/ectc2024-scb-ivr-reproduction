@@ -4,6 +4,29 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-27 (A256) - the peak current limit suspends itself after a run of limited pulses (bridge)
+
+**Source:** A254. At 110 / 125 A the limit takes item 10's 1 MHz peaks under 200 A. But under a 125 % load on N0 it
+cut almost every pulse, and the series capacitors collapsed (rails 3.8 / 26.6 / 3.6 / 14.0 V, Vo 757 mV, 241.5 A).
+- A per-phase limit that keeps setting the on-time is peak current control, which flying-capacitor converters cannot
+  balance (Abdelhamid et al., TPEL 2019, abstract).
+- Commercial controllers count limit events and then shut down or hiccup: TI TPS546D24A (up/down count, default 3),
+  Renesas ISL68222 / 68233 (6 consecutive), TI TPS54A20 (an SCB: 3 sequential, hiccup with a Ct pre-charge).
+- The +62.5 A step is a specified row, so it must stay regulated. Here the count instead hands the overload to the
+  loop. That action is ours, no source.
+
+Bridge cfg "ocp" gains "n_susp" (0 = never):
+- per phase, an up/down count: +1 for a limited pulse, -1 for a clean one (floor 0);
+- a count of n_susp suspends the limit on every phase;
+- while it is suspended, a crossing only sets a probe at its would-be turn-off time. The pulse counts +1 if the
+  controller's turn-off comes after that time. A pending turn-off is dropped before the plant steps;
+- when every count is back at 0, the limit acts again;
+- record "ocp_susp" (t_s, phase, on).
+
+**Gate:** "n_susp" absent or 0: ocp_count returns at once, so runs are A254's bit for bit. tests 724 (test_cosim_ocp:
+the count suspends and re-arms, off by default, a suspended turn-off is only counted). cosim_regression --quick and
+--full PASS. A254's p_S75h_10k to 160 us (5 fires in the handover, count <= 1) is the same with and without n_susp 6.
+
 ## 2026-10-26 (A253) - a cycle-by-cycle peak current limit in the driver's path (bridge)
 
 **Source:** item 10's open part. On A240's 1 MHz train, a slotted phase starts its on-time with a positive valley
