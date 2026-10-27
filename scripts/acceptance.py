@@ -153,8 +153,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A253": (TA / "A253_p24_peak_current_limit", "a253_analyze.py", "a253_summary.json"),
     "A254": (TA / "A254_p24_peak_limit_measured_level", "a254_analyze.py", "a254_summary.json"),
     "A255": (TA / "A255_p24_overload_on_2p2nh", "a255_analyze.py", "a255_summary.json"),
+    "A256": (TA / "A256_p24_limit_suspends_on_overload", "a256_analyze.py", "a256_summary.json"),
 }
-ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_"}                # run file stem -> summary row: the run name carries this leading letter
+ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_", "A256": "s_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
     "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
     "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
@@ -862,6 +863,12 @@ EXCEPTIONS["A254"] = {("rows/k_N0", "p3"): _A254c, ("rows/m4_s_p250", "p3"): _A2
 _A255 = ("the 110 A limit collapses the ladder at 125 % load on the 2.2 nH boards too, as predicted; the overload "
          "response (A256) is needed on every board (RESULTS 0)")
 EXCEPTIONS["A255"] = {("rows/N75", "c2"): _A255, ("rows/S75h", "c2"): _A255, ("criteria", "c2"): _A255}
+_A256s2 = ("adopted (user decision 2026-10-27): the 2 NEW are the hand-back's spikes on S75h phase 2 (174.6 / 172.8 A, "
+           "+14 / +12 A over both neighbours): the loop's Ton rose 1.1 ns while the limit cut; peak, Vo and ladder pass (RESULTS 0)")
+_A256s3 = ("adopted (user decision 2026-10-27): ladder 3.525 against 3.518 V at one section 1.1 us after the line step, from "
+           "the limit's phase-1 cuts before the count reaches 6 (A254's arm l the same); peak 201.0 against 207.8 A (RESULTS 0)")
+EXCEPTIONS["A256"] = {("rows/o125_S75h", "s2"): _A256s2, ("criteria", "s2"): _A256s2,
+                      ("rows/a_S75h_d20", "s3"): _A256s3, ("criteria", "s3"): _A256s3}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

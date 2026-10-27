@@ -27,6 +27,9 @@ Bridge cfg "ocp" gains "n_susp" (0 = never):
 the count suspends and re-arms, off by default, a suspended turn-off is only counted). cosim_regression --quick and
 --full PASS. A254's p_S75h_10k to 160 us (5 fires in the handover, count <= 1) is the same with and without n_susp 6.
 
+**Adopted** (user decision 2026-10-27, A256 RESULTS 4). The final configuration now carries ocp {i_a 110 / 125 / 140 A
+on 2.2 / 2.933 / 3.813 nH, t_ns 1.0, n_susp 6}.
+
 ## 2026-10-26 (A253) - a cycle-by-cycle peak current limit in the driver's path (bridge)
 
 **Source:** item 10's open part. On A240's 1 MHz train, a slotted phase starts its on-time with a positive valley

@@ -30,6 +30,12 @@ Figure: a256_figure.py -> a256_limit_suspends.png.
   3.318 + 0.2) at a single section, 154.53 us. That is 1.1 us after the +4.8 V / 1 us step and before the count reaches 6
   (159.2 us). The cause is the limit's two phase-1 cuts; A254's arm l has the same 3.525 V. The row's peak falls 6.8 A,
   from 207.8 to 201.0 A.
+- **On the item-2 rows the suspension hands the limit's gain back.** Their counts reach 6, so the limit suspends for
+  19.5-31.6 us, and their peaks return to the final configuration's:
+  - a_S75h_d2: 211.8 A; final configuration 211.2 A, limit alone 200.8 A;
+  - a_S75h_d20: 201.0 A; final configuration 207.8 A, limit alone 197.1 A.
+
+  Item 2 stays as it was, as predicted.
 - Cost summary:
   - with n_susp 6 the limit fixes the 1 MHz rows;
   - it keeps every 125 % row as the final configuration, plus one hand-back kick (at most +14 A, below the row's peak);
@@ -58,3 +64,17 @@ Figure: a256_figure.py -> a256_limit_suspends.png.
 - The suspension stays on for as long as the overload lasts (the four 125 % rows end suspended). Re-arming was seen on
   the four item-2 and line rows, 19.5-31.6 us after suspension, with no fire after it. A re-arm under a load that is
   still high was not run.
+
+## 4. Decision
+- **ADOPTED by user decision on 2026-10-27, with the costs above recorded.** The final configuration is now A244 cfg_w +
+  rev_n 16 + hold_floor_ns 3.0 + ocp {i_a 110 / 125 / 140 A on 2.2 / 2.933 / 3.813 nH (A254's level), t_ns 1.0,
+  n_susp 6}. Item 10 is closed at 1 MHz.
+- Stated limits:
+  - plant V7;
+  - tested at 110 A on 2.2 nH and 125 A on 2.933 nH; the 140 A level on 3.813 nH (N13) is A254's formula and was not
+    run;
+  - one module, plus m4_s_p250 on four modules;
+  - 125 % load only;
+  - no fault path modelled;
+  - the hand-back kick (at most +14 A) and a_S75h_d20's single section +0.2 V are recorded costs. The oracle's classes
+    are unchanged, so they still count as NEW / misses.

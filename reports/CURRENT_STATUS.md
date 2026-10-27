@@ -2501,6 +2501,39 @@ each question:
          deeper: A244's collapsed phase 4 helped that step). Accepted
          217 / 15. ADOPTED by user decision on 2026-10-25: item 10 closed
          at 10-200 kHz; 1 MHz stays the ladder's.
+    146. The turn-on-delay learner and item 10 at 1 MHz (A247-A256,
+         2026-10-26/27, V7).
+         - The learner, after six special-case rules in ten days (A247-A252):
+           - The soft-turn-on windows nest, so one delay per board would serve
+             every negative current. A247's 0.92 V offset was the analysis's
+             rail, not physics (A248; plant edge = D57 + 1.65 ns gate +
+             0.28 V r_core).
+           - Holding phases 2-4 at one delay removes the N0 100 kHz lock
+             (A249), but the learner's collapse was an actuator: it sinks
+             charge on the first release and pulls the start-up ladder back.
+           - A hold after the start-up costs 1 MHz and N0 10 kHz (A251).
+           - A short held delay moves N75 1 MHz by 37 A but turns phases 2-4
+             on hard at 12.5 V (A252).
+           - Line verdict: the learner stays.
+         - 1 MHz:
+           - A cycle-by-cycle peak limit per phase is set at 200 - 5 - 14 -
+             69 x 2.2 / L from A253's measured rise: 110 / 125 / 140 A.
+           - It takes N75 / S75h to 193.2 / 182.7 A (A254).
+           - But at 125 % load it acts every period and collapses the ladder:
+             Vo 757 / 731 / 637 mV on N0 / N75 / S75h (A254 / A255).
+           - A per-phase up/down count suspends it at 6 (bridge ocp n_susp,
+             unit tests 724). The 125 % rows then run as the final
+             configuration (N0 181.3 A, ladder 0.40 V; A256).
+           - Costs:
+             - the hand-back kick on S75h, +11-14 A (174.6 A; 2 NEW);
+             - a_S75h_d20's ladder 7 mV over for one section;
+             - the item-2 rows suspend, so their peaks stay at item 2's.
+         - Accepted: A249 33 / 3, A251 49 / 63, A252 0 / 3, A253 8 / 7,
+           A254 72 / 4, A255 4 / 3, A256 14 / 4.
+         - ADOPTED by user decision on 2026-10-27: ocp {i_a by board, t_ns
+           1.0, n_susp 6}. Item 10 is closed at 1 MHz.
+         - Not run: 140 A (N13), > 125 %, a re-arm under a still-high load,
+           a real fault (no hiccup path).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
