@@ -1,0 +1,89 @@
+{
+ "rows": {
+  "N75": {
+   "h": {
+    "peak_a": 182.04786285336954,
+    "vo_min_v": 0.9899641691725155,
+    "vo_tail_err_v": 0.00023270484293103078,
+    "dev_max_v": 0.35493289311637,
+    "dev_end_v": 0.3433689615151394,
+    "vds_max_v": 27.89070050749891,
+    "late": 0,
+    "fires": 0,
+    "sources_modified": false
+   },
+   "l": {
+    "peak_a": 246.88819518644965,
+    "vo_min_v": 0.7312694367523969,
+    "vo_tail_err_v": 0.23959135112638363,
+    "dev_max_v": 12.566044705923463,
+    "dev_end_v": 12.566044705923463,
+    "vds_max_v": 35.33626538645615,
+    "late": 0,
+    "fires": 939,
+    "sources_modified": false
+   },
+   "criteria": {
+    "c1": true,
+    "c2": false
+   }
+  },
+  "S75h": {
+   "h": {
+    "peak_a": 185.6314132098711,
+    "vo_min_v": 0.988466920790466,
+    "vo_tail_err_v": 0.00019885735566982365,
+    "dev_max_v": 0.35272915295710305,
+    "dev_end_v": 0.31942391373610235,
+    "vds_max_v": 30.865189600154164,
+    "late": 74,
+    "fires": 0,
+    "sources_modified": false
+   },
+   "l": {
+    "peak_a": 211.96496062739854,
+    "vo_min_v": 0.6366660242376647,
+    "vo_tail_err_v": 0.3220219044820052,
+    "dev_max_v": 14.25124725914334,
+    "dev_end_v": 14.25124725914334,
+    "vds_max_v": 35.12867150911856,
+    "late": 64,
+    "fires": 998,
+    "sources_modified": false
+   },
+   "criteria": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ },
+ "n0": {
+  "h": {
+   "peak_a": 181.20880482610076,
+   "vo_min_v": 0.9872048449755318,
+   "vo_tail_err_v": 0.0002601405351745356,
+   "dev_max_v": 0.40420464297584857,
+   "dev_end_v": 0.40344087492331226,
+   "vds_max_v": 28.1066152737936,
+   "late": 0,
+   "fires": 0,
+   "sources_modified": false
+  },
+  "l": {
+   "peak_a": 241.51844897277888,
+   "vo_min_v": 0.7569252816734764,
+   "vo_tail_err_v": 0.19591189364262018,
+   "dev_max_v": 15.580567147146137,
+   "dev_end_v": 15.580567147146137,
+   "vds_max_v": 38.87848579568008,
+   "late": 0,
+   "fires": 549,
+   "sources_modified": false
+  }
+ },
+ "criteria": {
+  "c1": true,
+  "c2": false,
+  "complete": true
+ }
+}
