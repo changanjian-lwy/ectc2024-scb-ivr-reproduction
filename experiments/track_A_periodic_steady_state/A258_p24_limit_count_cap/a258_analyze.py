@@ -53,10 +53,21 @@ def rearm_us(d, after):
     return [round(1e6 * x["t_s"], 2) for x in d.get("ocp_susp", []) if x["on"] == 0 and x["t_s"] >= after]
 
 
+def train_row(f):
+    """A236's row quantities for a pulse train (A236 reads only line and load steps), from the train's start."""
+    d = json.loads(f.read_text())
+    t0 = t_event(d)
+    g = d["gate_offs_last"]
+    return {"post_pk": max(e["i_max_a"] for e in g if e["t_s"] >= t0), "peak_whole": max(e["i_max_a"] for e in g),
+            "new_after": sum(e["cls"] == "NEW" and e["t_s"] >= t0 for e in A36.ORA.check(f)["events"]),
+            "vo_ext_mv": 1e3 * max((q["vo"] - 1.0 for q in d["sections"] if q["t_s"] >= t0), key=abs)}
+
+
 def against(fa, fb):
     """A256's s2 / s3 test with fb as the reference: (passes, a's metrics, b's metrics)."""
     da, db = json.loads(fa.read_text()), json.loads(fb.read_text())
-    a, b = A36.row("k_N0", fa), A36.row("k_N0", fb)
+    row = train_row if "load_pulse" in da["cfg"] else (lambda f: A36.row("k_N0", f))
+    a, b = row(fa), row(fb)
     t0 = t_event(da)
     keep = ("post_pk", "peak_whole", "new_after", "vo_ext_mv")
     ma, mb = {k: a[k] for k in keep} | {"dev_max_v": dev_max(da, t0)}, {k: b[k] for k in keep} | {"dev_max_v": dev_max(db, t0)}
