@@ -1,0 +1,92 @@
+{
+ "a_S75_d20": {
+  "fires": 20,
+  "max": 18,
+  "run": 18
+ },
+ "a_S75h_d2": {
+  "fires": 80,
+  "max": 74,
+  "run": 74
+ },
+ "a_S75h_d20": {
+  "fires": 38,
+  "max": 27,
+  "run": 26
+ },
+ "c30_S75h": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "k_N0": {
+  "fires": 549,
+  "max": 201,
+  "run": 201
+ },
+ "k_S75h": {
+  "fires": 41,
+  "max": 33,
+  "run": 29
+ },
+ "m4_s_p250": {
+  "fires": 1843,
+  "max": 159,
+  "run": 159
+ },
+ "p_N75_1000k": {
+  "fires": 91,
+  "max": 2,
+  "run": 2
+ },
+ "p_S75h_1000k": {
+  "fires": 37,
+  "max": 2,
+  "run": 2
+ },
+ "p_S75h_100k": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_100k_k2": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_100k_k4": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_10k": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_200k": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_30k": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "p_S75h_60k": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "u_S75h_100": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ },
+ "w30_S75h": {
+  "fires": 5,
+  "max": 1,
+  "run": 1
+ }
+}
