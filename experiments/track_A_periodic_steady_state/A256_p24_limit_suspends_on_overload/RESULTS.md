@@ -71,8 +71,8 @@ Figure: a256_figure.py -> a256_limit_suspends.png.
   n_susp 6}. Item 10 is closed at 1 MHz.
 - Stated limits:
   - plant V7;
-  - tested at 110 A on 2.2 nH and 125 A on 2.933 nH; the 140 A level on 3.813 nH (N13) is A254's formula and was not
-    run;
+  - tested at 110 A on 2.2 nH and 125 A on 2.933 nH; the 140 A level on 3.813 nH (N13) is A254's formula, run afterwards by A257
+    (it holds);
   - one module, plus m4_s_p250 on four modules;
   - 125 % load only;
   - no fault path modelled;

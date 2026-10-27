@@ -154,6 +154,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A254": (TA / "A254_p24_peak_limit_measured_level", "a254_analyze.py", "a254_summary.json"),
     "A255": (TA / "A255_p24_overload_on_2p2nh", "a255_analyze.py", "a255_summary.json"),
     "A256": (TA / "A256_p24_limit_suspends_on_overload", "a256_analyze.py", "a256_summary.json"),
+    "A257": (TA / "A257_p24_limit_on_n13_overload", "a257_analyze.py", "a257_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_", "A256": "s_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -417,6 +418,7 @@ NOT_ROWS["A245"] = r".*"                          # judged through ADAPT (stage 
 NOT_ROWS["A246"] = r".*"                          # judged through ADAPT (stage 1 / stage 2 rows, c1 rows)
 NOT_ROWS.update({e: r".*" for e in ("A249", "A251", "A252")})   # judged per arm and row through ADAPT
 NOT_ROWS["A255"] = r".*"                          # judged per board, both arms in one row
+NOT_ROWS["A257"] = r".*"                          # judged per row, both arms in one row
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
@@ -869,6 +871,9 @@ _A256s3 = ("adopted (user decision 2026-10-27): ladder 3.525 against 3.518 V at 
            "the limit's phase-1 cuts before the count reaches 6 (A254's arm l the same); peak 201.0 against 207.8 A (RESULTS 0)")
 EXCEPTIONS["A256"] = {("rows/o125_S75h", "s2"): _A256s2, ("criteria", "s2"): _A256s2,
                       ("rows/a_S75h_d20", "s3"): _A256s3, ("criteria", "s3"): _A256s3}
+_A257n1 = ("threshold registered without checking the row's reference: the +4.8 V / 1 us ramp lifts rail 1 to 16.99 V "
+           "(3.79 V) in the final configuration and in A235's record of the same row alike; peak, V_DS and Vo pass (RESULTS 0)")
+EXCEPTIONS["A257"] = {("rows/lp48_N13", "n1"): _A257n1, ("criteria", "n1"): _A257n1}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],

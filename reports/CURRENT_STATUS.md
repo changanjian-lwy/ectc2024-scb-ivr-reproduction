@@ -2532,8 +2532,14 @@ each question:
            A254 72 / 4, A255 4 / 3, A256 14 / 4.
          - ADOPTED by user decision on 2026-10-27: ocp {i_a by board, t_ns
            1.0, n_susp 6}. Item 10 is closed at 1 MHz.
-         - Not run: 140 A (N13), > 125 %, a re-arm under a still-high load,
-           a real fault (no hiccup path).
+         - A257: the 140 A level on N13 holds. At 125 % it suspends after
+           16 fires (181.0 A against 180.4 A); at +4.8 V / 1 us it never
+           fires. Accepted 8 / 2: n1 missed by my threshold; the +4.8 V
+           ramp's 3.79 V is A235's too. Found: after that step phases
+           3-4 turn on hard (median 7 V) for 80 us, 150 times; A235 had
+           none. Recorded, not run.
+         - Not run: > 125 %, a re-arm under a still-high load, a real
+           fault (no hiccup path).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
