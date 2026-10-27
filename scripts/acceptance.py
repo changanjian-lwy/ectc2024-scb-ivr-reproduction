@@ -151,8 +151,9 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A251": (TA / "A251_p24_hold_after_startup", "a251_analyze.py", "a251_summary.json"),
     "A252": (TA / "A252_p24_short_delay_1mhz", "a252_analyze.py", "a252_summary.json"),
     "A253": (TA / "A253_p24_peak_current_limit", "a253_analyze.py", "a253_summary.json"),
+    "A254": (TA / "A254_p24_peak_limit_measured_level", "a254_analyze.py", "a254_summary.json"),
 }
-ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_"}                # run file stem -> summary row: the run name carries this leading letter
+ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
     "C09": r"c06al9_",                    # contingency rerun, read by the post-step comparison
     "C10": r"s\d+_|c06al10_|c10al6_",     # single-module records (identity criteria S_*) and the trace reruns
@@ -852,6 +853,10 @@ _A253o3 = "item 2's S75h 125 C rows were over 200 A before the limit (207.8 / 21
 EXCEPTIONS["A253"] = {("rows/p_N75_100k", "o1"): _A253o1, ("criteria", "o1"): _A253o1,
                       ("rows/p_N75_1000k", "o2"): _A253o2, ("criteria", "o2"): _A253o2,
                       ("rows/a_S75h_d2", "o3"): _A253o3, ("rows/a_S75h_d20", "o3"): _A253o3, ("criteria", "o3"): _A253o3}
+_A254c = ("not adopted (user decision 2026-10-27): on N0 a 125 % load makes the 125 A limit act in almost every period "
+          "and the ladder collapses (rails 3.8 / 26.6 / 3.6 / 14.0 V, Vo 757 mV); an overload response comes first (RESULTS 0)")
+EXCEPTIONS["A254"] = {("rows/k_N0", "p3"): _A254c, ("rows/m4_s_p250", "p3"): _A254c, ("criteria", "p3"): _A254c,
+                      ("rows/a_S75h_d2", "p3"): "200.8 A against 211.2 A without the limit: 0.8 A over (RESULTS 0)"}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
