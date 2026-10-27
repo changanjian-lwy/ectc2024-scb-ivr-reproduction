@@ -8,13 +8,19 @@ result.
 
 **Source:** A256's count has no ceiling. While the limit is suspended, every pulse it would have cut counts +1, so a
 125 % overload drives the counts to 159-201 in 120 us (replay on A254's records). After the overload ends, the limit
-stays off for about as many clean pulses (80-100 us), and a 1 MHz train in that window is unprotected (A246: 231.7 A).
+stays off for about as many clean pulses (80-100 us), and a 1 MHz train in that window is unprotected (A246: 244.6 A
+gate-level).
 
 Bridge cfg "ocp" gains "n_cap" (absent = no ceiling): a count stops at n_cap, so the limit acts again n_cap clean
 pulses after any overload ends.
 
 **Gate:** "n_cap" absent leaves ocp_count as A256's: tests 726 (test_cosim_ocp: the ceiling bounds the count and
 re-arms after n_cap clean pulses; no ceiling by default). cosim_regression --quick and --full PASS.
+
+**Adopted (A258's registered rule, 2026-10-28; t0-t3 pass):** n_cap 6 joins the final configuration. After 90 us at
+125 % the limit re-arms 2.9 / 3.9 us after the release (without the ceiling 84.5 / 81.6 us), and a 1 MHz train 10 us
+later holds 198.0 / 187.3 A on N75 / S75h (without 276.9 / 209.3 A). A256's suspending rows are equal up to the earlier
+re-arm.
 
 ## 2026-10-27 (A256) - the peak current limit suspends itself after a run of limited pulses (bridge)
 

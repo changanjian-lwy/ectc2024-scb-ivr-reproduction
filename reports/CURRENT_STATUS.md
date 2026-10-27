@@ -2501,7 +2501,7 @@ each question:
          deeper: A244's collapsed phase 4 helped that step). Accepted
          217 / 15. ADOPTED by user decision on 2026-10-25: item 10 closed
          at 10-200 kHz; 1 MHz stays the ladder's.
-    146. The turn-on-delay learner and item 10 at 1 MHz (A247-A256,
+    146. The turn-on-delay learner and item 10 at 1 MHz (A247-A258,
          2026-10-26/27, V7).
          - The learner, after six special-case rules in ten days (A247-A252):
            - The soft-turn-on windows nest, so one delay per board would serve
@@ -2538,8 +2538,15 @@ each question:
            ramp's 3.79 V is A235's too. Found: after that step phases
            3-4 turn on hard (median 7 V) for 80 us, 150 times; A235 had
            none. Recorded, not run.
-         - Not run: > 125 %, a re-arm under a still-high load, a real
-           fault (no hiccup path).
+         - A258: A256's count had no ceiling, so after 90 us at 125 %
+           the limit stayed off 81.6-84.5 us; a 1 MHz train then reached
+           276.9 / 209.3 A (N75 / S75h). With each count stopped at 6
+           (ocp n_cap 6) it re-arms 2.9 / 3.9 us after the release and
+           the train holds 198.0 / 187.3 A. A256's suspending rows equal
+           up to the earlier re-arm. Accepted 15 / 0; n_cap 6 joins the
+           final configuration by the registered rule.
+         - Not run: > 125 %, a train < 10 us after an overload ends (N75
+           margin 2.0 A at 10 us), a real fault (no hiccup path).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

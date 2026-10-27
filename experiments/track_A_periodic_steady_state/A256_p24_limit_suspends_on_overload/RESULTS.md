@@ -63,7 +63,9 @@ Figure: a256_figure.py -> a256_limit_suspends.png.
   pre-charged restart (TPS54A20), which this plant does not model.
 - The suspension stays on for as long as the overload lasts (the four 125 % rows end suspended). Re-arming was seen on
   the four item-2 and line rows, 19.5-31.6 us after suspension, with no fire after it. A re-arm under a load that is
-  still high was not run.
+  still high was not run. The count has no ceiling, so after a long overload the limit stays off about as long: A258
+  measured 81.6-84.5 us after 90 us at 125 %, with a 1 MHz train in that window at 276.9 A (N75). A258's ceiling,
+  n_cap 6, closes it.
 
 ## 4. Decision
 - **ADOPTED by user decision on 2026-10-27, with the costs above recorded.** The final configuration is now A244 cfg_w +
