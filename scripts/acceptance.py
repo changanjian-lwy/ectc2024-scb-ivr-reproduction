@@ -152,6 +152,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A252": (TA / "A252_p24_short_delay_1mhz", "a252_analyze.py", "a252_summary.json"),
     "A253": (TA / "A253_p24_peak_current_limit", "a253_analyze.py", "a253_summary.json"),
     "A254": (TA / "A254_p24_peak_limit_measured_level", "a254_analyze.py", "a254_summary.json"),
+    "A255": (TA / "A255_p24_overload_on_2p2nh", "a255_analyze.py", "a255_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -414,6 +415,7 @@ NOT_ROWS.update({e: r".*" for e in ("A241", "A242", "A243", "A244")})   # judged
 NOT_ROWS["A245"] = r".*"                          # judged through ADAPT (stage 1 rows, identity block with stage 2)
 NOT_ROWS["A246"] = r".*"                          # judged through ADAPT (stage 1 / stage 2 rows, c1 rows)
 NOT_ROWS.update({e: r".*" for e in ("A249", "A251", "A252")})   # judged per arm and row through ADAPT
+NOT_ROWS["A255"] = r".*"                          # judged per board, both arms in one row
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),
@@ -857,6 +859,9 @@ _A254c = ("not adopted (user decision 2026-10-27): on N0 a 125 % load makes the 
           "and the ladder collapses (rails 3.8 / 26.6 / 3.6 / 14.0 V, Vo 757 mV); an overload response comes first (RESULTS 0)")
 EXCEPTIONS["A254"] = {("rows/k_N0", "p3"): _A254c, ("rows/m4_s_p250", "p3"): _A254c, ("criteria", "p3"): _A254c,
                       ("rows/a_S75h_d2", "p3"): "200.8 A against 211.2 A without the limit: 0.8 A over (RESULTS 0)"}
+_A255 = ("the 110 A limit collapses the ladder at 125 % load on the 2.2 nH boards too, as predicted; the overload "
+         "response (A256) is needed on every board (RESULTS 0)")
+EXCEPTIONS["A255"] = {("rows/N75", "c2"): _A255, ("rows/S75h", "c2"): _A255, ("criteria", "c2"): _A255}
 ADAPT = {   # summaries written before this gate's format: map their registered criteria to a "criteria" block
     "A151": lambda d: {"1_harness": d["c1"], "2_l50": d["c2"], "3_l100": d["c3"], "4_controller_l50": d["c2"]["c4"],
                        "4_controller_l100": d["c3"]["c4"], "5_edge_power_l50": d["c2"]["c5"],
