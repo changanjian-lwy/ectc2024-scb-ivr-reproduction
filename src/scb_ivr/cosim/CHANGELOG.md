@@ -12,7 +12,8 @@ stays off for about as many clean pulses (80-100 us), and a 1 MHz train in that 
 gate-level).
 
 Bridge cfg "ocp" gains "n_cap" (absent = no ceiling): a count stops at n_cap, so the limit acts again n_cap clean
-pulses after any overload ends.
+pulses after any overload ends. The bridge refuses n_cap unless 0 < n_susp <= n_cap: a lower ceiling keeps every
+count below n_susp, so the limit would never suspend (A254's ladder collapse at 125 %).
 
 **Gate:** "n_cap" absent leaves ocp_count as A256's: tests 726 (test_cosim_ocp: the ceiling bounds the count and
 re-arms after n_cap clean pulses; no ceiling by default). cosim_regression --quick and --full PASS.

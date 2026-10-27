@@ -109,6 +109,11 @@ class OcpSuspend(_Module, unittest.TestCase):
             m.ocp_count(0, False)
         self.assertEqual((m.ocp_cnt, m.ocp_susp), ([0] * 4, False))   # re-armed 3 clean pulses after a long overload
 
+    def test_cap_below_suspend_refused(self):
+        for ocp in ({"n_susp": 6, "n_cap": 3}, {"n_cap": 6}):           # the count could never reach n_susp
+            with self.assertRaises(ValueError):
+                self.module(True, **ocp)
+
     def test_no_cap_by_default(self):
         m = self.module(True, n_susp=3)
         for _ in range(50):

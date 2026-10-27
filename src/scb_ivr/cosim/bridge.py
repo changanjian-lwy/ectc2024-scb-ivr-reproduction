@@ -118,7 +118,8 @@ for a limited one and -1 for a clean one (floor 0). When a count reaches n, the 
 phase and hands the overload to the loop: a per-phase limit that keeps setting the on-time unbalances the series
 capacitors (A254). While it is suspended, a pulse the limit would have cut still counts +1; it acts again when every
 count is back at 0. With "n_cap" m (A258; absent = no cap) a count stops at m, so the limit acts again m clean pulses
-after an overload ends, however long it lasted. Record "ocp_susp" (t_s, phase, on).
+after an overload ends, however long it lasted; it needs 0 < n_susp <= m, or the limit could never suspend. Record
+"ocp_susp" (t_s, phase, on).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -613,6 +614,8 @@ class ModuleSim:
             self.ocp_prev, self.ocp_log = None, []
             self.ocp_n = int(self.ocp.get("n_susp", 0))                  # A256: suspend after a run of limited pulses
             self.ocp_cap = int(self.ocp["n_cap"]) if "n_cap" in self.ocp else None   # A258: the count's ceiling
+            if self.ocp_cap is not None and not 0 < self.ocp_n <= self.ocp_cap:   # a ceiling below n_susp never suspends
+                raise ValueError(f"cfg 'ocp': n_cap needs 0 < n_susp <= n_cap: {self.ocp}")
             self.ocp_cnt, self.ocp_probe, self.ocp_susp, self.ocp_susp_log = [0] * N, [None] * N, False, []
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
