@@ -2554,6 +2554,22 @@ each question:
          - Not run: > 125 % in co-simulation, a train 0-10 us after an
            overload ends (N75 margin 2.0 A at 10 us), a real fault (no
            hiccup path).
+    147. A latched fault trip (A259, 2026-10-28, V7, user decision to
+         build fault protection).
+         - Without one, a short or a 200 % load runs into the limit's
+           suspension 2.4-2.75 us in and the next pulse reaches 322-390 A
+           (445-668 A, V_DS up to 82 V; arm d).
+         - Bridge cfg "fault": under-voltage 0.9 V / 400 ns, a 220 A fault
+           level that cuts while suspended (up/down count 3), the 10 us
+           mean over 350 A; any of them turns every switch off, latched.
+           Plant cfg "short" adds a resistance across the output.
+         - Shorts trip on under-voltage 0.52-0.91 us in, at 174-175 A;
+           200 % on the fault level, 283.3 A; 150 % on the average at
+           8.8 us. Currents gone in 0.1-0.2 us; the ladder holds.
+           Legit rows bit for bit. Accepted 5 / 0; joins the final
+           configuration by the registered rule.
+         - Not run: restart (hiccup, flying capacitors pre-charged),
+           N0 / N13, four modules, faults in start-up or transients.
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.

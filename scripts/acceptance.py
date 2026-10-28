@@ -156,6 +156,7 @@ EXPERIMENTS = {   # name: (folder, analysis script, summary)
     "A256": (TA / "A256_p24_limit_suspends_on_overload", "a256_analyze.py", "a256_summary.json"),
     "A257": (TA / "A257_p24_limit_on_n13_overload", "a257_analyze.py", "a257_summary.json"),
     "A258": (TA / "A258_p24_limit_count_cap", "a258_analyze.py", "a258_summary.json"),
+    "A259": (TA / "A259_p24_fault_trip", "a259_analyze.py", "a259_summary.json"),
 }
 ROW_PREFIX = {"A137": "s", "A236": "h_", "A253": "o_", "A254": "l_", "A256": "s_"}                # run file stem -> summary row: the run name carries this leading letter
 NOT_ROWS = {                              # runs the summary does not list as rows (checked another way)
@@ -421,6 +422,7 @@ NOT_ROWS.update({e: r".*" for e in ("A249", "A251", "A252")})   # judged per arm
 NOT_ROWS["A255"] = r".*"                          # judged per board, both arms in one row
 NOT_ROWS["A257"] = r".*"                          # judged per row, both arms in one row
 NOT_ROWS["A258"] = r".*"                          # judged per row, both arms (or arm c against A256) in one row
+NOT_ROWS["A259"] = r".*"                          # judged per row (fault_rows / ident_rows), arm d as each row's reference
 STOPPED = {   # experiment: (run pattern, why): registered cfgs not run because the experiment was stopped by its rule
     "A241": (r"f_(f_S75_k0|k_S75h|m4_|r_F0_lm80|r_N13_lm48|u_N0|w20_N0|w30_S75h|w5_N0|w5_N75|z_N)",
              "stage 2 stopped after 15 of 28 rows: five misses had fixed the decision (RESULTS header)"),

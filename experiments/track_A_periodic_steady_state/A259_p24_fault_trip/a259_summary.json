@@ -1,0 +1,215 @@
+{
+ "fault_rows": {
+  "sh025_N75": {
+   "peak_a": 174.19531730664235,
+   "vds_v": 27.89070050749891,
+   "susp_us": null,
+   "fault": {
+    "t_s": 0.00040052400000000003,
+    "cause": "uv",
+    "phase": null,
+    "value": 0.6463304138445191,
+    "t_off_s": 0.000400534,
+    "vds_max_after_v": 16.580303437590665,
+    "i_max_after_a": 108.60519511201682
+   },
+   "trip_us": 0.524,
+   "rest_max_a": 0.00102535116059616,
+   "ladder_end_v": 0.41476652753008203,
+   "arm_d": {
+    "peak_a": 636.7347573470506,
+    "vds_v": 81.97709809234779,
+    "susp_us": 2.491
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  },
+  "sh1_N75": {
+   "peak_a": 175.19044293739785,
+   "vds_v": 27.89070050749891,
+   "susp_us": null,
+   "fault": {
+    "t_s": 0.000400912,
+    "cause": "uv",
+    "phase": null,
+    "value": 0.8301621790168494,
+    "t_off_s": 0.000400922,
+    "vds_max_after_v": 16.932152632958765,
+    "i_max_after_a": 106.35079990897408
+   },
+   "trip_us": 0.912,
+   "rest_max_a": 0.001429220045998666,
+   "ladder_end_v": 0.45558435874725767,
+   "arm_d": {
+    "peak_a": 668.132598329676,
+    "vds_v": 69.43522944336942,
+    "susp_us": 2.493
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  },
+  "ov150_N75": {
+   "peak_a": 227.73353664174,
+   "vds_v": 28.466332557116203,
+   "susp_us": 2.749,
+   "fault": {
+    "t_s": 0.00040878800000000004,
+    "cause": "avg",
+    "phase": null,
+    "value": 350.0150318144551,
+    "t_off_s": 0.00040879800000000004,
+    "vds_max_after_v": 17.39900107526848,
+    "i_max_after_a": 146.256768546005
+   },
+   "trip_us": 8.788,
+   "rest_max_a": 0.0007316987583426844,
+   "ladder_end_v": 0.3875512747527914,
+   "arm_d": {
+    "peak_a": 227.73353664174,
+    "vds_v": 28.466332557116203,
+    "susp_us": 2.749
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  },
+  "ov200_N75": {
+   "peak_a": 283.3065826918622,
+   "vds_v": 35.43365634894009,
+   "susp_us": 2.387,
+   "fault": {
+    "t_s": 0.000403382758048536,
+    "cause": "peak",
+    "phase": 3,
+    "value": 261.74485299609665,
+    "t_off_s": 0.000403392758048536,
+    "vds_max_after_v": 22.453009568507042,
+    "i_max_after_a": 266.15692635580746
+   },
+   "trip_us": 3.383,
+   "rest_max_a": 0.0008991385059984219,
+   "ladder_end_v": 2.7551954924219064,
+   "arm_d": {
+    "peak_a": 559.3963188636063,
+    "vds_v": 58.32571706533699,
+    "susp_us": 2.387
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  },
+  "sh025_S75h": {
+   "peak_a": 174.56240284733803,
+   "vds_v": 30.865189600154164,
+   "susp_us": null,
+   "fault": {
+    "t_s": 0.00040052400000000003,
+    "cause": "uv",
+    "phase": null,
+    "value": 0.6441616270466954,
+    "t_off_s": 0.000400534,
+    "vds_max_after_v": 16.90024168080936,
+    "i_max_after_a": 170.3076737463121
+   },
+   "trip_us": 0.524,
+   "rest_max_a": 0.0010347003656654358,
+   "ladder_end_v": 0.42386495192102913,
+   "arm_d": {
+    "peak_a": 444.78194469576636,
+    "vds_v": 53.58798929487263,
+    "susp_us": 2.412
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  },
+  "ov150_S75h": {
+   "peak_a": 258.64744199337787,
+   "vds_v": 31.86900019171491,
+   "susp_us": 2.608,
+   "fault": {
+    "t_s": 0.00040878400000000004,
+    "cause": "avg",
+    "phase": null,
+    "value": 350.0463320727195,
+    "t_off_s": 0.00040879400000000003,
+    "vds_max_after_v": 17.080544282842098,
+    "i_max_after_a": 184.71837587095834
+   },
+   "trip_us": 8.784,
+   "rest_max_a": 0.0007338770714901021,
+   "ladder_end_v": 0.6363842318342332,
+   "arm_d": {
+    "peak_a": 258.64744199337787,
+    "vds_v": 31.86900019171491,
+    "susp_us": 2.608
+   },
+   "f1": true,
+   "f2": true,
+   "f3": true
+  }
+ },
+ "ident_rows": {
+  "a_S75h_d2": {
+   "same": {
+    "sections": true,
+    "highoffs_last": true,
+    "lowoffs_last": true,
+    "turnons_last": true,
+    "late_fires": true,
+    "overlaps": true,
+    "ipk_a": true
+   },
+   "fault": null,
+   "f4": true
+  },
+  "p_N75_60k": {
+   "same": {
+    "sections": true,
+    "highoffs_last": true,
+    "lowoffs_last": true,
+    "turnons_last": true,
+    "late_fires": true,
+    "overlaps": true,
+    "ipk_a": true
+   },
+   "fault": null,
+   "f4": true
+  },
+  "o125_S75h": {
+   "same": {
+    "sections": true,
+    "highoffs_last": true,
+    "lowoffs_last": true,
+    "turnons_last": true,
+    "late_fires": true,
+    "overlaps": true,
+    "ipk_a": true
+   },
+   "fault": null,
+   "f4": true
+  },
+  "pr_N75": {
+   "same": {
+    "sections": true,
+    "highoffs_last": true,
+    "lowoffs_last": true,
+    "turnons_last": true,
+    "late_fires": true,
+    "overlaps": true,
+    "ipk_a": true
+   },
+   "fault": null,
+   "f4": true
+  }
+ },
+ "criteria": {
+  "f1": true,
+  "f2": true,
+  "f3": true,
+  "f4": true,
+  "complete": true
+ }
+}

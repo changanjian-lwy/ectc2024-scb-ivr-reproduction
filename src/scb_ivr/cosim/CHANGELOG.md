@@ -30,6 +30,12 @@ switch off at t_drv (latched). Records: "short_log", "fault", "fault_trace".
   test_cosim_fault (6).
 - cosim_regression --quick and --full PASS.
 
+**Adopted (A259's registered rule, 2026-10-28; f1-f4 pass):** fault {i_a 220, n 3, uv_v 0.9, uv_ns 400, uv_mask_us 0,
+iavg_a 350, avg_us 10} joins the final configuration, latched.
+- Shorts (0.25 / 1 mOhm) trip on under-voltage 0.52-0.91 us in, at 174-175 A.
+- 200 % trips on the fault level at 3.38 us (283.3 A); 150 % on the average at 8.8 us.
+- The legit rows closest to each detector are equal bit for bit.
+
 ## 2026-10-28 (A258) - a ceiling on the limit's count (bridge)
 
 **Source:** A256's count has no ceiling. While the limit is suspended, every pulse it would have cut counts +1, so a
