@@ -108,6 +108,10 @@ release to a constant-current load (a true no load with no step), without r_load
 Periodic load (cfg "load_pulse" {"t_us", "t_stop_us", "i_lo_a", "i_hi_a", "f_khz", "duty", "slew_a_us"}, A240): from
 t_us a trapezoid current on top of the load, starting at i_hi_a: i_hi_a for duty of each period, down to i_lo_a and
 back up at slew_a_us (A/us); i_hi_a again from t_stop_us on. With t_load_off_us = t_us it is the whole load.
+Output short (cfg "short" {"t_us", "r_mohm", "t_end_us"}, A259; absent = none): from the first window at or after
+t_us until t_end_us (absent = to the end) a resistance r_mohm sits across the output, in parallel with r_load (the
+plant's systems are rebuilt at each change). Unlike a load step, its current falls with Vo, so it stays physical after
+a shutdown. Record "short_log" (t_s, r_ohm of the whole resistive load).
 Cycle-by-cycle peak current limit (cfg "ocp" {"i_a", "t_ns" 0}, A253; absent = off): a comparator in the driver's
 path, outside the controller. While a high side is on, the first window end that finds its phase current >= i_a
 schedules that high side's turn-off at the crossing (linear between the window ends, ocp_cross) + t_ns + t_drv. If the
@@ -402,6 +406,15 @@ class ModuleSim:
         self.bal = cfg.get("bal")                                    # A245
         if self.bal is not None and set(self.bal) - {"band_v", "step_q4", "max_ns"}:
             raise ValueError(f"cfg 'bal': unknown keys {sorted(set(self.bal) - {'band_v', 'step_q4', 'max_ns'})}")
+        self.short = cfg.get("short")                                # A259: an output short across r_load
+        if self.short is not None:
+            if set(self.short) - {"t_us", "r_mohm", "t_end_us"} or p.load_kind != "r" or not self.short["r_mohm"] > 0:
+                raise ValueError(f"cfg 'short': needs t_us, r_mohm > 0 (t_end_us optional) on a resistive load: {self.short}")
+            self.r_base = p.r_load
+            self.r_short = 1.0 / (1.0 / p.r_load + 1.0 / (float(self.short["r_mohm"]) * 1e-3))
+            end = self.short.get("t_end_us")
+            self.t_short = (float(self.short["t_us"]) * 1e-6, float("inf") if end is None else float(end) * 1e-6)
+            self.short_log = []
         off = cfg.get("t_load_off_us")                               # A237: the resistive load disconnects
         self.t_load_off = None if off is None else float(off) * 1e-6
         t_clk = cfg["t_clk_ns"] * 1e-9
@@ -1040,6 +1053,11 @@ class ModuleSim:
         self.adc_vin.clear()
         c.set("hand_req", int(plant.t >= p.t_hand or self.hand["lat"]))   # A186: or the Vo-triggered request
         plant.load_on = plant.t >= p.t_load and (self.t_load_off is None or plant.t < self.t_load_off)   # A237
+        if self.short is not None:                                   # A259
+            r = self.r_short if self.t_short[0] <= plant.t < self.t_short[1] else self.r_base
+            if r != p.r_load:
+                plant.set_r_load(r)
+                self.short_log.append({"t_s": plant.t, "r_ohm": r})
         if self.en["t"] is None and plant.t >= self.t_en:        # A102: arm the branches (each starts at its
             plant.aux_armed = [True] * self.na; self.en["t"] = plant.t   # next low-side turn-off)
 
@@ -1145,6 +1163,8 @@ class ModuleSim:
             out["zcd_log"] = self.ph_log
         if self.gated:                                               # A164
             out["overlaps_cmd"] = ovl["cmd"]
+        if self.short is not None:                                   # A259
+            out["short_log"] = self.short_log
         if self.dep_on:                                              # A132
             out["dep_log"] = self.dep_log
         if self.sink_on:                                             # A238

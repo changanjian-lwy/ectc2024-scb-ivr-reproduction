@@ -336,6 +336,15 @@ class FastPlant:
             from scb_ivr.cosim.gate import GateEdges
             self.gm = GateEdges(self)
 
+    def set_r_load(self, r):
+        """A259: the resistive load from now on (r_load in parallel with an output short). Every cached system holds
+        the old conductance, so all are dropped and rebuilt on their next use."""
+        self.p.r_load = float(r)
+        self.sim.cache.clear()
+        for nm in ("_term", "_hfrev", "_pcache", "_kent"):
+            if hasattr(self.sim, nm):
+                getattr(self.sim, nm).clear()
+
     def eff(self, j):
         """Switch j's physical conduction: the commanded gate, except during a gate-model edge (A163)."""
         a = (self.gh + self.gl)[j]
@@ -852,6 +861,13 @@ class KernelPlant2(KernelPlant):
             setattr(r, nm, getattr(mon, nm).ctypes.data)
         r.vmin_zero = int(mon.vmin_zero)
         self._mon = mon
+
+    def set_r_load(self, r):
+        """FastPlant.set_r_load, and the C loop's table entries too."""
+        super().set_r_load(r)
+        for k in self._table_keep:
+            self._table[k] = None
+        self._table_keep.clear()
 
     def _register(self, key):
         """KernelSim's topology entry for the C key (cond bits, donly bits, euler, load_on, then A101's branch
