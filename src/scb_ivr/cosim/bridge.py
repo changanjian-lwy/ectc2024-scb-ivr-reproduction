@@ -124,6 +124,19 @@ capacitors (A254). While it is suspended, a pulse the limit would have cut still
 count is back at 0. With "n_cap" m (A258; absent = no cap) a count stops at m, so the limit acts again m clean pulses
 after an overload ends, however long it lasted; it needs 0 < n_susp <= m, or the limit could never suspend. Record
 "ocp_susp" (t_s, phase, on).
+Fault trip (cfg "fault", A259; absent = none): a shutdown in the driver's path, beside "ocp". Each detector is
+optional and any of them trips:
+- "i_a" with "n" (needs "ocp"): a second level beside the limit that never suspends. A pulse whose phase current
+  reaches i_a at a window end while its high side is on is cut like the limit's (crossing + t_ns + t_drv) and counts
+  +1 on its phase at the turn-off, a clean pulse -1 (floor 0); n trips (TI TPS546D24A's high-side short circuit:
+  pulse-by-pulse limiting for 3 cycles, then both FETs off; its up/down count, default 3).
+- "uv_v" with "uv_ns" and "uv_mask_us": Vo below uv_v at every window end for uv_ns trips; it acts from uv_mask_us
+  after mode P (TPS546D24A's UV is not active during the soft start).
+- "iavg_a" with "avg_us": the sum of the phase currents, averaged over the last avg_us of window ends, above iavg_a
+  trips (Renesas ISL68222's total-current fault with a response delay).
+At a trip the driver blocks every command scheduled t_drv or later after it and turns every switch off at t_drv
+(latched off; no restart). Record "fault" {t_s, cause, phase, value, t_off_s, vds_max_after_v, i_max_after_a} and
+"fault_trace" (every 50 ns for 5 us after the trip, then every 1 us: t_s, vo, i, vcs, vds_max).
 Zero-voltage valley (cfg "valley_zero" 1, A111; also inside "aux" for A101's branch): the high side's measured
 valley stops at its first V_DS <= 0, so the predictive turn-on is corrected toward the node's arrival at the rail
 instead of reporting a flat valley; it changes nothing while V_DS stays above zero.
@@ -172,6 +185,7 @@ zvs_waits, e_zvs_j and active_zvs_s per switch), gate "miller" 1 lets an off gat
 makes a conducting switch position that resistance instead of g_on (set circuit "R" to what is left in series with
 the inductor); the record adds "r_sw_ohm".
 """
+from collections import deque
 import gzip
 import heapq
 from concurrent.futures import ThreadPoolExecutor
@@ -630,6 +644,13 @@ class ModuleSim:
             if self.ocp_cap is not None and not 0 < self.ocp_n <= self.ocp_cap:   # a ceiling below n_susp never suspends
                 raise ValueError(f"cfg 'ocp': n_cap needs 0 < n_susp <= n_cap: {self.ocp}")
             self.ocp_cnt, self.ocp_probe, self.ocp_susp, self.ocp_susp_log = [0] * N, [None] * N, False, []
+        self.fault = cfg.get("fault")                             # A259: the fault trip
+        if self.fault is not None:
+            keys = {"i_a", "n", "uv_v", "uv_ns", "uv_mask_us", "iavg_a", "avg_us"}
+            if set(self.fault) - keys or ("i_a" in self.fault and self.ocp is None):
+                raise ValueError(f"cfg 'fault': keys {sorted(keys)}, and i_a needs 'ocp': {self.fault}")
+            self.flt = {"t": None, "block": None, "rec": None, "hit": [False] * N, "cnt": [0] * N, "uv_t0": None,
+                        "q": 0.0, "prev": None, "acc": deque(), "next": 0.0, "trace": [], "vds": 0.0, "imax": 0.0}
         self.im = [plant.sim.idx[f"m{k}"] for k in p.aux_phases]
         self.drv = cfg.get("driver")                             # A91: driver timing model
         if self.drv and not 0.0 <= self.drv.get("hs_on_lead_ns", 0.0) < cfg["t_drv_ns"]:
@@ -840,10 +861,79 @@ class ModuleSim:
             self.ocp_susp = False
             self.ocp_susp_log.append({"t_s": self.plant.t, "phase": k + 1, "on": 0})
 
+    def fault_count(self, k):
+        """A259: phase k's high side turns off: its pulse counts +1 if it reached the fault level, else -1."""
+        f, n = self.flt, int(self.fault["n"])
+        f["cnt"][k] = min(f["cnt"][k] + 1, n) if f["hit"][k] else max(f["cnt"][k] - 1, 0)
+        f["hit"][k] = False
+        if f["cnt"][k] >= n and f["t"] is None:
+            self.fault_trip("peak", k + 1, float(self.plant.y[self.nv + k]))
+
+    def fault_trip(self, cause, phase, value):
+        """A259: block the driver from t_drv on and turn every switch off then."""
+        f, plant = self.flt, self.plant
+        f["t"], f["block"] = plant.t, plant.t + self.t_drv
+        f["rec"] = {"t_s": plant.t, "cause": cause, "phase": phase, "value": value, "t_off_s": None}
+        f["next"] = plant.t
+        heapq.heappush(self.pend, (f["block"], self.seq[0], -2, 0, None)); self.seq[0] += 1
+
+    def fault_off(self):
+        plant = self.plant
+        for j in range(2 * N):
+            if plant.gh[j] if j < N else plant.gl[j - N]:
+                plant.set_gate(j, 0)
+        self.hs_on = [False] * N
+        if self.ocp is not None:
+            self.ocp_armed = [False] * N
+        self.flt["rec"]["t_off_s"] = plant.t
+
+    def fault_check(self):
+        """A259: the detectors at a window end, and the record after a trip."""
+        f, fc, plant, nv = self.flt, self.fault, self.plant, self.nv
+        t, vo = plant.t, float(plant.y[self.i_out])
+        i = [float(plant.y[nv + k]) for k in range(N)]
+        if f["t"] is not None:
+            vds = max(plant.vds(q) for q in range(2 * N))
+            f["vds"], f["imax"] = max(f["vds"], vds), max(f["imax"], max(abs(x) for x in i))
+            if t >= f["next"]:
+                f["trace"].append({"t_s": t, "vo": vo, "i": i, "vds_max": vds,
+                                   "vcs": [float(plant.y[plant.sim.idx[f"a{q}"]] - plant.y[plant.sim.idx[f"x{q}"]])
+                                           for q in range(1, N)]})
+                f["next"] = t + (50e-9 if t - f["t"] < 5e-6 else 1e-6)
+            return
+        if "i_a" in fc:
+            for k in range(N):
+                if self.hs_on[k] and i[k] >= fc["i_a"] and not f["hit"][k]:
+                    f["hit"][k] = True                           # cut even while the limit is suspended
+                    t0, i0 = self.ocp_prev if self.ocp_prev is not None else (t, i)
+                    ta = ocp_cross(t0, i0[k], t, i[k], fc["i_a"]) + self.ocp_t + self.t_drv
+                    heapq.heappush(self.pend, (ta, self.seq[0], k, 0, {"how": None, "bind": False, "ocp": True, "flt": True}))
+                    self.seq[0] += 1
+        if "uv_v" in fc and self.st["t_mode_p"] is not None and t >= self.st["t_mode_p"] + fc["uv_mask_us"] * 1e-6:
+            if vo >= fc["uv_v"]:
+                f["uv_t0"] = None
+            elif f["uv_t0"] is None:
+                f["uv_t0"] = t
+            elif t - f["uv_t0"] >= fc["uv_ns"] * 1e-9:
+                return self.fault_trip("uv", None, vo)
+        if "iavg_a" in fc:
+            s = sum(i)
+            if f["prev"] is not None:
+                f["q"] += 0.5 * (s + f["prev"][1]) * (t - f["prev"][0])
+            f["prev"] = (t, s)
+            acc, w = f["acc"], fc["avg_us"] * 1e-6
+            acc.append((t, f["q"]))
+            while len(acc) > 1 and acc[1][0] <= t - w:
+                acc.popleft()
+            if t - acc[0][0] >= w and (f["q"] - acc[0][1]) / (t - acc[0][0]) > fc["iavg_a"]:
+                return self.fault_trip("avg", None, (f["q"] - acc[0][1]) / (t - acc[0][0]))
+
     def apply(self, j, level, meta):
         cfg, p, plant, nv, mon, st, mlo, ovl = self.cfg, self.p, self.plant, self.nv, self.mon, self.st, self.mlo, self.ovl
         to_lsb, na = self.to_lsb, self.na
         k = j % N
+        if self.fault is not None and "i_a" in self.fault and j < N and not level and self.hs_on[k]:
+            self.fault_count(k)                                  # A259 (before the limit's bookkeeping)
         if self.ocp is not None and j < N:                        # A253
             if meta.get("ocp"):                                  # (run_window drops it if the on-time ended first)
                 self.ocp_done[k] = True
@@ -1066,11 +1156,17 @@ class ModuleSim:
         pend = self.pend
         while pend and pend[0][0] < t_win_end:
             ta, _, j, lvl, meta = heapq.heappop(pend)
-            if meta and meta.get("ocp") and (not self.hs_on[j] or self.ocp_susp):   # A253: ended first; A256: suspended
+            if self.fault is not None and self.flt["block"] is not None and ta >= self.flt["block"] and j != -2:
+                continue                                         # A259: blocked by the trip (no step to its time)
+            # A253: the pulse ended first; A256: the limit is suspended (A259: its fault level's cut still acts)
+            if meta and meta.get("ocp") and (not self.hs_on[j] or (self.ocp_susp and not meta.get("flt"))):
                 if self.hs_on[j]:
                     self.ocp_probe[j] = ta                       # suspended after it was scheduled: counted only
                 continue                                         # (no step to its time)
             self.integrate_to(ta)
+            if j == -2:                                         # A259: the trip's shutdown
+                self.fault_off()
+                continue
             if j < 0:                                           # A216: a paused module's tick
                 self.section(tick=True)
                 continue
@@ -1097,6 +1193,8 @@ class ModuleSim:
     def sample(self):
         """The comparators at the window end."""
         plant, nv, mon, c = self.plant, self.nv, self.mon, self.ctl
+        if self.fault is not None:                                   # A259
+            self.fault_check()
         ci = czl = czh = cva = 0
         for k in range(N):
             ci |= int(plant.y[nv + k] <= self.i_tgt + self.trim_now[k] * self.lsb_a) << k
@@ -1165,6 +1263,10 @@ class ModuleSim:
             out["overlaps_cmd"] = ovl["cmd"]
         if self.short is not None:                                   # A259
             out["short_log"] = self.short_log
+        if self.fault is not None:                                   # A259
+            out["fault"] = None if self.flt["rec"] is None else dict(self.flt["rec"], vds_max_after_v=self.flt["vds"],
+                                                                       i_max_after_a=self.flt["imax"])
+            out["fault_trace"] = self.flt["trace"]
         if self.dep_on:                                              # A132
             out["dep_log"] = self.dep_log
         if self.sink_on:                                             # A238

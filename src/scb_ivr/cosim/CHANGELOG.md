@@ -4,6 +4,32 @@ History lives here and in the experiments' BOUNDARY/RESULTS, not in the
 code. Each entry names its source and the gate that showed it changes no
 result.
 
+## 2026-10-28 (A259) - an output short (plant) and a latched fault trip (bridge)
+
+**Source:** D89. Once the limit suspends, the loop carries an overload up to about 136 % within 200 A. Above that,
+nothing stops the current. A259's arm d ran the final configuration with no fault path: under a short or a 200 %
+load, the first pulse after the suspension reaches 322-390 A, and the run reaches 445-668 A and V_DS 53.6-82.0 V.
+
+Plant: FastPlant / KernelPlant2 `set_r_load(r)`. It drops every cached system: sim.cache, _term, _hfrev, _pcache,
+_kent, and the C table's entries.
+
+Bridge cfg "short" {t_us, r_mohm, t_end_us} puts a resistance across the output, in parallel with r_load. Unlike a
+load step, its current falls with Vo, so it stays physical after a shutdown.
+
+Bridge cfg "fault" adds three optional detectors, each in the driver's path like "ocp":
+- a fault level i_a that cuts a pulse even while the limit is suspended, with an up/down count n that trips
+  (TI TPS546D24A);
+- under-voltage uv_v held for uv_ns, from uv_mask_us after mode P on (TPS54A20 / TPS546D24A);
+- the avg_us mean of the phase currents' sum above iavg_a (Renesas ISL68222's total current).
+
+Any detector trips. The driver then blocks every command scheduled t_drv or later after the trip and turns every
+switch off at t_drv (latched). Records: "short_log", "fault", "fault_trace".
+
+**Gate:** both are absent by default, and then no new code acts on the plant.
+- tests: test_cosim_short (3: rebuilt systems bit for bit, the change takes effect, the C table emptied) and
+  test_cosim_fault (6).
+- cosim_regression --quick and --full PASS.
+
 ## 2026-10-28 (A258) - a ceiling on the limit's count (bridge)
 
 **Source:** A256's count has no ceiling. While the limit is suspended, every pulse it would have cut counts +1, so a
