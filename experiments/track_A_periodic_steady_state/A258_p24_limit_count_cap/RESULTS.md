@@ -1,5 +1,5 @@
 # A258 - a ceiling on the limit's count, so it re-arms soon after an overload (RESULTS)
-Boundary: 78a86f9 (bridge option 2071bc7). Plant V7, one module, 25 C. Records: cosim/run_{s,c}_*.json, 13 runs from
+Boundary: 78a86f9 (bridge option 2071bc7). Plant V7, one module, 25 C (S75h: slow devices at 125 C). Records: cosim/run_{s,c}_*.json, 13 runs from
 78a86f9 (cosim_sources_modified False; release records-a258). Analysis: a258_analyze.py -> a258_summary.json.
 Figure: a258_figure.py -> a258_count_cap.png. Peaks are gate-level turn-off currents (gate_offs_last i_max_a, A240's q1).
 
@@ -55,10 +55,12 @@ existed. train_row() takes the same quantities from the train's start; it passes
   A train that starts sooner meets a loop that is still recovering; that case was not run. The re-arm cannot come
   sooner than 6 clean pulses on every phase, about 2.4 us at 2.5 MHz, because a ceiling below n_susp would stop the
   limit from ever suspending (the bridge now refuses it, fae6272). A train inside that window starts unprotected;
-  A246's unprotected N75 train first passed 200 A 3.9 us after its start.
+  A246's unprotected N75 train first passed 200 A 3.9 us after its start. A count replay on this experiment's arm-s
+  trains (D89) re-arms the limit 2.2 us into a train that starts at the ceiling: only 3-7 % of the train's pulses
+  last the 11 ns from the 110 A crossing to a cut.
 - With lows too short for A256's count to recover, the ceiling re-arms the limit where A256 would not. Each re-arm
   then costs at most 6 cuts per phase before the next suspension (n_susp 6), each with A256's hand-back kick
   (+11-14 A on S75h). This bound comes from the mechanism, not from a run: in ro_S75h both arms re-armed in every
   low.
-- One module, 25 C, 2.2 nH (110 A level). The 125 / 140 A levels on 2.933 / 3.813 nH carry the same count logic but
+- One module, 25 C (S75h 125 C), 2.2 nH (110 A level). The 125 / 140 A levels on 2.933 / 3.813 nH carry the same count logic but
   were not run with n_cap.

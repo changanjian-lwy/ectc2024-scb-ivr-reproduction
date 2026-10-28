@@ -69,7 +69,7 @@ on V7 from V5: F0 −0.2825, S0 +0.3275, N13 −0.22 ns (Vo(143.5 µs) 1.0360 / 
 V5's (records `A235_p24_v7_corner_boards/cosim/`, release records-a235).
 
 **+62.5 A (125 % load) on the 2.2 nH boards (A255, 2026-10-27, plant V7, final configuration before the peak limit, one
-module, 25 °C, step at 500 µs):** N75 182.0 A, S75h 185.6 A ✓; Vo minimum 990.0 / 988.5 mV, back within 0.2 mV of 1 V
+module, 25 °C (S75h: slow devices at 125 °C), step at 500 µs):** N75 182.0 A, S75h 185.6 A ✓; Vo minimum 990.0 / 988.5 mV, back within 0.2 mV of 1 V
 at the end; ladder deviation 0.35 V; V_DS 27.9 / 30.9 V. With the peak limit and its suspension (A256) the same rows are
 182.1 / 185.4 A (records `A255_p24_overload_on_2p2nh/cosim/run_h_o125_*.json`, `A256_p24_limit_suspends_on_overload/cosim/run_s_o125_*.json`,
 releases records-a255 / records-a256).
@@ -401,8 +401,18 @@ modules. Those columns of Section 3 remain V5 results with 3.0 Ω on the low sid
         at 6 (n_cap 6) it re-arms 2.9 / 3.9 µs after the release and the train holds 198.0 / 187.3 A. Margin on N75:
         2.0 A, with the train 10 µs after the release (Vo still 5.3 mV high then); a train sooner after it was not run.
         A 100 kHz train with 125 % highs on S75h is identical with and without the ceiling (187.0 A).
-      - **Not run:** overloads above 125 %, a train less than 10 µs after an overload ends, and a
-        real fault (a short circuit needs a total over-current trip with hiccup; TI TPS54A20, an SCB, pre-charges Ct to
+      - **Overload rating (D89, records only):** once the limit suspends, the loop carries the overload and the
+        steady peak rises 0.539-0.544 A per ampere of load on N0 / N75 / S75h / N13 (100 → 125 %; a fixed valley
+        gives 0.5 plus the valley's 0.3-0.4 A shift). Extrapolated, it reaches 200 A at 136.4 % (S75h, 341 A) to
+        139.5 % (N13): **the module carries about 136 % within the budget**. Above that a suspended limit lets the
+        peak through. A total over-current trip would be needed, and none is modelled.
+      - **A train while the limit is suspended (D89):** a count replay on A258's unprotected trains finds only 3-7 %
+        of their pulses lasting the 11 ns from the 110 A crossing to a cut. The replay matches the recorded suspension
+        exactly and the re-arm within 0.6 µs at 168 A. From the ceiling, the train's own clean pulses re-arm the limit
+        2.2 µs in; unprotected 1 MHz trains first passed 200 A 3.9-14.7 µs in. A train starting during the release
+        transient is not run.
+      - **Not run:** overloads above 125 % in co-simulation, a train 0-10 µs after an overload ends, and a real
+        fault (a short circuit needs a total over-current trip with hiccup; TI TPS54A20, an SCB, pre-charges Ct to
         Vin / 2 on restart).
       - **Evidence:** figures `A254_p24_peak_limit_measured_level/a254_peak_limit.png` and
         `A256_p24_limit_suspends_on_overload/a256_limit_suspends.png`; records `A256_p24_limit_suspends_on_overload/cosim/run_s_o125_S75h.json`

@@ -2545,8 +2545,15 @@ each question:
            the train holds 198.0 / 187.3 A. A256's suspending rows equal
            up to the earlier re-arm. Accepted 15 / 0; n_cap 6 joins the
            final configuration by the registered rule.
-         - Not run: > 125 %, a train < 10 us after an overload ends (N75
-           margin 2.0 A at 10 us), a real fault (no hiccup path).
+         - D89 (records only): the module carries about 136 % within
+           200 A once the limit suspends (peak +0.54 A per A of load;
+           200 A at 136.4-139.5 % on the four boards). A train that
+           starts while the limit is suspended re-arms it 2.2 us in
+           (count replay on A258's unprotected trains, 3-7 % of pulses
+           would be cut).
+         - Not run: > 125 % in co-simulation, a train 0-10 us after an
+           overload ends (N75 margin 2.0 A at 10 us), a real fault (no
+           hiccup path).
 4. **Device realism (physical model).** Repeat A69 with nonlinear GS61008T
    Coss (datasheet) and, if a public vendor model exists, with it. The
    question is whether ZVS margin and stability survive.
