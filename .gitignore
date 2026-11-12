@@ -54,3 +54,11 @@ log_*.txt
 sim_build*/
 results.xml
 plant_kernel*.so
+
+# Local cosim records and run logs: published as GitHub release assets (records-*), not committed
+# (records committed before this rule stay tracked)
+experiments/**/run_*.json
+experiments/**/log_cfg_*.txt
+experiments/**/queue*.txt
+extensions/**/run_*.json
+extensions/**/runs/
