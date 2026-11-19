@@ -108,7 +108,7 @@ def margin():
         ax.text(lo - 0.3, y, f"{hi:.1f} A" if hi - lo < 0.05 else f"{lo:.1f}–{hi:.1f} A", va="center", ha="right",
                 fontsize=9.5)
     ax.axvline(200, color="#222", lw=1.2, ls="--")
-    ax.text(200.1, len(rows) - 0.55, "200 A budget", fontsize=9, va="center")
+    ax.text(200.15, (len(rows) - 1) / 2, "200 A\nbudget", fontsize=9, va="center")
     ax.set_yticks(range(len(rows)), [r[0] for r in rows[::-1]], fontsize=9)
     ax.set_xlabel("Largest phase current after the step (A)")
     ax.set_xlim(185.5, 202.5)
